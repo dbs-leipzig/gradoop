@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.Collections;
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * The Factory the vertices are created with.</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMVertexFactory vertexFactory;
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * Reduce object instantiation.</em>
@@ -66,7 +66,7 @@
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * @param newVertexLabel  The new vertex Label.</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * @param newPropertyName The new property key.</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(EPGMVertexFactory factory, String newVertexLabel, String newPropertyName) {
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(VertexFactory&lt;EPGMVertex&gt; factory, String newVertexLabel, String newPropertyName) {
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = factory;
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">this</strong>.newVertexLabel = newVertexLabel;
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">this</strong>.newPropertyName = newPropertyName;

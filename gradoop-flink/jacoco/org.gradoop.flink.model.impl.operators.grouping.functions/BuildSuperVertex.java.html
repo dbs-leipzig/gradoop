@@ -22,7 +22,6 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
@@ -48,35 +47,27 @@ public class BuildSuperVertex&lt;V extends Vertex&gt; extends BuildBase
    * @param epgmVertexFactory vertex factory
    */
   public BuildSuperVertex(boolean useLabel, VertexFactory&lt;V&gt; epgmVertexFactory) {
-<span class="fc" id="L51">    super(useLabel);</span>
-<span class="fc" id="L52">    this.vertexFactory = epgmVertexFactory;</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L50">    super(useLabel);</span>
+<span class="fc" id="L51">    this.vertexFactory = epgmVertexFactory;</span>
+<span class="fc" id="L52">  }</span>
 
-  /**
-   * Creates a {@link EPGMVertex} object from the given {@link VertexGroupItem}
-   * and returns a new {@link org.apache.flink.graph.Vertex}.
-   *
-   * @param groupItem vertex group item
-   * @return vertex including new vertex data
-   * @throws Exception on failure
-   */
   @Override
   public V map(VertexGroupItem groupItem) throws Exception {
-<span class="fc" id="L65">    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());</span>
+<span class="fc" id="L56">    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());</span>
 
-<span class="fc" id="L67">    supVertex.setLabel(groupItem.getGroupLabel());</span>
-<span class="fc" id="L68">    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());</span>
-<span class="fc" id="L69">    setAggregateProperties(</span>
+<span class="fc" id="L58">    supVertex.setLabel(groupItem.getGroupLabel());</span>
+<span class="fc" id="L59">    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());</span>
+<span class="fc" id="L60">    setAggregateProperties(</span>
       supVertex,
-<span class="fc" id="L71">      groupItem.getAggregateValues(),</span>
-<span class="fc" id="L72">      groupItem.getLabelGroup().getAggregateFunctions());</span>
+<span class="fc" id="L62">      groupItem.getAggregateValues(),</span>
+<span class="fc" id="L63">      groupItem.getLabelGroup().getAggregateFunctions());</span>
 
-<span class="fc" id="L74">    return supVertex;</span>
+<span class="fc" id="L65">    return supVertex;</span>
   }
 
   @Override
   public TypeInformation&lt;V&gt; getProducedType() {
-<span class="fc" id="L79">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
+<span class="fc" id="L70">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

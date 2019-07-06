@@ -18,33 +18,35 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Returns a tuple which contains the source id and the edge and a tuple which contains the
  * target id and same edge.
+ *
+ * @param &lt;E&gt; edge type
  */
-public class VertexIdsWithEdge implements FlatMapFunction&lt;EPGMEdge, Tuple2&lt;GradoopId, EPGMEdge&gt;&gt; {
+public class VertexIdsWithEdge&lt;E extends Edge&gt; implements FlatMapFunction&lt;E, Tuple2&lt;GradoopId, E&gt;&gt; {
 
   /**
    * Reuse tuple to avoid instantiations.
    */
-  private Tuple2&lt;GradoopId, EPGMEdge&gt; reuseTuple;
+  private Tuple2&lt;GradoopId, E&gt; reuseTuple;
 
   /**
    * Constructor which instantiates the reuse tuple.
    */
-<span class="fc" id="L38">  public VertexIdsWithEdge() {</span>
-<span class="fc" id="L39">    reuseTuple = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L40">  public VertexIdsWithEdge() {</span>
+<span class="fc" id="L41">    reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector&lt;Tuple2&lt;GradoopId, EPGMEdge&gt;&gt; collector) throws Exception {
-<span class="fc" id="L44">    reuseTuple.setFields(edge.getSourceId(), edge);</span>
-<span class="fc" id="L45">    collector.collect(reuseTuple);</span>
-<span class="fc" id="L46">    reuseTuple.setFields(edge.getTargetId(), edge);</span>
+  public void flatMap(E edge, Collector&lt;Tuple2&lt;GradoopId, E&gt;&gt; collector) throws Exception {
+<span class="fc" id="L46">    reuseTuple.setFields(edge.getSourceId(), edge);</span>
 <span class="fc" id="L47">    collector.collect(reuseTuple);</span>
-<span class="fc" id="L48">  }</span>
+<span class="fc" id="L48">    reuseTuple.setFields(edge.getTargetId(), edge);</span>
+<span class="fc" id="L49">    collector.collect(reuseTuple);</span>
+<span class="fc" id="L50">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

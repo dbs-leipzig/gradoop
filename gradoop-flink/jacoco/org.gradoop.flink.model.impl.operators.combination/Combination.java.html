@@ -16,39 +16,46 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * Computes the combined graph from two logical graphs.
+ * Computes the combined graph from two base graph instances.
+ * Creates a new base graph by union of the vertex and edge sets of two
+ * input graphs. Vertex and edge equality is based on their respective
+ * identifiers.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-<span class="fc" id="L28">public class Combination implements BinaryGraphToGraphOperator {</span>
+<span class="fc" id="L39">public class Combination&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
-  /**
-   * Creates a new logical graph by union the vertex and edge sets of two
-   * input graphs. Vertex and edge equality is based on their respective
-   * identifiers.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return combined graph
-   */
   @Override
-  public LogicalGraph execute(LogicalGraph firstGraph,
-    LogicalGraph secondGraph) {
+  public LG execute(LG firstGraph, LG secondGraph) {
 
-<span class="fc" id="L43">    DataSet&lt;EPGMVertex&gt; newVertexSet = firstGraph.getVertices()</span>
-<span class="fc" id="L44">      .union(secondGraph.getVertices())</span>
-<span class="fc" id="L45">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L50">    DataSet&lt;V&gt; newVertexSet = firstGraph.getVertices()</span>
+<span class="fc" id="L51">      .union(secondGraph.getVertices())</span>
+<span class="fc" id="L52">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L47">    DataSet&lt;EPGMEdge&gt; newEdgeSet = firstGraph.getEdges()</span>
-<span class="fc" id="L48">      .union(secondGraph.getEdges())</span>
-<span class="fc" id="L49">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L54">    DataSet&lt;E&gt; newEdgeSet = firstGraph.getEdges()</span>
+<span class="fc" id="L55">      .union(secondGraph.getEdges())</span>
+<span class="fc" id="L56">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L51">    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);</span>
+<span class="fc" id="L58">    return firstGraph.getFactory().fromDataSets(newVertexSet, newEdgeSet);</span>
   }
 
 }

@@ -21,20 +21,15 @@ import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator
 
 /**
  * Computes the combined graph from a collection of logical graphs.
+ * Creates a new logical graph by union of the vertex and edge sets of all graphs
+ * contained in the given collection.
  */
-<span class="fc" id="L25">public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {</span>
+<span class="fc" id="L27">public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {</span>
 
-  /**
-   * Creates a new logical graph by union the vertex and edge sets of all graph
-   * contained in the given collection.
-   *
-   * @param collection input collection
-   * @return combined graph
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L36">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(</span>
-<span class="fc" id="L37">      collection.getVertices(), collection.getEdges());</span>
+<span class="fc" id="L31">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L32">      collection.getVertices(), collection.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

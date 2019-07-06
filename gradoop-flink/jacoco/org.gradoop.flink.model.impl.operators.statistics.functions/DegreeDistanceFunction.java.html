@@ -22,9 +22,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Calculates the distance of max degree and the degree of each vertex
- *
- * {@inheritDoc}
+ * A mapping function that converts the vertex degree to the distance of max degree and vertex
+ * degree.
  */
 public class DegreeDistanceFunction extends RichMapFunction&lt;WithCount&lt;GradoopId&gt;, Tuple1&lt;Long&gt;&gt; {
 
@@ -45,14 +44,13 @@ public class DegreeDistanceFunction extends RichMapFunction&lt;WithCount&lt;Grad
 
   /**
    * Creates an instance of {@link DegreeDistanceFunction}
-   * to calculate the distance of max degree degree and the degree of each vertex
    *
    * @param broadcastName name of broadcast variable
    */
-<span class="fc" id="L52">  public DegreeDistanceFunction(String broadcastName) {</span>
-<span class="fc" id="L53">    this.broadcastName = broadcastName;</span>
-<span class="fc" id="L54">    this.reuse = new Tuple1&lt;&gt;();</span>
-<span class="fc" id="L55">  }</span>
+<span class="fc" id="L50">  public DegreeDistanceFunction(String broadcastName) {</span>
+<span class="fc" id="L51">    this.broadcastName = broadcastName;</span>
+<span class="fc" id="L52">    this.reuse = new Tuple1&lt;&gt;();</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Function called to store broadcasted max degree.
@@ -62,24 +60,16 @@ public class DegreeDistanceFunction extends RichMapFunction&lt;WithCount&lt;Grad
    */
   @Override
   public void open(Configuration parameter) throws Exception {
-<span class="fc" id="L65">    super.open(parameter);</span>
-<span class="fc" id="L66">    maxDegree = getRuntimeContext()</span>
-<span class="fc" id="L67">      .&lt;WithCount&lt;GradoopId&gt;&gt;getBroadcastVariable(this.broadcastName)</span>
-<span class="fc" id="L68">      .get(0);</span>
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L63">    super.open(parameter);</span>
+<span class="fc" id="L64">    maxDegree = getRuntimeContext()</span>
+<span class="fc" id="L65">      .&lt;WithCount&lt;GradoopId&gt;&gt;getBroadcastVariable(this.broadcastName)</span>
+<span class="fc" id="L66">      .get(0);</span>
+<span class="fc" id="L67">  }</span>
 
-  /**
-   * Mapping function converting degree of vertex
-   * to distance of max degree and degree of vertex
-   *
-   * @param value degree of vertex
-   * @return degree distance
-   * @throws Exception throws any Exception
-   */
   @Override
   public Tuple1&lt;Long&gt; map(WithCount&lt;GradoopId&gt; value) throws Exception {
-<span class="fc" id="L81">    reuse.f0 = maxDegree.f1 - value.f1;</span>
-<span class="fc" id="L82">    return reuse;</span>
+<span class="fc" id="L71">    reuse.f0 = maxDegree.f1 - value.f1;</span>
+<span class="fc" id="L72">    return reuse;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -40,17 +40,17 @@
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * The modification operators is a unary graph operator that takes a logical</em>
+<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * The modification operators is a unary graph operator that takes a base</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * graph as input and applies user defined modification functions on the</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * elements of that graph as well as on its graph head.</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * The identity of the elements is preserved.</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; the EPGM graph head type</em>
-<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; the EPGM vertex type</em>
-<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; the EPGM edge type</em>
-<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * @param &lt;LG&gt; the logical graph type</em>
-<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> * @param &lt;GC&gt; the graph collection type</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt;  The graph head type.</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt;  The vertex type.</em>
+<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt;  The edge type.</em>
+<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * @param &lt;LG&gt; The type of the graph.</em>
+<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> * @param &lt;GC&gt; The type of the graph collection.</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="45" href="#45">45</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> Transformation&lt;
 <a name="46" href="#46">46</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
@@ -110,8 +110,8 @@
 <a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   * @param graphHeads graph heads</em>
 <a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * @param vertices vertices</em>
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * @param edges edges</em>
-<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * @param factory the factory that is responsible for creating an instance of the logical graph</em>
-<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * @return transformed logical graph</em>
+<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * @param factory the factory that is responsible for creating an instance of the base graph</em>
+<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * @return transformed base graph</em>
 <a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   */</em>
 <a name="106" href="#106">106</a>   <strong class="jxr_keyword">protected</strong> LG executeInternal(DataSet&lt;G&gt; graphHeads, DataSet&lt;V&gt; vertices, DataSet&lt;E&gt; edges,
 <a name="107" href="#107">107</a>     BaseGraphFactory&lt;G, V, E, LG, GC&gt; factory) {

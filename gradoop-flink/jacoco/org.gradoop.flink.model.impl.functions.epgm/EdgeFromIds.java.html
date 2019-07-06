@@ -21,21 +21,22 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Initializes an {@link EPGMVertex} from a given {@link GradoopId} triple.
- *
- * (edgeId, sourceId, targetId) -&gt; edge
- *
+ * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple.
+ * The triple contains (in that order) {@code edge id}, {@code source vertex id} and
+ * {@code target vertex id}
+ * &lt;p&gt;
  * Forwarded fields:
- *
- * f0-&gt;id:        edge id
- * f1-&gt;sourceId:  source vertex id
- * f2-&gt;targetId:  target vertex id
+ * &lt;p&gt;
+ * {@code f0-&gt;id:        edge id}
+ * &lt;p&gt;
+ * {@code f1-&gt;sourceId:  source vertex id}
+ * &lt;p&gt;
+ * {@code f2-&gt;targetId:  target vertex id}
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;id;f1-&gt;sourceId;f2-&gt;targetId&quot;)
 public class EdgeFromIds implements
@@ -52,28 +53,19 @@ public class EdgeFromIds implements
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-<span class="fc" id="L55">  public EdgeFromIds(EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory) {</span>
-<span class="fc" id="L56">    this.edgeFactory = epgmEdgeFactory;</span>
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L56">  public EdgeFromIds(EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory) {</span>
+<span class="fc" id="L57">    this.edgeFactory = epgmEdgeFactory;</span>
+<span class="fc" id="L58">  }</span>
 
-  /**
-   * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple. The
-   * triple consists of edge id, source vertex id and target vertex id.
-   *
-   * @param idTriple triple containing (in that order) edge id, source vertex
-   *                 id, target vertex id
-   * @return EPGM edge
-   * @throws Exception on failure
-   */
   @Override
   public EPGMEdge map(Tuple3&lt;GradoopId, GradoopId, GradoopId&gt; idTriple) throws
     Exception {
-<span class="fc" id="L71">    return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);</span>
+<span class="fc" id="L63">    return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);</span>
   }
 
   @Override
   public TypeInformation&lt;EPGMEdge&gt; getProducedType() {
-<span class="fc" id="L76">    return TypeExtractor.createTypeInfo(edgeFactory.getType());</span>
+<span class="fc" id="L68">    return TypeExtractor.createTypeInfo(edgeFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 1658,
+      <title>File: 1659,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -7522,20 +7522,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator.java">org/gradoop/flink/model/api/operators/BinaryGraphToValueOperator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.combination.Combination.java">org/gradoop/flink/model/impl/operators/combination/Combination.java</a>
                 </td>
                 <td>
@@ -9595,6 +9581,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.io.api.DataSource.java">org/gradoop/flink/io/api/DataSource.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator.java">org/gradoop/flink/model/api/operators/BinaryBaseGraphToValueOperator.java</a>
                 </td>
                 <td>
                   0
@@ -14214,20 +14214,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator.java">org/gradoop/flink/model/api/operators/BinaryGraphToGraphOperator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.sampling.RandomWalkSamplingTest.java">org/gradoop/flink/model/impl/operators/sampling/RandomWalkSamplingTest.java</a>
                 </td>
                 <td>
@@ -17770,6 +17756,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.epgm.BaseGraphOperators.java">org/gradoop/flink/model/api/epgm/BaseGraphOperators.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.CreateInitialExpandEmbeddingTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/functions/CreateInitialExpandEmbeddingTest.java</a>
                 </td>
                 <td>
@@ -18401,6 +18401,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.package-info.java">org/gradoop/flink/algorithms/gelly/connectedcomponents/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator.java">org/gradoop/flink/model/api/operators/BinaryBaseGraphToBaseGraphOperator.java</a>
                 </td>
                 <td>
                   0

@@ -57,8 +57,8 @@
 <a name="47" href="#47">47</a>      GradoopId target1 = GradoopId.get();
 <a name="48" href="#48">48</a>      GradoopId source2 = GradoopId.get();
 <a name="49" href="#49">49</a>      GradoopId target2 = GradoopId.get();
-<a name="50" href="#50">50</a>      EPGMEdge edge1 = getConfig().getEdgeFactory().createEdge(source1, target1);
-<a name="51" href="#51">51</a>      EPGMEdge edge2 = getConfig().getEdgeFactory().createEdge(source2, target2);
+<a name="50" href="#50">50</a>      EPGMEdge edge1 = getConfig().getLogicalGraphFactory().getEdgeFactory().createEdge(source1, target1);
+<a name="51" href="#51">51</a>      EPGMEdge edge2 = getConfig().getLogicalGraphFactory().getEdgeFactory().createEdge(source2, target2);
 <a name="52" href="#52">52</a>      Tuple2&lt;GradoopId, PropertyValue&gt; tuple1 = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(source1, PropertyValue.create(1L));
 <a name="53" href="#53">53</a>      Tuple2&lt;GradoopId, PropertyValue&gt; tuple2 = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(source2, PropertyValue.create(2L));
 <a name="54" href="#54">54</a>      List&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; result = getExecutionEnvironment()

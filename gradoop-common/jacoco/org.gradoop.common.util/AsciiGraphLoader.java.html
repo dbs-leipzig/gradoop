@@ -19,11 +19,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.s1ck.gdl.GDLHandler;
@@ -40,16 +40,16 @@ import java.util.Map;
  *
  * @see &lt;a href=&quot;https://github.com/s1ck/gdl&quot;&gt;GDL on GitHub&lt;/a&gt;
  *
- * @param &lt;G&gt; EPGM graph head type
- * @param &lt;V&gt; EPGM vertex type
- * @param &lt;E&gt; EPGM edge type
+ * @param &lt;G&gt; graph head type
+ * @param &lt;V&gt; vertex type
+ * @param &lt;E&gt; edge type
  */
 public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extends Edge&gt; {
 
   /**
-   * Gradoop configuration
+   * Factory provider for graph elements.
    */
-  private final GradoopConfig&lt;G, V, E&gt; config;
+  private final ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider;
 
   /**
    * Used to parse GDL scripts.
@@ -98,12 +98,12 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * Creates a new AsciiGraphLoader.
    *
    * @param gdlHandler GDL Handler
-   * @param config Gradoop configuration
+   * @param elementFactoryProvider Factory provider for EPGM elements.
    */
   private AsciiGraphLoader(GDLHandler gdlHandler,
-<span class="fc" id="L104">    GradoopConfig&lt;G, V, E&gt; config) {</span>
+<span class="fc" id="L104">                           ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider) {</span>
 <span class="fc" id="L105">    this.gdlHandler = gdlHandler;</span>
-<span class="fc" id="L106">    this.config = config;</span>
+<span class="fc" id="L106">    this.elementFactoryProvider = elementFactoryProvider;</span>
 
 <span class="fc" id="L108">    this.graphHeads     = Maps.newHashMap();</span>
 <span class="fc" id="L109">    this.vertices       = Maps.newHashMap();</span>
@@ -123,34 +123,34 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL string.
    *
-   * @param asciiGraph  GDL string
-   * @param config      Gradoop configuration
-   * @param &lt;G&gt; EPGM graph head type
-   * @param &lt;V&gt; EPGM vertex type
-   * @param &lt;E&gt; EPGM edge type
+   * @param asciiGraph GDL string
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param &lt;G&gt; graph head type
+   * @param &lt;V&gt; vertex type
+   * @param &lt;E&gt; edge type
    *
    * @return AsciiGraphLoader
    */
   public static
   &lt;G extends GraphHead, V extends Vertex, E extends Edge&gt;
   AsciiGraphLoader&lt;G, V, E&gt; fromString(String asciiGraph,
-    GradoopConfig&lt;G, V, E&gt; config) {
+                                       ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider) {
 <span class="fc" id="L138">    return new AsciiGraphLoader&lt;&gt;(new GDLHandler.Builder()</span>
 <span class="fc" id="L139">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
 <span class="fc" id="L140">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
 <span class="fc" id="L141">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
 <span class="fc" id="L142">      .buildFromString(asciiGraph),</span>
-      config);
+      elementFactoryProvider);
   }
 
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
-   * @param fileName  File that contains a GDL script
-   * @param config    Gradoop configuration
-   * @param &lt;G&gt; EPGM graph head type
-   * @param &lt;V&gt; EPGM vertex type
-   * @param &lt;E&gt; EPGM edge type
+   * @param fileName File that contains a GDL script
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param &lt;G&gt; graph head type
+   * @param &lt;V&gt; vertex type
+   * @param &lt;E&gt; edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException on failure
@@ -158,23 +158,24 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
   public static
   &lt;G extends GraphHead, V extends Vertex, E extends Edge&gt;
   AsciiGraphLoader&lt;G, V, E&gt; fromFile(String fileName,
-    GradoopConfig&lt;G, V, E&gt; config) throws IOException {
-<span class="fc" id="L162">    return new AsciiGraphLoader&lt;&gt;(new GDLHandler.Builder()</span>
-<span class="fc" id="L163">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
-<span class="fc" id="L164">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
-<span class="fc" id="L165">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
-<span class="fc" id="L166">      .buildFromFile(fileName),</span>
-      config);
+                                     ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider)
+    throws IOException {
+<span class="fc" id="L163">    return new AsciiGraphLoader&lt;&gt;(new GDLHandler.Builder()</span>
+<span class="fc" id="L164">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
+<span class="fc" id="L165">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
+<span class="fc" id="L166">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
+<span class="fc" id="L167">      .buildFromFile(fileName),</span>
+      elementFactoryProvider);
   }
 
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
-   * @param inputStream   File that contains a GDL script
-   * @param config        Gradoop configuration
-   * @param &lt;G&gt; EPGM graph head type
-   * @param &lt;V&gt; EPGM vertex type
-   * @param &lt;E&gt; EPGM edge type
+   * @param inputStream File that contains a GDL script
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param &lt;G&gt; graph head type
+   * @param &lt;V&gt; vertex type
+   * @param &lt;E&gt; edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException on failure
@@ -182,13 +183,14 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
   public static
   &lt;G extends GraphHead, V extends Vertex, E extends Edge&gt;
   AsciiGraphLoader&lt;G, V, E&gt; fromStream(InputStream inputStream,
-    GradoopConfig&lt;G, V, E&gt; config) throws IOException {
-<span class="nc" id="L186">    return new AsciiGraphLoader&lt;&gt;(new GDLHandler.Builder()</span>
-<span class="nc" id="L187">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
-<span class="nc" id="L188">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
-<span class="nc" id="L189">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
-<span class="nc" id="L190">      .buildFromStream(inputStream),</span>
-      config);
+                                       ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider)
+    throws IOException {
+<span class="nc" id="L188">    return new AsciiGraphLoader&lt;&gt;(new GDLHandler.Builder()</span>
+<span class="nc" id="L189">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
+<span class="nc" id="L190">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
+<span class="nc" id="L191">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
+<span class="nc" id="L192">      .buildFromStream(inputStream),</span>
+      elementFactoryProvider);
   }
 
   /**
@@ -200,9 +202,9 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param asciiGraph GDL string
    */
   public void appendFromString(String asciiGraph) {
-<span class="fc" id="L203">    this.gdlHandler.append(asciiGraph);</span>
-<span class="fc" id="L204">    init();</span>
-<span class="fc" id="L205">  }</span>
+<span class="fc" id="L205">    this.gdlHandler.append(asciiGraph);</span>
+<span class="fc" id="L206">    init();</span>
+<span class="fc" id="L207">  }</span>
 
   // ---------------------------------------------------------------------------
   //  Graph methods
@@ -214,8 +216,8 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return graphHeads
    */
   public Collection&lt;G&gt; getGraphHeads() {
-<span class="fc" id="L217">    return new ImmutableSet.Builder&lt;G&gt;()</span>
-<span class="fc" id="L218">      .addAll(graphHeads.values()).build();</span>
+<span class="fc" id="L219">    return new ImmutableSet.Builder&lt;G&gt;()</span>
+<span class="fc" id="L220">      .addAll(graphHeads.values()).build();</span>
   }
 
   /**
@@ -225,7 +227,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return graphHead or {@code null} if graph is not cached
    */
   public G getGraphHeadByVariable(String variable) {
-<span class="fc" id="L228">    return getGraphHeadCache().get(variable);</span>
+<span class="fc" id="L230">    return getGraphHeadCache().get(variable);</span>
   }
 
   /**
@@ -235,15 +237,15 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return graphHeads that are assigned to the given variables
    */
   public Collection&lt;G&gt;  getGraphHeadsByVariables(String... variables) {
-<span class="fc" id="L238">    Collection&lt;G&gt;  result =</span>
-<span class="fc" id="L239">      Sets.newHashSetWithExpectedSize(variables.length);</span>
-<span class="fc bfc" id="L240" title="All 2 branches covered.">    for (String variable : variables) {</span>
-<span class="fc" id="L241">      G graphHead = getGraphHeadByVariable(variable);</span>
-<span class="pc bpc" id="L242" title="1 of 2 branches missed.">      if (graphHead != null) {</span>
-<span class="fc" id="L243">        result.add(graphHead);</span>
+<span class="fc" id="L240">    Collection&lt;G&gt;  result =</span>
+<span class="fc" id="L241">      Sets.newHashSetWithExpectedSize(variables.length);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    for (String variable : variables) {</span>
+<span class="fc" id="L243">      G graphHead = getGraphHeadByVariable(variable);</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">      if (graphHead != null) {</span>
+<span class="fc" id="L245">        result.add(graphHead);</span>
       }
     }
-<span class="fc" id="L246">    return result;</span>
+<span class="fc" id="L248">    return result;</span>
   }
 
   // ---------------------------------------------------------------------------
@@ -256,7 +258,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return vertices
    */
   public Collection&lt;V&gt; getVertices() {
-<span class="fc" id="L259">    return new ImmutableSet.Builder&lt;V&gt;().addAll(vertices.values()).build();</span>
+<span class="fc" id="L261">    return new ImmutableSet.Builder&lt;V&gt;().addAll(vertices.values()).build();</span>
   }
 
   /**
@@ -266,7 +268,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return vertex or {@code null} if not present
    */
   public V getVertexByVariable(String variable) {
-<span class="fc" id="L269">    return vertexCache.get(variable);</span>
+<span class="fc" id="L271">    return vertexCache.get(variable);</span>
   }
 
   /**
@@ -276,14 +278,14 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return vertices
    */
   public Collection&lt;V&gt; getVerticesByVariables(String... variables) {
-<span class="fc" id="L279">    Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(variables.length);</span>
-<span class="fc bfc" id="L280" title="All 2 branches covered.">    for (String variable : variables) {</span>
-<span class="fc" id="L281">      V vertex = getVertexByVariable(variable);</span>
-<span class="pc bpc" id="L282" title="1 of 2 branches missed.">      if (vertex != null) {</span>
-<span class="fc" id="L283">        result.add(vertex);</span>
+<span class="fc" id="L281">    Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(variables.length);</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">    for (String variable : variables) {</span>
+<span class="fc" id="L283">      V vertex = getVertexByVariable(variable);</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">      if (vertex != null) {</span>
+<span class="fc" id="L285">        result.add(vertex);</span>
       }
     }
-<span class="fc" id="L286">    return result;</span>
+<span class="fc" id="L288">    return result;</span>
   }
 
   /**
@@ -293,13 +295,13 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return vertices that are contained in the graphs
    */
   public Collection&lt;V&gt; getVerticesByGraphIds(GradoopIdSet graphIds) {
-<span class="fc" id="L296">    Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(graphIds.size());</span>
-<span class="fc bfc" id="L297" title="All 2 branches covered.">    for (V vertex : vertices.values()) {</span>
-<span class="fc bfc" id="L298" title="All 2 branches covered.">      if (vertex.getGraphIds().containsAny(graphIds)) {</span>
-<span class="fc" id="L299">        result.add(vertex);</span>
+<span class="fc" id="L298">    Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(graphIds.size());</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">    for (V vertex : vertices.values()) {</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">      if (vertex.getGraphIds().containsAny(graphIds)) {</span>
+<span class="fc" id="L301">        result.add(vertex);</span>
       }
-<span class="fc" id="L301">    }</span>
-<span class="fc" id="L302">    return result;</span>
+<span class="fc" id="L303">    }</span>
+<span class="fc" id="L304">    return result;</span>
   }
 
   /**
@@ -309,11 +311,11 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return vertices that are contained in the graphs
    */
   public Collection&lt;V&gt; getVerticesByGraphVariables(String... graphVariables) {
-<span class="fc" id="L312">    GradoopIdSet graphIds = new GradoopIdSet();</span>
-<span class="fc bfc" id="L313" title="All 2 branches covered.">    for (G graphHead : getGraphHeadsByVariables(graphVariables)) {</span>
-<span class="fc" id="L314">      graphIds.add(graphHead.getId());</span>
-<span class="fc" id="L315">    }</span>
-<span class="fc" id="L316">    return getVerticesByGraphIds(graphIds);</span>
+<span class="fc" id="L314">    GradoopIdSet graphIds = new GradoopIdSet();</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">    for (G graphHead : getGraphHeadsByVariables(graphVariables)) {</span>
+<span class="fc" id="L316">      graphIds.add(graphHead.getId());</span>
+<span class="fc" id="L317">    }</span>
+<span class="fc" id="L318">    return getVerticesByGraphIds(graphIds);</span>
   }
 
   // ---------------------------------------------------------------------------
@@ -326,7 +328,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return edges
    */
   public Collection&lt;E&gt; getEdges() {
-<span class="fc" id="L329">    return new ImmutableSet.Builder&lt;E&gt;().addAll(edges.values()).build();</span>
+<span class="fc" id="L331">    return new ImmutableSet.Builder&lt;E&gt;().addAll(edges.values()).build();</span>
   }
 
   /**
@@ -336,7 +338,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return edge or {@code null} if not present
    */
   public E getEdgeByVariable(String variable) {
-<span class="fc" id="L339">    return edgeCache.get(variable);</span>
+<span class="fc" id="L341">    return edgeCache.get(variable);</span>
   }
 
   /**
@@ -346,14 +348,14 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return edges
    */
   public Collection&lt;E&gt; getEdgesByVariables(String... variables) {
-<span class="fc" id="L349">    Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(variables.length);</span>
-<span class="fc bfc" id="L350" title="All 2 branches covered.">    for (String variable : variables) {</span>
-<span class="fc" id="L351">      E edge = edgeCache.get(variable);</span>
-<span class="pc bpc" id="L352" title="1 of 2 branches missed.">      if (edge != null) {</span>
-<span class="fc" id="L353">        result.add(edge);</span>
+<span class="fc" id="L351">    Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(variables.length);</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">    for (String variable : variables) {</span>
+<span class="fc" id="L353">      E edge = edgeCache.get(variable);</span>
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">      if (edge != null) {</span>
+<span class="fc" id="L355">        result.add(edge);</span>
       }
     }
-<span class="fc" id="L356">    return result;</span>
+<span class="fc" id="L358">    return result;</span>
   }
 
   /**
@@ -363,13 +365,13 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return edges
    */
   public Collection&lt;E&gt;  getEdgesByGraphIds(GradoopIdSet graphIds) {
-<span class="fc" id="L366">    Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(graphIds.size());</span>
-<span class="fc bfc" id="L367" title="All 2 branches covered.">    for (E edge : edges.values()) {</span>
-<span class="fc bfc" id="L368" title="All 2 branches covered.">      if (edge.getGraphIds().containsAny(graphIds)) {</span>
-<span class="fc" id="L369">        result.add(edge);</span>
+<span class="fc" id="L368">    Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(graphIds.size());</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">    for (E edge : edges.values()) {</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">      if (edge.getGraphIds().containsAny(graphIds)) {</span>
+<span class="fc" id="L371">        result.add(edge);</span>
       }
-<span class="fc" id="L371">    }</span>
-<span class="fc" id="L372">    return result;</span>
+<span class="fc" id="L373">    }</span>
+<span class="fc" id="L374">    return result;</span>
   }
 
   /**
@@ -379,11 +381,11 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return edges
    */
   public Collection&lt;E&gt;  getEdgesByGraphVariables(String... variables) {
-<span class="fc" id="L382">    GradoopIdSet graphIds = new GradoopIdSet();</span>
-<span class="fc bfc" id="L383" title="All 2 branches covered.">    for (G graphHead : getGraphHeadsByVariables(variables)) {</span>
-<span class="fc" id="L384">      graphIds.add(graphHead.getId());</span>
-<span class="fc" id="L385">    }</span>
-<span class="fc" id="L386">    return getEdgesByGraphIds(graphIds);</span>
+<span class="fc" id="L384">    GradoopIdSet graphIds = new GradoopIdSet();</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">    for (G graphHead : getGraphHeadsByVariables(variables)) {</span>
+<span class="fc" id="L386">      graphIds.add(graphHead.getId());</span>
+<span class="fc" id="L387">    }</span>
+<span class="fc" id="L388">    return getEdgesByGraphIds(graphIds);</span>
   }
 
   // ---------------------------------------------------------------------------
@@ -396,8 +398,8 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return variable to graphHead mapping
    */
   public Map&lt;String, G&gt; getGraphHeadCache() {
-<span class="fc" id="L399">    return new ImmutableMap.Builder&lt;String, G&gt;().putAll(graphHeadCache)</span>
-<span class="fc" id="L400">      .build();</span>
+<span class="fc" id="L401">    return new ImmutableMap.Builder&lt;String, G&gt;().putAll(graphHeadCache)</span>
+<span class="fc" id="L402">      .build();</span>
   }
 
   /**
@@ -406,7 +408,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return variable to vertex mapping
    */
   public Map&lt;String, V&gt; getVertexCache() {
-<span class="fc" id="L409">    return new ImmutableMap.Builder&lt;String, V&gt;().putAll(vertexCache).build();</span>
+<span class="fc" id="L411">    return new ImmutableMap.Builder&lt;String, V&gt;().putAll(vertexCache).build();</span>
   }
 
   /**
@@ -415,7 +417,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return variable to edge mapping
    */
   public Map&lt;String, E&gt; getEdgeCache() {
-<span class="fc" id="L418">    return new ImmutableMap.Builder&lt;String, E&gt;().putAll(edgeCache).build();</span>
+<span class="fc" id="L420">    return new ImmutableMap.Builder&lt;String, E&gt;().putAll(edgeCache).build();</span>
   }
 
   // ---------------------------------------------------------------------------
@@ -426,110 +428,110 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * Initializes the AsciiGraphLoader
    */
   private void init() {
-<span class="fc" id="L429">    initGraphHeads();</span>
-<span class="fc" id="L430">    initVertices();</span>
-<span class="fc" id="L431">    initEdges();</span>
-<span class="fc" id="L432">  }</span>
+<span class="fc" id="L431">    initGraphHeads();</span>
+<span class="fc" id="L432">    initVertices();</span>
+<span class="fc" id="L433">    initEdges();</span>
+<span class="fc" id="L434">  }</span>
 
   /**
    * Initializes GraphHeads and their cache.
    */
   private void initGraphHeads() {
-<span class="fc bfc" id="L438" title="All 2 branches covered.">    for (Graph g : gdlHandler.getGraphs()) {</span>
-<span class="fc bfc" id="L439" title="All 2 branches covered.">      if (!graphHeadIds.containsKey(g.getId())) {</span>
-<span class="fc" id="L440">        initGraphHead(g);</span>
+<span class="fc bfc" id="L440" title="All 2 branches covered.">    for (Graph g : gdlHandler.getGraphs()) {</span>
+<span class="fc bfc" id="L441" title="All 2 branches covered.">      if (!graphHeadIds.containsKey(g.getId())) {</span>
+<span class="fc" id="L442">        initGraphHead(g);</span>
       }
-<span class="fc" id="L442">    }</span>
+<span class="fc" id="L444">    }</span>
 
-<span class="fc bfc" id="L444" title="All 2 branches covered.">    for (Map.Entry&lt;String, Graph&gt; e : gdlHandler.getGraphCache().entrySet()) {</span>
-<span class="fc" id="L445">      updateGraphCache(e.getKey(), e.getValue());</span>
-<span class="fc" id="L446">    }</span>
-<span class="fc" id="L447">  }</span>
+<span class="fc bfc" id="L446" title="All 2 branches covered.">    for (Map.Entry&lt;String, Graph&gt; e : gdlHandler.getGraphCache().entrySet()) {</span>
+<span class="fc" id="L447">      updateGraphCache(e.getKey(), e.getValue());</span>
+<span class="fc" id="L448">    }</span>
+<span class="fc" id="L449">  }</span>
 
   /**
    * Initializes vertices and their cache.
    */
   private void initVertices() {
-<span class="fc bfc" id="L453" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {</span>
-<span class="fc" id="L454">      initVertex(v);</span>
-<span class="fc" id="L455">    }</span>
+<span class="fc bfc" id="L455" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {</span>
+<span class="fc" id="L456">      initVertex(v);</span>
+<span class="fc" id="L457">    }</span>
 
-<span class="fc bfc" id="L457" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {</span>
-<span class="fc" id="L458">      updateVertexCache(e.getKey(), e.getValue());</span>
-<span class="fc" id="L459">    }</span>
-<span class="fc" id="L460">  }</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {</span>
+<span class="fc" id="L460">      updateVertexCache(e.getKey(), e.getValue());</span>
+<span class="fc" id="L461">    }</span>
+<span class="fc" id="L462">  }</span>
 
   /**
    * Initializes edges and their cache.
    */
   private void initEdges() {
-<span class="fc bfc" id="L466" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {</span>
-<span class="fc" id="L467">      initEdge(e);</span>
-<span class="fc" id="L468">    }</span>
+<span class="fc bfc" id="L468" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {</span>
+<span class="fc" id="L469">      initEdge(e);</span>
+<span class="fc" id="L470">    }</span>
 
-<span class="fc bfc" id="L470" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {</span>
-<span class="fc" id="L471">      updateEdgeCache(e.getKey(), e.getValue());</span>
-<span class="fc" id="L472">    }</span>
-<span class="fc" id="L473">  }</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {</span>
+<span class="fc" id="L473">      updateEdgeCache(e.getKey(), e.getValue());</span>
+<span class="fc" id="L474">    }</span>
+<span class="fc" id="L475">  }</span>
 
   /**
-   * Creates a new EPGMGraph from the GDL Loader.
+   * Creates a new Graph from the GDL Loader.
    *
    * @param g graph from GDL Loader
-   * @return EPGM graph head
+   * @return graph head
    */
   private G initGraphHead(Graph g) {
-<span class="fc" id="L482">    G graphHead = (G) config.getGraphHeadFactory().createGraphHead(</span>
-<span class="fc" id="L483">      g.getLabel(), Properties.createFromMap(g.getProperties()));</span>
-<span class="fc" id="L484">    graphHeadIds.put(g.getId(), graphHead.getId());</span>
-<span class="fc" id="L485">    graphHeads.put(graphHead.getId(), graphHead);</span>
-<span class="fc" id="L486">    return graphHead;</span>
+<span class="fc" id="L484">    G graphHead = elementFactoryProvider.getGraphHeadFactory().createGraphHead(</span>
+<span class="fc" id="L485">      g.getLabel(), Properties.createFromMap(g.getProperties()));</span>
+<span class="fc" id="L486">    graphHeadIds.put(g.getId(), graphHead.getId());</span>
+<span class="fc" id="L487">    graphHeads.put(graphHead.getId(), graphHead);</span>
+<span class="fc" id="L488">    return graphHead;</span>
   }
 
   /**
    * Creates a new Vertex from the GDL Loader or updates an existing one.
    *
    * @param v vertex from GDL Loader
-   * @return EPGM vertex
+   * @return vertex
    */
   private V initVertex(org.s1ck.gdl.model.Vertex v) {
     V vertex;
-<span class="fc bfc" id="L497" title="All 2 branches covered.">    if (!vertexIds.containsKey(v.getId())) {</span>
-<span class="fc" id="L498">      vertex = (V) config.getVertexFactory().createVertex(</span>
-<span class="fc" id="L499">        v.getLabel(),</span>
-<span class="fc" id="L500">        Properties.createFromMap(v.getProperties()),</span>
-<span class="fc" id="L501">        createGradoopIdSet(v));</span>
-<span class="fc" id="L502">      vertexIds.put(v.getId(), vertex.getId());</span>
-<span class="fc" id="L503">      vertices.put(vertex.getId(), vertex);</span>
+<span class="fc bfc" id="L499" title="All 2 branches covered.">    if (!vertexIds.containsKey(v.getId())) {</span>
+<span class="fc" id="L500">      vertex = elementFactoryProvider.getVertexFactory().createVertex(</span>
+<span class="fc" id="L501">        v.getLabel(),</span>
+<span class="fc" id="L502">        Properties.createFromMap(v.getProperties()),</span>
+<span class="fc" id="L503">        createGradoopIdSet(v));</span>
+<span class="fc" id="L504">      vertexIds.put(v.getId(), vertex.getId());</span>
+<span class="fc" id="L505">      vertices.put(vertex.getId(), vertex);</span>
     } else {
-<span class="fc" id="L505">      vertex = vertices.get(vertexIds.get(v.getId()));</span>
-<span class="fc" id="L506">      vertex.setGraphIds(createGradoopIdSet(v));</span>
+<span class="fc" id="L507">      vertex = vertices.get(vertexIds.get(v.getId()));</span>
+<span class="fc" id="L508">      vertex.setGraphIds(createGradoopIdSet(v));</span>
     }
-<span class="fc" id="L508">    return vertex;</span>
+<span class="fc" id="L510">    return vertex;</span>
   }
 
   /**
    * Creates a new Edge from the GDL Loader.
    *
    * @param e edge from GDL loader
-   * @return EPGM edge
+   * @return edge
    */
   private E initEdge(org.s1ck.gdl.model.Edge e) {
     E edge;
-<span class="fc bfc" id="L519" title="All 2 branches covered.">    if (!edgeIds.containsKey(e.getId())) {</span>
-<span class="fc" id="L520">      edge = (E) config.getEdgeFactory().createEdge(</span>
-<span class="fc" id="L521">        e.getLabel(),</span>
-<span class="fc" id="L522">        vertexIds.get(e.getSourceVertexId()),</span>
-<span class="fc" id="L523">        vertexIds.get(e.getTargetVertexId()),</span>
-<span class="fc" id="L524">        Properties.createFromMap(e.getProperties()),</span>
-<span class="fc" id="L525">        createGradoopIdSet(e));</span>
-<span class="fc" id="L526">      edgeIds.put(e.getId(), edge.getId());</span>
-<span class="fc" id="L527">      edges.put(edge.getId(), edge);</span>
+<span class="fc bfc" id="L521" title="All 2 branches covered.">    if (!edgeIds.containsKey(e.getId())) {</span>
+<span class="fc" id="L522">      edge = elementFactoryProvider.getEdgeFactory().createEdge(</span>
+<span class="fc" id="L523">        e.getLabel(),</span>
+<span class="fc" id="L524">        vertexIds.get(e.getSourceVertexId()),</span>
+<span class="fc" id="L525">        vertexIds.get(e.getTargetVertexId()),</span>
+<span class="fc" id="L526">        Properties.createFromMap(e.getProperties()),</span>
+<span class="fc" id="L527">        createGradoopIdSet(e));</span>
+<span class="fc" id="L528">      edgeIds.put(e.getId(), edge.getId());</span>
+<span class="fc" id="L529">      edges.put(edge.getId(), edge);</span>
     } else {
-<span class="fc" id="L529">      edge = edges.get(edgeIds.get(e.getId()));</span>
-<span class="fc" id="L530">      edge.setGraphIds(createGradoopIdSet(e));</span>
+<span class="fc" id="L531">      edge = edges.get(edgeIds.get(e.getId()));</span>
+<span class="fc" id="L532">      edge.setGraphIds(createGradoopIdSet(e));</span>
     }
-<span class="fc" id="L532">    return edge;</span>
+<span class="fc" id="L534">    return edge;</span>
   }
 
   /**
@@ -539,9 +541,9 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param g graph from GDL loader
    */
   private void updateGraphCache(String variable, Graph g) {
-<span class="fc" id="L542">    graphHeadCache.put(</span>
-<span class="fc" id="L543">      variable, graphHeads.get(graphHeadIds.get(g.getId())));</span>
-<span class="fc" id="L544">  }</span>
+<span class="fc" id="L544">    graphHeadCache.put(</span>
+<span class="fc" id="L545">      variable, graphHeads.get(graphHeadIds.get(g.getId())));</span>
+<span class="fc" id="L546">  }</span>
 
   /**
    * Updates the vertex cache.
@@ -550,8 +552,8 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param v vertex from GDL loader
    */
   private void updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
-<span class="fc" id="L553">    vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));</span>
-<span class="fc" id="L554">  }</span>
+<span class="fc" id="L555">    vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));</span>
+<span class="fc" id="L556">  }</span>
 
   /**
    * Updates the edge cache.
@@ -560,8 +562,8 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param e edge from GDL loader
    */
   private void updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
-<span class="fc" id="L563">    edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));</span>
-<span class="fc" id="L564">  }</span>
+<span class="fc" id="L565">    edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));</span>
+<span class="fc" id="L566">  }</span>
 
   /**
    * Creates a {@code GradoopIDSet} from the long identifiers stored at the
@@ -571,11 +573,11 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @return GradoopIDSet for the given element
    */
   private GradoopIdSet createGradoopIdSet(GraphElement e) {
-<span class="fc" id="L574">    GradoopIdSet result = new GradoopIdSet();</span>
-<span class="fc bfc" id="L575" title="All 2 branches covered.">    for (Long graphId : e.getGraphs()) {</span>
-<span class="fc" id="L576">      result.add(graphHeadIds.get(graphId));</span>
-<span class="fc" id="L577">    }</span>
-<span class="fc" id="L578">    return result;</span>
+<span class="fc" id="L576">    GradoopIdSet result = new GradoopIdSet();</span>
+<span class="fc bfc" id="L577" title="All 2 branches covered.">    for (Long graphId : e.getGraphs()) {</span>
+<span class="fc" id="L578">      result.add(graphHeadIds.get(graphId));</span>
+<span class="fc" id="L579">    }</span>
+<span class="fc" id="L580">    return result;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

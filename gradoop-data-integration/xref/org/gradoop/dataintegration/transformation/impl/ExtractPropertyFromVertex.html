@@ -155,10 +155,10 @@
 <a name="145" href="#145">145</a>       newVerticesAndOriginIds = candidates
 <a name="146" href="#146">146</a>         .groupBy(0)
 <a name="147" href="#147">147</a>         .reduceGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertexWithEqualityCondense.html">CreateNewVertexWithEqualityCondense</a>(
-<a name="148" href="#148">148</a>           logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));
+<a name="148" href="#148">148</a>           logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));
 <a name="149" href="#149">149</a>     } <strong class="jxr_keyword">else</strong> {
 <a name="150" href="#150">150</a>       newVerticesAndOriginIds = candidates
-<a name="151" href="#151">151</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,
+<a name="151" href="#151">151</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,
 <a name="152" href="#152">152</a>           newPropertyName));
 <a name="153" href="#153">153</a>     }
 <a name="154" href="#154">154</a> 
@@ -170,7 +170,7 @@
 <a name="160" href="#160">160</a>     DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();
 <a name="161" href="#161">161</a>     <strong class="jxr_keyword">if</strong> (!edgeDirection.equals(EdgeDirection.NONE)) {
 <a name="162" href="#162">162</a>       edges = newVerticesAndOriginIds
-<a name="163" href="#163">163</a>         .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewEdges.html">CreateNewEdges</a>(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,
+<a name="163" href="#163">163</a>         .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewEdges.html">CreateNewEdges</a>(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,
 <a name="164" href="#164">164</a>           edgeLabel))
 <a name="165" href="#165">165</a>         .union(edges);
 <a name="166" href="#166">166</a>     }

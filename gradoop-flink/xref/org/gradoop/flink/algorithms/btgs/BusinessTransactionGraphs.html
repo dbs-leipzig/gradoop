@@ -123,7 +123,7 @@
 <a name="113" href="#113">113</a> 
 <a name="114" href="#114">114</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = btgVerticesMap
 <a name="115" href="#115">115</a>       .map(<strong class="jxr_keyword">new</strong> Value0Of2&lt;&gt;())
-<a name="116" href="#116">116</a>       .map(<strong class="jxr_keyword">new</strong> NewBtgGraphHead&lt;&gt;(iig.getConfig().getGraphHeadFactory()));
+<a name="116" href="#116">116</a>       .map(<strong class="jxr_keyword">new</strong> NewBtgGraphHead&lt;&gt;(iig.getFactory().getGraphHeadFactory()));
 <a name="117" href="#117">117</a> 
 <a name="118" href="#118">118</a>     <em class="jxr_comment">// filter and update edges</em>
 <a name="119" href="#119">119</a>     DataSet&lt;EPGMEdge&gt; btgEdges = iig.getEdges()

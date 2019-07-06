@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.Row;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.List;
@@ -54,7 +54,7 @@
 <a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * The factory used to create the graph heads.</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">private</strong> EPGMGraphHeadFactory headFactory;
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">private</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; headFactory;
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * List containing names for the properties to be set.</em>
@@ -72,7 +72,7 @@
 <a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/result/functions/CreateGraphHeadWithProperties.html">CreateGraphHeadWithProperties</a>(
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">int</strong> start,
 <a name="64" href="#64">64</a>      <strong class="jxr_keyword">int</strong> end,
-<a name="65" href="#65">65</a>      EPGMGraphHeadFactory headFactory,
+<a name="65" href="#65">65</a>      GraphHeadFactory&lt;EPGMGraphHead&gt; headFactory,
 <a name="66" href="#66">66</a>      List&lt;String&gt; propertyNames) {
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>      <strong class="jxr_keyword">this</strong>.start = start;

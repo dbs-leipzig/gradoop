@@ -17,27 +17,27 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Puts the vertex to the first field of the tuple.
  *
- * @param &lt;K&gt; type of the first field of the tuple
- * @param &lt;V&gt; type of the second field of the tuple
+ * @param &lt;P&gt; type of the first field of the tuple
+ * @param &lt;Q&gt; type of the second field of the tuple
+ * @param &lt;V&gt; vertex type
  */
-<span class="fc" id="L28">public class VertexToFieldZero&lt;K, V&gt;</span>
-  implements JoinFunction&lt;Tuple2&lt;K, V&gt;, EPGMVertex, Tuple2&lt;EPGMVertex, V&gt;&gt; {
+<span class="fc" id="L29">public class VertexToFieldZero&lt;P, Q, V extends Vertex&gt;</span>
+  implements JoinFunction&lt;Tuple2&lt;P, Q&gt;, V, Tuple2&lt;V, Q&gt;&gt; {
 
   /**
    * Avoid object instantiation.
    */
-<span class="fc" id="L34">  private Tuple2&lt;EPGMVertex, V&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L35">  private Tuple2&lt;V, Q&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
-  public Tuple2&lt;EPGMVertex, V&gt; join(Tuple2&lt;K, V&gt; tuple, EPGMVertex vertex) throws Exception {
-<span class="fc" id="L38">    reuseTuple.setFields(vertex, tuple.f1);</span>
-<span class="fc" id="L39">    return reuseTuple;</span>
+  public Tuple2&lt;V, Q&gt; join(Tuple2&lt;P, Q&gt; tuple, V vertex) throws Exception {
+<span class="fc" id="L39">    reuseTuple.setFields(vertex, tuple.f1);</span>
+<span class="fc" id="L40">    return reuseTuple;</span>
   }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

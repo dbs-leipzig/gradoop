@@ -29,10 +29,10 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.conf.Configuration;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -91,8 +91,8 @@
 <a name="81" href="#81">81</a>      <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/logicalgraphcsv/MetaData.html">MetaData</a> metaData = MetaData.fromFile(getMetaDataPath(), hdfsConfig);
 <a name="82" href="#82">82</a>  
 <a name="83" href="#83">83</a>      ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-<a name="84" href="#84">84</a>      EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
-<a name="85" href="#85">85</a>      EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
+<a name="84" href="#84">84</a>      VertexFactory&lt;EPGMVertex&gt; vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+<a name="85" href="#85">85</a>      EdgeFactory&lt;EPGMEdge&gt; edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
 <a name="86" href="#86">86</a>  
 <a name="87" href="#87">87</a>      Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()
 <a name="88" href="#88">88</a>        .map(l -&gt; Tuple2.of(l, env.readTextFile(getVertexCSVPath(l))

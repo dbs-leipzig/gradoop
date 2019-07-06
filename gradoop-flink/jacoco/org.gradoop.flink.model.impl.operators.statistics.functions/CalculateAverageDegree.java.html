@@ -39,20 +39,14 @@ public class CalculateAverageDegree implements MapFunction&lt;EPGMGraphHead, EPG
 <span class="fc" id="L39">    this.propertyKey = propertyKey;</span>
 <span class="fc" id="L40">  }</span>
 
-  /**
-   * Calculates the average degree and safes the value as property to the graphHead.
-   *
-   * @param graphHead The graphHead the average degree property shall be written to
-   * @return EPGMGraphHead The graphHead the average degree property is written to
-   */
   @Override
   public EPGMGraphHead map(EPGMGraphHead graphHead) {
-<span class="fc" id="L50">    long numVertices = graphHead.getPropertyValue(&quot;vertexCount&quot;).getLong();</span>
-<span class="fc" id="L51">    long sumDegrees = graphHead.getPropertyValue(</span>
-<span class="fc" id="L52">      SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES).getLong();</span>
-<span class="fc" id="L53">    long average = (long) Math.ceil((double) sumDegrees / (double) numVertices);</span>
-<span class="fc" id="L54">    graphHead.setProperty(propertyKey, average);</span>
-<span class="fc" id="L55">    return graphHead;</span>
+<span class="fc" id="L44">    long numVertices = graphHead.getPropertyValue(&quot;vertexCount&quot;).getLong();</span>
+<span class="fc" id="L45">    long sumDegrees = graphHead.getPropertyValue(</span>
+<span class="fc" id="L46">      SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES).getLong();</span>
+<span class="fc" id="L47">    long average = (long) Math.ceil((double) sumDegrees / (double) numVertices);</span>
+<span class="fc" id="L48">    graphHead.setProperty(propertyKey, average);</span>
+<span class="fc" id="L49">    return graphHead;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

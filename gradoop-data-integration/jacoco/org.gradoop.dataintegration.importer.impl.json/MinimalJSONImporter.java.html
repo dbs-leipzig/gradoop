@@ -59,7 +59,7 @@ public class MinimalJSONImporter implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
 <span class="fc" id="L61">    DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment().readTextFile(jsonPath)</span>
-<span class="fc" id="L62">      .map(new MinimalJsonToVertex(config.getVertexFactory()));</span>
+<span class="fc" id="L62">      .map(new MinimalJsonToVertex(config.getLogicalGraphFactory().getVertexFactory()));</span>
 <span class="fc" id="L63">    return config.getLogicalGraphFactory().fromDataSets(vertices);</span>
   }
 

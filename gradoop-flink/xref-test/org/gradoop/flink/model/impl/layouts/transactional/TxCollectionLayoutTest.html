@@ -32,130 +32,131 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.junit.BeforeClass;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
-<a name="29" href="#29">29</a>  
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Collectors;
-<a name="32" href="#32">32</a>  
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.*;
-<a name="34" href="#34">34</a>  
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayoutTest.html">TxCollectionLayoutTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
-<a name="36" href="#36">36</a>  
-<a name="37" href="#37">37</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> GraphTransaction tx0;
-<a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> GraphTransaction tx1;
-<a name="40" href="#40">40</a>  
-<a name="41" href="#41">41</a>    @BeforeClass
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> setup() {
-<a name="43" href="#43">43</a>      ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-<a name="44" href="#44">44</a>      GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
-<a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>      EPGMGraphHead g0 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"A"</span>);
-<a name="47" href="#47">47</a>      EPGMGraphHead g1 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"B"</span>);
-<a name="48" href="#48">48</a>  
-<a name="49" href="#49">49</a>      EPGMVertex v0 = config.getVertexFactory().createVertex(<span class="jxr_string">"A"</span>);
-<a name="50" href="#50">50</a>      EPGMVertex v1 = config.getVertexFactory().createVertex(<span class="jxr_string">"B"</span>);
-<a name="51" href="#51">51</a>      EPGMVertex v2 = config.getVertexFactory().createVertex(<span class="jxr_string">"C"</span>);
-<a name="52" href="#52">52</a>  
-<a name="53" href="#53">53</a>      EPGMEdge e0 = config.getEdgeFactory().createEdge(<span class="jxr_string">"a"</span>, v0.getId(), v1.getId());
-<a name="54" href="#54">54</a>      EPGMEdge e1 = config.getEdgeFactory().createEdge(<span class="jxr_string">"b"</span>, v1.getId(), v2.getId());
-<a name="55" href="#55">55</a>  
-<a name="56" href="#56">56</a>      v0.addGraphId(g0.getId());
-<a name="57" href="#57">57</a>      v1.addGraphId(g0.getId());
-<a name="58" href="#58">58</a>      v1.addGraphId(g1.getId());
-<a name="59" href="#59">59</a>      v2.addGraphId(g1.getId());
-<a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      e0.addGraphId(g0.getId());
-<a name="62" href="#62">62</a>      e1.addGraphId(g1.getId());
-<a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>      tx0 = <strong class="jxr_keyword">new</strong> GraphTransaction(g0, Sets.newHashSet(v0, v1), Sets.newHashSet(e0));
-<a name="65" href="#65">65</a>      tx1 = <strong class="jxr_keyword">new</strong> GraphTransaction(g1, Sets.newHashSet(v1, v2), Sets.newHashSet(e1));
-<a name="66" href="#66">66</a>    }
-<a name="67" href="#67">67</a>  
-<a name="68" href="#68">68</a>    @Test
-<a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> hasGVELayout() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="70" href="#70">70</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
-<a name="71" href="#71">71</a>      assertFalse(layout.isGVELayout());
-<a name="72" href="#72">72</a>    }
-<a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>    @Test
-<a name="75" href="#75">75</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> hasTransactionalLayout() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="76" href="#76">76</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
-<a name="77" href="#77">77</a>      assertTrue(layout.isTransactionalLayout());
-<a name="78" href="#78">78</a>    }
-<a name="79" href="#79">79</a>  
-<a name="80" href="#80">80</a>    @Test
-<a name="81" href="#81">81</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphTransactions() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="82" href="#82">82</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
-<a name="83" href="#83">83</a>      assertEquals(tx0, layout.getGraphTransactions().collect().get(0));
-<a name="84" href="#84">84</a>    }
-<a name="85" href="#85">85</a>  
-<a name="86" href="#86">86</a>    @Test
-<a name="87" href="#87">87</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeads() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="88" href="#88">88</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="89" href="#89">89</a>        getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="90" href="#90">90</a>  
-<a name="91" href="#91">91</a>      GradoopTestUtils.validateElementCollections(
-<a name="92" href="#92">92</a>        Sets.newHashSet(tx0.getGraphHead(), tx1.getGraphHead()),
-<a name="93" href="#93">93</a>        layout.getGraphHeads().collect());
-<a name="94" href="#94">94</a>    }
-<a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>    @Test
-<a name="97" href="#97">97</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeadsByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="98" href="#98">98</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="99" href="#99">99</a>        getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="100" href="#100">100</a> 
-<a name="101" href="#101">101</a>     GradoopTestUtils.validateElementCollections(
-<a name="102" href="#102">102</a>       Sets.newHashSet(tx0.getGraphHead()),
-<a name="103" href="#103">103</a>       layout.getGraphHeadsByLabel(<span class="jxr_string">"A"</span>).collect());
-<a name="104" href="#104">104</a>   }
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>   @Test
-<a name="107" href="#107">107</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVertices() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="108" href="#108">108</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="109" href="#109">109</a>       getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     Set&lt;EPGMVertex&gt; expected = Sets.newHashSet(tx0.getVertices());
-<a name="112" href="#112">112</a>     expected.addAll(tx1.getVertices());
-<a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getVertices().collect());
-<a name="115" href="#115">115</a>   }
-<a name="116" href="#116">116</a> 
-<a name="117" href="#117">117</a>   @Test
-<a name="118" href="#118">118</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVerticesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="119" href="#119">119</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="120" href="#120">120</a>       getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="121" href="#121">121</a> 
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.junit.BeforeClass;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="30" href="#30">30</a>  
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Collectors;
+<a name="33" href="#33">33</a>  
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.*;
+<a name="35" href="#35">35</a>  
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayoutTest.html">TxCollectionLayoutTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
+<a name="37" href="#37">37</a>  
+<a name="38" href="#38">38</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> GraphTransaction tx0;
+<a name="39" href="#39">39</a>  
+<a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> GraphTransaction tx1;
+<a name="41" href="#41">41</a>  
+<a name="42" href="#42">42</a>    @BeforeClass
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> setup() {
+<a name="44" href="#44">44</a>      ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+<a name="45" href="#45">45</a>      LogicalGraphFactory factory = GradoopFlinkConfig.createConfig(env).getLogicalGraphFactory();
+<a name="46" href="#46">46</a>  
+<a name="47" href="#47">47</a>      EPGMGraphHead g0 = factory.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"A"</span>);
+<a name="48" href="#48">48</a>      EPGMGraphHead g1 = factory.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"B"</span>);
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>      EPGMVertex v0 = factory.getVertexFactory().createVertex(<span class="jxr_string">"A"</span>);
+<a name="51" href="#51">51</a>      EPGMVertex v1 = factory.getVertexFactory().createVertex(<span class="jxr_string">"B"</span>);
+<a name="52" href="#52">52</a>      EPGMVertex v2 = factory.getVertexFactory().createVertex(<span class="jxr_string">"C"</span>);
+<a name="53" href="#53">53</a>  
+<a name="54" href="#54">54</a>      EPGMEdge e0 = factory.getEdgeFactory().createEdge(<span class="jxr_string">"a"</span>, v0.getId(), v1.getId());
+<a name="55" href="#55">55</a>      EPGMEdge e1 = factory.getEdgeFactory().createEdge(<span class="jxr_string">"b"</span>, v1.getId(), v2.getId());
+<a name="56" href="#56">56</a>  
+<a name="57" href="#57">57</a>      v0.addGraphId(g0.getId());
+<a name="58" href="#58">58</a>      v1.addGraphId(g0.getId());
+<a name="59" href="#59">59</a>      v1.addGraphId(g1.getId());
+<a name="60" href="#60">60</a>      v2.addGraphId(g1.getId());
+<a name="61" href="#61">61</a>  
+<a name="62" href="#62">62</a>      e0.addGraphId(g0.getId());
+<a name="63" href="#63">63</a>      e1.addGraphId(g1.getId());
+<a name="64" href="#64">64</a>  
+<a name="65" href="#65">65</a>      tx0 = <strong class="jxr_keyword">new</strong> GraphTransaction(g0, Sets.newHashSet(v0, v1), Sets.newHashSet(e0));
+<a name="66" href="#66">66</a>      tx1 = <strong class="jxr_keyword">new</strong> GraphTransaction(g1, Sets.newHashSet(v1, v2), Sets.newHashSet(e1));
+<a name="67" href="#67">67</a>    }
+<a name="68" href="#68">68</a>  
+<a name="69" href="#69">69</a>    @Test
+<a name="70" href="#70">70</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> hasGVELayout() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="71" href="#71">71</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
+<a name="72" href="#72">72</a>      assertFalse(layout.isGVELayout());
+<a name="73" href="#73">73</a>    }
+<a name="74" href="#74">74</a>  
+<a name="75" href="#75">75</a>    @Test
+<a name="76" href="#76">76</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> hasTransactionalLayout() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="77" href="#77">77</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
+<a name="78" href="#78">78</a>      assertTrue(layout.isTransactionalLayout());
+<a name="79" href="#79">79</a>    }
+<a name="80" href="#80">80</a>  
+<a name="81" href="#81">81</a>    @Test
+<a name="82" href="#82">82</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphTransactions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="83" href="#83">83</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(getExecutionEnvironment().fromElements(tx0));
+<a name="84" href="#84">84</a>      assertEquals(tx0, layout.getGraphTransactions().collect().get(0));
+<a name="85" href="#85">85</a>    }
+<a name="86" href="#86">86</a>  
+<a name="87" href="#87">87</a>    @Test
+<a name="88" href="#88">88</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeads() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="89" href="#89">89</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="90" href="#90">90</a>        getExecutionEnvironment().fromElements(tx0, tx1));
+<a name="91" href="#91">91</a>  
+<a name="92" href="#92">92</a>      GradoopTestUtils.validateElementCollections(
+<a name="93" href="#93">93</a>        Sets.newHashSet(tx0.getGraphHead(), tx1.getGraphHead()),
+<a name="94" href="#94">94</a>        layout.getGraphHeads().collect());
+<a name="95" href="#95">95</a>    }
+<a name="96" href="#96">96</a>  
+<a name="97" href="#97">97</a>    @Test
+<a name="98" href="#98">98</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeadsByLabel() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="99" href="#99">99</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="100" href="#100">100</a>       getExecutionEnvironment().fromElements(tx0, tx1));
+<a name="101" href="#101">101</a> 
+<a name="102" href="#102">102</a>     GradoopTestUtils.validateElementCollections(
+<a name="103" href="#103">103</a>       Sets.newHashSet(tx0.getGraphHead()),
+<a name="104" href="#104">104</a>       layout.getGraphHeadsByLabel(<span class="jxr_string">"A"</span>).collect());
+<a name="105" href="#105">105</a>   }
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>   @Test
+<a name="108" href="#108">108</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVertices() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="109" href="#109">109</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="110" href="#110">110</a>       getExecutionEnvironment().fromElements(tx0, tx1));
+<a name="111" href="#111">111</a> 
+<a name="112" href="#112">112</a>     Set&lt;EPGMVertex&gt; expected = Sets.newHashSet(tx0.getVertices());
+<a name="113" href="#113">113</a>     expected.addAll(tx1.getVertices());
+<a name="114" href="#114">114</a> 
+<a name="115" href="#115">115</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getVertices().collect());
+<a name="116" href="#116">116</a>   }
+<a name="117" href="#117">117</a> 
+<a name="118" href="#118">118</a>   @Test
+<a name="119" href="#119">119</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVerticesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="120" href="#120">120</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="121" href="#121">121</a>       getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="122" href="#122">122</a> 
-<a name="123" href="#123">123</a>     GradoopTestUtils.validateGraphElementCollections(
-<a name="124" href="#124">124</a>       tx0.getVertices().stream().filter(v -&gt; v.getLabel().equals(<span class="jxr_string">"A"</span>)).collect(Collectors.toList()),
-<a name="125" href="#125">125</a>       layout.getVerticesByLabel(<span class="jxr_string">"A"</span>).collect());
-<a name="126" href="#126">126</a>   }
-<a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>   @Test
-<a name="129" href="#129">129</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdges() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="130" href="#130">130</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="131" href="#131">131</a>       getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="132" href="#132">132</a> 
-<a name="133" href="#133">133</a>     Set&lt;EPGMEdge&gt; expected = Sets.newHashSet(tx0.getEdges());
-<a name="134" href="#134">134</a>     expected.addAll(tx1.getEdges());
-<a name="135" href="#135">135</a> 
-<a name="136" href="#136">136</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getEdges().collect());
-<a name="137" href="#137">137</a>   }
-<a name="138" href="#138">138</a> 
-<a name="139" href="#139">139</a>   @Test
-<a name="140" href="#140">140</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdgesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="141" href="#141">141</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
-<a name="142" href="#142">142</a>       getExecutionEnvironment().fromElements(tx0, tx1));
-<a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     GradoopTestUtils.validateGraphElementCollections(
-<a name="145" href="#145">145</a>       tx0.getEdges().stream().filter(e -&gt; e.getLabel().equals(<span class="jxr_string">"a"</span>)).collect(Collectors.toList()),
-<a name="146" href="#146">146</a>       layout.getEdgesByLabel(<span class="jxr_string">"a"</span>).collect());
-<a name="147" href="#147">147</a>   }
-<a name="148" href="#148">148</a> }
+<a name="123" href="#123">123</a> 
+<a name="124" href="#124">124</a>     GradoopTestUtils.validateGraphElementCollections(
+<a name="125" href="#125">125</a>       tx0.getVertices().stream().filter(v -&gt; v.getLabel().equals(<span class="jxr_string">"A"</span>)).collect(Collectors.toList()),
+<a name="126" href="#126">126</a>       layout.getVerticesByLabel(<span class="jxr_string">"A"</span>).collect());
+<a name="127" href="#127">127</a>   }
+<a name="128" href="#128">128</a> 
+<a name="129" href="#129">129</a>   @Test
+<a name="130" href="#130">130</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdges() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="131" href="#131">131</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="132" href="#132">132</a>       getExecutionEnvironment().fromElements(tx0, tx1));
+<a name="133" href="#133">133</a> 
+<a name="134" href="#134">134</a>     Set&lt;EPGMEdge&gt; expected = Sets.newHashSet(tx0.getEdges());
+<a name="135" href="#135">135</a>     expected.addAll(tx1.getEdges());
+<a name="136" href="#136">136</a> 
+<a name="137" href="#137">137</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getEdges().collect());
+<a name="138" href="#138">138</a>   }
+<a name="139" href="#139">139</a> 
+<a name="140" href="#140">140</a>   @Test
+<a name="141" href="#141">141</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdgesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="142" href="#142">142</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
+<a name="143" href="#143">143</a>       getExecutionEnvironment().fromElements(tx0, tx1));
+<a name="144" href="#144">144</a> 
+<a name="145" href="#145">145</a>     GradoopTestUtils.validateGraphElementCollections(
+<a name="146" href="#146">146</a>       tx0.getEdges().stream().filter(e -&gt; e.getLabel().equals(<span class="jxr_string">"a"</span>)).collect(Collectors.toList()),
+<a name="147" href="#147">147</a>       layout.getEdgesByLabel(<span class="jxr_string">"a"</span>).collect());
+<a name="148" href="#148">148</a>   }
+<a name="149" href="#149">149</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

@@ -30,17 +30,17 @@ import org.gradoop.flink.model.impl.operators.transformation.functions.Transform
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
 
 /**
- * The modification operators is a unary graph operator that takes a logical
+ * The modification operators is a unary graph operator that takes a base
  * graph as input and applies user defined modification functions on the
  * elements of that graph as well as on its graph head.
  *
  * The identity of the elements is preserved.
  *
- * @param &lt;G&gt; the EPGM graph head type
- * @param &lt;V&gt; the EPGM vertex type
- * @param &lt;E&gt; the EPGM edge type
- * @param &lt;LG&gt; the logical graph type
- * @param &lt;GC&gt; the graph collection type
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
 public class Transformation&lt;
   G extends GraphHead,
@@ -100,8 +100,8 @@ public class Transformation&lt;
    * @param graphHeads graph heads
    * @param vertices vertices
    * @param edges edges
-   * @param factory the factory that is responsible for creating an instance of the logical graph
-   * @return transformed logical graph
+   * @param factory the factory that is responsible for creating an instance of the base graph
+   * @return transformed base graph
    */
   protected LG executeInternal(DataSet&lt;G&gt; graphHeads, DataSet&lt;V&gt; vertices, DataSet&lt;E&gt; edges,
     BaseGraphFactory&lt;G, V, E, LG, GC&gt; factory) {

@@ -17,9 +17,9 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class CreateNewVertex implements MapFunction&lt;Tuple2&lt;PropertyValue, 
   /**
    * The Factory the vertices are created with.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 
   /**
    * Reduce object instantiation.
@@ -56,7 +56,7 @@ public class CreateNewVertex implements MapFunction&lt;Tuple2&lt;PropertyValue, 
    * @param newVertexLabel  The new vertex Label.
    * @param newPropertyName The new property key.
    */
-<span class="fc" id="L59">  public CreateNewVertex(EPGMVertexFactory factory, String newVertexLabel, String newPropertyName) {</span>
+<span class="fc" id="L59">  public CreateNewVertex(VertexFactory&lt;EPGMVertex&gt; factory, String newVertexLabel, String newPropertyName) {</span>
 <span class="fc" id="L60">    this.vertexFactory = factory;</span>
 <span class="fc" id="L61">    this.newVertexLabel = newVertexLabel;</span>
 <span class="fc" id="L62">    this.newPropertyName = newPropertyName;</span>

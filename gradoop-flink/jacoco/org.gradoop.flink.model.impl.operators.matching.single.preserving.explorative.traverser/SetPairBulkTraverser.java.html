@@ -81,25 +81,18 @@ public class SetPairBulkTraverser&lt;K&gt; extends SetPairTraverser&lt;K&gt; {
       edgeStepJoinStrategy, vertexStepJoinStrategy, vertexMapping, edgeMapping);
 <span class="fc" id="L82">  }</span>
 
-  /**
-   * Traverses the graph according to the provided traversal code.
-   *
-   * @param vertices vertices including their query candidates
-   * @param edges    edges including their query candidates
-   * @return found embeddings
-   */
   @Override
   public DataSet&lt;Tuple1&lt;Embedding&lt;K&gt;&gt;&gt; traverse(
     DataSet&lt;IdWithCandidates&lt;K&gt;&gt; vertices,
     DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; edges) {
 
-<span class="fc" id="L96">    return iterate(vertices, edges, buildInitialEmbeddings(vertices))</span>
-<span class="fc" id="L97">      .project(1);</span>
+<span class="fc" id="L89">    return iterate(vertices, edges, buildInitialEmbeddings(vertices))</span>
+<span class="fc" id="L90">      .project(1);</span>
   }
 
   @Override
   boolean isIterative() {
-<span class="fc" id="L102">    return true;</span>
+<span class="fc" id="L95">    return true;</span>
   }
 
   /**
@@ -117,30 +110,30 @@ public class SetPairBulkTraverser&lt;K&gt; extends SetPairTraverser&lt;K&gt; {
     DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; initialEmbeddings) {
 
     // ITERATION HEAD
-<span class="fc" id="L120">    IterativeDataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; embeddings = initialEmbeddings</span>
-<span class="fc" id="L121">      .iterate(getTraversalCode().getSteps().size());</span>
+<span class="fc" id="L113">    IterativeDataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; embeddings = initialEmbeddings</span>
+<span class="fc" id="L114">      .iterate(getTraversalCode().getSteps().size());</span>
 
     // ITERATION BODY
 
     // get current superstep
-<span class="fc" id="L126">    DataSet&lt;Integer&gt; superstep = embeddings</span>
-<span class="fc" id="L127">      .first(1)</span>
-<span class="fc" id="L128">      .map(new Superstep&lt;&gt;());</span>
+<span class="fc" id="L119">    DataSet&lt;Integer&gt; superstep = embeddings</span>
+<span class="fc" id="L120">      .first(1)</span>
+<span class="fc" id="L121">      .map(new Superstep&lt;&gt;());</span>
 
     // traverse to outgoing/incoming edges
-<span class="fc" id="L131">    String[] forwardedFieldsEdgeSteps = new String[] {</span>
+<span class="fc" id="L124">    String[] forwardedFieldsEdgeSteps = new String[] {</span>
       &quot;f0&quot; // forward edge id
     };
-<span class="fc" id="L134">    DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; nextWorkSet = traverseEdges(edges,</span>
+<span class="fc" id="L127">    DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; nextWorkSet = traverseEdges(edges,</span>
       embeddings, superstep, TraverserStrategy.SET_PAIR_BULK_ITERATION,
       forwardedFieldsEdgeSteps);
 
     // traverse to vertices
-<span class="fc" id="L139">    nextWorkSet = traverseVertices(vertices, nextWorkSet, superstep,</span>
+<span class="fc" id="L132">    nextWorkSet = traverseVertices(vertices, nextWorkSet, superstep,</span>
       TraverserStrategy.SET_PAIR_BULK_ITERATION);
 
     // ITERATION FOOTER
-<span class="fc" id="L143">    return embeddings.closeWith(nextWorkSet, nextWorkSet);</span>
+<span class="fc" id="L136">    return embeddings.closeWith(nextWorkSet, nextWorkSet);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

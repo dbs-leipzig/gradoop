@@ -61,78 +61,63 @@ public class LogicalGraphFactory
 <span class="fc" id="L61">    this.layoutFactory.setGradoopFlinkConfig(config);</span>
 <span class="fc" id="L62">  }</span>
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public GraphHeadFactory&lt;EPGMGraphHead&gt; getGraphHeadFactory() {
-<span class="fc" id="L71">    return config.getGraphHeadFactory();</span>
+<span class="fc" id="L66">    return layoutFactory.getGraphHeadFactory();</span>
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public VertexFactory&lt;EPGMVertex&gt; getVertexFactory() {
-<span class="fc" id="L81">    return config.getVertexFactory();</span>
+<span class="fc" id="L71">    return layoutFactory.getVertexFactory();</span>
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public EdgeFactory&lt;EPGMEdge&gt; getEdgeFactory() {
-<span class="fc" id="L91">    return config.getEdgeFactory();</span>
+<span class="fc" id="L76">    return layoutFactory.getEdgeFactory();</span>
   }
 
   @Override
   public LogicalGraph fromDataSets(DataSet&lt;EPGMVertex&gt; vertices) {
-<span class="fc" id="L96">    return new LogicalGraph(layoutFactory.fromDataSets(vertices), config);</span>
+<span class="fc" id="L81">    return new LogicalGraph(layoutFactory.fromDataSets(vertices), config);</span>
   }
 
   @Override
   public LogicalGraph fromDataSets(DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
-<span class="fc" id="L101">    return new LogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);</span>
+<span class="fc" id="L86">    return new LogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph fromDataSets(DataSet&lt;EPGMGraphHead&gt; graphHead, DataSet&lt;EPGMVertex&gt; vertices,
     DataSet&lt;EPGMEdge&gt; edges) {
-<span class="fc" id="L107">    return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);</span>
+<span class="fc" id="L92">    return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
-<span class="fc" id="L113">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);</span>
+<span class="fc" id="L98">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHead,
     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
-<span class="nc" id="L119">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);</span>
+<span class="nc" id="L104">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph fromCollections(EPGMGraphHead graphHead, Collection&lt;EPGMVertex&gt; vertices,
     Collection&lt;EPGMEdge&gt; edges) {
-<span class="fc" id="L125">    return new LogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);</span>
+<span class="fc" id="L110">    return new LogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph fromCollections(Collection&lt;EPGMVertex&gt; vertices, Collection&lt;EPGMEdge&gt; edges) {
-<span class="fc" id="L130">    return new LogicalGraph(layoutFactory.fromCollections(vertices, edges), config);</span>
+<span class="fc" id="L115">    return new LogicalGraph(layoutFactory.fromCollections(vertices, edges), config);</span>
   }
 
   @Override
   public LogicalGraph createEmptyGraph() {
-<span class="nc" id="L135">    return new LogicalGraph(layoutFactory.createEmptyGraph(), config);</span>
+<span class="nc" id="L120">    return new LogicalGraph(layoutFactory.createEmptyGraph(), config);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

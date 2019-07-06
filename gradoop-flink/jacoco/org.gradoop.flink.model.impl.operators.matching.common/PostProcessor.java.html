@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
@@ -37,7 +38,6 @@ import org.gradoop.flink.model.impl.functions.utils.IsInstance;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Provides methods for post-processing query results.
@@ -47,33 +47,34 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
   /**
    * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
    *
-   * @param elements  EPGM elements
-   * @param config    Gradoop Flink config
+   * @param elements EPGM elements
+   * @param factory  graph collection factory
    * @return Graph collection
    */
-  public static GraphCollection extractGraphCollection(
-    DataSet&lt;EPGMElement&gt; elements, GradoopFlinkConfig config) {
-<span class="nc" id="L56">    return extractGraphCollection(elements, config, true);</span>
+  public static GraphCollection extractGraphCollection(DataSet&lt;EPGMElement&gt; elements,
+    BaseGraphCollectionFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; factory) {
+<span class="nc" id="L56">    return extractGraphCollection(elements, factory, true);</span>
   }
 
   /**
    * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
    *
-   * @param elements  EPGM elements
-   * @param config        Gradoop Flink config
+   * @param elements EPGM elements
+   * @param factory  graph collection factory
    * @param mayOverlap    elements may be contained in multiple graphs
    * @return Graph collection
    */
-  public static GraphCollection extractGraphCollection(
-    DataSet&lt;EPGMElement&gt; elements, GradoopFlinkConfig config, boolean mayOverlap) {
+  public static GraphCollection extractGraphCollection(DataSet&lt;EPGMElement&gt; elements,
+    BaseGraphCollectionFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; factory,
+    boolean mayOverlap) {
 
-<span class="fc" id="L70">    Class&lt;EPGMGraphHead&gt; graphHeadType = config.getGraphHeadFactory().getType();</span>
-<span class="fc" id="L71">    Class&lt;EPGMVertex&gt; vertexType = config.getVertexFactory().getType();</span>
-<span class="fc" id="L72">    Class&lt;EPGMEdge&gt; edgeType = config.getEdgeFactory().getType();</span>
-<span class="fc" id="L73">    return config.getGraphCollectionFactory().fromDataSets(</span>
-<span class="fc" id="L74">      extractGraphHeads(elements, graphHeadType),</span>
-<span class="fc" id="L75">      extractVertices(elements, vertexType, mayOverlap),</span>
-<span class="fc" id="L76">      extractEdges(elements, edgeType, mayOverlap)</span>
+<span class="fc" id="L71">    Class&lt;EPGMGraphHead&gt; graphHeadType = factory.getGraphHeadFactory().getType();</span>
+<span class="fc" id="L72">    Class&lt;EPGMVertex&gt; vertexType = factory.getVertexFactory().getType();</span>
+<span class="fc" id="L73">    Class&lt;EPGMEdge&gt; edgeType = factory.getEdgeFactory().getType();</span>
+<span class="fc" id="L74">    return factory.fromDataSets(</span>
+<span class="fc" id="L75">      extractGraphHeads(elements, graphHeadType),</span>
+<span class="fc" id="L76">      extractVertices(elements, vertexType, mayOverlap),</span>
+<span class="fc" id="L77">      extractEdges(elements, edgeType, mayOverlap)</span>
     );
   }
 
@@ -89,10 +90,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
   public static GraphCollection extractGraphCollectionWithData(
     DataSet&lt;EPGMElement&gt; elements, LogicalGraph inputGraph, boolean mayOverlap) {
 
-<span class="fc" id="L92">    GradoopFlinkConfig config = inputGraph.getConfig();</span>
-
     // get result collection without data
-<span class="fc" id="L95">    GraphCollection collection = extractGraphCollection(elements, config, mayOverlap);</span>
+<span class="fc" id="L94">    GraphCollection collection = extractGraphCollection(elements, inputGraph.getCollectionFactory(),</span>
+      mayOverlap);
 
     // attach data by joining first and merging the graph head ids
 <span class="fc" id="L98">    DataSet&lt;EPGMVertex&gt; newVertices = inputGraph.getVertices()</span>
@@ -108,7 +108,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 <span class="fc" id="L108">      .with(new MergedGraphIds&lt;&gt;())</span>
 <span class="fc" id="L109">      .withForwardedFieldsFirst(&quot;id;label;properties&quot;);</span>
 
-<span class="fc" id="L111">    return config.getGraphCollectionFactory().fromDataSets(</span>
+<span class="fc" id="L111">    return inputGraph.getCollectionFactory().fromDataSets(</span>
 <span class="fc" id="L112">      collection.getGraphHeads(), newVertices, newEdges);</span>
   }
   /**

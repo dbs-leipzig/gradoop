@@ -20,10 +20,7 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 
 /**
  * Basic Gradoop Configuration.
@@ -32,32 +29,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
  * @param &lt;V&gt; EPGM vertex type
  * @param &lt;E&gt; EPGM edge type
  */
-public class GradoopConfig
-  &lt;G extends GraphHead, V extends Vertex, E extends Edge&gt; {
-
-  /**
-   * Knows how to create {@link EPGMGraphHead}
-   */
-  private final EPGMGraphHeadFactory graphHeadFactory;
-
-  /**
-   * Knows how to create {@link EPGMVertex}
-   */
-  private final EPGMVertexFactory vertexFactory;
-
-  /**
-   *  Knows how to create {@link EPGMEdge}
-   */
-  private final EPGMEdgeFactory edgeFactory;
-
-  /**
-   * Creates a new Configuration.
-   */
-<span class="fc" id="L56">  protected GradoopConfig() {</span>
-<span class="fc" id="L57">    this.graphHeadFactory = new EPGMGraphHeadFactory();</span>
-<span class="fc" id="L58">    this.vertexFactory = new EPGMVertexFactory();</span>
-<span class="fc" id="L59">    this.edgeFactory = new EPGMEdgeFactory();</span>
-<span class="fc" id="L60">  }</span>
+<span class="nc" id="L32">public class GradoopConfig&lt;G extends GraphHead, V extends Vertex, E extends Edge&gt; {</span>
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -66,19 +38,7 @@ public class GradoopConfig
    * @return Default Gradoop configuration.
    */
   public static GradoopConfig&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; getDefaultConfig() {
-<span class="fc" id="L69">    return new GradoopConfig&lt;&gt;();</span>
-  }
-
-  public EPGMGraphHeadFactory getGraphHeadFactory() {
-<span class="fc" id="L73">    return graphHeadFactory;</span>
-  }
-
-  public EPGMVertexFactory getVertexFactory() {
-<span class="fc" id="L77">    return vertexFactory;</span>
-  }
-
-  public EPGMEdgeFactory getEdgeFactory() {
-<span class="fc" id="L81">    return edgeFactory;</span>
+<span class="nc" id="L41">    return new GradoopConfig&lt;&gt;();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

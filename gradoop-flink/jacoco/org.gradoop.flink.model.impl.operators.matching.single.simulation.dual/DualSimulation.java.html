@@ -102,7 +102,7 @@ public class DualSimulation extends PatternMatching {
     } else {
 <span class="fc" id="L103">      return collectionFactory.fromGraph(</span>
 <span class="fc" id="L104">        graphFactory.fromDataSets(matchingVertexIds</span>
-<span class="fc" id="L105">            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));</span>
+<span class="fc" id="L105">            .map(new VertexFromId(graph.getFactory().getVertexFactory()))));</span>
     }
   }
 
@@ -285,11 +285,11 @@ public class DualSimulation extends PatternMatching {
 
 <span class="fc bfc" id="L286" title="All 2 branches covered.">    DataSet&lt;EPGMVertex&gt; matchVertices = doAttachData() ?</span>
 <span class="fc" id="L287">      PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :</span>
-<span class="fc" id="L288">      PostProcessor.extractVertices(vertices, config.getVertexFactory());</span>
+<span class="fc" id="L288">      PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());</span>
 
 <span class="fc bfc" id="L290" title="All 2 branches covered.">    DataSet&lt;EPGMEdge&gt; matchEdges = doAttachData() ?</span>
 <span class="fc" id="L291">      PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :</span>
-<span class="fc" id="L292">      PostProcessor.extractEdges(vertices, config.getEdgeFactory());</span>
+<span class="fc" id="L292">      PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());</span>
 
 <span class="fc" id="L294">    return config.getGraphCollectionFactory().fromGraph(</span>
 <span class="fc" id="L295">      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));</span>

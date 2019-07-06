@@ -49,19 +49,12 @@ public class CombineEdgeGroupItems
 <span class="fc" id="L49">    super(useLabel);</span>
 <span class="fc" id="L50">  }</span>
 
-  /**
-   * Reduces edge group items to a single edge group item and collects it.
-   *
-   * @param edgeGroupItems edge group items
-   * @param collector output collector
-   * @throws Exception on failure
-   */
   @Override
   public void combine(Iterable&lt;EdgeGroupItem&gt; edgeGroupItems,
     Collector&lt;EdgeGroupItem&gt; collector) throws Exception {
-<span class="fc" id="L62">    reuseEdgeGroupItem = reduceInternal(edgeGroupItems);</span>
-<span class="fc" id="L63">    reuseEdgeGroupItem.getLabelGroup().resetAggregateValues();</span>
-<span class="fc" id="L64">    collector.collect(reuseEdgeGroupItem);</span>
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L55">    reuseEdgeGroupItem = reduceInternal(edgeGroupItems);</span>
+<span class="fc" id="L56">    reuseEdgeGroupItem.getLabelGroup().resetAggregateValues();</span>
+<span class="fc" id="L57">    collector.collect(reuseEdgeGroupItem);</span>
+<span class="fc" id="L58">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

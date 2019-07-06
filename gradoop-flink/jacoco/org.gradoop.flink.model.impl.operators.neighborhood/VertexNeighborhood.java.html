@@ -15,12 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Super class for all vertex neighborhood operators.
+ *
+ * @param &lt;LG&gt; graph type
  */
-public abstract class VertexNeighborhood extends Neighborhood {
+public abstract class VertexNeighborhood&lt;LG extends BaseGraph&gt; extends Neighborhood&lt;LG&gt; {
 
   /**
    * Valued constructor.
@@ -29,7 +32,7 @@ public abstract class VertexNeighborhood extends Neighborhood {
    * @param direction considered edge direction
    */
   VertexNeighborhood(VertexAggregateFunction function, EdgeDirection direction) {
-<span class="fc" id="L32">    super(function, direction);</span>
-<span class="fc" id="L33">  }</span>
+<span class="fc" id="L35">    super(function, direction);</span>
+<span class="fc" id="L36">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -26,31 +26,28 @@ import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 <span class="fc" id="L26">public class AddPageRankScoresToVertexCrossFunction</span>
   implements CrossFunction&lt;EPGMVertex, EPGMGraphHead, EPGMVertex&gt; {
 
-  /**
-   * Writes the PageRank-scores stored in the graphHead to all vertices.
-   */
   @Override
   public EPGMVertex cross(EPGMVertex vertex, EPGMGraphHead graphHead) {
-<span class="fc" id="L34">    double min = graphHead.getPropertyValue(</span>
-<span class="fc" id="L35">      SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
-<span class="fc" id="L36">    double max = graphHead.getPropertyValue(</span>
-<span class="fc" id="L37">      SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
-<span class="fc" id="L38">    double sum = graphHead.getPropertyValue(</span>
-<span class="fc" id="L39">      SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
+<span class="fc" id="L31">    double min = graphHead.getPropertyValue(</span>
+<span class="fc" id="L32">      SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
+<span class="fc" id="L33">    double max = graphHead.getPropertyValue(</span>
+<span class="fc" id="L34">      SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
+<span class="fc" id="L35">    double sum = graphHead.getPropertyValue(</span>
+<span class="fc" id="L36">      SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
 
-<span class="fc" id="L41">    vertex.setProperty(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY, min);</span>
-<span class="fc" id="L42">    vertex.setProperty(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY, max);</span>
-<span class="fc" id="L43">    vertex.setProperty(SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);</span>
-<span class="fc" id="L44">    vertex.setProperty(&quot;vertexCount&quot;, graphHead.getPropertyValue(&quot;vertexCount&quot;));</span>
+<span class="fc" id="L38">    vertex.setProperty(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY, min);</span>
+<span class="fc" id="L39">    vertex.setProperty(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY, max);</span>
+<span class="fc" id="L40">    vertex.setProperty(SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);</span>
+<span class="fc" id="L41">    vertex.setProperty(&quot;vertexCount&quot;, graphHead.getPropertyValue(&quot;vertexCount&quot;));</span>
 
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (min != max) {</span>
-<span class="fc" id="L47">      double score = vertex.getPropertyValue(</span>
-<span class="fc" id="L48">        SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
-<span class="fc" id="L49">      vertex.setProperty(</span>
-<span class="fc" id="L50">        SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY, (score - min) / (max - min));</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (min != max) {</span>
+<span class="fc" id="L44">      double score = vertex.getPropertyValue(</span>
+<span class="fc" id="L45">        SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
+<span class="fc" id="L46">      vertex.setProperty(</span>
+<span class="fc" id="L47">        SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY, (score - min) / (max - min));</span>
     }
 
-<span class="fc" id="L53">    return vertex;</span>
+<span class="fc" id="L50">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

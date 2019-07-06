@@ -28,14 +28,15 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddGradoopIdToRow;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddNewGraphs;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AggregateGraphs;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.CreateGraphHeadWithProperties;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.PropertyDecoder;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.SplitRow;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.opencypher.flink.api.CAPFSession;
 import org.opencypher.flink.impl.CAPFRecords;
 import org.opencypher.okapi.api.graph.CypherResult;
@@ -59,8 +60,8 @@ public class CAPFQueryResult {
    *
    * {@code ProjectMergeRule:force_mode} would result in long optimization times.
    */
-<span class="fc" id="L62">  private static final List&lt;String&gt; DISABLED_RULES =</span>
-<span class="fc" id="L63">    Collections.singletonList(&quot;ProjectMergeRule:force_mode&quot;);</span>
+<span class="fc" id="L63">  private static final List&lt;String&gt; DISABLED_RULES =</span>
+<span class="fc" id="L64">    Collections.singletonList(&quot;ProjectMergeRule:force_mode&quot;);</span>
 
   /**
    * The wrapped CAPFRecords.
@@ -88,9 +89,10 @@ public class CAPFQueryResult {
   private DataSet&lt;Tuple2&lt;Long, EPGMEdge&gt;&gt; edgesWithIds;
 
   /**
-   * The GradoopFlinkConfig.
+   * The graph collection factory.
    */
-  private GradoopFlinkConfig config;
+  private BaseGraphCollectionFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;
+    factory;
 
   /**
    * Constructor;
@@ -98,21 +100,21 @@ public class CAPFQueryResult {
    * @param result          result of CAPF query
    * @param verticesWithIds map between long id and original vertex
    * @param edgesWithIds    map between long id and original edge
-   * @param config          the gradoop config
+   * @param factory         graph collection factory
    */
   public CAPFQueryResult(
     CypherResult result,
     DataSet&lt;Tuple2&lt;Long, EPGMVertex&gt;&gt; verticesWithIds,
     DataSet&lt;Tuple2&lt;Long, EPGMEdge&gt;&gt; edgesWithIds,
-<span class="fc" id="L107">    GradoopFlinkConfig config) {</span>
-<span class="fc" id="L108">    this.records = (CAPFRecords) result.records();</span>
-<span class="fc" id="L109">    this.verticesWithIds = verticesWithIds;</span>
-<span class="fc" id="L110">    this.edgesWithIds = edgesWithIds;</span>
-<span class="fc" id="L111">    this.config = config;</span>
+<span class="fc" id="L109">    BaseGraphCollectionFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; factory) {</span>
+<span class="fc" id="L110">    this.records = (CAPFRecords) result.records();</span>
+<span class="fc" id="L111">    this.verticesWithIds = verticesWithIds;</span>
+<span class="fc" id="L112">    this.edgesWithIds = edgesWithIds;</span>
+<span class="fc" id="L113">    this.factory = factory;</span>
 
-<span class="fc" id="L113">    this.session = ((CAPFRecords) result.records()).capf();</span>
-<span class="fc bfc" id="L114" title="All 2 branches covered.">    this.isGraph = !records.header().entityVars().isEmpty();</span>
-<span class="fc" id="L115">  }</span>
+<span class="fc" id="L115">    this.session = ((CAPFRecords) result.records()).capf();</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">    this.isGraph = !records.header().entityVars().isEmpty();</span>
+<span class="fc" id="L117">  }</span>
 
 
   /**
@@ -121,7 +123,7 @@ public class CAPFQueryResult {
    * @return true iff results contain graphs
    */
   public boolean containsGraphs() {
-<span class="fc" id="L124">    return isGraph;</span>
+<span class="fc" id="L126">    return isGraph;</span>
   }
 
   /**
@@ -132,102 +134,102 @@ public class CAPFQueryResult {
    */
   public GraphCollection getGraphs() {
 
-<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (!isGraph) {</span>
-<span class="nc" id="L136">      return null;</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    if (!isGraph) {</span>
+<span class="nc" id="L138">      return null;</span>
     }
 
-<span class="fc" id="L139">    Set&lt;Var&gt; nodeVars = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L140">    Set&lt;Var&gt; relVars = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L141">    Set&lt;Var&gt; otherVars = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L141">    Set&lt;Var&gt; nodeVars = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L142">    Set&lt;Var&gt; relVars = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L143">    Set&lt;Var&gt; otherVars = new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L143">    Iterator&lt;Var&gt; varIt = records.header().vars().iterator();</span>
-<span class="fc bfc" id="L144" title="All 2 branches covered.">    while (varIt.hasNext()) {</span>
-<span class="fc" id="L145">      otherVars.add(varIt.next());</span>
+<span class="fc" id="L145">    Iterator&lt;Var&gt; varIt = records.header().vars().iterator();</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    while (varIt.hasNext()) {</span>
+<span class="fc" id="L147">      otherVars.add(varIt.next());</span>
     }
 
-<span class="fc" id="L148">    Iterator&lt;Var&gt; nodeVarIt = records.header().nodeEntities().iterator();</span>
-<span class="fc bfc" id="L149" title="All 2 branches covered.">    while (nodeVarIt.hasNext()) {</span>
-<span class="fc" id="L150">      Var nodeVar = nodeVarIt.next();</span>
-<span class="fc" id="L151">      nodeVars.add(nodeVar);</span>
-<span class="fc" id="L152">      otherVars.remove(nodeVar);</span>
-<span class="fc" id="L153">    }</span>
+<span class="fc" id="L150">    Iterator&lt;Var&gt; nodeVarIt = records.header().nodeEntities().iterator();</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    while (nodeVarIt.hasNext()) {</span>
+<span class="fc" id="L152">      Var nodeVar = nodeVarIt.next();</span>
+<span class="fc" id="L153">      nodeVars.add(nodeVar);</span>
+<span class="fc" id="L154">      otherVars.remove(nodeVar);</span>
+<span class="fc" id="L155">    }</span>
 
-<span class="fc" id="L155">    Iterator&lt;Var&gt; relVarIt = records.header().relationshipEntities().iterator();</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">    while (relVarIt.hasNext()) {</span>
-<span class="fc" id="L157">      Var relVar = relVarIt.next();</span>
-<span class="fc" id="L158">      relVars.add(relVar);</span>
-<span class="fc" id="L159">      otherVars.remove(relVar);</span>
-<span class="fc" id="L160">    }</span>
+<span class="fc" id="L157">    Iterator&lt;Var&gt; relVarIt = records.header().relationshipEntities().iterator();</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">    while (relVarIt.hasNext()) {</span>
+<span class="fc" id="L159">      Var relVar = relVarIt.next();</span>
+<span class="fc" id="L160">      relVars.add(relVar);</span>
+<span class="fc" id="L161">      otherVars.remove(relVar);</span>
+<span class="fc" id="L162">    }</span>
 
-<span class="fc" id="L162">    StringBuilder entityFieldsBuilder = new StringBuilder();</span>
-<span class="fc bfc" id="L163" title="All 2 branches covered.">    for (Var var : nodeVars) {</span>
-<span class="fc" id="L164">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
-<span class="fc" id="L165">    }</span>
+<span class="fc" id="L164">    StringBuilder entityFieldsBuilder = new StringBuilder();</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    for (Var var : nodeVars) {</span>
+<span class="fc" id="L166">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
+<span class="fc" id="L167">    }</span>
 
-<span class="fc bfc" id="L167" title="All 2 branches covered.">    for (Var var : relVars) {</span>
-<span class="fc" id="L168">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
-<span class="fc" id="L169">    }</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    for (Var var : relVars) {</span>
+<span class="fc" id="L170">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
+<span class="fc" id="L171">    }</span>
 
-<span class="fc" id="L171">    StringBuilder otherFieldsBuilder = new StringBuilder();</span>
-<span class="fc" id="L172">    List&lt;String&gt; otherVarNames = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L173">    StringBuilder otherFieldsBuilder = new StringBuilder();</span>
+<span class="fc" id="L174">    List&lt;String&gt; otherVarNames = new ArrayList&lt;&gt;();</span>
 
-<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    for (Var var : otherVars) {</span>
-<span class="nc" id="L175">      otherVarNames.add(var.name());</span>
-<span class="nc" id="L176">      otherFieldsBuilder.append(</span>
-<span class="nc" id="L177">        records.header().getColumn((Expr) var).get()).append(&quot;, &quot;);</span>
-<span class="nc" id="L178">    }</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    for (Var var : otherVars) {</span>
+<span class="nc" id="L177">      otherVarNames.add(var.name());</span>
+<span class="nc" id="L178">      otherFieldsBuilder.append(</span>
+<span class="nc" id="L179">        records.header().getColumn((Expr) var).get()).append(&quot;, &quot;);</span>
+<span class="nc" id="L180">    }</span>
 
-<span class="fc" id="L180">    String fieldString = entityFieldsBuilder.toString() + otherFieldsBuilder.toString();</span>
-<span class="pc bpc" id="L181" title="1 of 2 branches missed.">    if (fieldString.length() &gt; 0) {</span>
-<span class="fc" id="L182">      fieldString = fieldString.substring(0, fieldString.length() - 1);</span>
+<span class="fc" id="L182">    String fieldString = entityFieldsBuilder.toString() + otherFieldsBuilder.toString();</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">    if (fieldString.length() &gt; 0) {</span>
+<span class="fc" id="L184">      fieldString = fieldString.substring(0, fieldString.length() - 1);</span>
     }
 
-<span class="fc" id="L185">    TypeInformation&lt;Row&gt; rowTypeInfo = TypeInformation.of(Row.class);</span>
+<span class="fc" id="L187">    TypeInformation&lt;Row&gt; rowTypeInfo = TypeInformation.of(Row.class);</span>
 
     // Workaround for usable optimizer times
-<span class="fc" id="L188">    removeSlowOptimizationRule();</span>
+<span class="fc" id="L190">    removeSlowOptimizationRule();</span>
 
     // entities, others, id
-<span class="fc" id="L191">    org.apache.flink.api.scala.DataSet&lt;Row&gt; scalarowsWithNewIds = session.tableEnv()</span>
-<span class="fc" id="L192">      .toDataSet(records.table().table().select(fieldString), rowTypeInfo);</span>
+<span class="fc" id="L193">    org.apache.flink.api.scala.DataSet&lt;Row&gt; scalarowsWithNewIds = session.tableEnv()</span>
+<span class="fc" id="L194">      .toDataSet(records.table().table().select(fieldString), rowTypeInfo);</span>
 
-<span class="fc" id="L194">    DataSet&lt;Row&gt; rowsWithNewIds = scalarowsWithNewIds.javaSet()</span>
-<span class="fc" id="L195">      .map(new AddGradoopIdToRow());</span>
+<span class="fc" id="L196">    DataSet&lt;Row&gt; rowsWithNewIds = scalarowsWithNewIds.javaSet()</span>
+<span class="fc" id="L197">      .map(new AddGradoopIdToRow());</span>
 
-<span class="fc" id="L197">    int entityFieldsCount = nodeVars.size() + relVars.size();</span>
-<span class="fc" id="L198">    int otherFieldsCount = otherVars.size();</span>
+<span class="fc" id="L199">    int entityFieldsCount = nodeVars.size() + relVars.size();</span>
+<span class="fc" id="L200">    int otherFieldsCount = otherVars.size();</span>
 
-<span class="fc" id="L200">    DataSet&lt;EPGMGraphHead&gt; graphHeads = rowsWithNewIds</span>
-<span class="fc" id="L201">      .map(new CreateGraphHeadWithProperties(</span>
+<span class="fc" id="L202">    DataSet&lt;EPGMGraphHead&gt; graphHeads = rowsWithNewIds</span>
+<span class="fc" id="L203">      .map(new CreateGraphHeadWithProperties(</span>
         entityFieldsCount,
         entityFieldsCount + otherFieldsCount,
-<span class="fc" id="L204">        config.getGraphHeadFactory(),</span>
+<span class="fc" id="L206">        factory.getGraphHeadFactory(),</span>
         otherVarNames)
       );
 
-<span class="fc" id="L208">    DataSet&lt;Tuple2&lt;Long, GradoopIdSet&gt;&gt; rowsWithGraphIdSets = rowsWithNewIds</span>
-<span class="fc" id="L209">      .flatMap(new SplitRow(0, entityFieldsCount))</span>
-<span class="fc" id="L210">      .groupBy(0)</span>
-<span class="fc" id="L211">      .reduceGroup(new AggregateGraphs&lt;&gt;());</span>
+<span class="fc" id="L210">    DataSet&lt;Tuple2&lt;Long, GradoopIdSet&gt;&gt; rowsWithGraphIdSets = rowsWithNewIds</span>
+<span class="fc" id="L211">      .flatMap(new SplitRow(0, entityFieldsCount))</span>
+<span class="fc" id="L212">      .groupBy(0)</span>
+<span class="fc" id="L213">      .reduceGroup(new AggregateGraphs&lt;&gt;());</span>
 
-<span class="fc" id="L213">    DataSet&lt;EPGMVertex&gt; vertices =</span>
+<span class="fc" id="L215">    DataSet&lt;EPGMVertex&gt; vertices =</span>
       rowsWithGraphIdSets
-<span class="fc" id="L215">        .join(verticesWithIds)</span>
-<span class="fc" id="L216">        .where(0)</span>
-<span class="fc" id="L217">        .equalTo(0)</span>
-<span class="fc" id="L218">        .with(new AddNewGraphs&lt;&gt;());</span>
+<span class="fc" id="L217">        .join(verticesWithIds)</span>
+<span class="fc" id="L218">        .where(0)</span>
+<span class="fc" id="L219">        .equalTo(0)</span>
+<span class="fc" id="L220">        .with(new AddNewGraphs&lt;&gt;());</span>
 
-<span class="fc" id="L220">    DataSet&lt;EPGMEdge&gt; edges =</span>
+<span class="fc" id="L222">    DataSet&lt;EPGMEdge&gt; edges =</span>
       rowsWithGraphIdSets
-<span class="fc" id="L222">        .join(edgesWithIds)</span>
-<span class="fc" id="L223">        .where(0)</span>
-<span class="fc" id="L224">        .equalTo(0)</span>
-<span class="fc" id="L225">        .with(new AddNewGraphs&lt;&gt;());</span>
+<span class="fc" id="L224">        .join(edgesWithIds)</span>
+<span class="fc" id="L225">        .where(0)</span>
+<span class="fc" id="L226">        .equalTo(0)</span>
+<span class="fc" id="L227">        .with(new AddNewGraphs&lt;&gt;());</span>
 
-<span class="fc" id="L227">    vertices = vertices.map(new PropertyDecoder&lt;&gt;());</span>
-<span class="fc" id="L228">    edges = edges.map(new PropertyDecoder&lt;&gt;());</span>
+<span class="fc" id="L229">    vertices = vertices.map(new PropertyDecoder&lt;&gt;());</span>
+<span class="fc" id="L230">    edges = edges.map(new PropertyDecoder&lt;&gt;());</span>
 
-<span class="fc" id="L230">    return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L232">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
   }
 
   /**
@@ -238,38 +240,38 @@ public class CAPFQueryResult {
    * (https://github.com/dbs-leipzig/gradoop/issues/1221).
    */
   private void removeSlowOptimizationRule() {
-<span class="fc" id="L241">    List&lt;RelOptRule&gt; ruleList = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L242" title="All 2 branches covered.">    for (RelOptRule rule : session.tableEnv().getLogicalOptRuleSet()) {</span>
-<span class="pc bpc" id="L243" title="1 of 2 branches missed.">      if (!DISABLED_RULES.contains(rule.toString())) {</span>
-<span class="fc" id="L244">        ruleList.add(rule);</span>
+<span class="fc" id="L243">    List&lt;RelOptRule&gt; ruleList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">    for (RelOptRule rule : session.tableEnv().getLogicalOptRuleSet()) {</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">      if (!DISABLED_RULES.contains(rule.toString())) {</span>
+<span class="fc" id="L246">        ruleList.add(rule);</span>
       }
-<span class="fc" id="L246">    }</span>
-<span class="fc" id="L247">    CalciteConfigBuilder builder = new CalciteConfigBuilder()</span>
-<span class="fc" id="L248">      .replaceLogicalOptRuleSet(RuleSets.ofList(ruleList));</span>
+<span class="fc" id="L248">    }</span>
+<span class="fc" id="L249">    CalciteConfigBuilder builder = new CalciteConfigBuilder()</span>
+<span class="fc" id="L250">      .replaceLogicalOptRuleSet(RuleSets.ofList(ruleList));</span>
 
     // rebuild old calcite config
-<span class="fc" id="L251">    CalciteConfig calciteConfig = session.tableEnv().config().getCalciteConfig();</span>
-<span class="pc bpc" id="L252" title="1 of 2 branches missed.">    if (calciteConfig.replacesDecoRuleSet()) {</span>
-<span class="nc" id="L253">      builder.replaceDecoRuleSet(calciteConfig.getDecoRuleSet().get());</span>
+<span class="fc" id="L253">    CalciteConfig calciteConfig = session.tableEnv().config().getCalciteConfig();</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">    if (calciteConfig.replacesDecoRuleSet()) {</span>
+<span class="nc" id="L255">      builder.replaceDecoRuleSet(calciteConfig.getDecoRuleSet().get());</span>
     }
-<span class="pc bpc" id="L255" title="1 of 2 branches missed.">    if (calciteConfig.replacesNormRuleSet()) {</span>
-<span class="nc" id="L256">      builder.replaceNormRuleSet(calciteConfig.getNormRuleSet().get());</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    if (calciteConfig.replacesNormRuleSet()) {</span>
+<span class="nc" id="L258">      builder.replaceNormRuleSet(calciteConfig.getNormRuleSet().get());</span>
     }
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">    if (calciteConfig.replacesPhysicalOptRuleSet()) {</span>
-<span class="nc" id="L259">      builder.replacePhysicalOptRuleSet(calciteConfig.getPhysicalOptRuleSet().get());</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">    if (calciteConfig.replacesPhysicalOptRuleSet()) {</span>
+<span class="nc" id="L261">      builder.replacePhysicalOptRuleSet(calciteConfig.getPhysicalOptRuleSet().get());</span>
     }
-<span class="pc bpc" id="L261" title="1 of 2 branches missed.">    if (calciteConfig.replacesSqlOperatorTable()) {</span>
-<span class="nc" id="L262">      builder.replaceSqlOperatorTable(calciteConfig.getSqlOperatorTable().get());</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">    if (calciteConfig.replacesSqlOperatorTable()) {</span>
+<span class="nc" id="L264">      builder.replaceSqlOperatorTable(calciteConfig.getSqlOperatorTable().get());</span>
     }
-<span class="pc bpc" id="L264" title="1 of 2 branches missed.">    if (calciteConfig.getSqlParserConfig().isDefined()) {</span>
-<span class="nc" id="L265">      builder.replaceSqlParserConfig(calciteConfig.getSqlParserConfig().get());</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">    if (calciteConfig.getSqlParserConfig().isDefined()) {</span>
+<span class="nc" id="L267">      builder.replaceSqlParserConfig(calciteConfig.getSqlParserConfig().get());</span>
     }
-<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (calciteConfig.getSqlToRelConverterConfig().isDefined()) {</span>
-<span class="nc" id="L268">      builder.replaceSqlToRelConverterConfig(calciteConfig.getSqlToRelConverterConfig().get());</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">    if (calciteConfig.getSqlToRelConverterConfig().isDefined()) {</span>
+<span class="nc" id="L270">      builder.replaceSqlToRelConverterConfig(calciteConfig.getSqlToRelConverterConfig().get());</span>
     }
 
-<span class="fc" id="L271">    session.tableEnv().config().setCalciteConfig(builder.build());</span>
-<span class="fc" id="L272">  }</span>
+<span class="fc" id="L273">    session.tableEnv().config().setCalciteConfig(builder.build());</span>
+<span class="fc" id="L274">  }</span>
 
   /**
    * Get the flink table from the CAPF query result.
@@ -277,7 +279,7 @@ public class CAPFQueryResult {
    * @return flink table containing the CAPF query result
    */
   public Table getTable() {
-<span class="fc" id="L280">    return records.table().table();</span>
+<span class="fc" id="L282">    return records.table().table();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

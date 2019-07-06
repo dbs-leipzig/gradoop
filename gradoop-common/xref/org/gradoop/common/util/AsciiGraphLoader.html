@@ -29,11 +29,11 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.config.GradoopConfig;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.ElementFactoryProvider;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.GDLHandler;
@@ -50,16 +50,16 @@
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * @see &lt;a href="https://github.com/s1ck/gdl"&gt;GDL on GitHub&lt;/a&gt;</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; EPGM graph head type</em>
-<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; EPGM vertex type</em>
-<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM edge type</em>
+<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; graph head type</em>
+<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; vertex type</em>
+<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; edge type</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="47" href="#47">47</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> AsciiGraphLoader&lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt; {
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * Gradoop configuration</em>
+<a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * Factory provider for graph elements.</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="52" href="#52">52</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GradoopConfig&lt;G, V, E&gt; config;
+<a name="52" href="#52">52</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider;
 <a name="53" href="#53">53</a>  
 <a name="54" href="#54">54</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   * Used to parse GDL scripts.</em>
@@ -108,12 +108,12 @@
 <a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * Creates a new AsciiGraphLoader.</em>
 <a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   * @param gdlHandler GDL Handler</em>
-<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * @param config Gradoop configuration</em>
+<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * @param elementFactoryProvider Factory provider for EPGM elements.</em>
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   */</em>
 <a name="103" href="#103">103</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../org/gradoop/common/util/AsciiGraphLoader.html">AsciiGraphLoader</a>(GDLHandler gdlHandler,
-<a name="104" href="#104">104</a>     GradoopConfig&lt;G, V, E&gt; config) {
+<a name="104" href="#104">104</a>                            ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider) {
 <a name="105" href="#105">105</a>     <strong class="jxr_keyword">this</strong>.gdlHandler = gdlHandler;
-<a name="106" href="#106">106</a>     <strong class="jxr_keyword">this</strong>.config = config;
+<a name="106" href="#106">106</a>     <strong class="jxr_keyword">this</strong>.elementFactoryProvider = elementFactoryProvider;
 <a name="107" href="#107">107</a> 
 <a name="108" href="#108">108</a>     <strong class="jxr_keyword">this</strong>.graphHeads     = Maps.newHashMap();
 <a name="109" href="#109">109</a>     <strong class="jxr_keyword">this</strong>.vertices       = Maps.newHashMap();
@@ -133,34 +133,34 @@
 <a name="123" href="#123">123</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="124" href="#124">124</a> <em class="jxr_javadoccomment">   * Creates an AsciiGraphLoader from the given ASCII GDL string.</em>
 <a name="125" href="#125">125</a> <em class="jxr_javadoccomment">   *</em>
-<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * @param asciiGraph  GDL string</em>
-<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @param config      Gradoop configuration</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; EPGM graph head type</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; EPGM vertex type</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; EPGM edge type</em>
+<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * @param asciiGraph GDL string</em>
+<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @param elementFactoryProvider Factory provider for graph elements.</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; graph head type</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; vertex type</em>
+<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; edge type</em>
 <a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   *</em>
 <a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   * @return AsciiGraphLoader</em>
 <a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   */</em>
 <a name="134" href="#134">134</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong>
 <a name="135" href="#135">135</a>   &lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt;
 <a name="136" href="#136">136</a>   AsciiGraphLoader&lt;G, V, E&gt; fromString(String asciiGraph,
-<a name="137" href="#137">137</a>     GradoopConfig&lt;G, V, E&gt; config) {
+<a name="137" href="#137">137</a>                                        ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider) {
 <a name="138" href="#138">138</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AsciiGraphLoader&lt;&gt;(<strong class="jxr_keyword">new</strong> GDLHandler.Builder()
 <a name="139" href="#139">139</a>       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
 <a name="140" href="#140">140</a>       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
 <a name="141" href="#141">141</a>       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
 <a name="142" href="#142">142</a>       .buildFromString(asciiGraph),
-<a name="143" href="#143">143</a>       config);
+<a name="143" href="#143">143</a>       elementFactoryProvider);
 <a name="144" href="#144">144</a>   }
 <a name="145" href="#145">145</a> 
 <a name="146" href="#146">146</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="147" href="#147">147</a> <em class="jxr_javadoccomment">   * Creates an AsciiGraphLoader from the given ASCII GDL file.</em>
 <a name="148" href="#148">148</a> <em class="jxr_javadoccomment">   *</em>
-<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">   * @param fileName  File that contains a GDL script</em>
-<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">   * @param config    Gradoop configuration</em>
-<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; EPGM graph head type</em>
-<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; EPGM vertex type</em>
-<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; EPGM edge type</em>
+<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">   * @param fileName File that contains a GDL script</em>
+<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">   * @param elementFactoryProvider Factory provider for graph elements.</em>
+<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; graph head type</em>
+<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; vertex type</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; edge type</em>
 <a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   *</em>
 <a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * @return AsciiGraphLoader</em>
 <a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
@@ -168,426 +168,428 @@
 <a name="158" href="#158">158</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong>
 <a name="159" href="#159">159</a>   &lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt;
 <a name="160" href="#160">160</a>   AsciiGraphLoader&lt;G, V, E&gt; fromFile(String fileName,
-<a name="161" href="#161">161</a>     GradoopConfig&lt;G, V, E&gt; config) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="162" href="#162">162</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AsciiGraphLoader&lt;&gt;(<strong class="jxr_keyword">new</strong> GDLHandler.Builder()
-<a name="163" href="#163">163</a>       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
-<a name="164" href="#164">164</a>       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
-<a name="165" href="#165">165</a>       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-<a name="166" href="#166">166</a>       .buildFromFile(fileName),
-<a name="167" href="#167">167</a>       config);
-<a name="168" href="#168">168</a>   }
-<a name="169" href="#169">169</a> 
-<a name="170" href="#170">170</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   * Creates an AsciiGraphLoader from the given ASCII GDL file.</em>
-<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   *</em>
-<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   * @param inputStream   File that contains a GDL script</em>
-<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   * @param config        Gradoop configuration</em>
-<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; EPGM graph head type</em>
-<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; EPGM vertex type</em>
-<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; EPGM edge type</em>
-<a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   *</em>
-<a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   * @return AsciiGraphLoader</em>
-<a name="180" href="#180">180</a> <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
-<a name="181" href="#181">181</a> <em class="jxr_javadoccomment">   */</em>
-<a name="182" href="#182">182</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong>
-<a name="183" href="#183">183</a>   &lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt;
-<a name="184" href="#184">184</a>   AsciiGraphLoader&lt;G, V, E&gt; fromStream(InputStream inputStream,
-<a name="185" href="#185">185</a>     GradoopConfig&lt;G, V, E&gt; config) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="186" href="#186">186</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AsciiGraphLoader&lt;&gt;(<strong class="jxr_keyword">new</strong> GDLHandler.Builder()
-<a name="187" href="#187">187</a>       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
-<a name="188" href="#188">188</a>       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
-<a name="189" href="#189">189</a>       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-<a name="190" href="#190">190</a>       .buildFromStream(inputStream),
-<a name="191" href="#191">191</a>       config);
-<a name="192" href="#192">192</a>   }
-<a name="193" href="#193">193</a> 
-<a name="194" href="#194">194</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * Appends the given ASCII GDL to the graph handled by that loader.</em>
-<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   *</em>
-<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * Variables that were previously used, can be reused in the given script and</em>
-<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   * refer to the same entities.</em>
-<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   *</em>
-<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   * @param asciiGraph GDL string</em>
-<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   */</em>
-<a name="202" href="#202">202</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> appendFromString(String asciiGraph) {
-<a name="203" href="#203">203</a>     <strong class="jxr_keyword">this</strong>.gdlHandler.append(asciiGraph);
-<a name="204" href="#204">204</a>     init();
-<a name="205" href="#205">205</a>   }
-<a name="206" href="#206">206</a> 
-<a name="207" href="#207">207</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="208" href="#208">208</a>   <em class="jxr_comment">//  Graph methods</em>
+<a name="161" href="#161">161</a>                                      ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider)
+<a name="162" href="#162">162</a>     <strong class="jxr_keyword">throws</strong> IOException {
+<a name="163" href="#163">163</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AsciiGraphLoader&lt;&gt;(<strong class="jxr_keyword">new</strong> GDLHandler.Builder()
+<a name="164" href="#164">164</a>       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+<a name="165" href="#165">165</a>       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+<a name="166" href="#166">166</a>       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+<a name="167" href="#167">167</a>       .buildFromFile(fileName),
+<a name="168" href="#168">168</a>       elementFactoryProvider);
+<a name="169" href="#169">169</a>   }
+<a name="170" href="#170">170</a> 
+<a name="171" href="#171">171</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * Creates an AsciiGraphLoader from the given ASCII GDL file.</em>
+<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   *</em>
+<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   * @param inputStream File that contains a GDL script</em>
+<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   * @param elementFactoryProvider Factory provider for graph elements.</em>
+<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; graph head type</em>
+<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; vertex type</em>
+<a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; edge type</em>
+<a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   *</em>
+<a name="180" href="#180">180</a> <em class="jxr_javadoccomment">   * @return AsciiGraphLoader</em>
+<a name="181" href="#181">181</a> <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
+<a name="182" href="#182">182</a> <em class="jxr_javadoccomment">   */</em>
+<a name="183" href="#183">183</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong>
+<a name="184" href="#184">184</a>   &lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt;
+<a name="185" href="#185">185</a>   AsciiGraphLoader&lt;G, V, E&gt; fromStream(InputStream inputStream,
+<a name="186" href="#186">186</a>                                        ElementFactoryProvider&lt;G, V, E&gt; elementFactoryProvider)
+<a name="187" href="#187">187</a>     <strong class="jxr_keyword">throws</strong> IOException {
+<a name="188" href="#188">188</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AsciiGraphLoader&lt;&gt;(<strong class="jxr_keyword">new</strong> GDLHandler.Builder()
+<a name="189" href="#189">189</a>       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+<a name="190" href="#190">190</a>       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+<a name="191" href="#191">191</a>       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+<a name="192" href="#192">192</a>       .buildFromStream(inputStream),
+<a name="193" href="#193">193</a>       elementFactoryProvider);
+<a name="194" href="#194">194</a>   }
+<a name="195" href="#195">195</a> 
+<a name="196" href="#196">196</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * Appends the given ASCII GDL to the graph handled by that loader.</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   *</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   * Variables that were previously used, can be reused in the given script and</em>
+<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   * refer to the same entities.</em>
+<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   *</em>
+<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   * @param asciiGraph GDL string</em>
+<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   */</em>
+<a name="204" href="#204">204</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> appendFromString(String asciiGraph) {
+<a name="205" href="#205">205</a>     <strong class="jxr_keyword">this</strong>.gdlHandler.append(asciiGraph);
+<a name="206" href="#206">206</a>     init();
+<a name="207" href="#207">207</a>   }
+<a name="208" href="#208">208</a> 
 <a name="209" href="#209">209</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="210" href="#210">210</a> 
-<a name="211" href="#211">211</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   * Returns all GraphHeads contained in the ASCII graph.</em>
-<a name="213" href="#213">213</a> <em class="jxr_javadoccomment">   *</em>
-<a name="214" href="#214">214</a> <em class="jxr_javadoccomment">   * @return graphHeads</em>
-<a name="215" href="#215">215</a> <em class="jxr_javadoccomment">   */</em>
-<a name="216" href="#216">216</a>   <strong class="jxr_keyword">public</strong> Collection&lt;G&gt; getGraphHeads() {
-<a name="217" href="#217">217</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;G&gt;()
-<a name="218" href="#218">218</a>       .addAll(graphHeads.values()).build();
-<a name="219" href="#219">219</a>   }
-<a name="220" href="#220">220</a> 
-<a name="221" href="#221">221</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   * Returns GraphHead by given variable.</em>
-<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   *</em>
-<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @return graphHead or {@code null} if graph is not cached</em>
-<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   */</em>
-<a name="227" href="#227">227</a>   <strong class="jxr_keyword">public</strong> G getGraphHeadByVariable(String variable) {
-<a name="228" href="#228">228</a>     <strong class="jxr_keyword">return</strong> getGraphHeadCache().get(variable);
-<a name="229" href="#229">229</a>   }
-<a name="230" href="#230">230</a> 
-<a name="231" href="#231">231</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="232" href="#232">232</a> <em class="jxr_javadoccomment">   * Returns GraphHeads by their given variables.</em>
-<a name="233" href="#233">233</a> <em class="jxr_javadoccomment">   *</em>
-<a name="234" href="#234">234</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
-<a name="235" href="#235">235</a> <em class="jxr_javadoccomment">   * @return graphHeads that are assigned to the given variables</em>
-<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   */</em>
-<a name="237" href="#237">237</a>   <strong class="jxr_keyword">public</strong> Collection&lt;G&gt;  getGraphHeadsByVariables(String... variables) {
-<a name="238" href="#238">238</a>     Collection&lt;G&gt;  result =
-<a name="239" href="#239">239</a>       Sets.newHashSetWithExpectedSize(variables.length);
-<a name="240" href="#240">240</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
-<a name="241" href="#241">241</a>       G graphHead = getGraphHeadByVariable(variable);
-<a name="242" href="#242">242</a>       <strong class="jxr_keyword">if</strong> (graphHead != <strong class="jxr_keyword">null</strong>) {
-<a name="243" href="#243">243</a>         result.add(graphHead);
-<a name="244" href="#244">244</a>       }
-<a name="245" href="#245">245</a>     }
-<a name="246" href="#246">246</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="247" href="#247">247</a>   }
-<a name="248" href="#248">248</a> 
-<a name="249" href="#249">249</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="250" href="#250">250</a>   <em class="jxr_comment">//  Vertex methods</em>
+<a name="210" href="#210">210</a>   <em class="jxr_comment">//  Graph methods</em>
+<a name="211" href="#211">211</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
+<a name="212" href="#212">212</a> 
+<a name="213" href="#213">213</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="214" href="#214">214</a> <em class="jxr_javadoccomment">   * Returns all GraphHeads contained in the ASCII graph.</em>
+<a name="215" href="#215">215</a> <em class="jxr_javadoccomment">   *</em>
+<a name="216" href="#216">216</a> <em class="jxr_javadoccomment">   * @return graphHeads</em>
+<a name="217" href="#217">217</a> <em class="jxr_javadoccomment">   */</em>
+<a name="218" href="#218">218</a>   <strong class="jxr_keyword">public</strong> Collection&lt;G&gt; getGraphHeads() {
+<a name="219" href="#219">219</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;G&gt;()
+<a name="220" href="#220">220</a>       .addAll(graphHeads.values()).build();
+<a name="221" href="#221">221</a>   }
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * Returns GraphHead by given variable.</em>
+<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   *</em>
+<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
+<a name="227" href="#227">227</a> <em class="jxr_javadoccomment">   * @return graphHead or {@code null} if graph is not cached</em>
+<a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   */</em>
+<a name="229" href="#229">229</a>   <strong class="jxr_keyword">public</strong> G getGraphHeadByVariable(String variable) {
+<a name="230" href="#230">230</a>     <strong class="jxr_keyword">return</strong> getGraphHeadCache().get(variable);
+<a name="231" href="#231">231</a>   }
+<a name="232" href="#232">232</a> 
+<a name="233" href="#233">233</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="234" href="#234">234</a> <em class="jxr_javadoccomment">   * Returns GraphHeads by their given variables.</em>
+<a name="235" href="#235">235</a> <em class="jxr_javadoccomment">   *</em>
+<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
+<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * @return graphHeads that are assigned to the given variables</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   */</em>
+<a name="239" href="#239">239</a>   <strong class="jxr_keyword">public</strong> Collection&lt;G&gt;  getGraphHeadsByVariables(String... variables) {
+<a name="240" href="#240">240</a>     Collection&lt;G&gt;  result =
+<a name="241" href="#241">241</a>       Sets.newHashSetWithExpectedSize(variables.length);
+<a name="242" href="#242">242</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
+<a name="243" href="#243">243</a>       G graphHead = getGraphHeadByVariable(variable);
+<a name="244" href="#244">244</a>       <strong class="jxr_keyword">if</strong> (graphHead != <strong class="jxr_keyword">null</strong>) {
+<a name="245" href="#245">245</a>         result.add(graphHead);
+<a name="246" href="#246">246</a>       }
+<a name="247" href="#247">247</a>     }
+<a name="248" href="#248">248</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="249" href="#249">249</a>   }
+<a name="250" href="#250">250</a> 
 <a name="251" href="#251">251</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="252" href="#252">252</a> 
-<a name="253" href="#253">253</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   * Returns all vertices contained in the ASCII graph.</em>
-<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   *</em>
-<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   * @return vertices</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   */</em>
-<a name="258" href="#258">258</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVertices() {
-<a name="259" href="#259">259</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;V&gt;().addAll(vertices.values()).build();
-<a name="260" href="#260">260</a>   }
-<a name="261" href="#261">261</a> 
-<a name="262" href="#262">262</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * Returns vertex by its given variable.</em>
-<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   *</em>
-<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
-<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * @return vertex or {@code null} if not present</em>
-<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   */</em>
-<a name="268" href="#268">268</a>   <strong class="jxr_keyword">public</strong> V getVertexByVariable(String variable) {
-<a name="269" href="#269">269</a>     <strong class="jxr_keyword">return</strong> vertexCache.get(variable);
-<a name="270" href="#270">270</a>   }
-<a name="271" href="#271">271</a> 
-<a name="272" href="#272">272</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">   * Returns vertices by their given variables.</em>
-<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">   *</em>
-<a name="275" href="#275">275</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
-<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   * @return vertices</em>
-<a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   */</em>
-<a name="278" href="#278">278</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByVariables(String... variables) {
-<a name="279" href="#279">279</a>     Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(variables.length);
-<a name="280" href="#280">280</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
-<a name="281" href="#281">281</a>       V vertex = getVertexByVariable(variable);
-<a name="282" href="#282">282</a>       <strong class="jxr_keyword">if</strong> (vertex != <strong class="jxr_keyword">null</strong>) {
-<a name="283" href="#283">283</a>         result.add(vertex);
-<a name="284" href="#284">284</a>       }
-<a name="285" href="#285">285</a>     }
-<a name="286" href="#286">286</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="287" href="#287">287</a>   }
-<a name="288" href="#288">288</a> 
-<a name="289" href="#289">289</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="290" href="#290">290</a> <em class="jxr_javadoccomment">   * Returns all vertices that belong to the given graphs.</em>
-<a name="291" href="#291">291</a> <em class="jxr_javadoccomment">   *</em>
-<a name="292" href="#292">292</a> <em class="jxr_javadoccomment">   * @param graphIds graph identifiers</em>
-<a name="293" href="#293">293</a> <em class="jxr_javadoccomment">   * @return vertices that are contained in the graphs</em>
-<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">   */</em>
-<a name="295" href="#295">295</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByGraphIds(<a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds) {
-<a name="296" href="#296">296</a>     Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(graphIds.size());
-<a name="297" href="#297">297</a>     <strong class="jxr_keyword">for</strong> (V vertex : vertices.values()) {
-<a name="298" href="#298">298</a>       <strong class="jxr_keyword">if</strong> (vertex.getGraphIds().containsAny(graphIds)) {
-<a name="299" href="#299">299</a>         result.add(vertex);
-<a name="300" href="#300">300</a>       }
-<a name="301" href="#301">301</a>     }
-<a name="302" href="#302">302</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="303" href="#303">303</a>   }
-<a name="304" href="#304">304</a> 
-<a name="305" href="#305">305</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="306" href="#306">306</a> <em class="jxr_javadoccomment">   * Returns all vertices that belong to the given graph variables.</em>
-<a name="307" href="#307">307</a> <em class="jxr_javadoccomment">   *</em>
-<a name="308" href="#308">308</a> <em class="jxr_javadoccomment">   * @param graphVariables graph variables used in the GDL script</em>
-<a name="309" href="#309">309</a> <em class="jxr_javadoccomment">   * @return vertices that are contained in the graphs</em>
-<a name="310" href="#310">310</a> <em class="jxr_javadoccomment">   */</em>
-<a name="311" href="#311">311</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByGraphVariables(String... graphVariables) {
-<a name="312" href="#312">312</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
-<a name="313" href="#313">313</a>     <strong class="jxr_keyword">for</strong> (G graphHead : getGraphHeadsByVariables(graphVariables)) {
-<a name="314" href="#314">314</a>       graphIds.add(graphHead.getId());
-<a name="315" href="#315">315</a>     }
-<a name="316" href="#316">316</a>     <strong class="jxr_keyword">return</strong> getVerticesByGraphIds(graphIds);
-<a name="317" href="#317">317</a>   }
-<a name="318" href="#318">318</a> 
-<a name="319" href="#319">319</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="320" href="#320">320</a>   <em class="jxr_comment">//  Edge methods</em>
+<a name="252" href="#252">252</a>   <em class="jxr_comment">//  Vertex methods</em>
+<a name="253" href="#253">253</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
+<a name="254" href="#254">254</a> 
+<a name="255" href="#255">255</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   * Returns all vertices contained in the ASCII graph.</em>
+<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   *</em>
+<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   * @return vertices</em>
+<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   */</em>
+<a name="260" href="#260">260</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVertices() {
+<a name="261" href="#261">261</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;V&gt;().addAll(vertices.values()).build();
+<a name="262" href="#262">262</a>   }
+<a name="263" href="#263">263</a> 
+<a name="264" href="#264">264</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   * Returns vertex by its given variable.</em>
+<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   *</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
+<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   * @return vertex or {@code null} if not present</em>
+<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   */</em>
+<a name="270" href="#270">270</a>   <strong class="jxr_keyword">public</strong> V getVertexByVariable(String variable) {
+<a name="271" href="#271">271</a>     <strong class="jxr_keyword">return</strong> vertexCache.get(variable);
+<a name="272" href="#272">272</a>   }
+<a name="273" href="#273">273</a> 
+<a name="274" href="#274">274</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="275" href="#275">275</a> <em class="jxr_javadoccomment">   * Returns vertices by their given variables.</em>
+<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   *</em>
+<a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
+<a name="278" href="#278">278</a> <em class="jxr_javadoccomment">   * @return vertices</em>
+<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   */</em>
+<a name="280" href="#280">280</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByVariables(String... variables) {
+<a name="281" href="#281">281</a>     Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(variables.length);
+<a name="282" href="#282">282</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
+<a name="283" href="#283">283</a>       V vertex = getVertexByVariable(variable);
+<a name="284" href="#284">284</a>       <strong class="jxr_keyword">if</strong> (vertex != <strong class="jxr_keyword">null</strong>) {
+<a name="285" href="#285">285</a>         result.add(vertex);
+<a name="286" href="#286">286</a>       }
+<a name="287" href="#287">287</a>     }
+<a name="288" href="#288">288</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="289" href="#289">289</a>   }
+<a name="290" href="#290">290</a> 
+<a name="291" href="#291">291</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="292" href="#292">292</a> <em class="jxr_javadoccomment">   * Returns all vertices that belong to the given graphs.</em>
+<a name="293" href="#293">293</a> <em class="jxr_javadoccomment">   *</em>
+<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">   * @param graphIds graph identifiers</em>
+<a name="295" href="#295">295</a> <em class="jxr_javadoccomment">   * @return vertices that are contained in the graphs</em>
+<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   */</em>
+<a name="297" href="#297">297</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByGraphIds(<a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds) {
+<a name="298" href="#298">298</a>     Collection&lt;V&gt; result = Sets.newHashSetWithExpectedSize(graphIds.size());
+<a name="299" href="#299">299</a>     <strong class="jxr_keyword">for</strong> (V vertex : vertices.values()) {
+<a name="300" href="#300">300</a>       <strong class="jxr_keyword">if</strong> (vertex.getGraphIds().containsAny(graphIds)) {
+<a name="301" href="#301">301</a>         result.add(vertex);
+<a name="302" href="#302">302</a>       }
+<a name="303" href="#303">303</a>     }
+<a name="304" href="#304">304</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="305" href="#305">305</a>   }
+<a name="306" href="#306">306</a> 
+<a name="307" href="#307">307</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="308" href="#308">308</a> <em class="jxr_javadoccomment">   * Returns all vertices that belong to the given graph variables.</em>
+<a name="309" href="#309">309</a> <em class="jxr_javadoccomment">   *</em>
+<a name="310" href="#310">310</a> <em class="jxr_javadoccomment">   * @param graphVariables graph variables used in the GDL script</em>
+<a name="311" href="#311">311</a> <em class="jxr_javadoccomment">   * @return vertices that are contained in the graphs</em>
+<a name="312" href="#312">312</a> <em class="jxr_javadoccomment">   */</em>
+<a name="313" href="#313">313</a>   <strong class="jxr_keyword">public</strong> Collection&lt;V&gt; getVerticesByGraphVariables(String... graphVariables) {
+<a name="314" href="#314">314</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
+<a name="315" href="#315">315</a>     <strong class="jxr_keyword">for</strong> (G graphHead : getGraphHeadsByVariables(graphVariables)) {
+<a name="316" href="#316">316</a>       graphIds.add(graphHead.getId());
+<a name="317" href="#317">317</a>     }
+<a name="318" href="#318">318</a>     <strong class="jxr_keyword">return</strong> getVerticesByGraphIds(graphIds);
+<a name="319" href="#319">319</a>   }
+<a name="320" href="#320">320</a> 
 <a name="321" href="#321">321</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="322" href="#322">322</a> 
-<a name="323" href="#323">323</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="324" href="#324">324</a> <em class="jxr_javadoccomment">   * Returns all edges contained in the ASCII graph.</em>
-<a name="325" href="#325">325</a> <em class="jxr_javadoccomment">   *</em>
-<a name="326" href="#326">326</a> <em class="jxr_javadoccomment">   * @return edges</em>
-<a name="327" href="#327">327</a> <em class="jxr_javadoccomment">   */</em>
-<a name="328" href="#328">328</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt; getEdges() {
-<a name="329" href="#329">329</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;E&gt;().addAll(edges.values()).build();
-<a name="330" href="#330">330</a>   }
-<a name="331" href="#331">331</a> 
-<a name="332" href="#332">332</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="333" href="#333">333</a> <em class="jxr_javadoccomment">   * Returns edge by its given variable.</em>
-<a name="334" href="#334">334</a> <em class="jxr_javadoccomment">   *</em>
-<a name="335" href="#335">335</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
-<a name="336" href="#336">336</a> <em class="jxr_javadoccomment">   * @return edge or {@code null} if not present</em>
-<a name="337" href="#337">337</a> <em class="jxr_javadoccomment">   */</em>
-<a name="338" href="#338">338</a>   <strong class="jxr_keyword">public</strong> E getEdgeByVariable(String variable) {
-<a name="339" href="#339">339</a>     <strong class="jxr_keyword">return</strong> edgeCache.get(variable);
-<a name="340" href="#340">340</a>   }
-<a name="341" href="#341">341</a> 
-<a name="342" href="#342">342</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="343" href="#343">343</a> <em class="jxr_javadoccomment">   * Returns edges by their given variables.</em>
-<a name="344" href="#344">344</a> <em class="jxr_javadoccomment">   *</em>
-<a name="345" href="#345">345</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
-<a name="346" href="#346">346</a> <em class="jxr_javadoccomment">   * @return edges</em>
-<a name="347" href="#347">347</a> <em class="jxr_javadoccomment">   */</em>
-<a name="348" href="#348">348</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt; getEdgesByVariables(String... variables) {
-<a name="349" href="#349">349</a>     Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(variables.length);
-<a name="350" href="#350">350</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
-<a name="351" href="#351">351</a>       E edge = edgeCache.get(variable);
-<a name="352" href="#352">352</a>       <strong class="jxr_keyword">if</strong> (edge != <strong class="jxr_keyword">null</strong>) {
-<a name="353" href="#353">353</a>         result.add(edge);
-<a name="354" href="#354">354</a>       }
-<a name="355" href="#355">355</a>     }
-<a name="356" href="#356">356</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="357" href="#357">357</a>   }
-<a name="358" href="#358">358</a> 
-<a name="359" href="#359">359</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="360" href="#360">360</a> <em class="jxr_javadoccomment">   * Returns all edges that belong to the given graphs.</em>
-<a name="361" href="#361">361</a> <em class="jxr_javadoccomment">   *</em>
-<a name="362" href="#362">362</a> <em class="jxr_javadoccomment">   * @param graphIds Graph identifiers</em>
-<a name="363" href="#363">363</a> <em class="jxr_javadoccomment">   * @return edges</em>
-<a name="364" href="#364">364</a> <em class="jxr_javadoccomment">   */</em>
-<a name="365" href="#365">365</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt;  getEdgesByGraphIds(GradoopIdSet graphIds) {
-<a name="366" href="#366">366</a>     Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(graphIds.size());
-<a name="367" href="#367">367</a>     <strong class="jxr_keyword">for</strong> (E edge : edges.values()) {
-<a name="368" href="#368">368</a>       <strong class="jxr_keyword">if</strong> (edge.getGraphIds().containsAny(graphIds)) {
-<a name="369" href="#369">369</a>         result.add(edge);
-<a name="370" href="#370">370</a>       }
-<a name="371" href="#371">371</a>     }
-<a name="372" href="#372">372</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="373" href="#373">373</a>   }
-<a name="374" href="#374">374</a> 
-<a name="375" href="#375">375</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="376" href="#376">376</a> <em class="jxr_javadoccomment">   * Returns all edges that belong to the given graph variables.</em>
-<a name="377" href="#377">377</a> <em class="jxr_javadoccomment">   *</em>
-<a name="378" href="#378">378</a> <em class="jxr_javadoccomment">   * @param variables graph variables used in the GDL script</em>
-<a name="379" href="#379">379</a> <em class="jxr_javadoccomment">   * @return edges</em>
-<a name="380" href="#380">380</a> <em class="jxr_javadoccomment">   */</em>
-<a name="381" href="#381">381</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt;  getEdgesByGraphVariables(String... variables) {
-<a name="382" href="#382">382</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
-<a name="383" href="#383">383</a>     <strong class="jxr_keyword">for</strong> (G graphHead : getGraphHeadsByVariables(variables)) {
-<a name="384" href="#384">384</a>       graphIds.add(graphHead.getId());
-<a name="385" href="#385">385</a>     }
-<a name="386" href="#386">386</a>     <strong class="jxr_keyword">return</strong> getEdgesByGraphIds(graphIds);
-<a name="387" href="#387">387</a>   }
-<a name="388" href="#388">388</a> 
-<a name="389" href="#389">389</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="390" href="#390">390</a>   <em class="jxr_comment">//  Caches</em>
+<a name="322" href="#322">322</a>   <em class="jxr_comment">//  Edge methods</em>
+<a name="323" href="#323">323</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
+<a name="324" href="#324">324</a> 
+<a name="325" href="#325">325</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="326" href="#326">326</a> <em class="jxr_javadoccomment">   * Returns all edges contained in the ASCII graph.</em>
+<a name="327" href="#327">327</a> <em class="jxr_javadoccomment">   *</em>
+<a name="328" href="#328">328</a> <em class="jxr_javadoccomment">   * @return edges</em>
+<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">   */</em>
+<a name="330" href="#330">330</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt; getEdges() {
+<a name="331" href="#331">331</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableSet.Builder&lt;E&gt;().addAll(edges.values()).build();
+<a name="332" href="#332">332</a>   }
+<a name="333" href="#333">333</a> 
+<a name="334" href="#334">334</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="335" href="#335">335</a> <em class="jxr_javadoccomment">   * Returns edge by its given variable.</em>
+<a name="336" href="#336">336</a> <em class="jxr_javadoccomment">   *</em>
+<a name="337" href="#337">337</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
+<a name="338" href="#338">338</a> <em class="jxr_javadoccomment">   * @return edge or {@code null} if not present</em>
+<a name="339" href="#339">339</a> <em class="jxr_javadoccomment">   */</em>
+<a name="340" href="#340">340</a>   <strong class="jxr_keyword">public</strong> E getEdgeByVariable(String variable) {
+<a name="341" href="#341">341</a>     <strong class="jxr_keyword">return</strong> edgeCache.get(variable);
+<a name="342" href="#342">342</a>   }
+<a name="343" href="#343">343</a> 
+<a name="344" href="#344">344</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="345" href="#345">345</a> <em class="jxr_javadoccomment">   * Returns edges by their given variables.</em>
+<a name="346" href="#346">346</a> <em class="jxr_javadoccomment">   *</em>
+<a name="347" href="#347">347</a> <em class="jxr_javadoccomment">   * @param variables variables used in GDL script</em>
+<a name="348" href="#348">348</a> <em class="jxr_javadoccomment">   * @return edges</em>
+<a name="349" href="#349">349</a> <em class="jxr_javadoccomment">   */</em>
+<a name="350" href="#350">350</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt; getEdgesByVariables(String... variables) {
+<a name="351" href="#351">351</a>     Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(variables.length);
+<a name="352" href="#352">352</a>     <strong class="jxr_keyword">for</strong> (String variable : variables) {
+<a name="353" href="#353">353</a>       E edge = edgeCache.get(variable);
+<a name="354" href="#354">354</a>       <strong class="jxr_keyword">if</strong> (edge != <strong class="jxr_keyword">null</strong>) {
+<a name="355" href="#355">355</a>         result.add(edge);
+<a name="356" href="#356">356</a>       }
+<a name="357" href="#357">357</a>     }
+<a name="358" href="#358">358</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="359" href="#359">359</a>   }
+<a name="360" href="#360">360</a> 
+<a name="361" href="#361">361</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="362" href="#362">362</a> <em class="jxr_javadoccomment">   * Returns all edges that belong to the given graphs.</em>
+<a name="363" href="#363">363</a> <em class="jxr_javadoccomment">   *</em>
+<a name="364" href="#364">364</a> <em class="jxr_javadoccomment">   * @param graphIds Graph identifiers</em>
+<a name="365" href="#365">365</a> <em class="jxr_javadoccomment">   * @return edges</em>
+<a name="366" href="#366">366</a> <em class="jxr_javadoccomment">   */</em>
+<a name="367" href="#367">367</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt;  getEdgesByGraphIds(GradoopIdSet graphIds) {
+<a name="368" href="#368">368</a>     Collection&lt;E&gt;  result = Sets.newHashSetWithExpectedSize(graphIds.size());
+<a name="369" href="#369">369</a>     <strong class="jxr_keyword">for</strong> (E edge : edges.values()) {
+<a name="370" href="#370">370</a>       <strong class="jxr_keyword">if</strong> (edge.getGraphIds().containsAny(graphIds)) {
+<a name="371" href="#371">371</a>         result.add(edge);
+<a name="372" href="#372">372</a>       }
+<a name="373" href="#373">373</a>     }
+<a name="374" href="#374">374</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="375" href="#375">375</a>   }
+<a name="376" href="#376">376</a> 
+<a name="377" href="#377">377</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="378" href="#378">378</a> <em class="jxr_javadoccomment">   * Returns all edges that belong to the given graph variables.</em>
+<a name="379" href="#379">379</a> <em class="jxr_javadoccomment">   *</em>
+<a name="380" href="#380">380</a> <em class="jxr_javadoccomment">   * @param variables graph variables used in the GDL script</em>
+<a name="381" href="#381">381</a> <em class="jxr_javadoccomment">   * @return edges</em>
+<a name="382" href="#382">382</a> <em class="jxr_javadoccomment">   */</em>
+<a name="383" href="#383">383</a>   <strong class="jxr_keyword">public</strong> Collection&lt;E&gt;  getEdgesByGraphVariables(String... variables) {
+<a name="384" href="#384">384</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> graphIds = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
+<a name="385" href="#385">385</a>     <strong class="jxr_keyword">for</strong> (G graphHead : getGraphHeadsByVariables(variables)) {
+<a name="386" href="#386">386</a>       graphIds.add(graphHead.getId());
+<a name="387" href="#387">387</a>     }
+<a name="388" href="#388">388</a>     <strong class="jxr_keyword">return</strong> getEdgesByGraphIds(graphIds);
+<a name="389" href="#389">389</a>   }
+<a name="390" href="#390">390</a> 
 <a name="391" href="#391">391</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="392" href="#392">392</a> 
-<a name="393" href="#393">393</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="394" href="#394">394</a> <em class="jxr_javadoccomment">   * Returns all graph heads that are bound to a variable in the GDL script.</em>
-<a name="395" href="#395">395</a> <em class="jxr_javadoccomment">   *</em>
-<a name="396" href="#396">396</a> <em class="jxr_javadoccomment">   * @return variable to graphHead mapping</em>
-<a name="397" href="#397">397</a> <em class="jxr_javadoccomment">   */</em>
-<a name="398" href="#398">398</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, G&gt; getGraphHeadCache() {
-<a name="399" href="#399">399</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, G&gt;().putAll(graphHeadCache)
-<a name="400" href="#400">400</a>       .build();
-<a name="401" href="#401">401</a>   }
-<a name="402" href="#402">402</a> 
-<a name="403" href="#403">403</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="404" href="#404">404</a> <em class="jxr_javadoccomment">   * Returns all vertices that are bound to a variable in the GDL script.</em>
-<a name="405" href="#405">405</a> <em class="jxr_javadoccomment">   *</em>
-<a name="406" href="#406">406</a> <em class="jxr_javadoccomment">   * @return variable to vertex mapping</em>
-<a name="407" href="#407">407</a> <em class="jxr_javadoccomment">   */</em>
-<a name="408" href="#408">408</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, V&gt; getVertexCache() {
-<a name="409" href="#409">409</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, V&gt;().putAll(vertexCache).build();
-<a name="410" href="#410">410</a>   }
-<a name="411" href="#411">411</a> 
-<a name="412" href="#412">412</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="413" href="#413">413</a> <em class="jxr_javadoccomment">   * Returns all edges that are bound to a variable in the GDL script.</em>
-<a name="414" href="#414">414</a> <em class="jxr_javadoccomment">   *</em>
-<a name="415" href="#415">415</a> <em class="jxr_javadoccomment">   * @return variable to edge mapping</em>
-<a name="416" href="#416">416</a> <em class="jxr_javadoccomment">   */</em>
-<a name="417" href="#417">417</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, E&gt; getEdgeCache() {
-<a name="418" href="#418">418</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, E&gt;().putAll(edgeCache).build();
-<a name="419" href="#419">419</a>   }
-<a name="420" href="#420">420</a> 
-<a name="421" href="#421">421</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="422" href="#422">422</a>   <em class="jxr_comment">//  Private init methods</em>
+<a name="392" href="#392">392</a>   <em class="jxr_comment">//  Caches</em>
+<a name="393" href="#393">393</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
+<a name="394" href="#394">394</a> 
+<a name="395" href="#395">395</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="396" href="#396">396</a> <em class="jxr_javadoccomment">   * Returns all graph heads that are bound to a variable in the GDL script.</em>
+<a name="397" href="#397">397</a> <em class="jxr_javadoccomment">   *</em>
+<a name="398" href="#398">398</a> <em class="jxr_javadoccomment">   * @return variable to graphHead mapping</em>
+<a name="399" href="#399">399</a> <em class="jxr_javadoccomment">   */</em>
+<a name="400" href="#400">400</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, G&gt; getGraphHeadCache() {
+<a name="401" href="#401">401</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, G&gt;().putAll(graphHeadCache)
+<a name="402" href="#402">402</a>       .build();
+<a name="403" href="#403">403</a>   }
+<a name="404" href="#404">404</a> 
+<a name="405" href="#405">405</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="406" href="#406">406</a> <em class="jxr_javadoccomment">   * Returns all vertices that are bound to a variable in the GDL script.</em>
+<a name="407" href="#407">407</a> <em class="jxr_javadoccomment">   *</em>
+<a name="408" href="#408">408</a> <em class="jxr_javadoccomment">   * @return variable to vertex mapping</em>
+<a name="409" href="#409">409</a> <em class="jxr_javadoccomment">   */</em>
+<a name="410" href="#410">410</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, V&gt; getVertexCache() {
+<a name="411" href="#411">411</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, V&gt;().putAll(vertexCache).build();
+<a name="412" href="#412">412</a>   }
+<a name="413" href="#413">413</a> 
+<a name="414" href="#414">414</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="415" href="#415">415</a> <em class="jxr_javadoccomment">   * Returns all edges that are bound to a variable in the GDL script.</em>
+<a name="416" href="#416">416</a> <em class="jxr_javadoccomment">   *</em>
+<a name="417" href="#417">417</a> <em class="jxr_javadoccomment">   * @return variable to edge mapping</em>
+<a name="418" href="#418">418</a> <em class="jxr_javadoccomment">   */</em>
+<a name="419" href="#419">419</a>   <strong class="jxr_keyword">public</strong> Map&lt;String, E&gt; getEdgeCache() {
+<a name="420" href="#420">420</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ImmutableMap.Builder&lt;String, E&gt;().putAll(edgeCache).build();
+<a name="421" href="#421">421</a>   }
+<a name="422" href="#422">422</a> 
 <a name="423" href="#423">423</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
-<a name="424" href="#424">424</a> 
-<a name="425" href="#425">425</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="426" href="#426">426</a> <em class="jxr_javadoccomment">   * Initializes the AsciiGraphLoader</em>
-<a name="427" href="#427">427</a> <em class="jxr_javadoccomment">   */</em>
-<a name="428" href="#428">428</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> init() {
-<a name="429" href="#429">429</a>     initGraphHeads();
-<a name="430" href="#430">430</a>     initVertices();
-<a name="431" href="#431">431</a>     initEdges();
-<a name="432" href="#432">432</a>   }
-<a name="433" href="#433">433</a> 
-<a name="434" href="#434">434</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="435" href="#435">435</a> <em class="jxr_javadoccomment">   * Initializes GraphHeads and their cache.</em>
-<a name="436" href="#436">436</a> <em class="jxr_javadoccomment">   */</em>
-<a name="437" href="#437">437</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initGraphHeads() {
-<a name="438" href="#438">438</a>     <strong class="jxr_keyword">for</strong> (Graph g : gdlHandler.getGraphs()) {
-<a name="439" href="#439">439</a>       <strong class="jxr_keyword">if</strong> (!graphHeadIds.containsKey(g.getId())) {
-<a name="440" href="#440">440</a>         initGraphHead(g);
-<a name="441" href="#441">441</a>       }
-<a name="442" href="#442">442</a>     }
-<a name="443" href="#443">443</a> 
-<a name="444" href="#444">444</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, Graph&gt; e : gdlHandler.getGraphCache().entrySet()) {
-<a name="445" href="#445">445</a>       updateGraphCache(e.getKey(), e.getValue());
-<a name="446" href="#446">446</a>     }
-<a name="447" href="#447">447</a>   }
-<a name="448" href="#448">448</a> 
-<a name="449" href="#449">449</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="450" href="#450">450</a> <em class="jxr_javadoccomment">   * Initializes vertices and their cache.</em>
-<a name="451" href="#451">451</a> <em class="jxr_javadoccomment">   */</em>
-<a name="452" href="#452">452</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertices() {
-<a name="453" href="#453">453</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {
-<a name="454" href="#454">454</a>       initVertex(v);
-<a name="455" href="#455">455</a>     }
-<a name="456" href="#456">456</a> 
-<a name="457" href="#457">457</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {
-<a name="458" href="#458">458</a>       updateVertexCache(e.getKey(), e.getValue());
-<a name="459" href="#459">459</a>     }
-<a name="460" href="#460">460</a>   }
-<a name="461" href="#461">461</a> 
-<a name="462" href="#462">462</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="463" href="#463">463</a> <em class="jxr_javadoccomment">   * Initializes edges and their cache.</em>
-<a name="464" href="#464">464</a> <em class="jxr_javadoccomment">   */</em>
-<a name="465" href="#465">465</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdges() {
-<a name="466" href="#466">466</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {
-<a name="467" href="#467">467</a>       initEdge(e);
-<a name="468" href="#468">468</a>     }
-<a name="469" href="#469">469</a> 
-<a name="470" href="#470">470</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {
-<a name="471" href="#471">471</a>       updateEdgeCache(e.getKey(), e.getValue());
-<a name="472" href="#472">472</a>     }
-<a name="473" href="#473">473</a>   }
-<a name="474" href="#474">474</a> 
-<a name="475" href="#475">475</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="476" href="#476">476</a> <em class="jxr_javadoccomment">   * Creates a new EPGMGraph from the GDL Loader.</em>
-<a name="477" href="#477">477</a> <em class="jxr_javadoccomment">   *</em>
-<a name="478" href="#478">478</a> <em class="jxr_javadoccomment">   * @param g graph from GDL Loader</em>
-<a name="479" href="#479">479</a> <em class="jxr_javadoccomment">   * @return EPGM graph head</em>
-<a name="480" href="#480">480</a> <em class="jxr_javadoccomment">   */</em>
-<a name="481" href="#481">481</a>   <strong class="jxr_keyword">private</strong> G initGraphHead(Graph g) {
-<a name="482" href="#482">482</a>     G graphHead = (G) config.getGraphHeadFactory().createGraphHead(
-<a name="483" href="#483">483</a>       g.getLabel(), Properties.createFromMap(g.getProperties()));
-<a name="484" href="#484">484</a>     graphHeadIds.put(g.getId(), graphHead.getId());
-<a name="485" href="#485">485</a>     graphHeads.put(graphHead.getId(), graphHead);
-<a name="486" href="#486">486</a>     <strong class="jxr_keyword">return</strong> graphHead;
-<a name="487" href="#487">487</a>   }
-<a name="488" href="#488">488</a> 
-<a name="489" href="#489">489</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="490" href="#490">490</a> <em class="jxr_javadoccomment">   * Creates a new Vertex from the GDL Loader or updates an existing one.</em>
-<a name="491" href="#491">491</a> <em class="jxr_javadoccomment">   *</em>
-<a name="492" href="#492">492</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL Loader</em>
-<a name="493" href="#493">493</a> <em class="jxr_javadoccomment">   * @return EPGM vertex</em>
-<a name="494" href="#494">494</a> <em class="jxr_javadoccomment">   */</em>
-<a name="495" href="#495">495</a>   <strong class="jxr_keyword">private</strong> V initVertex(org.s1ck.gdl.model.Vertex v) {
-<a name="496" href="#496">496</a>     V vertex;
-<a name="497" href="#497">497</a>     <strong class="jxr_keyword">if</strong> (!vertexIds.containsKey(v.getId())) {
-<a name="498" href="#498">498</a>       vertex = (V) config.getVertexFactory().createVertex(
-<a name="499" href="#499">499</a>         v.getLabel(),
-<a name="500" href="#500">500</a>         Properties.createFromMap(v.getProperties()),
-<a name="501" href="#501">501</a>         createGradoopIdSet(v));
-<a name="502" href="#502">502</a>       vertexIds.put(v.getId(), vertex.getId());
-<a name="503" href="#503">503</a>       vertices.put(vertex.getId(), vertex);
-<a name="504" href="#504">504</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="505" href="#505">505</a>       vertex = vertices.get(vertexIds.get(v.getId()));
-<a name="506" href="#506">506</a>       vertex.setGraphIds(createGradoopIdSet(v));
-<a name="507" href="#507">507</a>     }
-<a name="508" href="#508">508</a>     <strong class="jxr_keyword">return</strong> vertex;
-<a name="509" href="#509">509</a>   }
-<a name="510" href="#510">510</a> 
-<a name="511" href="#511">511</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="512" href="#512">512</a> <em class="jxr_javadoccomment">   * Creates a new Edge from the GDL Loader.</em>
-<a name="513" href="#513">513</a> <em class="jxr_javadoccomment">   *</em>
-<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
-<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   * @return EPGM edge</em>
-<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   */</em>
-<a name="517" href="#517">517</a>   <strong class="jxr_keyword">private</strong> E initEdge(org.s1ck.gdl.model.Edge e) {
-<a name="518" href="#518">518</a>     E edge;
-<a name="519" href="#519">519</a>     <strong class="jxr_keyword">if</strong> (!edgeIds.containsKey(e.getId())) {
-<a name="520" href="#520">520</a>       edge = (E) config.getEdgeFactory().createEdge(
-<a name="521" href="#521">521</a>         e.getLabel(),
-<a name="522" href="#522">522</a>         vertexIds.get(e.getSourceVertexId()),
-<a name="523" href="#523">523</a>         vertexIds.get(e.getTargetVertexId()),
-<a name="524" href="#524">524</a>         Properties.createFromMap(e.getProperties()),
-<a name="525" href="#525">525</a>         createGradoopIdSet(e));
-<a name="526" href="#526">526</a>       edgeIds.put(e.getId(), edge.getId());
-<a name="527" href="#527">527</a>       edges.put(edge.getId(), edge);
-<a name="528" href="#528">528</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="529" href="#529">529</a>       edge = edges.get(edgeIds.get(e.getId()));
-<a name="530" href="#530">530</a>       edge.setGraphIds(createGradoopIdSet(e));
-<a name="531" href="#531">531</a>     }
-<a name="532" href="#532">532</a>     <strong class="jxr_keyword">return</strong> edge;
-<a name="533" href="#533">533</a>   }
-<a name="534" href="#534">534</a> 
-<a name="535" href="#535">535</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="536" href="#536">536</a> <em class="jxr_javadoccomment">   * Updates the graph cache.</em>
-<a name="537" href="#537">537</a> <em class="jxr_javadoccomment">   *</em>
-<a name="538" href="#538">538</a> <em class="jxr_javadoccomment">   * @param variable graph variable used in GDL script</em>
-<a name="539" href="#539">539</a> <em class="jxr_javadoccomment">   * @param g graph from GDL loader</em>
-<a name="540" href="#540">540</a> <em class="jxr_javadoccomment">   */</em>
-<a name="541" href="#541">541</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateGraphCache(String variable, Graph g) {
-<a name="542" href="#542">542</a>     graphHeadCache.put(
-<a name="543" href="#543">543</a>       variable, graphHeads.get(graphHeadIds.get(g.getId())));
-<a name="544" href="#544">544</a>   }
-<a name="545" href="#545">545</a> 
-<a name="546" href="#546">546</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="547" href="#547">547</a> <em class="jxr_javadoccomment">   * Updates the vertex cache.</em>
-<a name="548" href="#548">548</a> <em class="jxr_javadoccomment">   *</em>
-<a name="549" href="#549">549</a> <em class="jxr_javadoccomment">   * @param variable vertex variable used in GDL script</em>
-<a name="550" href="#550">550</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL loader</em>
-<a name="551" href="#551">551</a> <em class="jxr_javadoccomment">   */</em>
-<a name="552" href="#552">552</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
-<a name="553" href="#553">553</a>     vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
-<a name="554" href="#554">554</a>   }
-<a name="555" href="#555">555</a> 
-<a name="556" href="#556">556</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="557" href="#557">557</a> <em class="jxr_javadoccomment">   * Updates the edge cache.</em>
-<a name="558" href="#558">558</a> <em class="jxr_javadoccomment">   *</em>
-<a name="559" href="#559">559</a> <em class="jxr_javadoccomment">   * @param variable edge variable used in the GDL script</em>
-<a name="560" href="#560">560</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
-<a name="561" href="#561">561</a> <em class="jxr_javadoccomment">   */</em>
-<a name="562" href="#562">562</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
-<a name="563" href="#563">563</a>     edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
-<a name="564" href="#564">564</a>   }
-<a name="565" href="#565">565</a> 
-<a name="566" href="#566">566</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="567" href="#567">567</a> <em class="jxr_javadoccomment">   * Creates a {@code GradoopIDSet} from the long identifiers stored at the</em>
-<a name="568" href="#568">568</a> <em class="jxr_javadoccomment">   * given graph element.</em>
-<a name="569" href="#569">569</a> <em class="jxr_javadoccomment">   *</em>
-<a name="570" href="#570">570</a> <em class="jxr_javadoccomment">   * @param e graph element</em>
-<a name="571" href="#571">571</a> <em class="jxr_javadoccomment">   * @return GradoopIDSet for the given element</em>
-<a name="572" href="#572">572</a> <em class="jxr_javadoccomment">   */</em>
-<a name="573" href="#573">573</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> createGradoopIdSet(<a href="../../../../org/gradoop/common/model/api/entities/GraphElement.html">GraphElement</a> e) {
-<a name="574" href="#574">574</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> result = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
-<a name="575" href="#575">575</a>     <strong class="jxr_keyword">for</strong> (Long graphId : e.getGraphs()) {
-<a name="576" href="#576">576</a>       result.add(graphHeadIds.get(graphId));
-<a name="577" href="#577">577</a>     }
-<a name="578" href="#578">578</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="579" href="#579">579</a>   }
-<a name="580" href="#580">580</a> }
+<a name="424" href="#424">424</a>   <em class="jxr_comment">//  Private init methods</em>
+<a name="425" href="#425">425</a>   <em class="jxr_comment">// ---------------------------------------------------------------------------</em>
+<a name="426" href="#426">426</a> 
+<a name="427" href="#427">427</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="428" href="#428">428</a> <em class="jxr_javadoccomment">   * Initializes the AsciiGraphLoader</em>
+<a name="429" href="#429">429</a> <em class="jxr_javadoccomment">   */</em>
+<a name="430" href="#430">430</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> init() {
+<a name="431" href="#431">431</a>     initGraphHeads();
+<a name="432" href="#432">432</a>     initVertices();
+<a name="433" href="#433">433</a>     initEdges();
+<a name="434" href="#434">434</a>   }
+<a name="435" href="#435">435</a> 
+<a name="436" href="#436">436</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="437" href="#437">437</a> <em class="jxr_javadoccomment">   * Initializes GraphHeads and their cache.</em>
+<a name="438" href="#438">438</a> <em class="jxr_javadoccomment">   */</em>
+<a name="439" href="#439">439</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initGraphHeads() {
+<a name="440" href="#440">440</a>     <strong class="jxr_keyword">for</strong> (Graph g : gdlHandler.getGraphs()) {
+<a name="441" href="#441">441</a>       <strong class="jxr_keyword">if</strong> (!graphHeadIds.containsKey(g.getId())) {
+<a name="442" href="#442">442</a>         initGraphHead(g);
+<a name="443" href="#443">443</a>       }
+<a name="444" href="#444">444</a>     }
+<a name="445" href="#445">445</a> 
+<a name="446" href="#446">446</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, Graph&gt; e : gdlHandler.getGraphCache().entrySet()) {
+<a name="447" href="#447">447</a>       updateGraphCache(e.getKey(), e.getValue());
+<a name="448" href="#448">448</a>     }
+<a name="449" href="#449">449</a>   }
+<a name="450" href="#450">450</a> 
+<a name="451" href="#451">451</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="452" href="#452">452</a> <em class="jxr_javadoccomment">   * Initializes vertices and their cache.</em>
+<a name="453" href="#453">453</a> <em class="jxr_javadoccomment">   */</em>
+<a name="454" href="#454">454</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertices() {
+<a name="455" href="#455">455</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {
+<a name="456" href="#456">456</a>       initVertex(v);
+<a name="457" href="#457">457</a>     }
+<a name="458" href="#458">458</a> 
+<a name="459" href="#459">459</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {
+<a name="460" href="#460">460</a>       updateVertexCache(e.getKey(), e.getValue());
+<a name="461" href="#461">461</a>     }
+<a name="462" href="#462">462</a>   }
+<a name="463" href="#463">463</a> 
+<a name="464" href="#464">464</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="465" href="#465">465</a> <em class="jxr_javadoccomment">   * Initializes edges and their cache.</em>
+<a name="466" href="#466">466</a> <em class="jxr_javadoccomment">   */</em>
+<a name="467" href="#467">467</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdges() {
+<a name="468" href="#468">468</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {
+<a name="469" href="#469">469</a>       initEdge(e);
+<a name="470" href="#470">470</a>     }
+<a name="471" href="#471">471</a> 
+<a name="472" href="#472">472</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {
+<a name="473" href="#473">473</a>       updateEdgeCache(e.getKey(), e.getValue());
+<a name="474" href="#474">474</a>     }
+<a name="475" href="#475">475</a>   }
+<a name="476" href="#476">476</a> 
+<a name="477" href="#477">477</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="478" href="#478">478</a> <em class="jxr_javadoccomment">   * Creates a new Graph from the GDL Loader.</em>
+<a name="479" href="#479">479</a> <em class="jxr_javadoccomment">   *</em>
+<a name="480" href="#480">480</a> <em class="jxr_javadoccomment">   * @param g graph from GDL Loader</em>
+<a name="481" href="#481">481</a> <em class="jxr_javadoccomment">   * @return graph head</em>
+<a name="482" href="#482">482</a> <em class="jxr_javadoccomment">   */</em>
+<a name="483" href="#483">483</a>   <strong class="jxr_keyword">private</strong> G initGraphHead(Graph g) {
+<a name="484" href="#484">484</a>     G graphHead = elementFactoryProvider.getGraphHeadFactory().createGraphHead(
+<a name="485" href="#485">485</a>       g.getLabel(), Properties.createFromMap(g.getProperties()));
+<a name="486" href="#486">486</a>     graphHeadIds.put(g.getId(), graphHead.getId());
+<a name="487" href="#487">487</a>     graphHeads.put(graphHead.getId(), graphHead);
+<a name="488" href="#488">488</a>     <strong class="jxr_keyword">return</strong> graphHead;
+<a name="489" href="#489">489</a>   }
+<a name="490" href="#490">490</a> 
+<a name="491" href="#491">491</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="492" href="#492">492</a> <em class="jxr_javadoccomment">   * Creates a new Vertex from the GDL Loader or updates an existing one.</em>
+<a name="493" href="#493">493</a> <em class="jxr_javadoccomment">   *</em>
+<a name="494" href="#494">494</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL Loader</em>
+<a name="495" href="#495">495</a> <em class="jxr_javadoccomment">   * @return vertex</em>
+<a name="496" href="#496">496</a> <em class="jxr_javadoccomment">   */</em>
+<a name="497" href="#497">497</a>   <strong class="jxr_keyword">private</strong> V initVertex(org.s1ck.gdl.model.Vertex v) {
+<a name="498" href="#498">498</a>     V vertex;
+<a name="499" href="#499">499</a>     <strong class="jxr_keyword">if</strong> (!vertexIds.containsKey(v.getId())) {
+<a name="500" href="#500">500</a>       vertex = elementFactoryProvider.getVertexFactory().createVertex(
+<a name="501" href="#501">501</a>         v.getLabel(),
+<a name="502" href="#502">502</a>         Properties.createFromMap(v.getProperties()),
+<a name="503" href="#503">503</a>         createGradoopIdSet(v));
+<a name="504" href="#504">504</a>       vertexIds.put(v.getId(), vertex.getId());
+<a name="505" href="#505">505</a>       vertices.put(vertex.getId(), vertex);
+<a name="506" href="#506">506</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="507" href="#507">507</a>       vertex = vertices.get(vertexIds.get(v.getId()));
+<a name="508" href="#508">508</a>       vertex.setGraphIds(createGradoopIdSet(v));
+<a name="509" href="#509">509</a>     }
+<a name="510" href="#510">510</a>     <strong class="jxr_keyword">return</strong> vertex;
+<a name="511" href="#511">511</a>   }
+<a name="512" href="#512">512</a> 
+<a name="513" href="#513">513</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * Creates a new Edge from the GDL Loader.</em>
+<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   *</em>
+<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
+<a name="517" href="#517">517</a> <em class="jxr_javadoccomment">   * @return edge</em>
+<a name="518" href="#518">518</a> <em class="jxr_javadoccomment">   */</em>
+<a name="519" href="#519">519</a>   <strong class="jxr_keyword">private</strong> E initEdge(org.s1ck.gdl.model.Edge e) {
+<a name="520" href="#520">520</a>     E edge;
+<a name="521" href="#521">521</a>     <strong class="jxr_keyword">if</strong> (!edgeIds.containsKey(e.getId())) {
+<a name="522" href="#522">522</a>       edge = elementFactoryProvider.getEdgeFactory().createEdge(
+<a name="523" href="#523">523</a>         e.getLabel(),
+<a name="524" href="#524">524</a>         vertexIds.get(e.getSourceVertexId()),
+<a name="525" href="#525">525</a>         vertexIds.get(e.getTargetVertexId()),
+<a name="526" href="#526">526</a>         Properties.createFromMap(e.getProperties()),
+<a name="527" href="#527">527</a>         createGradoopIdSet(e));
+<a name="528" href="#528">528</a>       edgeIds.put(e.getId(), edge.getId());
+<a name="529" href="#529">529</a>       edges.put(edge.getId(), edge);
+<a name="530" href="#530">530</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="531" href="#531">531</a>       edge = edges.get(edgeIds.get(e.getId()));
+<a name="532" href="#532">532</a>       edge.setGraphIds(createGradoopIdSet(e));
+<a name="533" href="#533">533</a>     }
+<a name="534" href="#534">534</a>     <strong class="jxr_keyword">return</strong> edge;
+<a name="535" href="#535">535</a>   }
+<a name="536" href="#536">536</a> 
+<a name="537" href="#537">537</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="538" href="#538">538</a> <em class="jxr_javadoccomment">   * Updates the graph cache.</em>
+<a name="539" href="#539">539</a> <em class="jxr_javadoccomment">   *</em>
+<a name="540" href="#540">540</a> <em class="jxr_javadoccomment">   * @param variable graph variable used in GDL script</em>
+<a name="541" href="#541">541</a> <em class="jxr_javadoccomment">   * @param g graph from GDL loader</em>
+<a name="542" href="#542">542</a> <em class="jxr_javadoccomment">   */</em>
+<a name="543" href="#543">543</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateGraphCache(String variable, Graph g) {
+<a name="544" href="#544">544</a>     graphHeadCache.put(
+<a name="545" href="#545">545</a>       variable, graphHeads.get(graphHeadIds.get(g.getId())));
+<a name="546" href="#546">546</a>   }
+<a name="547" href="#547">547</a> 
+<a name="548" href="#548">548</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="549" href="#549">549</a> <em class="jxr_javadoccomment">   * Updates the vertex cache.</em>
+<a name="550" href="#550">550</a> <em class="jxr_javadoccomment">   *</em>
+<a name="551" href="#551">551</a> <em class="jxr_javadoccomment">   * @param variable vertex variable used in GDL script</em>
+<a name="552" href="#552">552</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL loader</em>
+<a name="553" href="#553">553</a> <em class="jxr_javadoccomment">   */</em>
+<a name="554" href="#554">554</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
+<a name="555" href="#555">555</a>     vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
+<a name="556" href="#556">556</a>   }
+<a name="557" href="#557">557</a> 
+<a name="558" href="#558">558</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="559" href="#559">559</a> <em class="jxr_javadoccomment">   * Updates the edge cache.</em>
+<a name="560" href="#560">560</a> <em class="jxr_javadoccomment">   *</em>
+<a name="561" href="#561">561</a> <em class="jxr_javadoccomment">   * @param variable edge variable used in the GDL script</em>
+<a name="562" href="#562">562</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
+<a name="563" href="#563">563</a> <em class="jxr_javadoccomment">   */</em>
+<a name="564" href="#564">564</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
+<a name="565" href="#565">565</a>     edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
+<a name="566" href="#566">566</a>   }
+<a name="567" href="#567">567</a> 
+<a name="568" href="#568">568</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="569" href="#569">569</a> <em class="jxr_javadoccomment">   * Creates a {@code GradoopIDSet} from the long identifiers stored at the</em>
+<a name="570" href="#570">570</a> <em class="jxr_javadoccomment">   * given graph element.</em>
+<a name="571" href="#571">571</a> <em class="jxr_javadoccomment">   *</em>
+<a name="572" href="#572">572</a> <em class="jxr_javadoccomment">   * @param e graph element</em>
+<a name="573" href="#573">573</a> <em class="jxr_javadoccomment">   * @return GradoopIDSet for the given element</em>
+<a name="574" href="#574">574</a> <em class="jxr_javadoccomment">   */</em>
+<a name="575" href="#575">575</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> createGradoopIdSet(<a href="../../../../org/gradoop/common/model/api/entities/GraphElement.html">GraphElement</a> e) {
+<a name="576" href="#576">576</a>     <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a> result = <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/common/model/impl/id/GradoopIdSet.html">GradoopIdSet</a>();
+<a name="577" href="#577">577</a>     <strong class="jxr_keyword">for</strong> (Long graphId : e.getGraphs()) {
+<a name="578" href="#578">578</a>       result.add(graphHeadIds.get(graphId));
+<a name="579" href="#579">579</a>     }
+<a name="580" href="#580">580</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="581" href="#581">581</a>   }
+<a name="582" href="#582">582</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

@@ -137,8 +137,8 @@
 <a name="127" href="#127">127</a>   @Override
 <a name="128" href="#128">128</a>   <strong class="jxr_keyword">protected</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> executeForVertex(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
 <a name="129" href="#129">129</a>     <a href="../../../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config = graph.getConfig();
-<a name="130" href="#130">130</a>     GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();
-<a name="131" href="#131">131</a>     VertexFactory&lt;EPGMVertex&gt; vertexFactory = config.getVertexFactory();
+<a name="130" href="#130">130</a>     GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = graph.getFactory().getGraphHeadFactory();
+<a name="131" href="#131">131</a>     VertexFactory&lt;EPGMVertex&gt; vertexFactory = graph.getFactory().getVertexFactory();
 <a name="132" href="#132">132</a>     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 <a name="133" href="#133">133</a> 
 <a name="134" href="#134">134</a>     DataSet&lt;EPGMVertex&gt; matchingVertices = graph.getVertices()
@@ -223,15 +223,15 @@
 <a name="213" href="#213">213</a> 
 <a name="214" href="#214">214</a>     DataSet&lt;EPGMElement&gt; elements = embeddings
 <a name="215" href="#215">215</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(traversalCode,
-<a name="216" href="#216">216</a>         graph.getConfig().getGraphHeadFactory(),
-<a name="217" href="#217">217</a>         graph.getConfig().getVertexFactory(),
-<a name="218" href="#218">218</a>         graph.getConfig().getEdgeFactory(),
+<a name="216" href="#216">216</a>         graph.getFactory().getGraphHeadFactory(),
+<a name="217" href="#217">217</a>         graph.getFactory().getVertexFactory(),
+<a name="218" href="#218">218</a>         graph.getFactory().getEdgeFactory(),
 <a name="219" href="#219">219</a>         getQueryHandler()
 <a name="220" href="#220">220</a>       ));
 <a name="221" href="#221">221</a> 
 <a name="222" href="#222">222</a>     <strong class="jxr_keyword">return</strong> doAttachData() ?
 <a name="223" href="#223">223</a>       PostProcessor.extractGraphCollectionWithData(elements, graph, <strong class="jxr_keyword">true</strong>) :
-<a name="224" href="#224">224</a>       PostProcessor.extractGraphCollection(elements, graph.getConfig(), <strong class="jxr_keyword">true</strong>);
+<a name="224" href="#224">224</a>       PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), <strong class="jxr_keyword">true</strong>);
 <a name="225" href="#225">225</a>   }
 <a name="226" href="#226">226</a> 
 <a name="227" href="#227">227</a> 

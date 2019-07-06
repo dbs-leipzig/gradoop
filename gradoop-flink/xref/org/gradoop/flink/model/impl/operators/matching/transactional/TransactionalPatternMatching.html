@@ -195,7 +195,7 @@
 <a name="185" href="#185">185</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="186" href="#186">186</a>     DataSet&lt;EPGMGraphHead&gt; newHeads = embeddings
 <a name="187" href="#187">187</a>       .map(<strong class="jxr_keyword">new</strong> Project4To0And1&lt;&gt;())
-<a name="188" href="#188">188</a>       .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/function/InitGraphHeadWithLineage.html">InitGraphHeadWithLineage</a>(collection.getConfig().getGraphHeadFactory()));
+<a name="188" href="#188">188</a>       .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/function/InitGraphHeadWithLineage.html">InitGraphHeadWithLineage</a>(collection.getFactory().getGraphHeadFactory()));
 <a name="189" href="#189">189</a> 
 <a name="190" href="#190">190</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="191" href="#191">191</a>     <em class="jxr_comment">// update vertex graphs</em>

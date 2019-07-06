@@ -73,9 +73,9 @@
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   * @param config Gradoop configuration</em>
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/functions/SubgraphDecoder.html">SubgraphDecoder</a>(<a href="../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config) {
-<a name="66" href="#66">66</a>      vertexFactory = config.getVertexFactory();
-<a name="67" href="#67">67</a>      graphHeadFactory = config.getGraphHeadFactory();
-<a name="68" href="#68">68</a>      edgeFactory = config.getEdgeFactory();
+<a name="66" href="#66">66</a>      vertexFactory = config.getLogicalGraphFactory().getVertexFactory();
+<a name="67" href="#67">67</a>      graphHeadFactory = config.getLogicalGraphFactory().getGraphHeadFactory();
+<a name="68" href="#68">68</a>      edgeFactory = config.getLogicalGraphFactory().getEdgeFactory();
 <a name="69" href="#69">69</a>    }
 <a name="70" href="#70">70</a>  
 <a name="71" href="#71">71</a>    <em class="jxr_javadoccomment">/**</em>

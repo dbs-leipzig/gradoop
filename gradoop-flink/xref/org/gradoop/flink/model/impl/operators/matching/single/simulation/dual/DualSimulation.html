@@ -112,7 +112,7 @@
 <a name="102" href="#102">102</a>     } <strong class="jxr_keyword">else</strong> {
 <a name="103" href="#103">103</a>       <strong class="jxr_keyword">return</strong> collectionFactory.fromGraph(
 <a name="104" href="#104">104</a>         graphFactory.fromDataSets(matchingVertexIds
-<a name="105" href="#105">105</a>             .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/VertexFromId.html">VertexFromId</a>(graph.getConfig().getVertexFactory()))));
+<a name="105" href="#105">105</a>             .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/VertexFromId.html">VertexFromId</a>(graph.getFactory().getVertexFactory()))));
 <a name="106" href="#106">106</a>     }
 <a name="107" href="#107">107</a>   }
 <a name="108" href="#108">108</a> 
@@ -295,11 +295,11 @@
 <a name="285" href="#285">285</a> 
 <a name="286" href="#286">286</a>     DataSet&lt;EPGMVertex&gt; matchVertices = doAttachData() ?
 <a name="287" href="#287">287</a>       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
-<a name="288" href="#288">288</a>       PostProcessor.extractVertices(vertices, config.getVertexFactory());
+<a name="288" href="#288">288</a>       PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());
 <a name="289" href="#289">289</a> 
 <a name="290" href="#290">290</a>     DataSet&lt;EPGMEdge&gt; matchEdges = doAttachData() ?
 <a name="291" href="#291">291</a>       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
-<a name="292" href="#292">292</a>       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
+<a name="292" href="#292">292</a>       PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());
 <a name="293" href="#293">293</a> 
 <a name="294" href="#294">294</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromGraph(
 <a name="295" href="#295">295</a>       config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));

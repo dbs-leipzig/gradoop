@@ -16,46 +16,51 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
- * Computes the overlap graph from two logical graphs.
+ * Computes the overlap graph from two base graphs.
+ * Creates a new base graph containing the overlapping vertex and edge
+ * sets of two input graphs. EPGMVertex and edge equality is based on their
+ * respective identifiers.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-<span class="fc" id="L29">public class Overlap implements BinaryGraphToGraphOperator {</span>
+<span class="fc" id="L40">public class Overlap&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
-  /**
-   * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. EPGMVertex and edge equality is based on their
-   * respective identifiers.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return graph with overlapping elements from both input graphs
-   */
   @Override
-  public LogicalGraph execute(
-    LogicalGraph firstGraph, LogicalGraph secondGraph) {
+  public LG execute(LG firstGraph, LG secondGraph) {
 
-<span class="fc" id="L44">    DataSet&lt;EPGMVertex&gt; newVertices = firstGraph.getVertices()</span>
-<span class="fc" id="L45">      .join(secondGraph.getVertices())</span>
-<span class="fc" id="L46">      .where(new Id&lt;&gt;())</span>
-<span class="fc" id="L47">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L48">      .with(new LeftSide&lt;&gt;());</span>
+<span class="fc" id="L51">    DataSet&lt;V&gt; newVertices = firstGraph.getVertices()</span>
+<span class="fc" id="L52">      .join(secondGraph.getVertices())</span>
+<span class="fc" id="L53">      .where(new Id&lt;&gt;())</span>
+<span class="fc" id="L54">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L55">      .with(new LeftSide&lt;&gt;());</span>
 
-<span class="fc" id="L50">    DataSet&lt;EPGMEdge&gt; newEdges = firstGraph.getEdges()</span>
-<span class="fc" id="L51">      .join(secondGraph.getEdges())</span>
-<span class="fc" id="L52">      .where(new Id&lt;&gt;())</span>
-<span class="fc" id="L53">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L54">      .with(new LeftSide&lt;&gt;());</span>
+<span class="fc" id="L57">    DataSet&lt;E&gt; newEdges = firstGraph.getEdges()</span>
+<span class="fc" id="L58">      .join(secondGraph.getEdges())</span>
+<span class="fc" id="L59">      .where(new Id&lt;&gt;())</span>
+<span class="fc" id="L60">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L61">      .with(new LeftSide&lt;&gt;());</span>
 
-<span class="fc" id="L56">    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);</span>
+<span class="fc" id="L63">    return firstGraph.getFactory().fromDataSets(newVertices, newEdges);</span>
   }
-
-
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

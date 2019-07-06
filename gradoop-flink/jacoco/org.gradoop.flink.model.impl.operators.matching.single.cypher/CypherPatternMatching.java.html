@@ -124,16 +124,16 @@ public class CypherPatternMatching extends PatternMatching {
 <span class="fc" id="L124">      constructFinalElements(graph, embeddings, embeddingMetaData) :</span>
 <span class="fc" id="L125">      embeddings.flatMap(</span>
         new ElementsFromEmbedding(
-<span class="fc" id="L127">          graph.getConfig().getGraphHeadFactory(),</span>
-<span class="fc" id="L128">          graph.getConfig().getVertexFactory(),</span>
-<span class="fc" id="L129">          graph.getConfig().getEdgeFactory(),</span>
+<span class="fc" id="L127">          graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L128">          graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L129">          graph.getFactory().getEdgeFactory(),</span>
           embeddingMetaData,
 <span class="fc" id="L131">          queryHandler.getSourceTargetVariables()));</span>
 
     // Post processing
 <span class="fc" id="L134">    return</span>
 <span class="fc bfc" id="L135" title="All 2 branches covered.">      doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :</span>
-<span class="fc" id="L136">      PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);</span>
+<span class="fc" id="L136">      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);</span>
   }
 
   /**
@@ -166,9 +166,9 @@ public class CypherPatternMatching extends PatternMatching {
 
 <span class="fc" id="L167">    return addEmbeddingsElements.evaluate().flatMap(</span>
       new ElementsFromEmbedding(
-<span class="fc" id="L169">        graph.getConfig().getGraphHeadFactory(),</span>
-<span class="fc" id="L170">        graph.getConfig().getVertexFactory(),</span>
-<span class="fc" id="L171">        graph.getConfig().getEdgeFactory(),</span>
+<span class="fc" id="L169">        graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L170">        graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L171">        graph.getFactory().getEdgeFactory(),</span>
         newMetaData,
 <span class="fc" id="L173">        constructionPatternHandler.getSourceTargetVariables(),</span>
 <span class="fc" id="L174">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>

@@ -31,18 +31,13 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 UnaryGraphToValueOperator&lt;MapOperator&lt;WithCount&lt;Tuple2&lt;String, String&gt;&gt;,
 Tuple3&lt;String, String, Long&gt;&gt;&gt; {
 
-  /**
-   * Prepares the statistic for distinct edge properties by label.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator&lt;WithCount&lt;Tuple2&lt;String, String&gt;&gt;, Tuple3&lt;String, String, Long&gt;&gt;
   execute(LogicalGraph graph) {
-<span class="fc" id="L42">    return new DistinctEdgePropertiesByLabel()</span>
-<span class="fc" id="L43">        .execute(graph)</span>
-<span class="fc" id="L44">        .map(value -&gt; Tuple3.of(value.f0.f0, value.f0.f1, value.f1))</span>
-<span class="fc" id="L45">        .returns(new TypeHint&lt;Tuple3&lt;String, String, Long&gt;&gt;() { });</span>
+<span class="fc" id="L37">    return new DistinctEdgePropertiesByLabel()</span>
+<span class="fc" id="L38">        .execute(graph)</span>
+<span class="fc" id="L39">        .map(value -&gt; Tuple3.of(value.f0.f0, value.f0.f1, value.f1))</span>
+<span class="fc" id="L40">        .returns(new TypeHint&lt;Tuple3&lt;String, String, Long&gt;&gt;() { });</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

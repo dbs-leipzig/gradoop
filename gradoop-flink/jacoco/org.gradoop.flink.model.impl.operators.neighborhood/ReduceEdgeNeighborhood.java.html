@@ -16,11 +16,11 @@
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -33,8 +33,19 @@ import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple
 
 /**
  * Reduce edge neighborhood operator.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
+public class ReduceEdgeNeighborhood&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends EdgeNeighborhood&lt;LG&gt; {
 
   /**
    * Valued constructor.
@@ -43,48 +54,47 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
    * @param direction considered edge direction
    */
   public ReduceEdgeNeighborhood(EdgeAggregateFunction function, EdgeDirection direction) {
-<span class="fc" id="L46">    super(function, direction);</span>
-<span class="fc" id="L47">  }</span>
+<span class="fc" id="L57">    super(function, direction);</span>
+<span class="fc" id="L58">  }</span>
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    DataSet&lt;EPGMVertex&gt; vertices;
-<span class="pc bpc" id="L52" title="1 of 4 branches missed.">    switch (getDirection()) {</span>
+  public LG execute(LG graph) {
+    DataSet&lt;V&gt; vertices;
+<span class="pc bpc" id="L63" title="1 of 4 branches missed.">    switch (getDirection()) {</span>
     case IN:
       // takes edges which target to the vertex and applies the aggregate function
-<span class="fc" id="L55">      vertices = graph.getEdges()</span>
-<span class="fc" id="L56">        .join(graph.getVertices())</span>
-<span class="fc" id="L57">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L58">        .groupBy(new IdInTuple&lt;Tuple2&lt;EPGMEdge, EPGMVertex&gt;&gt;(1))</span>
-<span class="fc" id="L59">        .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));</span>
-<span class="fc" id="L60">      break;</span>
+<span class="fc" id="L66">      vertices = graph.getEdges()</span>
+<span class="fc" id="L67">        .join(graph.getVertices())</span>
+<span class="fc" id="L68">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L69">        .groupBy(new IdInTuple&lt;&gt;(1))</span>
+<span class="fc" id="L70">        .reduceGroup(new NeighborEdgeReduceFunction&lt;&gt;((EdgeAggregateFunction) getFunction()));</span>
+<span class="fc" id="L71">      break;</span>
     case OUT:
       // takes edges which start at the vertex and applies the aggregate function
-<span class="fc" id="L63">      vertices = graph.getEdges()</span>
-<span class="fc" id="L64">        .join(graph.getVertices())</span>
-<span class="fc" id="L65">        .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L66">        .groupBy(new IdInTuple&lt;Tuple2&lt;EPGMEdge, EPGMVertex&gt;&gt;(1))</span>
-<span class="fc" id="L67">        .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));</span>
-<span class="fc" id="L68">      break;</span>
+<span class="fc" id="L74">      vertices = graph.getEdges()</span>
+<span class="fc" id="L75">        .join(graph.getVertices())</span>
+<span class="fc" id="L76">        .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L77">        .groupBy(new IdInTuple&lt;&gt;(1))</span>
+<span class="fc" id="L78">        .reduceGroup(new NeighborEdgeReduceFunction&lt;&gt;((EdgeAggregateFunction) getFunction()));</span>
+<span class="fc" id="L79">      break;</span>
     case BOTH:
       // takes edges which start at and target to the vertex and applies the aggregate function
-<span class="fc" id="L71">      vertices = graph.getEdges()</span>
+<span class="fc" id="L82">      vertices = graph.getEdges()</span>
         // maps the source id to the edge and the target id to the edge
-<span class="fc" id="L73">        .flatMap(new VertexIdsWithEdge())</span>
-<span class="fc" id="L74">        .map(new SwitchPair&lt;GradoopId, EPGMEdge&gt;())</span>
-<span class="fc" id="L75">        .join(graph.getVertices())</span>
-<span class="fc" id="L76">        .where(1).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L84">        .flatMap(new VertexIdsWithEdge&lt;&gt;())</span>
+<span class="fc" id="L85">        .map(new SwitchPair&lt;&gt;())</span>
+<span class="fc" id="L86">        .join(graph.getVertices())</span>
+<span class="fc" id="L87">        .where(1).equalTo(new Id&lt;&gt;())</span>
         // replace id with the vertex
-<span class="fc" id="L78">        .with(new VertexToFieldOne&lt;EPGMEdge, GradoopId&gt;())</span>
+<span class="fc" id="L89">        .with(new VertexToFieldOne&lt;&gt;())</span>
         // group by the vertex id
-<span class="fc" id="L80">        .groupBy(new IdInTuple&lt;Tuple2&lt;EPGMEdge, EPGMVertex&gt;&gt;(1))</span>
-<span class="fc" id="L81">        .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));</span>
-<span class="fc" id="L82">      break;</span>
+<span class="fc" id="L91">        .groupBy(new IdInTuple&lt;&gt;(1))</span>
+<span class="fc" id="L92">        .reduceGroup(new NeighborEdgeReduceFunction&lt;&gt;((EdgeAggregateFunction) getFunction()));</span>
+<span class="fc" id="L93">      break;</span>
     default:
-<span class="nc" id="L84">      vertices = null;</span>
+<span class="nc" id="L95">      vertices = null;</span>
     }
-<span class="fc" id="L86">    return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),</span>
-<span class="fc" id="L87">      vertices, graph.getEdges());</span>
+<span class="fc" id="L97">    return graph.getFactory().fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

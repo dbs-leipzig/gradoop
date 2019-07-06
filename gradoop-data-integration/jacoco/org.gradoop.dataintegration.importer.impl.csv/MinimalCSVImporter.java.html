@@ -163,8 +163,8 @@ public class MinimalCSVImporter implements DataSource {
 <span class="fc" id="L163">    return config.getExecutionEnvironment()</span>
 <span class="fc" id="L164">      .readTextFile(path)</span>
 <span class="fc" id="L165">      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))</span>
-<span class="fc" id="L166">      .map(new PropertiesToVertex&lt;&gt;(config.getVertexFactory()))</span>
-<span class="fc" id="L167">      .returns(config.getVertexFactory().getType());</span>
+<span class="fc" id="L166">      .map(new PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))</span>
+<span class="fc" id="L167">      .returns(config.getLogicalGraphFactory().getVertexFactory().getType());</span>
   }
 
   /**

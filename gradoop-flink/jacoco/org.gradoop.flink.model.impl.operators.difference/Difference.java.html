@@ -32,28 +32,23 @@ import org.gradoop.flink.model.impl.operators.difference.functions.RemoveCut;
  */
 <span class="fc" id="L33">public class Difference extends SetOperatorBase {</span>
 
-  /**
-   * Computes the logical graph dataset for the resulting collection.
-   *
-   * @return logical graph dataset of the resulting collection
-   */
   @Override
   protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
     // assign 1L to each logical graph in the first collection
-<span class="fc" id="L43">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; thisGraphs = firstCollection</span>
-<span class="fc" id="L44">      .getGraphHeads()</span>
-<span class="fc" id="L45">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(1L));</span>
+<span class="fc" id="L38">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; thisGraphs = firstCollection</span>
+<span class="fc" id="L39">      .getGraphHeads()</span>
+<span class="fc" id="L40">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(1L));</span>
     // assign 2L to each logical graph in the second collection
-<span class="fc" id="L47">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; otherGraphs = secondCollection</span>
-<span class="fc" id="L48">      .getGraphHeads()</span>
-<span class="fc" id="L49">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(2L));</span>
+<span class="fc" id="L42">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; otherGraphs = secondCollection</span>
+<span class="fc" id="L43">      .getGraphHeads()</span>
+<span class="fc" id="L44">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(2L));</span>
 
     // union the logical graphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
-<span class="fc" id="L53">    return thisGraphs</span>
-<span class="fc" id="L54">      .union(otherGraphs)</span>
-<span class="fc" id="L55">      .groupBy(new IdOf0InTuple2&lt;EPGMGraphHead, Long&gt;())</span>
-<span class="fc" id="L56">      .reduceGroup(new RemoveCut&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L48">    return thisGraphs</span>
+<span class="fc" id="L49">      .union(otherGraphs)</span>
+<span class="fc" id="L50">      .groupBy(new IdOf0InTuple2&lt;EPGMGraphHead, Long&gt;())</span>
+<span class="fc" id="L51">      .reduceGroup(new RemoveCut&lt;EPGMGraphHead&gt;());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
-<title>BinaryGraphToValueOperator xref</title>
+<title>BinaryBaseGraphToValueOperator xref</title>
 <link type="text/css" rel="stylesheet" href="../../../../../../stylesheet.css" />
 </head>
 <body>
-<div id="overview"><a href="../../../../../../../apidocs/org/gradoop/flink/model/api/operators/BinaryGraphToValueOperator.html">View Javadoc</a></div><pre>
+<div id="overview"><a href="../../../../../../../apidocs/org/gradoop/flink/model/api/operators/BinaryBaseGraphToValueOperator.html">View Javadoc</a></div><pre>
 
 <a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
 <a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2019 Leipzig University (Database Research Group)</em>
@@ -25,25 +25,24 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.api.operators;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="20" href="#20">20</a>  
-<a name="21" href="#21">21</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="22" href="#22">22</a>  <em class="jxr_javadoccomment"> * Creates a (usually 1-element) Boolean dataset based on two input graphs.</em>
-<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; value type</em>
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraph;
+<a name="19" href="#19">19</a>  
+<a name="20" href="#20">20</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="21" href="#21">21</a>  <em class="jxr_javadoccomment"> * Creates a value of type {@link V} from two input graphs of type {@link LG}.</em>
+<a name="22" href="#22">22</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * @param &lt;LG&gt; the input graphs type</em>
+<a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; the type of the return value</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> BinaryGraphToValueOperator&lt;T&gt; <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/api/operators/Operator.html">Operator</a> {
-<a name="27" href="#27">27</a>  
-<a name="28" href="#28">28</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Executes the operator.</em>
-<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * @param firstGraph  first input graph</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * @param secondGraph second input graph</em>
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * @return operator result</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="35" href="#35">35</a>    DataSet&lt;T&gt; execute(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> firstGraph, <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> secondGraph);
-<a name="36" href="#36">36</a>  }
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> BinaryBaseGraphToValueOperator&lt;LG <strong class="jxr_keyword">extends</strong> BaseGraph, V&gt; <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/api/operators/Operator.html">Operator</a> {
+<a name="27" href="#27">27</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   * Executes the operator on the given graphs.</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   * @param firstGraph first input graph</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * @param secondGraph second input graph</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * @return operator result</em>
+<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="34" href="#34">34</a>    V execute(LG firstGraph, LG secondGraph);
+<a name="35" href="#35">35</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

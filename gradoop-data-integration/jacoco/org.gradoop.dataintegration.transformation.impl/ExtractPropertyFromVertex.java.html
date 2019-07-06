@@ -145,10 +145,10 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
 <span class="fc" id="L145">      newVerticesAndOriginIds = candidates</span>
 <span class="fc" id="L146">        .groupBy(0)</span>
 <span class="fc" id="L147">        .reduceGroup(new CreateNewVertexWithEqualityCondense(</span>
-<span class="fc" id="L148">          logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));</span>
+<span class="fc" id="L148">          logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));</span>
     } else {
 <span class="fc" id="L150">      newVerticesAndOriginIds = candidates</span>
-<span class="fc" id="L151">        .map(new CreateNewVertex(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,</span>
+<span class="fc" id="L151">        .map(new CreateNewVertex(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,</span>
           newPropertyName));
     }
 
@@ -160,7 +160,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
 <span class="fc" id="L160">    DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();</span>
 <span class="fc bfc" id="L161" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
 <span class="fc" id="L162">      edges = newVerticesAndOriginIds</span>
-<span class="fc" id="L163">        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,</span>
+<span class="fc" id="L163">        .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,</span>
           edgeLabel))
 <span class="fc" id="L165">        .union(edges);</span>
     }

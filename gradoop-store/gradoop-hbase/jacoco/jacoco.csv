@@ -20,7 +20,7 @@ Gradoop HBase,org.gradoop.storage.impl.hbase.io.inputformats,EdgeTableInputForma
 Gradoop HBase,org.gradoop.storage.impl.hbase.factory,HBaseEPGMStoreFactory,8,186,0,12,5,47,0,14,0,8
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseBase,0,19,0,0,0,7,0,4,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSink,5,121,0,2,2,33,1,8,1,7
-Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSource,1,186,1,5,0,33,1,10,0,8
+Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSource,1,188,1,5,0,34,1,10,0,8
 Gradoop HBase,org.gradoop.storage.impl.hbase.predicate.filter,HBaseFilterUtils,10,319,3,27,2,80,4,20,1,8
 Gradoop HBase,org.gradoop.storage.impl.hbase.constants,HBaseConstants,3,0,0,0,1,0,1,0,1,0
 Gradoop HBase,org.gradoop.storage.config,GradoopHBaseConfig,3,158,3,3,0,36,3,12,0,12

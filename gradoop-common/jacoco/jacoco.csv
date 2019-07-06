@@ -47,5 +47,5 @@ Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMGraphHeadFactory,17,30,0,0
 Gradoop Common,org.gradoop.common.model.impl.comparators,IdentifiableComparator,6,3,0,0,1,1,1,1,1,1
 Gradoop Common,org.gradoop.common.model.impl.metadata,PropertyMetaData,9,12,0,0,3,5,3,1,3,1
 Gradoop Common,org.gradoop.common.model.impl.metadata,MetaData,15,317,1,31,1,68,1,26,0,11
-Gradoop Common,org.gradoop.common.config,GradoopConfig,0,31,0,0,0,9,0,5,0,5
+Gradoop Common,org.gradoop.common.config,GradoopConfig,7,0,0,0,2,0,2,0,2,0
 Gradoop Common,org.gradoop.common.exceptions,UnsupportedTypeException,0,16,0,0,0,4,0,2,0,2

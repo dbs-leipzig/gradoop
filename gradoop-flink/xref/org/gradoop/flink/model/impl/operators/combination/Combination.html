@@ -26,42 +26,49 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.combination;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
-<a name="24" href="#24">24</a>  
-<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Computes the combined graph from two logical graphs.</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/combination/Combination.html">Combination</a> implements <a href="../../../../../../../org/gradoop/flink/model/api/operators/BinaryGraphToGraphOperator.html">BinaryGraphToGraphOperator</a> {
-<a name="29" href="#29">29</a>  
-<a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * Creates a new logical graph by union the vertex and edge sets of two</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * input graphs. Vertex and edge equality is based on their respective</em>
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * identifiers.</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * @param firstGraph  first input graph</em>
-<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   * @param secondGraph second input graph</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * @return combined graph</em>
-<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="39" href="#39">39</a>    @Override
-<a name="40" href="#40">40</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> firstGraph,
-<a name="41" href="#41">41</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> secondGraph) {
-<a name="42" href="#42">42</a>  
-<a name="43" href="#43">43</a>      DataSet&lt;EPGMVertex&gt; newVertexSet = firstGraph.getVertices()
-<a name="44" href="#44">44</a>        .union(secondGraph.getVertices())
-<a name="45" href="#45">45</a>        .distinct(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraph;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
+<a name="26" href="#26">26</a>  
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Computes the combined graph from two base graph instances.</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Creates a new base graph by union of the vertex and edge sets of two</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * input graphs. Vertex and edge equality is based on their respective</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * identifiers.</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt;  The graph head type.</em>
+<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt;  The vertex type.</em>
+<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt;  The edge type.</em>
+<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * @param &lt;LG&gt; The type of the graph.</em>
+<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * @param &lt;GC&gt; The type of the graph collection.</em>
+<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> Combination&lt;
+<a name="40" href="#40">40</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
+<a name="41" href="#41">41</a>    V <strong class="jxr_keyword">extends</strong> Vertex,
+<a name="42" href="#42">42</a>    E <strong class="jxr_keyword">extends</strong> Edge,
+<a name="43" href="#43">43</a>    LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
+<a name="44" href="#44">44</a>    GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+<a name="45" href="#45">45</a>    implements BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 <a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>      DataSet&lt;EPGMEdge&gt; newEdgeSet = firstGraph.getEdges()
-<a name="48" href="#48">48</a>        .union(secondGraph.getEdges())
-<a name="49" href="#49">49</a>        .distinct(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
-<a name="50" href="#50">50</a>  
-<a name="51" href="#51">51</a>      <strong class="jxr_keyword">return</strong> firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
-<a name="52" href="#52">52</a>    }
+<a name="47" href="#47">47</a>    @Override
+<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> LG execute(LG firstGraph, LG secondGraph) {
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>      DataSet&lt;V&gt; newVertexSet = firstGraph.getVertices()
+<a name="51" href="#51">51</a>        .union(secondGraph.getVertices())
+<a name="52" href="#52">52</a>        .distinct(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>  }
+<a name="54" href="#54">54</a>      DataSet&lt;E&gt; newEdgeSet = firstGraph.getEdges()
+<a name="55" href="#55">55</a>        .union(secondGraph.getEdges())
+<a name="56" href="#56">56</a>        .distinct(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
+<a name="57" href="#57">57</a>  
+<a name="58" href="#58">58</a>      <strong class="jxr_keyword">return</strong> firstGraph.getFactory().fromDataSets(newVertexSet, newEdgeSet);
+<a name="59" href="#59">59</a>    }
+<a name="60" href="#60">60</a>  
+<a name="61" href="#61">61</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

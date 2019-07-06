@@ -117,7 +117,7 @@ public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements Dat
 
 <span class="fc" id="L118">    DataSet&lt;Tuple3&lt;K, GradoopId, EPGMVertex&gt;&gt; vertexTriples = importVertices</span>
 <span class="fc" id="L119">      .map(new InitVertex&lt;K&gt;(</span>
-<span class="fc" id="L120">        config.getVertexFactory(), lineagePropertyKey, externalIdType));</span>
+<span class="fc" id="L120">        config.getLogicalGraphFactory().getVertexFactory(), lineagePropertyKey, externalIdType));</span>
 
 <span class="fc" id="L122">    DataSet&lt;EPGMVertex&gt; epgmVertices = vertexTriples</span>
 <span class="fc" id="L123">      .map(new Value2Of3&lt;K, GradoopId, EPGMVertex&gt;());</span>
@@ -129,7 +129,7 @@ public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements Dat
 <span class="fc" id="L129">      .join(vertexIdPair)</span>
 <span class="fc" id="L130">      .where(1).equalTo(0)</span>
 <span class="fc" id="L131">      .with(new InitEdge&lt;K&gt;(</span>
-<span class="fc" id="L132">        config.getEdgeFactory(), lineagePropertyKey, externalIdType))</span>
+<span class="fc" id="L132">        config.getLogicalGraphFactory().getEdgeFactory(), lineagePropertyKey, externalIdType))</span>
 <span class="fc" id="L133">      .join(vertexIdPair)</span>
 <span class="fc" id="L134">      .where(0).equalTo(0)</span>
 <span class="fc" id="L135">      .with(new UpdateEdge&lt;EPGMEdge, K&gt;());</span>

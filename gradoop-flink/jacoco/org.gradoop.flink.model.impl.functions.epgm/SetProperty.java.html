@@ -55,16 +55,10 @@ public class SetProperty&lt;E extends EPGMElement&gt; implements MapFunction&lt;
 <span class="fc" id="L55">    this.propertyValue = propertyValue;</span>
 <span class="fc" id="L56">  }</span>
 
-  /**
-   * Adds a new property to the element.
-   *
-   * @param element original element to be updated
-   * @return updated element
-   */
   @Override
   public E map(E element) throws Exception {
-<span class="fc" id="L66">    element.setProperty(propertyKey, propertyValue);</span>
-<span class="fc" id="L67">    return element;</span>
+<span class="fc" id="L60">    element.setProperty(propertyKey, propertyValue);</span>
+<span class="fc" id="L61">    return element;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

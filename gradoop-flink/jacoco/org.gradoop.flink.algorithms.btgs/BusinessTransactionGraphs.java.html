@@ -113,7 +113,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 <span class="fc" id="L114">    DataSet&lt;EPGMGraphHead&gt; graphHeads = btgVerticesMap</span>
 <span class="fc" id="L115">      .map(new Value0Of2&lt;&gt;())</span>
-<span class="fc" id="L116">      .map(new NewBtgGraphHead&lt;&gt;(iig.getConfig().getGraphHeadFactory()));</span>
+<span class="fc" id="L116">      .map(new NewBtgGraphHead&lt;&gt;(iig.getFactory().getGraphHeadFactory()));</span>
 
     // filter and update edges
 <span class="fc" id="L119">    DataSet&lt;EPGMEdge&gt; btgEdges = iig.getEdges()</span>

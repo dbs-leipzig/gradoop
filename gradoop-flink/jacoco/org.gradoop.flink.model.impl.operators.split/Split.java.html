@@ -115,7 +115,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     // add new graph id's to the initial graph set
 <span class="fc" id="L117">    DataSet&lt;EPGMGraphHead&gt; newGraphs = newGraphIds</span>
-<span class="fc" id="L118">      .map(new InitGraphHead(graph.getConfig().getGraphHeadFactory()));</span>
+<span class="fc" id="L118">      .map(new InitGraphHead(graph.getFactory().getGraphHeadFactory()));</span>
 
     //--------------------------------------------------------------------------
     // compute edges

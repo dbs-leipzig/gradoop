@@ -37,13 +37,9 @@ public class VertexToDegreeMap implements MapFunction&lt;EPGMVertex, Tuple1&lt;L
 <span class="fc" id="L37">    this.nameOfDegreeProperty = nameOfDegreeProperty;</span>
 <span class="fc" id="L38">  }</span>
 
-  /**
-   * @param vertex the given vertex
-   * @return the degree of that vertex
-   */
   @Override
   public Tuple1&lt;Long&gt; map(EPGMVertex vertex) {
-<span class="fc" id="L46">    return new Tuple1&lt;&gt;(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));</span>
+<span class="fc" id="L42">    return new Tuple1&lt;&gt;(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

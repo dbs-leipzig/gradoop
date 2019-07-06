@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.cloning.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param &lt;EL&gt; element type of second field
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0.id-&gt;f0;f1&quot;)
-<span class="fc" id="L31">public class Value0Of2ToId&lt;EL extends EPGMElement, T&gt;</span>
+<span class="fc" id="L31">public class Value0Of2ToId&lt;EL extends Element, T&gt;</span>
   implements
   MapFunction&lt;Tuple2&lt;EL, T&gt;, Tuple2&lt;GradoopId, T&gt;&gt; {
 

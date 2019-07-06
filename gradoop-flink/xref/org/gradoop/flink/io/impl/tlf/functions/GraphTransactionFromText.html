@@ -29,13 +29,13 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.io.LongWritable;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.io.Text;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.tlf.TLFConstants;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
@@ -58,15 +58,15 @@
 <a name="48" href="#48">48</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * Graph head factory.</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="51" href="#51">51</a>    <strong class="jxr_keyword">private</strong> EPGMGraphHeadFactory graphHeadFactory;
+<a name="51" href="#51">51</a>    <strong class="jxr_keyword">private</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * EPGMVertex factory.</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> EPGMVertexFactory vertexFactory;
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 <a name="56" href="#56">56</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * EPGMEdge factory.</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> EPGMEdgeFactory edgeFactory;
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * Valued constructor.</em>
@@ -74,9 +74,9 @@
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * @param config gradoop flink config</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="66" href="#66">66</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/tlf/functions/GraphTransactionFromText.html">GraphTransactionFromText</a>(<a href="../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config) {
-<a name="67" href="#67">67</a>      <strong class="jxr_keyword">this</strong>.graphHeadFactory = config.getGraphHeadFactory();
-<a name="68" href="#68">68</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = config.getVertexFactory();
-<a name="69" href="#69">69</a>      <strong class="jxr_keyword">this</strong>.edgeFactory = config.getEdgeFactory();
+<a name="67" href="#67">67</a>      <strong class="jxr_keyword">this</strong>.graphHeadFactory = config.getLogicalGraphFactory().getGraphHeadFactory();
+<a name="68" href="#68">68</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = config.getLogicalGraphFactory().getVertexFactory();
+<a name="69" href="#69">69</a>      <strong class="jxr_keyword">this</strong>.edgeFactory = config.getLogicalGraphFactory().getEdgeFactory();
 <a name="70" href="#70">70</a>    }
 <a name="71" href="#71">71</a>  
 <a name="72" href="#72">72</a>    <em class="jxr_javadoccomment">/**</em>

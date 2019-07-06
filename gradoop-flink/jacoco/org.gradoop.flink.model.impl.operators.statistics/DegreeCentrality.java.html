@@ -25,36 +25,30 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Computes the degree centrality of a graph
+ * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
  */
-<span class="fc" id="L29">public class DegreeCentrality extends DegreeCentralityBase</span>
+<span class="fc" id="L30">public class DegreeCentrality extends DegreeCentralityBase</span>
   implements UnaryGraphToValueOperator&lt;DataSet&lt;Double&gt;&gt; {
 
-  /**
-   * Calculates the degree centrality of the graph
-   * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
-   *
-   * @param graph input graph
-   * @return DataSet with one degree centrality value
-   */
   @Override
   public DataSet&lt;Double&gt; execute(LogicalGraph graph) {
 
-<span class="fc" id="L42">    DataSet&lt;WithCount&lt;GradoopId&gt;&gt; degrees = new VertexDegrees().execute(graph);</span>
-<span class="fc" id="L43">    DataSet&lt;Long&gt; vertexCount = new VertexCount().execute(graph);</span>
+<span class="fc" id="L36">    DataSet&lt;WithCount&lt;GradoopId&gt;&gt; degrees = new VertexDegrees().execute(graph);</span>
+<span class="fc" id="L37">    DataSet&lt;Long&gt; vertexCount = new VertexCount().execute(graph);</span>
 
     // for broadcasting
-<span class="fc" id="L46">    DataSet&lt;WithCount&lt;GradoopId&gt;&gt; maxDegree = degrees.max(1);</span>
+<span class="fc" id="L40">    DataSet&lt;WithCount&lt;GradoopId&gt;&gt; maxDegree = degrees.max(1);</span>
 
-<span class="fc" id="L48">    return degrees</span>
-<span class="fc" id="L49">      .map(new DegreeDistanceFunction(BROADCAST_NAME))</span>
-<span class="fc" id="L50">      .withBroadcastSet(maxDegree, BROADCAST_NAME)</span>
-<span class="fc" id="L51">      .sum(0)</span>
-<span class="fc" id="L52">      .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());</span>
+<span class="fc" id="L42">    return degrees</span>
+<span class="fc" id="L43">      .map(new DegreeDistanceFunction(BROADCAST_NAME))</span>
+<span class="fc" id="L44">      .withBroadcastSet(maxDegree, BROADCAST_NAME)</span>
+<span class="fc" id="L45">      .sum(0)</span>
+<span class="fc" id="L46">      .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());</span>
   }
 
   @Override
   public String getName() {
-<span class="nc" id="L57">    return DegreeCentrality.class.getName();</span>
+<span class="nc" id="L51">    return DegreeCentrality.class.getName();</span>
   }
 }
 

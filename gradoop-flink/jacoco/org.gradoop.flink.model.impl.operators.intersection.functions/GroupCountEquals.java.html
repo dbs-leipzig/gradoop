@@ -44,27 +44,19 @@ public class GroupCountEquals&lt;O&gt; implements GroupReduceFunction&lt;O, O&gt
 <span class="fc" id="L44">    this.expectedGroupSize = expectedGroupSize;</span>
 <span class="fc" id="L45">  }</span>
 
-  /**
-   * If the number of elements in the group is equal to the user expected
-   * group size, the last element is returned.
-   *
-   * @param iterable  graph data
-   * @param collector output collector (contains 0 or 1 graph)
-   * @throws Exception on failure
-   */
   @Override
   public void reduce(Iterable&lt;O&gt; iterable,
     Collector&lt;O&gt; collector) throws Exception {
-<span class="fc" id="L58">    Iterator&lt;O&gt; iterator = iterable.iterator();</span>
-<span class="fc" id="L59">    long count = 0L;</span>
-<span class="fc" id="L60">    O object = null;</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L62">      object = iterator.next();</span>
-<span class="fc" id="L63">      count++;</span>
+<span class="fc" id="L50">    Iterator&lt;O&gt; iterator = iterable.iterator();</span>
+<span class="fc" id="L51">    long count = 0L;</span>
+<span class="fc" id="L52">    O object = null;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L54">      object = iterator.next();</span>
+<span class="fc" id="L55">      count++;</span>
     }
-<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (count == expectedGroupSize) {</span>
-<span class="fc" id="L66">      collector.collect(object);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    if (count == expectedGroupSize) {</span>
+<span class="fc" id="L58">      collector.collect(object);</span>
     }
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L60">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

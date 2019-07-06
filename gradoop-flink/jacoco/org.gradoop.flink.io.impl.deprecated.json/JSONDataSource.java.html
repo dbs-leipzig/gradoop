@@ -27,6 +27,7 @@ import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -49,11 +50,11 @@ public class JSONDataSource extends JSONBase implements DataSource {
    * @param config    Gradoop Flink configuration
    */
   public JSONDataSource(String inputPath, GradoopFlinkConfig config) {
-<span class="nc" id="L52">    this(inputPath + DEFAULT_GRAPHS_FILE,</span>
+<span class="nc" id="L53">    this(inputPath + DEFAULT_GRAPHS_FILE,</span>
       inputPath + DEFAULT_VERTEX_FILE,
       inputPath + DEFAULT_EDGE_FILE,
       config);
-<span class="nc" id="L56">  }</span>
+<span class="nc" id="L57">  }</span>
 
   /**
    * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
@@ -65,47 +66,46 @@ public class JSONDataSource extends JSONBase implements DataSource {
    */
   public JSONDataSource(String graphHeadPath, String vertexPath,
     String edgePath, GradoopFlinkConfig config) {
-<span class="fc" id="L68">    super(graphHeadPath, vertexPath, edgePath, config);</span>
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L69">    super(graphHeadPath, vertexPath, edgePath, config);</span>
+<span class="fc" id="L70">  }</span>
 
   @Override
   public LogicalGraph getLogicalGraph() {
-<span class="nc" id="L73">    return getGraphCollection().reduce(new ReduceCombination());</span>
+<span class="nc" id="L74">    return getGraphCollection().reduce(new ReduceCombination());</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() {
-<span class="fc" id="L78">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+<span class="fc" id="L79">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+<span class="fc" id="L80">    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();</span>
 
     // used for type hinting when loading vertex data
-<span class="fc" id="L81">    TypeInformation&lt;EPGMVertex&gt; vertexTypeInfo = TypeExtractor</span>
-<span class="fc" id="L82">      .createTypeInfo(getConfig().getVertexFactory().getType());</span>
+<span class="fc" id="L83">    TypeInformation&lt;EPGMVertex&gt; vertexTypeInfo = TypeExtractor</span>
+<span class="fc" id="L84">      .createTypeInfo(factory.getVertexFactory().getType());</span>
     // used for type hinting when loading edge data
-<span class="fc" id="L84">    TypeInformation&lt;EPGMEdge&gt; edgeTypeInfo = TypeExtractor</span>
-<span class="fc" id="L85">      .createTypeInfo(getConfig().getEdgeFactory().getType());</span>
+<span class="fc" id="L86">    TypeInformation&lt;EPGMEdge&gt; edgeTypeInfo = TypeExtractor</span>
+<span class="fc" id="L87">      .createTypeInfo(factory.getEdgeFactory().getType());</span>
     // used for type hinting when loading graph data
-<span class="fc" id="L87">    TypeInformation&lt;EPGMGraphHead&gt; graphTypeInfo = TypeExtractor</span>
-<span class="fc" id="L88">      .createTypeInfo(getConfig().getGraphHeadFactory().getType());</span>
+<span class="fc" id="L89">    TypeInformation&lt;EPGMGraphHead&gt; graphTypeInfo = TypeExtractor</span>
+<span class="fc" id="L90">      .createTypeInfo(factory.getGraphHeadFactory().getType());</span>
 
     // read vertex, edge and graph data
-<span class="fc" id="L91">    DataSet&lt;EPGMVertex&gt; vertices = env.readTextFile(getVertexPath())</span>
-<span class="fc" id="L92">      .map(new JSONToVertex(getConfig().getVertexFactory()))</span>
-<span class="fc" id="L93">      .returns(vertexTypeInfo);</span>
-<span class="fc" id="L94">    DataSet&lt;EPGMEdge&gt; edges = env.readTextFile(getEdgePath())</span>
-<span class="fc" id="L95">      .map(new JSONToEdge(getConfig().getEdgeFactory()))</span>
-<span class="fc" id="L96">      .returns(edgeTypeInfo);</span>
+<span class="fc" id="L93">    DataSet&lt;EPGMVertex&gt; vertices = env.readTextFile(getVertexPath())</span>
+<span class="fc" id="L94">      .map(new JSONToVertex(factory.getVertexFactory()))</span>
+<span class="fc" id="L95">      .returns(vertexTypeInfo);</span>
+<span class="fc" id="L96">    DataSet&lt;EPGMEdge&gt; edges = env.readTextFile(getEdgePath())</span>
+<span class="fc" id="L97">      .map(new JSONToEdge(factory.getEdgeFactory()))</span>
+<span class="fc" id="L98">      .returns(edgeTypeInfo);</span>
     DataSet&lt;EPGMGraphHead&gt; graphHeads;
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (getGraphHeadPath() != null) {</span>
-<span class="fc" id="L99">      graphHeads = env.readTextFile(getGraphHeadPath())</span>
-<span class="fc" id="L100">        .map(new JSONToGraphHead(getConfig().getGraphHeadFactory()))</span>
-<span class="fc" id="L101">        .returns(graphTypeInfo);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (getGraphHeadPath() != null) {</span>
+<span class="fc" id="L101">      graphHeads = env.readTextFile(getGraphHeadPath())</span>
+<span class="fc" id="L102">        .map(new JSONToGraphHead(factory.getGraphHeadFactory()))</span>
+<span class="fc" id="L103">        .returns(graphTypeInfo);</span>
     } else {
-<span class="nc" id="L103">      graphHeads = env.fromElements(</span>
-<span class="nc" id="L104">        getConfig().getGraphHeadFactory().createGraphHead());</span>
+<span class="nc" id="L105">      graphHeads = env.fromElements(factory.getGraphHeadFactory().createGraphHead());</span>
     }
 
-<span class="fc" id="L107">    return getConfig().getGraphCollectionFactory()</span>
-<span class="fc" id="L108">      .fromDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L108">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

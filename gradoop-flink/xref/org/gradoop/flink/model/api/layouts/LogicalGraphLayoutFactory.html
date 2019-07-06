@@ -43,7 +43,7 @@
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> LogicalGraphLayoutFactory&lt;
 <a name="34" href="#34">34</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
 <a name="35" href="#35">35</a>    V <strong class="jxr_keyword">extends</strong> Vertex,
-<a name="36" href="#36">36</a>    E <strong class="jxr_keyword">extends</strong> Edge&gt; <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/api/layouts/BaseLayoutFactory.html">BaseLayoutFactory</a> {
+<a name="36" href="#36">36</a>    E <strong class="jxr_keyword">extends</strong> Edge&gt; <strong class="jxr_keyword">extends</strong> BaseLayoutFactory&lt;G, V, E&gt; {
 <a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Creates a logical graph layout from the given vertex dataset.</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   *</em>

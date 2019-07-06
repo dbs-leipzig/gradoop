@@ -102,46 +102,33 @@
 <a name="92" href="#92">92</a>      <strong class="jxr_keyword">this</strong>.keepVerticesIfSameScore = keepVerticesIfSameScore;
 <a name="93" href="#93">93</a>    }
 <a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
-<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
-<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * Vertices are sampled by using the Gradoop-Wrapper of Flinks PageRank-algorithm</em>
-<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * {@link PageRank}. If they got different PageRank-scores, all scores are scaled</em>
-<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   * in a range between 0 and 1.</em>
-<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * Then all vertices with a PageRank-score greater or equal/smaller than a given sampling</em>
-<a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * threshold are retained - depending on the Boolean set in {@code sampleGreaterThanThreshold}.</em>
-<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * If ALL vertices got the same PageRank-score, it can be decided whether to sample all</em>
-<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * vertices or none of them - depending on the Boolean set in {@code keepVerticesIfSameScore}.</em>
-<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * Retains all edges which source- and target-vertices were chosen. There may retain some</em>
-<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   * unconnected vertices in the sampled graph.</em>
-<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   */</em>
-<a name="108" href="#108">108</a>   @Override
-<a name="109" href="#109">109</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> sample(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
-<a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> pageRankGraph = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/pagerank/PageRank.html">PageRank</a>(
-<a name="112" href="#112">112</a>       SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
-<a name="113" href="#113">113</a>       dampeningFactor,
-<a name="114" href="#114">114</a>       maxIteration,
-<a name="115" href="#115">115</a>       <strong class="jxr_keyword">true</strong>).execute(graph);
-<a name="116" href="#116">116</a> 
-<a name="117" href="#117">117</a>     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
-<a name="118" href="#118">118</a>       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
-<a name="119" href="#119">119</a> 
-<a name="120" href="#120">120</a>     graph = graph
-<a name="121" href="#121">121</a>       .aggregate(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/min/MinVertexProperty.html">MinVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
-<a name="122" href="#122">122</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/max/MaxVertexProperty.html">MaxVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
-<a name="123" href="#123">123</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/sum/SumVertexProperty.html">SumVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
-<a name="124" href="#124">124</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>());
-<a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     DataSet&lt;EPGMVertex&gt; scaledVertices = graph.getVertices()
-<a name="127" href="#127">127</a>       .crossWithTiny(graph.getGraphHead().first(1))
-<a name="128" href="#128">128</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/AddPageRankScoresToVertexCrossFunction.html">AddPageRankScoresToVertexCrossFunction</a>())
-<a name="129" href="#129">129</a>       .filter(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/PageRankResultVertexFilter.html">PageRankResultVertexFilter</a>(
-<a name="130" href="#130">130</a>         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
-<a name="131" href="#131">131</a> 
-<a name="132" href="#132">132</a>     <strong class="jxr_keyword">return</strong> graph.getFactory().fromDataSets(scaledVertices, graph.getEdges()).verify();
-<a name="133" href="#133">133</a>   }
-<a name="134" href="#134">134</a> }
+<a name="95" href="#95">95</a>    @Override
+<a name="96" href="#96">96</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> sample(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
+<a name="97" href="#97">97</a>  
+<a name="98" href="#98">98</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> pageRankGraph = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/pagerank/PageRank.html">PageRank</a>(
+<a name="99" href="#99">99</a>        SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
+<a name="100" href="#100">100</a>       dampeningFactor,
+<a name="101" href="#101">101</a>       maxIteration,
+<a name="102" href="#102">102</a>       <strong class="jxr_keyword">true</strong>).execute(graph);
+<a name="103" href="#103">103</a> 
+<a name="104" href="#104">104</a>     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="105" href="#105">105</a>       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>     graph = graph
+<a name="108" href="#108">108</a>       .aggregate(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/min/MinVertexProperty.html">MinVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
+<a name="109" href="#109">109</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/max/MaxVertexProperty.html">MaxVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
+<a name="110" href="#110">110</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/sum/SumVertexProperty.html">SumVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
+<a name="111" href="#111">111</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>());
+<a name="112" href="#112">112</a> 
+<a name="113" href="#113">113</a>     DataSet&lt;EPGMVertex&gt; scaledVertices = graph.getVertices()
+<a name="114" href="#114">114</a>       .crossWithTiny(graph.getGraphHead().first(1))
+<a name="115" href="#115">115</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/AddPageRankScoresToVertexCrossFunction.html">AddPageRankScoresToVertexCrossFunction</a>())
+<a name="116" href="#116">116</a>       .filter(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/PageRankResultVertexFilter.html">PageRankResultVertexFilter</a>(
+<a name="117" href="#117">117</a>         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
+<a name="118" href="#118">118</a> 
+<a name="119" href="#119">119</a>     <strong class="jxr_keyword">return</strong> graph.getFactory().fromDataSets(scaledVertices, graph.getEdges()).verify();
+<a name="120" href="#120">120</a>   }
+<a name="121" href="#121">121</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

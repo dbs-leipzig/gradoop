@@ -37,19 +37,13 @@ public class CalculateDensity implements MapFunction&lt;EPGMGraphHead, EPGMGraph
 <span class="fc" id="L37">    this.propertyKey = key;</span>
 <span class="fc" id="L38">  }</span>
 
-  /**
-   * Calculates the graph density and safes the value as property to the graphHead.
-   *
-   * @param graphHead The graphHead the density shall be written to
-   * @return EPGMGraphHead The graphHead the density is written to
-   */
   @Override
   public EPGMGraphHead map(EPGMGraphHead graphHead) {
-<span class="fc" id="L48">    double vc1 = (double) graphHead.getPropertyValue(&quot;vertexCount&quot;).getLong();</span>
-<span class="fc" id="L49">    double ec1 = (double) graphHead.getPropertyValue(&quot;edgeCount&quot;).getLong();</span>
-<span class="fc" id="L50">    double density = ec1 / (vc1 * (vc1 - 1.));</span>
-<span class="fc" id="L51">    graphHead.setProperty(propertyKey, density);</span>
-<span class="fc" id="L52">    return graphHead;</span>
+<span class="fc" id="L42">    double vc1 = (double) graphHead.getPropertyValue(&quot;vertexCount&quot;).getLong();</span>
+<span class="fc" id="L43">    double ec1 = (double) graphHead.getPropertyValue(&quot;edgeCount&quot;).getLong();</span>
+<span class="fc" id="L44">    double density = ec1 / (vc1 * (vc1 - 1.));</span>
+<span class="fc" id="L45">    graphHead.setProperty(propertyKey, density);</span>
+<span class="fc" id="L46">    return graphHead;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

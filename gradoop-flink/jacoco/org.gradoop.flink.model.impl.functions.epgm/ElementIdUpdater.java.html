@@ -18,25 +18,23 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-
 
 /**
- * Updates the id of an EPGM element in a Tuple2 by the GradoopId in the
- * second field.
+ * Updates the id of an element in a Tuple2 by the GradoopId in the second field.
  *
- * @param &lt;EL&gt; EPGM element type
+ * @param &lt;EL&gt; element type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;graphIds;label;properties&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;*-&gt;id&quot;)
-<span class="fc" id="L33">public class ElementIdUpdater&lt;EL extends EPGMElement&gt;</span>
+<span class="fc" id="L31">public class ElementIdUpdater&lt;EL extends Element&gt;</span>
   implements MapFunction&lt;Tuple2&lt;EL, GradoopId&gt;, EL&gt; {
 
   @Override
   public EL map(Tuple2&lt;EL, GradoopId&gt; tuple2) {
-<span class="fc" id="L38">    tuple2.f0.setId(tuple2.f1);</span>
-<span class="fc" id="L39">    return tuple2.f0;</span>
+<span class="fc" id="L36">    tuple2.f0.setId(tuple2.f1);</span>
+<span class="fc" id="L37">    return tuple2.f0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

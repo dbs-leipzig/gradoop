@@ -20,21 +20,14 @@ import org.apache.flink.api.java.tuple.Tuple1;
 
 /**
  * Calculates the degree centrality of the graph
+ * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
  */
-<span class="fc" id="L24">public class CalculateDegreeCentrality implements CrossFunction&lt;Tuple1&lt;Long&gt;, Long, Double&gt; {</span>
+<span class="fc" id="L25">public class CalculateDegreeCentrality implements CrossFunction&lt;Tuple1&lt;Long&gt;, Long, Double&gt; {</span>
 
-  /**
-   * Calculates the degree centrality of the graph
-   * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
-   *
-   * @param vertexDistanceSum sum of degree distances of the vertices
-   * @param vertexCount number of vertices
-   * @return degree centrality of graph
-   */
   @Override
   public Double cross(Tuple1&lt;Long&gt; vertexDistanceSum, Long vertexCount) {
-<span class="fc" id="L36">    double sum = vertexDistanceSum.f0;</span>
-<span class="fc" id="L37">    return sum / ((vertexCount - 2) * (vertexCount - 1));</span>
+<span class="fc" id="L29">    double sum = vertexDistanceSum.f0;</span>
+<span class="fc" id="L30">    return sum / ((vertexCount - 2) * (vertexCount - 1));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

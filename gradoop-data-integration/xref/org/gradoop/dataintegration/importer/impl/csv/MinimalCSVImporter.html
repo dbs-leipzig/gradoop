@@ -173,8 +173,8 @@
 <a name="163" href="#163">163</a>     <strong class="jxr_keyword">return</strong> config.getExecutionEnvironment()
 <a name="164" href="#164">164</a>       .readTextFile(path)
 <a name="165" href="#165">165</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/dataintegration/importer/impl/csv/functions/CsvRowToProperties.html">CsvRowToProperties</a>(tokenSeparator, propertyNames, checkReoccurringHeader))
-<a name="166" href="#166">166</a>       .map(<strong class="jxr_keyword">new</strong> PropertiesToVertex&lt;&gt;(config.getVertexFactory()))
-<a name="167" href="#167">167</a>       .returns(config.getVertexFactory().getType());
+<a name="166" href="#166">166</a>       .map(<strong class="jxr_keyword">new</strong> PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))
+<a name="167" href="#167">167</a>       .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
 <a name="168" href="#168">168</a>   }
 <a name="169" href="#169">169</a> 
 <a name="170" href="#170">170</a>   <em class="jxr_javadoccomment">/**</em>

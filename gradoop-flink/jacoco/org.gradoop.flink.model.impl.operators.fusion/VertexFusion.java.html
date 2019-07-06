@@ -21,9 +21,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.IdNotInBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -58,31 +58,23 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
  *    appearing in the search graph that are not expressed in the pattern graph are
  *    rendered as hooks over the fused vertex
  */
-<span class="fc" id="L61">public class VertexFusion implements BinaryGraphToGraphOperator {</span>
+<span class="fc" id="L61">public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator&lt;LogicalGraph&gt; {</span>
 
-  /**
-   * Fusing the already-combined sources
-   *
-   * @param searchGraph            Logical Graph defining the data lake
-   * @param graphPatterns Collection of elements representing which vertices will be merged into
-   *                      a vertex
-   * @return              A single merged graph
-   */
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
-<span class="fc" id="L73">    return execute(searchGraph,</span>
-<span class="fc" id="L74">        graphPatterns.getConfig().getGraphCollectionFactory()</span>
-<span class="fc" id="L75">        .fromDataSets(</span>
-<span class="fc" id="L76">            graphPatterns.getGraphHead(),</span>
-<span class="fc" id="L77">            graphPatterns.getVertices(),</span>
-<span class="fc" id="L78">            graphPatterns.getEdges()));</span>
+<span class="fc" id="L65">    return execute(searchGraph,</span>
+<span class="fc" id="L66">        graphPatterns.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L67">        .fromDataSets(</span>
+<span class="fc" id="L68">            graphPatterns.getGraphHead(),</span>
+<span class="fc" id="L69">            graphPatterns.getVertices(),</span>
+<span class="fc" id="L70">            graphPatterns.getEdges()));</span>
   }
 
 
   /**
-   * Fusing the already-combined sources
+   * Fusing the already-combined sources.
    *
-   * @param searchGraph            Logical Graph defining the data lake
+   * @param searchGraph   Logical Graph defining the data lake
    * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph
@@ -90,64 +82,64 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
   public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
 
     // Missing in the theoric definition: creating a new header
-<span class="fc" id="L93">    GradoopId newGraphid = GradoopId.get();</span>
+<span class="fc" id="L85">    GradoopId newGraphid = GradoopId.get();</span>
 
-<span class="fc" id="L95">    DataSet&lt;EPGMGraphHead&gt; gh = searchGraph.getGraphHead()</span>
-<span class="fc" id="L96">      .map(new MapGraphHeadForNewGraph(newGraphid));</span>
+<span class="fc" id="L87">    DataSet&lt;EPGMGraphHead&gt; gh = searchGraph.getGraphHead()</span>
+<span class="fc" id="L88">      .map(new MapGraphHeadForNewGraph(newGraphid));</span>
 
-<span class="fc" id="L98">    DataSet&lt;GradoopId&gt; patternVertexIds = graphPatterns.getVertices()</span>
-<span class="fc" id="L99">            .map(new Id&lt;&gt;());</span>
-<span class="fc" id="L100">    DataSet&lt;GradoopId&gt; patternEdgeIds = graphPatterns.getEdges()</span>
-<span class="fc" id="L101">            .map(new Id&lt;&gt;());</span>
+<span class="fc" id="L90">    DataSet&lt;GradoopId&gt; patternVertexIds = graphPatterns.getVertices()</span>
+<span class="fc" id="L91">            .map(new Id&lt;&gt;());</span>
+<span class="fc" id="L92">    DataSet&lt;GradoopId&gt; patternEdgeIds = graphPatterns.getEdges()</span>
+<span class="fc" id="L93">            .map(new Id&lt;&gt;());</span>
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
-<span class="fc" id="L105">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =</span>
-<span class="fc" id="L106">        graphPatterns.getVertices()</span>
-<span class="fc" id="L107">        .coGroup(searchGraph.getVertices())</span>
-<span class="fc" id="L108">        .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L109">        .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L110">        .flatMap(new MapVertexToPairWithGraphId());</span>
+<span class="fc" id="L97">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =</span>
+<span class="fc" id="L98">        graphPatterns.getVertices()</span>
+<span class="fc" id="L99">        .coGroup(searchGraph.getVertices())</span>
+<span class="fc" id="L100">        .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L101">        .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L102">        .flatMap(new MapVertexToPairWithGraphId());</span>
 
     // Associate each gid in hypervertices.H to the merged vertices
-<span class="fc" id="L113">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; mergedVertices =</span>
-<span class="fc" id="L114">        graphPatterns.getGraphHeads()</span>
-<span class="fc" id="L115">        .map(new CoGroupGraphHeadToVertex());</span>
+<span class="fc" id="L105">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; mergedVertices =</span>
+<span class="fc" id="L106">        graphPatterns.getGraphHeads()</span>
+<span class="fc" id="L107">        .map(new CoGroupGraphHeadToVertex());</span>
 
     // PHASE 2: Recreating the vertices
-<span class="fc" id="L118">    DataSet&lt;EPGMVertex&gt; vi = searchGraph.getVertices()</span>
-<span class="fc" id="L119">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
-<span class="fc" id="L120">      .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);</span>
+<span class="fc" id="L110">    DataSet&lt;EPGMVertex&gt; vi = searchGraph.getVertices()</span>
+<span class="fc" id="L111">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
+<span class="fc" id="L112">      .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);</span>
 
-<span class="fc" id="L122">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs</span>
-<span class="fc" id="L123">      .coGroup(mergedVertices)</span>
-<span class="fc" id="L124">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
-<span class="fc" id="L125">      .with(new CoGroupAssociateOldVerticesWithNewIds())</span>
-<span class="fc" id="L126">      .union(vi.map(new MapVerticesAsTuplesWithNullId()));</span>
+<span class="fc" id="L114">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs</span>
+<span class="fc" id="L115">      .coGroup(mergedVertices)</span>
+<span class="fc" id="L116">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
+<span class="fc" id="L117">      .with(new CoGroupAssociateOldVerticesWithNewIds())</span>
+<span class="fc" id="L118">      .union(vi.map(new MapVerticesAsTuplesWithNullId()));</span>
 
-<span class="fc" id="L128">    DataSet&lt;EPGMVertex&gt; vToRet = mergedVertices</span>
-<span class="fc" id="L129">      .coGroup(patternVerticesWithGraphIDs)</span>
-<span class="fc" id="L130">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
-<span class="fc" id="L131">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L132">      .map(new Value0Of2&lt;&gt;())</span>
-<span class="fc" id="L133">      .union(vi)</span>
-<span class="fc" id="L134">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
+<span class="fc" id="L120">    DataSet&lt;EPGMVertex&gt; vToRet = mergedVertices</span>
+<span class="fc" id="L121">      .coGroup(patternVerticesWithGraphIDs)</span>
+<span class="fc" id="L122">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
+<span class="fc" id="L123">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L124">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L125">      .union(vi)</span>
+<span class="fc" id="L126">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
 
     // PHASE 3: Recreating the edges
-<span class="fc" id="L137">    DataSet&lt;EPGMEdge&gt; edges = searchGraph.getEdges()</span>
-<span class="fc" id="L138">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
-<span class="fc" id="L139">      .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)</span>
-<span class="fc" id="L140">      .leftOuterJoin(idJoin)</span>
-<span class="fc" id="L141">      .where(new SourceId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
-<span class="fc" id="L142">      .with(new FlatJoinSourceEdgeReference(true))</span>
-<span class="fc" id="L143">      .leftOuterJoin(idJoin)</span>
-<span class="fc" id="L144">      .where(new TargetId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
-<span class="fc" id="L145">      .with(new FlatJoinSourceEdgeReference(false))</span>
-<span class="fc" id="L146">      .groupBy(new Id&lt;&gt;())</span>
-<span class="fc" id="L147">      .reduceGroup(new AddNewIdToDuplicatedEdge())</span>
-<span class="fc" id="L148">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
+<span class="fc" id="L129">    DataSet&lt;EPGMEdge&gt; edges = searchGraph.getEdges()</span>
+<span class="fc" id="L130">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
+<span class="fc" id="L131">      .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)</span>
+<span class="fc" id="L132">      .leftOuterJoin(idJoin)</span>
+<span class="fc" id="L133">      .where(new SourceId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
+<span class="fc" id="L134">      .with(new FlatJoinSourceEdgeReference(true))</span>
+<span class="fc" id="L135">      .leftOuterJoin(idJoin)</span>
+<span class="fc" id="L136">      .where(new TargetId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
+<span class="fc" id="L137">      .with(new FlatJoinSourceEdgeReference(false))</span>
+<span class="fc" id="L138">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L139">      .reduceGroup(new AddNewIdToDuplicatedEdge())</span>
+<span class="fc" id="L140">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
 
-<span class="fc" id="L150">    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);</span>
+<span class="fc" id="L142">    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

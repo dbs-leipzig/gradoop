@@ -69,7 +69,7 @@
 <a name="59" href="#59">59</a>    @Override
 <a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> LogicalGraph getLogicalGraph() {
 <a name="61" href="#61">61</a>      DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment().readTextFile(jsonPath)
-<a name="62" href="#62">62</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a>(config.getVertexFactory()));
+<a name="62" href="#62">62</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a>(config.getLogicalGraphFactory().getVertexFactory()));
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">return</strong> config.getLogicalGraphFactory().fromDataSets(vertices);
 <a name="64" href="#64">64</a>    }
 <a name="65" href="#65">65</a>  

@@ -127,8 +127,8 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
 <span class="fc" id="L129">    GradoopFlinkConfig config = graph.getConfig();</span>
-<span class="fc" id="L130">    GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();</span>
-<span class="fc" id="L131">    VertexFactory&lt;EPGMVertex&gt; vertexFactory = config.getVertexFactory();</span>
+<span class="fc" id="L130">    GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = graph.getFactory().getGraphHeadFactory();</span>
+<span class="fc" id="L131">    VertexFactory&lt;EPGMVertex&gt; vertexFactory = graph.getFactory().getVertexFactory();</span>
 <span class="fc" id="L132">    String variable = getQueryHandler().getVertices().iterator().next().getVariable();</span>
 
 <span class="fc" id="L134">    DataSet&lt;EPGMVertex&gt; matchingVertices = graph.getVertices()</span>
@@ -213,15 +213,15 @@ public class ExplorativePatternMatching
 
 <span class="fc" id="L214">    DataSet&lt;EPGMElement&gt; elements = embeddings</span>
 <span class="fc" id="L215">      .flatMap(new ElementsFromEmbedding(traversalCode,</span>
-<span class="fc" id="L216">        graph.getConfig().getGraphHeadFactory(),</span>
-<span class="fc" id="L217">        graph.getConfig().getVertexFactory(),</span>
-<span class="fc" id="L218">        graph.getConfig().getEdgeFactory(),</span>
+<span class="fc" id="L216">        graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L217">        graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L218">        graph.getFactory().getEdgeFactory(),</span>
 <span class="fc" id="L219">        getQueryHandler()</span>
       ));
 
 <span class="fc bfc" id="L222" title="All 2 branches covered.">    return doAttachData() ?</span>
 <span class="fc" id="L223">      PostProcessor.extractGraphCollectionWithData(elements, graph, true) :</span>
-<span class="fc" id="L224">      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);</span>
+<span class="fc" id="L224">      PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), true);</span>
   }
 
 

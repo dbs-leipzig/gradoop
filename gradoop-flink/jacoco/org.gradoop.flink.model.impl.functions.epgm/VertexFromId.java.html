@@ -47,22 +47,14 @@ public class VertexFromId implements
 <span class="fc" id="L47">    this.vertexFactory = vertexFactory;</span>
 <span class="fc" id="L48">  }</span>
 
-  /**
-   * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
-   *
-   * @param gradoopId Gradoop identifier
-   * @return EPGM vertex
-   * @throws Exception on failure
-   */
   @Override
   public EPGMVertex map(Tuple1&lt;GradoopId&gt; gradoopId) throws Exception {
-<span class="fc" id="L59">    return vertexFactory.initVertex(gradoopId.f0);</span>
+<span class="fc" id="L52">    return vertexFactory.initVertex(gradoopId.f0);</span>
   }
-
 
   @Override
   public TypeInformation&lt;EPGMVertex&gt; getProducedType() {
-<span class="fc" id="L65">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
+<span class="fc" id="L57">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

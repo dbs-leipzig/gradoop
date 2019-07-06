@@ -74,7 +74,7 @@ import java.util.Set;
 
     // Add a dummy graph head for entities which have no assigned graph
 <span class="fc" id="L76">    DataSet&lt;EPGMGraphHead&gt; dbGraphHead = getConfig().getExecutionEnvironment().fromElements(</span>
-<span class="fc" id="L77">      getConfig().getGraphHeadFactory()</span>
+<span class="fc" id="L77">      getGraphHeadFactory()</span>
 <span class="fc" id="L78">        .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)</span>
     );
 <span class="fc" id="L80">    inGraphHeads = inGraphHeads.union(dbGraphHead);</span>

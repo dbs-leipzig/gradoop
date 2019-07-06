@@ -17,12 +17,13 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
 import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -35,59 +36,69 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpda
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 
 /**
- * Creates a copy of the logical graph with new ids for the graph head,
- * vertices and edges.
+ * Creates a copy of the graph instance with new ids for the graph head, vertices and edges.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-<span class="fc" id="L41">public class Cloning implements UnaryGraphToGraphOperator {</span>
+<span class="fc" id="L47">public class Cloning&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LG execute(LG graph) {
 
     //--------------------------------------------------------------------------
     // compute new graphs
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L50">    DataSet&lt;EPGMGraphHead&gt; graphHead = graph.getGraphHead()</span>
-<span class="fc" id="L51">      .map(new Clone&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L62">    DataSet&lt;G&gt; graphHead = graph.getGraphHead()</span>
+<span class="fc" id="L63">      .map(new Clone&lt;&gt;());</span>
 
-<span class="fc" id="L53">    DataSet&lt;GradoopId&gt; graphId = graphHead.map(new Id&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L65">    DataSet&lt;GradoopId&gt; graphId = graphHead.map(new Id&lt;&gt;());</span>
 
     //--------------------------------------------------------------------------
     // compute new vertices
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L59">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; vertexTuple = graph.getVertices()</span>
-<span class="fc" id="L60">        .map(new PairElementWithNewId&lt;EPGMVertex&gt;());</span>
+<span class="fc" id="L71">    DataSet&lt;Tuple2&lt;V, GradoopId&gt;&gt; vertexTuple = graph.getVertices()</span>
+<span class="fc" id="L72">        .map(new PairElementWithNewId&lt;&gt;());</span>
 
-<span class="fc" id="L62">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexIdTuple = vertexTuple</span>
-<span class="fc" id="L63">      .map(new Value0Of2ToId&lt;EPGMVertex, GradoopId&gt;());</span>
+<span class="fc" id="L74">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexIdTuple = vertexTuple</span>
+<span class="fc" id="L75">      .map(new Value0Of2ToId&lt;&gt;());</span>
 
-<span class="fc" id="L65">    DataSet&lt;EPGMVertex&gt; vertices = vertexTuple</span>
-<span class="fc" id="L66">      .map(new ElementIdUpdater&lt;EPGMVertex&gt;())</span>
+<span class="fc" id="L77">    DataSet&lt;V&gt; vertices = vertexTuple</span>
+<span class="fc" id="L78">      .map(new ElementIdUpdater&lt;&gt;())</span>
       //update graph ids
-<span class="fc" id="L68">      .map(new ElementGraphUpdater&lt;EPGMVertex&gt;())</span>
-<span class="fc" id="L69">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
+<span class="fc" id="L80">      .map(new ElementGraphUpdater&lt;&gt;())</span>
+<span class="fc" id="L81">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
 
     //--------------------------------------------------------------------------
     // compute new edges
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L75">    DataSet&lt;EPGMEdge&gt; edges = graph.getEdges()</span>
-<span class="fc" id="L76">      .map(new Clone&lt;EPGMEdge&gt;())</span>
+<span class="fc" id="L87">    DataSet&lt;E&gt; edges = graph.getEdges()</span>
+<span class="fc" id="L88">      .map(new Clone&lt;&gt;())</span>
       //update source vertex ids
-<span class="fc" id="L78">      .join(vertexIdTuple)</span>
-<span class="fc" id="L79">      .where(new SourceId&lt;&gt;()).equalTo(0)</span>
-<span class="fc" id="L80">      .with(new EdgeSourceUpdateJoin&lt;&gt;())</span>
+<span class="fc" id="L90">      .join(vertexIdTuple)</span>
+<span class="fc" id="L91">      .where(new SourceId&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L92">      .with(new EdgeSourceUpdateJoin&lt;&gt;())</span>
       //update target vertex ids
-<span class="fc" id="L82">      .join(vertexIdTuple)</span>
-<span class="fc" id="L83">      .where(new TargetId&lt;&gt;()).equalTo(0)</span>
-<span class="fc" id="L84">      .with(new EdgeTargetUpdateJoin&lt;&gt;())</span>
+<span class="fc" id="L94">      .join(vertexIdTuple)</span>
+<span class="fc" id="L95">      .where(new TargetId&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L96">      .with(new EdgeTargetUpdateJoin&lt;&gt;())</span>
       //update graph ids
-<span class="fc" id="L86">      .map(new ElementGraphUpdater&lt;EPGMEdge&gt;())</span>
-<span class="fc" id="L87">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
+<span class="fc" id="L98">      .map(new ElementGraphUpdater&lt;&gt;())</span>
+<span class="fc" id="L99">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
 
-<span class="fc" id="L89">    return graph.getConfig().getLogicalGraphFactory()</span>
-<span class="fc" id="L90">      .fromDataSets(graphHead, vertices, edges);</span>
+<span class="fc" id="L101">    return graph.getFactory().fromDataSets(graphHead, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

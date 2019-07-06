@@ -18,17 +18,19 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
  /**
   * Sets the aggregation result as property for each vertex. All edges together with the
   * relevant vertex and the opposite vertex of the edge were grouped.
+  *
+  * @param &lt;V&gt; vertex type
   */
-public class NeighborVertexReduceFunction
+public class NeighborVertexReduceFunction&lt;V extends Vertex&gt;
   extends NeighborVertexFunction
-  implements GroupReduceFunction&lt;Tuple2&lt;EPGMVertex, EPGMVertex&gt;, EPGMVertex&gt; {
+  implements GroupReduceFunction&lt;Tuple2&lt;V, V&gt;, V&gt; {
 
   /**
    * Valued constructor.
@@ -36,33 +38,35 @@ public class NeighborVertexReduceFunction
    * @param function vertex aggregation function
    */
   public NeighborVertexReduceFunction(VertexAggregateFunction function) {
-<span class="fc" id="L39">    super(function);</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L41">    super(function);</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;EPGMVertex, EPGMVertex&gt;&gt; tuples,
-    Collector&lt;EPGMVertex&gt; collector) throws Exception {
+  public void reduce(Iterable&lt;Tuple2&lt;V, V&gt;&gt; tuples,
+    Collector&lt;V&gt; collector) throws Exception {
 
-<span class="fc" id="L46">    PropertyValue propertyValue = PropertyValue.NULL_VALUE;</span>
-<span class="fc" id="L47">    EPGMVertex vertex = null;</span>
-    EPGMVertex edgeVertex;
-<span class="fc" id="L49">    boolean isFirst = true;</span>
+<span class="fc" id="L48">    PropertyValue propertyValue = PropertyValue.NULL_VALUE;</span>
+<span class="fc" id="L49">    V vertex = null;</span>
+    V edgeVertex;
+<span class="fc" id="L51">    boolean isFirst = true;</span>
 
     // aggregates the value of each opposite vertex of an edge
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    for (Tuple2&lt;EPGMVertex, EPGMVertex&gt; tuple : tuples) {</span>
-<span class="fc" id="L53">      edgeVertex = tuple.f0;</span>
-<span class="fc bfc" id="L54" title="All 2 branches covered.">      if (isFirst) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (Tuple2&lt;V, V&gt; tuple : tuples) {</span>
+<span class="fc" id="L55">      edgeVertex = tuple.f0;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">      if (isFirst) {</span>
         // the current vertex is the same for each tuple
-<span class="fc" id="L56">        vertex = tuple.f1;</span>
-<span class="fc" id="L57">        isFirst = false;</span>
-<span class="fc" id="L58">        propertyValue = getFunction().getIncrement(edgeVertex);</span>
+<span class="fc" id="L58">        vertex = tuple.f1;</span>
+<span class="fc" id="L59">        isFirst = false;</span>
+<span class="fc" id="L60">        propertyValue = getFunction().getIncrement(edgeVertex);</span>
       } else {
-<span class="fc" id="L60">        propertyValue = getFunction()</span>
-<span class="fc" id="L61">          .aggregate(propertyValue, getFunction().getIncrement(edgeVertex));</span>
+<span class="fc" id="L62">        propertyValue = getFunction()</span>
+<span class="fc" id="L63">          .aggregate(propertyValue, getFunction().getIncrement(edgeVertex));</span>
       }
-<span class="fc" id="L63">    }</span>
-<span class="fc" id="L64">    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);</span>
-<span class="fc" id="L65">    collector.collect(vertex);</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L65">    }</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (vertex != null) {</span>
+<span class="fc" id="L67">      vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);</span>
+<span class="fc" id="L68">      collector.collect(vertex);</span>
+    }
+<span class="fc" id="L70">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -134,16 +134,16 @@
 <a name="124" href="#124">124</a>       constructFinalElements(graph, embeddings, embeddingMetaData) :
 <a name="125" href="#125">125</a>       embeddings.flatMap(
 <a name="126" href="#126">126</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(
-<a name="127" href="#127">127</a>           graph.getConfig().getGraphHeadFactory(),
-<a name="128" href="#128">128</a>           graph.getConfig().getVertexFactory(),
-<a name="129" href="#129">129</a>           graph.getConfig().getEdgeFactory(),
+<a name="127" href="#127">127</a>           graph.getFactory().getGraphHeadFactory(),
+<a name="128" href="#128">128</a>           graph.getFactory().getVertexFactory(),
+<a name="129" href="#129">129</a>           graph.getFactory().getEdgeFactory(),
 <a name="130" href="#130">130</a>           embeddingMetaData,
 <a name="131" href="#131">131</a>           queryHandler.getSourceTargetVariables()));
 <a name="132" href="#132">132</a> 
 <a name="133" href="#133">133</a>     <em class="jxr_comment">// Post processing</em>
 <a name="134" href="#134">134</a>     <strong class="jxr_keyword">return</strong>
 <a name="135" href="#135">135</a>       doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, <strong class="jxr_keyword">true</strong>) :
-<a name="136" href="#136">136</a>       PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), <strong class="jxr_keyword">true</strong>);
+<a name="136" href="#136">136</a>       PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), <strong class="jxr_keyword">true</strong>);
 <a name="137" href="#137">137</a>   }
 <a name="138" href="#138">138</a> 
 <a name="139" href="#139">139</a>   <em class="jxr_javadoccomment">/**</em>
@@ -176,9 +176,9 @@
 <a name="166" href="#166">166</a> 
 <a name="167" href="#167">167</a>     <strong class="jxr_keyword">return</strong> addEmbeddingsElements.evaluate().flatMap(
 <a name="168" href="#168">168</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(
-<a name="169" href="#169">169</a>         graph.getConfig().getGraphHeadFactory(),
-<a name="170" href="#170">170</a>         graph.getConfig().getVertexFactory(),
-<a name="171" href="#171">171</a>         graph.getConfig().getEdgeFactory(),
+<a name="169" href="#169">169</a>         graph.getFactory().getGraphHeadFactory(),
+<a name="170" href="#170">170</a>         graph.getFactory().getVertexFactory(),
+<a name="171" href="#171">171</a>         graph.getFactory().getEdgeFactory(),
 <a name="172" href="#172">172</a>         newMetaData,
 <a name="173" href="#173">173</a>         constructionPatternHandler.getSourceTargetVariables(),
 <a name="174" href="#174">174</a>         constructionPatternHandler.getLabelsForVariables(newVars)));
