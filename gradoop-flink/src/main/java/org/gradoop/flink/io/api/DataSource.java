@@ -15,6 +15,9 @@
  */
 package org.gradoop.flink.io.api;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
@@ -23,7 +26,8 @@ import java.io.IOException;
 /**
  * Data source in analytical programs.
  */
-public interface DataSource {
+public interface DataSource
+  extends BaseDataSource<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
 
   /**
    * Reads the input as logical graph.

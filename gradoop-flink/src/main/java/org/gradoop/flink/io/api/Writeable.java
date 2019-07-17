@@ -13,43 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.epgm;
+package org.gradoop.flink.io.api;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 import java.io.IOException;
 
 /**
- * Operators that are available at all graph structures.
+ * Indicates that a graph is writeable.
  *
- * @see BaseGraph
- * @see BaseGraphCollection
+ * @param <G> The graph head type of the graph.
+ * @param <V> The vertex type of the graph.
+ * @param <E> The edge type of the graph.
+ * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
-public interface GraphBaseOperators {
-
-  //----------------------------------------------------------------------------
-  // Utility methods
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the collection is empty.
-   *
-   * A collection is considered empty, if it contains no logical graphs.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
+public interface Writeable<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
 
   /**
-   * Writes logical graph/graph collection to given data sink.
+   * Writes graph/graph collection to given data sink.
    *
    * @param dataSink data sink
    * @throws IOException if the data sink can't be written
    */
-  void writeTo(DataSink dataSink) throws IOException;
+  void writeTo(BaseDataSink<G, V, E, LG, GC> dataSink) throws IOException;
 
   /**
    * Writes logical graph/graph collection to given data sink with overwrite option
@@ -58,5 +54,5 @@ public interface GraphBaseOperators {
    * @param overWrite determines whether existing files are overwritten
    * @throws IOException if the data sink can't be written
    */
-  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
+  void writeTo(BaseDataSink<G, V, E, LG, GC> dataSink, boolean overWrite) throws IOException;
 }

@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators extends GraphBaseOperators {
+public interface LogicalGraphOperators {
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -271,4 +271,14 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return result of given operator
    */
   GraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
+   *
+   * A graph is considered empty, if it contains no vertices.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
 }

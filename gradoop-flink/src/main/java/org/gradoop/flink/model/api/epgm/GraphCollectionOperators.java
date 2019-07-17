@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators extends GraphBaseOperators {
+public interface GraphCollectionOperators {
 
   //----------------------------------------------------------------------------
   // Logical Graph / Graph Head Getters
@@ -280,4 +280,15 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return grouped graph collection
    */
   GraphCollection groupByIsomorphism(GraphHeadReduceFunction func);
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the collection is empty.
+   *
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
 }

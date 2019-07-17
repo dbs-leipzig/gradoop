@@ -24,7 +24,8 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.Order;
-import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.BaseDataSink;
+import org.gradoop.flink.io.api.Writeable;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -87,7 +88,7 @@ import java.util.Objects;
  */
 public class GraphCollection implements
   BaseGraphCollection<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>,
-  GraphCollectionOperators {
+  GraphCollectionOperators, Writeable<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
   /**
    * Layout for that graph collection
    */
@@ -381,13 +382,15 @@ public class GraphCollection implements
   }
 
   @Override
-  public void writeTo(DataSink dataSink) throws IOException {
-    dataSink.write(this);
+  public void writeTo(BaseDataSink<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> sink)
+    throws IOException {
+    sink.write(this);
   }
 
   @Override
-  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-    dataSink.write(this, overWrite);
+  public void writeTo(BaseDataSink<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> sink,
+    boolean overWrite) throws IOException {
+    sink.write(this, overWrite);
   }
 
   /**
