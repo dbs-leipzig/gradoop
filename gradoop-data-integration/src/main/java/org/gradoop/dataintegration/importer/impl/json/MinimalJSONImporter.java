@@ -65,6 +65,7 @@ public class MinimalJSONImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() {
-    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 }

@@ -294,7 +294,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
-    checkCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+    checkCSVWrite(tmpPath, input.getCollectionFactory().fromGraph(input));
   }
 
   /**

@@ -80,7 +80,7 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override

@@ -61,7 +61,7 @@ public class DifferenceTest extends BinaryCollectionOperatorsTestBase {
 
     GraphCollection col01 = loader.getGraphCollectionByVariables("g0", "g1");
 
-    GraphCollection expectation = getConfig().getGraphCollectionFactory().createEmptyCollection();
+    GraphCollection expectation = col01.getFactory().createEmptyCollection();
 
     GraphCollection result = col01.difference(col01);
     checkAssertions(expectation, result, "total");
