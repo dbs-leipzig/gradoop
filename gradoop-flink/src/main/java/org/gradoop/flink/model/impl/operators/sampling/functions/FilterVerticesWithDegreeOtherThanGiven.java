@@ -57,7 +57,7 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
       .map(new PropertyRemover<>(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
       .map(new PropertyRemover<>(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(
+    return graph.getFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());
   }
 }

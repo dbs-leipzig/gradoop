@@ -38,7 +38,7 @@ public class ReduceOverlap extends OverlapBase implements
 
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<EPGMGraphHead>());
 
-    return collection.getConfig().getLogicalGraphFactory().fromDataSets(
+    return collection.getGraphFactory().fromDataSets(
       getVertices(collection.getVertices(), graphIDs),
       getEdges(collection.getEdges(), graphIDs)
     );

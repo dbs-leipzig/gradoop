@@ -28,7 +28,7 @@ public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-    return collection.getConfig().getLogicalGraphFactory().fromDataSets(
+    return collection.getGraphFactory().fromDataSets(
       collection.getVertices(), collection.getEdges());
   }
 }

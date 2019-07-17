@@ -33,7 +33,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
+    GraphCollection restoredCollection = originalCollection.getFactory()
       .fromTransactions(transactions);
 
     collectAndAssertTrue(
@@ -54,7 +54,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
+    GraphCollection restoredCollection = originalCollection.getFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(
@@ -77,7 +77,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
 
     DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
-    GraphCollection restoredCollection = getConfig().getGraphCollectionFactory()
+    GraphCollection restoredCollection = originalCollection.getFactory()
       .fromTransactions(transactions, new First<>(), new First<>());
 
     collectAndAssertTrue(

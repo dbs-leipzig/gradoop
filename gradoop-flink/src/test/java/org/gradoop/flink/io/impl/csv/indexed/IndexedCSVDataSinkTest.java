@@ -296,7 +296,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * @throws Exception if the execution or IO fails.
    */
   private void checkIndexedCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
-    checkIndexedCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+    checkIndexedCSVWrite(tmpPath, input.getCollectionFactory().fromGraph(input));
   }
 
   /**
