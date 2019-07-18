@@ -21,8 +21,7 @@ import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.io.api.BaseDataSink;
-import org.gradoop.flink.io.api.Writeable;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -76,8 +75,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements
-  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>, LogicalGraphOperators,
-  Writeable<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
+  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>, LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
@@ -316,15 +314,13 @@ public class LogicalGraph implements
   }
 
   @Override
-  public void writeTo(BaseDataSink<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> sink)
-    throws IOException {
-    sink.write(this);
+  public void writeTo(DataSink dataSink) throws IOException {
+    dataSink.write(this);
   }
 
   @Override
-  public void writeTo(BaseDataSink<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> sink,
-    boolean overWrite) throws IOException {
-    sink.write(this, overWrite);
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
   }
 
   /**

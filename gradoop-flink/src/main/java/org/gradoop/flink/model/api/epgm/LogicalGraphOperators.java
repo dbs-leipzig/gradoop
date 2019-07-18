@@ -17,6 +17,7 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -27,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -281,4 +283,22 @@ public interface LogicalGraphOperators {
    *          empty or {@code false} if not
    */
   DataSet<Boolean> isEmpty();
+
+  /**
+     * Writes graph/graph collection to given data sink.
+     *
+     * @param dataSink data sink
+     * @throws IOException if the data sink can't be written
+     */
+  void writeTo(DataSink dataSink)
+    throws IOException;
+
+  /**
+     * Writes logical graph/graph collection to given data sink with overwrite option
+     *
+     * @param dataSink data sink
+     * @param overWrite determines whether existing files are overwritten
+     * @throws IOException if the data sink can't be written
+     */
+  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }

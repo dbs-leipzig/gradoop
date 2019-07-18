@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.util.Order;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
@@ -31,6 +32,8 @@ import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+
+import java.io.IOException;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
@@ -291,4 +294,22 @@ public interface GraphCollectionOperators {
    *          empty or {@code false} if not
    */
   DataSet<Boolean> isEmpty();
+
+  /**
+     * Writes graph/graph collection to given data sink.
+     *
+     * @param dataSink data sink
+     * @throws IOException if the data sink can't be written
+     */
+  void writeTo(DataSink dataSink)
+    throws IOException;
+
+  /**
+     * Writes logical graph/graph collection to given data sink with overwrite option
+     *
+     * @param dataSink data sink
+     * @param overWrite determines whether existing files are overwritten
+     * @throws IOException if the data sink can't be written
+     */
+  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }
