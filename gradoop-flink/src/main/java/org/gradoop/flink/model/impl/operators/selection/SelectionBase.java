@@ -59,7 +59,7 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromDataSets(graphHeads, vertices, edges);
   }
 }
