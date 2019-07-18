@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Gradoop HBase Suite" verbose="2">
+    <test name="HBase Filter Tests">
+        <packages>
+            <package name="org.gradoop.storage.impl.hbase.predicate.filter.impl"/>
+        </packages>
+    </test>
+    <test name="HBase IO Tests">
+        <packages>
+            <package name="org.gradoop.storage.impl.hbase.io"/>
+        </packages>
+    </test>
+    <test name="HBase Graph Store Tests">
+        <classes>
+            <class name="org.gradoop.storage.impl.hbase.HBaseGraphStoreTest"/>
+        </classes>
+    </test>
+    <test name="HBase EPGM Store Tests">
+        <classes>
+            <class name="org.gradoop.storage.impl.hbase.HBaseEPGMStoreTest"/>
+        </classes>
+    </test>
+</suite>

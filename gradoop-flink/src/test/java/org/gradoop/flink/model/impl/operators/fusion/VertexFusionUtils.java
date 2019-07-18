@@ -82,7 +82,7 @@ public class VertexFusionUtils {
       .union(tobeUnitedWith)
       .distinct(new Id<>());
 
-    return superGraph.getConfig().getLogicalGraphFactory()
+    return superGraph.getFactory()
       .fromDataSets(newVertices, filteredEdges);
   }
 }

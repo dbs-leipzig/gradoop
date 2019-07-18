@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -31,7 +30,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.iterator.ClosableIterator;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,9 +39,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import static org.gradoop.common.GradoopTestUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Test class of {@link HBaseEPGMStore} with main I/O functionality.
@@ -203,7 +202,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(expected = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -250,73 +249,73 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     EPGMVertex v = graphStore.readVertex(vertexID);
     assert v != null;
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
-    assertEquals(properties.size(), propertyKeys.size());
+    assertEquals(propertyKeys.size(), properties.size());
 
     for (String propertyKey : propertyKeys) {
       switch (propertyKey) {
       case KEY_0:
         assertTrue(v.getPropertyValue(propertyKey).isNull());
-        assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
+        assertEquals(v.getPropertyValue(propertyKey).getObject(), NULL_VAL_0);
         break;
       case KEY_1:
         assertTrue(v.getPropertyValue(propertyKey).isBoolean());
-        assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
+        assertEquals(v.getPropertyValue(propertyKey).getBoolean(), BOOL_VAL_1);
         break;
       case KEY_2:
         assertTrue(v.getPropertyValue(propertyKey).isInt());
-        assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
+        assertEquals(v.getPropertyValue(propertyKey).getInt(), INT_VAL_2);
         break;
       case KEY_3:
         assertTrue(v.getPropertyValue(propertyKey).isLong());
-        assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
+        assertEquals(v.getPropertyValue(propertyKey).getLong(), LONG_VAL_3);
         break;
       case KEY_4:
         assertTrue(v.getPropertyValue(propertyKey).isFloat());
-        assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
+        assertEquals(v.getPropertyValue(propertyKey).getFloat(), FLOAT_VAL_4, 0);
         break;
       case KEY_5:
         assertTrue(v.getPropertyValue(propertyKey).isDouble());
-        assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
+        assertEquals(v.getPropertyValue(propertyKey).getDouble(), DOUBLE_VAL_5, 0);
         break;
       case KEY_6:
         assertTrue(v.getPropertyValue(propertyKey).isString());
-        assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
+        assertEquals(v.getPropertyValue(propertyKey).getString(), STRING_VAL_6);
         break;
       case KEY_7:
         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
-        assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
+        assertEquals(v.getPropertyValue(propertyKey).getBigDecimal(), BIG_DECIMAL_VAL_7);
         break;
       case KEY_8:
         assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
-        assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
+        assertEquals(v.getPropertyValue(propertyKey).getGradoopId(), GRADOOP_ID_VAL_8);
         break;
       case KEY_9:
         assertTrue(v.getPropertyValue(propertyKey).isMap());
-        assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
+        assertEquals(v.getPropertyValue(propertyKey).getMap(), MAP_VAL_9);
         break;
       case KEY_a:
         assertTrue(v.getPropertyValue(propertyKey).isList());
-        assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
+        assertEquals(v.getPropertyValue(propertyKey).getList(), LIST_VAL_a);
         break;
       case KEY_b:
         assertTrue(v.getPropertyValue(propertyKey).isDate());
-        assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
+        assertEquals(v.getPropertyValue(propertyKey).getDate(), DATE_VAL_b);
         break;
       case KEY_c:
         assertTrue(v.getPropertyValue(propertyKey).isTime());
-        assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
+        assertEquals(v.getPropertyValue(propertyKey).getTime(), TIME_VAL_c);
         break;
       case KEY_d:
         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
-        assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+        assertEquals(v.getPropertyValue(propertyKey).getDateTime(), DATETIME_VAL_d);
         break;
       case KEY_e:
         assertTrue(v.getPropertyValue(propertyKey).isShort());
-        assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
+        assertEquals(v.getPropertyValue(propertyKey).getShort(), SHORT_VAL_e);
         break;
       case KEY_f:
         assertTrue(v.getPropertyValue(propertyKey).isSet());
-        assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
+        assertEquals(v.getPropertyValue(propertyKey).getSet(), SET_VAL_f);
         break;
       default: break;
       }
@@ -367,13 +366,13 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
       boolean hasNext = space.hasNext();
       // Make sure to close the iterator before the assertion.
       space.close();
-      assertFalse(message, hasNext);
+      assertFalse(hasNext, message);
     }
   }
 
   private AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
-    return AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
+    return AsciiGraphLoader.fromString(asciiGraph, getEPGMElementFactoryProvider());
   }
 
   private void validateGraphHead(HBaseEPGMStore graphStore, EPGMGraphHead originalGraphHead)
@@ -400,8 +399,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     validateGraphElements(originalEdge, loadedEdge);
 
     assert loadedEdge != null;
-    assertEquals("source vertex mismatch", originalEdge.getSourceId(), loadedEdge.getSourceId());
-    assertEquals("target vertex mismatch", originalEdge.getTargetId(), loadedEdge.getTargetId());
+    assertEquals(loadedEdge.getSourceId(), originalEdge.getSourceId(), "source vertex mismatch");
+    assertEquals(loadedEdge.getTargetId(), originalEdge.getTargetId(), "target vertex mismatch");
   }
 
 }

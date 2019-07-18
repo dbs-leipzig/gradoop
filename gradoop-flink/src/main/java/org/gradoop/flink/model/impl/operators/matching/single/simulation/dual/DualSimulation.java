@@ -21,12 +21,13 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
@@ -49,7 +50,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.fu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
@@ -88,10 +88,10 @@ public class DualSimulation extends PatternMatching {
       .filterVertices(graph, getQuery())
       .project(0);
 
-    LogicalGraphFactory graphFactory = graph.getConfig()
-      .getLogicalGraphFactory();
-    GraphCollectionFactory collectionFactory = graph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      graphFactory = graph.getFactory();
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      collectionFactory = graph.getCollectionFactory();
 
     if (doAttachData()) {
       return collectionFactory.fromGraph(
@@ -102,7 +102,7 @@ public class DualSimulation extends PatternMatching {
     } else {
       return collectionFactory.fromGraph(
         graphFactory.fromDataSets(matchingVertexIds
-            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));
+            .map(new VertexFromId(graph.getFactory().getVertexFactory()))));
     }
   }
 
@@ -281,17 +281,16 @@ public class DualSimulation extends PatternMatching {
    */
   private GraphCollection postProcess(LogicalGraph graph,
     DataSet<FatVertex> vertices) {
-    GradoopFlinkConfig config = graph.getConfig();
 
     DataSet<EPGMVertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
-      PostProcessor.extractVertices(vertices, config.getVertexFactory());
+      PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());
 
     DataSet<EPGMEdge> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
-      PostProcessor.extractEdges(vertices, config.getEdgeFactory());
+      PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());
 
-    return config.getGraphCollectionFactory().fromGraph(
-      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
+    return graph.getCollectionFactory().fromGraph(
+      graph.getFactory().fromDataSets(matchVertices, matchEdges));
   }
 }

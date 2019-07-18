@@ -19,13 +19,13 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -48,15 +48,15 @@ public class GraphTransactionFromText
   /**
    * Graph head factory.
    */
-  private EPGMGraphHeadFactory graphHeadFactory;
+  private GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
    * EPGMVertex factory.
    */
-  private EPGMVertexFactory vertexFactory;
+  private VertexFactory<EPGMVertex> vertexFactory;
   /**
    * EPGMEdge factory.
    */
-  private EPGMEdgeFactory edgeFactory;
+  private EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Valued constructor.
@@ -64,9 +64,9 @@ public class GraphTransactionFromText
    * @param config gradoop flink config
    */
   public GraphTransactionFromText(GradoopFlinkConfig config) {
-    this.graphHeadFactory = config.getGraphHeadFactory();
-    this.vertexFactory = config.getVertexFactory();
-    this.edgeFactory = config.getEdgeFactory();
+    this.graphHeadFactory = config.getLogicalGraphFactory().getGraphHeadFactory();
+    this.vertexFactory = config.getLogicalGraphFactory().getVertexFactory();
+    this.edgeFactory = config.getLogicalGraphFactory().getEdgeFactory();
   }
 
   /**

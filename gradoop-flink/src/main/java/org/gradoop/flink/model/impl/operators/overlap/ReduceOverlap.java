@@ -25,25 +25,20 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Computes the overlap graph from a collection of logical graphs.
+ * Creates a new logical graph containing the overlapping vertex and edge sets
+ * of the graphs contained in the given collection. EPGMVertex and edge equality
+ * is based on their respective identifiers.
  */
 public class ReduceOverlap extends OverlapBase implements
   ReducibleBinaryGraphToGraphOperator {
 
-  /**
-   * Creates a new logical graph containing the overlapping vertex and edge sets
-   * of the graphs contained in the given collection. EPGMVertex and edge equality
-   * is based on their respective identifiers.
-   *
-   * @param collection input collection
-   * @return graph with overlapping elements from the input collection
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
     DataSet<GradoopId> graphIDs = graphHeads.map(new Id<EPGMGraphHead>());
 
-    return collection.getConfig().getLogicalGraphFactory().fromDataSets(
+    return collection.getGraphFactory().fromDataSets(
       getVertices(collection.getVertices(), graphIDs),
       getEdges(collection.getEdges(), graphIDs)
     );

@@ -60,18 +60,10 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
  */
 public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalGraph> {
 
-  /**
-   * Fusing the already-combined sources
-   *
-   * @param searchGraph            Logical Graph defining the data lake
-   * @param graphPatterns Collection of elements representing which vertices will be merged into
-   *                      a vertex
-   * @return              A single merged graph
-   */
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
     return execute(searchGraph,
-        graphPatterns.getConfig().getGraphCollectionFactory()
+        graphPatterns.getCollectionFactory()
         .fromDataSets(
             graphPatterns.getGraphHead(),
             graphPatterns.getVertices(),
@@ -80,9 +72,9 @@ public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalG
 
 
   /**
-   * Fusing the already-combined sources
+   * Fusing the already-combined sources.
    *
-   * @param searchGraph            Logical Graph defining the data lake
+   * @param searchGraph   Logical Graph defining the data lake
    * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph
@@ -147,6 +139,6 @@ public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalG
       .reduceGroup(new AddNewIdToDuplicatedEdge())
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
-    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
+    return searchGraph.getFactory().fromDataSets(gh, vToRet, edges);
   }
 }

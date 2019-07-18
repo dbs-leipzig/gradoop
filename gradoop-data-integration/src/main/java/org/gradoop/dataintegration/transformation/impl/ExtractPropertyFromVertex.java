@@ -145,10 +145,10 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
       newVerticesAndOriginIds = candidates
         .groupBy(0)
         .reduceGroup(new CreateNewVertexWithEqualityCondense(
-          logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));
+          logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));
     } else {
       newVerticesAndOriginIds = candidates
-        .map(new CreateNewVertex(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,
+        .map(new CreateNewVertex(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,
           newPropertyName));
     }
 
@@ -160,13 +160,12 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
     DataSet<EPGMEdge> edges = logicalGraph.getEdges();
     if (!edgeDirection.equals(EdgeDirection.NONE)) {
       edges = newVerticesAndOriginIds
-        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,
+        .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,
           edgeLabel))
         .union(edges);
     }
 
-    return logicalGraph.getConfig()
-      .getLogicalGraphFactory()
+    return logicalGraph.getFactory()
       .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
   }
 }

@@ -92,19 +92,6 @@ public class PageRankSampling extends SamplingAlgorithm {
     this.keepVerticesIfSameScore = keepVerticesIfSameScore;
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Vertices are sampled by using the Gradoop-Wrapper of Flinks PageRank-algorithm
-   * {@link PageRank}. If they got different PageRank-scores, all scores are scaled
-   * in a range between 0 and 1.
-   * Then all vertices with a PageRank-score greater or equal/smaller than a given sampling
-   * threshold are retained - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
-   * If ALL vertices got the same PageRank-score, it can be decided whether to sample all
-   * vertices or none of them - depending on the Boolean set in {@code keepVerticesIfSameScore}.
-   * Retains all edges which source- and target-vertices were chosen. There may retain some
-   * unconnected vertices in the sampled graph.
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -114,7 +101,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       maxIteration,
       true).execute(graph);
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
+    graph = graph.getFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
 
     graph = graph

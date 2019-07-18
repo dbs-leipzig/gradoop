@@ -17,15 +17,14 @@ package org.gradoop.flink.model.impl.operators.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -56,7 +55,7 @@ public class ApplyTransformation
       collection.getGraphHeads(),
       collection.getVertices(),
       collection.getEdges(),
-      collection.getConfig().getLogicalGraphFactory());
+      collection.getGraphFactory());
 
     return collection.getFactory().fromDataSets(
       modifiedGraph.getGraphHead(),
@@ -68,8 +67,6 @@ public class ApplyTransformation
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     DataSet<GraphTransaction> graphTransactions = collection.getGraphTransactions();
 
-    GradoopFlinkConfig config = collection.getConfig();
-
     DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
       .map(new TransformGraphTransaction(
         collection.getFactory().getGraphHeadFactory(),
@@ -80,6 +77,6 @@ public class ApplyTransformation
         edgeTransFunc
       ));
 
-    return config.getGraphCollectionFactory().fromTransactions(transformedGraphTransactions);
+    return collection.getFactory().fromTransactions(transformedGraphTransactions);
   }
 }
