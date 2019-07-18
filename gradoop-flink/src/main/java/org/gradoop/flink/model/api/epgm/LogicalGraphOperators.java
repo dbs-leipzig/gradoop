@@ -285,20 +285,19 @@ public interface LogicalGraphOperators {
   DataSet<Boolean> isEmpty();
 
   /**
-     * Writes graph/graph collection to given data sink.
+     * Writes the graph to given data sink.
      *
-     * @param dataSink data sink
-     * @throws IOException if the data sink can't be written
+     * @param dataSink The data sink to which the graph should be written.
+     * @throws IOException if the graph can't be written to the sink
      */
-  void writeTo(DataSink dataSink)
-    throws IOException;
+  void writeTo(DataSink dataSink) throws IOException;
 
   /**
-     * Writes logical graph/graph collection to given data sink with overwrite option
+     * Writes the graph to given data sink with an optional overwrite option.
      *
-     * @param dataSink data sink
+     * @param dataSink The data sink to which the graph should be written.
      * @param overWrite determines whether existing files are overwritten
-     * @throws IOException if the data sink can't be written
+     * @throws IOException if the graph can't be written to the sink
      */
   void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }

@@ -298,18 +298,17 @@ public interface GraphCollectionOperators {
   /**
      * Writes the graph collection to the given data sink.
      *
-     * @param dataSink data sink
+     * @param dataSink The data sink to which the graph collection should be written.
      * @throws IOException if the collection can't be written to the sink
      */
-  void writeTo(DataSink dataSink)
-    throws IOException;
+  void writeTo(DataSink dataSink) throws IOException;
 
   /**
      * Writes the graph collection to the given data sink with an optional overwrite option.
      *
-     * @param dataSink data sink
+     * @param dataSink The data sink to which the graph collection should be written.
      * @param overWrite determines whether existing files are overwritten
-     * @throws IOException if the data sink can't be written
+     * @throws IOException if the collection can't be written to the sink
      */
   void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }
