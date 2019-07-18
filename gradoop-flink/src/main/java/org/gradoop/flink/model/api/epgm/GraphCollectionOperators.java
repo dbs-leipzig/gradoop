@@ -296,16 +296,16 @@ public interface GraphCollectionOperators {
   DataSet<Boolean> isEmpty();
 
   /**
-     * Writes graph/graph collection to given data sink.
+     * Writes the graph collection to the given data sink.
      *
      * @param dataSink data sink
-     * @throws IOException if the data sink can't be written
+     * @throws IOException if the collection can't be written to the sink
      */
   void writeTo(DataSink dataSink)
     throws IOException;
 
   /**
-     * Writes logical graph/graph collection to given data sink with overwrite option
+     * Writes the graph collection to the given data sink with an optional overwrite option.
      *
      * @param dataSink data sink
      * @param overWrite determines whether existing files are overwritten
