@@ -96,7 +96,7 @@ public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
       .join(currentGraph.getVertices())
       .where(new PageRankResultKey()).equalTo(new Id<>())
       .with(new PageRankToAttribute(propertyKey));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+    return currentGraph.getFactory().fromDataSets(
       currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 }

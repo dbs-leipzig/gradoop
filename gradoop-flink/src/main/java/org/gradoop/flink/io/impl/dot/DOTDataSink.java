@@ -87,7 +87,7 @@ public class DOTDataSink implements DataSink {
 
   @Override
   public void write(LogicalGraph graph, boolean overwrite) throws IOException {
-    write(graph.getConfig().getGraphCollectionFactory().fromGraph(graph), overwrite);
+    write(graph.getCollectionFactory().fromGraph(graph), overwrite);
   }
 
   @Override

@@ -144,7 +144,7 @@ public class BusinessTransactionGraphs implements
       .where(new Id<>()).equalTo(0)
       .with(new SetBtgIds<>());
 
-    return iig.getConfig().getGraphCollectionFactory()
+    return iig.getCollectionFactory()
       .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);
   }
 }
