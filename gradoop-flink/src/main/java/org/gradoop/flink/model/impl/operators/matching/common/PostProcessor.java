@@ -26,7 +26,6 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -46,27 +45,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
  * Provides methods for post-processing query results.
  */
 public class PostProcessor {
-
-  /**
-   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement}.
-   *
-   * @param elements elements
-   * @param factory  element factory
-   * @param <G> The graph head type.
-   * @param <V> The vertex type.
-   * @param <E> The edge type.
-   * @param <LG> The graph type.
-   * @param <GC> The graph collection type.
-   * @return Graph collection
-   */
-  public static <G extends GraphHead,
-    V extends Vertex,
-    E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> GC extractGraphCollection(
-    DataSet<Element> elements, BaseGraphCollectionFactory<G, V, E, LG, GC> factory) {
-    return extractGraphCollection(elements, factory, true);
-  }
 
   /**
    * Extracts a {@link GraphCollection} from a set of {@link Element}.
@@ -99,7 +77,7 @@ public class PostProcessor {
   }
 
   /**
-   * Extracts a {@link GraphCollection} from a set of {@link EPGMElement} and
+   * Extracts a {@link GraphCollection} from a set of {@link Element} and
    * attaches the original data from the input {@link LogicalGraph}.
    *
    * @param elements      elements
@@ -146,7 +124,7 @@ public class PostProcessor {
    * @param result pattern matching result
    * @return dataset with (vertexId) tuples
    */
-  public static DataSet<Tuple1<GradoopId>> extractVertexIds(
+  private static DataSet<Tuple1<GradoopId>> extractVertexIds(
     DataSet<FatVertex> result) {
     return result.project(0);
   }
@@ -158,7 +136,7 @@ public class PostProcessor {
    * @param result pattern matching result
    * @return dataset with (edgeId, sourceId, targetId) tuples
    */
-  public static DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> extractEdgeIds(
+  private static DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> extractEdgeIds(
     DataSet<FatVertex> result) {
     return result.flatMap(new EdgeTriple());
   }
@@ -171,7 +149,7 @@ public class PostProcessor {
    * @param <G> The graph head type
    * @return graph heads
    */
-  public static <G extends GraphHead> DataSet<G> extractGraphHeads(DataSet<Element> elements,
+  private static <G extends GraphHead> DataSet<G> extractGraphHeads(DataSet<Element> elements,
     Class<G> graphHeadType) {
     return elements
       .filter(new IsInstance<>(graphHeadType))
@@ -180,16 +158,16 @@ public class PostProcessor {
   }
 
   /**
-   * Initializes EPGM vertices from the given pattern matching result.
+   * Initializes vertices from the given pattern matching result.
    *
    * @param result        pattern matching result
-   * @param epgmVertexFactory EPGM vertex factory
+   * @param vertexFactory vertex factory
    * @param <V> The produced vertex type.
-   * @return EPGM vertices
+   * @return vertices
    */
   public static <V extends Vertex> DataSet<V> extractVertices(DataSet<FatVertex> result,
-                                                VertexFactory<V> epgmVertexFactory) {
-    return extractVertexIds(result).map(new VertexFromId<>(epgmVertexFactory));
+    VertexFactory<V> vertexFactory) {
+    return extractVertexIds(result).map(new VertexFromId<>(vertexFactory));
   }
 
   /**
@@ -199,9 +177,9 @@ public class PostProcessor {
    * @param vertexType    vertex type
    * @param mayOverlap    vertices may be contained in multiple graphs
    * @param <V> The produced vertex type.
-   * @return EPGM vertices
+   * @return vertices
    */
-  public static <V extends Vertex> DataSet<V> extractVertices(DataSet<Element> elements,
+  private static <V extends Vertex> DataSet<V> extractVertices(DataSet<Element> elements,
     Class<V> vertexType, boolean mayOverlap) {
     DataSet<V> result = elements
       .filter(new IsInstance<>(vertexType))
@@ -219,13 +197,13 @@ public class PostProcessor {
    * Initializes edges from the given pattern matching result.
    *
    * @param result      pattern matching result
-   * @param epgmEdgeFactory EPGM edge factory
+   * @param edgeFactory edge factory
    * @param <E> The produced edge type.
-   * @return EPGM edges
+   * @return edges
    */
   public static <E extends Edge> DataSet<E> extractEdges(DataSet<FatVertex> result,
-    EdgeFactory<E> epgmEdgeFactory) {
-    return extractEdgeIds(result).map(new EdgeFromIds<>(epgmEdgeFactory));
+    EdgeFactory<E> edgeFactory) {
+    return extractEdgeIds(result).map(new EdgeFromIds<>(edgeFactory));
   }
 
   /**
@@ -237,7 +215,7 @@ public class PostProcessor {
    * @param <E> The produced edge type.
    * @return edges
    */
-  public static <E extends Edge> DataSet<E> extractEdges(DataSet<Element> elements,
+  private static <E extends Edge> DataSet<E> extractEdges(DataSet<Element> elements,
     Class<E> edgeType, boolean mayOverlap) {
     DataSet<E> result = elements
       .filter(new IsInstance<>(edgeType))

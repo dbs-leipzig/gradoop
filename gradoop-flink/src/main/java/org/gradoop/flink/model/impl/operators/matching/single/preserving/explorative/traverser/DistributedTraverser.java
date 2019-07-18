@@ -50,11 +50,11 @@ public abstract class DistributedTraverser<K> {
    */
   private final Class<K> keyClazz;
   /**
-   * EPGMVertex mapping used for debug
+   * Vertex mapping used for debug
    */
   private final DataSet<Tuple2<K, PropertyValue>> vertexMapping;
   /**
-   * EPGMEdge mapping used for debug
+   * Edge mapping used for debug
    */
   private final DataSet<Tuple2<K, PropertyValue>> edgeMapping;
 

@@ -18,20 +18,18 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
 /**
- * Utility class to convert an EPGM element ({@link EPGMVertex} and {@link EPGMEdge} into an
+ * Utility class to convert an element ({@link Vertex} and {@link Edge} into an
  * {@link Embedding}.
  */
 public class EmbeddingFactory {
 
   /**
-   * Converts a {@link EPGMVertex} into an {@link Embedding}.
+   * Converts a {@link Vertex} into an {@link Embedding}.
    *
    * The resulting embedding has one entry containing the vertex id and one entry for each property
    * value associated with the specified property keys (ordered by list order). Note that missing
@@ -49,7 +47,7 @@ public class EmbeddingFactory {
   }
 
   /**
-   * Converts an {@link EPGMEdge} into an {@link Embedding}.
+   * Converts an {@link Edge} into an {@link Embedding}.
    *
    * The resulting embedding has three entries containing the source vertex id, the edge id and the
    * target vertex id. Furthermore, the embedding has one entry for each property value associated

@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * element -> (elementId, propertyValue)
  *
- * @param <EL> EPGM element type
+ * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 public class PairElementWithPropertyValue<EL extends Element>

@@ -93,8 +93,7 @@ public class DualSimulation<
   }
 
   @Override
-  protected GC executeForVertex(
-    LG graph)  {
+  protected GC executeForVertex(LG graph)  {
     DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
       .filterVertices(graph, getQuery())
       .project(0);
@@ -285,8 +284,7 @@ public class DualSimulation<
    * @param vertices valid vertices after simulation
    * @return maximum match graph
    */
-  private GC postProcess(LG graph,
-    DataSet<FatVertex> vertices) {
+  private GC postProcess(LG graph, DataSet<FatVertex> vertices) {
     BaseGraphFactory<G, V, E, LG, GC> graphFactory = graph.getFactory();
 
     DataSet<V> matchVertices = doAttachData() ?

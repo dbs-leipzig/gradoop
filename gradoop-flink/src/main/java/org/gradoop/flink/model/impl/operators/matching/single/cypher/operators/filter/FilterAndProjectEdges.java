@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -26,18 +25,18 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import java.util.List;
 
 /**
- * Filters a set of {@link EPGMEdge} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link Edge} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * EPGMEdge -> Embedding(
+ * Edge -> Embedding(
  *  [IdEntry(SourceId),IdEntry(EdgeId),IdEntry(TargetId)],
  *  [PropertyEntry(v1),PropertyEntry(v2)]
  * )
  *
  * Example:
  *
- * Given an EPGMEdge(0, 1, 2, "friendOf", {since:2017, weight:23}), a predicate "weight = 23" and
+ * Given an Edge(0, 1, 2, "friendOf", {since:2017, weight:23}), a predicate "weight = 23" and
  * list of projection property keys [since,isValid] the operator creates
  * an {@link Embedding}:
  *

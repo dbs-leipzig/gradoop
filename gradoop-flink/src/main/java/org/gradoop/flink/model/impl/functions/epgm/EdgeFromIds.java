@@ -23,10 +23,9 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple.
+ * Initializes an {@link Edge} from a given {@link GradoopId} triple.
  * The triple contains (in that order) {@code edge id}, {@code source vertex id} and
  * {@code target vertex id}
  * <p>
@@ -41,8 +40,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * @param <E> The produced edge type.
  */
 @FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
-public class EdgeFromIds<E extends Edge> implements
-  MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, E>,
+public class EdgeFromIds<E extends Edge> implements MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, E>,
   ResultTypeQueryable<E> {
 
   /**

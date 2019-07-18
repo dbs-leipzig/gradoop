@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import java.util.List;
 
 /**
- * Base class for mapping EPGM elements to representations for mapping.
+ * Base class for mapping elements to representations for mapping.
  *
  * @param <EL> element type
  * @param <OUT> output type

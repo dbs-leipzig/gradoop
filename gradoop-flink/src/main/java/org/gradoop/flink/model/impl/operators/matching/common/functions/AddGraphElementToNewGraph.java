@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import java.util.HashMap;
 
 /**
- * (GE) -> (GE (+ EPGMGraphHead), EPGMGraphHead)
+ * (GE) -> (GE (+ GraphHead), GraphHead)
  *
  * Forwarded fields:
  *

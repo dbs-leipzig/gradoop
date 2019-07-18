@@ -17,24 +17,23 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
 import java.util.List;
 
 /**
- * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link Vertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * EPGMVertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
+ * Vertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
  *
  * Example:
  *
- * Given a EPGMVertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
+ * Given a Vertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
  * projection property keys [name, location] the operator creates an
  * {@link Embedding}:
  *

@@ -31,8 +31,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields("f0->id")
 public class VertexFromId<V extends Vertex> implements
-  MapFunction<Tuple1<GradoopId>, V>,
-  ResultTypeQueryable<V> {
+  MapFunction<Tuple1<GradoopId>, V>, ResultTypeQueryable<V> {
 
   /**
    * The type of the produced vertex.
@@ -50,7 +49,7 @@ public class VertexFromId<V extends Vertex> implements
    * @param vertexFactory vertex factory
    */
   public VertexFromId(VertexFactory<V> vertexFactory) {
-    vertexType = TypeInformation.of(vertexFactory.getType());
+    this.vertexType = TypeInformation.of(vertexFactory.getType());
     this.vertexFactory = vertexFactory;
   }
 

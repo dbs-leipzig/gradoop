@@ -28,14 +28,12 @@ import java.util.Iterator;
  * Creates a single graph element which is contained in all graphs that the
  * input elements are contained in.
  *
- * EPGMGraphElement* -> EPGMGraphElement
+ * GraphElement* -> GraphElement
  *
  * @param <GE> graph element type
  */
-public class MergedGraphIds<GE extends GraphElement>
-  implements GroupCombineFunction<GE, GE>, GroupReduceFunction<GE, GE>,
-  JoinFunction<GE, GE, GE> {
-
+public class MergedGraphIds<GE extends GraphElement> implements GroupCombineFunction<GE, GE>,
+  GroupReduceFunction<GE, GE>, JoinFunction<GE, GE, GE> {
 
   @Override
   public void combine(Iterable<GE> values, Collector<GE> out) throws Exception {

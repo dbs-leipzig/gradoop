@@ -18,15 +18,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link EPGMVertex} and projects specified property values to the
+ * Applies a given predicate on a {@link Vertex} and projects specified property values to the
  * output embedding.
  *
  * @param <V> The vertex type.

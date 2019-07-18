@@ -90,29 +90,6 @@ public class PreProcessor {
   /**
    * Filters vertex-edge pairs based on the given GDL query. The resulting
    * dataset only contains vertex-edge pairs that match at least one vertex-edge
-   * pair in the query graph.
-   *
-   * @param g     data graph
-   * @param query query graph
-   * @param <G> The graph head type.
-   * @param <V> The vertex type.
-   * @param <E> The edge type.
-   * @param <LG> The graph type.
-   * @param <GC> The graph collection type.
-   * @return dataset with matching vertex-edge pairs
-   */
-  public static <G extends GraphHead,
-    V extends Vertex,
-    E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithSourceEdgeCandidates<GradoopId>>
-    filterPairs(LG g, final String query) {
-    return filterPairs(g, query, filterVertices(g, query));
-  }
-
-  /**
-   * Filters vertex-edge pairs based on the given GDL query. The resulting
-   * dataset only contains vertex-edge pairs that match at least one vertex-edge
    * pair in the query graph and their corresponding candidates
    *
    * @param graph             data graph
@@ -125,7 +102,7 @@ public class PreProcessor {
    * @param <GC> The graph collection type.
    * @return dataset with matching vertex-edge pairs and their candidates
    */
-  public static <G extends GraphHead,
+  private static <G extends GraphHead,
     V extends Vertex,
     E extends Edge,
     LG extends BaseGraph<G, V, E, LG, GC>,
@@ -176,7 +153,7 @@ public class PreProcessor {
    * @param <GC> The graph collection type.
    * @return dataset with matching triples and their candidates
    */
-  public static <G extends GraphHead,
+  private static <G extends GraphHead,
     V extends Vertex,
     E extends Edge,
     LG extends BaseGraph<G, V, E, LG, GC>,

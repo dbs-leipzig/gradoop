@@ -88,37 +88,34 @@ public class ElementsFromEmbedding<
   /**
    * Constructor.
    *
-   * @param epgmGraphHeadFactory  graph head factory
-   * @param epgmVertexFactory     vertex factory
-   * @param epgmEdgeFactory       edge factory
+   * @param graphHeadFactory      graph head factory
+   * @param vertexFactory         vertex factory
+   * @param edgeFactory           edge factory
    * @param embeddingMetaData     meta data for the embedding
-*    @param sourceTargetVariables source and target vertex variables by edge variable
+   * @param sourceTargetVariables source and target vertex variables by edge variable
    */
-  public ElementsFromEmbedding(GraphHeadFactory<G> epgmGraphHeadFactory,
-    VertexFactory<V> epgmVertexFactory,
-    EdgeFactory<E> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+  public ElementsFromEmbedding(GraphHeadFactory<G> graphHeadFactory,
+    VertexFactory<V> vertexFactory, EdgeFactory<E> edgeFactory, EmbeddingMetaData embeddingMetaData,
     Map<String, Pair<String, String>> sourceTargetVariables) {
-    this(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,
+    this(graphHeadFactory, vertexFactory, edgeFactory, embeddingMetaData,
       sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));
   }
   /**
    * Constructor.
    *
-   * @param epgmGraphHeadFactory  graph head factory
-   * @param epgmVertexFactory     vertex factory
-   * @param epgmEdgeFactory       edge factory
+   * @param graphHeadFactory      graph head factory
+   * @param vertexFactory         vertex factory
+   * @param edgeFactory           edge factory
    * @param embeddingMetaData     meta data for the embedding
    * @param sourceTargetVariables source and target vertex variables by edge variable
    * @param labelMapping          mapping between newElementVariables and its labels
    */
-  public ElementsFromEmbedding(GraphHeadFactory<G> epgmGraphHeadFactory,
-    VertexFactory<V> epgmVertexFactory,
-    EdgeFactory<E> epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
-    Map<String, Pair<String, String>> sourceTargetVariables,
-    Map<String, String> labelMapping) {
-    this.graphHeadFactory = epgmGraphHeadFactory;
-    this.vertexFactory = epgmVertexFactory;
-    this.edgeFactory = epgmEdgeFactory;
+  public ElementsFromEmbedding(GraphHeadFactory<G> graphHeadFactory, VertexFactory<V> vertexFactory,
+    EdgeFactory<E> edgeFactory, EmbeddingMetaData embeddingMetaData,
+    Map<String, Pair<String, String>> sourceTargetVariables, Map<String, String> labelMapping) {
+    this.graphHeadFactory = graphHeadFactory;
+    this.vertexFactory = vertexFactory;
+    this.edgeFactory = edgeFactory;
     this.metaData = embeddingMetaData;
     this.sourceTargetVariables = sourceTargetVariables;
     this.labelMapping = labelMapping;
@@ -218,7 +215,7 @@ public class ElementsFromEmbedding<
   }
 
   /**
-   * Initializes an EPGM vertex using the specified parameters
+   * Initializes an vertex using the specified parameters
    *
    * @param out flat map collector
    * @param graphHead graph head to assign vertex to
@@ -229,7 +226,7 @@ public class ElementsFromEmbedding<
   }
 
   /**
-   * Initializes an EPGM vertex using the specified parameters and adds its label
+   * Initializes an vertex using the specified parameters and adds its label
    * if the given vertex was created for the return pattern.
    *
    * @param out flat map collector
@@ -249,7 +246,7 @@ public class ElementsFromEmbedding<
   }
 
   /**
-   * Initializes an EPGM edge using the specified parameters.
+   * Initializes an edge using the specified parameters.
    *
    * @param out flat map collector
    * @param graphHead graph head to assign edge to
@@ -263,7 +260,7 @@ public class ElementsFromEmbedding<
   }
 
   /**
-   * Initializes an EPGM edge using the specified parameters and adds its label
+   * Initializes an edge using the specified parameters and adds its label
    * if the given edge was created for return pattern
    *
    * @param out flat map collector
