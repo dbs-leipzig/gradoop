@@ -100,17 +100,17 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   /**
    * Matches a given pattern on a graph collection.
    * The boolean flag {@code returnEmbeddings} specifies, if the return shall be the input graphs with
-   * a new property {@value AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
+   * a new property {@link AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
    * constructed embeddings.
    *
    * @param query the query pattern in GDL syntax
    * @param algorithm custom pattern matching algorithm, e.g., {@link DepthSearchMatching}
    * @param returnEmbeddings if true it returns the embeddings as a new graph collection
    *                         if false it returns the input collection with a new property with key
-   *                         {@value AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
+   *                         {@link AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
    *                         is contained in the respective graph
    * @return a graph collection containing either the embeddings or the input
-   * graphs with a new property with name {@value AddMatchesToProperties#DEFAULT_KEY}
+   * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
    */
   GraphCollection query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings);
 
