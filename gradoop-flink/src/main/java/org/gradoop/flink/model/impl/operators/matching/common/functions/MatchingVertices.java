@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ReadFields("label;properties")
-public class MatchingVertices<V extends EPGMVertex> extends AbstractFilter<V> {
+public class MatchingVertices<V extends Vertex> extends AbstractFilter<V> {
   /**
    * serial version uid
    */

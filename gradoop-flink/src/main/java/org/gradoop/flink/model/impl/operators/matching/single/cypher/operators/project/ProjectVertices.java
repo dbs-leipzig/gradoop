@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Projects a EPGMVertex by a set of properties.
- * EPGMVertex -> Embedding(ProjectionEmbedding(EPGMVertex))
+ * Projects a Vertex by a set of properties.
+ * Vertex -> Embedding(ProjectionEmbedding(Vertex))
  */
 public class ProjectVertices implements PhysicalOperator {
 
