@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.BeforeClass;
@@ -41,17 +42,17 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
   @BeforeClass
   public static void setup() {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
+    LogicalGraphFactory factory = GradoopFlinkConfig.createConfig(env).getLogicalGraphFactory();
 
-    EPGMGraphHead g0 = config.getGraphHeadFactory().createGraphHead("A");
-    EPGMGraphHead g1 = config.getGraphHeadFactory().createGraphHead("B");
+    EPGMGraphHead g0 = factory.getGraphHeadFactory().createGraphHead("A");
+    EPGMGraphHead g1 = factory.getGraphHeadFactory().createGraphHead("B");
 
-    EPGMVertex v0 = config.getVertexFactory().createVertex("A");
-    EPGMVertex v1 = config.getVertexFactory().createVertex("B");
-    EPGMVertex v2 = config.getVertexFactory().createVertex("C");
+    EPGMVertex v0 = factory.getVertexFactory().createVertex("A");
+    EPGMVertex v1 = factory.getVertexFactory().createVertex("B");
+    EPGMVertex v2 = factory.getVertexFactory().createVertex("C");
 
-    EPGMEdge e0 = config.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
-    EPGMEdge e1 = config.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
+    EPGMEdge e0 = factory.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
+    EPGMEdge e1 = factory.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
 
     v0.addGraphId(g0.getId());
     v1.addGraphId(g0.getId());

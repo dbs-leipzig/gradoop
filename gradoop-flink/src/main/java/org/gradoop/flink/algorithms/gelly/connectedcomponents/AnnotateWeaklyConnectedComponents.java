@@ -104,7 +104,7 @@ public class AnnotateWeaklyConnectedComponents extends GradoopGellyAlgorithm<Gra
         .with(new VertexPropertyToEdgePropertyJoin(propertyKey));
     }
 
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+    return currentGraph.getFactory().fromDataSets(
       currentGraph.getGraphHead(), annotatedVertices, edges);
   }
 }

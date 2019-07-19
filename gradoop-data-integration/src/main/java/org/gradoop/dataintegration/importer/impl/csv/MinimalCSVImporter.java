@@ -147,7 +147,8 @@ public class MinimalCSVImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 
   /**
@@ -163,8 +164,8 @@ public class MinimalCSVImporter implements DataSource {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))
-      .map(new PropertiesToVertex<>(config.getVertexFactory()))
-      .returns(config.getVertexFactory().getType());
+      .map(new PropertiesToVertex<>(config.getLogicalGraphFactory().getVertexFactory()))
+      .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
   }
 
   /**

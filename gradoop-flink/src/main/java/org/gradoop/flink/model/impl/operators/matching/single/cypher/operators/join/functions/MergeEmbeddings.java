@@ -53,19 +53,19 @@ public class MergeEmbeddings implements
    */
   private final int joinColumnsRightSize;
   /**
-   * EPGMVertex columns of the left embedding that need to have distinct id values.
+   * Vertex columns of the left embedding that need to have distinct id values.
    */
   private final int[] distinctVertexColumnsLeft;
   /**
-   * EPGMVertex columns of the right embedding that need to have distinct id values.
+   * Vertex columns of the right embedding that need to have distinct id values.
    */
   private final int[] distinctVertexColumnsRight;
   /**
-   * EPGMEdge columns of the left embedding that need to have distinct id values.
+   * Edge columns of the left embedding that need to have distinct id values.
    */
   private final int[] distinctEdgeColumnsLeft;
   /**
-   * EPGMEdge columns of the right embedding that need to have distinct id values.
+   * Edge columns of the right embedding that need to have distinct id values.
    */
   private final int[] distinctEdgeColumnsRight;
   /**
@@ -135,15 +135,15 @@ public class MergeEmbeddings implements
   protected boolean isValid(Embedding left, Embedding right) {
     boolean collect = false;
 
-    // EPGMVertex-Homomorphism + EPGMEdge-Homomorphism
+    // Vertex-Homomorphism + Edge-Homomorphism
     if (!checkDistinctVertices && !checkDistinctEdges) {
       collect = true;
-      // EPGMVertex-Homomorphism + EPGMEdge-Isomorphism
+      // Vertex-Homomorphism + Edge-Isomorphism
     } else if (!checkDistinctVertices) {
       if (isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
         collect = true;
       }
-      // EPGMVertex-Isomorphism + EPGMEdge-Isomorphism
+      // Vertex-Isomorphism + Edge-Isomorphism
     } else {
       if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &&
         isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {

@@ -15,6 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.SubgraphHomomorphismTest;
@@ -31,7 +36,8 @@ public class ExplorativeHomomorphismTriplesForLoopTest extends SubgraphHomomorph
   }
 
   @Override
-  public PatternMatching getImplementation(String queryGraph, boolean attachData) {
+  public PatternMatching<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getImplementation(String queryGraph, boolean attachData) {
     return new ExplorativePatternMatching.Builder()
       .setQuery(queryGraph)
       .setAttachData(attachData)

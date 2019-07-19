@@ -23,15 +23,21 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.Identifiable;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.comparators.IdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 
@@ -103,6 +109,12 @@ public class GradoopTestUtils {
 
   private static Comparator<Identifiable> ID_COMPARATOR = new IdentifiableComparator();
 
+  /**
+   * Singleton instance of a EPGM ElementFactoryProvider.
+   */
+  private static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> epgmElementFactoryProvider =
+    null;
+
   static {
     MAP_VAL_9.put(PropertyValue.create(KEY_0), PropertyValue.create(NULL_VAL_0));
     MAP_VAL_9.put(PropertyValue.create(KEY_1), PropertyValue.create(BOOL_VAL_1));
@@ -166,6 +178,37 @@ public class GradoopTestUtils {
   }
 
   /**
+   * Returns a {@link ElementFactoryProvider} able to create EPGM elements.
+   *
+   * @return ElementFactoryProvider for EPGM elements
+   */
+  public static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> getEPGMElementFactoryProvider() {
+    if (epgmElementFactoryProvider == null) {
+      epgmElementFactoryProvider = new ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge>() {
+        GraphHeadFactory<EPGMGraphHead> graphHeadFactory = new EPGMGraphHeadFactory();
+        VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
+        EdgeFactory<EPGMEdge> edgeFactory = new EPGMEdgeFactory();
+
+        @Override
+        public GraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
+          return graphHeadFactory;
+        }
+
+        @Override
+        public VertexFactory<EPGMVertex> getVertexFactory() {
+          return vertexFactory;
+        }
+
+        @Override
+        public EdgeFactory<EPGMEdge> getEdgeFactory() {
+          return edgeFactory;
+        }
+      };
+    }
+    return epgmElementFactoryProvider;
+  }
+
+  /**
    * Creates a social network as a basis for tests.
    * <p/>
    * An image of the network can be found in
@@ -176,11 +219,8 @@ public class GradoopTestUtils {
    */
   public static AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getSocialNetworkLoader()
     throws IOException {
-
-    GradoopConfig<EPGMGraphHead, EPGMVertex, EPGMEdge> config = GradoopConfig.getDefaultConfig();
-
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
-    return AsciiGraphLoader.fromStream(inputStream, config);
+    return AsciiGraphLoader.fromStream(inputStream, getEPGMElementFactoryProvider());
   }
 
   /**
@@ -360,8 +400,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]
@@ -382,8 +421,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]

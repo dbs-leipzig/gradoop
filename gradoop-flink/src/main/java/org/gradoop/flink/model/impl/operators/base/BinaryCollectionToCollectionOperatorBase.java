@@ -51,7 +51,7 @@ public abstract class BinaryCollectionToCollectionOperatorBase
     final DataSet<EPGMVertex> newVertices = computeNewVertices(newGraphHeads);
     final DataSet<EPGMEdge> newEdges = computeNewEdges(newVertices);
 
-    return firstCollection.getConfig().getGraphCollectionFactory()
+    return firstCollection.getFactory()
       .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 

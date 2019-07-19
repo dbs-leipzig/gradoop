@@ -20,10 +20,7 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 
 /**
  * Basic Gradoop Configuration.
@@ -32,32 +29,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GradoopConfig
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
-
-  /**
-   * Knows how to create {@link EPGMGraphHead}
-   */
-  private final EPGMGraphHeadFactory graphHeadFactory;
-
-  /**
-   * Knows how to create {@link EPGMVertex}
-   */
-  private final EPGMVertexFactory vertexFactory;
-
-  /**
-   *  Knows how to create {@link EPGMEdge}
-   */
-  private final EPGMEdgeFactory edgeFactory;
-
-  /**
-   * Creates a new Configuration.
-   */
-  protected GradoopConfig() {
-    this.graphHeadFactory = new EPGMGraphHeadFactory();
-    this.vertexFactory = new EPGMVertexFactory();
-    this.edgeFactory = new EPGMEdgeFactory();
-  }
+public class GradoopConfig<G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -67,17 +39,5 @@ public class GradoopConfig
    */
   public static GradoopConfig<EPGMGraphHead, EPGMVertex, EPGMEdge> getDefaultConfig() {
     return new GradoopConfig<>();
-  }
-
-  public EPGMGraphHeadFactory getGraphHeadFactory() {
-    return graphHeadFactory;
-  }
-
-  public EPGMVertexFactory getVertexFactory() {
-    return vertexFactory;
-  }
-
-  public EPGMEdgeFactory getEdgeFactory() {
-    return edgeFactory;
   }
 }

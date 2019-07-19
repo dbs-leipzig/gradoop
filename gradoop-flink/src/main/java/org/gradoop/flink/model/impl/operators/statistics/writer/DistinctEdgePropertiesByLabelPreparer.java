@@ -31,11 +31,6 @@ public class DistinctEdgePropertiesByLabelPreparer implements
 UnaryGraphToValueOperator<MapOperator<WithCount<Tuple2<String, String>>,
 Tuple3<String, String, Long>>> {
 
-  /**
-   * Prepares the statistic for distinct edge properties by label.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator<WithCount<Tuple2<String, String>>, Tuple3<String, String, Long>>
   execute(LogicalGraph graph) {
