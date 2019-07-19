@@ -21,6 +21,8 @@ import org.apache.flink.core.fs.FileSystem;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.common.model.impl.metadata.MetaData;
 
+import java.io.IOException;
+
 /**
  * Class defining a sink for meta data. Meta data can be written locally or distributed.
  *
@@ -48,10 +50,11 @@ public interface MetaDataSink<M extends MetaData> {
    * @param metaData   meta data object
    * @param hdfsConfig hdfs file configuration
    * @param overwrite  write mode, overwrite or not
+   * @throws IOException on error when writing file locally
    */
   void writeLocal(
     String path,
     M metaData,
     Configuration hdfsConfig,
-    boolean overwrite);
+    boolean overwrite) throws IOException;
 }
