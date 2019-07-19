@@ -235,14 +235,8 @@ public class GraphCollection implements
   }
 
   @Override
-  public GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings) {
-    return new TransactionalPatternMatching(
-      pattern,
-      algorithm,
-      returnEmbeddings).execute(this);
+  public GraphCollection query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
+    return new TransactionalPatternMatching(query, algorithm, returnEmbeddings).execute(this);
   }
 
   //----------------------------------------------------------------------------

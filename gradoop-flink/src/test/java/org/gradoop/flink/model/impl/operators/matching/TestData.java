@@ -79,6 +79,15 @@ public class TestData {
   public static final String UNLABELED_PATTERN_3 =
     "(:A)-->(:B)";
 
+  public static final String PROPERTY_PATTERN_1 =
+    "(:A {id:1})-[:a]->(:B)";
+
+  public static final String PROPERTY_PATTERN_2 =
+    "(:A {id:999})-[:a]->(:B)";
+
+  public static final String PROPERTY_PATTERN_3 =
+    "(:A {id:1, abc:5})-[:a]->(:B)";
+
   public static final String VAR_LENGTH_PATH_PATTERN_0 =
     "(:B)-[:a*2..2]->(:B)";
 

@@ -71,7 +71,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
         "]" +
         "g2:B[" +
         "(v11:B {id : 0})" +
-        "(v12:A {id : 1})" +
+        "(v12:A {id : 1, abc : 5})" +
         "(v13:A {id : 2})" +
         "(v14:A {id : 3})" +
         "(v15:C {id : 4})" +
@@ -120,7 +120,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     for (int i = 0; i < tests.length; i++) {
       String testPattern = tests[i];
 
-      GraphCollection result = coll.match(testPattern, new DepthSearchMatching(), true);
+      GraphCollection result = coll.query(testPattern, new DepthSearchMatching(), true);
 
       Collection<EPGMGraphHead> originalHeads = Lists.newArrayList();
       Collection<EPGMGraphHead> resultHeads = Lists.newArrayList();
@@ -162,11 +162,11 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
           eCount++;
         }
       }
-      assertEquals(aCount, resultCounts[i][0]);
-      assertEquals(bCount, resultCounts[i][1]);
-      assertEquals(cCount, resultCounts[i][2]);
-      assertEquals(dCount, resultCounts[i][3]);
-      assertEquals(eCount, resultCounts[i][4]);
+      assertEquals(resultCounts[i][0], aCount);
+      assertEquals(resultCounts[i][1], bCount);
+      assertEquals(resultCounts[i][2], cCount);
+      assertEquals(resultCounts[i][3], dCount);
+      assertEquals(resultCounts[i][4], eCount);
     }
   }
 
@@ -189,6 +189,9 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     TestData.UNLABELED_PATTERN_1,
     TestData.UNLABELED_PATTERN_2,
     TestData.UNLABELED_PATTERN_3,
+    TestData.PROPERTY_PATTERN_1,
+    TestData.PROPERTY_PATTERN_2,
+    TestData.PROPERTY_PATTERN_3
   };
 
   private long[][] resultCounts = {
@@ -209,6 +212,9 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     {11, 13, 4, 4, 2},
     {13, 18, 3, 4, 1},
     {2, 3, 0, 0, 0},
-    {3, 5, 0, 0, 0}
+    {3, 5, 0, 0, 0},
+    {1, 2, 0, 0, 0},
+    {0, 0, 0, 0, 0},
+    {0, 2, 0, 0, 0}
   };
 }
