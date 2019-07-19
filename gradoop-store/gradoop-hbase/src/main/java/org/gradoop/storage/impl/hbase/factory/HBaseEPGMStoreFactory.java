@@ -56,8 +56,7 @@ public class HBaseEPGMStoreFactory {
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
     final GradoopHBaseConfig gradoopHBaseConfig,
-    final String prefix
-  ) {
+    final String prefix) throws IOException {
     return createOrOpenEPGMStore(config,
       GradoopHBaseConfig.createConfig(
         gradoopHBaseConfig,
@@ -79,34 +78,30 @@ public class HBaseEPGMStoreFactory {
    */
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
-    final GradoopHBaseConfig gradoopHBaseConfig
-  ) {
-    try (Connection connection = ConnectionFactory.createConnection(config)) {
-      createTablesIfNotExists(
-        connection.getAdmin(),
-        gradoopHBaseConfig.getVertexHandler(),
-        gradoopHBaseConfig.getEdgeHandler(),
-        gradoopHBaseConfig.getGraphHeadHandler(),
-        gradoopHBaseConfig.getVertexTableName(),
-        gradoopHBaseConfig.getEdgeTableName(),
-        gradoopHBaseConfig.getGraphTableName()
-      );
+    final GradoopHBaseConfig gradoopHBaseConfig) throws IOException {
 
-      Table graphDataTable = connection.getTable(gradoopHBaseConfig.getGraphTableName());
-      Table vertexDataTable = connection.getTable(gradoopHBaseConfig.getVertexTableName());
-      Table edgeDataTable = connection.getTable(gradoopHBaseConfig.getEdgeTableName());
+    Connection connection = ConnectionFactory.createConnection(config);
+    createTablesIfNotExists(
+      connection.getAdmin(),
+      gradoopHBaseConfig.getVertexHandler(),
+      gradoopHBaseConfig.getEdgeHandler(),
+      gradoopHBaseConfig.getGraphHeadHandler(),
+      gradoopHBaseConfig.getVertexTableName(),
+      gradoopHBaseConfig.getEdgeTableName(),
+      gradoopHBaseConfig.getGraphTableName()
+    );
 
-      return new HBaseEPGMStore(
-        graphDataTable,
-        vertexDataTable,
-        edgeDataTable,
-        gradoopHBaseConfig,
-        connection.getAdmin()
-      );
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
+    Table graphDataTable = connection.getTable(gradoopHBaseConfig.getGraphTableName());
+    Table vertexDataTable = connection.getTable(gradoopHBaseConfig.getVertexTableName());
+    Table edgeDataTable = connection.getTable(gradoopHBaseConfig.getEdgeTableName());
+
+    return new HBaseEPGMStore(
+      graphDataTable,
+      vertexDataTable,
+      edgeDataTable,
+      gradoopHBaseConfig,
+      connection.getAdmin()
+    );
   }
 
   /**
