@@ -39,7 +39,7 @@ import java.util.Map;
  * Given a Triple
  * (
  *   p1: SourceVertex(0, "Person", {name:"Alice", age:23, location: "Sweden"}),
- *   e1: EPGMEdge(1, "knows", {}),
+ *   e1: Edge(1, "knows", {}),
  *   p2: TargetVertex(2, "Person", {name:"Bob", age:23})
  * ),
  * a predicate "p1.name = "Alice" AND p1.age <= p2.age" and
@@ -93,7 +93,7 @@ public class FilterAndProjectTriples implements PhysicalOperator {
    * @param targetVariable Variable assigned to the vertex
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
-   * @param vertexMatchStrategy EPGMVertex match strategy
+   * @param vertexMatchStrategy Vertex match strategy
    */
   public FilterAndProjectTriples(DataSet<Triple> input, String sourceVariable, String edgeVariable,
     String targetVariable, CNF predicates, Map<String, List<String>> projectionPropertyKeys,

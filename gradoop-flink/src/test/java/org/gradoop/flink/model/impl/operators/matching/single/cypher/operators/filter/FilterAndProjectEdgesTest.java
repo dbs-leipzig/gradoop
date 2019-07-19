@@ -46,7 +46,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1);
 
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
+    List<Embedding> result = new FilterAndProjectEdges<>(edges, predicates, new ArrayList<>(), false)
       .evaluate()
       .collect();
 
@@ -69,7 +69,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
+    List<Embedding> result = new FilterAndProjectEdges<>(edges, predicates, new ArrayList<>(), false)
       .evaluate()
       .collect();
 
@@ -86,7 +86,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     EPGMEdge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
+    List<Embedding> result = new FilterAndProjectEdges<>(edges, predicates, new ArrayList<>(), false)
       .evaluate()
       .collect();
 
@@ -105,7 +105,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
-    List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
+    List<Embedding> result = new FilterAndProjectEdges<>(edges, predicates, new ArrayList<>(), false)
       .evaluate()
       .collect();
 
@@ -127,7 +127,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    Embedding result = new FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
+    Embedding result = new FilterAndProjectEdges<>(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
     assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
@@ -146,7 +146,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "since");
 
-    Embedding result = new FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
+    Embedding result = new FilterAndProjectEdges<>(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
     assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
@@ -162,7 +162,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
-    Embedding result = new FilterAndProjectEdges(edges, predicates, Collections.emptyList(), true)
+    Embedding result = new FilterAndProjectEdges<>(edges, predicates, Collections.emptyList(), true)
       .evaluate().collect().get(0);
 
     assertEquals(result.size(), 2);

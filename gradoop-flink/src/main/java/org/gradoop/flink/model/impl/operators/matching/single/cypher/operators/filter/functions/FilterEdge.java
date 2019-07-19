@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 
 /**
- * Filters an EPGMEdge by a given predicate
+ * Filters an Edge by a given predicate
  */
 public class FilterEdge implements FilterFunction<EPGMEdge> {
 
