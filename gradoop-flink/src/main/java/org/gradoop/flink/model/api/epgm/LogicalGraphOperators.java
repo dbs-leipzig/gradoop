@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
@@ -270,5 +270,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param operator unary graph to collection operator
    * @return result of given operator
    */
-  GraphCollection callForCollection(UnaryGraphToCollectionOperator operator);
+  GraphCollection callForCollection(
+    UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> operator);
 }

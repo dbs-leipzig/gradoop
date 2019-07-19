@@ -31,8 +31,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -207,7 +207,7 @@ public class LogicalGraph implements
   public GraphCollection query(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
     GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+    return callForCollection(new CypherPatternMatching<>(query, constructionPattern, attachData,
       vertexStrategy, edgeStrategy, graphStatistics));
   }
 
@@ -290,7 +290,8 @@ public class LogicalGraph implements
   }
 
   @Override
-  public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
+  public GraphCollection callForCollection(
+    UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> operator) {
     return operator.execute(this);
   }
 

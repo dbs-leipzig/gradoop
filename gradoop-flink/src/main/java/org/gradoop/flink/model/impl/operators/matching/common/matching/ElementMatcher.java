@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.matching;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.s1ck.gdl.model.GraphElement;
 
 import java.util.Collection;
@@ -32,14 +32,14 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against all given query elements.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElements query graph elements (vertices/edges)
    * @param defaultLabel  default element label
    * @return true, iff the data graph element matches at least one query element
    */
-  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
+  public static <EL1 extends Element, EL2 extends GraphElement>
   boolean matchAll(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
 
     boolean match = false;
@@ -57,14 +57,14 @@ public class ElementMatcher {
   /**
    * Returns all query candidate ids for the given EPGM element.
    *
-   * @param dbElement     EPGM element (vertices/edges)
+   * @param dbElement     element (vertices/edges)
    * @param queryElements query graph elements (vertices/edges)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
    * @param defaultLabel  default element label
    * @return all candidate ids for {@code dbElement}
    */
-  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
+  public static <EL1 extends Element, EL2 extends GraphElement>
   List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
 
     List<Long> matches = Lists.newArrayListWithCapacity(queryElements.size());
@@ -81,14 +81,14 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against the given query element.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElement  query graph element (vertex/edge)
    * @param defaultLabel  default element label
    * @return true, iff the data graph element matches the query graph element
    */
-  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
+  public static <EL1 extends Element, EL2 extends GraphElement>
   boolean match(EL1 dbElement, EL2 queryElement, String defaultLabel) {
 
     boolean match  = false;

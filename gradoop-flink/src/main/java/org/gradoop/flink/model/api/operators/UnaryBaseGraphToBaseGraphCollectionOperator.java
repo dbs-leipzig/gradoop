@@ -15,12 +15,24 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
- * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
+ * Creates a graph collection of type {@link GC} based on one graph of type {@link G}.
+ *
+ * @param <G> the type of the graph used as input
+ * @param <GC> the type of the graph used as return value
  */
-public interface UnaryGraphToCollectionOperator
-  extends UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> {
+public interface UnaryBaseGraphToBaseGraphCollectionOperator<
+  G extends BaseGraph,
+  GC extends BaseGraphCollection> extends Operator {
+
+  /**
+   * Executes the operator.
+   *
+   * @param graph input graph
+   * @return resulting graph collection
+   */
+  GC execute(G graph);
 }
