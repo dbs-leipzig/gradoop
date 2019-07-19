@@ -14,10 +14,6 @@
     <name>Gradoop HBase</name>
 	<description>Read/write graphs from/to HBase</description>
 
-    <properties>
-        <hbaseSuite>**/HBaseTestSuite.class</hbaseSuite>
-    </properties>
-
     <profiles>
         <profile>
             <id>release</id>
@@ -96,9 +92,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include>${hbaseSuite}</include>
-                    </includes>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>gradoop-hbase-testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <properties>
+                        <property>
+                            <name>surefire.testng.verbose</name>
+                            <value>2</value>
+                        </property>
+                    </properties>
                 </configuration>
             </plugin>
             <!-- Creates an extra *-tests.jar which can be used as dependency -->
@@ -192,8 +194,8 @@
         
         <!-- Others -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
