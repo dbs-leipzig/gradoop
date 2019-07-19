@@ -61,7 +61,7 @@ public class MinimalJSONImporterTest extends GradoopFlinkTestBase {
     LogicalGraph read = dataImport.getLogicalGraph();
     LogicalGraph expected = loader.getLogicalGraph();
     GraphCollection expectedCollection =
-      getConfig().getGraphCollectionFactory().fromGraph(expected);
+      expected.getCollectionFactory().fromGraph(expected);
 
     collectAndAssertTrue(expected.equalsByElementData(read));
     collectAndAssertTrue(dataImport.getGraphCollection()
@@ -79,7 +79,7 @@ public class MinimalJSONImporterTest extends GradoopFlinkTestBase {
     LogicalGraph read = dataImport.getLogicalGraph();
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected2");
     GraphCollection expectedCollection =
-      getConfig().getGraphCollectionFactory().fromGraph(expected);
+      expected.getCollectionFactory().fromGraph(expected);
 
     collectAndAssertTrue(expected.equalsByElementData(read));
     collectAndAssertTrue(dataImport.getGraphCollection()

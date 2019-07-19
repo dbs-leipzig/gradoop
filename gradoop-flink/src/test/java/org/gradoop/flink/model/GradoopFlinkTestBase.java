@@ -18,8 +18,8 @@ package org.gradoop.flink.model;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
-import org.apache.flink.test.util.TestEnvironment;
+import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
+import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -32,18 +32,13 @@ import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -53,11 +48,12 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GradoopFlinkTestBase {
 
-  protected static final int DEFAULT_PARALLELISM = 4;
+  private static final int DEFAULT_PARALLELISM = 4;
 
-  protected static final long TASKMANAGER_MEMORY_SIZE_MB = 512;
+  private static final long TASKMANAGER_MEMORY_SIZE_MB = 512;
 
-  protected static LocalFlinkMiniCluster CLUSTER = null;
+  @ClassRule
+  public static MiniClusterWithClientResource miniClusterResource = getMiniCluster();
 
   /**
    * Flink Execution Environment
@@ -83,10 +79,7 @@ public abstract class GradoopFlinkTestBase {
    * Creates a new instance of {@link GradoopFlinkTestBase}.
    */
   public GradoopFlinkTestBase() {
-    TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
-    // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
-    testEnv.setAsContext();
-    this.env = testEnv;
+    this.env = ExecutionEnvironment.getExecutionEnvironment();
     this.graphLayoutFactory = new GVEGraphLayoutFactory();
     this.collectionLayoutFactory = new GVECollectionLayoutFactory();
   }
@@ -136,37 +129,16 @@ public abstract class GradoopFlinkTestBase {
    *
    * TODO: remove, when future issue is fixed
    * {@see http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E}
-   *
-   * @throws Exception on failure
    */
-  @BeforeClass
-  public static void setupFlink() throws Exception {
-    File logDir = File.createTempFile("TestBaseUtils-logdir", null);
-    Assert.assertTrue("Unable to delete temp file", logDir.delete());
-    Assert.assertTrue("Unable to create temp directory", logDir.mkdir());
-
-    Files.createFile((new File(logDir, "jobmanager.out")).toPath());
-    Path logFile =  Files
-      .createFile((new File(logDir, "jobmanager.log")).toPath());
-
+  private static MiniClusterWithClientResource getMiniCluster() {
     Configuration config = new Configuration();
-
-    config.setInteger("local.number-taskmanager", 1);
-    config.setInteger("taskmanager.numberOfTaskSlots", DEFAULT_PARALLELISM);
-    config.setBoolean("local.start-webserver", false);
     config.setLong("taskmanager.memory.size", TASKMANAGER_MEMORY_SIZE_MB);
-    config.setBoolean("fs.overwrite-files", true);
-    config.setString("akka.ask.timeout", "1000s");
-    config.setString("akka.startup-timeout", "60 s");
-    config.setInteger("jobmanager.web.port", 8081);
-    config.setString("jobmanager.web.log.path", logFile.toString());
-    CLUSTER = new LocalFlinkMiniCluster(config, true);
-    CLUSTER.start();
-  }
 
-  @AfterClass
-  public static void tearDownFlink() {
-    CLUSTER.stop();
+    return new MiniClusterWithClientResource(
+      new MiniClusterResourceConfiguration.Builder()
+        .setNumberTaskManagers(1)
+        .setNumberSlotsPerTaskManager(DEFAULT_PARALLELISM)
+        .setConfiguration(config).build());
   }
 
   //----------------------------------------------------------------------------

@@ -21,9 +21,9 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 /**
- * Base class for filtering EPGM elements based on their matches.
+ * Base class for filtering elements based on their matches.
  *
- * @param <EL>  EPGM element type
+ * @param <EL> element type
  */
 public abstract class AbstractFilter<EL extends Element> extends RichFilterFunction<EL> {
 

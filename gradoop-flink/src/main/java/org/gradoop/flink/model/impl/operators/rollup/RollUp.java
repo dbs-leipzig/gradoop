@@ -15,20 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
@@ -128,10 +128,10 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
     // DataSets is null.
     GraphCollection collection;
     if (graphHeads != null && vertices != null && edges != null) {
-      collection = graph.getConfig().getGraphCollectionFactory()
+      collection = graph.getCollectionFactory()
         .fromDataSets(graphHeads, vertices, edges);
     } else {
-      collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();
+      collection = graph.getCollectionFactory().createEmptyCollection();
     }
 
     return collection;

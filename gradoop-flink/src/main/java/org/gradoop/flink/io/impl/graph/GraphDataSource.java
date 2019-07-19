@@ -31,6 +31,7 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -115,9 +116,11 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
     TypeInformation<K> externalIdType = ((TupleTypeInfo<?>) importVertices
       .getType()).getTypeAt(0);
 
+    LogicalGraphFactory factory = config.getLogicalGraphFactory();
+
     DataSet<Tuple3<K, GradoopId, EPGMVertex>> vertexTriples = importVertices
       .map(new InitVertex<K>(
-        config.getLogicalGraphFactory().getVertexFactory(), lineagePropertyKey, externalIdType));
+        factory.getVertexFactory(), lineagePropertyKey, externalIdType));
 
     DataSet<EPGMVertex> epgmVertices = vertexTriples
       .map(new Value2Of3<K, GradoopId, EPGMVertex>());
@@ -129,16 +132,17 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
       .join(vertexIdPair)
       .where(1).equalTo(0)
       .with(new InitEdge<K>(
-        config.getLogicalGraphFactory().getEdgeFactory(), lineagePropertyKey, externalIdType))
+        factory.getEdgeFactory(), lineagePropertyKey, externalIdType))
       .join(vertexIdPair)
       .where(0).equalTo(0)
       .with(new UpdateEdge<EPGMEdge, K>());
 
-    return config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);
+    return factory.fromDataSets(epgmVertices, epgmEdges);
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 }

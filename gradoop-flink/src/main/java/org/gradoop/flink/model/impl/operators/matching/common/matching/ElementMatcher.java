@@ -32,7 +32,7 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against all given query elements.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElements query graph elements (vertices/edges)
@@ -57,7 +57,7 @@ public class ElementMatcher {
   /**
    * Returns all query candidate ids for the given EPGM element.
    *
-   * @param dbElement     EPGM element (vertices/edges)
+   * @param dbElement     element (vertices/edges)
    * @param queryElements query graph elements (vertices/edges)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
@@ -81,7 +81,7 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against the given query element.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElement  query graph element (vertex/edge)

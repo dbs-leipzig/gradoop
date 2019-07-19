@@ -92,7 +92,7 @@ public class Selection<
     DataSet<GraphTransaction> filteredTransactions = collection.getGraphTransactions()
       .filter(new FilterTransactions((FilterFunction<EPGMGraphHead>) predicate));
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromTransactions(filteredTransactions);
   }
 }
