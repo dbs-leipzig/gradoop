@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +31,15 @@ import java.util.Set;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectEdges} operator.
+ *
+ * @param <E> The edge type.
  */
-public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, ProjectionNode {
+public class FilterAndProjectEdgesNode<E extends Edge> extends LeafNode
+  implements FilterNode, ProjectionNode {
   /**
    * Input data set
    */
-  private DataSet<EPGMEdge> edges;
+  private DataSet<E> edges;
   /**
    * Query variable of the source vertex
    */
@@ -73,7 +76,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @param projectionKeys property keys whose associated values are projected to the output
    * @param isPath indicates if the edges is actually a path
    */
-  public FilterAndProjectEdgesNode(DataSet<EPGMEdge> edges,
+  public FilterAndProjectEdgesNode(DataSet<E> edges,
     String sourceVariable, String edgeVariable, String targetVariable,
     CNF filterPredicate, Set<String> projectionKeys, boolean isPath) {
     this.edges = edges;
@@ -87,7 +90,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
 
   @Override
   public DataSet<Embedding> execute() {
-    FilterAndProjectEdges op =  new FilterAndProjectEdges(
+    FilterAndProjectEdges<E> op =  new FilterAndProjectEdges<>(
       edges,
       filterPredicate,
       projectionKeys,

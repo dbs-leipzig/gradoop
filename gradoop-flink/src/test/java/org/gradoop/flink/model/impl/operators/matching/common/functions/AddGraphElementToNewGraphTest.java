@@ -26,12 +26,13 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AddGraphElementToNewGraphTest {
   @Test
   public void testVariableMappingCreation() throws Exception {
-    AddGraphElementToNewGraph<EPGMVertex> udf =
+    AddGraphElementToNewGraph<EPGMVertex, EPGMGraphHead> udf =
       new AddGraphElementToNewGraph<>(new EPGMGraphHeadFactory(), "a");
 
     EPGMVertex vertex = new EPGMVertexFactory().createVertex();

@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
  */
 public class ValueJoinNode extends BinaryNode implements JoinNode {
   /**
-   * EPGMVertex and EPGMEdge properties of the left side that are used for the join
+   * Vertex and Edge properties of the left side that are used for the join
    */
   private final List<Pair<String, String>> leftJoinProperties;
   /**
-   * EPGMVertex and EPGMEdge properties of the right side that are used for the join
+   * Vertex and Edge properties of the right side that are used for the join
    */
   private final List<Pair<String, String>> rightJoinProperties;
   /**

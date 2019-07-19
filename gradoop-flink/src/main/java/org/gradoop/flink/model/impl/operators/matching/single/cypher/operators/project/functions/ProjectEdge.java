@@ -23,8 +23,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.util.List;
 
 /**
- * Projects an EPGMEdge by a set of properties.
- * EPGMEdge -> Embedding(GraphElementEmbedding(EPGMEdge))
+ * Projects an Edge by a set of properties.
+ * Edge -> Embedding(GraphElementEmbedding(Edge))
  */
 public class ProjectEdge extends RichMapFunction<EPGMEdge, Embedding> {
   /**
