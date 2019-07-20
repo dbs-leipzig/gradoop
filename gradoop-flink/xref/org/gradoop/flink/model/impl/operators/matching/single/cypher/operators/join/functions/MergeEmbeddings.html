@@ -63,19 +63,19 @@
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="54" href="#54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> joinColumnsRightSize;
 <a name="55" href="#55">55</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * EPGMVertex columns of the left embedding that need to have distinct id values.</em>
+<a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * Vertex columns of the left embedding that need to have distinct id values.</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="58" href="#58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>[] distinctVertexColumnsLeft;
 <a name="59" href="#59">59</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * EPGMVertex columns of the right embedding that need to have distinct id values.</em>
+<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * Vertex columns of the right embedding that need to have distinct id values.</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="62" href="#62">62</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>[] distinctVertexColumnsRight;
 <a name="63" href="#63">63</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * EPGMEdge columns of the left embedding that need to have distinct id values.</em>
+<a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * Edge columns of the left embedding that need to have distinct id values.</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="66" href="#66">66</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>[] distinctEdgeColumnsLeft;
 <a name="67" href="#67">67</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * EPGMEdge columns of the right embedding that need to have distinct id values.</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * Edge columns of the right embedding that need to have distinct id values.</em>
 <a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="70" href="#70">70</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong>[] distinctEdgeColumnsRight;
 <a name="71" href="#71">71</a>    <em class="jxr_javadoccomment">/**</em>
@@ -145,15 +145,15 @@
 <a name="135" href="#135">135</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> isValid(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> left, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> right) {
 <a name="136" href="#136">136</a>     <strong class="jxr_keyword">boolean</strong> collect = false;
 <a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>     <em class="jxr_comment">// EPGMVertex-Homomorphism + EPGMEdge-Homomorphism</em>
+<a name="138" href="#138">138</a>     <em class="jxr_comment">// Vertex-Homomorphism + Edge-Homomorphism</em>
 <a name="139" href="#139">139</a>     <strong class="jxr_keyword">if</strong> (!checkDistinctVertices &amp;&amp; !checkDistinctEdges) {
 <a name="140" href="#140">140</a>       collect = <strong class="jxr_keyword">true</strong>;
-<a name="141" href="#141">141</a>       <em class="jxr_comment">// EPGMVertex-Homomorphism + EPGMEdge-Isomorphism</em>
+<a name="141" href="#141">141</a>       <em class="jxr_comment">// Vertex-Homomorphism + Edge-Isomorphism</em>
 <a name="142" href="#142">142</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (!checkDistinctVertices) {
 <a name="143" href="#143">143</a>       <strong class="jxr_keyword">if</strong> (isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {
 <a name="144" href="#144">144</a>         collect = <strong class="jxr_keyword">true</strong>;
 <a name="145" href="#145">145</a>       }
-<a name="146" href="#146">146</a>       <em class="jxr_comment">// EPGMVertex-Isomorphism + EPGMEdge-Isomorphism</em>
+<a name="146" href="#146">146</a>       <em class="jxr_comment">// Vertex-Isomorphism + Edge-Isomorphism</em>
 <a name="147" href="#147">147</a>     } <strong class="jxr_keyword">else</strong> {
 <a name="148" href="#148">148</a>       <strong class="jxr_keyword">if</strong> (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &amp;&amp;
 <a name="149" href="#149">149</a>         isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {

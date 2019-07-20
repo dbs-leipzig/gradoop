@@ -15,20 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
@@ -128,10 +128,10 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
     // DataSets is null.
     GraphCollection collection;
 <span class="pc bpc" id="L130" title="3 of 6 branches missed.">    if (graphHeads != null &amp;&amp; vertices != null &amp;&amp; edges != null) {</span>
-<span class="fc" id="L131">      collection = graph.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L131">      collection = graph.getCollectionFactory()</span>
 <span class="fc" id="L132">        .fromDataSets(graphHeads, vertices, edges);</span>
     } else {
-<span class="nc" id="L134">      collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();</span>
+<span class="nc" id="L134">      collection = graph.getCollectionFactory().createEmptyCollection();</span>
     }
 
 <span class="fc" id="L137">    return collection;</span>

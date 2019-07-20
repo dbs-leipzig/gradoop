@@ -63,7 +63,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
 <span class="fc" id="L65">    return execute(searchGraph,</span>
-<span class="fc" id="L66">        graphPatterns.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L66">        graphPatterns.getCollectionFactory()</span>
 <span class="fc" id="L67">        .fromDataSets(</span>
 <span class="fc" id="L68">            graphPatterns.getGraphHead(),</span>
 <span class="fc" id="L69">            graphPatterns.getVertices(),</span>
@@ -139,7 +139,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 <span class="fc" id="L139">      .reduceGroup(new AddNewIdToDuplicatedEdge())</span>
 <span class="fc" id="L140">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
 
-<span class="fc" id="L142">    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);</span>
+<span class="fc" id="L142">    return searchGraph.getFactory().fromDataSets(gh, vToRet, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

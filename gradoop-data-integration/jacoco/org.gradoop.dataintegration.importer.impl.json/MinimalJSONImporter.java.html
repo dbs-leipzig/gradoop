@@ -65,7 +65,8 @@ public class MinimalJSONImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() {
-<span class="fc" id="L68">    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+<span class="fc" id="L68">    LogicalGraph logicalGraph = getLogicalGraph();</span>
+<span class="fc" id="L69">    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -28,10 +28,10 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.util.ListCollector;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple1;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
@@ -48,69 +48,70 @@
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
 <a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> java.util.Map;
-<a name="41" href="#41">41</a>  
-<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
-<a name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
-<a name="44" href="#44">44</a>  
-<a name="45" href="#45">45</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbeddingTest.html">ElementsFromEmbeddingTest</a> {
-<a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>    @Test
-<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> variableMappingTest() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="49" href="#49">49</a>      GradoopId v1 = GradoopId.get();
-<a name="50" href="#50">50</a>      GradoopId v2 = GradoopId.get();
-<a name="51" href="#51">51</a>      GradoopId v3 = GradoopId.get();
-<a name="52" href="#52">52</a>      GradoopId e1 = GradoopId.get();
-<a name="53" href="#53">53</a>      GradoopId e2 = GradoopId.get();
-<a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>      QueryHandler query = <strong class="jxr_keyword">new</strong> QueryHandler(<span class="jxr_string">"(a)-[e]-&gt;(b)-[f]-&gt;(c)"</span>);
-<a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>      Traverser traverser = <strong class="jxr_keyword">new</strong> DFSTraverser();
-<a name="58" href="#58">58</a>      traverser.setQueryHandler(query);
-<a name="59" href="#59">59</a>  
-<a name="60" href="#60">60</a>      TraversalCode traversalCode = traverser.traverse();
-<a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      ElementsFromEmbedding udf = <strong class="jxr_keyword">new</strong> ElementsFromEmbedding(
-<a name="63" href="#63">63</a>        traversalCode, <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory(), <strong class="jxr_keyword">new</strong> EPGMVertexFactory(), <strong class="jxr_keyword">new</strong> EPGMEdgeFactory(), query
-<a name="64" href="#64">64</a>      );
-<a name="65" href="#65">65</a>      udf.open(<strong class="jxr_keyword">new</strong> Configuration());
-<a name="66" href="#66">66</a>  
-<a name="67" href="#67">67</a>      GradoopId[] vertexMapping = <strong class="jxr_keyword">new</strong> GradoopId[]{v1, v2, v3};
-<a name="68" href="#68">68</a>      GradoopId[] edgeMapping = <strong class="jxr_keyword">new</strong> GradoopId[]{e1, e2};
-<a name="69" href="#69">69</a>  
-<a name="70" href="#70">70</a>      Embedding&lt;GradoopId&gt; embedding = <strong class="jxr_keyword">new</strong> Embedding&lt;&gt;();
-<a name="71" href="#71">71</a>      embedding.setVertexMapping(vertexMapping);
-<a name="72" href="#72">72</a>      embedding.setEdgeMapping(edgeMapping);
-<a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>      List&lt;EPGMElement&gt; result = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="75" href="#75">75</a>  
-<a name="76" href="#76">76</a>      udf.flatMap(Tuple1.of(embedding), <strong class="jxr_keyword">new</strong> ListCollector&lt;&gt;(result));
-<a name="77" href="#77">77</a>  
-<a name="78" href="#78">78</a>      EPGMGraphHead graphHead = (EPGMGraphHead) result
-<a name="79" href="#79">79</a>        .stream()
-<a name="80" href="#80">80</a>        .filter(e -&gt; e instanceof EPGMGraphHead)
-<a name="81" href="#81">81</a>        .findFirst()
-<a name="82" href="#82">82</a>        .get();
-<a name="83" href="#83">83</a>  
-<a name="84" href="#84">84</a>      assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
-<a name="85" href="#85">85</a>  
-<a name="86" href="#86">86</a>      Map&lt;PropertyValue, PropertyValue&gt; variableMapping
-<a name="87" href="#87">87</a>        = graphHead.getPropertyValue(PatternMatching.VARIABLE_MAPPING_KEY).getMap();
-<a name="88" href="#88">88</a>  
-<a name="89" href="#89">89</a>      <strong class="jxr_keyword">for</strong> (Vertex queryVertex : query.getVertices()) {
-<a name="90" href="#90">90</a>        assertEquals(
-<a name="91" href="#91">91</a>          variableMapping.get(PropertyValue.create(queryVertex.getVariable())),
-<a name="92" href="#92">92</a>          PropertyValue.create(vertexMapping[(<strong class="jxr_keyword">int</strong>) queryVertex.getId()])
-<a name="93" href="#93">93</a>        );
-<a name="94" href="#94">94</a>      }
-<a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>      <strong class="jxr_keyword">for</strong> (Edge queryEdge : query.getEdges()) {
-<a name="97" href="#97">97</a>        assertEquals(
-<a name="98" href="#98">98</a>          variableMapping.get(PropertyValue.create(queryEdge.getVariable())),
-<a name="99" href="#99">99</a>          PropertyValue.create(edgeMapping[(<strong class="jxr_keyword">int</strong>) queryEdge.getId()])
-<a name="100" href="#100">100</a>       );
-<a name="101" href="#101">101</a>     }
-<a name="102" href="#102">102</a>   }
-<a name="103" href="#103">103</a> }
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> java.util.NoSuchElementException;
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbeddingTest.html">ElementsFromEmbeddingTest</a> {
+<a name="47" href="#47">47</a>  
+<a name="48" href="#48">48</a>    @Test
+<a name="49" href="#49">49</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> variableMappingTest() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="50" href="#50">50</a>      GradoopId v1 = GradoopId.get();
+<a name="51" href="#51">51</a>      GradoopId v2 = GradoopId.get();
+<a name="52" href="#52">52</a>      GradoopId v3 = GradoopId.get();
+<a name="53" href="#53">53</a>      GradoopId e1 = GradoopId.get();
+<a name="54" href="#54">54</a>      GradoopId e2 = GradoopId.get();
+<a name="55" href="#55">55</a>  
+<a name="56" href="#56">56</a>      QueryHandler query = <strong class="jxr_keyword">new</strong> QueryHandler(<span class="jxr_string">"(a)-[e]-&gt;(b)-[f]-&gt;(c)"</span>);
+<a name="57" href="#57">57</a>  
+<a name="58" href="#58">58</a>      Traverser traverser = <strong class="jxr_keyword">new</strong> DFSTraverser();
+<a name="59" href="#59">59</a>      traverser.setQueryHandler(query);
+<a name="60" href="#60">60</a>  
+<a name="61" href="#61">61</a>      TraversalCode traversalCode = traverser.traverse();
+<a name="62" href="#62">62</a>  
+<a name="63" href="#63">63</a>      ElementsFromEmbedding udf = <strong class="jxr_keyword">new</strong> ElementsFromEmbedding(
+<a name="64" href="#64">64</a>        traversalCode, <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory(), <strong class="jxr_keyword">new</strong> EPGMVertexFactory(), <strong class="jxr_keyword">new</strong> EPGMEdgeFactory(), query
+<a name="65" href="#65">65</a>      );
+<a name="66" href="#66">66</a>      udf.open(<strong class="jxr_keyword">new</strong> Configuration());
+<a name="67" href="#67">67</a>  
+<a name="68" href="#68">68</a>      GradoopId[] vertexMapping = <strong class="jxr_keyword">new</strong> GradoopId[]{v1, v2, v3};
+<a name="69" href="#69">69</a>      GradoopId[] edgeMapping = <strong class="jxr_keyword">new</strong> GradoopId[]{e1, e2};
+<a name="70" href="#70">70</a>  
+<a name="71" href="#71">71</a>      Embedding&lt;GradoopId&gt; embedding = <strong class="jxr_keyword">new</strong> Embedding&lt;&gt;();
+<a name="72" href="#72">72</a>      embedding.setVertexMapping(vertexMapping);
+<a name="73" href="#73">73</a>      embedding.setEdgeMapping(edgeMapping);
+<a name="74" href="#74">74</a>  
+<a name="75" href="#75">75</a>      List&lt;Element&gt; result = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="76" href="#76">76</a>  
+<a name="77" href="#77">77</a>      udf.flatMap(Tuple1.of(embedding), <strong class="jxr_keyword">new</strong> ListCollector&lt;&gt;(result));
+<a name="78" href="#78">78</a>  
+<a name="79" href="#79">79</a>      EPGMGraphHead graphHead = (EPGMGraphHead) result
+<a name="80" href="#80">80</a>        .stream()
+<a name="81" href="#81">81</a>        .filter(e -&gt; e instanceof EPGMGraphHead)
+<a name="82" href="#82">82</a>        .findFirst()
+<a name="83" href="#83">83</a>        .orElseThrow(NoSuchElementException::<strong class="jxr_keyword">new</strong>);
+<a name="84" href="#84">84</a>  
+<a name="85" href="#85">85</a>      assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
+<a name="86" href="#86">86</a>  
+<a name="87" href="#87">87</a>      Map&lt;PropertyValue, PropertyValue&gt; variableMapping
+<a name="88" href="#88">88</a>        = graphHead.getPropertyValue(PatternMatching.VARIABLE_MAPPING_KEY).getMap();
+<a name="89" href="#89">89</a>  
+<a name="90" href="#90">90</a>      <strong class="jxr_keyword">for</strong> (Vertex queryVertex : query.getVertices()) {
+<a name="91" href="#91">91</a>        assertEquals(
+<a name="92" href="#92">92</a>          variableMapping.get(PropertyValue.create(queryVertex.getVariable())),
+<a name="93" href="#93">93</a>          PropertyValue.create(vertexMapping[(<strong class="jxr_keyword">int</strong>) queryVertex.getId()])
+<a name="94" href="#94">94</a>        );
+<a name="95" href="#95">95</a>      }
+<a name="96" href="#96">96</a>  
+<a name="97" href="#97">97</a>      <strong class="jxr_keyword">for</strong> (Edge queryEdge : query.getEdges()) {
+<a name="98" href="#98">98</a>        assertEquals(
+<a name="99" href="#99">99</a>          variableMapping.get(PropertyValue.create(queryEdge.getVariable())),
+<a name="100" href="#100">100</a>         PropertyValue.create(edgeMapping[(<strong class="jxr_keyword">int</strong>) queryEdge.getId()])
+<a name="101" href="#101">101</a>       );
+<a name="102" href="#102">102</a>     }
+<a name="103" href="#103">103</a>   }
+<a name="104" href="#104">104</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

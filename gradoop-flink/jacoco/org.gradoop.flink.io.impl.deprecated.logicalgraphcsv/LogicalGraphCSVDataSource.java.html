@@ -69,7 +69,8 @@ public class LogicalGraphCSVDataSource extends LogicalGraphCSVBase implements Da
 
   @Override
   public GraphCollection getGraphCollection() {
-<span class="nc" id="L72">    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+<span class="nc" id="L72">    LogicalGraph logicalGraph = getLogicalGraph();</span>
+<span class="nc" id="L73">    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);</span>
   }
 }
 

@@ -28,10 +28,10 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.tuple.Pair;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.GradoopConstants;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.GradoopConstants;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraph;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -72,522 +72,534 @@
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment"> * A greedy query planner that builds a query plan by iteratively picking the cheapest partial query</em>
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment"> * plan and extending it.</em>
-<a name="65" href="#65">65</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="66" href="#66">66</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/planner/greedy/GreedyPlanner.html">GreedyPlanner</a> {
-<a name="67" href="#67">67</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * The search graph to be queried</em>
-<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="70" href="#70">70</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph;
-<a name="71" href="#71">71</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   * The query handler represents the query.</em>
-<a name="73" href="#73">73</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="74" href="#74">74</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a> queryHandler;
-<a name="75" href="#75">75</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   * Statistics about the search graph.</em>
-<a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="78" href="#78">78</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a> graphStatistics;
+<a name="65" href="#65">65</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="66" href="#66">66</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; The graph head type.</em>
+<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; The vertex type.</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; The edge type.</em>
+<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment"> * @param &lt;LG&gt; The graph type.</em>
+<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment"> * @param &lt;GC&gt; The graph collection type.</em>
+<a name="71" href="#71">71</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="72" href="#72">72</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GreedyPlanner&lt;
+<a name="73" href="#73">73</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
+<a name="74" href="#74">74</a>    V <strong class="jxr_keyword">extends</strong> org.gradoop.common.model.api.entities.Vertex,
+<a name="75" href="#75">75</a>    E <strong class="jxr_keyword">extends</strong> org.gradoop.common.model.api.entities.Edge,
+<a name="76" href="#76">76</a>    LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
+<a name="77" href="#77">77</a>    GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; {
+<a name="78" href="#78">78</a>  
 <a name="79" href="#79">79</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="80" href="#80">80</a>  <em class="jxr_javadoccomment">   * The morphism type for vertex mappings.</em>
+<a name="80" href="#80">80</a>  <em class="jxr_javadoccomment">   * The search graph to be queried</em>
 <a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="82" href="#82">82</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> vertexStrategy;
+<a name="82" href="#82">82</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> LG graph;
 <a name="83" href="#83">83</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * The morphism type for edge mappings.</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * The query handler represents the query.</em>
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="86" href="#86">86</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> edgeStrategy;
-<a name="87" href="#87">87</a>  
-<a name="88" href="#88">88</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * Creates a new greedy planner.</em>
-<a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * @param graph search graph</em>
-<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   * @param queryHandler query handler</em>
-<a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   * @param graphStatistics search graph statistics</em>
-<a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   * @param vertexStrategy morphism type for vertex mappings</em>
-<a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * @param edgeStrategy morphism type for edge mappings</em>
-<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="97" href="#97">97</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/planner/greedy/GreedyPlanner.html">GreedyPlanner</a>(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a> queryHandler,
-<a name="98" href="#98">98</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a> graphStatistics, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> vertexStrategy, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> edgeStrategy) {
-<a name="99" href="#99">99</a>      <strong class="jxr_keyword">this</strong>.graph = graph;
-<a name="100" href="#100">100</a>     <strong class="jxr_keyword">this</strong>.queryHandler = queryHandler;
-<a name="101" href="#101">101</a>     <strong class="jxr_keyword">this</strong>.graphStatistics = graphStatistics;
-<a name="102" href="#102">102</a>     <strong class="jxr_keyword">this</strong>.vertexStrategy = vertexStrategy;
-<a name="103" href="#103">103</a>     <strong class="jxr_keyword">this</strong>.edgeStrategy = edgeStrategy;
-<a name="104" href="#104">104</a>   }
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * Computes the {@link PlanTableEntry} that wraps the {@link QueryPlan} with the minimum costs</em>
-<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   * according to the greedy optimization algorithm.</em>
-<a name="109" href="#109">109</a> <em class="jxr_javadoccomment">   *</em>
-<a name="110" href="#110">110</a> <em class="jxr_javadoccomment">   * @return entry with minimum execution costs</em>
-<a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   */</em>
-<a name="112" href="#112">112</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> plan() {
-<a name="113" href="#113">113</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable = initPlanTable();
-<a name="114" href="#114">114</a> 
-<a name="115" href="#115">115</a>     <strong class="jxr_keyword">while</strong> (planTable.size() &gt; 1) {
-<a name="116" href="#116">116</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newPlans = evaluateJoins(planTable);
+<a name="86" href="#86">86</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a> queryHandler;
+<a name="87" href="#87">87</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * Statistics about the search graph.</em>
+<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="90" href="#90">90</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a> graphStatistics;
+<a name="91" href="#91">91</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   * The morphism type for vertex mappings.</em>
+<a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="94" href="#94">94</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> vertexStrategy;
+<a name="95" href="#95">95</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * The morphism type for edge mappings.</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="98" href="#98">98</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> edgeStrategy;
+<a name="99" href="#99">99</a>  
+<a name="100" href="#100">100</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * Creates a new greedy planner.</em>
+<a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   *</em>
+<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * @param graph search graph</em>
+<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * @param queryHandler query handler</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * @param graphStatistics search graph statistics</em>
+<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   * @param vertexStrategy morphism type for vertex mappings</em>
+<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * @param edgeStrategy morphism type for edge mappings</em>
+<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   */</em>
+<a name="109" href="#109">109</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/planner/greedy/GreedyPlanner.html">GreedyPlanner</a>(LG graph, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a> queryHandler,
+<a name="110" href="#110">110</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a> graphStatistics, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> vertexStrategy, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> edgeStrategy) {
+<a name="111" href="#111">111</a>     <strong class="jxr_keyword">this</strong>.graph = graph;
+<a name="112" href="#112">112</a>     <strong class="jxr_keyword">this</strong>.queryHandler = queryHandler;
+<a name="113" href="#113">113</a>     <strong class="jxr_keyword">this</strong>.graphStatistics = graphStatistics;
+<a name="114" href="#114">114</a>     <strong class="jxr_keyword">this</strong>.vertexStrategy = vertexStrategy;
+<a name="115" href="#115">115</a>     <strong class="jxr_keyword">this</strong>.edgeStrategy = edgeStrategy;
+<a name="116" href="#116">116</a>   }
 <a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>       <strong class="jxr_keyword">if</strong> (newPlans.size() == 0) {
-<a name="119" href="#119">119</a>         <em class="jxr_comment">// No new plans where generated by joining but there are still multiple disconnected</em>
-<a name="120" href="#120">120</a>         <em class="jxr_comment">// query graph components. In this case we need to do a cartesian product.</em>
-<a name="121" href="#121">121</a>         newPlans = evaluateCartesianProducts(planTable);
-<a name="122" href="#122">122</a>       }
-<a name="123" href="#123">123</a>       newPlans = evaluateFilter(newPlans);
-<a name="124" href="#124">124</a>       newPlans = evaluateProjection(newPlans);
-<a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>       <em class="jxr_comment">// get plan with minimum costs and remove all plans covered by this plan</em>
-<a name="127" href="#127">127</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> bestEntry = newPlans.min();
-<a name="128" href="#128">128</a>       planTable.removeCoveredBy(bestEntry);
-<a name="129" href="#129">129</a>       planTable.add(bestEntry);
-<a name="130" href="#130">130</a>     }
-<a name="131" href="#131">131</a> 
-<a name="132" href="#132">132</a>     <strong class="jxr_keyword">return</strong> planTable.get(0);
-<a name="133" href="#133">133</a>   }
-<a name="134" href="#134">134</a> 
-<a name="135" href="#135">135</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="136" href="#136">136</a>   <em class="jxr_comment">// Initialization</em>
-<a name="137" href="#137">137</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="138" href="#138">138</a> 
-<a name="139" href="#139">139</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * Creates the initial plan table entries according to the specified vertices and edges.</em>
-<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   *</em>
-<a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * @return initial plan table</em>
-<a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   */</em>
-<a name="144" href="#144">144</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> initPlanTable() {
-<a name="145" href="#145">145</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
-<a name="146" href="#146">146</a>     createVertexPlans(planTable);
-<a name="147" href="#147">147</a>     createEdgePlans(planTable);
-<a name="148" href="#148">148</a>     <strong class="jxr_keyword">return</strong> planTable;
-<a name="149" href="#149">149</a>   }
+<a name="118" href="#118">118</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * Computes the {@link PlanTableEntry} that wraps the {@link QueryPlan} with the minimum costs</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * according to the greedy optimization algorithm.</em>
+<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   *</em>
+<a name="122" href="#122">122</a> <em class="jxr_javadoccomment">   * @return entry with minimum execution costs</em>
+<a name="123" href="#123">123</a> <em class="jxr_javadoccomment">   */</em>
+<a name="124" href="#124">124</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> plan() {
+<a name="125" href="#125">125</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable = initPlanTable();
+<a name="126" href="#126">126</a> 
+<a name="127" href="#127">127</a>     <strong class="jxr_keyword">while</strong> (planTable.size() &gt; 1) {
+<a name="128" href="#128">128</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newPlans = evaluateJoins(planTable);
+<a name="129" href="#129">129</a> 
+<a name="130" href="#130">130</a>       <strong class="jxr_keyword">if</strong> (newPlans.size() == 0) {
+<a name="131" href="#131">131</a>         <em class="jxr_comment">// No new plans where generated by joining but there are still multiple disconnected</em>
+<a name="132" href="#132">132</a>         <em class="jxr_comment">// query graph components. In this case we need to do a cartesian product.</em>
+<a name="133" href="#133">133</a>         newPlans = evaluateCartesianProducts(planTable);
+<a name="134" href="#134">134</a>       }
+<a name="135" href="#135">135</a>       newPlans = evaluateFilter(newPlans);
+<a name="136" href="#136">136</a>       newPlans = evaluateProjection(newPlans);
+<a name="137" href="#137">137</a> 
+<a name="138" href="#138">138</a>       <em class="jxr_comment">// get plan with minimum costs and remove all plans covered by this plan</em>
+<a name="139" href="#139">139</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> bestEntry = newPlans.min();
+<a name="140" href="#140">140</a>       planTable.removeCoveredBy(bestEntry);
+<a name="141" href="#141">141</a>       planTable.add(bestEntry);
+<a name="142" href="#142">142</a>     }
+<a name="143" href="#143">143</a> 
+<a name="144" href="#144">144</a>     <strong class="jxr_keyword">return</strong> planTable.get(0);
+<a name="145" href="#145">145</a>   }
+<a name="146" href="#146">146</a> 
+<a name="147" href="#147">147</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="148" href="#148">148</a>   <em class="jxr_comment">// Initialization</em>
+<a name="149" href="#149">149</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
 <a name="150" href="#150">150</a> 
-<a name="151" href="#151">151</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="152" href="#152">152</a>   <em class="jxr_comment">// Leaf nodes (i.e. vertices and (variable length) edges)</em>
-<a name="153" href="#153">153</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="154" href="#154">154</a> 
-<a name="155" href="#155">155</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * Creates an initial {@link PlanTableEntry} for each vertex in the query graph and adds it to the</em>
-<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * specified {@link PlanTable}. The entry wraps a query plan that filters vertices based on their</em>
-<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   * predicates and projects properties that are required for further query planning.</em>
-<a name="159" href="#159">159</a> <em class="jxr_javadoccomment">   *</em>
-<a name="160" href="#160">160</a> <em class="jxr_javadoccomment">   * @param planTable plan table</em>
-<a name="161" href="#161">161</a> <em class="jxr_javadoccomment">   */</em>
-<a name="162" href="#162">162</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> createVertexPlans(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable) {
-<a name="163" href="#163">163</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : queryHandler.getVertices()) {
-<a name="164" href="#164">164</a>       String vertexVariable = vertex.getVariable();
-<a name="165" href="#165">165</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> allPredicates = queryHandler.getPredicates();
-<a name="166" href="#166">166</a>       <em class="jxr_comment">// TODO: this might be moved to the FilterAndProject node in issue #510</em>
-<a name="167" href="#167">167</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
-<a name="168" href="#168">168</a>       Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
-<a name="169" href="#169">169</a> 
-<a name="170" href="#170">170</a>       DataSet&lt;EPGMVertex&gt; vertices =
-<a name="171" href="#171">171</a>         vertex.getLabel().equals(GradoopConstants.DEFAULT_VERTEX_LABEL) ?
-<a name="172" href="#172">172</a>           graph.getVertices() : graph.getVerticesByLabel(vertex.getLabel());
-<a name="173" href="#173">173</a> 
-<a name="174" href="#174">174</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectVerticesNode.html">FilterAndProjectVerticesNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectVerticesNode.html">FilterAndProjectVerticesNode</a>(vertices,
-<a name="175" href="#175">175</a>         vertex.getVariable(), vertexPredicates, projectionKeys);
-<a name="176" href="#176">176</a> 
-<a name="177" href="#177">177</a>       planTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
-<a name="178" href="#178">178</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
-<a name="179" href="#179">179</a>     }
-<a name="180" href="#180">180</a>   }
+<a name="151" href="#151">151</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   * Creates the initial plan table entries according to the specified vertices and edges.</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   *</em>
+<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   * @return initial plan table</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   */</em>
+<a name="156" href="#156">156</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> initPlanTable() {
+<a name="157" href="#157">157</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
+<a name="158" href="#158">158</a>     createVertexPlans(planTable);
+<a name="159" href="#159">159</a>     createEdgePlans(planTable);
+<a name="160" href="#160">160</a>     <strong class="jxr_keyword">return</strong> planTable;
+<a name="161" href="#161">161</a>   }
+<a name="162" href="#162">162</a> 
+<a name="163" href="#163">163</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="164" href="#164">164</a>   <em class="jxr_comment">// Leaf nodes (i.e. vertices and (variable length) edges)</em>
+<a name="165" href="#165">165</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="166" href="#166">166</a> 
+<a name="167" href="#167">167</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   * Creates an initial {@link PlanTableEntry} for each vertex in the query graph and adds it to the</em>
+<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   * specified {@link PlanTable}. The entry wraps a query plan that filters vertices based on their</em>
+<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   * predicates and projects properties that are required for further query planning.</em>
+<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   *</em>
+<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * @param planTable plan table</em>
+<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   */</em>
+<a name="174" href="#174">174</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> createVertexPlans(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable) {
+<a name="175" href="#175">175</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : queryHandler.getVertices()) {
+<a name="176" href="#176">176</a>       String vertexVariable = vertex.getVariable();
+<a name="177" href="#177">177</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> allPredicates = queryHandler.getPredicates();
+<a name="178" href="#178">178</a>       <em class="jxr_comment">// TODO: this might be moved to the FilterAndProject node in issue #510</em>
+<a name="179" href="#179">179</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
+<a name="180" href="#180">180</a>       Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 <a name="181" href="#181">181</a> 
-<a name="182" href="#182">182</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="183" href="#183">183</a> <em class="jxr_javadoccomment">   * Creates an initial {@link PlanTableEntry} for each edge in the query graph and adds it to the</em>
-<a name="184" href="#184">184</a> <em class="jxr_javadoccomment">   * specified {@link PlanTable}. The entry wraps a {@link QueryPlan} that filters edges based on</em>
-<a name="185" href="#185">185</a> <em class="jxr_javadoccomment">   * their predicates and projects properties that are required for further query planning.</em>
-<a name="186" href="#186">186</a> <em class="jxr_javadoccomment">   *</em>
-<a name="187" href="#187">187</a> <em class="jxr_javadoccomment">   * @param planTable plan table</em>
-<a name="188" href="#188">188</a> <em class="jxr_javadoccomment">   */</em>
-<a name="189" href="#189">189</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> createEdgePlans(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable) {
-<a name="190" href="#190">190</a>     <strong class="jxr_keyword">for</strong> (Edge edge : queryHandler.getEdges()) {
-<a name="191" href="#191">191</a>       String edgeVariable = edge.getVariable();
-<a name="192" href="#192">192</a>       String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
-<a name="193" href="#193">193</a>       String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
-<a name="194" href="#194">194</a> 
-<a name="195" href="#195">195</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> allPredicates = queryHandler.getPredicates();
-<a name="196" href="#196">196</a>       <em class="jxr_comment">// TODO: this might be moved the the FilterAndProject node in issue #510</em>
-<a name="197" href="#197">197</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> edgePredicates = allPredicates.removeSubCNF(edgeVariable);
-<a name="198" href="#198">198</a>       Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
-<a name="199" href="#199">199</a> 
-<a name="200" href="#200">200</a>       <strong class="jxr_keyword">boolean</strong> isPath = edge.getUpperBound() != 1;
-<a name="201" href="#201">201</a> 
-<a name="202" href="#202">202</a>       DataSet&lt;EPGMEdge&gt; edges =
-<a name="203" href="#203">203</a>         edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
-<a name="204" href="#204">204</a>           graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
-<a name="205" href="#205">205</a> 
-<a name="206" href="#206">206</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectEdgesNode.html">FilterAndProjectEdgesNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectEdgesNode.html">FilterAndProjectEdgesNode</a>(edges,
-<a name="207" href="#207">207</a>         sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
-<a name="208" href="#208">208</a> 
-<a name="209" href="#209">209</a>       PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
-<a name="210" href="#210">210</a> 
-<a name="211" href="#211">211</a>       planTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(type, Sets.newHashSet(edgeVariable), allPredicates,
-<a name="212" href="#212">212</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
-<a name="213" href="#213">213</a>     }
-<a name="214" href="#214">214</a>   }
-<a name="215" href="#215">215</a> 
-<a name="216" href="#216">216</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="217" href="#217">217</a>   <em class="jxr_comment">// Join and Expand</em>
-<a name="218" href="#218">218</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="219" href="#219">219</a> 
-<a name="220" href="#220">220</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   * Evaluates which entries in the specified plan table can be joined. The joined entries</em>
-<a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   * are added to a new table which is returned.</em>
-<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   *</em>
-<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @return new table containing solely joined plans from the input table</em>
-<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   */</em>
-<a name="227" href="#227">227</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateJoins(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
-<a name="228" href="#228">228</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
-<a name="229" href="#229">229</a> 
-<a name="230" href="#230">230</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; currentTable.size(); i++) {
-<a name="231" href="#231">231</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry = currentTable.get(i);
-<a name="232" href="#232">232</a>       <strong class="jxr_keyword">if</strong> (mayExtend(leftEntry)) {
-<a name="233" href="#233">233</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = 0; j &lt; currentTable.size(); j++) {
-<a name="234" href="#234">234</a>           <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry = currentTable.get(j);
-<a name="235" href="#235">235</a>           <strong class="jxr_keyword">if</strong> (i != j) {
-<a name="236" href="#236">236</a>             List&lt;String&gt; joinVariables = getOverlap(leftEntry, rightEntry);
-<a name="237" href="#237">237</a>             <strong class="jxr_keyword">if</strong> (joinVariables.size() &gt; 0) {
-<a name="238" href="#238">238</a>               <strong class="jxr_keyword">if</strong> (rightEntry.getType() == PATH &amp;&amp; joinVariables.size() == 2) {
-<a name="239" href="#239">239</a>                 <em class="jxr_comment">// evaluate join with variable length path on source and target vertex</em>
-<a name="240" href="#240">240</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(0, 1)));
-<a name="241" href="#241">241</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(1, 2)));
-<a name="242" href="#242">242</a>               } <strong class="jxr_keyword">else</strong> {
-<a name="243" href="#243">243</a>                 <em class="jxr_comment">// regular join or join with variable length path on source or target vertex</em>
-<a name="244" href="#244">244</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables));
-<a name="245" href="#245">245</a>               }
-<a name="246" href="#246">246</a>             }
-<a name="247" href="#247">247</a>           }
-<a name="248" href="#248">248</a>         }
-<a name="249" href="#249">249</a>       }
-<a name="250" href="#250">250</a>     }
-<a name="251" href="#251">251</a>     <strong class="jxr_keyword">return</strong> newTable;
-<a name="252" href="#252">252</a>   }
-<a name="253" href="#253">253</a> 
-<a name="254" href="#254">254</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   * Checks if the given entry may be extended. This is only the case for entries that represents</em>
-<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   * either a vertex or a partial match graph.</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   *</em>
-<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   * @param entry plan table entry</em>
-<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   * @return true, iff the specified entry may be extended</em>
-<a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   */</em>
-<a name="261" href="#261">261</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> mayExtend(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> entry) {
-<a name="262" href="#262">262</a>     <strong class="jxr_keyword">return</strong> entry.getType() == VERTEX || entry.getType() == GRAPH;
-<a name="263" href="#263">263</a>   }
-<a name="264" href="#264">264</a> 
-<a name="265" href="#265">265</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * Computes the overlapping query variables of the specified entries.</em>
-<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   *</em>
-<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   * @param firstEntry first entry</em>
-<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   * @param secondEntry second entry</em>
-<a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   * @return variables that are available in both input entries</em>
-<a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   */</em>
-<a name="272" href="#272">272</a>   <strong class="jxr_keyword">private</strong> List&lt;String&gt; getOverlap(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> firstEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> secondEntry) {
-<a name="273" href="#273">273</a>     Set&lt;String&gt; overlap = firstEntry.getAllVariables();
-<a name="274" href="#274">274</a>     overlap.retainAll(secondEntry.getAllVariables());
-<a name="275" href="#275">275</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(overlap);
-<a name="276" href="#276">276</a>   }
-<a name="277" href="#277">277</a> 
-<a name="278" href="#278">278</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   * Joins the query plans represented by the specified plan table entries.</em>
-<a name="280" href="#280">280</a> <em class="jxr_javadoccomment">   *</em>
-<a name="281" href="#281">281</a> <em class="jxr_javadoccomment">   * The method considers if the right entry is a variable length path and in that case</em>
-<a name="282" href="#282">282</a> <em class="jxr_javadoccomment">   * creates an {@link ExpandEmbeddingsNode}. In any other case, a regular</em>
-<a name="283" href="#283">283</a> <em class="jxr_javadoccomment">   * {@link JoinEmbeddingsNode} is used to join the query plans.</em>
-<a name="284" href="#284">284</a> <em class="jxr_javadoccomment">   *</em>
-<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
-<a name="286" href="#286">286</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
-<a name="287" href="#287">287</a> <em class="jxr_javadoccomment">   * @param joinVariables join variables</em>
-<a name="288" href="#288">288</a> <em class="jxr_javadoccomment">   * @return an entry that represents the join of both input entries</em>
-<a name="289" href="#289">289</a> <em class="jxr_javadoccomment">   */</em>
-<a name="290" href="#290">290</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> joinEntries(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry,
-<a name="291" href="#291">291</a>     List&lt;String&gt; joinVariables) {
-<a name="292" href="#292">292</a> 
-<a name="293" href="#293">293</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/PlanNode.html">PlanNode</a> node;
-<a name="294" href="#294">294</a>     <strong class="jxr_keyword">if</strong> (rightEntry.getType() == PATH) {
-<a name="295" href="#295">295</a>       assert joinVariables.size() == 1;
-<a name="296" href="#296">296</a>       node = createExpandNode(leftEntry, rightEntry, joinVariables.get(0));
-<a name="297" href="#297">297</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="298" href="#298">298</a>       node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/JoinEmbeddingsNode.html">JoinEmbeddingsNode</a>(leftEntry.getQueryPlan().getRoot(),
-<a name="299" href="#299">299</a>         rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
-<a name="300" href="#300">300</a>     }
-<a name="301" href="#301">301</a> 
-<a name="302" href="#302">302</a>     <em class="jxr_comment">// update processed variables</em>
-<a name="303" href="#303">303</a>     HashSet&lt;String&gt; processedVariables = Sets.newHashSet(leftEntry.getProcessedVariables());
-<a name="304" href="#304">304</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
-<a name="305" href="#305">305</a>     <em class="jxr_comment">// create resulting predicates</em>
-<a name="306" href="#306">306</a>     <em class="jxr_comment">// TODO: this might be moved to the join/expand node in issue #510</em>
-<a name="307" href="#307">307</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
-<a name="308" href="#308">308</a> 
-<a name="309" href="#309">309</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH, processedVariables, predicates,
-<a name="310" href="#310">310</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics));
-<a name="311" href="#311">311</a>   }
-<a name="312" href="#312">312</a> 
-<a name="313" href="#313">313</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="314" href="#314">314</a> <em class="jxr_javadoccomment">   * Creates an {@link ExpandEmbeddingsNode} from the specified arguments.</em>
-<a name="315" href="#315">315</a> <em class="jxr_javadoccomment">   *</em>
-<a name="316" href="#316">316</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
-<a name="317" href="#317">317</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
-<a name="318" href="#318">318</a> <em class="jxr_javadoccomment">   * @param startVariable vertex variable to expand from</em>
-<a name="319" href="#319">319</a> <em class="jxr_javadoccomment">   *</em>
-<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">   * @return new expand node</em>
-<a name="321" href="#321">321</a> <em class="jxr_javadoccomment">   */</em>
-<a name="322" href="#322">322</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ExpandEmbeddingsNode.html">ExpandEmbeddingsNode</a> createExpandNode(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry,
-<a name="323" href="#323">323</a>     String startVariable) {
+<a name="182" href="#182">182</a>       DataSet&lt;V&gt; vertices =
+<a name="183" href="#183">183</a>         vertex.getLabel().equals(GradoopConstants.DEFAULT_VERTEX_LABEL) ?
+<a name="184" href="#184">184</a>           graph.getVertices() : graph.getVerticesByLabel(vertex.getLabel());
+<a name="185" href="#185">185</a> 
+<a name="186" href="#186">186</a>       FilterAndProjectVerticesNode&lt;V&gt; node = <strong class="jxr_keyword">new</strong> FilterAndProjectVerticesNode&lt;&gt;(vertices,
+<a name="187" href="#187">187</a>         vertex.getVariable(), vertexPredicates, projectionKeys);
+<a name="188" href="#188">188</a> 
+<a name="189" href="#189">189</a>       planTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
+<a name="190" href="#190">190</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
+<a name="191" href="#191">191</a>     }
+<a name="192" href="#192">192</a>   }
+<a name="193" href="#193">193</a> 
+<a name="194" href="#194">194</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * Creates an initial {@link PlanTableEntry} for each edge in the query graph and adds it to the</em>
+<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   * specified {@link PlanTable}. The entry wraps a {@link QueryPlan} that filters edges based on</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * their predicates and projects properties that are required for further query planning.</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   *</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   * @param planTable plan table</em>
+<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   */</em>
+<a name="201" href="#201">201</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> createEdgePlans(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> planTable) {
+<a name="202" href="#202">202</a>     <strong class="jxr_keyword">for</strong> (Edge edge : queryHandler.getEdges()) {
+<a name="203" href="#203">203</a>       String edgeVariable = edge.getVariable();
+<a name="204" href="#204">204</a>       String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
+<a name="205" href="#205">205</a>       String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
+<a name="206" href="#206">206</a> 
+<a name="207" href="#207">207</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> allPredicates = queryHandler.getPredicates();
+<a name="208" href="#208">208</a>       <em class="jxr_comment">// TODO: this might be moved the the FilterAndProject node in issue #510</em>
+<a name="209" href="#209">209</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> edgePredicates = allPredicates.removeSubCNF(edgeVariable);
+<a name="210" href="#210">210</a>       Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
+<a name="211" href="#211">211</a> 
+<a name="212" href="#212">212</a>       <strong class="jxr_keyword">boolean</strong> isPath = edge.getUpperBound() != 1;
+<a name="213" href="#213">213</a> 
+<a name="214" href="#214">214</a>       DataSet&lt;E&gt; edges =
+<a name="215" href="#215">215</a>         edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
+<a name="216" href="#216">216</a>           graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
+<a name="217" href="#217">217</a> 
+<a name="218" href="#218">218</a>       FilterAndProjectEdgesNode&lt;E&gt; node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode&lt;&gt;(edges,
+<a name="219" href="#219">219</a>         sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
+<a name="220" href="#220">220</a> 
+<a name="221" href="#221">221</a>       PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>       planTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(type, Sets.newHashSet(edgeVariable), allPredicates,
+<a name="224" href="#224">224</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
+<a name="225" href="#225">225</a>     }
+<a name="226" href="#226">226</a>   }
+<a name="227" href="#227">227</a> 
+<a name="228" href="#228">228</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="229" href="#229">229</a>   <em class="jxr_comment">// Join and Expand</em>
+<a name="230" href="#230">230</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="231" href="#231">231</a> 
+<a name="232" href="#232">232</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="233" href="#233">233</a> <em class="jxr_javadoccomment">   * Evaluates which entries in the specified plan table can be joined. The joined entries</em>
+<a name="234" href="#234">234</a> <em class="jxr_javadoccomment">   * are added to a new table which is returned.</em>
+<a name="235" href="#235">235</a> <em class="jxr_javadoccomment">   *</em>
+<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
+<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * @return new table containing solely joined plans from the input table</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   */</em>
+<a name="239" href="#239">239</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateJoins(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
+<a name="240" href="#240">240</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
+<a name="241" href="#241">241</a> 
+<a name="242" href="#242">242</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; currentTable.size(); i++) {
+<a name="243" href="#243">243</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry = currentTable.get(i);
+<a name="244" href="#244">244</a>       <strong class="jxr_keyword">if</strong> (mayExtend(leftEntry)) {
+<a name="245" href="#245">245</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = 0; j &lt; currentTable.size(); j++) {
+<a name="246" href="#246">246</a>           <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry = currentTable.get(j);
+<a name="247" href="#247">247</a>           <strong class="jxr_keyword">if</strong> (i != j) {
+<a name="248" href="#248">248</a>             List&lt;String&gt; joinVariables = getOverlap(leftEntry, rightEntry);
+<a name="249" href="#249">249</a>             <strong class="jxr_keyword">if</strong> (joinVariables.size() &gt; 0) {
+<a name="250" href="#250">250</a>               <strong class="jxr_keyword">if</strong> (rightEntry.getType() == PATH &amp;&amp; joinVariables.size() == 2) {
+<a name="251" href="#251">251</a>                 <em class="jxr_comment">// evaluate join with variable length path on source and target vertex</em>
+<a name="252" href="#252">252</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(0, 1)));
+<a name="253" href="#253">253</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(1, 2)));
+<a name="254" href="#254">254</a>               } <strong class="jxr_keyword">else</strong> {
+<a name="255" href="#255">255</a>                 <em class="jxr_comment">// regular join or join with variable length path on source or target vertex</em>
+<a name="256" href="#256">256</a>                 newTable.add(joinEntries(leftEntry, rightEntry, joinVariables));
+<a name="257" href="#257">257</a>               }
+<a name="258" href="#258">258</a>             }
+<a name="259" href="#259">259</a>           }
+<a name="260" href="#260">260</a>         }
+<a name="261" href="#261">261</a>       }
+<a name="262" href="#262">262</a>     }
+<a name="263" href="#263">263</a>     <strong class="jxr_keyword">return</strong> newTable;
+<a name="264" href="#264">264</a>   }
+<a name="265" href="#265">265</a> 
+<a name="266" href="#266">266</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   * Checks if the given entry may be extended. This is only the case for entries that represents</em>
+<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   * either a vertex or a partial match graph.</em>
+<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   *</em>
+<a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   * @param entry plan table entry</em>
+<a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   * @return true, iff the specified entry may be extended</em>
+<a name="272" href="#272">272</a> <em class="jxr_javadoccomment">   */</em>
+<a name="273" href="#273">273</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> mayExtend(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> entry) {
+<a name="274" href="#274">274</a>     <strong class="jxr_keyword">return</strong> entry.getType() == VERTEX || entry.getType() == GRAPH;
+<a name="275" href="#275">275</a>   }
+<a name="276" href="#276">276</a> 
+<a name="277" href="#277">277</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="278" href="#278">278</a> <em class="jxr_javadoccomment">   * Computes the overlapping query variables of the specified entries.</em>
+<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   *</em>
+<a name="280" href="#280">280</a> <em class="jxr_javadoccomment">   * @param firstEntry first entry</em>
+<a name="281" href="#281">281</a> <em class="jxr_javadoccomment">   * @param secondEntry second entry</em>
+<a name="282" href="#282">282</a> <em class="jxr_javadoccomment">   * @return variables that are available in both input entries</em>
+<a name="283" href="#283">283</a> <em class="jxr_javadoccomment">   */</em>
+<a name="284" href="#284">284</a>   <strong class="jxr_keyword">private</strong> List&lt;String&gt; getOverlap(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> firstEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> secondEntry) {
+<a name="285" href="#285">285</a>     Set&lt;String&gt; overlap = firstEntry.getAllVariables();
+<a name="286" href="#286">286</a>     overlap.retainAll(secondEntry.getAllVariables());
+<a name="287" href="#287">287</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(overlap);
+<a name="288" href="#288">288</a>   }
+<a name="289" href="#289">289</a> 
+<a name="290" href="#290">290</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="291" href="#291">291</a> <em class="jxr_javadoccomment">   * Joins the query plans represented by the specified plan table entries.</em>
+<a name="292" href="#292">292</a> <em class="jxr_javadoccomment">   *</em>
+<a name="293" href="#293">293</a> <em class="jxr_javadoccomment">   * The method considers if the right entry is a variable length path and in that case</em>
+<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">   * creates an {@link ExpandEmbeddingsNode}. In any other case, a regular</em>
+<a name="295" href="#295">295</a> <em class="jxr_javadoccomment">   * {@link JoinEmbeddingsNode} is used to join the query plans.</em>
+<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   *</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
+<a name="299" href="#299">299</a> <em class="jxr_javadoccomment">   * @param joinVariables join variables</em>
+<a name="300" href="#300">300</a> <em class="jxr_javadoccomment">   * @return an entry that represents the join of both input entries</em>
+<a name="301" href="#301">301</a> <em class="jxr_javadoccomment">   */</em>
+<a name="302" href="#302">302</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> joinEntries(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry,
+<a name="303" href="#303">303</a>     List&lt;String&gt; joinVariables) {
+<a name="304" href="#304">304</a> 
+<a name="305" href="#305">305</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/PlanNode.html">PlanNode</a> node;
+<a name="306" href="#306">306</a>     <strong class="jxr_keyword">if</strong> (rightEntry.getType() == PATH) {
+<a name="307" href="#307">307</a>       assert joinVariables.size() == 1;
+<a name="308" href="#308">308</a>       node = createExpandNode(leftEntry, rightEntry, joinVariables.get(0));
+<a name="309" href="#309">309</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="310" href="#310">310</a>       node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/JoinEmbeddingsNode.html">JoinEmbeddingsNode</a>(leftEntry.getQueryPlan().getRoot(),
+<a name="311" href="#311">311</a>         rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);
+<a name="312" href="#312">312</a>     }
+<a name="313" href="#313">313</a> 
+<a name="314" href="#314">314</a>     <em class="jxr_comment">// update processed variables</em>
+<a name="315" href="#315">315</a>     HashSet&lt;String&gt; processedVariables = Sets.newHashSet(leftEntry.getProcessedVariables());
+<a name="316" href="#316">316</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
+<a name="317" href="#317">317</a>     <em class="jxr_comment">// create resulting predicates</em>
+<a name="318" href="#318">318</a>     <em class="jxr_comment">// TODO: this might be moved to the join/expand node in issue #510</em>
+<a name="319" href="#319">319</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
+<a name="320" href="#320">320</a> 
+<a name="321" href="#321">321</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH, processedVariables, predicates,
+<a name="322" href="#322">322</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics));
+<a name="323" href="#323">323</a>   }
 <a name="324" href="#324">324</a> 
-<a name="325" href="#325">325</a>     String pathVariable = rightEntry.getQueryPlan().getRoot()
-<a name="326" href="#326">326</a>       .getEmbeddingMetaData().getEdgeVariables().get(0);
-<a name="327" href="#327">327</a> 
-<a name="328" href="#328">328</a>     Edge queryEdge = queryHandler.getEdgeByVariable(pathVariable);
-<a name="329" href="#329">329</a>     Vertex sourceVertex = queryHandler.getVertexById(queryEdge.getSourceVertexId());
-<a name="330" href="#330">330</a>     Vertex targetVertex = queryHandler.getVertexById(queryEdge.getTargetVertexId());
-<a name="331" href="#331">331</a> 
-<a name="332" href="#332">332</a>     <strong class="jxr_keyword">int</strong> lowerBound = queryEdge.getLowerBound();
-<a name="333" href="#333">333</a>     <strong class="jxr_keyword">int</strong> upperBound = queryEdge.getUpperBound();
-<a name="334" href="#334">334</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/utils/ExpandDirection.html">ExpandDirection</a> direction = sourceVertex.getVariable().equals(startVariable) ?
-<a name="335" href="#335">335</a>       ExpandDirection.OUT : ExpandDirection.IN;
-<a name="336" href="#336">336</a>     String endVariable = direction == ExpandDirection.OUT ?
-<a name="337" href="#337">337</a>       targetVertex.getVariable() : sourceVertex.getVariable();
-<a name="338" href="#338">338</a> 
-<a name="339" href="#339">339</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ExpandEmbeddingsNode.html">ExpandEmbeddingsNode</a>(leftEntry.getQueryPlan().getRoot(),
-<a name="340" href="#340">340</a>       rightEntry.getQueryPlan().getRoot(),
-<a name="341" href="#341">341</a>       startVariable, pathVariable, endVariable, lowerBound, upperBound, direction,
-<a name="342" href="#342">342</a>       vertexStrategy, edgeStrategy);
-<a name="343" href="#343">343</a>   }
-<a name="344" href="#344">344</a> 
-<a name="345" href="#345">345</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="346" href="#346">346</a>   <em class="jxr_comment">// Filter embedding evaluation</em>
-<a name="347" href="#347">347</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="348" href="#348">348</a> 
-<a name="349" href="#349">349</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="350" href="#350">350</a> <em class="jxr_javadoccomment">   * The method checks if a filter can be applied on any of the entries in the specified table. If</em>
-<a name="351" href="#351">351</a> <em class="jxr_javadoccomment">   * this is the case, a {@link FilterEmbeddingsNode} is added to the query plan represented by the</em>
-<a name="352" href="#352">352</a> <em class="jxr_javadoccomment">   * affected entries.</em>
-<a name="353" href="#353">353</a> <em class="jxr_javadoccomment">   *</em>
-<a name="354" href="#354">354</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
-<a name="355" href="#355">355</a> <em class="jxr_javadoccomment">   * @return input table with possibly updated entries</em>
-<a name="356" href="#356">356</a> <em class="jxr_javadoccomment">   */</em>
-<a name="357" href="#357">357</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateFilter(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
-<a name="358" href="#358">358</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
-<a name="359" href="#359">359</a> 
-<a name="360" href="#360">360</a>     <strong class="jxr_keyword">for</strong> (PlanTableEntry entry : currentTable) {
-<a name="361" href="#361">361</a>       Set&lt;String&gt; variables = Sets.newHashSet(entry.getProcessedVariables());
-<a name="362" href="#362">362</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = entry.getPredicates();
-<a name="363" href="#363">363</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> subCNF = predicates.removeSubCNF(variables);
-<a name="364" href="#364">364</a>       <strong class="jxr_keyword">if</strong> (subCNF.size() &gt; 0) {
-<a name="365" href="#365">365</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/FilterEmbeddingsNode.html">FilterEmbeddingsNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/FilterEmbeddingsNode.html">FilterEmbeddingsNode</a>(entry.getQueryPlan().getRoot(),
-<a name="366" href="#366">366</a>           subCNF);
-<a name="367" href="#367">367</a>         newTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
-<a name="368" href="#368">368</a>           predicates, <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
-<a name="369" href="#369">369</a>       } <strong class="jxr_keyword">else</strong> {
-<a name="370" href="#370">370</a>         newTable.add(entry);
-<a name="371" href="#371">371</a>       }
-<a name="372" href="#372">372</a>     }
-<a name="373" href="#373">373</a> 
-<a name="374" href="#374">374</a>     <strong class="jxr_keyword">return</strong> newTable;
-<a name="375" href="#375">375</a>   }
-<a name="376" href="#376">376</a> 
-<a name="377" href="#377">377</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="378" href="#378">378</a>   <em class="jxr_comment">// Filter embedding evaluation</em>
-<a name="379" href="#379">379</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="380" href="#380">380</a> 
-<a name="381" href="#381">381</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="382" href="#382">382</a> <em class="jxr_javadoccomment">   * The method checks if a filter can be applied on any of the entries in the specified table. If</em>
-<a name="383" href="#383">383</a> <em class="jxr_javadoccomment">   * this is the case, a {@link ProjectEmbeddingsNode} is added to the query plan represented by the</em>
-<a name="384" href="#384">384</a> <em class="jxr_javadoccomment">   * affected entries.</em>
-<a name="385" href="#385">385</a> <em class="jxr_javadoccomment">   *</em>
-<a name="386" href="#386">386</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
-<a name="387" href="#387">387</a> <em class="jxr_javadoccomment">   * @return input table with possibly updated entries</em>
-<a name="388" href="#388">388</a> <em class="jxr_javadoccomment">   */</em>
-<a name="389" href="#389">389</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateProjection(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
-<a name="390" href="#390">390</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
-<a name="391" href="#391">391</a> 
-<a name="392" href="#392">392</a>     <strong class="jxr_keyword">for</strong> (PlanTableEntry entry : currentTable) {
-<a name="393" href="#393">393</a>       Set&lt;Pair&lt;String, String&gt;&gt; propertyPairs = entry.getPropertyPairs();
-<a name="394" href="#394">394</a>       Set&lt;Pair&lt;String, String&gt;&gt; projectionPairs = entry.getProjectionPairs();
-<a name="395" href="#395">395</a> 
-<a name="396" href="#396">396</a>       Set&lt;Pair&lt;String, String&gt;&gt; updatedPropertyPairs = propertyPairs.stream()
-<a name="397" href="#397">397</a>         .filter(projectionPairs::contains)
-<a name="398" href="#398">398</a>         .collect(Collectors.toSet());
-<a name="399" href="#399">399</a> 
-<a name="400" href="#400">400</a>       <strong class="jxr_keyword">if</strong> (updatedPropertyPairs.size() &lt; propertyPairs.size()) {
-<a name="401" href="#401">401</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/ProjectEmbeddingsNode.html">ProjectEmbeddingsNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/ProjectEmbeddingsNode.html">ProjectEmbeddingsNode</a>(entry.getQueryPlan().getRoot(),
-<a name="402" href="#402">402</a>           <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(updatedPropertyPairs));
-<a name="403" href="#403">403</a>         newTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH,
-<a name="404" href="#404">404</a>           Sets.newHashSet(entry.getProcessedVariables()), entry.getPredicates(),
-<a name="405" href="#405">405</a>           <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
-<a name="406" href="#406">406</a>       } <strong class="jxr_keyword">else</strong> {
-<a name="407" href="#407">407</a>         newTable.add(entry);
-<a name="408" href="#408">408</a>       }
-<a name="409" href="#409">409</a>     }
-<a name="410" href="#410">410</a>     <strong class="jxr_keyword">return</strong> newTable;
-<a name="411" href="#411">411</a>   }
-<a name="412" href="#412">412</a> 
-<a name="413" href="#413">413</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="414" href="#414">414</a>   <em class="jxr_comment">// Join and Expand</em>
-<a name="415" href="#415">415</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
-<a name="416" href="#416">416</a> 
-<a name="417" href="#417">417</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="418" href="#418">418</a> <em class="jxr_javadoccomment">   * Evaluates which entries in the specified plan table can be joined. The joined entries</em>
-<a name="419" href="#419">419</a> <em class="jxr_javadoccomment">   * are added to a new table which is returned.</em>
-<a name="420" href="#420">420</a> <em class="jxr_javadoccomment">   *</em>
-<a name="421" href="#421">421</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
-<a name="422" href="#422">422</a> <em class="jxr_javadoccomment">   * @return new table containing solely joined plans from the input table</em>
-<a name="423" href="#423">423</a> <em class="jxr_javadoccomment">   */</em>
-<a name="424" href="#424">424</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateCartesianProducts(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
-<a name="425" href="#425">425</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
-<a name="426" href="#426">426</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; currentTable.size(); i++) {
-<a name="427" href="#427">427</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry = currentTable.get(i);
-<a name="428" href="#428">428</a>       <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = i + 1; j &lt; currentTable.size(); j++) {
-<a name="429" href="#429">429</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry = currentTable.get(j);
-<a name="430" href="#430">430</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> joinPredicate = getJoinPredicate(leftEntry, rightEntry);
-<a name="431" href="#431">431</a>         <strong class="jxr_keyword">if</strong> (joinPredicate.size() &gt; 0) {
-<a name="432" href="#432">432</a>           newTable.add(createValueJoinEntry(leftEntry, rightEntry, joinPredicate));
-<a name="433" href="#433">433</a>         } <strong class="jxr_keyword">else</strong> {
-<a name="434" href="#434">434</a>           <em class="jxr_comment">// regular join or join with variable length path on source or target vertex</em>
-<a name="435" href="#435">435</a>           newTable.add(createCartesianProductEntry(leftEntry, rightEntry));
-<a name="436" href="#436">436</a>         }
-<a name="437" href="#437">437</a>       }
-<a name="438" href="#438">438</a>     }
-<a name="439" href="#439">439</a>     <strong class="jxr_keyword">return</strong> newTable;
-<a name="440" href="#440">440</a>   }
-<a name="441" href="#441">441</a> 
-<a name="442" href="#442">442</a> 
-<a name="443" href="#443">443</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="444" href="#444">444</a> <em class="jxr_javadoccomment">   * Computes the overlapping query variables of the specified entries.</em>
-<a name="445" href="#445">445</a> <em class="jxr_javadoccomment">   *</em>
-<a name="446" href="#446">446</a> <em class="jxr_javadoccomment">   * @param leftEntry first entry</em>
-<a name="447" href="#447">447</a> <em class="jxr_javadoccomment">   * @param rightEntry second entry</em>
-<a name="448" href="#448">448</a> <em class="jxr_javadoccomment">   * @return variables that are available in both input entries</em>
-<a name="449" href="#449">449</a> <em class="jxr_javadoccomment">   */</em>
-<a name="450" href="#450">450</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> getJoinPredicate(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
-<a name="451" href="#451">451</a>     Set&lt;String&gt; allVariables = leftEntry.getAllVariables();
-<a name="452" href="#452">452</a>     allVariables.addAll(rightEntry.getAllVariables());
+<a name="325" href="#325">325</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="326" href="#326">326</a> <em class="jxr_javadoccomment">   * Creates an {@link ExpandEmbeddingsNode} from the specified arguments.</em>
+<a name="327" href="#327">327</a> <em class="jxr_javadoccomment">   *</em>
+<a name="328" href="#328">328</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
+<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
+<a name="330" href="#330">330</a> <em class="jxr_javadoccomment">   * @param startVariable vertex variable to expand from</em>
+<a name="331" href="#331">331</a> <em class="jxr_javadoccomment">   *</em>
+<a name="332" href="#332">332</a> <em class="jxr_javadoccomment">   * @return new expand node</em>
+<a name="333" href="#333">333</a> <em class="jxr_javadoccomment">   */</em>
+<a name="334" href="#334">334</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ExpandEmbeddingsNode.html">ExpandEmbeddingsNode</a> createExpandNode(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry,
+<a name="335" href="#335">335</a>     String startVariable) {
+<a name="336" href="#336">336</a> 
+<a name="337" href="#337">337</a>     String pathVariable = rightEntry.getQueryPlan().getRoot()
+<a name="338" href="#338">338</a>       .getEmbeddingMetaData().getEdgeVariables().get(0);
+<a name="339" href="#339">339</a> 
+<a name="340" href="#340">340</a>     Edge queryEdge = queryHandler.getEdgeByVariable(pathVariable);
+<a name="341" href="#341">341</a>     Vertex sourceVertex = queryHandler.getVertexById(queryEdge.getSourceVertexId());
+<a name="342" href="#342">342</a>     Vertex targetVertex = queryHandler.getVertexById(queryEdge.getTargetVertexId());
+<a name="343" href="#343">343</a> 
+<a name="344" href="#344">344</a>     <strong class="jxr_keyword">int</strong> lowerBound = queryEdge.getLowerBound();
+<a name="345" href="#345">345</a>     <strong class="jxr_keyword">int</strong> upperBound = queryEdge.getUpperBound();
+<a name="346" href="#346">346</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/utils/ExpandDirection.html">ExpandDirection</a> direction = sourceVertex.getVariable().equals(startVariable) ?
+<a name="347" href="#347">347</a>       ExpandDirection.OUT : ExpandDirection.IN;
+<a name="348" href="#348">348</a>     String endVariable = direction == ExpandDirection.OUT ?
+<a name="349" href="#349">349</a>       targetVertex.getVariable() : sourceVertex.getVariable();
+<a name="350" href="#350">350</a> 
+<a name="351" href="#351">351</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ExpandEmbeddingsNode.html">ExpandEmbeddingsNode</a>(leftEntry.getQueryPlan().getRoot(),
+<a name="352" href="#352">352</a>       rightEntry.getQueryPlan().getRoot(),
+<a name="353" href="#353">353</a>       startVariable, pathVariable, endVariable, lowerBound, upperBound, direction,
+<a name="354" href="#354">354</a>       vertexStrategy, edgeStrategy);
+<a name="355" href="#355">355</a>   }
+<a name="356" href="#356">356</a> 
+<a name="357" href="#357">357</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="358" href="#358">358</a>   <em class="jxr_comment">// Filter embedding evaluation</em>
+<a name="359" href="#359">359</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="360" href="#360">360</a> 
+<a name="361" href="#361">361</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="362" href="#362">362</a> <em class="jxr_javadoccomment">   * The method checks if a filter can be applied on any of the entries in the specified table. If</em>
+<a name="363" href="#363">363</a> <em class="jxr_javadoccomment">   * this is the case, a {@link FilterEmbeddingsNode} is added to the query plan represented by the</em>
+<a name="364" href="#364">364</a> <em class="jxr_javadoccomment">   * affected entries.</em>
+<a name="365" href="#365">365</a> <em class="jxr_javadoccomment">   *</em>
+<a name="366" href="#366">366</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
+<a name="367" href="#367">367</a> <em class="jxr_javadoccomment">   * @return input table with possibly updated entries</em>
+<a name="368" href="#368">368</a> <em class="jxr_javadoccomment">   */</em>
+<a name="369" href="#369">369</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateFilter(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
+<a name="370" href="#370">370</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
+<a name="371" href="#371">371</a> 
+<a name="372" href="#372">372</a>     <strong class="jxr_keyword">for</strong> (PlanTableEntry entry : currentTable) {
+<a name="373" href="#373">373</a>       Set&lt;String&gt; variables = Sets.newHashSet(entry.getProcessedVariables());
+<a name="374" href="#374">374</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = entry.getPredicates();
+<a name="375" href="#375">375</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> subCNF = predicates.removeSubCNF(variables);
+<a name="376" href="#376">376</a>       <strong class="jxr_keyword">if</strong> (subCNF.size() &gt; 0) {
+<a name="377" href="#377">377</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/FilterEmbeddingsNode.html">FilterEmbeddingsNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/FilterEmbeddingsNode.html">FilterEmbeddingsNode</a>(entry.getQueryPlan().getRoot(),
+<a name="378" href="#378">378</a>           subCNF);
+<a name="379" href="#379">379</a>         newTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
+<a name="380" href="#380">380</a>           predicates, <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
+<a name="381" href="#381">381</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="382" href="#382">382</a>         newTable.add(entry);
+<a name="383" href="#383">383</a>       }
+<a name="384" href="#384">384</a>     }
+<a name="385" href="#385">385</a> 
+<a name="386" href="#386">386</a>     <strong class="jxr_keyword">return</strong> newTable;
+<a name="387" href="#387">387</a>   }
+<a name="388" href="#388">388</a> 
+<a name="389" href="#389">389</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="390" href="#390">390</a>   <em class="jxr_comment">// Filter embedding evaluation</em>
+<a name="391" href="#391">391</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="392" href="#392">392</a> 
+<a name="393" href="#393">393</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="394" href="#394">394</a> <em class="jxr_javadoccomment">   * The method checks if a filter can be applied on any of the entries in the specified table. If</em>
+<a name="395" href="#395">395</a> <em class="jxr_javadoccomment">   * this is the case, a {@link ProjectEmbeddingsNode} is added to the query plan represented by the</em>
+<a name="396" href="#396">396</a> <em class="jxr_javadoccomment">   * affected entries.</em>
+<a name="397" href="#397">397</a> <em class="jxr_javadoccomment">   *</em>
+<a name="398" href="#398">398</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
+<a name="399" href="#399">399</a> <em class="jxr_javadoccomment">   * @return input table with possibly updated entries</em>
+<a name="400" href="#400">400</a> <em class="jxr_javadoccomment">   */</em>
+<a name="401" href="#401">401</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateProjection(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
+<a name="402" href="#402">402</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
+<a name="403" href="#403">403</a> 
+<a name="404" href="#404">404</a>     <strong class="jxr_keyword">for</strong> (PlanTableEntry entry : currentTable) {
+<a name="405" href="#405">405</a>       Set&lt;Pair&lt;String, String&gt;&gt; propertyPairs = entry.getPropertyPairs();
+<a name="406" href="#406">406</a>       Set&lt;Pair&lt;String, String&gt;&gt; projectionPairs = entry.getProjectionPairs();
+<a name="407" href="#407">407</a> 
+<a name="408" href="#408">408</a>       Set&lt;Pair&lt;String, String&gt;&gt; updatedPropertyPairs = propertyPairs.stream()
+<a name="409" href="#409">409</a>         .filter(projectionPairs::contains)
+<a name="410" href="#410">410</a>         .collect(Collectors.toSet());
+<a name="411" href="#411">411</a> 
+<a name="412" href="#412">412</a>       <strong class="jxr_keyword">if</strong> (updatedPropertyPairs.size() &lt; propertyPairs.size()) {
+<a name="413" href="#413">413</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/ProjectEmbeddingsNode.html">ProjectEmbeddingsNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/unary/ProjectEmbeddingsNode.html">ProjectEmbeddingsNode</a>(entry.getQueryPlan().getRoot(),
+<a name="414" href="#414">414</a>           <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(updatedPropertyPairs));
+<a name="415" href="#415">415</a>         newTable.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(GRAPH,
+<a name="416" href="#416">416</a>           Sets.newHashSet(entry.getProcessedVariables()), entry.getPredicates(),
+<a name="417" href="#417">417</a>           <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)));
+<a name="418" href="#418">418</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="419" href="#419">419</a>         newTable.add(entry);
+<a name="420" href="#420">420</a>       }
+<a name="421" href="#421">421</a>     }
+<a name="422" href="#422">422</a>     <strong class="jxr_keyword">return</strong> newTable;
+<a name="423" href="#423">423</a>   }
+<a name="424" href="#424">424</a> 
+<a name="425" href="#425">425</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="426" href="#426">426</a>   <em class="jxr_comment">// Join and Expand</em>
+<a name="427" href="#427">427</a>   <em class="jxr_comment">//------------------------------------------------------------------------------------------------</em>
+<a name="428" href="#428">428</a> 
+<a name="429" href="#429">429</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="430" href="#430">430</a> <em class="jxr_javadoccomment">   * Evaluates which entries in the specified plan table can be joined. The joined entries</em>
+<a name="431" href="#431">431</a> <em class="jxr_javadoccomment">   * are added to a new table which is returned.</em>
+<a name="432" href="#432">432</a> <em class="jxr_javadoccomment">   *</em>
+<a name="433" href="#433">433</a> <em class="jxr_javadoccomment">   * @param currentTable query plan table</em>
+<a name="434" href="#434">434</a> <em class="jxr_javadoccomment">   * @return new table containing solely joined plans from the input table</em>
+<a name="435" href="#435">435</a> <em class="jxr_javadoccomment">   */</em>
+<a name="436" href="#436">436</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> evaluateCartesianProducts(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> currentTable) {
+<a name="437" href="#437">437</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a> newTable = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTable.html">PlanTable</a>();
+<a name="438" href="#438">438</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; currentTable.size(); i++) {
+<a name="439" href="#439">439</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry = currentTable.get(i);
+<a name="440" href="#440">440</a>       <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = i + 1; j &lt; currentTable.size(); j++) {
+<a name="441" href="#441">441</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry = currentTable.get(j);
+<a name="442" href="#442">442</a>         <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> joinPredicate = getJoinPredicate(leftEntry, rightEntry);
+<a name="443" href="#443">443</a>         <strong class="jxr_keyword">if</strong> (joinPredicate.size() &gt; 0) {
+<a name="444" href="#444">444</a>           newTable.add(createValueJoinEntry(leftEntry, rightEntry, joinPredicate));
+<a name="445" href="#445">445</a>         } <strong class="jxr_keyword">else</strong> {
+<a name="446" href="#446">446</a>           <em class="jxr_comment">// regular join or join with variable length path on source or target vertex</em>
+<a name="447" href="#447">447</a>           newTable.add(createCartesianProductEntry(leftEntry, rightEntry));
+<a name="448" href="#448">448</a>         }
+<a name="449" href="#449">449</a>       }
+<a name="450" href="#450">450</a>     }
+<a name="451" href="#451">451</a>     <strong class="jxr_keyword">return</strong> newTable;
+<a name="452" href="#452">452</a>   }
 <a name="453" href="#453">453</a> 
-<a name="454" href="#454">454</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> leftPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(leftEntry.getPredicates());
-<a name="455" href="#455">455</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> rightPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(rightEntry.getPredicates());
-<a name="456" href="#456">456</a>     leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
-<a name="457" href="#457">457</a>     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
-<a name="458" href="#458">458</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);
-<a name="459" href="#459">459</a> 
-<a name="460" href="#460">460</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(
-<a name="461" href="#461">461</a>       predicates.getPredicates()
-<a name="462" href="#462">462</a>         .stream()
-<a name="463" href="#463">463</a>         .filter(p -&gt;
-<a name="464" href="#464">464</a>           p.size() == 1 &amp;&amp; p.getPredicates().get(0).getComparator().equals(Comparator.EQ)
-<a name="465" href="#465">465</a>         ).collect(Collectors.toList())
-<a name="466" href="#466">466</a>     );
-<a name="467" href="#467">467</a>   }
-<a name="468" href="#468">468</a> 
-<a name="469" href="#469">469</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="470" href="#470">470</a> <em class="jxr_javadoccomment">   * Creates an {@link CartesianProductNode} from the specified arguments.</em>
-<a name="471" href="#471">471</a> <em class="jxr_javadoccomment">   *</em>
-<a name="472" href="#472">472</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
-<a name="473" href="#473">473</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
-<a name="474" href="#474">474</a> <em class="jxr_javadoccomment">   *</em>
-<a name="475" href="#475">475</a> <em class="jxr_javadoccomment">   * @return new expand node</em>
-<a name="476" href="#476">476</a> <em class="jxr_javadoccomment">   */</em>
-<a name="477" href="#477">477</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> createCartesianProductEntry(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry,
-<a name="478" href="#478">478</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
-<a name="479" href="#479">479</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/CartesianProductNode.html">CartesianProductNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/CartesianProductNode.html">CartesianProductNode</a>(
-<a name="480" href="#480">480</a>       leftEntry.getQueryPlan().getRoot(),
-<a name="481" href="#481">481</a>       rightEntry.getQueryPlan().getRoot(),
-<a name="482" href="#482">482</a>       vertexStrategy, edgeStrategy
-<a name="483" href="#483">483</a>     );
-<a name="484" href="#484">484</a> 
-<a name="485" href="#485">485</a>     Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();
-<a name="486" href="#486">486</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
-<a name="487" href="#487">487</a> 
-<a name="488" href="#488">488</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
-<a name="489" href="#489">489</a> 
-<a name="490" href="#490">490</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(
-<a name="491" href="#491">491</a>       GRAPH,
-<a name="492" href="#492">492</a>       processedVariables,
-<a name="493" href="#493">493</a>       predicates,
-<a name="494" href="#494">494</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)
+<a name="454" href="#454">454</a> 
+<a name="455" href="#455">455</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="456" href="#456">456</a> <em class="jxr_javadoccomment">   * Computes the overlapping query variables of the specified entries.</em>
+<a name="457" href="#457">457</a> <em class="jxr_javadoccomment">   *</em>
+<a name="458" href="#458">458</a> <em class="jxr_javadoccomment">   * @param leftEntry first entry</em>
+<a name="459" href="#459">459</a> <em class="jxr_javadoccomment">   * @param rightEntry second entry</em>
+<a name="460" href="#460">460</a> <em class="jxr_javadoccomment">   * @return variables that are available in both input entries</em>
+<a name="461" href="#461">461</a> <em class="jxr_javadoccomment">   */</em>
+<a name="462" href="#462">462</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> getJoinPredicate(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
+<a name="463" href="#463">463</a>     Set&lt;String&gt; allVariables = leftEntry.getAllVariables();
+<a name="464" href="#464">464</a>     allVariables.addAll(rightEntry.getAllVariables());
+<a name="465" href="#465">465</a> 
+<a name="466" href="#466">466</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> leftPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(leftEntry.getPredicates());
+<a name="467" href="#467">467</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> rightPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(rightEntry.getPredicates());
+<a name="468" href="#468">468</a>     leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
+<a name="469" href="#469">469</a>     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+<a name="470" href="#470">470</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);
+<a name="471" href="#471">471</a> 
+<a name="472" href="#472">472</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(
+<a name="473" href="#473">473</a>       predicates.getPredicates()
+<a name="474" href="#474">474</a>         .stream()
+<a name="475" href="#475">475</a>         .filter(p -&gt;
+<a name="476" href="#476">476</a>           p.size() == 1 &amp;&amp; p.getPredicates().get(0).getComparator().equals(Comparator.EQ)
+<a name="477" href="#477">477</a>         ).collect(Collectors.toList())
+<a name="478" href="#478">478</a>     );
+<a name="479" href="#479">479</a>   }
+<a name="480" href="#480">480</a> 
+<a name="481" href="#481">481</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="482" href="#482">482</a> <em class="jxr_javadoccomment">   * Creates an {@link CartesianProductNode} from the specified arguments.</em>
+<a name="483" href="#483">483</a> <em class="jxr_javadoccomment">   *</em>
+<a name="484" href="#484">484</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
+<a name="485" href="#485">485</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
+<a name="486" href="#486">486</a> <em class="jxr_javadoccomment">   *</em>
+<a name="487" href="#487">487</a> <em class="jxr_javadoccomment">   * @return new expand node</em>
+<a name="488" href="#488">488</a> <em class="jxr_javadoccomment">   */</em>
+<a name="489" href="#489">489</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> createCartesianProductEntry(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry,
+<a name="490" href="#490">490</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
+<a name="491" href="#491">491</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/CartesianProductNode.html">CartesianProductNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/CartesianProductNode.html">CartesianProductNode</a>(
+<a name="492" href="#492">492</a>       leftEntry.getQueryPlan().getRoot(),
+<a name="493" href="#493">493</a>       rightEntry.getQueryPlan().getRoot(),
+<a name="494" href="#494">494</a>       vertexStrategy, edgeStrategy
 <a name="495" href="#495">495</a>     );
-<a name="496" href="#496">496</a>   }
-<a name="497" href="#497">497</a> 
-<a name="498" href="#498">498</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="499" href="#499">499</a> <em class="jxr_javadoccomment">   * Creates an {@link ValueJoinNode} from the specified arguments.</em>
-<a name="500" href="#500">500</a> <em class="jxr_javadoccomment">   *</em>
-<a name="501" href="#501">501</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
-<a name="502" href="#502">502</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
-<a name="503" href="#503">503</a> <em class="jxr_javadoccomment">   * @param joinPredicate join predicate</em>
-<a name="504" href="#504">504</a> <em class="jxr_javadoccomment">   *</em>
-<a name="505" href="#505">505</a> <em class="jxr_javadoccomment">   * @return new value join node</em>
-<a name="506" href="#506">506</a> <em class="jxr_javadoccomment">   */</em>
-<a name="507" href="#507">507</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> createValueJoinEntry(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry,
-<a name="508" href="#508">508</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> joinPredicate) {
+<a name="496" href="#496">496</a> 
+<a name="497" href="#497">497</a>     Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();
+<a name="498" href="#498">498</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
+<a name="499" href="#499">499</a> 
+<a name="500" href="#500">500</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
+<a name="501" href="#501">501</a> 
+<a name="502" href="#502">502</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(
+<a name="503" href="#503">503</a>       GRAPH,
+<a name="504" href="#504">504</a>       processedVariables,
+<a name="505" href="#505">505</a>       predicates,
+<a name="506" href="#506">506</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)
+<a name="507" href="#507">507</a>     );
+<a name="508" href="#508">508</a>   }
 <a name="509" href="#509">509</a> 
-<a name="510" href="#510">510</a>     List&lt;Pair&lt;String, String&gt;&gt; leftProperties = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="511" href="#511">511</a>     List&lt;Pair&lt;String, String&gt;&gt; rightProperties = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="512" href="#512">512</a> 
-<a name="513" href="#513">513</a>     <strong class="jxr_keyword">for</strong> (CNFElement e : joinPredicate.getPredicates()) {
-<a name="514" href="#514">514</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/expressions/ComparisonExpression.html">ComparisonExpression</a> comparison = e.getPredicates().get(0);
-<a name="515" href="#515">515</a> 
-<a name="516" href="#516">516</a>       Pair&lt;String, String&gt; joinProperty = extractJoinProperty(comparison.getLhs());
-<a name="517" href="#517">517</a>       <strong class="jxr_keyword">if</strong> (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
-<a name="518" href="#518">518</a>         leftProperties.add(joinProperty);
-<a name="519" href="#519">519</a>       } <strong class="jxr_keyword">else</strong> {
-<a name="520" href="#520">520</a>         rightProperties.add(joinProperty);
-<a name="521" href="#521">521</a>       }
-<a name="522" href="#522">522</a> 
-<a name="523" href="#523">523</a>       joinProperty = extractJoinProperty(comparison.getRhs());
-<a name="524" href="#524">524</a>       <strong class="jxr_keyword">if</strong> (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
-<a name="525" href="#525">525</a>         leftProperties.add(joinProperty);
-<a name="526" href="#526">526</a>       } <strong class="jxr_keyword">else</strong> {
-<a name="527" href="#527">527</a>         rightProperties.add(joinProperty);
-<a name="528" href="#528">528</a>       }
-<a name="529" href="#529">529</a>     }
-<a name="530" href="#530">530</a> 
-<a name="531" href="#531">531</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNode.html">ValueJoinNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNode.html">ValueJoinNode</a>(
-<a name="532" href="#532">532</a>       leftEntry.getQueryPlan().getRoot(),
-<a name="533" href="#533">533</a>       rightEntry.getQueryPlan().getRoot(),
-<a name="534" href="#534">534</a>       leftProperties, rightProperties,
-<a name="535" href="#535">535</a>       vertexStrategy, edgeStrategy
-<a name="536" href="#536">536</a>     );
-<a name="537" href="#537">537</a> 
-<a name="538" href="#538">538</a>     Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();
-<a name="539" href="#539">539</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
-<a name="540" href="#540">540</a> 
-<a name="541" href="#541">541</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
+<a name="510" href="#510">510</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="511" href="#511">511</a> <em class="jxr_javadoccomment">   * Creates an {@link ValueJoinNode} from the specified arguments.</em>
+<a name="512" href="#512">512</a> <em class="jxr_javadoccomment">   *</em>
+<a name="513" href="#513">513</a> <em class="jxr_javadoccomment">   * @param leftEntry left entry</em>
+<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * @param rightEntry right entry</em>
+<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   * @param joinPredicate join predicate</em>
+<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   *</em>
+<a name="517" href="#517">517</a> <em class="jxr_javadoccomment">   * @return new value join node</em>
+<a name="518" href="#518">518</a> <em class="jxr_javadoccomment">   */</em>
+<a name="519" href="#519">519</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> createValueJoinEntry(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry,
+<a name="520" href="#520">520</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> joinPredicate) {
+<a name="521" href="#521">521</a> 
+<a name="522" href="#522">522</a>     List&lt;Pair&lt;String, String&gt;&gt; leftProperties = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="523" href="#523">523</a>     List&lt;Pair&lt;String, String&gt;&gt; rightProperties = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="524" href="#524">524</a> 
+<a name="525" href="#525">525</a>     <strong class="jxr_keyword">for</strong> (CNFElement e : joinPredicate.getPredicates()) {
+<a name="526" href="#526">526</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/expressions/ComparisonExpression.html">ComparisonExpression</a> comparison = e.getPredicates().get(0);
+<a name="527" href="#527">527</a> 
+<a name="528" href="#528">528</a>       Pair&lt;String, String&gt; joinProperty = extractJoinProperty(comparison.getLhs());
+<a name="529" href="#529">529</a>       <strong class="jxr_keyword">if</strong> (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
+<a name="530" href="#530">530</a>         leftProperties.add(joinProperty);
+<a name="531" href="#531">531</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="532" href="#532">532</a>         rightProperties.add(joinProperty);
+<a name="533" href="#533">533</a>       }
+<a name="534" href="#534">534</a> 
+<a name="535" href="#535">535</a>       joinProperty = extractJoinProperty(comparison.getRhs());
+<a name="536" href="#536">536</a>       <strong class="jxr_keyword">if</strong> (leftEntry.getAllVariables().contains(joinProperty.getKey())) {
+<a name="537" href="#537">537</a>         leftProperties.add(joinProperty);
+<a name="538" href="#538">538</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="539" href="#539">539</a>         rightProperties.add(joinProperty);
+<a name="540" href="#540">540</a>       }
+<a name="541" href="#541">541</a>     }
 <a name="542" href="#542">542</a> 
-<a name="543" href="#543">543</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(
-<a name="544" href="#544">544</a>       GRAPH,
-<a name="545" href="#545">545</a>       processedVariables,
-<a name="546" href="#546">546</a>       predicates,
-<a name="547" href="#547">547</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)
+<a name="543" href="#543">543</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNode.html">ValueJoinNode</a> node = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNode.html">ValueJoinNode</a>(
+<a name="544" href="#544">544</a>       leftEntry.getQueryPlan().getRoot(),
+<a name="545" href="#545">545</a>       rightEntry.getQueryPlan().getRoot(),
+<a name="546" href="#546">546</a>       leftProperties, rightProperties,
+<a name="547" href="#547">547</a>       vertexStrategy, edgeStrategy
 <a name="548" href="#548">548</a>     );
-<a name="549" href="#549">549</a>   }
-<a name="550" href="#550">550</a> 
-<a name="551" href="#551">551</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="552" href="#552">552</a> <em class="jxr_javadoccomment">   * Turns a QueryComparable into a {@code Pair&lt;Variable, PropertyKey&gt;}</em>
-<a name="553" href="#553">553</a> <em class="jxr_javadoccomment">   * @param comparable query comparable</em>
-<a name="554" href="#554">554</a> <em class="jxr_javadoccomment">   * @return join property</em>
-<a name="555" href="#555">555</a> <em class="jxr_javadoccomment">   */</em>
-<a name="556" href="#556">556</a>   <strong class="jxr_keyword">private</strong> Pair&lt;String, String&gt; extractJoinProperty(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/QueryComparable.html">QueryComparable</a> comparable) {
-<a name="557" href="#557">557</a>     <strong class="jxr_keyword">if</strong> (comparable instanceof PropertySelectorComparable) {
-<a name="558" href="#558">558</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/comparables/PropertySelectorComparable.html">PropertySelectorComparable</a> propertySelector = (PropertySelectorComparable) comparable;
-<a name="559" href="#559">559</a>       <strong class="jxr_keyword">return</strong> Pair.of(propertySelector.getVariable(), propertySelector.getPropertyKey());
-<a name="560" href="#560">560</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="561" href="#561">561</a>       <em class="jxr_comment">//TODO #580 Include ElementSelector -&gt; ID needs to be projected as property</em>
-<a name="562" href="#562">562</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Comparable "</span> + comparable + <span class="jxr_string">"cant be used for ValueJoin"</span>);
-<a name="563" href="#563">563</a>     }
-<a name="564" href="#564">564</a>   }
-<a name="565" href="#565">565</a> 
-<a name="566" href="#566">566</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="567" href="#567">567</a> <em class="jxr_javadoccomment">   * Creates a new predicate that includes only elements that exist in both input predicates</em>
-<a name="568" href="#568">568</a> <em class="jxr_javadoccomment">   *</em>
-<a name="569" href="#569">569</a> <em class="jxr_javadoccomment">   * @param leftEntry left side plant table entry</em>
-<a name="570" href="#570">570</a> <em class="jxr_javadoccomment">   * @param rightEntry right side plan table entry</em>
-<a name="571" href="#571">571</a> <em class="jxr_javadoccomment">   * @return Merged predicates</em>
-<a name="572" href="#572">572</a> <em class="jxr_javadoccomment">   */</em>
-<a name="573" href="#573">573</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> mergePredicates(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
-<a name="574" href="#574">574</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> leftPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(leftEntry.getPredicates());
-<a name="575" href="#575">575</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> rightPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(rightEntry.getPredicates());
-<a name="576" href="#576">576</a>     leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
-<a name="577" href="#577">577</a>     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
-<a name="578" href="#578">578</a>     <strong class="jxr_keyword">return</strong> leftPredicates.and(rightPredicates);
-<a name="579" href="#579">579</a>   }
-<a name="580" href="#580">580</a> }
+<a name="549" href="#549">549</a> 
+<a name="550" href="#550">550</a>     Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();
+<a name="551" href="#551">551</a>     processedVariables.addAll(rightEntry.getProcessedVariables());
+<a name="552" href="#552">552</a> 
+<a name="553" href="#553">553</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates = mergePredicates(leftEntry, rightEntry);
+<a name="554" href="#554">554</a> 
+<a name="555" href="#555">555</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a>(
+<a name="556" href="#556">556</a>       GRAPH,
+<a name="557" href="#557">557</a>       processedVariables,
+<a name="558" href="#558">558</a>       predicates,
+<a name="559" href="#559">559</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimator.html">QueryPlanEstimator</a>(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/QueryPlan.html">QueryPlan</a>(node), queryHandler, graphStatistics)
+<a name="560" href="#560">560</a>     );
+<a name="561" href="#561">561</a>   }
+<a name="562" href="#562">562</a> 
+<a name="563" href="#563">563</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="564" href="#564">564</a> <em class="jxr_javadoccomment">   * Turns a QueryComparable into a {@code Pair&lt;Variable, PropertyKey&gt;}</em>
+<a name="565" href="#565">565</a> <em class="jxr_javadoccomment">   * @param comparable query comparable</em>
+<a name="566" href="#566">566</a> <em class="jxr_javadoccomment">   * @return join property</em>
+<a name="567" href="#567">567</a> <em class="jxr_javadoccomment">   */</em>
+<a name="568" href="#568">568</a>   <strong class="jxr_keyword">private</strong> Pair&lt;String, String&gt; extractJoinProperty(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/QueryComparable.html">QueryComparable</a> comparable) {
+<a name="569" href="#569">569</a>     <strong class="jxr_keyword">if</strong> (comparable instanceof PropertySelectorComparable) {
+<a name="570" href="#570">570</a>       <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/comparables/PropertySelectorComparable.html">PropertySelectorComparable</a> propertySelector = (PropertySelectorComparable) comparable;
+<a name="571" href="#571">571</a>       <strong class="jxr_keyword">return</strong> Pair.of(propertySelector.getVariable(), propertySelector.getPropertyKey());
+<a name="572" href="#572">572</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="573" href="#573">573</a>       <em class="jxr_comment">//TODO #580 Include ElementSelector -&gt; ID needs to be projected as property</em>
+<a name="574" href="#574">574</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Comparable "</span> + comparable + <span class="jxr_string">"cant be used for ValueJoin"</span>);
+<a name="575" href="#575">575</a>     }
+<a name="576" href="#576">576</a>   }
+<a name="577" href="#577">577</a> 
+<a name="578" href="#578">578</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="579" href="#579">579</a> <em class="jxr_javadoccomment">   * Creates a new predicate that includes only elements that exist in both input predicates</em>
+<a name="580" href="#580">580</a> <em class="jxr_javadoccomment">   *</em>
+<a name="581" href="#581">581</a> <em class="jxr_javadoccomment">   * @param leftEntry left side plant table entry</em>
+<a name="582" href="#582">582</a> <em class="jxr_javadoccomment">   * @param rightEntry right side plan table entry</em>
+<a name="583" href="#583">583</a> <em class="jxr_javadoccomment">   * @return Merged predicates</em>
+<a name="584" href="#584">584</a> <em class="jxr_javadoccomment">   */</em>
+<a name="585" href="#585">585</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> mergePredicates(<a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> leftEntry, <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/plantable/PlanTableEntry.html">PlanTableEntry</a> rightEntry) {
+<a name="586" href="#586">586</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> leftPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(leftEntry.getPredicates());
+<a name="587" href="#587">587</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> rightPredicates = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a>(rightEntry.getPredicates());
+<a name="588" href="#588">588</a>     leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
+<a name="589" href="#589">589</a>     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
+<a name="590" href="#590">590</a>     <strong class="jxr_keyword">return</strong> leftPredicates.and(rightPredicates);
+<a name="591" href="#591">591</a>   }
+<a name="592" href="#592">592</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

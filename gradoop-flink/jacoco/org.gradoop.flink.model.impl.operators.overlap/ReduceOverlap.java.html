@@ -38,7 +38,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 <span class="fc" id="L39">    DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(new Id&lt;EPGMGraphHead&gt;());</span>
 
-<span class="fc" id="L41">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L41">    return collection.getGraphFactory().fromDataSets(</span>
 <span class="fc" id="L42">      getVertices(collection.getVertices(), graphIDs),</span>
 <span class="fc" id="L43">      getEdges(collection.getEdges(), graphIDs)</span>
     );

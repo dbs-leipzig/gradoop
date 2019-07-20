@@ -220,7 +220,7 @@ public class KRandomJumpGellyVCI
 <span class="fc" id="L220">      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
 
     // return graph
-<span class="fc" id="L223">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L223">    return currentGraph.getFactory().fromDataSets(</span>
 <span class="fc" id="L224">      currentGraph.getGraphHead(), visitedVertices, visitedEdges);</span>
   }
 

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -25,28 +25,30 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import java.util.List;
 
 /**
- * Filters a set of {@link EPGMEdge} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link Edge} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * EPGMEdge -&gt; Embedding(
+ * Edge -&gt; Embedding(
  *  [IdEntry(SourceId),IdEntry(EdgeId),IdEntry(TargetId)],
  *  [PropertyEntry(v1),PropertyEntry(v2)]
  * )
  *
  * Example:
  *
- * Given an EPGMEdge(0, 1, 2, &quot;friendOf&quot;, {since:2017, weight:23}), a predicate &quot;weight = 23&quot; and
+ * Given an Edge(0, 1, 2, &quot;friendOf&quot;, {since:2017, weight:23}), a predicate &quot;weight = 23&quot; and
  * list of projection property keys [since,isValid] the operator creates
  * an {@link Embedding}:
  *
  * ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(2017),PropertyEntry(NULL)])
+ *
+ * @param &lt;E&gt; The edge type.
  */
-public class FilterAndProjectEdges implements PhysicalOperator {
+public class FilterAndProjectEdges&lt;E extends Edge&gt; implements PhysicalOperator {
   /**
    * Input graph elements
    */
-  private final DataSet&lt;EPGMEdge&gt; input;
+  private final DataSet&lt;E&gt; input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -73,30 +75,30 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * @param projectionPropertyKeys Property keys used for projection
    * @param isLoop is the edge a loop
    */
-  public FilterAndProjectEdges(DataSet&lt;EPGMEdge&gt; input, CNF predicates,
-<span class="fc" id="L77">    List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
-<span class="fc" id="L78">    this.input = input;</span>
-<span class="fc" id="L79">    this.predicates = predicates;</span>
-<span class="fc" id="L80">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="fc" id="L81">    this.isLoop = isLoop;</span>
-<span class="fc" id="L82">    this.setName(&quot;FilterAndProjectEdges&quot;);</span>
-<span class="fc" id="L83">  }</span>
+  public FilterAndProjectEdges(DataSet&lt;E&gt; input, CNF predicates,
+<span class="fc" id="L79">    List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
+<span class="fc" id="L80">    this.input = input;</span>
+<span class="fc" id="L81">    this.predicates = predicates;</span>
+<span class="fc" id="L82">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L83">    this.isLoop = isLoop;</span>
+<span class="fc" id="L84">    this.setName(&quot;FilterAndProjectEdges&quot;);</span>
+<span class="fc" id="L85">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="fc" id="L87">    return input</span>
-<span class="fc" id="L88">      .flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys, isLoop))</span>
-<span class="fc" id="L89">      .name(getName());</span>
+<span class="fc" id="L89">    return input</span>
+<span class="fc" id="L90">      .flatMap(new FilterAndProjectEdge&lt;&gt;(predicates, projectionPropertyKeys, isLoop))</span>
+<span class="fc" id="L91">      .name(getName());</span>
   }
 
   @Override
   public void setName(String newName) {
-<span class="fc" id="L94">    this.name = newName;</span>
-<span class="fc" id="L95">  }</span>
+<span class="fc" id="L96">    this.name = newName;</span>
+<span class="fc" id="L97">  }</span>
 
   @Override
   public String getName() {
-<span class="fc" id="L99">    return this.name;</span>
+<span class="fc" id="L101">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

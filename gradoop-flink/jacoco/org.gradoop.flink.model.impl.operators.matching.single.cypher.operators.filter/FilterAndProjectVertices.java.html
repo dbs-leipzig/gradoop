@@ -16,34 +16,36 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
 import java.util.List;
 
 /**
- * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link Vertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * EPGMVertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
+ * Vertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
  *
  * Example:
  *
- * Given a EPGMVertex(0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23}), a predicate &quot;age = 23&quot; and
+ * Given a Vertex(0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23}), a predicate &quot;age = 23&quot; and
  * projection property keys [name, location] the operator creates an
  * {@link Embedding}:
  *
  * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class FilterAndProjectVertices implements PhysicalOperator {
+public class FilterAndProjectVertices&lt;V extends Vertex&gt; implements PhysicalOperator {
   /**
    * Input vertices
    */
-  private final DataSet&lt;EPGMVertex&gt; input;
+  private final DataSet&lt;V&gt; input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -65,29 +67,29 @@ public class FilterAndProjectVertices implements PhysicalOperator {
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectVertices(DataSet&lt;EPGMVertex&gt; input, CNF predicates,
-<span class="fc" id="L69">    List&lt;String&gt; projectionPropertyKeys) {</span>
-<span class="fc" id="L70">    this.input = input;</span>
-<span class="fc" id="L71">    this.predicates = predicates;</span>
-<span class="fc" id="L72">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="fc" id="L73">    this.setName(&quot;FilterAndProjectVertices&quot;);</span>
-<span class="fc" id="L74">  }</span>
+  public FilterAndProjectVertices(DataSet&lt;V&gt; input, CNF predicates,
+<span class="fc" id="L71">    List&lt;String&gt; projectionPropertyKeys) {</span>
+<span class="fc" id="L72">    this.input = input;</span>
+<span class="fc" id="L73">    this.predicates = predicates;</span>
+<span class="fc" id="L74">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L75">    this.setName(&quot;FilterAndProjectVertices&quot;);</span>
+<span class="fc" id="L76">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="fc" id="L78">    return input</span>
-<span class="fc" id="L79">      .flatMap(new FilterAndProjectVertex(predicates, projectionPropertyKeys))</span>
-<span class="fc" id="L80">      .name(getName());</span>
+<span class="fc" id="L80">    return input</span>
+<span class="fc" id="L81">      .flatMap(new FilterAndProjectVertex&lt;&gt;(predicates, projectionPropertyKeys))</span>
+<span class="fc" id="L82">      .name(getName());</span>
   }
 
   @Override
   public void setName(String newName) {
-<span class="fc" id="L85">    this.name = newName;</span>
-<span class="fc" id="L86">  }</span>
+<span class="fc" id="L87">    this.name = newName;</span>
+<span class="fc" id="L88">  }</span>
 
   @Override
   public String getName() {
-<span class="fc" id="L90">    return this.name;</span>
+<span class="fc" id="L92">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

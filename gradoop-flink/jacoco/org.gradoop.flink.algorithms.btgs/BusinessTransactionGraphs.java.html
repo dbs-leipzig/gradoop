@@ -144,7 +144,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 <span class="fc" id="L144">      .where(new Id&lt;&gt;()).equalTo(0)</span>
 <span class="fc" id="L145">      .with(new SetBtgIds&lt;&gt;());</span>
 
-<span class="fc" id="L147">    return iig.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L147">    return iig.getCollectionFactory()</span>
 <span class="fc" id="L148">      .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);</span>
   }
 }

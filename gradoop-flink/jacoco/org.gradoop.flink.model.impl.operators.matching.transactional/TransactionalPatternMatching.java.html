@@ -159,7 +159,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // return updated graph collection
     //--------------------------------------------------------------------------
-<span class="nc" id="L162">    return collection.getConfig().getGraphCollectionFactory().fromDataSets(</span>
+<span class="nc" id="L162">    return collection.getFactory().fromDataSets(</span>
 <span class="nc" id="L163">      newHeads, collection.getVertices(), collection.getEdges());</span>
   }
 
@@ -216,7 +216,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // return the embeddings
     //--------------------------------------------------------------------------
-<span class="fc" id="L219">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L219">    return collection.getFactory()</span>
 <span class="fc" id="L220">      .fromDataSets(newHeads, newVertices, newEdges);</span>
   }
 }

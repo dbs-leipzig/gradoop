@@ -68,7 +68,7 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
 <span class="fc" id="L68">      .filter(new NotInGraphsBroadcast&lt;&gt;())</span>
 <span class="fc" id="L69">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L71">    return collection.getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L71">    return collection.getGraphFactory()</span>
 <span class="fc" id="L72">      .fromDataSets(collection.getGraphHeads().filter(new BySameId&lt;&gt;(startId)), vertices, edges);</span>
   }
 }

@@ -179,7 +179,7 @@ public class PropertyValueList
         try {
 <span class="fc" id="L180">          inputStream.close();</span>
 <span class="nc" id="L181">        } catch (IOException e) {</span>
-<span class="nc" id="L182">          e.printStackTrace();</span>
+          // Ignore this exception because, it is not critical in this case
 <span class="fc" id="L183">        }</span>
 <span class="fc" id="L184">        hasNext = false;</span>
       }

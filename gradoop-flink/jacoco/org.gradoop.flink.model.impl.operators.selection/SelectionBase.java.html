@@ -59,7 +59,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadca
 <span class="fc" id="L59">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
 <span class="fc" id="L60">      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L62">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L62">    return collection.getFactory()</span>
 <span class="fc" id="L63">      .fromDataSets(graphHeads, vertices, edges);</span>
   }
 }

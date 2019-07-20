@@ -77,7 +77,7 @@ public abstract class TransactionalFSMBase implements UnaryCollectionToCollectio
 
 <span class="fc" id="L78">    DataSet&lt;GraphTransaction&gt; output = execute(input);</span>
 
-<span class="fc" id="L80">    return config.getGraphCollectionFactory()</span>
+<span class="fc" id="L80">    return collection.getFactory()</span>
 <span class="fc" id="L81">      .fromTransactions(output);</span>
   }
 

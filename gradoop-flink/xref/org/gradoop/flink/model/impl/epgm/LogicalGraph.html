@@ -41,8 +41,8 @@
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 <a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.bool.Not;
 <a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.bool.Or;
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.bool.True;
@@ -217,7 +217,7 @@
 <a name="207" href="#207">207</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> query(String query, String constructionPattern, <strong class="jxr_keyword">boolean</strong> attachData,
 <a name="208" href="#208">208</a>     <a href="../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> vertexStrategy, <a href="../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> edgeStrategy,
 <a name="209" href="#209">209</a>     <a href="../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a> graphStatistics) {
-<a name="210" href="#210">210</a>     <strong class="jxr_keyword">return</strong> callForCollection(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/CypherPatternMatching.html">CypherPatternMatching</a>(query, constructionPattern, attachData,
+<a name="210" href="#210">210</a>     <strong class="jxr_keyword">return</strong> callForCollection(<strong class="jxr_keyword">new</strong> CypherPatternMatching&lt;&gt;(query, constructionPattern, attachData,
 <a name="211" href="#211">211</a>       vertexStrategy, edgeStrategy, graphStatistics));
 <a name="212" href="#212">212</a>   }
 <a name="213" href="#213">213</a> 
@@ -300,48 +300,49 @@
 <a name="290" href="#290">290</a>   }
 <a name="291" href="#291">291</a> 
 <a name="292" href="#292">292</a>   @Override
-<a name="293" href="#293">293</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> callForCollection(<a href="../../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToCollectionOperator.html">UnaryGraphToCollectionOperator</a> <strong class="jxr_keyword">operator</strong>) {
-<a name="294" href="#294">294</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">operator</strong>.execute(<strong class="jxr_keyword">this</strong>);
-<a name="295" href="#295">295</a>   }
-<a name="296" href="#296">296</a> 
-<a name="297" href="#297">297</a>   @Override
-<a name="298" href="#298">298</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> splitBy(String propertyKey) {
-<a name="299" href="#299">299</a>     <strong class="jxr_keyword">return</strong> callForCollection(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/operators/split/Split.html">Split</a>(<strong class="jxr_keyword">new</strong> PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));
-<a name="300" href="#300">300</a>   }
-<a name="301" href="#301">301</a> 
-<a name="302" href="#302">302</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="303" href="#303">303</a>   <em class="jxr_comment">// Utility methods</em>
-<a name="304" href="#304">304</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="305" href="#305">305</a> 
-<a name="306" href="#306">306</a>   @Override
-<a name="307" href="#307">307</a>   <strong class="jxr_keyword">public</strong> DataSet&lt;Boolean&gt; isEmpty() {
-<a name="308" href="#308">308</a>     <strong class="jxr_keyword">return</strong> getVertices()
-<a name="309" href="#309">309</a>       .map(<strong class="jxr_keyword">new</strong> True&lt;&gt;())
-<a name="310" href="#310">310</a>       .distinct()
-<a name="311" href="#311">311</a>       .union(getConfig().getExecutionEnvironment().fromElements(false))
-<a name="312" href="#312">312</a>       .reduce(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/functions/bool/Or.html">Or</a>())
-<a name="313" href="#313">313</a>       .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/functions/bool/Not.html">Not</a>());
-<a name="314" href="#314">314</a>   }
-<a name="315" href="#315">315</a> 
-<a name="316" href="#316">316</a>   @Override
-<a name="317" href="#317">317</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="318" href="#318">318</a>     dataSink.write(<strong class="jxr_keyword">this</strong>);
-<a name="319" href="#319">319</a>   }
-<a name="320" href="#320">320</a> 
-<a name="321" href="#321">321</a>   @Override
-<a name="322" href="#322">322</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink, <strong class="jxr_keyword">boolean</strong> overWrite) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="323" href="#323">323</a>     dataSink.write(<strong class="jxr_keyword">this</strong>, overWrite);
-<a name="324" href="#324">324</a>   }
-<a name="325" href="#325">325</a> 
-<a name="326" href="#326">326</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="327" href="#327">327</a> <em class="jxr_javadoccomment">   * Prints the GDL formatted graph to the standard output.</em>
-<a name="328" href="#328">328</a> <em class="jxr_javadoccomment">   *</em>
-<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">   * @throws Exception forwarded from dataset print</em>
-<a name="330" href="#330">330</a> <em class="jxr_javadoccomment">   */</em>
-<a name="331" href="#331">331</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> print() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="332" href="#332">332</a>     GDLConsoleOutput.print(<strong class="jxr_keyword">this</strong>);
-<a name="333" href="#333">333</a>   }
-<a name="334" href="#334">334</a> }
+<a name="293" href="#293">293</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> callForCollection(
+<a name="294" href="#294">294</a>     UnaryBaseGraphToBaseGraphCollectionOperator&lt;LogicalGraph, GraphCollection&gt; <strong class="jxr_keyword">operator</strong>) {
+<a name="295" href="#295">295</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">operator</strong>.execute(<strong class="jxr_keyword">this</strong>);
+<a name="296" href="#296">296</a>   }
+<a name="297" href="#297">297</a> 
+<a name="298" href="#298">298</a>   @Override
+<a name="299" href="#299">299</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> splitBy(String propertyKey) {
+<a name="300" href="#300">300</a>     <strong class="jxr_keyword">return</strong> callForCollection(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/operators/split/Split.html">Split</a>(<strong class="jxr_keyword">new</strong> PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));
+<a name="301" href="#301">301</a>   }
+<a name="302" href="#302">302</a> 
+<a name="303" href="#303">303</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="304" href="#304">304</a>   <em class="jxr_comment">// Utility methods</em>
+<a name="305" href="#305">305</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="306" href="#306">306</a> 
+<a name="307" href="#307">307</a>   @Override
+<a name="308" href="#308">308</a>   <strong class="jxr_keyword">public</strong> DataSet&lt;Boolean&gt; isEmpty() {
+<a name="309" href="#309">309</a>     <strong class="jxr_keyword">return</strong> getVertices()
+<a name="310" href="#310">310</a>       .map(<strong class="jxr_keyword">new</strong> True&lt;&gt;())
+<a name="311" href="#311">311</a>       .distinct()
+<a name="312" href="#312">312</a>       .union(getConfig().getExecutionEnvironment().fromElements(false))
+<a name="313" href="#313">313</a>       .reduce(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/functions/bool/Or.html">Or</a>())
+<a name="314" href="#314">314</a>       .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/model/impl/functions/bool/Not.html">Not</a>());
+<a name="315" href="#315">315</a>   }
+<a name="316" href="#316">316</a> 
+<a name="317" href="#317">317</a>   @Override
+<a name="318" href="#318">318</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="319" href="#319">319</a>     dataSink.write(<strong class="jxr_keyword">this</strong>);
+<a name="320" href="#320">320</a>   }
+<a name="321" href="#321">321</a> 
+<a name="322" href="#322">322</a>   @Override
+<a name="323" href="#323">323</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink, <strong class="jxr_keyword">boolean</strong> overWrite) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="324" href="#324">324</a>     dataSink.write(<strong class="jxr_keyword">this</strong>, overWrite);
+<a name="325" href="#325">325</a>   }
+<a name="326" href="#326">326</a> 
+<a name="327" href="#327">327</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="328" href="#328">328</a> <em class="jxr_javadoccomment">   * Prints the GDL formatted graph to the standard output.</em>
+<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">   *</em>
+<a name="330" href="#330">330</a> <em class="jxr_javadoccomment">   * @throws Exception forwarded from dataset print</em>
+<a name="331" href="#331">331</a> <em class="jxr_javadoccomment">   */</em>
+<a name="332" href="#332">332</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> print() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="333" href="#333">333</a>     GDLConsoleOutput.print(<strong class="jxr_keyword">this</strong>);
+<a name="334" href="#334">334</a>   }
+<a name="335" href="#335">335</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

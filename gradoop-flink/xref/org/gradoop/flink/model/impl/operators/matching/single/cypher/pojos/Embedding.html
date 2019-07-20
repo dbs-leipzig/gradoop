@@ -45,8 +45,8 @@
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * This class represents an Embedding, an ordered List of Embedding Entries. Every entry is</em>
-<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * either a reference to a single EPGMEdge or EPGMVertex, or a</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * path (EPGMEdge, EPGMVertex, EPGMEdge, EPGMVertex, ..., EPGMEdge).</em>
+<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * either a reference to a single Edge or Vertex, or a</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * path (Edge, Vertex, Edge, Vertex, ..., Edge).</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * The reference is stored via the elements ID. Additionally the embedding ca store an ordered</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * list of PropertyValues.</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> */</em>
@@ -108,7 +108,7 @@
 <a name="98" href="#98">98</a>    <em class="jxr_comment">// ---------------------------------------------------------------------------------------------</em>
 <a name="99" href="#99">99</a>  
 <a name="100" href="#100">100</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * Appends a reference to an EPGMVertex/EPGMEdge to the embedding</em>
+<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * Appends a reference to an Vertex/Edge to the embedding</em>
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * @param id the Id that will be appended</em>
 <a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   */</em>
 <a name="104" href="#104">104</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> add(GradoopId id) {
@@ -202,9 +202,9 @@
 <a name="192" href="#192">192</a> 
 <a name="193" href="#193">193</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="194" href="#194">194</a> <em class="jxr_javadoccomment">   * Adds an entry to the embedding.</em>
-<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * This can either be an ID representing referencing a EPGMVertex/EPGMEdge or a pointer to a path entry</em>
+<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * This can either be an ID representing referencing a Vertex/Edge or a pointer to a path entry</em>
 <a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   * @param id the id that will be added to the embedding</em>
-<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * @param isIdList indicates if the id represents a EPGMGraphElement or points to a path entry</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * @param isIdList indicates if the id represents a GraphElement or points to a path entry</em>
 <a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   */</em>
 <a name="199" href="#199">199</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> add(GradoopId id, <strong class="jxr_keyword">boolean</strong> isIdList) {
 <a name="200" href="#200">200</a>     byte[] newIds = <strong class="jxr_keyword">new</strong> byte[idData.length + 1 + GradoopId.ID_SIZE];

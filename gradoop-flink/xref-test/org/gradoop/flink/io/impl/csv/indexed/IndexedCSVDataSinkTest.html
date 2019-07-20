@@ -306,7 +306,7 @@
 <a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
 <a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   */</em>
 <a name="298" href="#298">298</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> checkIndexedCSVWrite(String tmpPath, LogicalGraph input) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="299" href="#299">299</a>     checkIndexedCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+<a name="299" href="#299">299</a>     checkIndexedCSVWrite(tmpPath, input.getCollectionFactory().fromGraph(input));
 <a name="300" href="#300">300</a>   }
 <a name="301" href="#301">301</a> 
 <a name="302" href="#302">302</a>   <em class="jxr_javadoccomment">/**</em>

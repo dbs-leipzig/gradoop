@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>        .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="59" href="#59">59</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/clusteringcoefficient/functions/LocalCCResultTupleToVertexJoin.html">LocalCCResultTupleToVertexJoin</a>());
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> currentGraph.getFactory().fromDataSets(
 <a name="62" href="#62">62</a>        currentGraph.getGraphHead(), resultVertices, currentGraph.getEdges());
 <a name="63" href="#63">63</a>    }
 <a name="64" href="#64">64</a>  }

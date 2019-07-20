@@ -58,7 +58,7 @@ public class GellyLocalClusteringCoefficientUndirected extends ClusteringCoeffic
 <span class="fc" id="L58">      .where(0).equalTo(new Id&lt;&gt;())</span>
 <span class="fc" id="L59">      .with(new LocalCCResultTupleToVertexJoin());</span>
 
-<span class="fc" id="L61">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L61">    return currentGraph.getFactory().fromDataSets(</span>
 <span class="fc" id="L62">      currentGraph.getGraphHead(), resultVertices, currentGraph.getEdges());</span>
   }
 }

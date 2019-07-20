@@ -5,7 +5,7 @@ Gradoop Common,org.gradoop.common.model.impl.properties,Properties,13,260,6,16,4
 Gradoop Common,org.gradoop.common.model.impl.properties,Property,2,172,2,14,1,37,2,20,0,14
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils.Numeric,217,726,43,153,46,152,24,90,2,11
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList,4,107,2,4,2,28,2,12,0,11
-Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList.PropertyValueListIterator,4,58,0,4,3,19,1,5,1,3
+Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList.PropertyValueListIterator,2,58,0,4,2,19,1,5,1,3
 Gradoop Common,org.gradoop.common.model.impl.properties,DateTimeSerializer,3,229,0,2,1,39,1,8,1,7
 Gradoop Common,org.gradoop.common.model.impl.properties,Type,0,214,0,0,0,23,0,4,0,4
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils.Bytes,3,42,0,0,1,8,1,3,1,3
@@ -30,7 +30,6 @@ Gradoop Common,org.gradoop.common.model.impl.properties.strategies,BigDecimalStr
 Gradoop Common,org.gradoop.common.model.impl.properties.strategies,ListStrategy,26,167,1,13,7,40,1,14,0,8
 Gradoop Common,org.gradoop.common.model.impl.properties.strategies,AbstractFixSizedPropertyValueStrategy,0,9,0,0,0,3,0,2,0,2
 Gradoop Common,org.gradoop.common.model.impl.properties.strategies,PropertyValueStrategyFactory,44,295,4,22,7,58,4,19,0,10
-Gradoop Common,org.gradoop.common.util,NetworkHelper,45,12,11,1,17,5,7,1,1,1
 Gradoop Common,org.gradoop.common.util,GradoopConstants,7,0,0,0,2,0,2,0,2,0
 Gradoop Common,org.gradoop.common.util,Order,24,0,0,0,3,0,1,0,1,0
 Gradoop Common,org.gradoop.common.util,AsciiGraphLoader,16,707,3,41,5,144,4,50,1,31

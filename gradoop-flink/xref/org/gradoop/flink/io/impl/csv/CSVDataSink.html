@@ -87,7 +87,7 @@
 <a name="77" href="#77">77</a>  
 <a name="78" href="#78">78</a>    @Override
 <a name="79" href="#79">79</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> logicalGraph, <strong class="jxr_keyword">boolean</strong> overwrite) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="80" href="#80">80</a>      write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+<a name="80" href="#80">80</a>      write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
 <a name="81" href="#81">81</a>    }
 <a name="82" href="#82">82</a>  
 <a name="83" href="#83">83</a>    @Override

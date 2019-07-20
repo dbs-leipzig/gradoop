@@ -86,7 +86,7 @@
 <a name="76" href="#76">76</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/labelpropagation/functions/LPVertexJoin.html">LPVertexJoin</a>(propertyKey));
 <a name="77" href="#77">77</a>  
 <a name="78" href="#78">78</a>      <em class="jxr_comment">// return labeled graph</em>
-<a name="79" href="#79">79</a>      <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory()
+<a name="79" href="#79">79</a>      <strong class="jxr_keyword">return</strong> currentGraph.getFactory()
 <a name="80" href="#80">80</a>        .fromDataSets(currentGraph.getGraphHead(), labeledVertices, currentGraph.getEdges());
 <a name="81" href="#81">81</a>    }
 <a name="82" href="#82">82</a>  

@@ -31,12 +31,12 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="25" href="#25">25</a>  
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.Assert.assertEquals;
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> * Test class for {@link HBaseLabelReg}</em>
@@ -58,7 +58,7 @@
 <a name="48" href="#48">48</a>        <strong class="jxr_keyword">new</strong> RegexStringComparator(PATTERN_VERTEX.pattern())
 <a name="49" href="#49">49</a>      );
 <a name="50" href="#50">50</a>  
-<a name="51" href="#51">51</a>      assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+<a name="51" href="#51">51</a>      assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString());
 <a name="52" href="#52">52</a>    }
 <a name="53" href="#53">53</a>  }
 </pre>

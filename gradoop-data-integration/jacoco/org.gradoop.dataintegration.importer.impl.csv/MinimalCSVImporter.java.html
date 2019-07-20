@@ -147,7 +147,8 @@ public class MinimalCSVImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-<span class="fc" id="L150">    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+<span class="fc" id="L150">    LogicalGraph logicalGraph = getLogicalGraph();</span>
+<span class="fc" id="L151">    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);</span>
   }
 
   /**
@@ -160,11 +161,11 @@ public class MinimalCSVImporter implements DataSource {
    * @return a {@link DataSet} of all vertices from one specific file
    */
   private DataSet&lt;EPGMVertex&gt; readCSVFile(List&lt;String&gt; propertyNames, boolean checkReoccurringHeader) {
-<span class="fc" id="L163">    return config.getExecutionEnvironment()</span>
-<span class="fc" id="L164">      .readTextFile(path)</span>
-<span class="fc" id="L165">      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))</span>
-<span class="fc" id="L166">      .map(new PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))</span>
-<span class="fc" id="L167">      .returns(config.getLogicalGraphFactory().getVertexFactory().getType());</span>
+<span class="fc" id="L164">    return config.getExecutionEnvironment()</span>
+<span class="fc" id="L165">      .readTextFile(path)</span>
+<span class="fc" id="L166">      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))</span>
+<span class="fc" id="L167">      .map(new PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))</span>
+<span class="fc" id="L168">      .returns(config.getLogicalGraphFactory().getVertexFactory().getType());</span>
   }
 
   /**
@@ -175,18 +176,18 @@ public class MinimalCSVImporter implements DataSource {
    * @throws IOException if an error occurred while open the stream
    */
   private List&lt;String&gt; readHeaderRow() throws IOException {
-<span class="fc" id="L178">    Path filePath = new Path(path);</span>
-<span class="fc" id="L179">    try (FileSystem fs = FileSystem.get(filePath.toUri(), new Configuration())) {</span>
-<span class="fc" id="L180">      FSDataInputStream inputStream = fs.open(filePath);</span>
-<span class="fc" id="L181">      BufferedReader lineReader = new BufferedReader(new InputStreamReader(inputStream, charset));</span>
-<span class="fc" id="L182">      String headerLine = lineReader.readLine();</span>
-<span class="fc" id="L183">      lineReader.close();</span>
-<span class="fc bfc" id="L184" title="All 4 branches covered.">      if (headerLine == null || headerLine.isEmpty()) {</span>
-<span class="fc" id="L185">        throw new IOException(&quot;The csv file '&quot; + path + &quot;' does not contain any rows.&quot;);</span>
+<span class="fc" id="L179">    Path filePath = new Path(path);</span>
+<span class="fc" id="L180">    try (FileSystem fs = FileSystem.get(filePath.toUri(), new Configuration())) {</span>
+<span class="fc" id="L181">      FSDataInputStream inputStream = fs.open(filePath);</span>
+<span class="fc" id="L182">      BufferedReader lineReader = new BufferedReader(new InputStreamReader(inputStream, charset));</span>
+<span class="fc" id="L183">      String headerLine = lineReader.readLine();</span>
+<span class="fc" id="L184">      lineReader.close();</span>
+<span class="fc bfc" id="L185" title="All 4 branches covered.">      if (headerLine == null || headerLine.isEmpty()) {</span>
+<span class="fc" id="L186">        throw new IOException(&quot;The csv file '&quot; + path + &quot;' does not contain any rows.&quot;);</span>
       }
-<span class="fc" id="L187">      return Arrays.asList(headerLine.split(tokenSeparator));</span>
-<span class="fc" id="L188">    } catch (IOException ioe) {</span>
-<span class="fc" id="L189">      throw new IOException(&quot;Error while opening a stream to '&quot; + path + &quot;'.&quot;, ioe);</span>
+<span class="fc" id="L188">      return Arrays.asList(headerLine.split(tokenSeparator));</span>
+<span class="fc" id="L189">    } catch (IOException ioe) {</span>
+<span class="fc" id="L190">      throw new IOException(&quot;Error while opening a stream to '&quot; + path + &quot;'.&quot;, ioe);</span>
     }
   }
 }

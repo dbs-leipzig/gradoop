@@ -25,20 +25,20 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.rollup;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> java.util.List;
-<a name="20" href="#20">20</a>  
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.SetProperty;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.SetProperty;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+<a name="29" href="#29">29</a>  
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys</em>
@@ -138,10 +138,10 @@
 <a name="128" href="#128">128</a>     <em class="jxr_comment">// DataSets is null.</em>
 <a name="129" href="#129">129</a>     <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection;
 <a name="130" href="#130">130</a>     <strong class="jxr_keyword">if</strong> (graphHeads != <strong class="jxr_keyword">null</strong> &amp;&amp; vertices != <strong class="jxr_keyword">null</strong> &amp;&amp; edges != <strong class="jxr_keyword">null</strong>) {
-<a name="131" href="#131">131</a>       collection = graph.getConfig().getGraphCollectionFactory()
+<a name="131" href="#131">131</a>       collection = graph.getCollectionFactory()
 <a name="132" href="#132">132</a>         .fromDataSets(graphHeads, vertices, edges);
 <a name="133" href="#133">133</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="134" href="#134">134</a>       collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();
+<a name="134" href="#134">134</a>       collection = graph.getCollectionFactory().createEmptyCollection();
 <a name="135" href="#135">135</a>     }
 <a name="136" href="#136">136</a> 
 <a name="137" href="#137">137</a>     <strong class="jxr_keyword">return</strong> collection;

@@ -17,18 +17,20 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link EPGMVertex} and projects specified property values to the
+ * Applies a given predicate on a {@link Vertex} and projects specified property values to the
  * output embedding.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class FilterAndProjectVertex extends RichFlatMapFunction&lt;EPGMVertex, Embedding&gt; {
+public class FilterAndProjectVertex&lt;V extends Vertex&gt; extends RichFlatMapFunction&lt;V, Embedding&gt; {
   /**
    * Predicates used for filtering
    */
@@ -44,16 +46,16 @@ public class FilterAndProjectVertex extends RichFlatMapFunction&lt;EPGMVertex, E
    * @param predicates predicates used for filtering
    * @param projectionPropertyKeys property keys that will be used for projection
    */
-<span class="fc" id="L47">  public FilterAndProjectVertex(CNF predicates, List&lt;String&gt; projectionPropertyKeys) {</span>
-<span class="fc" id="L48">    this.predicates = predicates;</span>
-<span class="fc" id="L49">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="fc" id="L50">  }</span>
+<span class="fc" id="L49">  public FilterAndProjectVertex(CNF predicates, List&lt;String&gt; projectionPropertyKeys) {</span>
+<span class="fc" id="L50">    this.predicates = predicates;</span>
+<span class="fc" id="L51">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L52">  }</span>
 
   @Override
-  public void flatMap(EPGMVertex vertex, Collector&lt;Embedding&gt; out) throws Exception {
-<span class="fc bfc" id="L54" title="All 2 branches covered.">    if (predicates.evaluate(vertex)) {</span>
-<span class="fc" id="L55">      out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));</span>
+  public void flatMap(V vertex, Collector&lt;Embedding&gt; out) throws Exception {
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (predicates.evaluate(vertex)) {</span>
+<span class="fc" id="L57">      out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));</span>
     }
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L59">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

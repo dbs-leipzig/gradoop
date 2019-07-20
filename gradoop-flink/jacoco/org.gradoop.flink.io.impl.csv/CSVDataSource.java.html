@@ -63,7 +63,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
 <span class="fc" id="L65">    GraphCollection collection = getGraphCollection();</span>
-<span class="fc" id="L66">    return getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L66">    return collection.getGraphFactory()</span>
 <span class="fc" id="L67">      .fromDataSets(</span>
 <span class="fc" id="L68">        collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());</span>
   }
@@ -89,8 +89,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
 <span class="fc" id="L89">      .map(new CSVLineToEdge(factory.getEdgeFactory()))</span>
 <span class="fc" id="L90">      .withBroadcastSet(metaData, BC_METADATA);</span>
 
-
-<span class="fc" id="L93">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L92">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

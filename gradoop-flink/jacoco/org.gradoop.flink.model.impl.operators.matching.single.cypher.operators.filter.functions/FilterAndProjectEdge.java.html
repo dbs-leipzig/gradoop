@@ -17,18 +17,20 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link EPGMEdge} and projects specified property values to the
+ * Applies a given predicate on a {@link Edge} and projects specified property values to the
  * output embedding.
+ *
+ * @param &lt;E&gt; The edge type.
  */
-public class FilterAndProjectEdge extends RichFlatMapFunction&lt;EPGMEdge, Embedding&gt; {
+public class FilterAndProjectEdge&lt;E extends Edge&gt; extends RichFlatMapFunction&lt;E, Embedding&gt; {
   /**
    * Predicates used for filtering
    */
@@ -49,17 +51,17 @@ public class FilterAndProjectEdge extends RichFlatMapFunction&lt;EPGMEdge, Embed
    * @param projectionPropertyKeys property keys that will be used for projection
    * @param isLoop is the edge a loop
    */
-<span class="fc" id="L52">  public FilterAndProjectEdge(CNF predicates, List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
-<span class="fc" id="L53">    this.predicates = predicates;</span>
-<span class="fc" id="L54">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="fc" id="L55">    this.isLoop = isLoop;</span>
-<span class="fc" id="L56">  }</span>
+<span class="fc" id="L54">  public FilterAndProjectEdge(CNF predicates, List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
+<span class="fc" id="L55">    this.predicates = predicates;</span>
+<span class="fc" id="L56">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L57">    this.isLoop = isLoop;</span>
+<span class="fc" id="L58">  }</span>
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector&lt;Embedding&gt; out) throws Exception {
-<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (predicates.evaluate(edge)) {</span>
-<span class="fc" id="L61">      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));</span>
+  public void flatMap(E edge, Collector&lt;Embedding&gt; out) throws Exception {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (predicates.evaluate(edge)) {</span>
+<span class="fc" id="L63">      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));</span>
     }
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L65">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

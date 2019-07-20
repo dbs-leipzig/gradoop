@@ -78,7 +78,7 @@
 <a name="68" href="#68">68</a>        .filter(<strong class="jxr_keyword">new</strong> NotInGraphsBroadcast&lt;&gt;())
 <a name="69" href="#69">69</a>        .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 <a name="70" href="#70">70</a>  
-<a name="71" href="#71">71</a>      <strong class="jxr_keyword">return</strong> collection.getConfig().getLogicalGraphFactory()
+<a name="71" href="#71">71</a>      <strong class="jxr_keyword">return</strong> collection.getGraphFactory()
 <a name="72" href="#72">72</a>        .fromDataSets(collection.getGraphHeads().filter(<strong class="jxr_keyword">new</strong> BySameId&lt;&gt;(startId)), vertices, edges);
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  }

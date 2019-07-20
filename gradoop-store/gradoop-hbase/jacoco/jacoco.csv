@@ -17,7 +17,7 @@ Gradoop HBase,org.gradoop.storage.impl.hbase.io.inputformats,GraphHeadTableInput
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.inputformats,BaseTableInputFormat,0,40,1,7,0,9,1,5,0,2
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.inputformats,VertexTableInputFormat,0,43,0,2,0,11,0,5,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.inputformats,EdgeTableInputFormat,0,43,0,2,0,11,0,5,0,4
-Gradoop HBase,org.gradoop.storage.impl.hbase.factory,HBaseEPGMStoreFactory,8,186,0,12,5,47,0,14,0,8
+Gradoop HBase,org.gradoop.storage.impl.hbase.factory,HBaseEPGMStoreFactory,3,188,0,12,2,47,0,14,0,8
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseBase,0,19,0,0,0,7,0,4,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSink,5,121,0,2,2,33,1,8,1,7
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSource,1,188,1,5,0,34,1,10,0,8

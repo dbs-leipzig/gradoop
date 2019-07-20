@@ -61,7 +61,7 @@
 <a name="51" href="#51">51</a>      <strong class="jxr_keyword">final</strong> DataSet&lt;EPGMVertex&gt; newVertices = computeNewVertices(newGraphHeads);
 <a name="52" href="#52">52</a>      <strong class="jxr_keyword">final</strong> DataSet&lt;EPGMEdge&gt; newEdges = computeNewEdges(newVertices);
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      <strong class="jxr_keyword">return</strong> firstCollection.getConfig().getGraphCollectionFactory()
+<a name="54" href="#54">54</a>      <strong class="jxr_keyword">return</strong> firstCollection.getFactory()
 <a name="55" href="#55">55</a>        .fromDataSets(newGraphHeads, newVertices, newEdges);
 <a name="56" href="#56">56</a>    }
 <a name="57" href="#57">57</a>  

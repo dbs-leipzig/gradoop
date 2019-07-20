@@ -66,7 +66,7 @@ public class TransactionalFSM implements UnaryCollectionToCollectionOperator {
 <span class="fc" id="L66">    DataSet&lt;GraphTransaction&gt; output = dimSpan.execute(input);</span>
 
     // convert to Gradoop graph collection
-<span class="fc" id="L69">    return collection.getConfig().getGraphCollectionFactory().fromTransactions(output);</span>
+<span class="fc" id="L69">    return collection.getFactory().fromTransactions(output);</span>
   }
 
   @Override

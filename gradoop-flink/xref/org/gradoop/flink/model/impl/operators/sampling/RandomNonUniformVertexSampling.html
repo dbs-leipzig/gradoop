@@ -94,7 +94,7 @@
 <a name="84" href="#84">84</a>        .cross(graph.getVertices())
 <a name="85" href="#85">85</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/AddMaxDegreeCrossFunction.html">AddMaxDegreeCrossFunction</a>(SamplingConstants.PROPERTY_KEY_MAX_DEGREE));
 <a name="86" href="#86">86</a>  
-<a name="87" href="#87">87</a>      graph = graph.getConfig().getLogicalGraphFactory()
+<a name="87" href="#87">87</a>      graph = graph.getFactory()
 <a name="88" href="#88">88</a>        .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>      newVertices = graph.getVertices().filter(<strong class="jxr_keyword">new</strong> NonUniformVertexRandomFilter&lt;&gt;(

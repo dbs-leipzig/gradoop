@@ -71,7 +71,7 @@
 <a name="61" href="#61">61</a>  
 <a name="62" href="#62">62</a>      GraphCollection col01 = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>);
 <a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>      GraphCollection expectation = getConfig().getGraphCollectionFactory().createEmptyCollection();
+<a name="64" href="#64">64</a>      GraphCollection expectation = col01.getFactory().createEmptyCollection();
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>      GraphCollection result = col01.difference(col01);
 <a name="67" href="#67">67</a>      checkAssertions(expectation, result, <span class="jxr_string">"total"</span>);

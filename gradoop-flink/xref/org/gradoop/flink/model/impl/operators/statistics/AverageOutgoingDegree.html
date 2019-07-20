@@ -51,7 +51,7 @@
 <a name="41" href="#41">41</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/CalculateAverageDegree.html">CalculateAverageDegree</a>(
 <a name="42" href="#42">42</a>          SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE));
 <a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>      <strong class="jxr_keyword">return</strong> graph.getConfig().getLogicalGraphFactory()
+<a name="44" href="#44">44</a>      <strong class="jxr_keyword">return</strong> graph.getFactory()
 <a name="45" href="#45">45</a>        .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
 <a name="46" href="#46">46</a>    }
 <a name="47" href="#47">47</a>  }

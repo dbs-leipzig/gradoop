@@ -31,6 +31,7 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
 import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -80,8 +81,8 @@ public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements Dat
    */
   public GraphDataSource(DataSet&lt;ImportVertex&lt;K&gt;&gt; importVertices,
     DataSet&lt;ImportEdge&lt;K&gt;&gt; importEdges, GradoopFlinkConfig config) {
-<span class="fc" id="L83">    this(importVertices, importEdges, null, config);</span>
-<span class="fc" id="L84">  }</span>
+<span class="fc" id="L84">    this(importVertices, importEdges, null, config);</span>
+<span class="fc" id="L85">  }</span>
 
   /**
    * Creates a new graph reader.
@@ -97,12 +98,12 @@ public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements Dat
    */
   public GraphDataSource(DataSet&lt;ImportVertex&lt;K&gt;&gt; importVertices,
     DataSet&lt;ImportEdge&lt;K&gt;&gt; importEdges, String lineagePropertyKey,
-<span class="fc" id="L100">    GradoopFlinkConfig config) {</span>
-<span class="fc" id="L101">    this.importVertices     = checkNotNull(importVertices);</span>
-<span class="fc" id="L102">    this.importEdges        = checkNotNull(importEdges);</span>
-<span class="fc" id="L103">    this.lineagePropertyKey = lineagePropertyKey;</span>
-<span class="fc" id="L104">    this.config             = checkNotNull(config);</span>
-<span class="fc" id="L105">  }</span>
+<span class="fc" id="L101">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L102">    this.importVertices     = checkNotNull(importVertices);</span>
+<span class="fc" id="L103">    this.importEdges        = checkNotNull(importEdges);</span>
+<span class="fc" id="L104">    this.lineagePropertyKey = lineagePropertyKey;</span>
+<span class="fc" id="L105">    this.config             = checkNotNull(config);</span>
+<span class="fc" id="L106">  }</span>
 
   /**
    * Transforms the import graph into a logical graph.
@@ -112,34 +113,37 @@ public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements Dat
   @Override
   public LogicalGraph getLogicalGraph() {
 
-<span class="fc" id="L115">    TypeInformation&lt;K&gt; externalIdType = ((TupleTypeInfo&lt;?&gt;) importVertices</span>
-<span class="fc" id="L116">      .getType()).getTypeAt(0);</span>
+<span class="fc" id="L116">    TypeInformation&lt;K&gt; externalIdType = ((TupleTypeInfo&lt;?&gt;) importVertices</span>
+<span class="fc" id="L117">      .getType()).getTypeAt(0);</span>
 
-<span class="fc" id="L118">    DataSet&lt;Tuple3&lt;K, GradoopId, EPGMVertex&gt;&gt; vertexTriples = importVertices</span>
-<span class="fc" id="L119">      .map(new InitVertex&lt;K&gt;(</span>
-<span class="fc" id="L120">        config.getLogicalGraphFactory().getVertexFactory(), lineagePropertyKey, externalIdType));</span>
+<span class="fc" id="L119">    LogicalGraphFactory factory = config.getLogicalGraphFactory();</span>
 
-<span class="fc" id="L122">    DataSet&lt;EPGMVertex&gt; epgmVertices = vertexTriples</span>
-<span class="fc" id="L123">      .map(new Value2Of3&lt;K, GradoopId, EPGMVertex&gt;());</span>
+<span class="fc" id="L121">    DataSet&lt;Tuple3&lt;K, GradoopId, EPGMVertex&gt;&gt; vertexTriples = importVertices</span>
+<span class="fc" id="L122">      .map(new InitVertex&lt;K&gt;(</span>
+<span class="fc" id="L123">        factory.getVertexFactory(), lineagePropertyKey, externalIdType));</span>
 
-<span class="fc" id="L125">    DataSet&lt;Tuple2&lt;K, GradoopId&gt;&gt; vertexIdPair = vertexTriples</span>
-<span class="fc" id="L126">      .map(new Project3To0And1&lt;K, GradoopId, EPGMVertex&gt;());</span>
+<span class="fc" id="L125">    DataSet&lt;EPGMVertex&gt; epgmVertices = vertexTriples</span>
+<span class="fc" id="L126">      .map(new Value2Of3&lt;K, GradoopId, EPGMVertex&gt;());</span>
 
-<span class="fc" id="L128">    DataSet&lt;EPGMEdge&gt; epgmEdges = importEdges</span>
-<span class="fc" id="L129">      .join(vertexIdPair)</span>
-<span class="fc" id="L130">      .where(1).equalTo(0)</span>
-<span class="fc" id="L131">      .with(new InitEdge&lt;K&gt;(</span>
-<span class="fc" id="L132">        config.getLogicalGraphFactory().getEdgeFactory(), lineagePropertyKey, externalIdType))</span>
-<span class="fc" id="L133">      .join(vertexIdPair)</span>
-<span class="fc" id="L134">      .where(0).equalTo(0)</span>
-<span class="fc" id="L135">      .with(new UpdateEdge&lt;EPGMEdge, K&gt;());</span>
+<span class="fc" id="L128">    DataSet&lt;Tuple2&lt;K, GradoopId&gt;&gt; vertexIdPair = vertexTriples</span>
+<span class="fc" id="L129">      .map(new Project3To0And1&lt;K, GradoopId, EPGMVertex&gt;());</span>
 
-<span class="fc" id="L137">    return config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);</span>
+<span class="fc" id="L131">    DataSet&lt;EPGMEdge&gt; epgmEdges = importEdges</span>
+<span class="fc" id="L132">      .join(vertexIdPair)</span>
+<span class="fc" id="L133">      .where(1).equalTo(0)</span>
+<span class="fc" id="L134">      .with(new InitEdge&lt;K&gt;(</span>
+<span class="fc" id="L135">        factory.getEdgeFactory(), lineagePropertyKey, externalIdType))</span>
+<span class="fc" id="L136">      .join(vertexIdPair)</span>
+<span class="fc" id="L137">      .where(0).equalTo(0)</span>
+<span class="fc" id="L138">      .with(new UpdateEdge&lt;EPGMEdge, K&gt;());</span>
+
+<span class="fc" id="L140">    return factory.fromDataSets(epgmVertices, epgmEdges);</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-<span class="fc" id="L142">    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+<span class="fc" id="L145">    LogicalGraph logicalGraph = getLogicalGraph();</span>
+<span class="fc" id="L146">    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

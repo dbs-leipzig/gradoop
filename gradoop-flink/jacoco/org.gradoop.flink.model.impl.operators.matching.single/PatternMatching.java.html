@@ -20,11 +20,14 @@ import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithPropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintIdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
@@ -35,8 +38,20 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 
 /**
  * Base class for pattern matching implementations.
+ *
+ * @param &lt;G&gt; The graph head type.
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ * @param &lt;LG&gt; The graph type.
+ * @param &lt;GC&gt; The graph collection type.
  */
-public abstract class PatternMatching implements UnaryGraphToCollectionOperator {
+public abstract class PatternMatching&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphCollectionOperator&lt;LG, GC&gt; {
 
   /**
    * The property key used to stored the variable mappings inside the GraphHead properties
@@ -76,30 +91,30 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @param attachData  true, if original data shall be attached to the result
    * @param log         Logger of the concrete implementation
    */
-<span class="fc" id="L79">  public PatternMatching(String query, boolean attachData, Logger log) {</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    Preconditions.checkState(!Strings.isNullOrEmpty(query),</span>
+<span class="fc" id="L94">  public PatternMatching(String query, boolean attachData, Logger log) {</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    Preconditions.checkState(!Strings.isNullOrEmpty(query),</span>
       &quot;Query must not be null or empty&quot;);
-<span class="fc" id="L82">    this.query         = query;</span>
-<span class="fc" id="L83">    this.queryHandler  = new QueryHandler(query);</span>
-<span class="fc" id="L84">    this.attachData    = attachData;</span>
-<span class="fc" id="L85">    this.log           = log;</span>
-<span class="fc" id="L86">  }</span>
+<span class="fc" id="L97">    this.query         = query;</span>
+<span class="fc" id="L98">    this.queryHandler  = new QueryHandler(query);</span>
+<span class="fc" id="L99">    this.attachData    = attachData;</span>
+<span class="fc" id="L100">    this.log           = log;</span>
+<span class="fc" id="L101">  }</span>
 
   @Override
-  public GraphCollection execute(LogicalGraph graph) {
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
-<span class="nc" id="L91">      initDebugMappings(graph);</span>
+  public GC execute(LG graph) {
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L106">      initDebugMappings(graph);</span>
     }
 
-    GraphCollection result;
+    GC result;
 
-<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (queryHandler.isSingleVertexGraph()) {</span>
-<span class="fc" id="L97">      result = executeForVertex(graph);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (queryHandler.isSingleVertexGraph()) {</span>
+<span class="fc" id="L112">      result = executeForVertex(graph);</span>
     } else {
-<span class="fc" id="L99">      result = executeForPattern(graph);</span>
+<span class="fc" id="L114">      result = executeForPattern(graph);</span>
     }
 
-<span class="fc" id="L102">    return result;</span>
+<span class="fc" id="L117">    return result;</span>
   }
 
   /**
@@ -108,7 +123,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection executeForVertex(LogicalGraph graph);
+  protected abstract GC executeForVertex(LG graph);
 
   /**
    * Computes the result for pattern query graph.
@@ -116,7 +131,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @param graph data graph
    * @return result collection
    */
-  protected abstract GraphCollection executeForPattern(LogicalGraph graph);
+  protected abstract GC executeForPattern(LG graph);
 
   /**
    * Returns the query handler.
@@ -124,7 +139,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @return query handler
    */
   protected QueryHandler getQueryHandler() {
-<span class="fc" id="L127">    return queryHandler;</span>
+<span class="fc" id="L142">    return queryHandler;</span>
   }
 
   /**
@@ -133,7 +148,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @return GDL query
    */
   protected String getQuery() {
-<span class="fc" id="L136">    return query;</span>
+<span class="fc" id="L151">    return query;</span>
   }
 
   /**
@@ -143,7 +158,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @return true, if original data must be attached
    */
   protected boolean doAttachData() {
-<span class="fc" id="L146">    return attachData;</span>
+<span class="fc" id="L161">    return attachData;</span>
   }
 
   /**
@@ -152,7 +167,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @return vertex id -&gt; property value mapping
    */
   protected DataSet&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; getVertexMapping() {
-<span class="fc" id="L155">    return vertexMapping;</span>
+<span class="fc" id="L170">    return vertexMapping;</span>
   }
 
   /**
@@ -161,7 +176,7 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    * @return edge id -&gt; property value mapping
    */
   protected DataSet&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; getEdgeMapping() {
-<span class="fc" id="L164">    return edgeMapping;</span>
+<span class="fc" id="L179">    return edgeMapping;</span>
   }
 
   /**
@@ -172,10 +187,10 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    */
   protected DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; printTriplesWithCandidates(
     DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edges) {
-<span class="nc" id="L175">    return edges</span>
-<span class="nc" id="L176">      .map(new PrintTripleWithCandidates&lt;&gt;())</span>
-<span class="nc" id="L177">      .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)</span>
-<span class="nc" id="L178">      .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);</span>
+<span class="nc" id="L190">    return edges</span>
+<span class="nc" id="L191">      .map(new PrintTripleWithCandidates&lt;&gt;())</span>
+<span class="nc" id="L192">      .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)</span>
+<span class="nc" id="L193">      .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);</span>
   }
 
   /**
@@ -186,10 +201,10 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    */
   protected DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; printIdWithCandidates(
     DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertices) {
-<span class="nc" id="L189">    return vertices</span>
-<span class="nc" id="L190">      .map(new PrintIdWithCandidates&lt;&gt;())</span>
-<span class="nc" id="L191">      .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)</span>
-<span class="nc" id="L192">      .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);</span>
+<span class="nc" id="L204">    return vertices</span>
+<span class="nc" id="L205">      .map(new PrintIdWithCandidates&lt;&gt;())</span>
+<span class="nc" id="L206">      .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)</span>
+<span class="nc" id="L207">      .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);</span>
   }
 
   /**
@@ -197,11 +212,11 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    *
    * @param graph data graph
    */
-  private void initDebugMappings(LogicalGraph graph) {
-<span class="nc" id="L201">    vertexMapping = graph.getVertices()</span>
-<span class="nc" id="L202">      .map(new PairElementWithPropertyValue&lt;&gt;(&quot;id&quot;));</span>
-<span class="nc" id="L203">    edgeMapping = graph.getEdges()</span>
-<span class="nc" id="L204">      .map(new PairElementWithPropertyValue&lt;&gt;(&quot;id&quot;));</span>
-<span class="nc" id="L205">  }</span>
+  private void initDebugMappings(LG graph) {
+<span class="nc" id="L216">    vertexMapping = graph.getVertices()</span>
+<span class="nc" id="L217">      .map(new PairElementWithPropertyValue&lt;&gt;(&quot;id&quot;));</span>
+<span class="nc" id="L218">    edgeMapping = graph.getEdges()</span>
+<span class="nc" id="L219">      .map(new PairElementWithPropertyValue&lt;&gt;(&quot;id&quot;));</span>
+<span class="nc" id="L220">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

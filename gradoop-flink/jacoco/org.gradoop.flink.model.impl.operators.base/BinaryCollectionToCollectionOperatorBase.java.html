@@ -51,7 +51,7 @@ import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperato
 <span class="fc" id="L51">    final DataSet&lt;EPGMVertex&gt; newVertices = computeNewVertices(newGraphHeads);</span>
 <span class="fc" id="L52">    final DataSet&lt;EPGMEdge&gt; newEdges = computeNewEdges(newVertices);</span>
 
-<span class="fc" id="L54">    return firstCollection.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L54">    return firstCollection.getFactory()</span>
 <span class="fc" id="L55">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
   }
 

@@ -76,7 +76,7 @@ public class JSONDataSink extends JSONBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-<span class="nc" id="L79">    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);</span>
+<span class="nc" id="L79">    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);</span>
 <span class="nc" id="L80">  }</span>
 
   @Override

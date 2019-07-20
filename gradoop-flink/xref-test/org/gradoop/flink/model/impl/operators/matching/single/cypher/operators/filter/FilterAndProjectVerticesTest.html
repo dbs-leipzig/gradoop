@@ -53,8 +53,8 @@
 <a name="43" href="#43">43</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment()
 <a name="44" href="#44">44</a>        .fromElements(<strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties));
 <a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>      FilterAndProjectVertices filter =
-<a name="47" href="#47">47</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;());
+<a name="46" href="#46">46</a>      FilterAndProjectVertices&lt;EPGMVertex&gt; filter =
+<a name="47" href="#47">47</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices&lt;&gt;(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;());
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>      assertEquals(1, filter.evaluate().count());
 <a name="50" href="#50">50</a>    }
@@ -75,7 +75,7 @@
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>  
 <a name="67" href="#67">67</a>      List&lt;Embedding&gt; result =
-<a name="68" href="#68">68</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;())
+<a name="68" href="#68">68</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices&lt;&gt;(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;())
 <a name="69" href="#69">69</a>          .evaluate()
 <a name="70" href="#70">70</a>          .collect();
 <a name="71" href="#71">71</a>  
@@ -93,7 +93,7 @@
 <a name="83" href="#83">83</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2);
 <a name="84" href="#84">84</a>  
 <a name="85" href="#85">85</a>      List&lt;Embedding&gt; result =
-<a name="86" href="#86">86</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;())
+<a name="86" href="#86">86</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices&lt;&gt;(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;())
 <a name="87" href="#87">87</a>        .evaluate()
 <a name="88" href="#88">88</a>        .collect();
 <a name="89" href="#89">89</a>  
@@ -113,7 +113,7 @@
 <a name="103" href="#103">103</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>);
 <a name="104" href="#104">104</a> 
 <a name="105" href="#105">105</a>     Embedding result =
-<a name="106" href="#106">106</a>       <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+<a name="106" href="#106">106</a>       <strong class="jxr_keyword">new</strong> FilterAndProjectVertices&lt;&gt;(vertices, predicates, projectionPropertyKeys)
 <a name="107" href="#107">107</a>       .evaluate()
 <a name="108" href="#108">108</a>       .collect()
 <a name="109" href="#109">109</a>       .get(0);
@@ -135,7 +135,7 @@
 <a name="125" href="#125">125</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>, <span class="jxr_string">"age"</span>);
 <a name="126" href="#126">126</a> 
 <a name="127" href="#127">127</a>     Embedding result =
-<a name="128" href="#128">128</a>       <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+<a name="128" href="#128">128</a>       <strong class="jxr_keyword">new</strong> FilterAndProjectVertices&lt;&gt;(vertices, predicates, projectionPropertyKeys)
 <a name="129" href="#129">129</a>       .evaluate()
 <a name="130" href="#130">130</a>       .collect()
 <a name="131" href="#131">131</a>       .get(0);

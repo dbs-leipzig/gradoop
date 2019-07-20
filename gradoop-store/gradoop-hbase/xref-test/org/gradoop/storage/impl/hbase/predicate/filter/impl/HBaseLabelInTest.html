@@ -30,13 +30,13 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.Assert.assertEquals;
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> * Test class for {@link HBaseLabelIn}</em>
@@ -64,7 +64,7 @@
 <a name="54" href="#54">54</a>        );
 <a name="55" href="#55">55</a>        expectedFilterList.addFilter(valueFilter);
 <a name="56" href="#56">56</a>      }
-<a name="57" href="#57">57</a>      assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter(false).toString());
+<a name="57" href="#57">57</a>      assertEquals(edgeFilter.toHBaseFilter(false).toString(), expectedFilterList.toString());
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  }
 </pre>

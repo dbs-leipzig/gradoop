@@ -157,49 +157,50 @@
 <a name="147" href="#147">147</a> 
 <a name="148" href="#148">148</a>   @Override
 <a name="149" href="#149">149</a>   <strong class="jxr_keyword">public</strong> GraphCollection getGraphCollection() <strong class="jxr_keyword">throws</strong> IOException {
-<a name="150" href="#150">150</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
-<a name="151" href="#151">151</a>   }
-<a name="152" href="#152">152</a> 
-<a name="153" href="#153">153</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   * Reads the csv file specified by {@link MinimalCSVImporter#path} and converts each valid line</em>
-<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * to a {@link EPGMVertex}.</em>
-<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   *</em>
-<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * @param propertyNames list of the property identifier names</em>
-<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   * @param checkReoccurringHeader set to true if each row of the file should be checked for</em>
-<a name="159" href="#159">159</a> <em class="jxr_javadoccomment">   *                               reoccurring of the column property names</em>
-<a name="160" href="#160">160</a> <em class="jxr_javadoccomment">   * @return a {@link DataSet} of all vertices from one specific file</em>
-<a name="161" href="#161">161</a> <em class="jxr_javadoccomment">   */</em>
-<a name="162" href="#162">162</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;EPGMVertex&gt; readCSVFile(List&lt;String&gt; propertyNames, <strong class="jxr_keyword">boolean</strong> checkReoccurringHeader) {
-<a name="163" href="#163">163</a>     <strong class="jxr_keyword">return</strong> config.getExecutionEnvironment()
-<a name="164" href="#164">164</a>       .readTextFile(path)
-<a name="165" href="#165">165</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/dataintegration/importer/impl/csv/functions/CsvRowToProperties.html">CsvRowToProperties</a>(tokenSeparator, propertyNames, checkReoccurringHeader))
-<a name="166" href="#166">166</a>       .map(<strong class="jxr_keyword">new</strong> PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))
-<a name="167" href="#167">167</a>       .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
-<a name="168" href="#168">168</a>   }
-<a name="169" href="#169">169</a> 
-<a name="170" href="#170">170</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   * Reads the fist row of a csv file and creates a list including all column entries that</em>
-<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * will be used as property names.</em>
-<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   *</em>
-<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   * @return the property names</em>
-<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   * @throws IOException if an error occurred while open the stream</em>
-<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   */</em>
-<a name="177" href="#177">177</a>   <strong class="jxr_keyword">private</strong> List&lt;String&gt; readHeaderRow() <strong class="jxr_keyword">throws</strong> IOException {
-<a name="178" href="#178">178</a>     Path filePath = <strong class="jxr_keyword">new</strong> Path(path);
-<a name="179" href="#179">179</a>     <strong class="jxr_keyword">try</strong> (FileSystem fs = FileSystem.get(filePath.toUri(), <strong class="jxr_keyword">new</strong> Configuration())) {
-<a name="180" href="#180">180</a>       FSDataInputStream inputStream = fs.open(filePath);
-<a name="181" href="#181">181</a>       BufferedReader lineReader = <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong> InputStreamReader(inputStream, charset));
-<a name="182" href="#182">182</a>       String headerLine = lineReader.readLine();
-<a name="183" href="#183">183</a>       lineReader.close();
-<a name="184" href="#184">184</a>       <strong class="jxr_keyword">if</strong> (headerLine == <strong class="jxr_keyword">null</strong> || headerLine.isEmpty()) {
-<a name="185" href="#185">185</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"The csv file '"</span> + path + <span class="jxr_string">"' does not contain any rows."</span>);
-<a name="186" href="#186">186</a>       }
-<a name="187" href="#187">187</a>       <strong class="jxr_keyword">return</strong> Arrays.asList(headerLine.split(tokenSeparator));
-<a name="188" href="#188">188</a>     } <strong class="jxr_keyword">catch</strong> (IOException ioe) {
-<a name="189" href="#189">189</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"Error while opening a stream to '"</span> + path + <span class="jxr_string">"'."</span>, ioe);
-<a name="190" href="#190">190</a>     }
-<a name="191" href="#191">191</a>   }
-<a name="192" href="#192">192</a> }
+<a name="150" href="#150">150</a>     LogicalGraph logicalGraph = getLogicalGraph();
+<a name="151" href="#151">151</a>     <strong class="jxr_keyword">return</strong> logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
+<a name="152" href="#152">152</a>   }
+<a name="153" href="#153">153</a> 
+<a name="154" href="#154">154</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * Reads the csv file specified by {@link MinimalCSVImporter#path} and converts each valid line</em>
+<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * to a {@link EPGMVertex}.</em>
+<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   *</em>
+<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   * @param propertyNames list of the property identifier names</em>
+<a name="159" href="#159">159</a> <em class="jxr_javadoccomment">   * @param checkReoccurringHeader set to true if each row of the file should be checked for</em>
+<a name="160" href="#160">160</a> <em class="jxr_javadoccomment">   *                               reoccurring of the column property names</em>
+<a name="161" href="#161">161</a> <em class="jxr_javadoccomment">   * @return a {@link DataSet} of all vertices from one specific file</em>
+<a name="162" href="#162">162</a> <em class="jxr_javadoccomment">   */</em>
+<a name="163" href="#163">163</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;EPGMVertex&gt; readCSVFile(List&lt;String&gt; propertyNames, <strong class="jxr_keyword">boolean</strong> checkReoccurringHeader) {
+<a name="164" href="#164">164</a>     <strong class="jxr_keyword">return</strong> config.getExecutionEnvironment()
+<a name="165" href="#165">165</a>       .readTextFile(path)
+<a name="166" href="#166">166</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/dataintegration/importer/impl/csv/functions/CsvRowToProperties.html">CsvRowToProperties</a>(tokenSeparator, propertyNames, checkReoccurringHeader))
+<a name="167" href="#167">167</a>       .map(<strong class="jxr_keyword">new</strong> PropertiesToVertex&lt;&gt;(config.getLogicalGraphFactory().getVertexFactory()))
+<a name="168" href="#168">168</a>       .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
+<a name="169" href="#169">169</a>   }
+<a name="170" href="#170">170</a> 
+<a name="171" href="#171">171</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * Reads the fist row of a csv file and creates a list including all column entries that</em>
+<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   * will be used as property names.</em>
+<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   *</em>
+<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   * @return the property names</em>
+<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * @throws IOException if an error occurred while open the stream</em>
+<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   */</em>
+<a name="178" href="#178">178</a>   <strong class="jxr_keyword">private</strong> List&lt;String&gt; readHeaderRow() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="179" href="#179">179</a>     Path filePath = <strong class="jxr_keyword">new</strong> Path(path);
+<a name="180" href="#180">180</a>     <strong class="jxr_keyword">try</strong> (FileSystem fs = FileSystem.get(filePath.toUri(), <strong class="jxr_keyword">new</strong> Configuration())) {
+<a name="181" href="#181">181</a>       FSDataInputStream inputStream = fs.open(filePath);
+<a name="182" href="#182">182</a>       BufferedReader lineReader = <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong> InputStreamReader(inputStream, charset));
+<a name="183" href="#183">183</a>       String headerLine = lineReader.readLine();
+<a name="184" href="#184">184</a>       lineReader.close();
+<a name="185" href="#185">185</a>       <strong class="jxr_keyword">if</strong> (headerLine == <strong class="jxr_keyword">null</strong> || headerLine.isEmpty()) {
+<a name="186" href="#186">186</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"The csv file '"</span> + path + <span class="jxr_string">"' does not contain any rows."</span>);
+<a name="187" href="#187">187</a>       }
+<a name="188" href="#188">188</a>       <strong class="jxr_keyword">return</strong> Arrays.asList(headerLine.split(tokenSeparator));
+<a name="189" href="#189">189</a>     } <strong class="jxr_keyword">catch</strong> (IOException ioe) {
+<a name="190" href="#190">190</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"Error while opening a stream to '"</span> + path + <span class="jxr_string">"'."</span>, ioe);
+<a name="191" href="#191">191</a>     }
+<a name="192" href="#192">192</a>   }
+<a name="193" href="#193">193</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

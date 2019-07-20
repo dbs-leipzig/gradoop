@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>        .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
 <a name="58" href="#58">58</a>        .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 <a name="59" href="#59">59</a>  
-<a name="60" href="#60">60</a>      <strong class="jxr_keyword">return</strong> graph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="60" href="#60">60</a>      <strong class="jxr_keyword">return</strong> graph.getFactory().fromDataSets(
 <a name="61" href="#61">61</a>        graph.getGraphHead(), newVertices, graph.getEdges());
 <a name="62" href="#62">62</a>    }
 <a name="63" href="#63">63</a>  }

@@ -106,7 +106,7 @@
 <a name="96" href="#96">96</a>        .join(currentGraph.getVertices())
 <a name="97" href="#97">97</a>        .where(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/pagerank/functions/PageRankResultKey.html">PageRankResultKey</a>()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="98" href="#98">98</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/pagerank/functions/PageRankToAttribute.html">PageRankToAttribute</a>(propertyKey));
-<a name="99" href="#99">99</a>      <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="99" href="#99">99</a>      <strong class="jxr_keyword">return</strong> currentGraph.getFactory().fromDataSets(
 <a name="100" href="#100">100</a>       currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
 <a name="101" href="#101">101</a>   }
 <a name="102" href="#102">102</a> }

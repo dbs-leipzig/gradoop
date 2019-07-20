@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectVertices;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +31,16 @@ import java.util.Set;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectVertices} operator.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode, ProjectionNode {
+public class FilterAndProjectVerticesNode&lt;V extends Vertex&gt; extends LeafNode
+  implements FilterNode, ProjectionNode {
+
   /**
    * Input data set
    */
-  private DataSet&lt;EPGMVertex&gt; vertices;
+  private DataSet&lt;V&gt; vertices;
   /**
    * Query variable of the vertex
    */
@@ -58,20 +62,20 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
    */
-  public FilterAndProjectVerticesNode(DataSet&lt;EPGMVertex&gt; vertices, String vertexVariable,
-<span class="fc" id="L62">    CNF filterPredicate, Set&lt;String&gt; projectionKeys) {</span>
-<span class="fc" id="L63">    this.vertices = vertices;</span>
-<span class="fc" id="L64">    this.vertexVariable = vertexVariable;</span>
-<span class="fc" id="L65">    this.filterPredicate = filterPredicate;</span>
-<span class="fc" id="L66">    this.projectionKeys = new ArrayList&lt;&gt;(projectionKeys);</span>
-<span class="fc" id="L67">  }</span>
+  public FilterAndProjectVerticesNode(DataSet&lt;V&gt; vertices, String vertexVariable,
+<span class="fc" id="L66">    CNF filterPredicate, Set&lt;String&gt; projectionKeys) {</span>
+<span class="fc" id="L67">    this.vertices = vertices;</span>
+<span class="fc" id="L68">    this.vertexVariable = vertexVariable;</span>
+<span class="fc" id="L69">    this.filterPredicate = filterPredicate;</span>
+<span class="fc" id="L70">    this.projectionKeys = new ArrayList&lt;&gt;(projectionKeys);</span>
+<span class="fc" id="L71">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; execute() {
-<span class="fc" id="L71">    FilterAndProjectVertices op =</span>
-      new FilterAndProjectVertices(vertices, filterPredicate, projectionKeys);
-<span class="fc" id="L73">    op.setName(toString());</span>
-<span class="fc" id="L74">    return op.evaluate();</span>
+<span class="fc" id="L75">    FilterAndProjectVertices&lt;V&gt; op =</span>
+      new FilterAndProjectVertices&lt;&gt;(vertices, filterPredicate, projectionKeys);
+<span class="fc" id="L77">    op.setName(toString());</span>
+<span class="fc" id="L78">    return op.evaluate();</span>
   }
 
   /**
@@ -80,7 +84,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
    * @return filter predicate
    */
   public CNF getFilterPredicate() {
-<span class="fc" id="L83">    return new CNF(filterPredicate);</span>
+<span class="fc" id="L87">    return new CNF(filterPredicate);</span>
   }
 
   /**
@@ -89,21 +93,21 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
    * @return projection keys
    */
   public List&lt;String&gt; getProjectionKeys() {
-<span class="nc" id="L92">    return new ArrayList&lt;&gt;(projectionKeys);</span>
+<span class="nc" id="L96">    return new ArrayList&lt;&gt;(projectionKeys);</span>
   }
 
   @Override
   protected EmbeddingMetaData computeEmbeddingMetaData() {
-<span class="fc" id="L97">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();</span>
-<span class="fc" id="L98">    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
-<span class="fc" id="L99">    embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, projectionKeys);</span>
+<span class="fc" id="L101">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L102">    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
+<span class="fc" id="L103">    embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, projectionKeys);</span>
 
-<span class="fc" id="L101">    return embeddingMetaData;</span>
+<span class="fc" id="L105">    return embeddingMetaData;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L106">    return String.format(&quot;FilterAndProjectVerticesNode{&quot; +</span>
+<span class="fc" id="L110">    return String.format(&quot;FilterAndProjectVerticesNode{&quot; +</span>
         &quot;vertexVariable=%s, &quot; +
         &quot;filterPredicate=%s, &quot; +
         &quot;projectionKeys=%s}&quot;,

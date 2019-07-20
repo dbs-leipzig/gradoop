@@ -28,7 +28,7 @@ import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator
 
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L31">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L31">    return collection.getGraphFactory().fromDataSets(</span>
 <span class="fc" id="L32">      collection.getVertices(), collection.getEdges());</span>
   }
 }

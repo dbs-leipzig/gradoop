@@ -154,7 +154,7 @@
 <a name="144" href="#144">144</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(0)
 <a name="145" href="#145">145</a>       .with(<strong class="jxr_keyword">new</strong> SetBtgIds&lt;&gt;());
 <a name="146" href="#146">146</a> 
-<a name="147" href="#147">147</a>     <strong class="jxr_keyword">return</strong> iig.getConfig().getGraphCollectionFactory()
+<a name="147" href="#147">147</a>     <strong class="jxr_keyword">return</strong> iig.getCollectionFactory()
 <a name="148" href="#148">148</a>       .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);
 <a name="149" href="#149">149</a>   }
 <a name="150" href="#150">150</a> }

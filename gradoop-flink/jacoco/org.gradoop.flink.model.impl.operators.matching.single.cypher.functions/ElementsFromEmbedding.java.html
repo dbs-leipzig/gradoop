@@ -19,19 +19,19 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,21 +41,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Extracts EPGM elements from an {@link Embedding}.
+ * Extracts elements from an {@link Embedding}.
+ *
+ * @param &lt;G&gt; The graph head type.
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
  */
-public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGMElement&gt; {
+public class ElementsFromEmbedding&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge&gt; implements FlatMapFunction&lt;Embedding, Element&gt; {
   /**
-   * Constructs EPGM graph heads
+   * Constructs graph heads
    */
-  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
   /**
-   * Constructs EPGM vertices
+   * Constructs vertices
    */
-  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
+  private final VertexFactory&lt;V&gt; vertexFactory;
   /**
-   * Constructs EPGM edges
+   * Constructs edges
    */
-  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
+  private final EdgeFactory&lt;E&gt; edgeFactory;
   /**
    * Describes the embedding content
    */
@@ -81,148 +88,145 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGM
   /**
    * Constructor.
    *
-   * @param epgmGraphHeadFactory EPGM graph head factory
-   * @param epgmVertexFactory EPGM vertex factory
-   * @param epgmEdgeFactory EPGM edge factory
-   * @param embeddingMetaData meta data for the embedding
-*    @param sourceTargetVariables source and target vertex variables by edge variable
+   * @param graphHeadFactory      graph head factory
+   * @param vertexFactory         vertex factory
+   * @param edgeFactory           edge factory
+   * @param embeddingMetaData     meta data for the embedding
+   * @param sourceTargetVariables source and target vertex variables by edge variable
    */
-  public ElementsFromEmbedding(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
-    VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
-    EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+  public ElementsFromEmbedding(GraphHeadFactory&lt;G&gt; graphHeadFactory,
+    VertexFactory&lt;V&gt; vertexFactory, EdgeFactory&lt;E&gt; edgeFactory, EmbeddingMetaData embeddingMetaData,
     Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables) {
-<span class="fc" id="L94">    this(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,</span>
-<span class="fc" id="L95">      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));</span>
-<span class="fc" id="L96">  }</span>
+<span class="fc" id="L100">    this(graphHeadFactory, vertexFactory, edgeFactory, embeddingMetaData,</span>
+<span class="fc" id="L101">      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));</span>
+<span class="fc" id="L102">  }</span>
   /**
    * Constructor.
    *
-   * @param epgmGraphHeadFactory EPGM graph head factory
-   * @param epgmVertexFactory EPGM vertex factory
-   * @param epgmEdgeFactory EPGM edge factory
-   * @param embeddingMetaData meta data for the embedding
+   * @param graphHeadFactory      graph head factory
+   * @param vertexFactory         vertex factory
+   * @param edgeFactory           edge factory
+   * @param embeddingMetaData     meta data for the embedding
    * @param sourceTargetVariables source and target vertex variables by edge variable
-   * @param labelMapping mapping between newElementVariables and its labels
+   * @param labelMapping          mapping between newElementVariables and its labels
    */
-  public ElementsFromEmbedding(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
-    VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
-    EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
-    Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables,
-<span class="fc" id="L111">    Map&lt;String, String&gt; labelMapping) {</span>
-<span class="fc" id="L112">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
-<span class="fc" id="L113">    this.vertexFactory = epgmVertexFactory;</span>
-<span class="fc" id="L114">    this.edgeFactory = epgmEdgeFactory;</span>
-<span class="fc" id="L115">    this.metaData = embeddingMetaData;</span>
-<span class="fc" id="L116">    this.sourceTargetVariables = sourceTargetVariables;</span>
-<span class="fc" id="L117">    this.labelMapping = labelMapping;</span>
-<span class="fc" id="L118">    this.variableMapping = new HashMap&lt;&gt;(embeddingMetaData.getEntryCount());</span>
-<span class="fc" id="L119">    this.processedIds = new HashSet&lt;&gt;(embeddingMetaData.getEntryCount());</span>
-<span class="fc" id="L120">  }</span>
+  public ElementsFromEmbedding(GraphHeadFactory&lt;G&gt; graphHeadFactory, VertexFactory&lt;V&gt; vertexFactory,
+    EdgeFactory&lt;E&gt; edgeFactory, EmbeddingMetaData embeddingMetaData,
+<span class="fc" id="L115">    Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables, Map&lt;String, String&gt; labelMapping) {</span>
+<span class="fc" id="L116">    this.graphHeadFactory = graphHeadFactory;</span>
+<span class="fc" id="L117">    this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L118">    this.edgeFactory = edgeFactory;</span>
+<span class="fc" id="L119">    this.metaData = embeddingMetaData;</span>
+<span class="fc" id="L120">    this.sourceTargetVariables = sourceTargetVariables;</span>
+<span class="fc" id="L121">    this.labelMapping = labelMapping;</span>
+<span class="fc" id="L122">    this.variableMapping = new HashMap&lt;&gt;(embeddingMetaData.getEntryCount());</span>
+<span class="fc" id="L123">    this.processedIds = new HashSet&lt;&gt;(embeddingMetaData.getEntryCount());</span>
+<span class="fc" id="L124">  }</span>
 
   @Override
-  public void flatMap(Embedding embedding, Collector&lt;EPGMElement&gt; out) throws Exception {
+  public void flatMap(Embedding embedding, Collector&lt;Element&gt; out) throws Exception {
     // clear for each embedding
-<span class="fc" id="L125">    processedIds.clear();</span>
+<span class="fc" id="L129">    processedIds.clear();</span>
 
     // create graph head for this embedding
-<span class="fc" id="L128">    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();</span>
+<span class="fc" id="L132">    G graphHead = graphHeadFactory.createGraphHead();</span>
 
     // vertices
-<span class="fc bfc" id="L131" title="All 2 branches covered.">    for (String vertexVariable : metaData.getVertexVariables()) {</span>
-<span class="fc" id="L132">      GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    for (String vertexVariable : metaData.getVertexVariables()) {</span>
+<span class="fc" id="L136">      GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));</span>
 
-<span class="fc bfc" id="L134" title="All 2 branches covered.">      if (labelMapping.containsKey(vertexVariable)) {</span>
-<span class="fc" id="L135">        String label = labelMapping.get(vertexVariable);</span>
-<span class="fc" id="L136">        initVertexWithData(out, graphHead, id, label);</span>
-<span class="fc" id="L137">      } else {</span>
-<span class="fc" id="L138">        initVertex(out, graphHead, id);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      if (labelMapping.containsKey(vertexVariable)) {</span>
+<span class="fc" id="L139">        String label = labelMapping.get(vertexVariable);</span>
+<span class="fc" id="L140">        initVertexWithData(out, graphHead, id, label);</span>
+<span class="fc" id="L141">      } else {</span>
+<span class="fc" id="L142">        initVertex(out, graphHead, id);</span>
       }
-<span class="fc" id="L140">      variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L144">      variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));</span>
+<span class="fc" id="L145">    }</span>
 
     // edges
     GradoopId edgeId;
     GradoopId sourceId;
     GradoopId targetId;
-<span class="fc bfc" id="L147" title="All 2 branches covered.">    for (String edgeVariable : metaData.getEdgeVariables()) {</span>
-<span class="fc" id="L148">      edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));</span>
-<span class="fc" id="L149">      sourceId = embedding.getId(</span>
-<span class="fc" id="L150">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));</span>
-<span class="fc" id="L151">      targetId = embedding.getId(</span>
-<span class="fc" id="L152">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    for (String edgeVariable : metaData.getEdgeVariables()) {</span>
+<span class="fc" id="L152">      edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));</span>
+<span class="fc" id="L153">      sourceId = embedding.getId(</span>
+<span class="fc" id="L154">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));</span>
+<span class="fc" id="L155">      targetId = embedding.getId(</span>
+<span class="fc" id="L156">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));</span>
 
-<span class="fc bfc" id="L154" title="All 2 branches covered.">      if (labelMapping.containsKey(edgeVariable)) {</span>
-<span class="fc" id="L155">        String label = labelMapping.get(edgeVariable);</span>
-<span class="fc" id="L156">        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);</span>
-<span class="fc" id="L157">      } else {</span>
-<span class="fc" id="L158">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">      if (labelMapping.containsKey(edgeVariable)) {</span>
+<span class="fc" id="L159">        String label = labelMapping.get(edgeVariable);</span>
+<span class="fc" id="L160">        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);</span>
+<span class="fc" id="L161">      } else {</span>
+<span class="fc" id="L162">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
       }
-<span class="fc" id="L160">      variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));</span>
-<span class="fc" id="L161">    }</span>
+<span class="fc" id="L164">      variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));</span>
+<span class="fc" id="L165">    }</span>
 
     // paths
-<span class="fc bfc" id="L164" title="All 2 branches covered.">    for (String pathVariable : metaData.getPathVariables()) {</span>
-<span class="fc" id="L165">      ExpandDirection direction = metaData.getDirection(pathVariable);</span>
-<span class="fc" id="L166">      List&lt;GradoopId&gt; path = embedding.getIdList(metaData.getEntryColumn(pathVariable));</span>
-<span class="fc" id="L167">      List&lt;PropertyValue&gt; mappingValue = new ArrayList&lt;&gt;(path.size());</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">      for (int i = 0; i &lt; path.size(); i += 2) {</span>
-<span class="fc" id="L169">        edgeId = path.get(i);</span>
-<span class="fc" id="L170">        mappingValue.add(PropertyValue.create(edgeId));</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    for (String pathVariable : metaData.getPathVariables()) {</span>
+<span class="fc" id="L169">      ExpandDirection direction = metaData.getDirection(pathVariable);</span>
+<span class="fc" id="L170">      List&lt;GradoopId&gt; path = embedding.getIdList(metaData.getEntryColumn(pathVariable));</span>
+<span class="fc" id="L171">      List&lt;PropertyValue&gt; mappingValue = new ArrayList&lt;&gt;(path.size());</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">      for (int i = 0; i &lt; path.size(); i += 2) {</span>
+<span class="fc" id="L173">        edgeId = path.get(i);</span>
+<span class="fc" id="L174">        mappingValue.add(PropertyValue.create(edgeId));</span>
 
-<span class="fc bfc" id="L172" title="All 2 branches covered.">        if (direction == ExpandDirection.OUT) {</span>
-<span class="fc bfc" id="L173" title="All 2 branches covered.">          sourceId = i &gt; 0 ?</span>
-<span class="fc" id="L174">            path.get(i - 1) :</span>
-<span class="fc" id="L175">            embedding.getId(</span>
-<span class="fc" id="L176">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">        if (direction == ExpandDirection.OUT) {</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">          sourceId = i &gt; 0 ?</span>
+<span class="fc" id="L178">            path.get(i - 1) :</span>
+<span class="fc" id="L179">            embedding.getId(</span>
+<span class="fc" id="L180">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
 
-<span class="fc bfc" id="L178" title="All 2 branches covered.">          targetId = i &lt; path.size() - 1 ?</span>
-<span class="fc" id="L179">            path.get(i + 1) :</span>
-<span class="fc" id="L180">            embedding.getId(</span>
-<span class="fc" id="L181">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">          targetId = i &lt; path.size() - 1 ?</span>
+<span class="fc" id="L183">            path.get(i + 1) :</span>
+<span class="fc" id="L184">            embedding.getId(</span>
+<span class="fc" id="L185">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));</span>
 
-<span class="fc bfc" id="L183" title="All 2 branches covered.">          if (i + 2 &lt; path.size()) {</span>
-<span class="fc" id="L184">            mappingValue.add(PropertyValue.create(targetId));</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">          if (i + 2 &lt; path.size()) {</span>
+<span class="fc" id="L188">            mappingValue.add(PropertyValue.create(targetId));</span>
           }
         } else {
-<span class="fc bfc" id="L187" title="All 2 branches covered.">          sourceId = i &lt; path.size() - 1 ?</span>
-<span class="fc" id="L188">            path.get(i + 1) :</span>
-<span class="fc" id="L189">            embedding.getId(</span>
-<span class="fc" id="L190">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">          sourceId = i &lt; path.size() - 1 ?</span>
+<span class="fc" id="L192">            path.get(i + 1) :</span>
+<span class="fc" id="L193">            embedding.getId(</span>
+<span class="fc" id="L194">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
 
-<span class="fc bfc" id="L192" title="All 2 branches covered.">          targetId = i &gt; 0 ?</span>
-<span class="fc" id="L193">            path.get(i - 1) :</span>
-<span class="fc" id="L194">            embedding.getId(</span>
-<span class="fc" id="L195">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">          targetId = i &gt; 0 ?</span>
+<span class="fc" id="L197">            path.get(i - 1) :</span>
+<span class="fc" id="L198">            embedding.getId(</span>
+<span class="fc" id="L199">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));</span>
 
-<span class="fc bfc" id="L197" title="All 2 branches covered.">          if (i &gt; 0) {</span>
-<span class="fc" id="L198">            mappingValue.add(PropertyValue.create(sourceId));</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">          if (i &gt; 0) {</span>
+<span class="fc" id="L202">            mappingValue.add(PropertyValue.create(sourceId));</span>
           }
         }
 
-<span class="fc" id="L202">        initVertex(out, graphHead, sourceId);</span>
-<span class="fc" id="L203">        initVertex(out, graphHead, targetId);</span>
-<span class="fc" id="L204">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
+<span class="fc" id="L206">        initVertex(out, graphHead, sourceId);</span>
+<span class="fc" id="L207">        initVertex(out, graphHead, targetId);</span>
+<span class="fc" id="L208">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
       }
-<span class="fc" id="L206">      variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));</span>
-<span class="fc" id="L207">    }</span>
+<span class="fc" id="L210">      variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));</span>
+<span class="fc" id="L211">    }</span>
 
-<span class="fc" id="L209">    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);</span>
-<span class="fc" id="L210">    out.collect(graphHead);</span>
-<span class="fc" id="L211">  }</span>
+<span class="fc" id="L213">    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);</span>
+<span class="fc" id="L214">    out.collect(graphHead);</span>
+<span class="fc" id="L215">  }</span>
 
   /**
-   * Initializes an EPGM vertex using the specified parameters
+   * Initializes an vertex using the specified parameters
    *
    * @param out flat map collector
    * @param graphHead graph head to assign vertex to
    * @param vertexId vertex identifier
    */
-  private void initVertex(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId) {
-<span class="fc" id="L221">    initVertexWithData(out, graphHead, vertexId, null);</span>
-<span class="fc" id="L222">  }</span>
+  private void initVertex(Collector&lt;Element&gt; out, G graphHead, GradoopId vertexId) {
+<span class="fc" id="L225">    initVertexWithData(out, graphHead, vertexId, null);</span>
+<span class="fc" id="L226">  }</span>
 
   /**
-   * Initializes an EPGM vertex using the specified parameters and adds its label
+   * Initializes an vertex using the specified parameters and adds its label
    * if the given vertex was created for the return pattern.
    *
    * @param out flat map collector
@@ -230,19 +234,19 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGM
    * @param vertexId vertex identifier
    * @param label label associated with vertex
    */
-  private void initVertexWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId,
+  private void initVertexWithData(Collector&lt;Element&gt; out, G graphHead, GradoopId vertexId,
                                   String label) {
-<span class="fc bfc" id="L235" title="All 2 branches covered.">    if (!processedIds.contains(vertexId)) {</span>
-<span class="fc" id="L236">      EPGMVertex v = vertexFactory.initVertex(vertexId);</span>
-<span class="fc" id="L237">      v.addGraphId(graphHead.getId());</span>
-<span class="fc" id="L238">      v.setLabel(label);</span>
-<span class="fc" id="L239">      out.collect(v);</span>
-<span class="fc" id="L240">      processedIds.add(vertexId);</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">    if (!processedIds.contains(vertexId)) {</span>
+<span class="fc" id="L240">      V v = vertexFactory.initVertex(vertexId);</span>
+<span class="fc" id="L241">      v.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L242">      v.setLabel(label);</span>
+<span class="fc" id="L243">      out.collect(v);</span>
+<span class="fc" id="L244">      processedIds.add(vertexId);</span>
     }
-<span class="fc" id="L242">  }</span>
+<span class="fc" id="L246">  }</span>
 
   /**
-   * Initializes an EPGM edge using the specified parameters.
+   * Initializes an edge using the specified parameters.
    *
    * @param out flat map collector
    * @param graphHead graph head to assign edge to
@@ -250,13 +254,13 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGM
    * @param sourceId source vertex identifier
    * @param targetId target vertex identifier
    */
-  private void initEdge(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
+  private void initEdge(Collector&lt;Element&gt; out, G graphHead, GradoopId edgeId,
     GradoopId sourceId, GradoopId targetId) {
-<span class="fc" id="L255">    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);</span>
-<span class="fc" id="L256">  }</span>
+<span class="fc" id="L259">    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);</span>
+<span class="fc" id="L260">  }</span>
 
   /**
-   * Initializes an EPGM edge using the specified parameters and adds its label
+   * Initializes an edge using the specified parameters and adds its label
    * if the given edge was created for return pattern
    *
    * @param out flat map collector
@@ -266,15 +270,15 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGM
    * @param targetId target vertex identifier
    * @param label label associated with edge
    */
-  private void initEdgeWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
+  private void initEdgeWithData(Collector&lt;Element&gt; out, G graphHead, GradoopId edgeId,
                                 GradoopId sourceId, GradoopId targetId, String label) {
-<span class="fc bfc" id="L271" title="All 2 branches covered.">    if (!processedIds.contains(edgeId)) {</span>
-<span class="fc" id="L272">      EPGMEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);</span>
-<span class="fc" id="L273">      e.addGraphId(graphHead.getId());</span>
-<span class="fc" id="L274">      e.setLabel(label);</span>
-<span class="fc" id="L275">      out.collect(e);</span>
-<span class="fc" id="L276">      processedIds.add(edgeId);</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">    if (!processedIds.contains(edgeId)) {</span>
+<span class="fc" id="L276">      E e = edgeFactory.initEdge(edgeId, sourceId, targetId);</span>
+<span class="fc" id="L277">      e.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L278">      e.setLabel(label);</span>
+<span class="fc" id="L279">      out.collect(e);</span>
+<span class="fc" id="L280">      processedIds.add(edgeId);</span>
     }
-<span class="fc" id="L278">  }</span>
+<span class="fc" id="L282">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

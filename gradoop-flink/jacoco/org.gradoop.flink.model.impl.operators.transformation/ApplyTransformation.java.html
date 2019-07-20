@@ -17,15 +17,14 @@ package org.gradoop.flink.model.impl.operators.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Applies the transformation operator on on all logical graphs in a graph
@@ -45,42 +44,40 @@ public class ApplyTransformation
   public ApplyTransformation(TransformationFunction&lt;EPGMGraphHead&gt; graphHeadModFunc,
     TransformationFunction&lt;EPGMVertex&gt; vertexModFunc,
     TransformationFunction&lt;EPGMEdge&gt; edgeModFunc) {
-<span class="fc" id="L48">    super(graphHeadModFunc, vertexModFunc, edgeModFunc);</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L47">    super(graphHeadModFunc, vertexModFunc, edgeModFunc);</span>
+<span class="fc" id="L48">  }</span>
 
 
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     // the resulting logical graph holds multiple graph heads
-<span class="fc" id="L55">    LogicalGraph modifiedGraph = executeInternal(</span>
-<span class="fc" id="L56">      collection.getGraphHeads(),</span>
-<span class="fc" id="L57">      collection.getVertices(),</span>
-<span class="fc" id="L58">      collection.getEdges(),</span>
-<span class="fc" id="L59">      collection.getConfig().getLogicalGraphFactory());</span>
+<span class="fc" id="L54">    LogicalGraph modifiedGraph = executeInternal(</span>
+<span class="fc" id="L55">      collection.getGraphHeads(),</span>
+<span class="fc" id="L56">      collection.getVertices(),</span>
+<span class="fc" id="L57">      collection.getEdges(),</span>
+<span class="fc" id="L58">      collection.getGraphFactory());</span>
 
-<span class="fc" id="L61">    return collection.getFactory().fromDataSets(</span>
-<span class="fc" id="L62">      modifiedGraph.getGraphHead(),</span>
-<span class="fc" id="L63">      modifiedGraph.getVertices(),</span>
-<span class="fc" id="L64">      modifiedGraph.getEdges());</span>
+<span class="fc" id="L60">    return collection.getFactory().fromDataSets(</span>
+<span class="fc" id="L61">      modifiedGraph.getGraphHead(),</span>
+<span class="fc" id="L62">      modifiedGraph.getVertices(),</span>
+<span class="fc" id="L63">      modifiedGraph.getEdges());</span>
   }
 
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
-<span class="fc" id="L69">    DataSet&lt;GraphTransaction&gt; graphTransactions = collection.getGraphTransactions();</span>
+<span class="fc" id="L68">    DataSet&lt;GraphTransaction&gt; graphTransactions = collection.getGraphTransactions();</span>
 
-<span class="fc" id="L71">    GradoopFlinkConfig config = collection.getConfig();</span>
-
-<span class="fc" id="L73">    DataSet&lt;GraphTransaction&gt; transformedGraphTransactions = graphTransactions</span>
-<span class="fc" id="L74">      .map(new TransformGraphTransaction(</span>
-<span class="fc" id="L75">        collection.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L70">    DataSet&lt;GraphTransaction&gt; transformedGraphTransactions = graphTransactions</span>
+<span class="fc" id="L71">      .map(new TransformGraphTransaction(</span>
+<span class="fc" id="L72">        collection.getFactory().getGraphHeadFactory(),</span>
         graphHeadTransFunc,
-<span class="fc" id="L77">        collection.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L74">        collection.getFactory().getVertexFactory(),</span>
         vertexTransFunc,
-<span class="fc" id="L79">        collection.getFactory().getEdgeFactory(),</span>
+<span class="fc" id="L76">        collection.getFactory().getEdgeFactory(),</span>
         edgeTransFunc
       ));
 
-<span class="fc" id="L83">    return config.getGraphCollectionFactory().fromTransactions(transformedGraphTransactions);</span>
+<span class="fc" id="L80">    return collection.getFactory().fromTransactions(transformedGraphTransactions);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

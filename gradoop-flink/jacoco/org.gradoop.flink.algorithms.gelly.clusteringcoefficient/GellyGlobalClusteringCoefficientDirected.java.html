@@ -61,7 +61,7 @@ public class GellyGlobalClusteringCoefficientDirected extends ClusteringCoeffici
 <span class="fc" id="L61">      .map(new WritePropertyToGraphHeadMap(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,</span>
 <span class="fc" id="L62">        PropertyValue.create(globalValue)));</span>
 
-<span class="fc" id="L64">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L64">    return currentGraph.getFactory().fromDataSets(</span>
 <span class="fc" id="L65">      resultHead, currentGraph.getVertices(), currentGraph.getEdges());</span>
   }
 }

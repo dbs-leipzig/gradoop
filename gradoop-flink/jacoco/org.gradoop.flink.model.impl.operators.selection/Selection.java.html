@@ -75,7 +75,7 @@ public class Selection extends SelectionBase {
 <span class="nc" id="L75">    DataSet&lt;GraphTransaction&gt; filteredTransactions = collection.getGraphTransactions()</span>
 <span class="nc" id="L76">      .filter(new FilterTransactions(predicate));</span>
 
-<span class="nc" id="L78">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="nc" id="L78">    return collection.getFactory()</span>
 <span class="nc" id="L79">      .fromTransactions(filteredTransactions);</span>
   }
 }

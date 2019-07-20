@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphElement;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
@@ -77,10 +77,10 @@
 <a name="67" href="#67">67</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * Evaluates the expression with respect to the given EPGMGraphElement</em>
 <a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   * @param element EPGMGraphElement under which the predicate will be evaluated</em>
+<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   * @param element GraphElement under which the predicate will be evaluated</em>
 <a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   * @return evaluation result</em>
 <a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="73" href="#73">73</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> PropertyValue evaluate(EPGMGraphElement element);
+<a name="73" href="#73">73</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> PropertyValue evaluate(GraphElement element);
 <a name="74" href="#74">74</a>  
 <a name="75" href="#75">75</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   * Returns a set of property keys referenced by this expression for a given variable</em>

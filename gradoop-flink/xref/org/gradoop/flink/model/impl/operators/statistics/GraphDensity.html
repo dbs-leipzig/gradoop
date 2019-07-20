@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>        .getGraphHead()
 <a name="38" href="#38">38</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/CalculateDensity.html">CalculateDensity</a>(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 <a name="39" href="#39">39</a>  
-<a name="40" href="#40">40</a>      <strong class="jxr_keyword">return</strong> graph.getConfig().getLogicalGraphFactory()
+<a name="40" href="#40">40</a>      <strong class="jxr_keyword">return</strong> graph.getFactory()
 <a name="41" href="#41">41</a>        .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
 <a name="42" href="#42">42</a>    }
 <a name="43" href="#43">43</a>  }

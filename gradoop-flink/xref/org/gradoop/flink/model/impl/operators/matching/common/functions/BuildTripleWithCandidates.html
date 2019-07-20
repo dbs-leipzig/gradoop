@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 <a name="24" href="#24">24</a>  
@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM edge type</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="40" href="#40">40</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"id-&gt;f0;sourceId-&gt;f1;targetId-&gt;f2"</span>)
-<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> BuildTripleWithCandidates&lt;E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> BuildTripleWithCandidates&lt;E <strong class="jxr_keyword">extends</strong> Edge&gt;
 <a name="42" href="#42">42</a>    <strong class="jxr_keyword">extends</strong> AbstractBuilder&lt;E, TripleWithCandidates&lt;GradoopId&gt;&gt; {
 <a name="43" href="#43">43</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * serial version uid</em>

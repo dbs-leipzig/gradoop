@@ -165,9 +165,8 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
 <span class="fc" id="L165">        .union(edges);</span>
     }
 
-<span class="fc" id="L168">    return logicalGraph.getConfig()</span>
-<span class="fc" id="L169">      .getLogicalGraphFactory()</span>
-<span class="fc" id="L170">      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);</span>
+<span class="fc" id="L168">    return logicalGraph.getFactory()</span>
+<span class="fc" id="L169">      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

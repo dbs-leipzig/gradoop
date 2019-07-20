@@ -53,19 +53,19 @@ public class MergeEmbeddings implements
    */
   private final int joinColumnsRightSize;
   /**
-   * EPGMVertex columns of the left embedding that need to have distinct id values.
+   * Vertex columns of the left embedding that need to have distinct id values.
    */
   private final int[] distinctVertexColumnsLeft;
   /**
-   * EPGMVertex columns of the right embedding that need to have distinct id values.
+   * Vertex columns of the right embedding that need to have distinct id values.
    */
   private final int[] distinctVertexColumnsRight;
   /**
-   * EPGMEdge columns of the left embedding that need to have distinct id values.
+   * Edge columns of the left embedding that need to have distinct id values.
    */
   private final int[] distinctEdgeColumnsLeft;
   /**
-   * EPGMEdge columns of the right embedding that need to have distinct id values.
+   * Edge columns of the right embedding that need to have distinct id values.
    */
   private final int[] distinctEdgeColumnsRight;
   /**
@@ -135,15 +135,15 @@ public class MergeEmbeddings implements
   protected boolean isValid(Embedding left, Embedding right) {
 <span class="fc" id="L136">    boolean collect = false;</span>
 
-    // EPGMVertex-Homomorphism + EPGMEdge-Homomorphism
+    // Vertex-Homomorphism + Edge-Homomorphism
 <span class="fc bfc" id="L139" title="All 4 branches covered.">    if (!checkDistinctVertices &amp;&amp; !checkDistinctEdges) {</span>
 <span class="fc" id="L140">      collect = true;</span>
-      // EPGMVertex-Homomorphism + EPGMEdge-Isomorphism
+      // Vertex-Homomorphism + Edge-Isomorphism
 <span class="fc bfc" id="L142" title="All 2 branches covered.">    } else if (!checkDistinctVertices) {</span>
 <span class="fc bfc" id="L143" title="All 2 branches covered.">      if (isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {</span>
 <span class="fc" id="L144">        collect = true;</span>
       }
-      // EPGMVertex-Isomorphism + EPGMEdge-Isomorphism
+      // Vertex-Isomorphism + Edge-Isomorphism
     } else {
 <span class="fc bfc" id="L148" title="All 2 branches covered.">      if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &amp;&amp;</span>
 <span class="fc bfc" id="L149" title="All 2 branches covered.">        isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {</span>

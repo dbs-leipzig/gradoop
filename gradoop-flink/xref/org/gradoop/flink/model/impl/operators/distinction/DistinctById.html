@@ -37,7 +37,7 @@
 <a name="27" href="#27">27</a>  
 <a name="28" href="#28">28</a>    @Override
 <a name="29" href="#29">29</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection) {
-<a name="30" href="#30">30</a>      <strong class="jxr_keyword">return</strong> collection.getConfig().getGraphCollectionFactory().fromDataSets(
+<a name="30" href="#30">30</a>      <strong class="jxr_keyword">return</strong> collection.getFactory().fromDataSets(
 <a name="31" href="#31">31</a>        collection.getGraphHeads().distinct(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()),
 <a name="32" href="#32">32</a>        collection.getVertices(),
 <a name="33" href="#33">33</a>        collection.getEdges());

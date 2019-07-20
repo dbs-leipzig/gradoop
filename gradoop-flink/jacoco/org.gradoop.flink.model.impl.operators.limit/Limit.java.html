@@ -63,7 +63,7 @@ public class Limit implements UnaryCollectionToCollectionOperator {
 <span class="fc" id="L63">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
 <span class="fc" id="L64">      .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L66">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L66">    return collection.getFactory()</span>
 <span class="fc" id="L67">      .fromDataSets(graphHeads, filteredVertices, filteredEdges);</span>
   }
 }

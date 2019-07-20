@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.common.matching;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.model.GraphElement;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> java.util.Collection;
@@ -42,14 +42,14 @@
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Matches the given data graph element against all given query elements.</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * @param &lt;EL1&gt;         EPGM element type</em>
+<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * @param &lt;EL1&gt;         element type</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   * @param &lt;EL2&gt;         GDL element type</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * @param dbElement     data graph element (vertex/edge)</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * @param queryElements query graph elements (vertices/edges)</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * @param defaultLabel  default element label</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * @return true, iff the data graph element matches at least one query element</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> EPGMElement, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> Element, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
 <a name="43" href="#43">43</a>    <strong class="jxr_keyword">boolean</strong> matchAll(EL1 dbElement, Collection&lt;EL2&gt; queryElements, String defaultLabel) {
 <a name="44" href="#44">44</a>  
 <a name="45" href="#45">45</a>      <strong class="jxr_keyword">boolean</strong> match = false;
@@ -67,14 +67,14 @@
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Returns all query candidate ids for the given EPGM element.</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * @param dbElement     EPGM element (vertices/edges)</em>
+<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * @param dbElement     element (vertices/edges)</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @param queryElements query graph elements (vertices/edges)</em>
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * @param &lt;EL1&gt;         EPGM element type</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   * @param &lt;EL2&gt;         GDL element type</em>
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * @param defaultLabel  default element label</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   * @return all candidate ids for {@code dbElement}</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> EPGMElement, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
+<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> Element, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
 <a name="68" href="#68">68</a>    List&lt;Long&gt; getMatches(EL1 dbElement, Collection&lt;EL2&gt; queryElements, String defaultLabel) {
 <a name="69" href="#69">69</a>  
 <a name="70" href="#70">70</a>      List&lt;Long&gt; matches = Lists.newArrayListWithCapacity(queryElements.size());
@@ -91,14 +91,14 @@
 <a name="81" href="#81">81</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   * Matches the given data graph element against the given query element.</em>
 <a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * @param &lt;EL1&gt;         EPGM element type</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * @param &lt;EL1&gt;         element type</em>
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * @param &lt;EL2&gt;         GDL element type</em>
 <a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * @param dbElement     data graph element (vertex/edge)</em>
 <a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * @param queryElement  query graph element (vertex/edge)</em>
 <a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * @param defaultLabel  default element label</em>
 <a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * @return true, iff the data graph element matches the query graph element</em>
 <a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="91" href="#91">91</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> EPGMElement, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
+<a name="91" href="#91">91</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;EL1 <strong class="jxr_keyword">extends</strong> Element, EL2 <strong class="jxr_keyword">extends</strong> GraphElement&gt;
 <a name="92" href="#92">92</a>    <strong class="jxr_keyword">boolean</strong> match(EL1 dbElement, EL2 queryElement, String defaultLabel) {
 <a name="93" href="#93">93</a>  
 <a name="94" href="#94">94</a>      <strong class="jxr_keyword">boolean</strong> match  = false;

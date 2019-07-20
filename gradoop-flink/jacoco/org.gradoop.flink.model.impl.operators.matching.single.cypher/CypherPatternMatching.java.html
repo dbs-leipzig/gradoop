@@ -18,9 +18,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -43,12 +46,23 @@ import static org.gradoop.flink.model.impl.operators.matching.common.debug.Print
 
 /**
  * Implementation of a query engine based on the Cypher graph query language.
+ *
+ * @param &lt;G&gt; The graph head type.
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ * @param &lt;LG&gt; The graph type.
+ * @param &lt;GC&gt; The graph collection type.
  */
-public class CypherPatternMatching extends PatternMatching {
+public class CypherPatternMatching&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends PatternMatching&lt;G, V, E, LG, GC&gt; {
   /**
    * Logger
    */
-<span class="fc" id="L51">  private static final Logger LOG = Logger.getLogger(CypherPatternMatching.class);</span>
+<span class="fc" id="L65">  private static final Logger LOG = Logger.getLogger(CypherPatternMatching.class);</span>
   /**
    * Construction pattern for result transformation.
    */
@@ -77,8 +91,8 @@ public class CypherPatternMatching extends PatternMatching {
    */
   public CypherPatternMatching(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-<span class="fc" id="L80">    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);</span>
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L94">    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);</span>
+<span class="fc" id="L95">  }</span>
 
   /**
    * Instantiates a new operator.
@@ -92,48 +106,48 @@ public class CypherPatternMatching extends PatternMatching {
    */
   public CypherPatternMatching(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-<span class="fc" id="L95">    super(query, attachData, LOG);</span>
-<span class="fc" id="L96">    this.constructionPattern = constructionPattern;</span>
-<span class="fc" id="L97">    this.vertexStrategy = vertexStrategy;</span>
-<span class="fc" id="L98">    this.edgeStrategy = edgeStrategy;</span>
-<span class="fc" id="L99">    this.graphStatistics = graphStatistics;</span>
-<span class="fc" id="L100">  }</span>
+<span class="fc" id="L109">    super(query, attachData, LOG);</span>
+<span class="fc" id="L110">    this.constructionPattern = constructionPattern;</span>
+<span class="fc" id="L111">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L112">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L113">    this.graphStatistics = graphStatistics;</span>
+<span class="fc" id="L114">  }</span>
 
   @Override
-  protected GraphCollection executeForVertex(LogicalGraph graph) {
-<span class="fc" id="L104">    return executeForPattern(graph);</span>
+  protected GC executeForVertex(LG graph) {
+<span class="fc" id="L118">    return executeForPattern(graph);</span>
   }
 
   @Override
-  protected GraphCollection executeForPattern(LogicalGraph graph) {
+  protected GC executeForPattern(LG graph) {
     // Query planning
-<span class="fc" id="L110">    QueryHandler queryHandler = getQueryHandler();</span>
-<span class="fc" id="L111">    QueryPlan plan =</span>
-<span class="fc" id="L112">      new GreedyPlanner(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()</span>
-<span class="fc" id="L113">        .getQueryPlan();</span>
+<span class="fc" id="L124">    QueryHandler queryHandler = getQueryHandler();</span>
+<span class="fc" id="L125">    QueryPlan plan =</span>
+<span class="fc" id="L126">      new GreedyPlanner&lt;&gt;(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()</span>
+<span class="fc" id="L127">        .getQueryPlan();</span>
 
     // Query execution
-<span class="fc" id="L116">    DataSet&lt;Embedding&gt; embeddings = plan.execute();</span>
-<span class="fc" id="L117">    EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();</span>
+<span class="fc" id="L130">    DataSet&lt;Embedding&gt; embeddings = plan.execute();</span>
+<span class="fc" id="L131">    EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();</span>
 
-<span class="fc" id="L119">    embeddings =</span>
-<span class="fc" id="L120">      log(embeddings, new PrintEmbedding(embeddingMetaData), getVertexMapping(), getEdgeMapping());</span>
+<span class="fc" id="L133">    embeddings =</span>
+<span class="fc" id="L134">      log(embeddings, new PrintEmbedding(embeddingMetaData), getVertexMapping(), getEdgeMapping());</span>
 
     // Pattern construction (if necessary)
-<span class="fc bfc" id="L123" title="All 2 branches covered.">    DataSet&lt;EPGMElement&gt; finalElements = this.constructionPattern != null ?</span>
-<span class="fc" id="L124">      constructFinalElements(graph, embeddings, embeddingMetaData) :</span>
-<span class="fc" id="L125">      embeddings.flatMap(</span>
-        new ElementsFromEmbedding(
-<span class="fc" id="L127">          graph.getFactory().getGraphHeadFactory(),</span>
-<span class="fc" id="L128">          graph.getFactory().getVertexFactory(),</span>
-<span class="fc" id="L129">          graph.getFactory().getEdgeFactory(),</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    DataSet&lt;Element&gt; finalElements = this.constructionPattern != null ?</span>
+<span class="fc" id="L138">      constructFinalElements(graph, embeddings, embeddingMetaData) :</span>
+<span class="fc" id="L139">      embeddings.flatMap(</span>
+        new ElementsFromEmbedding&lt;&gt;(
+<span class="fc" id="L141">          graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L142">          graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L143">          graph.getFactory().getEdgeFactory(),</span>
           embeddingMetaData,
-<span class="fc" id="L131">          queryHandler.getSourceTargetVariables()));</span>
+<span class="fc" id="L145">          queryHandler.getSourceTargetVariables()));</span>
 
     // Post processing
-<span class="fc" id="L134">    return</span>
-<span class="fc bfc" id="L135" title="All 2 branches covered.">      doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :</span>
-<span class="fc" id="L136">      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);</span>
+<span class="fc" id="L148">    return</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">      doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :</span>
+<span class="fc" id="L150">      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);</span>
   }
 
   /**
@@ -144,34 +158,34 @@ public class CypherPatternMatching extends PatternMatching {
    * @param embeddingMetaData   Meta information
    * @return                    New set of EmbeddingElements
    */
-  private DataSet&lt;EPGMElement&gt; constructFinalElements(LogicalGraph graph, DataSet&lt;Embedding&gt; embeddings,
+  private DataSet&lt;Element&gt; constructFinalElements(LG graph, DataSet&lt;Embedding&gt; embeddings,
     EmbeddingMetaData embeddingMetaData) {
 
-<span class="fc" id="L150">    QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);</span>
+<span class="fc" id="L164">    QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);</span>
 
-<span class="fc" id="L152">    Set&lt;String&gt; queryVars = Sets.newHashSet(embeddingMetaData.getVariables());</span>
-<span class="fc" id="L153">    Set&lt;String&gt; constructionVars = constructionPatternHandler.getAllVariables();</span>
-<span class="fc" id="L154">    Set&lt;String&gt; existingVars = intersection(queryVars, constructionVars).immutableCopy();</span>
-<span class="fc" id="L155">    Set&lt;String&gt; newVars = difference(constructionVars, queryVars).immutableCopy();</span>
+<span class="fc" id="L166">    Set&lt;String&gt; queryVars = Sets.newHashSet(embeddingMetaData.getVariables());</span>
+<span class="fc" id="L167">    Set&lt;String&gt; constructionVars = constructionPatternHandler.getAllVariables();</span>
+<span class="fc" id="L168">    Set&lt;String&gt; existingVars = intersection(queryVars, constructionVars).immutableCopy();</span>
+<span class="fc" id="L169">    Set&lt;String&gt; newVars = difference(constructionVars, queryVars).immutableCopy();</span>
 
-<span class="fc" id="L157">    EmbeddingMetaData newMetaData = computeNewMetaData(</span>
+<span class="fc" id="L171">    EmbeddingMetaData newMetaData = computeNewMetaData(</span>
       embeddingMetaData, constructionPatternHandler, existingVars, newVars);
 
     // project existing embedding elements to new embeddings
-<span class="fc" id="L161">    ProjectEmbeddingsElements projectedEmbeddings =</span>
+<span class="fc" id="L175">    ProjectEmbeddingsElements projectedEmbeddings =</span>
       new ProjectEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
     // add new embedding elements
-<span class="fc" id="L164">    AddEmbeddingsElements addEmbeddingsElements =</span>
-<span class="fc" id="L165">      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());</span>
+<span class="fc" id="L178">    AddEmbeddingsElements addEmbeddingsElements =</span>
+<span class="fc" id="L179">      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());</span>
 
-<span class="fc" id="L167">    return addEmbeddingsElements.evaluate().flatMap(</span>
-      new ElementsFromEmbedding(
-<span class="fc" id="L169">        graph.getFactory().getGraphHeadFactory(),</span>
-<span class="fc" id="L170">        graph.getFactory().getVertexFactory(),</span>
-<span class="fc" id="L171">        graph.getFactory().getEdgeFactory(),</span>
+<span class="fc" id="L181">    return addEmbeddingsElements.evaluate().flatMap(</span>
+      new ElementsFromEmbedding&lt;&gt;(
+<span class="fc" id="L183">        graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L184">        graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L185">        graph.getFactory().getEdgeFactory(),</span>
         newMetaData,
-<span class="fc" id="L173">        constructionPatternHandler.getSourceTargetVariables(),</span>
-<span class="fc" id="L174">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>
+<span class="fc" id="L187">        constructionPatternHandler.getSourceTargetVariables(),</span>
+<span class="fc" id="L188">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>
   }
 
   /**
@@ -186,22 +200,22 @@ public class CypherPatternMatching extends PatternMatching {
   private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
     QueryHandler returnPatternHandler, Set&lt;String&gt; existingVariables, Set&lt;String&gt; newVariables) {
     // update meta data
-<span class="fc" id="L189">    EmbeddingMetaData newMetaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L203">    EmbeddingMetaData newMetaData = new EmbeddingMetaData();</span>
 
     // case 1: Filter existing embeddings based on return pattern
-<span class="fc bfc" id="L192" title="All 2 branches covered.">    for (String var : existingVariables) {</span>
-<span class="fc" id="L193">      newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());</span>
-<span class="fc" id="L194">    }</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">    for (String var : existingVariables) {</span>
+<span class="fc" id="L207">      newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());</span>
+<span class="fc" id="L208">    }</span>
 
     // case 2: Add new vertices and edges
-<span class="fc bfc" id="L197" title="All 2 branches covered.">    for (String var : newVariables) {</span>
-<span class="fc bfc" id="L198" title="All 2 branches covered.">      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">    for (String var : newVariables) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?</span>
         EmbeddingMetaData.EntryType.EDGE :
         EmbeddingMetaData.EntryType.VERTEX;
 
-<span class="fc" id="L202">      newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());</span>
-<span class="fc" id="L203">    }</span>
-<span class="fc" id="L204">    return newMetaData;</span>
+<span class="fc" id="L216">      newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());</span>
+<span class="fc" id="L217">    }</span>
+<span class="fc" id="L218">    return newMetaData;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

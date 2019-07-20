@@ -25,8 +25,8 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> java.util.List;
@@ -34,8 +34,8 @@
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Represents a leaf node in the query plan. Leaf nodes are different in terms of their input which</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * is a data set containing EPGM elements, i.e. {@link EPGMVertex} or</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * {@link EPGMEdge}.</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * is a data set containing elements, i.e. {@link Vertex} or</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * {@link Edge}.</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/LeafNode.html">LeafNode</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/PlanNode.html">PlanNode</a> {
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>

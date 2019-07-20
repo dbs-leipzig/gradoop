@@ -32,13 +32,13 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> java.util.regex.Pattern;
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.Assert.assertEquals;
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * Test class for {@link HBasePropReg}</em>
@@ -77,8 +77,8 @@
 <a name="67" href="#67">67</a>      expectedFilter.addFilter(typeFilter);
 <a name="68" href="#68">68</a>      expectedFilter.addFilter(valueFilter);
 <a name="69" href="#69">69</a>  
-<a name="70" href="#70">70</a>      assertEquals(<span class="jxr_string">"Failed during filter comparison for key ["</span> + key + <span class="jxr_string">"]."</span>,
-<a name="71" href="#71">71</a>        expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+<a name="70" href="#70">70</a>      assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
+<a name="71" href="#71">71</a>        <span class="jxr_string">"Failed during filter comparison for key ["</span> + key + <span class="jxr_string">"]."</span>);
 <a name="72" href="#72">72</a>    }
 <a name="73" href="#73">73</a>  }
 </pre>

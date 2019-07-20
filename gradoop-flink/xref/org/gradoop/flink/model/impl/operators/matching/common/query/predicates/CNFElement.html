@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphElement;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>    @Override
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> evaluate(EPGMGraphElement element) {
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> evaluate(GraphElement element) {
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">for</strong> (ComparisonExpression comparisonExpression : predicates) {
 <a name="63" href="#63">63</a>        <strong class="jxr_keyword">if</strong> (comparisonExpression.evaluate(element)) {
 <a name="64" href="#64">64</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;

@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-<span class="fc" id="L30">    return collection.getConfig().getGraphCollectionFactory().fromDataSets(</span>
+<span class="fc" id="L30">    return collection.getFactory().fromDataSets(</span>
 <span class="fc" id="L31">      collection.getGraphHeads().distinct(new Id&lt;&gt;()),</span>
 <span class="fc" id="L32">      collection.getVertices(),</span>
 <span class="fc" id="L33">      collection.getEdges());</span>

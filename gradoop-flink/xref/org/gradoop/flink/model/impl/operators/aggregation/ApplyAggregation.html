@@ -92,7 +92,7 @@
 <a name="82" href="#82">82</a>        .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(0)
 <a name="83" href="#83">83</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/SetAggregateProperties.html">SetAggregateProperties</a>(aggregateFunctions));
 <a name="84" href="#84">84</a>  
-<a name="85" href="#85">85</a>      <strong class="jxr_keyword">return</strong> collection.getConfig().getGraphCollectionFactory()
+<a name="85" href="#85">85</a>      <strong class="jxr_keyword">return</strong> collection.getFactory()
 <a name="86" href="#86">86</a>        .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
 <a name="87" href="#87">87</a>    }
 <a name="88" href="#88">88</a>  
@@ -101,7 +101,7 @@
 <a name="91" href="#91">91</a>      DataSet&lt;GraphTransaction&gt; updatedTransactions = collection.getGraphTransactions()
 <a name="92" href="#92">92</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/AggregateTransactions.html">AggregateTransactions</a>(aggregateFunctions));
 <a name="93" href="#93">93</a>  
-<a name="94" href="#94">94</a>      <strong class="jxr_keyword">return</strong> collection.getConfig().getGraphCollectionFactory().fromTransactions(updatedTransactions);
+<a name="94" href="#94">94</a>      <strong class="jxr_keyword">return</strong> collection.getFactory().fromTransactions(updatedTransactions);
 <a name="95" href="#95">95</a>    }
 <a name="96" href="#96">96</a>  
 <a name="97" href="#97">97</a>    <em class="jxr_javadoccomment">/**</em>

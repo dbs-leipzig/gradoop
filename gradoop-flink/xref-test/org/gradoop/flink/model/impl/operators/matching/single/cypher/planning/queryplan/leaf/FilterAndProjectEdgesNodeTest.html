@@ -50,11 +50,11 @@
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectEdgesNodeTest.html">FilterAndProjectEdgesNodeTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>    @Test
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitialization() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitialization() {
 <a name="44" href="#44">44</a>      String sourceVariable = <span class="jxr_string">"a"</span>;
 <a name="45" href="#45">45</a>      String edgeVariable   = <span class="jxr_string">"e"</span>;
 <a name="46" href="#46">46</a>      String targetVariable = <span class="jxr_string">"b"</span>;
-<a name="47" href="#47">47</a>      FilterAndProjectEdgesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode(
+<a name="47" href="#47">47</a>      FilterAndProjectEdgesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode&lt;&gt;(
 <a name="48" href="#48">48</a>        <strong class="jxr_keyword">null</strong>, sourceVariable, edgeVariable, targetVariable, <strong class="jxr_keyword">new</strong> CNF(), <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;(), false);
 <a name="49" href="#49">49</a>  
 <a name="50" href="#50">50</a>      EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
@@ -65,11 +65,11 @@
 <a name="55" href="#55">55</a>    }
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    @Test
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitializationWithLoop() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitializationWithLoop() {
 <a name="59" href="#59">59</a>      String sourceVariable = <span class="jxr_string">"a"</span>;
 <a name="60" href="#60">60</a>      String edgeVariable   = <span class="jxr_string">"e"</span>;
 <a name="61" href="#61">61</a>      String targetVariable = <span class="jxr_string">"a"</span>;
-<a name="62" href="#62">62</a>      FilterAndProjectEdgesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode(
+<a name="62" href="#62">62</a>      FilterAndProjectEdgesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode&lt;&gt;(
 <a name="63" href="#63">63</a>        <strong class="jxr_keyword">null</strong>, sourceVariable, edgeVariable, targetVariable, <strong class="jxr_keyword">new</strong> CNF(), <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;(), false);
 <a name="64" href="#64">64</a>  
 <a name="65" href="#65">65</a>      EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
@@ -91,10 +91,10 @@
 <a name="81" href="#81">81</a>      Map&lt;String, Object&gt; edge2Props = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
 <a name="82" href="#82">82</a>      edge2Props.put(<span class="jxr_string">"foo"</span>, 42);
 <a name="83" href="#83">83</a>  
-<a name="84" href="#84">84</a>      EPGMEdge
-<a name="85" href="#85">85</a>        e1 = <strong class="jxr_keyword">new</strong> EPGMEdge(edge1Id, <span class="jxr_string">"a"</span>, sourceId, targetId, Properties.createFromMap(edge1Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
-<a name="86" href="#86">86</a>      EPGMEdge
-<a name="87" href="#87">87</a>        e2 = <strong class="jxr_keyword">new</strong> EPGMEdge(edge2Id, <span class="jxr_string">"b"</span>, sourceId, targetId, Properties.createFromMap(edge2Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
+<a name="84" href="#84">84</a>      EPGMEdge e1 = <strong class="jxr_keyword">new</strong> EPGMEdge(edge1Id, <span class="jxr_string">"a"</span>, sourceId, targetId, Properties.createFromMap(edge1Props),
+<a name="85" href="#85">85</a>        <strong class="jxr_keyword">new</strong> GradoopIdSet());
+<a name="86" href="#86">86</a>      EPGMEdge e2 = <strong class="jxr_keyword">new</strong> EPGMEdge(edge2Id, <span class="jxr_string">"b"</span>, sourceId, targetId, Properties.createFromMap(edge2Props),
+<a name="87" href="#87">87</a>        <strong class="jxr_keyword">new</strong> GradoopIdSet());
 <a name="88" href="#88">88</a>  
 <a name="89" href="#89">89</a>      DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2);
 <a name="90" href="#90">90</a>  
@@ -103,8 +103,8 @@
 <a name="93" href="#93">93</a>      CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet(<span class="jxr_string">"e"</span>));
 <a name="94" href="#94">94</a>      Set&lt;String&gt; projectionKeys = queryHandler.getPredicates().getPropertyKeys(<span class="jxr_string">"e"</span>);
 <a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>      FilterAndProjectEdgesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode(
-<a name="97" href="#97">97</a>        edges, <span class="jxr_string">"a"</span>, <span class="jxr_string">"e"</span>, <span class="jxr_string">"b"</span>, filterPredicate, projectionKeys, false);
+<a name="96" href="#96">96</a>      FilterAndProjectEdgesNode&lt;EPGMEdge&gt; node = <strong class="jxr_keyword">new</strong> FilterAndProjectEdgesNode&lt;&gt;(edges, <span class="jxr_string">"a"</span>, <span class="jxr_string">"e"</span>, <span class="jxr_string">"b"</span>,
+<a name="97" href="#97">97</a>        filterPredicate, projectionKeys, false);
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>      List&lt;Embedding&gt; filteredEdges = node.execute().collect();
 <a name="100" href="#100">100</a> 

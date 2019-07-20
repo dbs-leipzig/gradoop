@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +31,15 @@ import java.util.Set;
 
 /**
  * Leaf node that wraps a {@link FilterAndProjectEdges} operator.
+ *
+ * @param &lt;E&gt; The edge type.
  */
-public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, ProjectionNode {
+public class FilterAndProjectEdgesNode&lt;E extends Edge&gt; extends LeafNode
+  implements FilterNode, ProjectionNode {
   /**
    * Input data set
    */
-  private DataSet&lt;EPGMEdge&gt; edges;
+  private DataSet&lt;E&gt; edges;
   /**
    * Query variable of the source vertex
    */
@@ -73,28 +76,28 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @param projectionKeys property keys whose associated values are projected to the output
    * @param isPath indicates if the edges is actually a path
    */
-  public FilterAndProjectEdgesNode(DataSet&lt;EPGMEdge&gt; edges,
+  public FilterAndProjectEdgesNode(DataSet&lt;E&gt; edges,
     String sourceVariable, String edgeVariable, String targetVariable,
-<span class="fc" id="L78">    CNF filterPredicate, Set&lt;String&gt; projectionKeys, boolean isPath) {</span>
-<span class="fc" id="L79">    this.edges = edges;</span>
-<span class="fc" id="L80">    this.sourceVariable = sourceVariable;</span>
-<span class="fc" id="L81">    this.edgeVariable = edgeVariable;</span>
-<span class="fc" id="L82">    this.targetVariable = targetVariable;</span>
-<span class="fc" id="L83">    this.filterPredicate = filterPredicate;</span>
-<span class="fc" id="L84">    this.projectionKeys = new ArrayList&lt;&gt;(projectionKeys);</span>
-<span class="fc" id="L85">    this.isPath = isPath;</span>
-<span class="fc" id="L86">  }</span>
+<span class="fc" id="L81">    CNF filterPredicate, Set&lt;String&gt; projectionKeys, boolean isPath) {</span>
+<span class="fc" id="L82">    this.edges = edges;</span>
+<span class="fc" id="L83">    this.sourceVariable = sourceVariable;</span>
+<span class="fc" id="L84">    this.edgeVariable = edgeVariable;</span>
+<span class="fc" id="L85">    this.targetVariable = targetVariable;</span>
+<span class="fc" id="L86">    this.filterPredicate = filterPredicate;</span>
+<span class="fc" id="L87">    this.projectionKeys = new ArrayList&lt;&gt;(projectionKeys);</span>
+<span class="fc" id="L88">    this.isPath = isPath;</span>
+<span class="fc" id="L89">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; execute() {
-<span class="fc" id="L90">    FilterAndProjectEdges op =  new FilterAndProjectEdges(</span>
+<span class="fc" id="L93">    FilterAndProjectEdges&lt;E&gt; op =  new FilterAndProjectEdges&lt;&gt;(</span>
       edges,
       filterPredicate,
       projectionKeys,
-<span class="fc" id="L94">      isLoop()</span>
+<span class="fc" id="L97">      isLoop()</span>
     );
-<span class="fc" id="L96">    op.setName(toString());</span>
-<span class="fc" id="L97">    return op.evaluate();</span>
+<span class="fc" id="L99">    op.setName(toString());</span>
+<span class="fc" id="L100">    return op.evaluate();</span>
   }
 
   /**
@@ -103,7 +106,7 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @return filter predicate
    */
   public CNF getFilterPredicate() {
-<span class="fc" id="L106">    return new CNF(filterPredicate);</span>
+<span class="fc" id="L109">    return new CNF(filterPredicate);</span>
   }
 
   /**
@@ -112,30 +115,30 @@ public class FilterAndProjectEdgesNode extends LeafNode implements FilterNode, P
    * @return projection keys
    */
   public List&lt;String&gt; getProjectionKeys() {
-<span class="nc" id="L115">    return new ArrayList&lt;&gt;(projectionKeys);</span>
+<span class="nc" id="L118">    return new ArrayList&lt;&gt;(projectionKeys);</span>
   }
 
   public boolean isLoop() {
-<span class="fc bfc" id="L119" title="All 4 branches covered.">    return sourceVariable.equals(targetVariable) &amp;&amp; !isPath;</span>
+<span class="fc bfc" id="L122" title="All 4 branches covered.">    return sourceVariable.equals(targetVariable) &amp;&amp; !isPath;</span>
   }
 
   @Override
   protected EmbeddingMetaData computeEmbeddingMetaData() {
-<span class="fc" id="L124">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();</span>
-<span class="fc" id="L125">    embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
-<span class="fc" id="L126">    embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">    if (!isLoop()) {</span>
-<span class="fc" id="L128">      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);</span>
+<span class="fc" id="L127">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L128">    embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
+<span class="fc" id="L129">    embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">    if (!isLoop()) {</span>
+<span class="fc" id="L131">      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);</span>
     }
 
-<span class="fc" id="L131">    embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);</span>
+<span class="fc" id="L134">    embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);</span>
 
-<span class="fc" id="L133">    return embeddingMetaData;</span>
+<span class="fc" id="L136">    return embeddingMetaData;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L138">    return String.format(&quot;FilterAndProjectEdgesNode{&quot; +</span>
+<span class="fc" id="L141">    return String.format(&quot;FilterAndProjectEdgesNode{&quot; +</span>
         &quot;sourceVariable='%s', &quot; +
         &quot;edgeVariable='%s', &quot; +
         &quot;targetVariable='%s', &quot; +

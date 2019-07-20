@@ -18,17 +18,17 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * element -&gt; (elementId, propertyValue)
  *
- * @param &lt;EL&gt; EPGM element type
+ * @param &lt;EL&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
-public class PairElementWithPropertyValue&lt;EL extends EPGMElement&gt;
+public class PairElementWithPropertyValue&lt;EL extends Element&gt;
   implements MapFunction&lt;EL, Tuple2&lt;GradoopId, PropertyValue&gt;&gt; {
 
   /**

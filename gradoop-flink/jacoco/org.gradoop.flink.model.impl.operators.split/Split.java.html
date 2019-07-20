@@ -140,7 +140,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     // return new graph collection
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L143">    return graph.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L143">    return graph.getCollectionFactory()</span>
 <span class="fc" id="L144">      .fromDataSets(newGraphs, vertices, edges);</span>
   }
 }

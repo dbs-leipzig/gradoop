@@ -62,7 +62,7 @@ public class GellyTriangleCounting extends GradoopGellyAlgorithm&lt;NullValue, N
 <span class="fc" id="L62">      .map(new WritePropertyToGraphHeadMap(</span>
 <span class="fc" id="L63">        PROPERTY_KEY_TRIANGLES, PropertyValue.create(triangles.count())));</span>
 
-<span class="fc" id="L65">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L65">    return currentGraph.getFactory().fromDataSets(</span>
 <span class="fc" id="L66">      resultHead, currentGraph.getVertices(), currentGraph.getEdges());</span>
   }
 }

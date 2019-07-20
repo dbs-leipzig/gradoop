@@ -20,13 +20,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple.
+ * Initializes an {@link Edge} from a given {@link GradoopId} triple.
  * The triple contains (in that order) {@code edge id}, {@code source vertex id} and
  * {@code target vertex id}
  * &lt;p&gt;
@@ -37,35 +36,44 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * {@code f1-&gt;sourceId:  source vertex id}
  * &lt;p&gt;
  * {@code f2-&gt;targetId:  target vertex id}
+ *
+ * @param &lt;E&gt; The produced edge type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;id;f1-&gt;sourceId;f2-&gt;targetId&quot;)
-public class EdgeFromIds implements
-  MapFunction&lt;Tuple3&lt;GradoopId, GradoopId, GradoopId&gt;, EPGMEdge&gt;,
-  ResultTypeQueryable&lt;EPGMEdge&gt; {
+public class EdgeFromIds&lt;E extends Edge&gt; implements MapFunction&lt;Tuple3&lt;GradoopId, GradoopId, GradoopId&gt;, E&gt;,
+  ResultTypeQueryable&lt;E&gt; {
 
   /**
-   * EPGM edge factory
+   * The type of the produced edge.
    */
-  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
+  private final TypeInformation&lt;E&gt; edgeType;
 
   /**
-   * Constructor
+   * Reduce object instantiations.
+   */
+  private final E reuseEdge;
+
+  /**
+   * Constructor.
    *
-   * @param epgmEdgeFactory EPGM edge factory
+   * @param edgeFactory The edge factory.
    */
-<span class="fc" id="L56">  public EdgeFromIds(EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory) {</span>
-<span class="fc" id="L57">    this.edgeFactory = epgmEdgeFactory;</span>
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L61">  public EdgeFromIds(EdgeFactory&lt;E&gt; edgeFactory) {</span>
+<span class="fc" id="L62">    edgeType = TypeInformation.of(edgeFactory.getType());</span>
+<span class="fc" id="L63">    reuseEdge = edgeFactory.createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);</span>
+<span class="fc" id="L64">  }</span>
 
   @Override
-  public EPGMEdge map(Tuple3&lt;GradoopId, GradoopId, GradoopId&gt; idTriple) throws
-    Exception {
-<span class="fc" id="L63">    return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);</span>
+  public E map(Tuple3&lt;GradoopId, GradoopId, GradoopId&gt; idTriple) {
+<span class="fc" id="L68">    reuseEdge.setId(idTriple.f0);</span>
+<span class="fc" id="L69">    reuseEdge.setSourceId(idTriple.f1);</span>
+<span class="fc" id="L70">    reuseEdge.setTargetId(idTriple.f2);</span>
+<span class="fc" id="L71">    return reuseEdge;</span>
   }
 
   @Override
-  public TypeInformation&lt;EPGMEdge&gt; getProducedType() {
-<span class="fc" id="L68">    return TypeExtractor.createTypeInfo(edgeFactory.getType());</span>
+  public TypeInformation&lt;E&gt; getProducedType() {
+<span class="fc" id="L76">    return edgeType;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -89,42 +89,38 @@ import java.util.Map;
 <span class="fc" id="L89">  }</span>
 
   @Override
-  public LogicalGraph getLogicalGraph() {
+  public LogicalGraph getLogicalGraph() throws IOException {
 <span class="nc" id="L93">    return getGraphCollection().reduce(new ReduceCombination());</span>
   }
 
   @Override
-  public GraphCollection getGraphCollection() {
+  public GraphCollection getGraphCollection() throws IOException {
     DataSet&lt;GraphTransaction&gt; transactions;
 <span class="fc" id="L99">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
 
 <span class="fc" id="L101">    DataSet&lt;Tuple2&lt;LongWritable, Text&gt;&gt; input = null;</span>
 
-    try {
-<span class="fc" id="L104">      input = env.createInput(HadoopInputs.readHadoopFile(</span>
-<span class="fc" id="L105">        new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath()));</span>
-<span class="nc" id="L106">    } catch (IOException e) {</span>
-<span class="nc" id="L107">      e.printStackTrace();</span>
-<span class="fc" id="L108">    }</span>
+<span class="fc" id="L103">    input = env.createInput(HadoopInputs.readHadoopFile(</span>
+<span class="fc" id="L104">      new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath()));</span>
 
     // load tlf graphs from file
-<span class="pc bpc" id="L111" title="2 of 4 branches missed.">    assert input != null;</span>
-<span class="fc" id="L112">    transactions = input.map(new GraphTransactionFromText(getConfig()));</span>
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">    assert input != null;</span>
+<span class="fc" id="L108">    transactions = input.map(new GraphTransactionFromText(getConfig()));</span>
 
     // map the integer valued labels to strings from dictionary
-<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (hasVertexDictionary()) {</span>
-<span class="fc" id="L116">      transactions = transactions</span>
-<span class="fc" id="L117">        .map(new VertexLabelDecoder())</span>
-<span class="fc" id="L118">        .withBroadcastSet(</span>
-<span class="fc" id="L119">          getVertexDictionary(), TLFConstants.VERTEX_DICTIONARY);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (hasVertexDictionary()) {</span>
+<span class="fc" id="L112">      transactions = transactions</span>
+<span class="fc" id="L113">        .map(new VertexLabelDecoder())</span>
+<span class="fc" id="L114">        .withBroadcastSet(</span>
+<span class="fc" id="L115">          getVertexDictionary(), TLFConstants.VERTEX_DICTIONARY);</span>
     }
-<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (hasEdgeDictionary()) {</span>
-<span class="fc" id="L122">      transactions = transactions</span>
-<span class="fc" id="L123">        .map(new EdgeLabelDecoder())</span>
-<span class="fc" id="L124">        .withBroadcastSet(</span>
-<span class="fc" id="L125">          getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (hasEdgeDictionary()) {</span>
+<span class="fc" id="L118">      transactions = transactions</span>
+<span class="fc" id="L119">        .map(new EdgeLabelDecoder())</span>
+<span class="fc" id="L120">        .withBroadcastSet(</span>
+<span class="fc" id="L121">          getEdgeDictionary(), TLFConstants.EDGE_DICTIONARY);</span>
     }
-<span class="fc" id="L127">    return getConfig().getGraphCollectionFactory().fromTransactions(transactions);</span>
+<span class="fc" id="L123">    return getConfig().getGraphCollectionFactory().fromTransactions(transactions);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

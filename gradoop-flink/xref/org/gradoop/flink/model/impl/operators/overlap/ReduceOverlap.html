@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>  
 <a name="39" href="#39">39</a>      DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(<strong class="jxr_keyword">new</strong> Id&lt;EPGMGraphHead&gt;());
 <a name="40" href="#40">40</a>  
-<a name="41" href="#41">41</a>      <strong class="jxr_keyword">return</strong> collection.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="41" href="#41">41</a>      <strong class="jxr_keyword">return</strong> collection.getGraphFactory().fromDataSets(
 <a name="42" href="#42">42</a>        getVertices(collection.getVertices(), graphIDs),
 <a name="43" href="#43">43</a>        getEdges(collection.getEdges(), graphIDs)
 <a name="44" href="#44">44</a>      );

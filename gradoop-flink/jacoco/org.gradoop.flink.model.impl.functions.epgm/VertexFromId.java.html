@@ -20,41 +20,47 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
+ * Initializes an {@link Vertex} from a given {@link GradoopId}.
+ *
+ * @param &lt;V&gt; The produced vertex type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;id&quot;)
-public class VertexFromId implements
-  MapFunction&lt;Tuple1&lt;GradoopId&gt;, EPGMVertex&gt;,
-  ResultTypeQueryable&lt;EPGMVertex&gt; {
+public class VertexFromId&lt;V extends Vertex&gt; implements
+  MapFunction&lt;Tuple1&lt;GradoopId&gt;, V&gt;, ResultTypeQueryable&lt;V&gt; {
 
   /**
-   * EPGM vertex factory
+   * The type of the produced vertex.
    */
-  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
+  private final TypeInformation&lt;V&gt; vertexType;
+
+  /**
+   * The factory used to create new vertices.
+   */
+  private final VertexFactory&lt;V&gt; vertexFactory;
 
   /**
    * Create new function.
    *
-   * @param vertexFactory EPGM vertex factory
+   * @param vertexFactory vertex factory
    */
-<span class="fc" id="L46">  public VertexFromId(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
-<span class="fc" id="L47">    this.vertexFactory = vertexFactory;</span>
-<span class="fc" id="L48">  }</span>
+<span class="fc" id="L51">  public VertexFromId(VertexFactory&lt;V&gt; vertexFactory) {</span>
+<span class="fc" id="L52">    this.vertexType = TypeInformation.of(vertexFactory.getType());</span>
+<span class="fc" id="L53">    this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L54">  }</span>
 
   @Override
-  public EPGMVertex map(Tuple1&lt;GradoopId&gt; gradoopId) throws Exception {
-<span class="fc" id="L52">    return vertexFactory.initVertex(gradoopId.f0);</span>
+  public V map(Tuple1&lt;GradoopId&gt; gradoopId) throws Exception {
+<span class="fc" id="L58">    return vertexFactory.initVertex(gradoopId.f0);</span>
   }
 
   @Override
-  public TypeInformation&lt;EPGMVertex&gt; getProducedType() {
-<span class="fc" id="L57">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
+  public TypeInformation&lt;V&gt; getProducedType() {
+<span class="fc" id="L63">    return vertexType;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

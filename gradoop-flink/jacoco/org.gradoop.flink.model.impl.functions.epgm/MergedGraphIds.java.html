@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.util.Iterator;
@@ -28,38 +28,36 @@ import java.util.Iterator;
  * Creates a single graph element which is contained in all graphs that the
  * input elements are contained in.
  *
- * EPGMGraphElement* -&gt; EPGMGraphElement
+ * GraphElement* -&gt; GraphElement
  *
- * @param &lt;GE&gt; EPGM graph element type
+ * @param &lt;GE&gt; graph element type
  */
-<span class="fc" id="L35">public class MergedGraphIds&lt;GE extends EPGMGraphElement&gt;</span>
-  implements GroupCombineFunction&lt;GE, GE&gt;, GroupReduceFunction&lt;GE, GE&gt;,
-  JoinFunction&lt;GE, GE, GE&gt; {
-
+<span class="fc" id="L35">public class MergedGraphIds&lt;GE extends GraphElement&gt; implements GroupCombineFunction&lt;GE, GE&gt;,</span>
+  GroupReduceFunction&lt;GE, GE&gt;, JoinFunction&lt;GE, GE, GE&gt; {
 
   @Override
   public void combine(Iterable&lt;GE&gt; values, Collector&lt;GE&gt; out) throws Exception {
-<span class="fc" id="L42">    reduce(values, out);</span>
-<span class="fc" id="L43">  }</span>
+<span class="fc" id="L40">    reduce(values, out);</span>
+<span class="fc" id="L41">  }</span>
 
   @Override
   public void reduce(Iterable&lt;GE&gt; values, Collector&lt;GE&gt; out) throws Exception {
-<span class="fc" id="L47">    Iterator&lt;GE&gt; iterator = values.iterator();</span>
-<span class="fc" id="L48">    GE result = iterator.next();</span>
-<span class="fc" id="L49">    GradoopIdSet graphIds = result.getGraphIds();</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L51">      graphIds.addAll(iterator.next().getGraphIds());</span>
+<span class="fc" id="L45">    Iterator&lt;GE&gt; iterator = values.iterator();</span>
+<span class="fc" id="L46">    GE result = iterator.next();</span>
+<span class="fc" id="L47">    GradoopIdSet graphIds = result.getGraphIds();</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L49">      graphIds.addAll(iterator.next().getGraphIds());</span>
     }
-<span class="fc" id="L53">    out.collect(result);</span>
-<span class="fc" id="L54">  }</span>
+<span class="fc" id="L51">    out.collect(result);</span>
+<span class="fc" id="L52">  }</span>
 
   @Override
   public GE join(GE first, GE second) throws Exception {
-<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (first == null) {</span>
-<span class="fc" id="L59">      return second;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (first == null) {</span>
+<span class="fc" id="L57">      return second;</span>
     }
-<span class="fc" id="L61">    first.getGraphIds().addAll(second.getGraphIds());</span>
-<span class="fc" id="L62">    return first;</span>
+<span class="fc" id="L59">    first.getGraphIds().addAll(second.getGraphIds());</span>
+<span class="fc" id="L60">    return first;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

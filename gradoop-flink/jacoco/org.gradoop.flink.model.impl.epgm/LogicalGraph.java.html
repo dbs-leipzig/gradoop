@@ -31,8 +31,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -207,7 +207,7 @@ public class LogicalGraph implements
   public GraphCollection query(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
     GraphStatistics graphStatistics) {
-<span class="fc" id="L210">    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,</span>
+<span class="fc" id="L210">    return callForCollection(new CypherPatternMatching&lt;&gt;(query, constructionPattern, attachData,</span>
       vertexStrategy, edgeStrategy, graphStatistics));
   }
 
@@ -290,13 +290,14 @@ public class LogicalGraph implements
   }
 
   @Override
-  public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
-<span class="fc" id="L294">    return operator.execute(this);</span>
+  public GraphCollection callForCollection(
+    UnaryBaseGraphToBaseGraphCollectionOperator&lt;LogicalGraph, GraphCollection&gt; operator) {
+<span class="fc" id="L295">    return operator.execute(this);</span>
   }
 
   @Override
   public GraphCollection splitBy(String propertyKey) {
-<span class="fc" id="L299">    return callForCollection(new Split(new PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));</span>
+<span class="fc" id="L300">    return callForCollection(new Split(new PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));</span>
   }
 
   //----------------------------------------------------------------------------
@@ -305,23 +306,23 @@ public class LogicalGraph implements
 
   @Override
   public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="nc" id="L308">    return getVertices()</span>
-<span class="nc" id="L309">      .map(new True&lt;&gt;())</span>
-<span class="nc" id="L310">      .distinct()</span>
-<span class="nc" id="L311">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
-<span class="nc" id="L312">      .reduce(new Or())</span>
-<span class="nc" id="L313">      .map(new Not());</span>
+<span class="nc" id="L309">    return getVertices()</span>
+<span class="nc" id="L310">      .map(new True&lt;&gt;())</span>
+<span class="nc" id="L311">      .distinct()</span>
+<span class="nc" id="L312">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
+<span class="nc" id="L313">      .reduce(new Or())</span>
+<span class="nc" id="L314">      .map(new Not());</span>
   }
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
-<span class="nc" id="L318">    dataSink.write(this);</span>
-<span class="nc" id="L319">  }</span>
+<span class="nc" id="L319">    dataSink.write(this);</span>
+<span class="nc" id="L320">  }</span>
 
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-<span class="nc" id="L323">    dataSink.write(this, overWrite);</span>
-<span class="nc" id="L324">  }</span>
+<span class="nc" id="L324">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L325">  }</span>
 
   /**
    * Prints the GDL formatted graph to the standard output.
@@ -329,7 +330,7 @@ public class LogicalGraph implements
    * @throws Exception forwarded from dataset print
    */
   public void print() throws Exception {
-<span class="nc" id="L332">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L333">  }</span>
+<span class="nc" id="L333">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L334">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

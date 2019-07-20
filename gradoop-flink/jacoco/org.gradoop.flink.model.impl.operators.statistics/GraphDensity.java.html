@@ -37,7 +37,7 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDens
 <span class="fc" id="L37">      .getGraphHead()</span>
 <span class="fc" id="L38">      .map(new CalculateDensity(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));</span>
 
-<span class="fc" id="L40">    return graph.getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L40">    return graph.getFactory()</span>
 <span class="fc" id="L41">      .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());</span>
   }
 }

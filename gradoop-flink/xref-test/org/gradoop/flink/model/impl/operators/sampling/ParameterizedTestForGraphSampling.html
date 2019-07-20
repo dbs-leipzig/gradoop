@@ -232,46 +232,48 @@
 <a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   *</em>
 <a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   * @param input The input graph</em>
 <a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @param output The sampled graph</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   */</em>
-<a name="226" href="#226">226</a>   <strong class="jxr_keyword">void</strong> validateGraph(LogicalGraph input, LogicalGraph output) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="227" href="#227">227</a>     dbVertices = Lists.newArrayList();
-<a name="228" href="#228">228</a>     dbEdges = Lists.newArrayList();
-<a name="229" href="#229">229</a>     newVertices = Lists.newArrayList();
-<a name="230" href="#230">230</a>     newEdges = Lists.newArrayList();
-<a name="231" href="#231">231</a> 
-<a name="232" href="#232">232</a>     input.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(dbVertices));
-<a name="233" href="#233">233</a>     input.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(dbEdges));
-<a name="234" href="#234">234</a> 
-<a name="235" href="#235">235</a>     output.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newVertices));
-<a name="236" href="#236">236</a>     output.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newEdges));
-<a name="237" href="#237">237</a> 
-<a name="238" href="#238">238</a>     getExecutionEnvironment().execute();
-<a name="239" href="#239">239</a> 
-<a name="240" href="#240">240</a>     assertNotNull(<span class="jxr_string">"graph was null"</span>, output);
-<a name="241" href="#241">241</a> 
-<a name="242" href="#242">242</a>     newVertexIDs = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="243" href="#243">243</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : newVertices) {
-<a name="244" href="#244">244</a>       assertTrue(<span class="jxr_string">"sampled vertex is not part of the original graph"</span>, dbVertices.contains(vertex));
-<a name="245" href="#245">245</a>       newVertexIDs.add(vertex.getId());
-<a name="246" href="#246">246</a>     }
-<a name="247" href="#247">247</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : newEdges) {
-<a name="248" href="#248">248</a>       assertTrue(<span class="jxr_string">"sampled edge is not part of the original graph"</span>, dbEdges.contains(edge));
-<a name="249" href="#249">249</a>       assertTrue(<span class="jxr_string">"sampled edge has source vertex which is not part of the sampled graph"</span>,
-<a name="250" href="#250">250</a>         newVertexIDs.contains(edge.getSourceId()));
-<a name="251" href="#251">251</a>       assertTrue(<span class="jxr_string">"sampled edge has target vertex which is not part of the sampled graph"</span>,
-<a name="252" href="#252">252</a>         newVertexIDs.contains(edge.getTargetId()));
-<a name="253" href="#253">253</a>     }
-<a name="254" href="#254">254</a>   }
-<a name="255" href="#255">255</a> 
-<a name="256" href="#256">256</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   * The specific graph validation used by some graph samplings.</em>
-<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   * Needs to be implemented in the respective sampling test-class.</em>
-<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   *</em>
-<a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   * @param input The input graph</em>
-<a name="261" href="#261">261</a> <em class="jxr_javadoccomment">   * @param output The sampled graph</em>
-<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   */</em>
-<a name="263" href="#263">263</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">void</strong> validateSpecific(LogicalGraph input, LogicalGraph output);
-<a name="264" href="#264">264</a> }
+<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
+<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   */</em>
+<a name="227" href="#227">227</a>   <strong class="jxr_keyword">void</strong> validateGraph(LogicalGraph input, LogicalGraph output) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="228" href="#228">228</a>     dbVertices = Lists.newArrayList();
+<a name="229" href="#229">229</a>     dbEdges = Lists.newArrayList();
+<a name="230" href="#230">230</a>     newVertices = Lists.newArrayList();
+<a name="231" href="#231">231</a>     newEdges = Lists.newArrayList();
+<a name="232" href="#232">232</a> 
+<a name="233" href="#233">233</a>     input.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(dbVertices));
+<a name="234" href="#234">234</a>     input.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(dbEdges));
+<a name="235" href="#235">235</a> 
+<a name="236" href="#236">236</a>     output.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newVertices));
+<a name="237" href="#237">237</a>     output.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newEdges));
+<a name="238" href="#238">238</a> 
+<a name="239" href="#239">239</a>     getExecutionEnvironment().execute();
+<a name="240" href="#240">240</a> 
+<a name="241" href="#241">241</a>     assertNotNull(<span class="jxr_string">"graph was null"</span>, output);
+<a name="242" href="#242">242</a> 
+<a name="243" href="#243">243</a>     newVertexIDs = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="244" href="#244">244</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : newVertices) {
+<a name="245" href="#245">245</a>       assertTrue(<span class="jxr_string">"sampled vertex is not part of the original graph"</span>, dbVertices.contains(vertex));
+<a name="246" href="#246">246</a>       newVertexIDs.add(vertex.getId());
+<a name="247" href="#247">247</a>     }
+<a name="248" href="#248">248</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : newEdges) {
+<a name="249" href="#249">249</a>       assertTrue(<span class="jxr_string">"sampled edge is not part of the original graph"</span>, dbEdges.contains(edge));
+<a name="250" href="#250">250</a>       assertTrue(<span class="jxr_string">"sampled edge has source vertex which is not part of the sampled graph"</span>,
+<a name="251" href="#251">251</a>         newVertexIDs.contains(edge.getSourceId()));
+<a name="252" href="#252">252</a>       assertTrue(<span class="jxr_string">"sampled edge has target vertex which is not part of the sampled graph"</span>,
+<a name="253" href="#253">253</a>         newVertexIDs.contains(edge.getTargetId()));
+<a name="254" href="#254">254</a>     }
+<a name="255" href="#255">255</a>   }
+<a name="256" href="#256">256</a> 
+<a name="257" href="#257">257</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   * The specific graph validation used by some graph samplings.</em>
+<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   * Needs to be implemented in the respective sampling test-class.</em>
+<a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   *</em>
+<a name="261" href="#261">261</a> <em class="jxr_javadoccomment">   * @param input The input graph</em>
+<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   * @param output The sampled graph</em>
+<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
+<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   */</em>
+<a name="265" href="#265">265</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">void</strong> validateSpecific(LogicalGraph input, LogicalGraph output) <strong class="jxr_keyword">throws</strong> Exception;
+<a name="266" href="#266">266</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

@@ -72,7 +72,7 @@
 <a name="62" href="#62">62</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/functions/WritePropertyToGraphHeadMap.html">WritePropertyToGraphHeadMap</a>(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,
 <a name="63" href="#63">63</a>          PropertyValue.create(globalValue)));
 <a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> currentGraph.getFactory().fromDataSets(
 <a name="66" href="#66">66</a>        resultHead, currentGraph.getVertices(), currentGraph.getEdges());
 <a name="67" href="#67">67</a>    }
 <a name="68" href="#68">68</a>  }

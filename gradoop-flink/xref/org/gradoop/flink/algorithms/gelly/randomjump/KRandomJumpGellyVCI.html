@@ -230,7 +230,7 @@
 <a name="220" href="#220">220</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/randomjump/functions/VertexWithVisitedSourceTargetIdJoin.html">VertexWithVisitedSourceTargetIdJoin</a>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 <a name="221" href="#221">221</a> 
 <a name="222" href="#222">222</a>     <em class="jxr_comment">// return graph</em>
-<a name="223" href="#223">223</a>     <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+<a name="223" href="#223">223</a>     <strong class="jxr_keyword">return</strong> currentGraph.getFactory().fromDataSets(
 <a name="224" href="#224">224</a>       currentGraph.getGraphHead(), visitedVertices, visitedEdges);
 <a name="225" href="#225">225</a>   }
 <a name="226" href="#226">226</a> 

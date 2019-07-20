@@ -73,7 +73,7 @@
 <a name="63" href="#63">63</a>    @Override
 <a name="64" href="#64">64</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> searchGraph, <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graphPatterns) {
 <a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> execute(searchGraph,
-<a name="66" href="#66">66</a>          graphPatterns.getConfig().getGraphCollectionFactory()
+<a name="66" href="#66">66</a>          graphPatterns.getCollectionFactory()
 <a name="67" href="#67">67</a>          .fromDataSets(
 <a name="68" href="#68">68</a>              graphPatterns.getGraphHead(),
 <a name="69" href="#69">69</a>              graphPatterns.getVertices(),
@@ -149,7 +149,7 @@
 <a name="139" href="#139">139</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/AddNewIdToDuplicatedEdge.html">AddNewIdToDuplicatedEdge</a>())
 <a name="140" href="#140">140</a>       .map(<strong class="jxr_keyword">new</strong> MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));
 <a name="141" href="#141">141</a> 
-<a name="142" href="#142">142</a>     <strong class="jxr_keyword">return</strong> searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
+<a name="142" href="#142">142</a>     <strong class="jxr_keyword">return</strong> searchGraph.getFactory().fromDataSets(gh, vToRet, edges);
 <a name="143" href="#143">143</a>   }
 <a name="144" href="#144">144</a> }
 </pre>

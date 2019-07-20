@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>    @Override
 <a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(LogicalGraph logicalGraph, <strong class="jxr_keyword">boolean</strong> overwrite) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="61" href="#61">61</a>      write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+<a name="61" href="#61">61</a>      write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
 <a name="62" href="#62">62</a>    }
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>    @Override

@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphElement;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 <a name="21" href="#21">21</a>  
@@ -105,10 +105,10 @@
 <a name="95" href="#95">95</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * Evaluates the predicate collection with respect to the given EPGMGraphElement</em>
 <a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @param element EPGMGraphElement under which the predicate will be evaluated</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @param element GraphElement under which the predicate will be evaluated</em>
 <a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * @return evaluation result</em>
 <a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   */</em>
-<a name="101" href="#101">101</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">boolean</strong> evaluate(EPGMGraphElement element);
+<a name="101" href="#101">101</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">boolean</strong> evaluate(GraphElement element);
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * Retrieves a set of all variables included in the predicate collection</em>
