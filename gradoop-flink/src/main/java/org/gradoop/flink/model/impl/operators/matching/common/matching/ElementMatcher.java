@@ -104,10 +104,13 @@ public class ElementMatcher {
 
       while (match && queryProperties.hasNext()) {
         Map.Entry<String, Object> queryProperty = queryProperties.next();
-        boolean validKey = dbElement.hasProperty(queryProperty.getKey());
-        boolean validValue = dbElement.getPropertyValue(
-          queryProperty.getKey()).getObject().equals(queryProperty.getValue());
-        match = validKey && validValue;
+        // if the property key is not valid, it is not a match
+        if (!dbElement.hasProperty(queryProperty.getKey())) {
+          match = false;
+          break;
+        }
+        match = dbElement.getPropertyValue(queryProperty.getKey()).getObject()
+          .equals(queryProperty.getValue());
       }
     }
     return match;
