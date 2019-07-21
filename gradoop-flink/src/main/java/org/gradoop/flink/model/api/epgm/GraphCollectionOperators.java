@@ -29,7 +29,9 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 
 /**
@@ -97,21 +99,20 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
 
   /**
    * Matches a given pattern on a graph collection.
-   * The boolean flag specifies, if the return shall be the input graphs with
-   * a new property ("contains pattern"), or a new collection consisting of the
-   * constructed embeddings
+   * The boolean flag {@code returnEmbeddings} specifies, if the return shall be the input graphs with
+   * a new property {@link AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
+   * constructed embeddings.
    *
-   * @param algorithm         custom pattern matching algorithm
-   * @param pattern           query pattern
-   * @param returnEmbeddings  true -> return embeddings as new collection,
-   *                          false -> return collection with new property
-   * @return  a graph collection containing either the embeddings or the input
-   * graphs with a new property ("contains pattern")
+   * @param query the query pattern in GDL syntax
+   * @param algorithm custom pattern matching algorithm, e.g., {@link DepthSearchMatching}
+   * @param returnEmbeddings if true it returns the embeddings as a new graph collection
+   *                         if false it returns the input collection with a new property with key
+   *                         {@link AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
+   *                         is contained in the respective graph
+   * @return a graph collection containing either the embeddings or the input
+   * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
    */
-  GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings);
+  GraphCollection query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings);
 
   //----------------------------------------------------------------------------
   // Binary operators
