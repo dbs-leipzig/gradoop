@@ -81,13 +81,6 @@ public class SetPairBulkTraverser<K> extends SetPairTraverser<K> {
       edgeStepJoinStrategy, vertexStepJoinStrategy, vertexMapping, edgeMapping);
   }
 
-  /**
-   * Traverses the graph according to the provided traversal code.
-   *
-   * @param vertices vertices including their query candidates
-   * @param edges    edges including their query candidates
-   * @return found embeddings
-   */
   @Override
   public DataSet<Tuple1<Embedding<K>>> traverse(
     DataSet<IdWithCandidates<K>> vertices,

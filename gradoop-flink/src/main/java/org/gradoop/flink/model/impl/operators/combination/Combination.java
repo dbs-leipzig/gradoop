@@ -26,6 +26,9 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Computes the combined graph from two base graph instances.
+ * Creates a new base graph by union of the vertex and edge sets of two
+ * input graphs. Vertex and edge equality is based on their respective
+ * identifiers.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -41,14 +44,6 @@ public class Combination<
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
-  /**
-   * Creates a new base graph by union the vertex and edge sets of two
-   * input graphs. Vertex and edge equality is based on their respective identifiers.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return combined graph
-   */
   @Override
   public LG execute(LG firstGraph, LG secondGraph) {
 

@@ -17,9 +17,9 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
   /**
    * The Factory the vertices are created with.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * Reduce object instantiation.
@@ -56,7 +56,7 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
    * @param newVertexLabel  The new vertex Label.
    * @param newPropertyName The new property key.
    */
-  public CreateNewVertex(EPGMVertexFactory factory, String newVertexLabel, String newPropertyName) {
+  public CreateNewVertex(VertexFactory<EPGMVertex> factory, String newVertexLabel, String newPropertyName) {
     this.vertexFactory = factory;
     this.newVertexLabel = newVertexLabel;
     this.newPropertyName = newPropertyName;

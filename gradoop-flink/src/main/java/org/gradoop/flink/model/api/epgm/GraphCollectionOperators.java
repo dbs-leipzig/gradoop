@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.util.Order;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
@@ -29,13 +30,17 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+
+import java.io.IOException;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators extends GraphBaseOperators {
+public interface GraphCollectionOperators {
 
   //----------------------------------------------------------------------------
   // Logical Graph / Graph Head Getters
@@ -97,21 +102,20 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
 
   /**
    * Matches a given pattern on a graph collection.
-   * The boolean flag specifies, if the return shall be the input graphs with
-   * a new property ("contains pattern"), or a new collection consisting of the
-   * constructed embeddings
+   * The boolean flag {@code returnEmbeddings} specifies, if the return shall be the input graphs with
+   * a new property {@link AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
+   * constructed embeddings.
    *
-   * @param algorithm         custom pattern matching algorithm
-   * @param pattern           query pattern
-   * @param returnEmbeddings  true -> return embeddings as new collection,
-   *                          false -> return collection with new property
-   * @return  a graph collection containing either the embeddings or the input
-   * graphs with a new property ("contains pattern")
+   * @param query the query pattern in GDL syntax
+   * @param algorithm custom pattern matching algorithm, e.g., {@link DepthSearchMatching}
+   * @param returnEmbeddings if true it returns the embeddings as a new graph collection
+   *                         if false it returns the input collection with a new property with key
+   *                         {@link AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
+   *                         is contained in the respective graph
+   * @return a graph collection containing either the embeddings or the input
+   * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
    */
-  GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings);
+  GraphCollection query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings);
 
   //----------------------------------------------------------------------------
   // Binary operators
@@ -280,4 +284,32 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return grouped graph collection
    */
   GraphCollection groupByIsomorphism(GraphHeadReduceFunction func);
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the collection is empty.
+   *
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
+
+  /**
+     * Writes the graph collection to the given data sink.
+     *
+     * @param dataSink The data sink to which the graph collection should be written.
+     * @throws IOException if the collection can't be written to the sink
+     */
+  void writeTo(DataSink dataSink) throws IOException;
+
+  /**
+     * Writes the graph collection to the given data sink with an optional overwrite option.
+     *
+     * @param dataSink The data sink to which the graph collection should be written.
+     * @param overWrite determines whether existing files are overwritten
+     * @throws IOException if the collection can't be written to the sink
+     */
+  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }

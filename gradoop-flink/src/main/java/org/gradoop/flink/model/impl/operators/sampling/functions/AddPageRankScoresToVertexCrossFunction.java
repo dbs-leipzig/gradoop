@@ -26,9 +26,6 @@ import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 public class AddPageRankScoresToVertexCrossFunction
   implements CrossFunction<EPGMVertex, EPGMGraphHead, EPGMVertex> {
 
-  /**
-   * Writes the PageRank-scores stored in the graphHead to all vertices.
-   */
   @Override
   public EPGMVertex cross(EPGMVertex vertex, EPGMGraphHead graphHead) {
     double min = graphHead.getPropertyValue(

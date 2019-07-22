@@ -18,9 +18,9 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
   /**
    * The factory new vertices are created with.
    */
-  private final EPGMVertexFactory vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
     * Reduce object instantiation.
@@ -59,7 +59,7 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
    * @param newVertexLabel  The new vertex label.
    * @param newPropertyName The new property key.
    */
-  public CreateNewVertexWithEqualityCondense(EPGMVertexFactory factory, String newVertexLabel,
+  public CreateNewVertexWithEqualityCondense(VertexFactory<EPGMVertex> factory, String newVertexLabel,
                                              String newPropertyName) {
     this.vertexFactory = factory;
     this.newVertexLabel = newVertexLabel;

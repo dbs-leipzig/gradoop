@@ -82,7 +82,7 @@ public class ApplyAggregation
       .where(new Id<>()).equalTo(0)
       .with(new SetAggregateProperties(aggregateFunctions));
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
   }
 
@@ -91,7 +91,7 @@ public class ApplyAggregation
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
       .map(new AggregateTransactions(aggregateFunctions));
 
-    return collection.getConfig().getGraphCollectionFactory().fromTransactions(updatedTransactions);
+    return collection.getFactory().fromTransactions(updatedTransactions);
   }
 
   /**

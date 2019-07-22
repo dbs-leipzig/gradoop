@@ -15,6 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
 public class DualSimulationDeltaTest extends DualSimulationTest {
@@ -27,8 +32,9 @@ public class DualSimulationDeltaTest extends DualSimulationTest {
   }
 
   @Override
-  public PatternMatching getImplementation(String queryGraph,
+  public PatternMatching<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getImplementation(String queryGraph,
     boolean attachData) {
-    return new DualSimulation(queryGraph, attachData, false);
+    return new DualSimulation<>(queryGraph, attachData, false);
   }
 }

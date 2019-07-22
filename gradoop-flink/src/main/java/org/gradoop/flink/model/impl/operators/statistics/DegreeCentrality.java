@@ -25,17 +25,11 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Computes the degree centrality of a graph
+ * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
  */
 public class DegreeCentrality extends DegreeCentralityBase
   implements UnaryGraphToValueOperator<DataSet<Double>> {
 
-  /**
-   * Calculates the degree centrality of the graph
-   * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
-   *
-   * @param graph input graph
-   * @return DataSet with one degree centrality value
-   */
   @Override
   public DataSet<Double> execute(LogicalGraph graph) {
 
