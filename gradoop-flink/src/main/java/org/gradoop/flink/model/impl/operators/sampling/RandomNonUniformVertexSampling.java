@@ -84,7 +84,7 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
       .cross(graph.getVertices())
       .with(new AddMaxDegreeCrossFunction(SamplingConstants.PROPERTY_KEY_MAX_DEGREE));
 
-    graph = graph.getConfig().getLogicalGraphFactory()
+    graph = graph.getFactory()
       .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 
     newVertices = graph.getVertices().filter(new NonUniformVertexRandomFilter<>(

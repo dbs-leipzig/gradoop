@@ -20,13 +20,14 @@ import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
@@ -49,14 +50,24 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.fu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
- * EPGMVertex-centric Dual-Simulation.
+ * Vertex-centric Dual-Simulation.
+ *
+ * @param <G> The graph head type.
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
+ * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
-public class DualSimulation extends PatternMatching {
+public class DualSimulation<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends PatternMatching<G, V, E, LG, GC> {
 
   /**
    * Logger
@@ -82,16 +93,13 @@ public class DualSimulation extends PatternMatching {
   }
 
   @Override
-  protected GraphCollection executeForVertex(
-    LogicalGraph graph)  {
+  protected GC executeForVertex(LG graph)  {
     DataSet<Tuple1<GradoopId>> matchingVertexIds = PreProcessor
       .filterVertices(graph, getQuery())
       .project(0);
 
-    LogicalGraphFactory graphFactory = graph.getConfig()
-      .getLogicalGraphFactory();
-    GraphCollectionFactory collectionFactory = graph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphFactory<G, V, E, LG, GC> graphFactory = graph.getFactory();
+    BaseGraphCollectionFactory<G, V, E, LG, GC> collectionFactory = graph.getCollectionFactory();
 
     if (doAttachData()) {
       return collectionFactory.fromGraph(
@@ -102,7 +110,7 @@ public class DualSimulation extends PatternMatching {
     } else {
       return collectionFactory.fromGraph(
         graphFactory.fromDataSets(matchingVertexIds
-            .map(new VertexFromId(graph.getFactory().getVertexFactory()))));
+            .map(new VertexFromId<>(graphFactory.getVertexFactory()))));
     }
   }
 
@@ -112,8 +120,7 @@ public class DualSimulation extends PatternMatching {
    * @param graph data graph
    * @return match graph
    */
-  protected GraphCollection executeForPattern(
-    LogicalGraph graph) {
+  protected GC executeForPattern(LG graph) {
     //--------------------------------------------------------------------------
     // Pre-processing (filter candidates + build initial working set)
     //--------------------------------------------------------------------------
@@ -141,8 +148,7 @@ public class DualSimulation extends PatternMatching {
    * @param g input graph
    * @return triples that have a match in the query graph
    */
-  private DataSet<TripleWithCandidates<GradoopId>> filterTriples(
-    LogicalGraph g) {
+  private DataSet<TripleWithCandidates<GradoopId>> filterTriples(LG g) {
     // filter vertex-edge-vertex triples by query predicates
     return PreProcessor.filterTriplets(g, getQuery());
   }
@@ -153,8 +159,7 @@ public class DualSimulation extends PatternMatching {
    * @param triples matching triples from the input graph
    * @return data set containing fat vertices
    */
-  private DataSet<FatVertex> buildInitialWorkingSet(
-    DataSet<TripleWithCandidates<GradoopId>> triples) {
+  private DataSet<FatVertex> buildInitialWorkingSet(DataSet<TripleWithCandidates<GradoopId>> triples) {
     return triples.flatMap(new CloneAndReverse())
       .groupBy(1) // sourceId
       .combineGroup(new BuildFatVertex(getQuery()))
@@ -279,19 +284,17 @@ public class DualSimulation extends PatternMatching {
    * @param vertices valid vertices after simulation
    * @return maximum match graph
    */
-  private GraphCollection postProcess(LogicalGraph graph,
-    DataSet<FatVertex> vertices) {
-    GradoopFlinkConfig config = graph.getConfig();
+  private GC postProcess(LG graph, DataSet<FatVertex> vertices) {
+    BaseGraphFactory<G, V, E, LG, GC> graphFactory = graph.getFactory();
 
-    DataSet<EPGMVertex> matchVertices = doAttachData() ?
+    DataSet<V> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
-      PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());
+      PostProcessor.extractVertices(vertices, graphFactory.getVertexFactory());
 
-    DataSet<EPGMEdge> matchEdges = doAttachData() ?
+    DataSet<E> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
-      PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());
+      PostProcessor.extractEdges(vertices, graphFactory.getEdgeFactory());
 
-    return config.getGraphCollectionFactory().fromGraph(
-      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
+    return graph.getCollectionFactory().fromGraph(graphFactory.fromDataSets(matchVertices, matchEdges));
   }
 }

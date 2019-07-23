@@ -63,7 +63,7 @@ public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalG
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
     return execute(searchGraph,
-        graphPatterns.getConfig().getGraphCollectionFactory()
+        graphPatterns.getCollectionFactory()
         .fromDataSets(
             graphPatterns.getGraphHead(),
             graphPatterns.getVertices(),
@@ -139,6 +139,6 @@ public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalG
       .reduceGroup(new AddNewIdToDuplicatedEdge())
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
-    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
+    return searchGraph.getFactory().fromDataSets(gh, vToRet, edges);
   }
 }

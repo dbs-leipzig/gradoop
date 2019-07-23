@@ -41,7 +41,7 @@ public class AverageOutgoingDegree implements UnaryGraphToGraphOperator {
       .map(new CalculateAverageDegree(
         SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE));
 
-    return graph.getConfig().getLogicalGraphFactory()
+    return graph.getFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 }
