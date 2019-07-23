@@ -92,17 +92,17 @@ Latest nightly build (additional repository is required):
 </dependency>
 
 ```
-In any case you also need Apache Flink (version 1.8.0):
+In any case you also need Apache Flink (version 1.8.1):
 ```xml
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-java</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
 </dependency>
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-clients_2.11</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
 </dependency>
 ```
 
