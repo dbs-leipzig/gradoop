@@ -91,7 +91,7 @@ public class VerifyTest extends GradoopFlinkTestBase {
    * @throws Exception when the execution in Flink fails.
    */
   @Test
-  public void testApplyVerifyWithSubgraph() throws Exception {
+  public void testVerifyWithApplySubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
     loader.appendToDatabaseFromString("expected0[" +
       "(eve)-[ekb:knows {since : 2015}]->(bob)" +
@@ -205,9 +205,9 @@ public class VerifyTest extends GradoopFlinkTestBase {
     throws Exception {
     for (E element : elements.collect()) {
       GradoopIdSet ids = element.getGraphIds();
-      assertFalse("EPGMElement has no graph ids", ids.isEmpty());
+      assertFalse("Element has no graph ids", ids.isEmpty());
       ids.removeAll(idSet);
-      assertTrue("EPGMElement has dangling graph ids", ids.isEmpty());
+      assertTrue("Element has dangling graph ids", ids.isEmpty());
     }
   }
 }
