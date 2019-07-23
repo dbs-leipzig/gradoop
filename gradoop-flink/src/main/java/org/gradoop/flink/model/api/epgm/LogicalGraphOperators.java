@@ -17,6 +17,7 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
@@ -27,12 +28,13 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators extends GraphBaseOperators {
+public interface LogicalGraphOperators {
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -272,4 +274,31 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   GraphCollection callForCollection(
     UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> operator);
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
+   *
+   * A graph is considered empty, if it contains no vertices.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
+
+  /**
+     * Writes the graph to given data sink.
+     *
+     * @param dataSink The data sink to which the graph should be written.
+     * @throws IOException if the graph can't be written to the sink
+     */
+  void writeTo(DataSink dataSink) throws IOException;
+
+  /**
+     * Writes the graph to given data sink with an optional overwrite option.
+     *
+     * @param dataSink The data sink to which the graph should be written.
+     * @param overWrite determines whether existing files are overwritten
+     * @throws IOException if the graph can't be written to the sink
+     */
+  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }
