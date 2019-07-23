@@ -54,6 +54,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.flink.model.impl.operators.verify.VerifyCollection;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
 /**
@@ -142,6 +143,18 @@ public interface BaseGraphCollectionOperators<
    */
   default GC query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
     return callForCollection(new TransactionalPatternMatching<>(query, algorithm, returnEmbeddings));
+  }
+
+  /**
+   * Verifies each graph of this collection, removing dangling edges, i.e. edges pointing to or from
+   * a vertex not contained in the graph.<br>
+   * This operator can be applied after an operator that has not checked these graphs validity.
+   * The graph heads of these base graphs remains unchanged.
+   *
+   * @return this graph collection with all dangling edges removed.
+   */
+  default GC verify() {
+    return callForCollection(new VerifyCollection<>());
   }
 
   /**

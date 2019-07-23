@@ -26,7 +26,6 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetId;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
@@ -175,16 +174,10 @@ public class Subgraph<
    */
   private LG vertexInducedSubgraph(LG superGraph) {
     DataSet<V> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
-    DataSet<E> inducedEdges = superGraph.getEdges()
-      .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
 
     return superGraph.getFactory()
-      .fromDataSets(superGraph.getGraphHead(), filteredVertices, inducedEdges);
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, superGraph.getEdges())
+      .verify();
   }
 
   /**

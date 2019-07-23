@@ -29,6 +29,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -59,10 +60,12 @@ public class VerifyTest extends GradoopFlinkTestBase {
       "(eve)-[ekb:knows {since : 2015}]->(bob)" +
       "]");
     LogicalGraph input = loader.getLogicalGraphByVariable("g0");
+
     // Apply a subgraph operator that would result in dangling edges.
     LogicalGraph subgraph = input.subgraph(
       new ByProperty<EPGMVertex>("name", PropertyValue.create("Alice")).negate(),
       new True<>(), Subgraph.Strategy.BOTH);
+
     // Make sure that the graph contains dangling edges.
     List<EPGMEdge> danglingEdges = getDanglingEdges(subgraph);
     List<EPGMEdge> expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable("eka"),
@@ -71,13 +74,70 @@ public class VerifyTest extends GradoopFlinkTestBase {
     danglingEdges.sort(comparator);
     expectedDanglingEdges.sort(comparator);
     assertArrayEquals(expectedDanglingEdges.toArray(), danglingEdges.toArray());
+
     // Now run verify and check if those edges were removed.
     LogicalGraph verifiedSubgraph = subgraph.verify();
     assertEquals("Verified graph contained dangling edges.",
       0, getDanglingEdges(verifiedSubgraph).size());
+
     // Check if nothing else has been removed (i.e. the result is correct)
     collectAndAssertTrue(loader.getLogicalGraphByVariable("expected")
       .equalsByElementData(verifiedSubgraph));
+  }
+
+  /**
+   * Test the verify operator for graph collections with a subgraph operator.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testVerifyWithApplySubgraph() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    loader.appendToDatabaseFromString("expected0[" +
+      "(eve)-[ekb:knows {since : 2015}]->(bob)" +
+      "] expected1 [" +
+      "(frank)-[fkd:knows {since : 2015}]->(dave)" +
+      "]");
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1");
+    GradoopId id0 = loader.getGraphHeadByVariable("g0").getId();
+    GradoopId id1 = loader.getGraphHeadByVariable("g1").getId();
+
+    // Apply a subgraph operator that would result in dangling edges.
+    GraphCollection subgraph = input.apply(new ApplySubgraph<>(
+      new ByProperty<EPGMVertex>("name", PropertyValue.create("Alice"))
+        .or(new ByProperty<>("name", PropertyValue.create("Carol")))
+        .negate(),
+      new True<>(), Subgraph.Strategy.BOTH));
+
+    // Make sure that the graphs contain dangling edges.
+    Comparator<EPGMEdge> comparator = Comparator.comparing(EPGMEdge::getId);
+    List<EPGMEdge> danglingEdges0 = getDanglingEdges(subgraph.getGraph(id0));
+    List<EPGMEdge> expectedDanglingEdges0 = Arrays.asList(loader.getEdgeByVariable("eka"),
+      loader.getEdgeByVariable("akb"), loader.getEdgeByVariable("bka"));
+    danglingEdges0.sort(comparator);
+    expectedDanglingEdges0.sort(comparator);
+    assertArrayEquals(expectedDanglingEdges0.toArray(), danglingEdges0.toArray());
+
+    List<EPGMEdge> danglingEdges1 = getDanglingEdges(subgraph.getGraph(id1));
+    List<EPGMEdge> expectedDanglingEdges1 = Arrays.asList(loader.getEdgeByVariable("fkc"),
+      loader.getEdgeByVariable("ckd"), loader.getEdgeByVariable("dkc"));
+    danglingEdges1.sort(comparator);
+    expectedDanglingEdges1.sort(comparator);
+    assertArrayEquals(expectedDanglingEdges1.toArray(), danglingEdges1.toArray());
+
+    // Now run verify and check if those edges were removed.
+    GraphCollection verifiedSubgraph = subgraph.verify();
+
+    assertEquals("Verified graph contained dangling edges.",
+      0, getDanglingEdges(verifiedSubgraph.getGraph(id0)).size());
+    assertEquals("Verified graph contained dangling edges.",
+      0, getDanglingEdges(verifiedSubgraph.getGraph(id1)).size());
+
+    // Check if nothing else has been removed (i.e. the result is correct)
+    collectAndAssertTrue(loader.getLogicalGraphByVariable("expected0")
+      .equalsByElementData(verifiedSubgraph.getGraph(id0)));
+    collectAndAssertTrue(loader.getLogicalGraphByVariable("expected1")
+      .equalsByElementData(verifiedSubgraph.getGraph(id1)));
   }
 
   /**
@@ -145,9 +205,9 @@ public class VerifyTest extends GradoopFlinkTestBase {
     throws Exception {
     for (E element : elements.collect()) {
       GradoopIdSet ids = element.getGraphIds();
-      assertFalse("EPGMElement has no graph ids", ids.isEmpty());
+      assertFalse("Element has no graph ids", ids.isEmpty());
       ids.removeAll(idSet);
-      assertTrue("EPGMElement has dangling graph ids", ids.isEmpty());
+      assertTrue("Element has dangling graph ids", ids.isEmpty());
     }
   }
 }
