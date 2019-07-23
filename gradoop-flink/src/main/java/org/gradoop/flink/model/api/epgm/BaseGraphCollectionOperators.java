@@ -42,7 +42,9 @@ import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -121,6 +123,25 @@ public interface BaseGraphCollectionOperators<
    */
   default GC limit(int n) {
     return callForCollection(new Limit<>(n));
+  }
+
+  /**
+   * Matches a given pattern on a graph collection.
+   * The boolean flag {@code returnEmbeddings} specifies, if the return shall be the input graphs with
+   * a new property {@link AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
+   * constructed embeddings.
+   *
+   * @param query the query pattern in GDL syntax
+   * @param algorithm custom pattern matching algorithm, e.g., {@link DepthSearchMatching}
+   * @param returnEmbeddings if true it returns the embeddings as a new graph collection
+   *                         if false it returns the input collection with a new property with key
+   *                         {@link AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
+   *                         is contained in the respective graph
+   * @return a graph collection containing either the embeddings or the input
+   * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
+   */
+  default GC query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
+    return callForCollection(new TransactionalPatternMatching<>(query, algorithm, returnEmbeddings));
   }
 
   /**

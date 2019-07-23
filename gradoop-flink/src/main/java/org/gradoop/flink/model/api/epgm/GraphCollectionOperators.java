@@ -15,10 +15,46 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+
+import java.io.IOException;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators extends GraphBaseOperators {
+public interface GraphCollectionOperators {
+
+  //----------------------------------------------------------------------------
+  // Auxiliary operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the collection is empty.
+   *
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
+
+  /**
+     * Writes the graph collection to the given data sink.
+     *
+     * @param dataSink The data sink to which the graph collection should be written.
+     * @throws IOException if the collection can't be written to the sink
+     */
+  void writeTo(DataSink dataSink) throws IOException;
+
+  /**
+     * Writes the graph collection to the given data sink with an optional overwrite option.
+     *
+     * @param dataSink The data sink to which the graph collection should be written.
+     * @param overWrite determines whether existing files are overwritten
+     * @throws IOException if the collection can't be written to the sink
+     */
+  void writeTo(DataSink dataSink, boolean overWrite) throws IOException;
 }
