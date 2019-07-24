@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VerifyCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.verify</a> &gt; <span class="el_source">VerifyCollection.java</span></div><h1>VerifyCollection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.verify;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSideWithRightGraphs;
+
+/**
+ * Verifies the edge set for each graph in a collection, removing dangling edges, i.e. edges with a
+ * source- or target-id not matching any vertices of this graph.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The graph type.
+ * @param &lt;GC&gt; The graph collection type.
+ */
+<span class="fc" id="L40">public class VerifyCollection&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; {
+
+  @Override
+  public GC execute(GC collection) {
+<span class="fc" id="L50">    DataSet&lt;V&gt; vertices = collection.getVertices();</span>
+<span class="fc" id="L51">    DataSet&lt;E&gt; verifiedEdges = collection.getEdges()</span>
+<span class="fc" id="L52">      .join(vertices)</span>
+<span class="fc" id="L53">      .where(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L54">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L55">      .with(new LeftSideWithRightGraphs&lt;&gt;())</span>
+<span class="fc" id="L56">      .name(&quot;Verify Edges (1/2)&quot;)</span>
+<span class="fc" id="L57">      .join(vertices)</span>
+<span class="fc" id="L58">      .where(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L59">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L60">      .with(new LeftSideWithRightGraphs&lt;&gt;())</span>
+<span class="fc" id="L61">      .name(&quot;Verify Edges (2/2)&quot;);</span>
+<span class="fc" id="L62">    return collection.getFactory().fromDataSets(collection.getGraphHeads(), vertices, verifiedEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

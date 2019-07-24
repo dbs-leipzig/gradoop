@@ -81,7 +81,7 @@
 <a name="71" href="#71">71</a>          <span class="jxr_string">"]"</span> +
 <a name="72" href="#72">72</a>          <span class="jxr_string">"g2:B["</span> +
 <a name="73" href="#73">73</a>          <span class="jxr_string">"(v11:B {id : 0})"</span> +
-<a name="74" href="#74">74</a>          <span class="jxr_string">"(v12:A {id : 1})"</span> +
+<a name="74" href="#74">74</a>          <span class="jxr_string">"(v12:A {id : 1, abc : 5})"</span> +
 <a name="75" href="#75">75</a>          <span class="jxr_string">"(v13:A {id : 2})"</span> +
 <a name="76" href="#76">76</a>          <span class="jxr_string">"(v14:A {id : 3})"</span> +
 <a name="77" href="#77">77</a>          <span class="jxr_string">"(v15:C {id : 4})"</span> +
@@ -130,7 +130,7 @@
 <a name="120" href="#120">120</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; tests.length; i++) {
 <a name="121" href="#121">121</a>       String testPattern = tests[i];
 <a name="122" href="#122">122</a> 
-<a name="123" href="#123">123</a>       GraphCollection result = coll.match(testPattern, <strong class="jxr_keyword">new</strong> DepthSearchMatching(), <strong class="jxr_keyword">true</strong>);
+<a name="123" href="#123">123</a>       GraphCollection result = coll.query(testPattern, <strong class="jxr_keyword">new</strong> DepthSearchMatching(), <strong class="jxr_keyword">true</strong>);
 <a name="124" href="#124">124</a> 
 <a name="125" href="#125">125</a>       Collection&lt;EPGMGraphHead&gt; originalHeads = Lists.newArrayList();
 <a name="126" href="#126">126</a>       Collection&lt;EPGMGraphHead&gt; resultHeads = Lists.newArrayList();
@@ -172,11 +172,11 @@
 <a name="162" href="#162">162</a>           eCount++;
 <a name="163" href="#163">163</a>         }
 <a name="164" href="#164">164</a>       }
-<a name="165" href="#165">165</a>       assertEquals(aCount, resultCounts[i][0]);
-<a name="166" href="#166">166</a>       assertEquals(bCount, resultCounts[i][1]);
-<a name="167" href="#167">167</a>       assertEquals(cCount, resultCounts[i][2]);
-<a name="168" href="#168">168</a>       assertEquals(dCount, resultCounts[i][3]);
-<a name="169" href="#169">169</a>       assertEquals(eCount, resultCounts[i][4]);
+<a name="165" href="#165">165</a>       assertEquals(resultCounts[i][0], aCount);
+<a name="166" href="#166">166</a>       assertEquals(resultCounts[i][1], bCount);
+<a name="167" href="#167">167</a>       assertEquals(resultCounts[i][2], cCount);
+<a name="168" href="#168">168</a>       assertEquals(resultCounts[i][3], dCount);
+<a name="169" href="#169">169</a>       assertEquals(resultCounts[i][4], eCount);
 <a name="170" href="#170">170</a>     }
 <a name="171" href="#171">171</a>   }
 <a name="172" href="#172">172</a> 
@@ -199,29 +199,35 @@
 <a name="189" href="#189">189</a>     TestData.UNLABELED_PATTERN_1,
 <a name="190" href="#190">190</a>     TestData.UNLABELED_PATTERN_2,
 <a name="191" href="#191">191</a>     TestData.UNLABELED_PATTERN_3,
-<a name="192" href="#192">192</a>   };
-<a name="193" href="#193">193</a> 
-<a name="194" href="#194">194</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">long</strong>[][] resultCounts = {
-<a name="195" href="#195">195</a>     {3, 5, 0, 0, 0},
-<a name="196" href="#196">196</a>     {0, 0, 3, 4, 0},
-<a name="197" href="#197">197</a>     {3, 4, 4, 4, 0},
-<a name="198" href="#198">198</a>     {0, 0, 0, 0, 0},
-<a name="199" href="#199">199</a>     {0, 0, 2, 4, 0},
-<a name="200" href="#200">200</a>     {0, 0, 0, 0, 0},
-<a name="201" href="#201">201</a>     {12, 18, 0, 0, 0},
-<a name="202" href="#202">202</a>     {1, 1, 0, 0, 0},
+<a name="192" href="#192">192</a>     TestData.PROPERTY_PATTERN_1,
+<a name="193" href="#193">193</a>     TestData.PROPERTY_PATTERN_2,
+<a name="194" href="#194">194</a>     TestData.PROPERTY_PATTERN_3
+<a name="195" href="#195">195</a>   };
+<a name="196" href="#196">196</a> 
+<a name="197" href="#197">197</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">long</strong>[][] resultCounts = {
+<a name="198" href="#198">198</a>     {3, 5, 0, 0, 0},
+<a name="199" href="#199">199</a>     {0, 0, 3, 4, 0},
+<a name="200" href="#200">200</a>     {3, 4, 4, 4, 0},
+<a name="201" href="#201">201</a>     {0, 0, 0, 0, 0},
+<a name="202" href="#202">202</a>     {0, 0, 2, 4, 0},
 <a name="203" href="#203">203</a>     {0, 0, 0, 0, 0},
-<a name="204" href="#204">204</a>     {1, 1, 0, 0, 0},
-<a name="205" href="#205">205</a>     {0, 1, 0, 0, 0},
-<a name="206" href="#206">206</a>     {2, 4, 0, 0, 0},
-<a name="207" href="#207">207</a>     {0, 2, 0, 0, 0},
+<a name="204" href="#204">204</a>     {12, 18, 0, 0, 0},
+<a name="205" href="#205">205</a>     {1, 1, 0, 0, 0},
+<a name="206" href="#206">206</a>     {0, 0, 0, 0, 0},
+<a name="207" href="#207">207</a>     {1, 1, 0, 0, 0},
 <a name="208" href="#208">208</a>     {0, 1, 0, 0, 0},
-<a name="209" href="#209">209</a>     {11, 13, 4, 4, 2},
-<a name="210" href="#210">210</a>     {13, 18, 3, 4, 1},
-<a name="211" href="#211">211</a>     {2, 3, 0, 0, 0},
-<a name="212" href="#212">212</a>     {3, 5, 0, 0, 0}
-<a name="213" href="#213">213</a>   };
-<a name="214" href="#214">214</a> }
+<a name="209" href="#209">209</a>     {2, 4, 0, 0, 0},
+<a name="210" href="#210">210</a>     {0, 2, 0, 0, 0},
+<a name="211" href="#211">211</a>     {0, 1, 0, 0, 0},
+<a name="212" href="#212">212</a>     {11, 13, 4, 4, 2},
+<a name="213" href="#213">213</a>     {13, 18, 3, 4, 1},
+<a name="214" href="#214">214</a>     {2, 3, 0, 0, 0},
+<a name="215" href="#215">215</a>     {3, 5, 0, 0, 0},
+<a name="216" href="#216">216</a>     {1, 2, 0, 0, 0},
+<a name="217" href="#217">217</a>     {0, 0, 0, 0, 0},
+<a name="218" href="#218">218</a>     {0, 2, 0, 0, 0}
+<a name="219" href="#219">219</a>   };
+<a name="220" href="#220">220</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

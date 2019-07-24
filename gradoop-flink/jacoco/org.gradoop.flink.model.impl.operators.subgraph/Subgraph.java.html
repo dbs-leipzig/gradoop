@@ -26,7 +26,6 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetId;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
@@ -81,26 +80,26 @@ public class Subgraph&lt;
   /**
    * Available execution strategies.
    */
-<span class="fc" id="L84">  public enum Strategy {</span>
+<span class="fc" id="L83">  public enum Strategy {</span>
     /**
      * Applies both filter functions on the input vertex and edge data set.
      */
-<span class="fc" id="L88">    BOTH,</span>
+<span class="fc" id="L87">    BOTH,</span>
     /**
      * Only applies the vertex filter function and adds the incident edges connecting those
      * vertices via a join.
      */
-<span class="fc" id="L93">    VERTEX_INDUCED,</span>
+<span class="fc" id="L92">    VERTEX_INDUCED,</span>
     /**
      * Only applies the edge filter function and computes the resulting vertices via:
      * (E |&gt;&lt;| V ON e.source = v.id) U (E |&gt;&lt;| V on e.target = v.id)
      */
-<span class="fc" id="L98">    EDGE_INDUCED,</span>
+<span class="fc" id="L97">    EDGE_INDUCED,</span>
     /**
      * Only applies the edge filter function and computes the resulting vertices via:
      * DISTINCT((π_source(E) U π_target(E))) |&gt;&lt;| V
      */
-<span class="fc" id="L103">    EDGE_INDUCED_PROJECT_FIRST</span>
+<span class="fc" id="L102">    EDGE_INDUCED_PROJECT_FIRST</span>
   }
 
   /**
@@ -120,50 +119,50 @@ public class Subgraph&lt;
    * @param strategy             sets the execution strategy for the operator
    */
   public Subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
-<span class="fc" id="L123">    FilterFunction&lt;E&gt; edgeFilterFunction, Strategy strategy) {</span>
+<span class="fc" id="L122">    FilterFunction&lt;E&gt; edgeFilterFunction, Strategy strategy) {</span>
 
-<span class="pc bpc" id="L125" title="2 of 6 branches missed.">    if (strategy == BOTH &amp;&amp;</span>
+<span class="pc bpc" id="L124" title="2 of 6 branches missed.">    if (strategy == BOTH &amp;&amp;</span>
       (vertexFilterFunction == null || edgeFilterFunction == null)) {
-<span class="nc" id="L127">      throw new IllegalArgumentException(&quot;No vertex or no edge filter function was given.&quot;);</span>
+<span class="nc" id="L126">      throw new IllegalArgumentException(&quot;No vertex or no edge filter function was given.&quot;);</span>
     }
 
-<span class="pc bpc" id="L130" title="1 of 4 branches missed.">    if (strategy == VERTEX_INDUCED &amp;&amp; vertexFilterFunction == null) {</span>
-<span class="nc" id="L131">      throw new IllegalArgumentException(&quot;No vertex filter functions was given.&quot;);</span>
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">    if (strategy == VERTEX_INDUCED &amp;&amp; vertexFilterFunction == null) {</span>
+<span class="nc" id="L130">      throw new IllegalArgumentException(&quot;No vertex filter functions was given.&quot;);</span>
     }
 
-<span class="pc bpc" id="L134" title="1 of 6 branches missed.">    if ((strategy == EDGE_INDUCED || strategy == EDGE_INDUCED_PROJECT_FIRST) &amp;&amp;</span>
+<span class="pc bpc" id="L133" title="1 of 6 branches missed.">    if ((strategy == EDGE_INDUCED || strategy == EDGE_INDUCED_PROJECT_FIRST) &amp;&amp;</span>
       edgeFilterFunction == null) {
-<span class="nc" id="L136">      throw new IllegalArgumentException(&quot;No vertex edge functions was given.&quot;);</span>
+<span class="nc" id="L135">      throw new IllegalArgumentException(&quot;No vertex edge functions was given.&quot;);</span>
     }
 
-<span class="fc" id="L139">    this.strategy = strategy;</span>
+<span class="fc" id="L138">    this.strategy = strategy;</span>
 
-<span class="fc" id="L141">    this.vertexFilterFunction = vertexFilterFunction;</span>
-<span class="fc" id="L142">    this.edgeFilterFunction = edgeFilterFunction;</span>
-<span class="fc" id="L143">  }</span>
+<span class="fc" id="L140">    this.vertexFilterFunction = vertexFilterFunction;</span>
+<span class="fc" id="L141">    this.edgeFilterFunction = edgeFilterFunction;</span>
+<span class="fc" id="L142">  }</span>
 
   @Override
   public LG execute(LG superGraph) {
 
     LG result;
-<span class="pc bpc" id="L149" title="1 of 5 branches missed.">    switch (strategy) {</span>
+<span class="pc bpc" id="L148" title="1 of 5 branches missed.">    switch (strategy) {</span>
     case BOTH:
-<span class="fc" id="L151">      result = subgraph(superGraph);</span>
-<span class="fc" id="L152">      break;</span>
+<span class="fc" id="L150">      result = subgraph(superGraph);</span>
+<span class="fc" id="L151">      break;</span>
     case VERTEX_INDUCED:
-<span class="fc" id="L154">      result = vertexInducedSubgraph(superGraph);</span>
-<span class="fc" id="L155">      break;</span>
+<span class="fc" id="L153">      result = vertexInducedSubgraph(superGraph);</span>
+<span class="fc" id="L154">      break;</span>
     case EDGE_INDUCED:
-<span class="fc" id="L157">      result = edgeInducedSubgraph(superGraph);</span>
-<span class="fc" id="L158">      break;</span>
+<span class="fc" id="L156">      result = edgeInducedSubgraph(superGraph);</span>
+<span class="fc" id="L157">      break;</span>
     case EDGE_INDUCED_PROJECT_FIRST:
-<span class="fc" id="L160">      result = edgeInducedSubgraphProjectFirst(superGraph);</span>
-<span class="fc" id="L161">      break;</span>
+<span class="fc" id="L159">      result = edgeInducedSubgraphProjectFirst(superGraph);</span>
+<span class="fc" id="L160">      break;</span>
     default:
-<span class="nc" id="L163">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
+<span class="nc" id="L162">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
     }
 
-<span class="fc" id="L166">    return result;</span>
+<span class="fc" id="L165">    return result;</span>
   }
 
   /**
@@ -174,17 +173,11 @@ public class Subgraph&lt;
    * @return vertex-induced subgraph
    */
   private LG vertexInducedSubgraph(LG superGraph) {
-<span class="fc" id="L177">    DataSet&lt;V&gt; filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);</span>
-<span class="fc" id="L178">    DataSet&lt;E&gt; inducedEdges = superGraph.getEdges()</span>
-<span class="fc" id="L179">      .join(filteredVertices)</span>
-<span class="fc" id="L180">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L181">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L182">      .join(filteredVertices)</span>
-<span class="fc" id="L183">      .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L184">      .with(new LeftSide&lt;&gt;());</span>
+<span class="fc" id="L176">    DataSet&lt;V&gt; filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);</span>
 
-<span class="fc" id="L186">    return superGraph.getFactory()</span>
-<span class="fc" id="L187">      .fromDataSets(superGraph.getGraphHead(), filteredVertices, inducedEdges);</span>
+<span class="fc" id="L178">    return superGraph.getFactory()</span>
+<span class="fc" id="L179">      .fromDataSets(superGraph.getGraphHead(), filteredVertices, superGraph.getEdges())</span>
+<span class="fc" id="L180">      .verify();</span>
   }
 
   /**
@@ -195,19 +188,19 @@ public class Subgraph&lt;
    * @return edge-induced subgraph
    */
   private LG edgeInducedSubgraph(LG superGraph) {
-<span class="fc" id="L198">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
-<span class="fc" id="L199">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
-<span class="fc" id="L200">      .join(superGraph.getVertices())</span>
-<span class="fc" id="L201">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L202">      .with(new RightSide&lt;&gt;())</span>
-<span class="fc" id="L203">      .union(filteredEdges</span>
-<span class="fc" id="L204">        .join(superGraph.getVertices())</span>
-<span class="fc" id="L205">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L206">        .with(new RightSide&lt;&gt;()))</span>
-<span class="fc" id="L207">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L191">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L192">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L193">      .join(superGraph.getVertices())</span>
+<span class="fc" id="L194">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L195">      .with(new RightSide&lt;&gt;())</span>
+<span class="fc" id="L196">      .union(filteredEdges</span>
+<span class="fc" id="L197">        .join(superGraph.getVertices())</span>
+<span class="fc" id="L198">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L199">        .with(new RightSide&lt;&gt;()))</span>
+<span class="fc" id="L200">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L209">    return superGraph.getFactory()</span>
-<span class="fc" id="L210">      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);</span>
+<span class="fc" id="L202">    return superGraph.getFactory()</span>
+<span class="fc" id="L203">      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);</span>
   }
 
   /**
@@ -218,16 +211,16 @@ public class Subgraph&lt;
    * @return edge-induced subgraph
    */
   private LG edgeInducedSubgraphProjectFirst(LG superGraph) {
-<span class="fc" id="L221">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
-<span class="fc" id="L222">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
-<span class="fc" id="L223">      .flatMap(new EdgeToSourceAndTargetId&lt;&gt;())</span>
-<span class="fc" id="L224">      .distinct()</span>
-<span class="fc" id="L225">      .join(superGraph.getVertices())</span>
-<span class="fc" id="L226">      .where(&quot;*&quot;).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L227">      .with(new RightSide&lt;&gt;());</span>
+<span class="fc" id="L214">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L215">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L216">      .flatMap(new EdgeToSourceAndTargetId&lt;&gt;())</span>
+<span class="fc" id="L217">      .distinct()</span>
+<span class="fc" id="L218">      .join(superGraph.getVertices())</span>
+<span class="fc" id="L219">      .where(&quot;*&quot;).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L220">      .with(new RightSide&lt;&gt;());</span>
 
-<span class="fc" id="L229">    return superGraph.getFactory()</span>
-<span class="fc" id="L230">      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);</span>
+<span class="fc" id="L222">    return superGraph.getFactory()</span>
+<span class="fc" id="L223">      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);</span>
   }
 
   /**
@@ -242,10 +235,10 @@ public class Subgraph&lt;
    * @return subgraph
    */
   private LG subgraph(LG superGraph) {
-<span class="fc" id="L245">    return superGraph.getFactory().fromDataSets(</span>
-<span class="fc" id="L246">      superGraph.getGraphHead(),</span>
-<span class="fc" id="L247">      superGraph.getVertices().filter(vertexFilterFunction),</span>
-<span class="fc" id="L248">      superGraph.getEdges().filter(edgeFilterFunction));</span>
+<span class="fc" id="L238">    return superGraph.getFactory().fromDataSets(</span>
+<span class="fc" id="L239">      superGraph.getGraphHead(),</span>
+<span class="fc" id="L240">      superGraph.getVertices().filter(vertexFilterFunction),</span>
+<span class="fc" id="L241">      superGraph.getEdges().filter(edgeFilterFunction));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

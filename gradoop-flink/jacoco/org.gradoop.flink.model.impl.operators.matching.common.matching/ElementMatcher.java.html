@@ -102,15 +102,18 @@ import java.util.Map;
 <span class="fc" id="L102">      Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; queryProperties =</span>
 <span class="fc" id="L103">        queryElement.getProperties().entrySet().iterator();</span>
 
-<span class="pc bpc" id="L105" title="2 of 4 branches missed.">      while (match &amp;&amp; queryProperties.hasNext()) {</span>
-<span class="nc" id="L106">        Map.Entry&lt;String, Object&gt; queryProperty = queryProperties.next();</span>
-<span class="nc" id="L107">        boolean validKey = dbElement.hasProperty(queryProperty.getKey());</span>
-<span class="nc" id="L108">        boolean validValue = dbElement.getPropertyValue(</span>
-<span class="nc" id="L109">          queryProperty.getKey()).getObject().equals(queryProperty.getValue());</span>
-<span class="nc bnc" id="L110" title="All 4 branches missed.">        match = validKey &amp;&amp; validValue;</span>
-<span class="nc" id="L111">      }</span>
+<span class="fc bfc" id="L105" title="All 4 branches covered.">      while (match &amp;&amp; queryProperties.hasNext()) {</span>
+<span class="fc" id="L106">        Map.Entry&lt;String, Object&gt; queryProperty = queryProperties.next();</span>
+        // if the property key is not valid, it is not a match
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (!dbElement.hasProperty(queryProperty.getKey())) {</span>
+<span class="fc" id="L109">          match = false;</span>
+<span class="fc" id="L110">          break;</span>
+        }
+<span class="fc" id="L112">        match = dbElement.getPropertyValue(queryProperty.getKey()).getObject()</span>
+<span class="fc" id="L113">          .equals(queryProperty.getValue());</span>
+<span class="fc" id="L114">      }</span>
     }
-<span class="fc" id="L113">    return match;</span>
+<span class="fc" id="L116">    return match;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

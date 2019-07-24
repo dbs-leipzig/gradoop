@@ -235,14 +235,8 @@ public class GraphCollection implements
   }
 
   @Override
-  public GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings) {
-<span class="fc" id="L242">    return new TransactionalPatternMatching(</span>
-      pattern,
-      algorithm,
-<span class="fc" id="L245">      returnEmbeddings).execute(this);</span>
+  public GraphCollection query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
+<span class="fc" id="L239">    return new TransactionalPatternMatching(query, algorithm, returnEmbeddings).execute(this);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -251,60 +245,60 @@ public class GraphCollection implements
 
   @Override
   public GraphCollection union(GraphCollection otherCollection) {
-<span class="fc" id="L254">    return callForCollection(new Union(), otherCollection);</span>
+<span class="fc" id="L248">    return callForCollection(new Union(), otherCollection);</span>
   }
 
   @Override
   public GraphCollection intersect(GraphCollection otherCollection) {
-<span class="fc" id="L259">    return callForCollection(new Intersection(), otherCollection);</span>
+<span class="fc" id="L253">    return callForCollection(new Intersection(), otherCollection);</span>
   }
 
   @Override
   public GraphCollection intersectWithSmallResult(
     GraphCollection otherCollection) {
-<span class="fc" id="L265">    return callForCollection(new IntersectionBroadcast(),</span>
+<span class="fc" id="L259">    return callForCollection(new IntersectionBroadcast(),</span>
       otherCollection);
   }
 
   @Override
   public GraphCollection difference(GraphCollection otherCollection) {
-<span class="fc" id="L271">    return callForCollection(new Difference(), otherCollection);</span>
+<span class="fc" id="L265">    return callForCollection(new Difference(), otherCollection);</span>
   }
 
   @Override
   public GraphCollection differenceWithSmallResult(
     GraphCollection otherCollection) {
-<span class="fc" id="L277">    return callForCollection(new DifferenceBroadcast(),</span>
+<span class="fc" id="L271">    return callForCollection(new DifferenceBroadcast(),</span>
       otherCollection);
   }
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphIds(GraphCollection other) {
-<span class="fc" id="L283">    return new CollectionEqualityByGraphIds().execute(this, other);</span>
+<span class="fc" id="L277">    return new CollectionEqualityByGraphIds().execute(this, other);</span>
   }
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphElementIds(GraphCollection other) {
-<span class="fc" id="L288">    return new CollectionEquality(</span>
+<span class="fc" id="L282">    return new CollectionEquality(</span>
       new GraphHeadToEmptyString(),
       new VertexToIdString(),
-<span class="fc" id="L291">      new EdgeToIdString(), true).execute(this, other);</span>
+<span class="fc" id="L285">      new EdgeToIdString(), true).execute(this, other);</span>
   }
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphElementData(GraphCollection other) {
-<span class="fc" id="L296">    return new CollectionEquality(</span>
+<span class="fc" id="L290">    return new CollectionEquality(</span>
       new GraphHeadToEmptyString(),
       new VertexToDataString(),
-<span class="fc" id="L299">      new EdgeToDataString(), true).execute(this, other);</span>
+<span class="fc" id="L293">      new EdgeToDataString(), true).execute(this, other);</span>
   }
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphData(GraphCollection other) {
-<span class="fc" id="L304">    return new CollectionEquality(</span>
+<span class="fc" id="L298">    return new CollectionEquality(</span>
       new GraphHeadToDataString(),
       new VertexToDataString(),
-<span class="fc" id="L307">      new EdgeToDataString(), true).execute(this, other);</span>
+<span class="fc" id="L301">      new EdgeToDataString(), true).execute(this, other);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -314,24 +308,24 @@ public class GraphCollection implements
   @Override
   public GraphCollection callForCollection(
     UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GraphCollection&gt; operator) {
-<span class="fc" id="L317">    return operator.execute(this);</span>
+<span class="fc" id="L311">    return operator.execute(this);</span>
   }
 
   @Override
   public GraphCollection callForCollection(
     BinaryCollectionToCollectionOperator op,
     GraphCollection otherCollection) {
-<span class="fc" id="L324">    return op.execute(this, otherCollection);</span>
+<span class="fc" id="L318">    return op.execute(this, otherCollection);</span>
   }
 
   @Override
   public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
-<span class="fc" id="L329">    return op.execute(this);</span>
+<span class="fc" id="L323">    return op.execute(this);</span>
   }
 
   @Override
   public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
-<span class="fc" id="L334">    return callForGraph(op);</span>
+<span class="fc" id="L328">    return callForGraph(op);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -340,55 +334,55 @@ public class GraphCollection implements
 
   @Override
   public GradoopFlinkConfig getConfig() {
-<span class="fc" id="L343">    return config;</span>
+<span class="fc" id="L337">    return config;</span>
   }
 
   @Override
   public BaseGraphCollectionFactory&lt;
     EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getFactory() {
-<span class="fc" id="L349">    return config.getGraphCollectionFactory();</span>
+<span class="fc" id="L343">    return config.getGraphCollectionFactory();</span>
   }
 
   @Override
   public BaseGraphFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;
   getGraphFactory() {
-<span class="fc" id="L355">    return config.getLogicalGraphFactory();</span>
+<span class="fc" id="L349">    return config.getLogicalGraphFactory();</span>
   }
 
   @Override
   public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="fc" id="L360">    return getGraphHeads()</span>
-<span class="fc" id="L361">      .map(new True&lt;&gt;())</span>
-<span class="fc" id="L362">      .distinct()</span>
-<span class="fc" id="L363">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
-<span class="fc" id="L364">      .reduce(new Or())</span>
-<span class="fc" id="L365">      .map(new Not());</span>
+<span class="fc" id="L354">    return getGraphHeads()</span>
+<span class="fc" id="L355">      .map(new True&lt;&gt;())</span>
+<span class="fc" id="L356">      .distinct()</span>
+<span class="fc" id="L357">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
+<span class="fc" id="L358">      .reduce(new Or())</span>
+<span class="fc" id="L359">      .map(new Not());</span>
   }
 
   @Override
   public GraphCollection distinctById() {
-<span class="fc" id="L370">    return callForCollection(new DistinctById());</span>
+<span class="fc" id="L364">    return callForCollection(new DistinctById());</span>
   }
 
   @Override
   public GraphCollection distinctByIsomorphism() {
-<span class="fc" id="L375">    return callForCollection(new DistinctByIsomorphism());</span>
+<span class="fc" id="L369">    return callForCollection(new DistinctByIsomorphism());</span>
   }
 
   @Override
   public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
-<span class="fc" id="L380">    return callForCollection(new GroupByIsomorphism(func));</span>
+<span class="fc" id="L374">    return callForCollection(new GroupByIsomorphism(func));</span>
   }
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
-<span class="fc" id="L385">    dataSink.write(this);</span>
-<span class="fc" id="L386">  }</span>
+<span class="fc" id="L379">    dataSink.write(this);</span>
+<span class="fc" id="L380">  }</span>
 
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-<span class="nc" id="L390">    dataSink.write(this, overWrite);</span>
-<span class="nc" id="L391">  }</span>
+<span class="nc" id="L384">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L385">  }</span>
 
   /**
    * Prints this graph collection to the console.
@@ -396,7 +390,7 @@ public class GraphCollection implements
    * @throws Exception forwarded DataSet print() Exception.
    */
   public void print() throws Exception {
-<span class="nc" id="L399">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L400">  }</span>
+<span class="nc" id="L393">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L394">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

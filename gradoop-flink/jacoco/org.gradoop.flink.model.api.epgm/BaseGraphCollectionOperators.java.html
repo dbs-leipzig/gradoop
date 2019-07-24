@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.operators.verify.VerifyCollection;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
 /**
@@ -43,6 +44,18 @@ public interface BaseGraphCollectionOperators&lt;
   //----------------------------------------------------------------------------
 
   /**
+   * Verifies each graph of this collection, removing dangling edges, i.e. edges pointing to or from
+   * a vertex not contained in the graph.&lt;br&gt;
+   * This operator can be applied after an operator that has not checked these graphs validity.
+   * The graph heads of these base graphs remains unchanged.
+   *
+   * @return this graph collection with all dangling edges removed.
+   */
+  default GC verify() {
+<span class="fc" id="L55">    return callForCollection(new VerifyCollection&lt;&gt;());</span>
+  }
+
+  /**
    * Verifies this graph collection, removing dangling graph ids from its elements,
    * i.e. ids not contained in the collection.&lt;br&gt;
    * This operator can be applied after an operator that has not checked the graphs validity.
@@ -51,7 +64,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling graph ids removed.
    */
   default GC verifyGraphsContainment() {
-<span class="fc" id="L54">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
+<span class="fc" id="L67">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
   }
 
   //----------------------------------------------------------------------------
@@ -74,7 +87,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return collection with resulting logical graphs
    */
   default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
-<span class="fc" id="L77">    return callForCollection(operator);</span>
+<span class="fc" id="L90">    return callForCollection(operator);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
