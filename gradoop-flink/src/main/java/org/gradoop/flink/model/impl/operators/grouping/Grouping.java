@@ -743,9 +743,9 @@ public abstract class Grouping<
       E extends Edge,
       LG extends BaseGraph<G, V, E, LG, GC>,
       GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
-      if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
-        throw new IllegalArgumentException(
-          "Provide vertex key(s) and/or use vertex labels for grouping.");
+
+      if (strategy == null) {
+        throw new IllegalStateException("A GroupingStrategy has to be set.");
       }
 
       // adding the global aggregators to the associated label groups

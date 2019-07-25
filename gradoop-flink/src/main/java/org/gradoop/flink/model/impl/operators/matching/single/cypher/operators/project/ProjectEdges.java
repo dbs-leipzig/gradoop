@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Projects an EPGMEdge by a set of properties.
- * EPGMEdge -> Embedding(IdEntry(SrcID), GraphElementEntry(EPGMEdge), IdEntry(TargetID))
+ * Projects an Edge by a set of properties.
+ * Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
  */
 public class ProjectEdges implements PhysicalOperator {
 

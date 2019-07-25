@@ -21,12 +21,12 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for {@link HBaseLabelReg}
@@ -48,6 +48,6 @@ public class HBaseLabelRegTest {
       new RegexStringComparator(PATTERN_VERTEX.pattern())
     );
 
-    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+    assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString());
   }
 }
