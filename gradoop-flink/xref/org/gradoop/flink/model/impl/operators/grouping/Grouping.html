@@ -670,9 +670,9 @@
 <a name="660" href="#660">660</a>       E <strong class="jxr_keyword">extends</strong> Edge,
 <a name="661" href="#661">661</a>       LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
 <a name="662" href="#662">662</a>       GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; Grouping&lt;G, V, E, LG, GC&gt; build() {
-<a name="663" href="#663">663</a>       <strong class="jxr_keyword">if</strong> (vertexLabelGroups.isEmpty() &amp;&amp; !useVertexLabel) {
-<a name="664" href="#664">664</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(
-<a name="665" href="#665">665</a>           <span class="jxr_string">"Provide vertex key(s) and/or use vertex labels for grouping."</span>);
+<a name="663" href="#663">663</a> 
+<a name="664" href="#664">664</a>       <strong class="jxr_keyword">if</strong> (strategy == <strong class="jxr_keyword">null</strong>) {
+<a name="665" href="#665">665</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalStateException(<span class="jxr_string">"A GroupingStrategy has to be set."</span>);
 <a name="666" href="#666">666</a>       }
 <a name="667" href="#667">667</a> 
 <a name="668" href="#668">668</a>       <em class="jxr_comment">// adding the global aggregators to the associated label groups</em>

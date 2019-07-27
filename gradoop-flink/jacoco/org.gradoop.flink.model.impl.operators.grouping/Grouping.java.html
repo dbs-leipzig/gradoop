@@ -660,9 +660,9 @@ public abstract class Grouping&lt;
       E extends Edge,
       LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
       GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; Grouping&lt;G, V, E, LG, GC&gt; build() {
-<span class="pc bpc" id="L663" title="3 of 4 branches missed.">      if (vertexLabelGroups.isEmpty() &amp;&amp; !useVertexLabel) {</span>
-<span class="nc" id="L664">        throw new IllegalArgumentException(</span>
-          &quot;Provide vertex key(s) and/or use vertex labels for grouping.&quot;);
+
+<span class="fc bfc" id="L664" title="All 2 branches covered.">      if (strategy == null) {</span>
+<span class="fc" id="L665">        throw new IllegalStateException(&quot;A GroupingStrategy has to be set.&quot;);</span>
       }
 
       // adding the global aggregators to the associated label groups

@@ -278,7 +278,7 @@ Gradoop Flink,org.gradoop.flink.io.impl.csv,CSVDataSource,0,88,0,0,0,22,0,3,0,3
 Gradoop Flink,org.gradoop.flink.io.impl.csv,CSVDataSink,14,129,5,7,4,29,6,7,2,5
 Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,GroupingGroupReduce,0,64,0,0,0,14,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,Grouping.new Object() {...},2,17,0,0,0,1,0,1,0,1
-Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,Grouping.GroupingBuilder,21,353,4,19,2,78,3,30,0,21
+Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,Grouping.GroupingBuilder,13,357,1,20,1,79,1,31,0,21
 Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,GroupingGroupCombine,0,87,0,0,0,21,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,GroupingStrategy,0,24,0,0,0,3,0,1,0,1
 Gradoop Flink,org.gradoop.flink.model.impl.operators.grouping,Grouping,55,245,14,12,7,44,11,13,0,11
@@ -641,7 +641,7 @@ Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,AlphabeticalLa
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,UndirectedDFSBranchComparator,71,0,8,0,13,0,6,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,ProportionalLabelComparator,31,0,4,0,7,0,4,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,34,202,22,36,6,47,17,14,0,2
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,0,92,0,12,0,19,0,8,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,6,86,2,10,2,17,2,6,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,0,31,0,4,0,7,0,4,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,DFSCodeUtils,1,49,2,6,0,11,2,6,0,4
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,Simple16Compressor,3,54,0,4,1,11,1,7,1,5
