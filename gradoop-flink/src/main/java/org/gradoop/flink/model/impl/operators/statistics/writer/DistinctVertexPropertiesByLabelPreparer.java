@@ -25,17 +25,12 @@ import org.gradoop.flink.model.impl.operators.statistics.DistinctVertexPropertie
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Computes {@link DistinctVertexPropertiesByLabel} for a given logical graph and write it in a CSV file.
+ * Computes {@link DistinctVertexPropertiesByLabel} for a given logical graph.
  */
 public class DistinctVertexPropertiesByLabelPreparer implements
 UnaryGraphToValueOperator<MapOperator<WithCount<Tuple2<String, String>>,
 Tuple3<String, String, Long>>> {
 
-  /**
-   * Prepares the statistic for distinct vertex properties by label.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator<WithCount<Tuple2<String, String>>, Tuple3<String, String, Long>>
   execute(final LogicalGraph graph) {

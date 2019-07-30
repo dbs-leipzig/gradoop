@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 /**
  * Creates a graph of type {@link LG} based on one input graph of the same type.
  *
- * @param <LG> the type of the graph used as input and return value.
+ * @param <LG> the type of the graphs used as input and return value.
  */
 public interface UnaryBaseGraphToBaseGraphOperator<LG extends BaseGraph>
   extends UnaryBaseGraphToValueOperator<LG, LG> {

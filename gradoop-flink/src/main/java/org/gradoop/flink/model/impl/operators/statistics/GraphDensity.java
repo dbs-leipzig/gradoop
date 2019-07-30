@@ -37,7 +37,7 @@ public class GraphDensity implements UnaryGraphToGraphOperator {
       .getGraphHead()
       .map(new CalculateDensity(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
-    return graph.getConfig().getLogicalGraphFactory()
+    return graph.getFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 }

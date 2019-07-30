@@ -61,7 +61,7 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override

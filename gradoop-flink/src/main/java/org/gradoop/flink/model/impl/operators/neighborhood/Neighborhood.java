@@ -15,13 +15,17 @@
  */
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 
 /**
  * Super class for all neighborhood operators.
+ *
+ * @param <LG> graph type
  */
-public abstract class Neighborhood implements UnaryGraphToGraphOperator {
+public abstract class Neighborhood<LG extends BaseGraph>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Defines which edge direction shall be considered for aggregation. Incoming edges, outgoing

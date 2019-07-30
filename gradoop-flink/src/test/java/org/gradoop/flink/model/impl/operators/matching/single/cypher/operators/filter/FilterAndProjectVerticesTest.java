@@ -43,8 +43,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<EPGMVertex> vertices = getExecutionEnvironment()
       .fromElements(new EPGMVertexFactory().createVertex("Person", properties));
 
-    FilterAndProjectVertices filter =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>());
+    FilterAndProjectVertices<EPGMVertex> filter =
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>());
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -65,7 +65,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
 
@@ -83,7 +83,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>())
       .evaluate()
       .collect();
 
@@ -103,7 +103,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVertices<>(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);
@@ -125,7 +125,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVertices<>(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);

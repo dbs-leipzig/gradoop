@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.overlap;
+package org.gradoop.flink.model.impl.operators.verify;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
@@ -21,45 +21,44 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.utils.LeftSideWithRightGraphs;
 
 /**
- * Computes the overlap graph from two base graphs.
- * Creates a new base graph containing the overlapping vertex and edge
- * sets of two input graphs. EPGMVertex and edge equality is based on their
- * respective identifiers.
+ * Verifies the edge set for each graph in a collection, removing dangling edges, i.e. edges with a
+ * source- or target-id not matching any vertices of this graph.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
- * @param <LG> The type of the graph.
- * @param <GC> The type of the graph collection.
+ * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
-public class Overlap<
+public class VerifyCollection<
   G extends GraphHead,
   V extends Vertex,
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
-  implements BinaryBaseGraphToBaseGraphOperator<LG> {
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   @Override
-  public LG execute(LG firstGraph, LG secondGraph) {
-
-    DataSet<V> newVertices = firstGraph.getVertices()
-      .join(secondGraph.getVertices())
-      .where(new Id<>())
+  public GC execute(GC collection) {
+    DataSet<V> vertices = collection.getVertices();
+    DataSet<E> verifiedEdges = collection.getEdges()
+      .join(vertices)
+      .where(new SourceId<>())
       .equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    DataSet<E> newEdges = firstGraph.getEdges()
-      .join(secondGraph.getEdges())
-      .where(new Id<>())
+      .with(new LeftSideWithRightGraphs<>())
+      .name("Verify Edges (1/2)")
+      .join(vertices)
+      .where(new TargetId<>())
       .equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    return firstGraph.getFactory().fromDataSets(newVertices, newEdges);
+      .with(new LeftSideWithRightGraphs<>())
+      .name("Verify Edges (2/2)");
+    return collection.getFactory().fromDataSets(collection.getGraphHeads(), vertices, verifiedEdges);
   }
 }

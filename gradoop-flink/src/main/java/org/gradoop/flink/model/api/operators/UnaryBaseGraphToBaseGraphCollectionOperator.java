@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.util;
+package org.gradoop.flink.model.api.operators;
 
-import org.testng.annotations.Test;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
-import static org.testng.Assert.assertNotEquals;
+/**
+ * Creates a graph collection of type {@link GC} based on one graph of type {@link G}.
+ *
+ * @param <G> the type of the graph used as input
+ * @param <GC> the type of the graph used as return value
+ */
+public interface UnaryBaseGraphToBaseGraphCollectionOperator<
+  G extends BaseGraph,
+  GC extends BaseGraphCollection> extends Operator {
 
-public class NetworkHelperTest {
-  @Test
-  public void getLocalHost() {
-    assertNotEquals(NetworkHelper.getLocalHost(), NetworkHelper.LOCAL_HOST);
-  }
+  /**
+   * Executes the operator.
+   *
+   * @param graph input graph
+   * @return resulting graph collection
+   */
+  GC execute(G graph);
 }

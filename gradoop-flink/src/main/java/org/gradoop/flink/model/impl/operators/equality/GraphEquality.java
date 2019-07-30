@@ -19,9 +19,10 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
@@ -30,7 +31,8 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
  */
-public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
+public class GraphEquality
+  implements BinaryBaseGraphToValueOperator<LogicalGraph, DataSet<Boolean>> {
 
   /**
    * collection equality operator, wrapped by graph equality
@@ -60,8 +62,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
 
   @Override
   public DataSet<Boolean> execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    GraphCollectionFactory collectionFactory = firstGraph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      collectionFactory = firstGraph.getCollectionFactory();
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }

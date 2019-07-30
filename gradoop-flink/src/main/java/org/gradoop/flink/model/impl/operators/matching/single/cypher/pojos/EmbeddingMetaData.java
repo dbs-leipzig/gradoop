@@ -45,11 +45,11 @@ public class EmbeddingMetaData implements Serializable {
    */
   public enum EntryType {
     /**
-     * EPGMVertex
+     * Vertex
      */
     VERTEX,
     /**
-     * EPGMEdge
+     * Edge
      */
     EDGE,
     /**

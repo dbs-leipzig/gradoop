@@ -129,7 +129,7 @@ public class GradoopFlinkTestUtils {
   public static void printDirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printDirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+    printDirectedCanonicalAdjacencyMatrix(graph.getCollectionFactory()
       .fromGraph(graph));
   }
 
@@ -145,7 +145,7 @@ public class GradoopFlinkTestUtils {
   public static void printUndirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printUndirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+    printUndirectedCanonicalAdjacencyMatrix(graph.getCollectionFactory()
       .fromGraph(graph));
   }
 

@@ -22,14 +22,5 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
  * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
  */
 public interface UnaryGraphToCollectionOperator
-  extends UnaryBaseGraphToBaseCollectionOperator<LogicalGraph, GraphCollection> {
-
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
-  @Override
-  GraphCollection execute(LogicalGraph graph);
+  extends UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> {
 }

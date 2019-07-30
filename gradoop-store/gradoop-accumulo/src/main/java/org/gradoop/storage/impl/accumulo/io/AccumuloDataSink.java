@@ -58,7 +58,7 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
+    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override

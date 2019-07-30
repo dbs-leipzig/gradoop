@@ -21,9 +21,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.IdNotInBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -58,20 +58,12 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
  *    appearing in the search graph that are not expressed in the pattern graph are
  *    rendered as hooks over the fused vertex
  */
-public class VertexFusion implements BinaryGraphToGraphOperator {
+public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalGraph> {
 
-  /**
-   * Fusing the already-combined sources
-   *
-   * @param searchGraph            Logical Graph defining the data lake
-   * @param graphPatterns Collection of elements representing which vertices will be merged into
-   *                      a vertex
-   * @return              A single merged graph
-   */
   @Override
   public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
     return execute(searchGraph,
-        graphPatterns.getConfig().getGraphCollectionFactory()
+        graphPatterns.getCollectionFactory()
         .fromDataSets(
             graphPatterns.getGraphHead(),
             graphPatterns.getVertices(),
@@ -80,9 +72,9 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
 
 
   /**
-   * Fusing the already-combined sources
+   * Fusing the already-combined sources.
    *
-   * @param searchGraph            Logical Graph defining the data lake
+   * @param searchGraph   Logical Graph defining the data lake
    * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph
@@ -147,6 +139,6 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .reduceGroup(new AddNewIdToDuplicatedEdge())
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
-    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
+    return searchGraph.getFactory().fromDataSets(gh, vToRet, edges);
   }
 }

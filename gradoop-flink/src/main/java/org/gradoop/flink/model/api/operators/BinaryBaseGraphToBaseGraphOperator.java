@@ -15,22 +15,13 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 
 /**
- * Creates a (usually 1-element) Boolean dataset based on two input graphs.
+ * Creates a graph of type {@link LG} based on two input graphs of the same type.
  *
- * @param <T> value type
+ * @param <LG> the type of the graph used as input and return value.
  */
-public interface BinaryGraphToValueOperator<T> extends Operator {
-
-  /**
-   * Executes the operator.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return operator result
-   */
-  DataSet<T> execute(LogicalGraph firstGraph, LogicalGraph secondGraph);
+public interface BinaryBaseGraphToBaseGraphOperator<LG extends BaseGraph>
+  extends BinaryBaseGraphToValueOperator<LG, LG> {
 }

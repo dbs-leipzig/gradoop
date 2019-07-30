@@ -17,12 +17,13 @@ package org.gradoop.flink.model.impl.operators.cloning;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
 import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -35,45 +36,56 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpda
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 
 /**
- * Creates a copy of the logical graph with new ids for the graph head,
- * vertices and edges.
+ * Creates a copy of the graph instance with new ids for the graph head, vertices and edges.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class Cloning implements UnaryGraphToGraphOperator {
+public class Cloning<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LG execute(LG graph) {
 
     //--------------------------------------------------------------------------
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    DataSet<EPGMGraphHead> graphHead = graph.getGraphHead()
-      .map(new Clone<EPGMGraphHead>());
+    DataSet<G> graphHead = graph.getGraphHead()
+      .map(new Clone<>());
 
-    DataSet<GradoopId> graphId = graphHead.map(new Id<EPGMGraphHead>());
+    DataSet<GradoopId> graphId = graphHead.map(new Id<>());
 
     //--------------------------------------------------------------------------
     // compute new vertices
     //--------------------------------------------------------------------------
 
-    DataSet<Tuple2<EPGMVertex, GradoopId>> vertexTuple = graph.getVertices()
-        .map(new PairElementWithNewId<EPGMVertex>());
+    DataSet<Tuple2<V, GradoopId>> vertexTuple = graph.getVertices()
+        .map(new PairElementWithNewId<>());
 
     DataSet<Tuple2<GradoopId, GradoopId>> vertexIdTuple = vertexTuple
-      .map(new Value0Of2ToId<EPGMVertex, GradoopId>());
+      .map(new Value0Of2ToId<>());
 
-    DataSet<EPGMVertex> vertices = vertexTuple
-      .map(new ElementIdUpdater<EPGMVertex>())
+    DataSet<V> vertices = vertexTuple
+      .map(new ElementIdUpdater<>())
       //update graph ids
-      .map(new ElementGraphUpdater<EPGMVertex>())
+      .map(new ElementGraphUpdater<>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 
     //--------------------------------------------------------------------------
     // compute new edges
     //--------------------------------------------------------------------------
 
-    DataSet<EPGMEdge> edges = graph.getEdges()
-      .map(new Clone<EPGMEdge>())
+    DataSet<E> edges = graph.getEdges()
+      .map(new Clone<>())
       //update source vertex ids
       .join(vertexIdTuple)
       .where(new SourceId<>()).equalTo(0)
@@ -83,10 +95,9 @@ public class Cloning implements UnaryGraphToGraphOperator {
       .where(new TargetId<>()).equalTo(0)
       .with(new EdgeTargetUpdateJoin<>())
       //update graph ids
-      .map(new ElementGraphUpdater<EPGMEdge>())
+      .map(new ElementGraphUpdater<>())
       .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graphHead, vertices, edges);
+    return graph.getFactory().fromDataSets(graphHead, vertices, edges);
   }
 }

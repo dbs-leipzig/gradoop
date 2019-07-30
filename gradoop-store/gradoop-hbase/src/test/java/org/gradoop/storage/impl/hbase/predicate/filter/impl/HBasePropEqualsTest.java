@@ -23,59 +23,28 @@ import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for {@link HBasePropEquals}
  */
-@RunWith(Parameterized.class)
 public class HBasePropEqualsTest {
-
-  /**
-   * Property type
-   */
-  private final String propertyType;
-
-  /**
-   * Property key
-   */
-  private final String propertyKey;
-
-  /**
-   * Property value
-   */
-  private final PropertyValue propertyValue;
-
-  /**
-   * Constructor for parametrized test
-   *
-   * @param propertyKey property key to test
-   * @param value property value to test
-   */
-  public HBasePropEqualsTest(String propertyKey, Object value) {
-    this.propertyKey = propertyKey;
-    this.propertyValue = PropertyValue.create(value);
-    this.propertyType = this.propertyValue.getType() == null ?
-      "null" : this.propertyValue.getType().toString();
-  }
 
   /**
    * Test the toHBaseFilter function
    */
-  @Test
-  public void testToHBaseFilter() {
+  @Test(dataProvider = "property values")
+  public void testToHBaseFilter(String propertyKey, Object value) {
+    PropertyValue propertyValue = PropertyValue.create(value);
 
     HBasePropEquals<EPGMVertex> vertexFilter = new HBasePropEquals<>(propertyKey, propertyValue);
 
@@ -102,8 +71,8 @@ public class HBasePropEqualsTest {
     expectedFilter.addFilter(valueFilter);
     expectedFilter.addFilter(typeFilter);
 
-    assertEquals("Failed during filter comparison for type [" + propertyType + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+    assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
+      "Failed during filter comparison for type [" + propertyValue.getType() + "].");
   }
 
   /**
@@ -111,8 +80,8 @@ public class HBasePropEqualsTest {
    *
    * @return a collection containing the test parameters
    */
-  @Parameterized.Parameters
-  public static Collection properties() {
+  @DataProvider(name = "property values")
+  public static Object[][] properties() {
     ArrayList<PropertyValue> intList = new ArrayList<>();
     intList.add(PropertyValue.create(1234));
     intList.add(PropertyValue.create(5678));
@@ -121,7 +90,7 @@ public class HBasePropEqualsTest {
     objectMap.put(PropertyValue.create("a"), PropertyValue.create(12.345));
     objectMap.put(PropertyValue.create("b"), PropertyValue.create(67.89));
 
-    return Arrays.asList(new Object[][] {
+    return new Object[][] {
       {GradoopTestUtils.KEY_0, GradoopTestUtils.NULL_VAL_0},
       {GradoopTestUtils.KEY_1, GradoopTestUtils.BOOL_VAL_1},
       {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2},
@@ -137,6 +106,6 @@ public class HBasePropEqualsTest {
       {GradoopTestUtils.KEY_c, GradoopTestUtils.TIME_VAL_c},
       {GradoopTestUtils.KEY_d, GradoopTestUtils.DATETIME_VAL_d},
       {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e}
-    });
+    };
   }
 }

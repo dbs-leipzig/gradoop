@@ -26,6 +26,7 @@ import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -62,32 +63,32 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     GraphCollection collection = getGraphCollection();
-    return getConfig().getLogicalGraphFactory()
+    return collection.getGraphFactory()
       .fromDataSets(
         collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
   }
 
   @Override
   public GraphCollection getGraphCollection() {
+    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();
     DataSet<Tuple3<String, String, String>> metaData =
       new CSVMetaDataSource().readDistributed(getMetaDataPath(), getConfig());
 
     DataSet<EPGMGraphHead> graphHeads = getConfig().getExecutionEnvironment()
       .readTextFile(getGraphHeadCSVPath())
-      .map(new CSVLineToGraphHead(getConfig().getGraphHeadFactory()))
+      .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     DataSet<EPGMVertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
-      .map(new CSVLineToVertex(getConfig().getVertexFactory()))
+      .map(new CSVLineToVertex(factory.getVertexFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     DataSet<EPGMEdge> edges = getConfig().getExecutionEnvironment()
       .readTextFile(getEdgeCSVPath())
-      .map(new CSVLineToEdge(getConfig().getEdgeFactory()))
+      .map(new CSVLineToEdge(factory.getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-
-    return getConfig().getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
+    return factory.fromDataSets(graphHeads, vertices, edges);
   }
 }

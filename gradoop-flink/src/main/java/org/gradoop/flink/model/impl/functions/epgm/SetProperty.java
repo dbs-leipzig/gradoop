@@ -55,12 +55,6 @@ public class SetProperty<E extends EPGMElement> implements MapFunction<E, E> {
     this.propertyValue = propertyValue;
   }
 
-  /**
-   * Adds a new property to the element.
-   *
-   * @param element original element to be updated
-   * @return updated element
-   */
   @Override
   public E map(E element) throws Exception {
     element.setProperty(propertyKey, propertyValue);

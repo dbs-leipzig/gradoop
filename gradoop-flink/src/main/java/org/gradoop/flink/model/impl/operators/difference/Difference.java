@@ -32,11 +32,6 @@ import org.gradoop.flink.model.impl.operators.difference.functions.RemoveCut;
  */
 public class Difference extends SetOperatorBase {
 
-  /**
-   * Computes the logical graph dataset for the resulting collection.
-   *
-   * @return logical graph dataset of the resulting collection
-   */
   @Override
   protected DataSet<EPGMGraphHead> computeNewGraphHeads() {
     // assign 1L to each logical graph in the first collection
