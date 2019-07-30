@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Factory for creating temporal edge POJOs.
  */
-public class TemporalEdgeFactory implements EPGMEdgeFactory<TemporalEdge>, Serializable {
+public class TemporalEdgeFactory implements EdgeFactory<TemporalEdge>, Serializable {
 
   @Override
   public TemporalEdge createEdge(GradoopId sourceVertexId, GradoopId targetVertexId) {
@@ -127,7 +127,7 @@ public class TemporalEdgeFactory implements EPGMEdgeFactory<TemporalEdge>, Seria
    * @param edge the EPGM edge instance
    * @return a TPGM edge instance with default values at its valid times
    */
-  public TemporalEdge fromNonTemporalEdge(EPGMEdge edge) {
+  public TemporalEdge fromNonTemporalEdge(Edge edge) {
     return initEdge(edge.getId(), edge.getLabel(), edge.getSourceId(), edge.getTargetId(),
       edge.getProperties(), edge.getGraphIds());
   }
