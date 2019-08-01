@@ -18,25 +18,25 @@ package org.gradoop.temporal.model.impl.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
 import java.util.Objects;
 
 /**
- * Initializes a {@link TemporalEdge} from a {@link EPGMEdge} instance by setting either
+ * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;label;properties;graphIds")
-public class TemporalEdgeFromNonTemporal implements MapFunction<EPGMEdge, TemporalEdge> {
+public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEdge> {
   /**
    * The user defined timestamp extractor.
    */
-  private TimeIntervalExtractor<EPGMEdge> timeIntervalExtractor;
+  private TimeIntervalExtractor<Edge> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -62,7 +62,7 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<EPGMEdge, Tempor
    */
   public TemporalEdgeFromNonTemporal(
     EdgeFactory<TemporalEdge> elementFactory,
-    TimeIntervalExtractor<EPGMEdge> timeIntervalExtractor) {
+    TimeIntervalExtractor<Edge> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
   }
@@ -77,7 +77,7 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<EPGMEdge, Tempor
    * @throws Exception on failure
    */
   @Override
-  public TemporalEdge map(EPGMEdge value) throws Exception {
+  public TemporalEdge map(Edge value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setSourceId(value.getSourceId());

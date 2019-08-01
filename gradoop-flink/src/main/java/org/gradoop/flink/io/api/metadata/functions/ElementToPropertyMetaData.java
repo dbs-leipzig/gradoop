@@ -18,6 +18,10 @@ package org.gradoop.flink.io.api.metadata.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -34,10 +38,10 @@ import java.util.Set;
 /**
  * (element) -> (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})
  *
- * @param <E> EPGM element type
+ * @param <E> element type
  */
 @FunctionAnnotation.ForwardedFields("label->f1")
-public class ElementToPropertyMetaData<E extends EPGMElement>
+public class ElementToPropertyMetaData<E extends Element>
   implements MapFunction<E, Tuple3<String, String, Set<String>>> {
   /**
    * Reduce object instantiations.
@@ -53,16 +57,14 @@ public class ElementToPropertyMetaData<E extends EPGMElement>
 
   @Override
   public Tuple3<String, String, Set<String>> map(E e) throws Exception {
-    Class<? extends EPGMElement> type = e.getClass();
-
-    if (type == EPGMEdge.class) {
+    if (e instanceof Edge) {
       reuseTuple.f0 = MetaDataSource.EDGE_TYPE;
-    } else if (type == EPGMVertex.class) {
+    } else if (e instanceof Vertex) {
       reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;
-    } else if (type == EPGMGraphHead.class) {
+    } else if (e instanceof GraphHead) {
       reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;
     } else {
-      throw new Exception("Unsupported element class");
+      throw new Exception("Unsupported element class: " + e.getClass().getName());
     }
     reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);
     reuseTuple.f2.clear();

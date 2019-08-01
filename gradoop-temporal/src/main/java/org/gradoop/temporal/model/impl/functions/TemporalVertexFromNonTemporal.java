@@ -17,22 +17,22 @@ package org.gradoop.temporal.model.impl.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 /**
- * Initializes a {@link TemporalVertex} from a {@link EPGMVertex} instance by setting either
+ * Initializes a {@link TemporalVertex} from a {@link Vertex} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties;graphIds")
-public class TemporalVertexFromNonTemporal implements MapFunction<EPGMVertex, TemporalVertex> {
+public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, TemporalVertex> {
   /**
    * The user defined interval extractor, might be {@code null}.
    */
-  private TimeIntervalExtractor<EPGMVertex> timeIntervalExtractor;
+  private TimeIntervalExtractor<Vertex> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -58,7 +58,7 @@ public class TemporalVertexFromNonTemporal implements MapFunction<EPGMVertex, Te
    */
   public TemporalVertexFromNonTemporal(
     VertexFactory<TemporalVertex> elementFactory,
-    TimeIntervalExtractor<EPGMVertex> timeIntervalExtractor) {
+    TimeIntervalExtractor<Vertex> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
@@ -73,7 +73,7 @@ public class TemporalVertexFromNonTemporal implements MapFunction<EPGMVertex, Te
    * @throws Exception on failure
    */
   @Override
-  public TemporalVertex map(EPGMVertex value) throws Exception {
+  public TemporalVertex map(Vertex value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setProperties(value.getProperties());

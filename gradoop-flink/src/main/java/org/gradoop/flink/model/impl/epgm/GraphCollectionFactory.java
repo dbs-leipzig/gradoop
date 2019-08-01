@@ -61,6 +61,11 @@ public class GraphCollectionFactory implements
   }
 
   @Override
+  public GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getLayoutFactory() {
+    return layoutFactory;
+  }
+
+  @Override
   public void setLayoutFactory(
     GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);

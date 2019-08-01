@@ -18,25 +18,24 @@ package org.gradoop.temporal.model.impl.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 
 import java.util.Objects;
 
 /**
- * Initializes a {@link TemporalGraphHead} from a {@link EPGMGraphHead} instance by setting either
+ * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class TemporalGraphHeadFromNonTemporal
-  implements MapFunction<EPGMGraphHead, TemporalGraphHead> {
+public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, TemporalGraphHead> {
   /**
    * The user defined interval extractor, might be {@code null}.
    */
-  private TimeIntervalExtractor<EPGMGraphHead> timeIntervalExtractor;
+  private TimeIntervalExtractor<GraphHead> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -62,7 +61,7 @@ public class TemporalGraphHeadFromNonTemporal
    */
   public TemporalGraphHeadFromNonTemporal(
     GraphHeadFactory<TemporalGraphHead> elementFactory,
-    TimeIntervalExtractor<EPGMGraphHead> timeIntervalExtractor) {
+    TimeIntervalExtractor<GraphHead> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
   }
@@ -77,7 +76,7 @@ public class TemporalGraphHeadFromNonTemporal
    * @throws Exception on failure
    */
   @Override
-  public TemporalGraphHead map(EPGMGraphHead value) throws Exception {
+  public TemporalGraphHead map(GraphHead value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setProperties(value.getProperties());
