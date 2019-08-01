@@ -24,7 +24,9 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Add all gradoop ids in the second field of the first tuple to the element.
- * id:el{id1} join (id, {id2, id3}) -> id:el{id1, id2, id3}
+ * <p>
+ * {@code id:el{id1} join (id, {id2, id3}) -> id:el{id1, id2, id3}}
+ *
  * @param <EL> epgm graph element type
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")

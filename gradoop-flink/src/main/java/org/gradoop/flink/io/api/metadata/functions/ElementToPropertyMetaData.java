@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * (element) -> (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})
+ * {@code (element) -> (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})}
  *
  * @param <E> EPGM element type
  */

@@ -31,11 +31,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * combiner: (graphId, [vertex|edges] -> (graphId, {vertex,...}, {edge,...})
- * reducer:  (graphId, {vertex,...}, {edge,...}) -> (graphId, {vertex,...}, {edge,...})
- *
+ * combiner: {@code (graphId, [vertex|edges] -> (graphId, {vertex,...}, {edge,...})}<br>
+ * reducer: {@code (graphId, {vertex,...}, {edge,...}) -> (graphId, {vertex,...}, {edge,...})}
+ * <p>
  * Forwarded fields:
- *
+ * <br>
  * f0: graph head id
  */
 @FunctionAnnotation.ForwardedFields("f0")

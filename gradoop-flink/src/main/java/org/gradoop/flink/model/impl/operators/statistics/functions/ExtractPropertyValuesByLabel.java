@@ -27,8 +27,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.util.Set;
 
 /**
- * Extracts Triples of the form <Tuple2<Label,PropertyName>, PropertyValue> from the given list of
+ * Extracts Triples of the form {@code <Tuple2<Label,PropertyName>, PropertyValue>} from the given list of
  * GraphElements
+ *
  * @param <T> graph element type
  */
 @FunctionAnnotation.ForwardedFields("label->0.0")

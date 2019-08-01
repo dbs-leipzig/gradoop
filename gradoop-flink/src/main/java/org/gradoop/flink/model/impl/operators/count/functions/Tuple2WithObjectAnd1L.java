@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * object => (object, 1)
+ * {@code object => (object, 1)}
  *
  * @param <T> value type
  */

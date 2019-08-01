@@ -92,27 +92,25 @@ public class Subgraph<
     VERTEX_INDUCED,
     /**
      * Only applies the edge filter function and computes the resulting vertices via:
-     * (E |><| V ON e.source = v.id) U (E |><| V on e.target = v.id)
+     * {@code (E |><| V ON e.source = v.id) U (E |><| V on e.target = v.id)}
      */
     EDGE_INDUCED,
     /**
      * Only applies the edge filter function and computes the resulting vertices via:
-     * DISTINCT((π_source(E) U π_target(E))) |><| V
+     * {@code DISTINCT((π_source(E) U π_target(E))) |><| V}
      */
     EDGE_INDUCED_PROJECT_FIRST
   }
 
   /**
    * Creates a new sub graph operator instance.
-   *
+   * <p>
    * If both parameters are not {@code null}, the operator returns the subgraph
    * defined by filtered vertices and edges.
-   *
-   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the
-   * vertex-induced subgraph.
-   *
-   * If the {@code vertexFilterFunction} is {@code null}, the operator returns
-   * the edge-induced subgraph.
+   * <p>
+   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the vertex-induced subgraph.
+   * <p>
+   * If the {@code vertexFilterFunction} is {@code null}, the operator returns the edge-induced subgraph.
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
@@ -225,11 +223,9 @@ public class Subgraph<
 
   /**
    * Returns the subgraph of the given supergraph that is defined by the
-   * vertices that fulfil the vertex filter function and edges that fulfill
-   * the edge filter function.
-   *
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph.
+   * vertices that fulfil the vertex filter function and edges that fulfill the edge filter function.
+   * <p>
+   * Note, that the operator does not verify the consistency of the resulting graph.
    *
    * @param superGraph supergraph
    * @return subgraph

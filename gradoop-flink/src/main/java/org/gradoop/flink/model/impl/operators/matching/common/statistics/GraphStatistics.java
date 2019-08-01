@@ -124,10 +124,10 @@ public class GraphStatistics {
    * @param distinctTargetVertexCount number of distinct target vertices
    * @param distinctSourceVertexCountByEdgeLabel number of distinct source vertices by edge label
    * @param distinctTargetVertexCountByEdgeLabel number of distinct target vertices by edge label
-   * @param distinctEdgePropertiesByLabel (label,property) -> distinct values
-   * @param distinctVertexPropertiesByLabel (label,property) -> distinct values
-   * @param distinctEdgeProperties (edge property) -> distinct values
-   * @param distinctVertexProperties (vertex property) -> distinct values
+   * @param distinctEdgePropertiesByLabel {@code (label,property) -> distinct values}
+   * @param distinctVertexPropertiesByLabel {@code (label,property) -> distinct values}
+   * @param distinctEdgeProperties {@code (edge property) -> distinct values}
+   * @param distinctVertexProperties {@code (vertex property) -> distinct values}
    */
   GraphStatistics(long vertexCount, long edgeCount, Map<String, Long> vertexCountByLabel,
     Map<String, Long> edgeCountByLabel,
@@ -260,7 +260,7 @@ public class GraphStatistics {
 
   /**
    * Returns the number of distinct vertex property values for given property name
-   * Eg (name) -> 20
+   * Eg {@code (name) -> 20}
    *
    * @param propertyName property name
    * @return number of distinct property values for label property name pair
@@ -271,7 +271,7 @@ public class GraphStatistics {
 
   /**
    * Returns the number of distinct edge property values for given property name
-   * Eg (name) -> 20
+   * Eg {@code (name) -> 20}
    *
    * @param propertyName property name
    * @return number of distinct property values for label property name pair
@@ -282,7 +282,7 @@ public class GraphStatistics {
 
   /**
    * Returns the number of distinct property values for given vertex label property name pair
-   * Eg (Person, name) -> 20
+   * Eg {@code (Person, name) -> 20}
    *
    * @param vertexLabel vertex label
    * @param propertyName property name
@@ -295,7 +295,7 @@ public class GraphStatistics {
 
   /**
    * Returns the number of distinct property values for given edge label property name pair
-   * Eg (Person, name) -> 20
+   * Eg {@code (Person, name) -> 20}
    *
    * @param edgeLabel edge label
    * @param propertyName property name

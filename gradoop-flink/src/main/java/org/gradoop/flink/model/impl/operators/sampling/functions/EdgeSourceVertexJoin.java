@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins to get the edge source:
- * (edge),(vertex) -> (edge,edge.targetId,(bool)vertex[propertyKey])
+ * {@code (edge),(vertex) -> (edge,edge.targetId,(bool)vertex[propertyKey])}
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"*->f0", "id->f1"})
 @FunctionAnnotation.ReadFieldsSecond("properties")

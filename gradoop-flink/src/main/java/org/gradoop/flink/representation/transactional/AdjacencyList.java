@@ -24,25 +24,26 @@ import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
- *
- * f0 : graph head
- * f1 : vertex/edge id -> label
- * f2 : vertex/edge id -> properties
- * f3 : vertex id -> outgoing adjacency rows
- * f4 : vertex id -> incoming adjacency rows
+ * <ul>
+ * <li>f0: graph head</li>
+ * <li>f1: {@code vertex/edge id -> label}</li>
+ * <li>f2: {@code vertex/edge id -> properties}</li>
+ * <li>f3: {@code vertex id -> outgoing adjacency rows}</li>
+ * <li>f4: {@code vertex id -> incoming adjacency rows}</li>
+ * </ul>
  *
  * @param <ID> ID type
  * @param <L> label type
  * @param <ED> edge data type
  * @param <VD> vertex data type
  */
-public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, ED, VD> extends
-  Tuple5<EPGMGraphHead,
+public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, ED, VD>
+  extends Tuple5<
+    EPGMGraphHead,
     Map<ID, L>,
     Map<ID, Properties>,
     Map<ID, AdjacencyListRow<ED, VD>>,
-    Map<ID, AdjacencyListRow<ED, VD>>
-  > {
+    Map<ID, AdjacencyListRow<ED, VD>>> {
 
   /**
    * Default constructor.
@@ -52,6 +53,7 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
 
   /**
    * Constructor.
+   *
    * @param graphHead graph id
    * @param labels graph, vertex and edge labels
    * @param properties graph, vertex and edge properties
@@ -71,7 +73,6 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
    * Label accessor.
    *
    * @param elementId graph / vertex / edge id
-   *
    * @return label
    */
   public L getLabel(ID elementId) {
@@ -80,8 +81,8 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
 
   /**
    * Property accessor.
-   * @param elementId graph / vertex / edge id
    *
+   * @param elementId graph / vertex / edge id
    * @return property list
    */
   public Properties getProperties(ID elementId) {

@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * (label, graphId) |><| graphHead => (label, graphHead)
+ * {@code (label, graphId) |><| graphHead => (label, graphHead)}
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
 public class GraphHeadGroup

@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple4;
 
 /**
- * (f0,f1,f2) => f0
+ * {@code (f0,f1,f2) => f0}
  *
  * @param <T0> f0 type
  * @param <T1> f1 type
@@ -30,9 +30,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
  */
 @FunctionAnnotation.ForwardedFields("f0->*")
 public class Value0Of4<T0, T1, T2, T3>
-  implements
-  MapFunction<Tuple4<T0, T1, T2, T3>, T0>,
-  KeySelector<Tuple4<T0, T1, T2, T3>, T0> {
+  implements MapFunction<Tuple4<T0, T1, T2, T3>, T0>, KeySelector<Tuple4<T0, T1, T2, T3>, T0> {
 
   @Override
   public T0 map(Tuple4<T0, T1, T2, T3> quadruple) throws Exception {

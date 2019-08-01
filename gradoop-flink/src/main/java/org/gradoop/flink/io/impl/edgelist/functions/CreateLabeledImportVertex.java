@@ -23,10 +23,10 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * (vertexId, label) => ImportVertex
- *
+ * {@code (vertexId, label) => ImportVertex}
+ * <p>
  * Forwarded fields:
- *
+ * <br>
  * f0: vertexId
  *
  * @param <K> id type

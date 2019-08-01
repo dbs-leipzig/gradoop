@@ -31,8 +31,8 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 /**
  * Converts an EPGM vertex to a Tuple2 with its graph ids in field 0 and a
  * {@link IdWithCandidates} in field 1.
- *
- * (vId,props,graphs) -> {(graphId, (vid,candidates)}
+ * <p>
+ * {@code (vId,props,graphs) -> {(graphId, (vid,candidates)}}
  *
  * @param <V> EPGM vertex type
  */

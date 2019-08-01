@@ -20,11 +20,11 @@ package org.gradoop.flink.model.impl.operators.grouping;
  */
 public enum GroupingStrategy {
   /**
-   * {@see GroupingGroupReduce}
+   * @see GroupingGroupReduce
    */
   GROUP_REDUCE,
   /**
-   * {@see GroupingGroupCombine}
+   * @see GroupingGroupCombine
    */
   GROUP_COMBINE
 }

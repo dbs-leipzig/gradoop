@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Projects an Edge by a set of properties.
- * Edge -> Embedding(GraphElementEmbedding(Edge))
+ * {@code Edge -> Embedding(GraphElementEmbedding(Edge))}
  */
 public class ProjectEdge extends RichMapFunction<EPGMEdge, Embedding> {
   /**
@@ -35,7 +35,6 @@ public class ProjectEdge extends RichMapFunction<EPGMEdge, Embedding> {
    * Indicates if the edges is a loop
    */
   private final boolean isLoop;
-
 
   /**
    * Creates a new edge projection function

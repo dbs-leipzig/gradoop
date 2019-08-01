@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.List;
 
 /**
- * (graph, k-edge pattern -> embeddings) => (graph, k+1-edge pattern -> embeddings)
+ * {@code (graph, k-edge pattern -> embeddings) => (graph, k+1-edge pattern -> embeddings)}
  */
 public class GrowFrequentPatterns
   extends RichMapFunction<GraphWithPatternEmbeddingsMap, GraphWithPatternEmbeddingsMap> {

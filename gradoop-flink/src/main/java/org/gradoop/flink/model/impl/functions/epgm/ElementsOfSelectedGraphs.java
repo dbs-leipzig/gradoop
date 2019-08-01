@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * graphIds (BC)
- * element => (graphId, element),..
+ * {@code element => (graphId, element),..}
  *
  * \forall (graphId, element) : graphId \in graphIds
  *
@@ -64,8 +64,7 @@ public class ElementsOfSelectedGraphs<EL extends EPGMGraphElement> extends
   }
 
   @Override
-  public void flatMap(EL el, Collector
-    <Tuple2<GradoopId, EL>> collector) throws Exception {
+  public void flatMap(EL el, Collector<Tuple2<GradoopId, EL>> collector) throws Exception {
     for (GradoopId graphId : el.getGraphIds()) {
       if (graphIds.contains(graphId)) {
         reuse.f0 = graphId;

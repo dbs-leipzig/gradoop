@@ -21,10 +21,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * id1,..,idn => {id1,..,idn}
+ * {@code id1,..,idn => {id1,..,idn}}
  */
-public class ToGradoopIdSet
-  implements GroupReduceFunction<GradoopId, GradoopIdSet> {
+public class ToGradoopIdSet implements GroupReduceFunction<GradoopId, GradoopIdSet> {
 
   @Override
   public void reduce(Iterable<GradoopId> iterable,

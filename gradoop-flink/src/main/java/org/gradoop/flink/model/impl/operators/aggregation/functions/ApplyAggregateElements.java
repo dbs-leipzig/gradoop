@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  * Applies vertex aggregate functions to vertices with the same graph id.
- * (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..
+ * {@code (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..}
  *
  * @param <T> element type
  */

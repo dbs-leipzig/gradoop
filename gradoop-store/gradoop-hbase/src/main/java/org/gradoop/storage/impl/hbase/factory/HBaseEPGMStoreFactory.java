@@ -33,8 +33,7 @@ import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import java.io.IOException;
 
 /**
- * Manages {@link EPGMGraphInput} instances which can be
- * used to store an EPGM instance in HBase.
+ * Manages {@link EPGMGraphInput} instances which can be used to store an EPGM instance in HBase.
  */
 public class HBaseEPGMStoreFactory {
 
@@ -52,6 +51,7 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
    * @return a graph store instance or {@code null in the case of errors}
+   * @throws IOException on failure
    */
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
@@ -75,6 +75,7 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig  Gradoop HBase configuration
    *
    * @return EPGM store instance or {@code null in the case of errors}
+   * @throws IOException on failure
    */
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,

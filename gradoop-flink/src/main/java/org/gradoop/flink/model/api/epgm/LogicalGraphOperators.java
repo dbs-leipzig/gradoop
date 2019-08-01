@@ -42,28 +42,29 @@ public interface LogicalGraphOperators {
 
   /**
    * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
-   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
-   * result is a CAPFQueryResult, containing a flink table that can be converted to a
-   * GraphCollection, if it contains vertices or edges.
+   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism.
+   * The result is a CAPFQueryResult, containing a flink table that can be converted to a GraphCollection,
+   * if it contains vertices or edges.
    *
    * @param query    the query string
    * @param metaData metaData object
    * @return the result, containing a flink table and possibly a GraphCollection
+   * @throws Exception on failure
    */
   CAPFQueryResult cypher(String query, MetaData metaData) throws Exception;
 
   /**
    * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
-   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
-   * result is a CAPFQueryResult, containing a flink table that can be converted to a
-   * GraphCollection, if it contains vertices or edges.
+   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism.
+   * The result is a CAPFQueryResult, containing a flink table that can be converted to a GraphCollection,
+   * if it contains vertices or edges.
    * <p>
    * In this overloaded function, the property maps are constructed automatically. This is
-   * a lot slower and actually requires the job to be split in two parts to collect the property
-   * maps.
+   * a lot slower and actually requires the job to be split in two parts to collect the property maps.
    *
    * @param query the query string
    * @return the result, containing a flink table and possibly a GraphCollection
+   * @throws Exception on failure
    */
   CAPFQueryResult cypher(String query) throws Exception;
 
@@ -91,18 +92,14 @@ public interface LogicalGraphOperators {
    * provide statistics for the query planner.
    * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
-   *
-   * <pre>
-   * <code>graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
+   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
    * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   * {@code graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
    * @param query               Cypher query string
    * @param constructionPattern Construction pattern
@@ -127,18 +124,14 @@ public interface LogicalGraphOperators {
    * the data graph elements is attached to the resulting vertices.
    * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
-   *
-   * <pre>
-   * <code>graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
+   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
    * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   * {@code graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
    * @param query               Cypher query
    * @param constructionPattern Construction pattern
@@ -176,8 +169,7 @@ public interface LogicalGraphOperators {
     GraphStatistics graphStatistics);
 
   /**
-   * Creates a new graph from a randomly chosen subset of nodes and their
-   * associated edges.
+   * Creates a new graph from a randomly chosen subset of nodes and their associated edges.
    *
    * @param algorithm used sampling algorithm
    * @return logical graph with random nodes and their associated edges
@@ -185,8 +177,7 @@ public interface LogicalGraphOperators {
   LogicalGraph sample(SamplingAlgorithm algorithm);
 
   /**
-   * Checks, if another logical graph contains exactly the same vertices and
-   * edges (by id) as this graph.
+   * Checks, if another logical graph contains exactly the same vertices and edges (by id) as this graph.
    *
    * @param other other graph
    * @return 1-element dataset containing true, if equal by element ids

@@ -27,8 +27,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 
 /**
  * Extracts all edges contained ina a {@link FatVertex}.
- *
- * fatVertex -> [(edgeId,sourceId,targetId)]*
+ * <p>
+ * {@code fatVertex -> [(edgeId,sourceId,targetId)]*}
  */
 @FunctionAnnotation.ReadFields("f4")
 public class EdgeTriple implements

@@ -20,26 +20,23 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
 import org.s1ck.gdl.model.Edge;
 
 /**
- * Takes a vertex-edge pair and the corresponding target vertex as input and
- * evaluates, if the triple matches against the query graph. The output is
- * a {@link TripleWithCandidates} containing all query candidates for the
- * triple.
- *
+ * Takes a vertex-edge pair and the corresponding target vertex as input and evaluates, if the triple matches
+ * against the query graph. The output is a {@link TripleWithCandidates} containing all query candidates for
+ * the triple.
+ * <p>
  * Forwarded fields first:
- *
+ * <br>
  * f0:      edge id
  * f1:      source vertex id
- * f3->f2:  target vertex id
+ * {@code f3->f2}:  target vertex id
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3->f2")
 public class MatchingTriples extends RichFlatJoinFunction<TripleWithSourceEdgeCandidates<GradoopId>,

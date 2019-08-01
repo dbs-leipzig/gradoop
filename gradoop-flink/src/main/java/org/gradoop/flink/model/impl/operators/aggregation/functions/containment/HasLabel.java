@@ -26,16 +26,13 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 import java.util.Objects;
 
 /**
- * Superclass of aggregate and filter functions that check vertex or edge label
- * presence in a graph.
- *
- * <pre>
+ * Superclass of aggregate and filter functions that check vertex or edge label presence in a graph.
+ * <p>
  * Usage:
  * <ol>
  * <li>aggregate
  * <li>filter using the same UDF instance.
  * </ol>
- * </pre>
  */
 public class HasLabel extends BaseAggregateFunction
   implements Or, AggregateFunction, CombinableFilter<EPGMGraphHead> {

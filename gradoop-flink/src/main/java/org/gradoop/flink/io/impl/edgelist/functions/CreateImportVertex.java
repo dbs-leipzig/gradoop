@@ -22,10 +22,10 @@ import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * (vertexId) => ImportVertex
- *
+ * {@code (vertexId) => ImportVertex}
+ * <p>
  * Forwarded fields:
- *
+ * <br>
  * f0: vertexId
  *
  * @param <K> comparable key

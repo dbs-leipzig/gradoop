@@ -26,10 +26,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import java.util.Map;
 
 /**
- * graphTransaction => categorizedGraph
+ * {@code graphTransaction => categorizedGraph}
  */
-public class ToCCSGraph extends ToFSMGraph
-  implements MapFunction<GraphTransaction, CCSGraph> {
+public class ToCCSGraph extends ToFSMGraph implements MapFunction<GraphTransaction, CCSGraph> {
 
   @Override
   public CCSGraph map(GraphTransaction graph) throws Exception {
