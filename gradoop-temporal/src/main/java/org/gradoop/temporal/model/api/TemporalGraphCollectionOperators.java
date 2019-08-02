@@ -15,14 +15,13 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraphCollection}.
  */
-public interface TemporalGraphCollectionOperators extends GraphBaseOperators {
+public interface TemporalGraphCollectionOperators {
 
   //----------------------------------------------------------------------------
   // Utilities
