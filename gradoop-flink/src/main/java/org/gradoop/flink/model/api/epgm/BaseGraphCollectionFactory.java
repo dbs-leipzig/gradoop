@@ -23,7 +23,6 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Collection;
@@ -115,7 +114,7 @@ public interface BaseGraphCollectionFactory<
    * @param logicalGraphLayout  input graphs
    * @return graph collection
    */
-  GC fromGraphs(LogicalGraph... logicalGraphLayout);
+  GC fromGraphs(LogicalGraphLayout<G, V, E>... logicalGraphLayout);
 
   /**
    * Creates a graph collection from a graph transaction dataset.
