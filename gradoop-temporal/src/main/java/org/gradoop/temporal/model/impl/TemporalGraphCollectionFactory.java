@@ -24,10 +24,11 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.functions.TemporalEdgeFromNonTemporal;
@@ -39,6 +40,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopConfig;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -120,8 +122,21 @@ public class TemporalGraphCollectionFactory
   }
 
   @Override
-  public TemporalGraphCollection fromGraphs(LogicalGraph... logicalGraphLayout) {
-    return null;
+  public TemporalGraphCollection fromGraphs(
+    LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>... logicalGraphLayout) {
+    if (logicalGraphLayout.length == 0) {
+      return createEmptyCollection();
+    } else if (logicalGraphLayout.length == 1) {
+      return fromGraph(logicalGraphLayout[0]);
+    } else {
+      return fromDataSets(
+        Arrays.stream(logicalGraphLayout).map(LogicalGraphLayout::getGraphHead).reduce(DataSet::union)
+          .get().distinct(new Id<>()),
+        Arrays.stream(logicalGraphLayout).map(LogicalGraphLayout::getVertices).reduce(DataSet::union)
+          .get().distinct(new Id<>()),
+        Arrays.stream(logicalGraphLayout).map(LogicalGraphLayout::getEdges).reduce(DataSet::union)
+          .get().distinct(new Id<>()));
+    }
   }
 
   @Override
@@ -166,13 +181,13 @@ public class TemporalGraphCollectionFactory
    * @return a temporal graph collection
    */
   public TemporalGraphCollection fromNonTemporalDataSets(
-    DataSet<GraphHead> graphHead,
-    DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
+    DataSet<? extends GraphHead> graphHead,
+    DataSet<? extends Vertex> vertices,
+    DataSet<? extends Edge> edges) {
     return new TemporalGraphCollection(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory())),
-      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory())),
-      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory()))), config);
+      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory())),
+      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory())),
+      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory()))), config);
   }
 
   /**
@@ -198,11 +213,26 @@ public class TemporalGraphCollectionFactory
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
     return new TemporalGraphCollection(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory(),
+      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory(),
         graphHeadTimeIntervalExtractor)),
-      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory(),
+      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory(),
         vertexTimeIntervalExtractor)),
-      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory(),
+      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory(),
         edgeTimeIntervalExtractor))), config);
+  }
+
+  /**
+   * Creates a {@link TemporalGraphCollection} from a (non-temporal) base graph collection.
+   *
+   * This method calls {@link #fromNonTemporalDataSets(DataSet, DataSet, DataSet)} on the graph collections
+   * element data sets.
+   *
+   * @param collection Some base graph collection.
+   * @return The resulting temporal graph collection.
+   */
+  public TemporalGraphCollection fromNonTemporalGraphCollection(
+    BaseGraphCollection<?, ?, ?, ?, ?> collection) {
+    return fromNonTemporalDataSets(
+      collection.getGraphHeads(), collection.getVertices(), collection.getEdges());
   }
 }

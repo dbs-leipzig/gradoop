@@ -29,13 +29,16 @@ import java.util.Objects;
  * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
+ *
+ * @param <G> The (non-temporal) graph-head type.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, TemporalGraphHead> {
+public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
+  implements MapFunction<G, TemporalGraphHead> {
   /**
    * The user defined interval extractor, might be {@code null}.
    */
-  private TimeIntervalExtractor<GraphHead> timeIntervalExtractor;
+  private TimeIntervalExtractor<G> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -61,7 +64,7 @@ public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, 
    */
   public TemporalGraphHeadFromNonTemporal(
     GraphHeadFactory<TemporalGraphHead> elementFactory,
-    TimeIntervalExtractor<GraphHead> timeIntervalExtractor) {
+    TimeIntervalExtractor<G> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
   }
@@ -76,7 +79,7 @@ public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, 
    * @throws Exception on failure
    */
   @Override
-  public TemporalGraphHead map(GraphHead value) throws Exception {
+  public TemporalGraphHead map(G value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setProperties(value.getProperties());

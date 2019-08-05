@@ -23,6 +23,8 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
@@ -149,13 +151,13 @@ public class TemporalGraphFactory implements
    * @return a temporal graph representing the temporal graph data
    */
   public TemporalGraph fromNonTemporalDataSets(
-    DataSet<GraphHead> graphHead,
-    DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
+    DataSet<? extends GraphHead> graphHead,
+    DataSet<? extends Vertex> vertices,
+    DataSet<? extends Edge> edges) {
     return new TemporalGraph(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory())),
-      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory())),
-      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory()))), config);
+      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory())),
+      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory())),
+      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory()))), config);
   }
 
   /**
@@ -183,11 +185,24 @@ public class TemporalGraphFactory implements
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
     return new TemporalGraph(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory(),
+      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory(),
         graphHeadTimeIntervalExtractor)),
-      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory(),
+      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory(),
         vertexTimeIntervalExtractor)),
-      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory(),
+      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory(),
         edgeTimeIntervalExtractor))), config);
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance from a (non-temporal) base graph.
+   *
+   * This method calls {@link #fromNonTemporalDataSets(DataSet, DataSet, DataSet)} on the graphs element
+   * data sets.
+   *
+   * @param graph Some base graph.
+   * @return The resulting temporal graph.
+   */
+  public TemporalGraph fromNonTemporalGraph(BaseGraph<?, ?, ?, ?, ?> graph) {
+    return fromNonTemporalDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges());
   }
 }

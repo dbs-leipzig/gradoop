@@ -26,13 +26,15 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
  * Initializes a {@link TemporalVertex} from a {@link Vertex} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
+ *
+ * @param <V> The (non-temporal) vertex type.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties;graphIds")
-public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, TemporalVertex> {
+public class TemporalVertexFromNonTemporal<V extends Vertex> implements MapFunction<V, TemporalVertex> {
   /**
    * The user defined interval extractor, might be {@code null}.
    */
-  private TimeIntervalExtractor<Vertex> timeIntervalExtractor;
+  private TimeIntervalExtractor<V> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -58,7 +60,7 @@ public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, Tempor
    */
   public TemporalVertexFromNonTemporal(
     VertexFactory<TemporalVertex> elementFactory,
-    TimeIntervalExtractor<Vertex> timeIntervalExtractor) {
+    TimeIntervalExtractor<V> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
@@ -73,7 +75,7 @@ public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, Tempor
    * @throws Exception on failure
    */
   @Override
-  public TemporalVertex map(Vertex value) throws Exception {
+  public TemporalVertex map(V value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setProperties(value.getProperties());

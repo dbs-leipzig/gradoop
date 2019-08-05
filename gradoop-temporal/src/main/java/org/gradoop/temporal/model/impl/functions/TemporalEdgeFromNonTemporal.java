@@ -30,13 +30,15 @@ import java.util.Objects;
  * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
+ *
+ * @param <E> The (non-temporal) edge type.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;label;properties;graphIds")
-public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEdge> {
+public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<E, TemporalEdge> {
   /**
    * The user defined timestamp extractor.
    */
-  private TimeIntervalExtractor<Edge> timeIntervalExtractor;
+  private TimeIntervalExtractor<E> timeIntervalExtractor;
   /**
    * Reuse this instance to reduce instantiations.
    */
@@ -62,7 +64,7 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEd
    */
   public TemporalEdgeFromNonTemporal(
     EdgeFactory<TemporalEdge> elementFactory,
-    TimeIntervalExtractor<Edge> timeIntervalExtractor) {
+    TimeIntervalExtractor<E> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
   }
@@ -77,7 +79,7 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEd
    * @throws Exception on failure
    */
   @Override
-  public TemporalEdge map(Edge value) throws Exception {
+  public TemporalEdge map(E value) throws Exception {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setSourceId(value.getSourceId());
