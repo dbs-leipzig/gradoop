@@ -15,7 +15,9 @@
  */
 package org.gradoop.temporal.util;
 
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.comparators.IdentifiableComparator;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -31,6 +33,20 @@ import static org.junit.Assert.assertFalse;
  * Common test utilities for temporal graphs and graph elements.
  */
 public class TemporalGradoopTestUtils {
+
+  /**
+   * The resource path to the temporal social network GDL file.
+   */
+  public static final String SOCIAL_NETWORK_TEMPORAL_GDL_FILE = "/data/gdl/social_network_temporal.gdl";
+  /**
+   * A property key used to store the valid-from time as a property.
+   */
+  public static final String PROPERTY_VALID_FROM = "__valFrom";
+  /**
+   * A property key used to store the valid-to time as a property.
+   */
+  public static final String PROPERTY_VALID_TO = "__valTo";
+
   /**
    * Checks if two TPGM collections contain the same TPGM elements in terms of data
    * (i.e. label and properties).
@@ -63,5 +79,25 @@ public class TemporalGradoopTestUtils {
       assertEquals(firstElement.getValidTime(), secondElement.getValidTime());
     }
     assertFalse("Too many elements in second collection", it2.hasNext());
+  }
+
+  /**
+   * Extract the valid time from properties of an {@link Element}.
+   * Those times are expected to be stored as {@value #PROPERTY_VALID_FROM} and {@value #PROPERTY_VALID_TO}.
+   *
+   * @param element The element storing valid times as properties.
+   * @return The valid time extracted from that element.
+   */
+  public static Tuple2<Long, Long> extractTime(Element element) {
+    Tuple2<Long, Long> validTime = new Tuple2<>(TemporalElement.DEFAULT_TIME_FROM,
+      TemporalElement.DEFAULT_TIME_TO);
+
+    if (element.hasProperty(PROPERTY_VALID_FROM)) {
+      validTime.f0 = element.getPropertyValue(PROPERTY_VALID_FROM).getLong();
+    }
+    if (element.hasProperty(PROPERTY_VALID_TO)) {
+      validTime.f1 = element.getPropertyValue(PROPERTY_VALID_TO).getLong();
+    }
+    return validTime;
   }
 }

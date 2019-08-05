@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.snapshot;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @param <T> The temporal element type.
  */
-public class ByTemporalPredicate<T extends TemporalElement> implements FilterFunction<T> {
+public class ByTemporalPredicate<T extends TemporalElement> implements CombinableFilter<T> {
 
   /**
    * Condition to be checked.

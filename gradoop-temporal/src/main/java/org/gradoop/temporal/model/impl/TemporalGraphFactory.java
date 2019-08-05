@@ -24,7 +24,6 @@ import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
-import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
@@ -145,9 +144,9 @@ public class TemporalGraphFactory implements
    * The method assumes that the given vertices and edges are already assigned to the given
    * graph head.
    *
-   * @param graphHead   1-element EPGM graph head DataSet
-   * @param vertices    EPGM vertex DataSet
-   * @param edges       EPGM edge DataSet
+   * @param graphHead   1-element graph head DataSet
+   * @param vertices    vertex DataSet
+   * @param edges       edge DataSet
    * @return a temporal graph representing the temporal graph data
    */
   public TemporalGraph fromNonTemporalDataSets(
@@ -168,21 +167,24 @@ public class TemporalGraphFactory implements
    * The method assumes that the given vertices and edges are already assigned to the given
    * graph head.
    *
-   * @param graphHead 1-element EPGM graph head DataSet
+   * @param graphHead 1-element graph head DataSet
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
-   * @param vertices EPGM vertex DataSet
+   * @param vertices vertex DataSet
    * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
-   * @param edges EPGM edge DataSet
+   * @param edges edge DataSet
    * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
    * @return the logical graph represented as temporal graph with defined valid times
    */
-  public TemporalGraph fromNonTemporalDataSets(
-    DataSet<GraphHead> graphHead,
-    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
-    DataSet<Vertex> vertices,
-    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
-    DataSet<Edge> edges,
-    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+  public <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraph fromNonTemporalDataSets(
+    DataSet<G> graphHead,
+    TimeIntervalExtractor<G> graphHeadTimeIntervalExtractor,
+    DataSet<V> vertices,
+    TimeIntervalExtractor<V> vertexTimeIntervalExtractor,
+    DataSet<E> edges,
+    TimeIntervalExtractor<E> edgeTimeIntervalExtractor) {
 
     return new TemporalGraph(this.layoutFactory.fromDataSets(
       graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory(),

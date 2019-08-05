@@ -15,16 +15,27 @@
  */
 package org.gradoop.temporal.util;
 
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHeadFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -95,6 +106,46 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   }
 
   /**
+   * Convert a graph to a {@link TemporalGraph} and set temporal attributes using
+   * {@link TimeIntervalExtractor} functions.
+   *
+   * @param graph                  The graph.
+   * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.
+   * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.
+   * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @return A temporal graph with temporal attributes extracted from the original graph.
+   */
+  protected <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraph toTemporalGraph(
+    BaseGraph<G, V, E, ?, ?> graph,
+    TimeIntervalExtractor<G> graphHeadTimeExtractor,
+    TimeIntervalExtractor<V> vertexTimeExtractor,
+    TimeIntervalExtractor<E> edgeTimeExtractor) {
+    return getConfig().getTemporalGraphFactory().fromNonTemporalDataSets(
+      graph.getGraphHead(), graphHeadTimeExtractor, graph.getVertices(), vertexTimeExtractor,
+      graph.getEdges(), edgeTimeExtractor);
+  }
+
+  /**
+   * Convert a graph to a {@link TemporalGraph} with time extraction functions.
+   * This will use {@link TemporalGradoopTestUtils#extractTime(Element)} to extract temporal attributes.
+   *
+   * @param graph The graph.
+   * @return The temporal graph with extracted temporal information.
+   */
+  protected TemporalGraph toTemporalGraphWithDefaultExtractors(BaseGraph<?, ?, ?, ?, ?> graph) {
+    // We have to use lambda expressions instead of method references here, otherwise a
+    // ClassCastException will be thrown when those extractor functions are called.
+    // TODO: Find out why.
+    return toTemporalGraph(graph,
+      g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v),
+      e -> TemporalGradoopTestUtils.extractTime(e));
+  }
+
+  /**
    * Convert some graph collection to a {@link TemporalGraphCollection}.
    *
    * @param collection The graph collection.
@@ -124,4 +175,17 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     assertTrue(element.getTxFrom() < System.currentTimeMillis());
     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getTxTo());
   }
+
+  /**
+   * Creates a social network graph with temporal attributes used for tests.
+   *
+   * @return The graph loader containing the network graph.
+   * @throws IOException When loading the graph resource fails.
+   */
+  protected FlinkAsciiGraphLoader getTemporalSocialNetworkLoader() throws IOException {
+    InputStream inputStream = getClass()
+      .getResourceAsStream(TemporalGradoopTestUtils.SOCIAL_NETWORK_TEMPORAL_GDL_FILE);
+    return getLoaderFromStream(inputStream);
+  }
+
 }
