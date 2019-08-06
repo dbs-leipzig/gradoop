@@ -35,12 +35,28 @@ import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 
 import java.io.IOException;
 
+/**
+ * A data sink storing graphs and graph collections as CSV files.
+ */
 public class TemporalCSVDataSink extends CSVDataSink implements TemporalDataSink {
 
+  /**
+   * Initialize this data sink.
+   *
+   * @param csvPath The output path.
+   * @param config  The Gradoop configuration.
+   */
   public TemporalCSVDataSink(String csvPath, GradoopFlinkConfig config) {
     super(csvPath, config);
   }
 
+  /**
+   * Initialize this data sink with existing metadata.
+   *
+   * @param csvPath      The output path.
+   * @param metaDataPath The metadata path.
+   * @param config       The Gradoop configuration.
+   */
   public TemporalCSVDataSink(String csvPath, String metaDataPath, GradoopFlinkConfig config) {
     super(csvPath, metaDataPath, config);
   }

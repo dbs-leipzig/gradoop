@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains function definitions operating on TPGM.
+ * A DataSource and -Sink implementation storing graphs and graph collections as CSV files.
  */
-package org.gradoop.temporal.model.api.functions;
+package org.gradoop.temporal.io.impl.csv;
