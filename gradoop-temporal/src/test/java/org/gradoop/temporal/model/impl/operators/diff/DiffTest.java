@@ -18,7 +18,7 @@ package org.gradoop.temporal.model.impl.operators.diff;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.functions.AsOf;
+import org.gradoop.temporal.model.impl.functions.predicates.AsOf;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 

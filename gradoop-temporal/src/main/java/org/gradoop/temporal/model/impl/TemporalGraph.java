@@ -35,9 +35,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatte
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
-import org.gradoop.temporal.model.impl.functions.EdgeFromTemporal;
-import org.gradoop.temporal.model.impl.functions.GraphHeadFromTemporal;
-import org.gradoop.temporal.model.impl.functions.VertexFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexFromTemporal;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;

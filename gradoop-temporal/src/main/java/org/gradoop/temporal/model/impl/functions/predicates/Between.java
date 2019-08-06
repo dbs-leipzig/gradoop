@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.functions;
+package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
- * Implementation of the <b>ContainedIn</b> temporal predicate.
- * Given a certain time interval, this predicate will match all intervals that are a
- * subset of that interval.
+ * Implementation of the <b>Between</b> temporal predicate.
+ * Given a certain time-interval, this predicate will match all intervals that start
+ * before or at that interval's end and end after the start of that interval.
  */
-public class ContainedIn implements TemporalPredicate {
+public class Between implements TemporalPredicate {
 
   /**
    * The start of the query time-interval.
@@ -35,23 +35,23 @@ public class ContainedIn implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a ContainedIn instance with the given time stamps.
+   * Creates a Between instance with the given time stamps.
    *
    * @param from The start of the query time-interval.
    * @param to   The end of the query time-interval.
    */
-  public ContainedIn(long from, long to) {
+  public Between(long from, long to) {
     queryFrom = from;
     queryTo = to;
   }
 
   @Override
   public boolean test(long from, long to) {
-    return queryFrom <= from && to <= queryTo;
+    return from <= queryTo && to > queryFrom;
   }
 
   @Override
   public String toString() {
-    return String.format("CONTAINED IN (%d, %d)", queryFrom, queryTo);
+    return "BETWEEN " + queryFrom + " AND " + queryTo;
   }
 }

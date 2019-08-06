@@ -31,9 +31,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
-import org.gradoop.temporal.model.impl.functions.EdgeFromTemporal;
-import org.gradoop.temporal.model.impl.functions.GraphHeadFromTemporal;
-import org.gradoop.temporal.model.impl.functions.VertexFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexFromTemporal;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;

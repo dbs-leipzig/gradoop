@@ -13,45 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.functions;
+package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
- * Implementation of the <b>Between</b> temporal predicate.
- * Given a certain time-interval, this predicate will match all intervals that start
- * before or at that interval's end and end after the start of that interval.
+ * Implementation of the <b>AsOf</b> predicate.
+ * Given a certain time-stamp, this predicate will match all time-stamps before that time
+ * and all time-interval containing that time.
  */
-public class Between implements TemporalPredicate {
+public class AsOf implements TemporalPredicate {
 
   /**
-   * The start of the query time-interval.
+   * The timestamp to be matched.
    */
-  private final long queryFrom;
+  private final long timeStamp;
 
   /**
-   * The end of the query time-interval.
-   */
-  private final long queryTo;
-
-  /**
-   * Creates a Between instance with the given time stamps.
+   * Creates a AsOf instance with the given time-stamp.
    *
-   * @param from The start of the query time-interval.
-   * @param to   The end of the query time-interval.
+   * @param timestamp The time-stamp to match.
    */
-  public Between(long from, long to) {
-    queryFrom = from;
-    queryTo = to;
+  public AsOf(long timestamp) {
+    timeStamp = timestamp;
   }
 
   @Override
   public boolean test(long from, long to) {
-    return from <= queryTo && to > queryFrom;
+    return from <= timeStamp && to > timeStamp;
   }
 
   @Override
   public String toString() {
-    return "BETWEEN " + queryFrom + " AND " + queryTo;
+    return "AS OF " + timeStamp;
   }
 }

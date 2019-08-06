@@ -23,13 +23,13 @@ import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphSt
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
-import org.gradoop.temporal.model.impl.functions.AsOf;
-import org.gradoop.temporal.model.impl.functions.Between;
-import org.gradoop.temporal.model.impl.functions.ContainedIn;
-import org.gradoop.temporal.model.impl.functions.CreatedIn;
-import org.gradoop.temporal.model.impl.functions.DeletedIn;
-import org.gradoop.temporal.model.impl.functions.FromTo;
-import org.gradoop.temporal.model.impl.functions.ValidDuring;
+import org.gradoop.temporal.model.impl.functions.predicates.AsOf;
+import org.gradoop.temporal.model.impl.functions.predicates.Between;
+import org.gradoop.temporal.model.impl.functions.predicates.ContainedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
+import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
 
 import java.util.Objects;

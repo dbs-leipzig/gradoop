@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.functions;
+package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
- * Implementation of the <b>FromTo</b> temporal predicate.
- * Given a certain time-interval, this predicate will match all intervals that were valid during
- * that interval.
+ * Implementation of the <b>ValidDuring</b> temporal predicate.
+ * Given a certain time-interval, this predicate matches all intervals that contain that interval.
  */
-public class FromTo implements TemporalPredicate {
+public class ValidDuring implements TemporalPredicate {
 
   /**
    * The start of the query time-interval.
@@ -35,23 +34,23 @@ public class FromTo implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a FromTo instance with the given time stamps.
+   * Creates a ValidDuring instance with the given time stamps.
    *
    * @param from The start of the query time-interval.
    * @param to   The end of the query time-interval.
    */
-  public FromTo(long from, long to) {
+  public ValidDuring(long from, long to) {
     queryFrom = from;
     queryTo = to;
   }
 
   @Override
   public boolean test(long from, long to) {
-    return from < queryTo && to > queryFrom;
+    return from <= queryFrom && to >= queryTo;
   }
 
   @Override
   public String toString() {
-    return "FROM " + queryFrom + " TO " + queryTo;
+    return String.format("VALID DURING (%d, %d)", queryFrom, queryTo);
   }
 }

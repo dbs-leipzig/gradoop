@@ -13,22 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.functions;
-
-import org.gradoop.temporal.model.api.functions.TemporalPredicate;
-
 /**
- * A temporal predicate that matches all time intervals.
+ * Contains some {@link org.gradoop.temporal.model.api.functions.TemporalPredicate} implementations.
  */
-public class All implements TemporalPredicate {
-
-  @Override
-  public boolean test(long from, long to) {
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "ALL";
-  }
-}
+package org.gradoop.temporal.model.impl.functions.predicates;

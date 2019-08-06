@@ -13,38 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.functions;
+package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
- * Implementation of the <b>AsOf</b> predicate.
- * Given a certain time-stamp, this predicate will match all time-stamps before that time
- * and all time-interval containing that time.
+ * Implementation of the <b>ContainedIn</b> temporal predicate.
+ * Given a certain time interval, this predicate will match all intervals that are a
+ * subset of that interval.
  */
-public class AsOf implements TemporalPredicate {
+public class ContainedIn implements TemporalPredicate {
 
   /**
-   * The timestamp to be matched.
+   * The start of the query time-interval.
    */
-  private final long timeStamp;
+  private final long queryFrom;
 
   /**
-   * Creates a AsOf instance with the given time-stamp.
+   * The end of the query time-interval.
+   */
+  private final long queryTo;
+
+  /**
+   * Creates a ContainedIn instance with the given time stamps.
    *
-   * @param timestamp The time-stamp to match.
+   * @param from The start of the query time-interval.
+   * @param to   The end of the query time-interval.
    */
-  public AsOf(long timestamp) {
-    timeStamp = timestamp;
+  public ContainedIn(long from, long to) {
+    queryFrom = from;
+    queryTo = to;
   }
 
   @Override
   public boolean test(long from, long to) {
-    return from <= timeStamp && to > timeStamp;
+    return queryFrom <= from && to <= queryTo;
   }
 
   @Override
   public String toString() {
-    return "AS OF " + timeStamp;
+    return String.format("CONTAINED IN (%d, %d)", queryFrom, queryTo);
   }
 }
