@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 
 /**
- * represents an edge by an id string
+ * A FlatMap to convert an edge to an id string.
  *
  * @param <E> edge type
  */
