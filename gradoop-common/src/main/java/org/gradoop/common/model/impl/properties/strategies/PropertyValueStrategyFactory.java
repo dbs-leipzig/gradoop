@@ -93,8 +93,8 @@ public class PropertyValueStrategyFactory {
    * to, or greater than {@code other}.
    */
   public static int compare(Object value, Object other) {
-    if (value == null) {
-      return INSTANCE.nullStrategy.compare(null, other);
+    if (value == null || other == null) {
+      return INSTANCE.nullStrategy.compare(value, other);
     } else {
       PropertyValueStrategy strategy = get(value.getClass());
       return strategy.compare(value, other);
