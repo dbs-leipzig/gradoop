@@ -26,12 +26,10 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
  *
  * @param <E> edge type
  */
-public class EdgeToIdString<E extends Edge> extends ElementToDataString<E>
-  implements EdgeToString<E> {
+public class EdgeToIdString<E extends Edge> extends ElementToDataString<E> implements EdgeToString<E> {
 
   @Override
-  public void flatMap(E edge, Collector<EdgeString> collector)
-      throws Exception {
+  public void flatMap(E edge, Collector<EdgeString> collector) throws Exception {
 
     GradoopId sourceId = edge.getSourceId();
     GradoopId targetId = edge.getTargetId();
@@ -40,6 +38,5 @@ public class EdgeToIdString<E extends Edge> extends ElementToDataString<E>
     for (GradoopId graphId : edge.getGraphIds()) {
       collector.collect(new EdgeString(graphId, sourceId, targetId, edgeLabel));
     }
-
   }
 }

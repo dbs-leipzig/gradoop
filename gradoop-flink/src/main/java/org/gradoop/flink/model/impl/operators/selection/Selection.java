@@ -20,12 +20,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -60,39 +56,9 @@ public class Selection<
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public GC execute(GC collection) {
-    return collection.isTransactionalLayout() && collection instanceof GraphCollection ?
-      (GC) executeForTxLayout((GraphCollection) collection) :
-      executeForGVELayout(collection);
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  private GC executeForGVELayout(GC collection) {
     DataSet<G> graphHeads = collection.getGraphHeads()
       .filter(predicate);
     return selectVerticesAndEdges(collection, graphHeads);
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  @SuppressWarnings("unchecked")
-  private GraphCollection executeForTxLayout(GraphCollection collection) {
-    DataSet<GraphTransaction> filteredTransactions = collection.getGraphTransactions()
-      .filter(new FilterTransactions((FilterFunction<EPGMGraphHead>) predicate));
-
-    return collection.getFactory()
-      .fromTransactions(filteredTransactions);
   }
 }

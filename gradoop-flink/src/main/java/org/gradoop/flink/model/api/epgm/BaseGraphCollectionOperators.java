@@ -169,22 +169,6 @@ public interface BaseGraphCollectionOperators<
     return callForCollection(new VerifyGraphsContainment<>());
   }
 
-  /**
-   * Matches a given pattern on a graph collection.
-   * The boolean flag specifies, if the return shall be the input graphs with a new property
-   * ("contains pattern"), or a new collection consisting of the constructed embeddings
-   *
-   * @param algorithm        custom pattern matching algorithm
-   * @param pattern          query pattern
-   * @param returnEmbeddings true -> return embeddings as new collection,
-   *                         false -> return collection with new property
-   * @return  a graph collection containing either the embeddings or the input
-   * graphs with a new property ("contains pattern")
-   */
-  default GC match(String pattern, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
-    return callForCollection(new TransactionalPatternMatching<>(pattern, algorithm, returnEmbeddings));
-  }
-
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
@@ -328,8 +312,7 @@ public interface BaseGraphCollectionOperators<
    * @param <T> return type
    * @return result of given operator
    */
-  <T> T callForCollection(BinaryBaseGraphCollectionToValueOperator<GC, T> operator,
-                          GC otherCollection);
+  <T> T callForCollection(BinaryBaseGraphCollectionToValueOperator<GC, T> operator, GC otherCollection);
 
   /**
    * Calls the given binary collection to collection operator using that
@@ -403,12 +386,12 @@ public interface BaseGraphCollectionOperators<
   /**
    * Groups a graph collection by isomorphism including labels and values.
    *
-   * @param func function to reduce all graph heads of a group into a single representative one,
-   *             e.g., to count the number of group members
+   * @param reduceFunction function to reduce all graph heads of a group into a single representative one,
+   *                       e.g., to count the number of group members
    *
    * @return grouped graph collection
    */
-  default GC groupByIsomorphism(GraphHeadReduceFunction<G> func) {
-    return callForCollection(new GroupByIsomorphism<>(func));
+  default GC groupByIsomorphism(GraphHeadReduceFunction<G> reduceFunction) {
+    return callForCollection(new GroupByIsomorphism<>(reduceFunction));
   }
 }

@@ -44,9 +44,9 @@ import java.util.Objects;
  * a model perspective, the collection represents a set of logical graphs. From a data perspective
  * this is reflected by providing three concepts:
  * <ul>
- * <li>a set of graph heads assigned to the graphs in that collection</li>
- * <li>a set of vertices which is the union of all vertex sets of the represented graphs</li>
- * <li>a set of edges which is the union of all edge sets of the represented graphs</li>
+ *   <li>a set of graph heads assigned to the graphs in that collection</li>
+ *   <li>a set of vertices which is the union of all vertex sets of the represented graphs</li>
+ *   <li>a set of edges which is the union of all edge sets of the represented graphs</li>
  * </ul>
  * Furthermore, a graph collection provides operations that are performed on the underlying data.
  * These operations result in either another graph collection or in a {@link LogicalGraph}.
