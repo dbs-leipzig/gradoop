@@ -83,9 +83,12 @@ public class PropertyValueStrategyFactory {
   }
 
   /**
-   * Compares two values.
-   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy}
-   * will throw an {@code IllegalArgumentException}.
+   * Compares two values.<br>
+   * {@link PropertyValue#NULL_VALUE} is considered to be less than all other properties.
+   * <p>
+   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy} will throw an
+   * {@code IllegalArgumentException}. This behavior violates the requirements of
+   * {@link Comparable#compareTo}.
    *
    * @param value first value.
    * @param other second value.
