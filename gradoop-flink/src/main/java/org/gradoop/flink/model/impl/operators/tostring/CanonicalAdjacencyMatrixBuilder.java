@@ -76,7 +76,7 @@ public class CanonicalAdjacencyMatrixBuilder<
   private final boolean directed;
 
   /**
-   * Constructor.
+   * Creates a new MatrixBuilder instance.
    *
    * @param graphHeadToString representation of graph heads
    * @param vertexToString representation of vertices
