@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tpgm.grouping.keys;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class PropertyKeyFunction<T extends EPGMAttributed>
+public class PropertyKeyFunction<T extends Attributed>
   implements GroupingKeyFunction<T, PropertyValue> {
 
   /**

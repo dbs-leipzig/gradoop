@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
@@ -34,7 +34,7 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  * @param <T> The input tuple type.
  * @param <E> The final vertex type.
  */
-public class BuildSuperVertexFromTuple<T extends Tuple, E extends EPGMVertex>
+public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
   extends BuildSuperElementFromTuple<T, E> {
 
   /**
@@ -55,7 +55,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends EPGMVertex>
    * @param vertexFactory      A factory used to create new vertices.
    */
   public BuildSuperVertexFromTuple(List<GroupingKeyFunction<? super E, ?>> groupingKeys,
-    List<AggregateFunction> aggregateFunctions, EPGMVertexFactory<E> vertexFactory) {
+    List<AggregateFunction> aggregateFunctions, VertexFactory<E> vertexFactory) {
     super(VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(vertexFactory).createVertex();
     vertexType = vertexFactory.getType();

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
 import org.apache.flink.api.java.tuple.Tuple;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
@@ -32,7 +32,7 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  *
  * @param <E> The element type.
  */
-public class BuildTuplesFromVertices<E extends EPGMElement> extends BuildTuplesFromElements<E> {
+public class BuildTuplesFromVertices<E extends Element> extends BuildTuplesFromElements<E> {
 
   /**
    * Initialize this function, setting the grouping keys abd aggregate functions.

@@ -20,7 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -40,7 +40,7 @@ import java.util.Objects;
  *
  * @param <E> The element type.
  */
-public class BuildTuplesFromElements<E extends EPGMElement>
+public class BuildTuplesFromElements<E extends Element>
   implements MapFunction<E, Tuple>, ResultTypeQueryable<Tuple> {
 
   /**

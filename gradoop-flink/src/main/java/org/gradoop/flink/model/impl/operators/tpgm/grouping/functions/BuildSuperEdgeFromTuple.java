@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
@@ -36,7 +36,7 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  * @param <T> The input tuple type.
  * @param <E> The final edge type.
  */
-public class BuildSuperEdgeFromTuple<T extends Tuple, E extends EPGMEdge>
+public class BuildSuperEdgeFromTuple<T extends Tuple, E extends Edge>
   extends BuildSuperElementFromTuple<T, E> {
 
   /**
@@ -57,10 +57,9 @@ public class BuildSuperEdgeFromTuple<T extends Tuple, E extends EPGMEdge>
    * @param edgeFactory        A factory used to create new edges.
    */
   public BuildSuperEdgeFromTuple(List<GroupingKeyFunction<? super E, ?>> groupingKeys,
-    List<AggregateFunction> aggregateFunctions, EPGMEdgeFactory<E> edgeFactory) {
+    List<AggregateFunction> aggregateFunctions, EdgeFactory<E> edgeFactory) {
     super(EDGE_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
-    reuse = Objects.requireNonNull(edgeFactory)
-      .createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
+    reuse = Objects.requireNonNull(edgeFactory).createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
     edgeType = edgeFactory.getType();
   }
 

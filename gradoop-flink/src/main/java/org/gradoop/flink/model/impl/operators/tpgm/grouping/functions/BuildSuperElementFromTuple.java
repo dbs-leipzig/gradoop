@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
@@ -33,7 +33,7 @@ import java.util.Objects;
  * @param <T> The input tuple type.
  * @param <E> The final element type.
  */
-abstract class BuildSuperElementFromTuple<T extends Tuple, E extends EPGMElement>
+abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
   implements MapFunction<T, E>, ResultTypeQueryable<E> {
 
   /**

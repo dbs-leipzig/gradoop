@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.api.tpgm.functions.grouping;
 
-import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.LabelKeyFunction;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.PropertyKeyFunction;
@@ -38,7 +38,7 @@ public class GroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the label.
    */
-  public static <T extends EPGMLabeled> GroupingKeyFunction<T, String> label() {
+  public static <T extends Labeled> GroupingKeyFunction<T, String> label() {
     return new LabelKeyFunction<>();
   }
 
@@ -49,7 +49,7 @@ public class GroupingKeys {
    * @param <T> the type of the elements to group.
    * @return The grouping key function extracting the property with that key.
    */
-  public static <T extends EPGMAttributed> GroupingKeyFunction<T, PropertyValue> property(
+  public static <T extends Attributed> GroupingKeyFunction<T, PropertyValue> property(
     String key) {
     return new PropertyKeyFunction<>(key);
   }

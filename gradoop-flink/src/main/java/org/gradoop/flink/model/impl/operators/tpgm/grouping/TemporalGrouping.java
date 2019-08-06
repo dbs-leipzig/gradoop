@@ -16,13 +16,12 @@
 package org.gradoop.flink.model.impl.operators.tpgm.grouping;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -65,11 +64,11 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  * @param <GC> The graph collection type.
  */
 public class TemporalGrouping<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * The vertex grouping keys.
@@ -216,7 +215,7 @@ public class TemporalGrouping<
    * @param labelGroups The label groups to convert. (Only the default group is supported.)
    * @return Key functions corresponding to those groups.
    */
-  private static <T extends EPGMElement> List<GroupingKeyFunction<? super T, ?>> asKeyFunctions(
+  private static <T extends Element> List<GroupingKeyFunction<? super T, ?>> asKeyFunctions(
     boolean useLabels, List<LabelGroup> labelGroups) {
     List<GroupingKeyFunction<? super T, ?>> keyFunctions = new ArrayList<>();
     if (useLabels) {
