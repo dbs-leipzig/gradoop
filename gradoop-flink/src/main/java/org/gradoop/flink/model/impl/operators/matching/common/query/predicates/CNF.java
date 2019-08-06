@@ -120,8 +120,8 @@ public class CNF extends PredicateCollection<CNFElement> {
    * Filters all disjunctions that could be evaluated with the given variable and returns them in a new CNF.
    * <p>
    * Example:
-   * <p>
-   * Given {@code myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))}
+   * <br>
+   * Given {@code myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))}<br>
    * {@code myFilter.getSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))}
    *
    * @param variable variable that must be included in the disjunction
@@ -138,8 +138,8 @@ public class CNF extends PredicateCollection<CNFElement> {
    * them in a new CNF.
    * <p>
    * Example:
-   * <p>
-   * Given {@code myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))}
+   * <br>
+   * Given {@code myFilter = CNF((a = b) And (b > 5 OR a > 10) AND (c = false) AND (a = c))}<br>
    * {@code myFilter.getSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))}
    *
    * @param variables set of variables that must be included in the disjunction
@@ -159,9 +159,9 @@ public class CNF extends PredicateCollection<CNFElement> {
    * them from the CNF. The filtered predicates will be returned in a new CNF.
    * <p>
    * Example:
-   * <p>
-   * Given {@code myFilter = CNF((a = 10) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))}
-   * {@code myFilter.removeSubCNF(a) => CNF(a = 10)}
+   * <br>
+   * Given {@code myFilter = CNF((a = 10) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))}<br>
+   * {@code myFilter.removeSubCNF(a) => CNF(a = 10)}<br>
    * and {@code myFilter == CNF((b > 5 OR a > 10) AND (c = false) AND (a = c))}
    *
    * @param variable variable that must be included in the disjunction
@@ -178,9 +178,9 @@ public class CNF extends PredicateCollection<CNFElement> {
    * them from the CNF. The filtered predicates will be returned in a new CNF.
    * <p>
    * Example:
-   * <p>
-   * Given {@code myFilter = CNF((a = b) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))}
-   * {@code myFilter.removeSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))}
+   * <br>
+   * Given {@code myFilter = CNF((a = b) AND (b > 5 OR a > 10) AND (c = false) AND (a = c))}<br>
+   * {@code myFilter.removeSubCNF(a,b) => CNF((a = b) And (b > 5 OR a > 10))}<br>
    * and {@code myFilter == CNF((c = false) AND (a = c))}
    *
    * @param variables set of variables that must be included in the disjunction

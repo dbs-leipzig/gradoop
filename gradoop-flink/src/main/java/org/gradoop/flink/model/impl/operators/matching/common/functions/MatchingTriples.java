@@ -34,8 +34,8 @@ import org.s1ck.gdl.model.Edge;
  * <p>
  * Forwarded fields first:
  * <br>
- * f0:      edge id
- * f1:      source vertex id
+ * {@code f0}:      edge id<br>
+ * {@code f1}:      source vertex id<br>
  * {@code f3->f2}:  target vertex id
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3->f2")

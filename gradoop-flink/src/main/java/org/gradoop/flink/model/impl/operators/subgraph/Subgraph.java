@@ -91,12 +91,12 @@ public class Subgraph<
      */
     VERTEX_INDUCED,
     /**
-     * Only applies the edge filter function and computes the resulting vertices via:
+     * Only applies the edge filter function and computes the resulting vertices via:<br>
      * {@code (E |><| V ON e.source = v.id) U (E |><| V on e.target = v.id)}
      */
     EDGE_INDUCED,
     /**
-     * Only applies the edge filter function and computes the resulting vertices via:
+     * Only applies the edge filter function and computes the resulting vertices via:<br>
      * {@code DISTINCT((π_source(E) U π_target(E))) |><| V}
      */
     EDGE_INDUCED_PROJECT_FIRST

@@ -37,8 +37,7 @@ import java.util.List;
  * Example:
  * <br>
  * Given an Edge {@code (0, 1, 2, "friendOf", {since:2017, weight:23})}, a predicate {@code "weight = 23"} and
- * list of projection property keys [since,isValid] the operator creates
- * an {@link Embedding}:
+ * list of projection property keys [since,isValid] the operator creates an {@link Embedding}:
  * <br>
  * {@code ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(2017),PropertyEntry(NULL)])}
  *

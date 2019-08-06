@@ -23,12 +23,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * in the vector indicates if the element may represent the query element with the same index.
  * <p>
  * Example:
- * <p>
+ * <br>
  * query graph: {@code (0:A)-[0:a]->(1:B)}<br>
  * data graph:  {@code (0:A)-[0:a]->(1:B)-[1:b]->(2:A)}
  * <p>
  * Vertices:
- * <p>
+ * <br>
  * bit vector size is 2 as there are 2 query vertices
  * <p>
  * IdWithCandidates(0): (0,[true, false])<br>
@@ -36,7 +36,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * IdWithCandidates(2): (1,[true, false])
  * <p>
  * Edges:
- * <p>
+ * <br>
  * bit vector size is 1 as there is 1 query edge
  * <p>
  * IdWithCandidates(0): (0, [true])<br>

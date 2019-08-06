@@ -259,7 +259,7 @@ public class GraphStatistics {
   }
 
   /**
-   * Returns the number of distinct vertex property values for given property name
+   * Returns the number of distinct vertex property values for given property name<br>
    * Eg {@code (name) -> 20}
    *
    * @param propertyName property name
@@ -270,7 +270,7 @@ public class GraphStatistics {
   }
 
   /**
-   * Returns the number of distinct edge property values for given property name
+   * Returns the number of distinct edge property values for given property name<br>
    * Eg {@code (name) -> 20}
    *
    * @param propertyName property name
@@ -281,7 +281,7 @@ public class GraphStatistics {
   }
 
   /**
-   * Returns the number of distinct property values for given vertex label property name pair
+   * Returns the number of distinct property values for given vertex label property name pair<br>
    * Eg {@code (Person, name) -> 20}
    *
    * @param vertexLabel vertex label
@@ -294,7 +294,7 @@ public class GraphStatistics {
   }
 
   /**
-   * Returns the number of distinct property values for given edge label property name pair
+   * Returns the number of distinct property values for given edge label property name pair<br>
    * Eg {@code (Person, name) -> 20}
    *
    * @param edgeLabel edge label

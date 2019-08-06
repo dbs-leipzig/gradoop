@@ -24,7 +24,7 @@ public enum DictionaryType implements Comparable<DictionaryType> {
    */
   RANDOM,
   /**
-   * {@code Higher label frequency <=> lower label (original gSpan)}
+   * {@code Higher label frequency <=> lower label} (original gSpan)
    */
   INVERSE_PROPORTIONAL,
   /**
