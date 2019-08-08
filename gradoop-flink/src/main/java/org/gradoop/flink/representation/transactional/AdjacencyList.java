@@ -25,11 +25,11 @@ import java.util.Map;
 /**
  * Traversal optimized representation of a graph transaction.
  * <ul>
- * <li>f0: graph head</li>
- * <li>f1: {@code vertex/edge id -> label}</li>
- * <li>f2: {@code vertex/edge id -> properties}</li>
- * <li>f3: {@code vertex id -> outgoing adjacency rows}</li>
- * <li>f4: {@code vertex id -> incoming adjacency rows}</li>
+ *   <li>{@code f0: graph head}</li>
+ *   <li>{@code f1: vertex/edge id -> label}</li>
+ *   <li>{@code f2: vertex/edge id -> properties}</li>
+ *   <li>{@code f3: vertex id -> outgoing adjacency rows}</li>
+ *   <li>{@code f4: vertex id -> incoming adjacency rows}</li>
  * </ul>
  *
  * @param <ID> ID type

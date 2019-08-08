@@ -35,7 +35,7 @@ import java.io.IOException;
 
 /**
  * Used to read/write EPGM edge data from/to a HBase table.
- * <table>
+ * <table border="1">
  *   <caption>Edge data in HBase</caption>
  *   <tr>
  *     <td>row-key</td>

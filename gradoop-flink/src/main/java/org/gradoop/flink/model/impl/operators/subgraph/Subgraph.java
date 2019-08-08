@@ -41,11 +41,11 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
  * <p>
  * The operator is able to:
  * <ol>
- * <li>extract vertex-induced subgraph</li>
- * <li>extract edge-induced subgraph via join + union strategy</li>
- * <li>extract edge-induced subgraph via project + union + join strategy</li>
- * <li>extract subgraph based on vertex and edge filter function without verification
- * (no joins, use {@link Verify} to verify the subgraph)</li>
+ *   <li>extract vertex-induced subgraph</li>
+ *   <li>extract edge-induced subgraph via join + union strategy</li>
+ *   <li>extract edge-induced subgraph via project + union + join strategy</li>
+ *   <li>extract subgraph based on vertex and edge filter function without verification
+ *   (no joins, use {@link Verify} to verify the subgraph)</li>
  * </ol>
  *
  * @param <G>  The graph head type.
@@ -225,7 +225,7 @@ public class Subgraph<
    * Returns the subgraph of the given supergraph that is defined by the
    * vertices that fulfil the vertex filter function and edges that fulfill the edge filter function.
    * <p>
-   * Note, that the operator does not verify the consistency of the resulting graph.
+   * <b>Note:</b> The operator does not verify the consistency of the resulting graph.
    *
    * @param superGraph supergraph
    * @return subgraph
