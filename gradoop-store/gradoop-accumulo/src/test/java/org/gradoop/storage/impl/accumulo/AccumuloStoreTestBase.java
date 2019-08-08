@@ -22,7 +22,8 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.accumulo.impl.AccumuloEPGMStore;
+import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
 
 import java.util.ArrayList;
 import java.util.List;

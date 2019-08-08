@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
-import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
+import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
