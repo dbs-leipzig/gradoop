@@ -28,8 +28,6 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.util.Arrays;
-
 /**
  * Default interface of a graph collection instance.
  *
@@ -83,14 +81,6 @@ public interface BaseGraphCollection<
       .filter(new InGraph<>(graphID));
 
     return getGraphFactory().fromDataSets(graphHead, vertices, edges);
-  }
-
-  @Override
-  default GC getGraphs(final GradoopId... identifiers) {
-    GradoopIdSet graphIds = new GradoopIdSet();
-    graphIds.addAll(Arrays.asList(identifiers));
-
-    return getGraphs(graphIds);
   }
 
   @Override

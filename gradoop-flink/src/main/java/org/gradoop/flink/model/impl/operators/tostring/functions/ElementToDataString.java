@@ -28,7 +28,7 @@ import java.util.List;
  * superclass of data-bases string representations of EPGM elements, i.e.,
  * such including label and properties
  *
- * @param <EL> EPGM element type
+ * @param <EL> element type
  */
 public abstract class ElementToDataString<EL extends Element> {
 

@@ -92,8 +92,9 @@ public interface BaseGraphCollectionOperators<
    * @param identifiers graph identifiers
    * @return collection containing requested base graphs
    */
-  GC getGraphs(final GradoopId... identifiers);
-
+  default GC getGraphs(final GradoopId... identifiers) {
+    return getGraphs(GradoopIdSet.fromExisting(identifiers));
+  }
   /**
    * Extracts base graphs from collection using their identifiers.
    *
@@ -262,6 +263,7 @@ public interface BaseGraphCollectionOperators<
    * indicates if the graph collection is equal to the given graph collection.
    * <p>
    * Equality is defined on the element data contained inside the collection, i.e. vertices and edges.
+   * This is limited to EPGM data (IDs, Label, Properties). All extensions of EPGM are ignored.
    *
    * @param otherCollection graph collection to compare with
    * @return 1-element dataset containing {@code true} if the two collections
@@ -279,6 +281,7 @@ public interface BaseGraphCollectionOperators<
    * indicates if the graph collection is equal to the given graph collection.
    * <p>
    * Equality is defined on the data contained inside the collection, i.e. graph heads, vertices and edges.
+   * This is limited to EPGM data (IDs, Label, Properties). All extensions of EPGM are ignored.
    *
    * @param otherCollection graph collection to compare with
    * @return 1-element dataset containing {@code true} if the two collections
@@ -304,8 +307,8 @@ public interface BaseGraphCollectionOperators<
   GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator);
 
   /**
-   * Calls the given binary collection to value operator using that
-   * graph collection and the input graph collection.
+   * Calls the given binary collection to value operator using that graph collection and the
+   * input graph collection.
    *
    * @param operator        binary collection to value operator
    * @param otherCollection second input collection for operator
@@ -315,8 +318,8 @@ public interface BaseGraphCollectionOperators<
   <T> T callForCollection(BinaryBaseGraphCollectionToValueOperator<GC, T> operator, GC otherCollection);
 
   /**
-   * Calls the given binary collection to collection operator using that
-   * graph collection and the input graph collection.
+   * Calls the given binary collection to collection operator using that graph collection and the
+   * input graph collection.
    *
    * @param operator        binary collection to collection operator
    * @param otherCollection second input collection for operator
@@ -346,11 +349,10 @@ public interface BaseGraphCollectionOperators<
 
   /**
    * Transforms a graph collection into a base graph by applying a
-   * {@link org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator}
-   * pairwise on the elements of the collection.
+   * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
    *
    * @param operator reducible binary graph to graph operator
-   * @return base graph
+   * @return base graph returned by the operator
    *
    * @see Exclusion
    * @see Overlap
