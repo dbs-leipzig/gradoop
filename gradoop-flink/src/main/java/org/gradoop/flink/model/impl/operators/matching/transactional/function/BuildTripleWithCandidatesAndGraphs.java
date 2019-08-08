@@ -29,10 +29,10 @@ import java.util.Collection;
 import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
 
 /**
- * Converts an EPGM edge to a Tuple2 with its graphs in field 0 and a
+ * Converts an edge to a Tuple2 with its graphs in field 0 and a
  * {@link TripleWithCandidates} in field 1.
  *
- * @param <E> EPGM edge type
+ * @param <E> edge type
  */
 public class BuildTripleWithCandidatesAndGraphs<E extends Edge>
   extends AbstractBuilder<E, Tuple2<GradoopIdSet, TripleWithCandidates<GradoopId>>> {

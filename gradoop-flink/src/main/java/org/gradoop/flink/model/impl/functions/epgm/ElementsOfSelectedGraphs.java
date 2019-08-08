@@ -64,11 +64,11 @@ public class ElementsOfSelectedGraphs<EL extends GraphElement>
   }
 
   @Override
-  public void flatMap(EL el, Collector<Tuple2<GradoopId, EL>> collector) throws Exception {
-    for (GradoopId graphId : el.getGraphIds()) {
+  public void flatMap(EL element, Collector<Tuple2<GradoopId, EL>> collector) throws Exception {
+    for (GradoopId graphId : element.getGraphIds()) {
       if (graphIds.contains(graphId)) {
         reuse.f0 = graphId;
-        reuse.f1 = el;
+        reuse.f1 = element;
         collector.collect(reuse);
       }
     }

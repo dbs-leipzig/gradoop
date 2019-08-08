@@ -34,7 +34,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  *
  * (vId,props,graphs) -> {(graphId, (vid,candidates)}
  *
- * @param <V> EPGM vertex type
+ * @param <V> vertex type
  */
 public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
   extends AbstractBuilder<V, Tuple2<GradoopIdSet, IdWithCandidates<GradoopId>>> {

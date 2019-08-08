@@ -24,8 +24,7 @@ import org.gradoop.common.model.api.entities.GraphElement;
  * @param <GE> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class InAllGraphsBroadcast<GE extends GraphElement>
-  extends GraphsContainmentFilterBroadcast<GE> {
+public class InAllGraphsBroadcast<GE extends GraphElement> extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override
   public boolean filter(GE element) throws Exception {

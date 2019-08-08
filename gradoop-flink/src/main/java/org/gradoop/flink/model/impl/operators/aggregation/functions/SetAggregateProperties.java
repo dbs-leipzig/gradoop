@@ -63,8 +63,8 @@ public class SetAggregateProperties<G extends GraphHead>
   }
 
   @Override
-  public void coGroup(Iterable<G> left,
-    Iterable<Tuple2<GradoopId, Map<String, PropertyValue>>> right, Collector<G> out) {
+  public void coGroup(Iterable<G> left, Iterable<Tuple2<GradoopId, Map<String, PropertyValue>>> right,
+                      Collector<G> out) {
 
     for (G leftElem : left) {
       boolean rightEmpty = true;

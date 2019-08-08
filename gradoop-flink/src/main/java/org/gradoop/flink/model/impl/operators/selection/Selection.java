@@ -23,7 +23,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 /**
  * Filter base graphs from a graph collection based on their associated graph head.
@@ -52,13 +52,12 @@ public class Selection<
    * @param predicate user-defined predicate function
    */
   public Selection(FilterFunction<G> predicate) {
-    this.predicate = checkNotNull(predicate, "Predicate function was null");
+    this.predicate = Objects.requireNonNull(predicate, "Predicate function was null");
   }
 
   @Override
   public GC execute(GC collection) {
-    DataSet<G> graphHeads = collection.getGraphHeads()
-      .filter(predicate);
+    DataSet<G> graphHeads = collection.getGraphHeads().filter(predicate);
     return selectVerticesAndEdges(collection, graphHeads);
   }
 }

@@ -39,8 +39,7 @@ public abstract class OverlapBase<V extends Vertex, E extends Edge> {
    * @param ids       graph identifiers
    * @return filtered vertices
    */
-  protected DataSet<V> getVertices(DataSet<V> vertices,
-    DataSet<GradoopId> ids) {
+  protected DataSet<V> getVertices(DataSet<V> vertices, DataSet<GradoopId> ids) {
     return vertices
       .filter(new InAllGraphsBroadcast<>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
@@ -53,8 +52,7 @@ public abstract class OverlapBase<V extends Vertex, E extends Edge> {
    * @param ids   graph identifiers
    * @return filtered edges
    */
-  protected DataSet<E> getEdges(DataSet<E> edges,
-    DataSet<GradoopId> ids) {
+  protected DataSet<E> getEdges(DataSet<E> edges, DataSet<GradoopId> ids) {
     return edges
       .filter(new InAllGraphsBroadcast<>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);

@@ -28,8 +28,7 @@ import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 public class FirstGraphHead<G extends GraphHead> implements GraphHeadReduceFunction<G> {
 
   @Override
-  public void reduce(Iterable<Tuple2<String, G>> iterable,
-    Collector<G> collector) throws Exception {
+  public void reduce(Iterable<Tuple2<String, G>> iterable, Collector<G> collector) throws Exception {
     collector.collect(iterable.iterator().next().f1);
   }
 }

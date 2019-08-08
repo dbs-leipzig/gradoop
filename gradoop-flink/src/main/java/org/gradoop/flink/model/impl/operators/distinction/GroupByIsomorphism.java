@@ -74,12 +74,12 @@ public class GroupByIsomorphism<
   }
 
   /**
-   * Createas a canonical label for each graph in a collection.
+   * Creates a canonical label for each graph in a collection.
    *
    * @param collection input collection
-   * @return (graph id, label) pairs
+   * @return graph head label set
    */
-  protected DataSet<GraphHeadString> getCanonicalLabels(GC collection) {
+  DataSet<GraphHeadString> getCanonicalLabels(GC collection) {
     // Init builder for canonical labels
     CanonicalAdjacencyMatrixBuilder<G, V, E, LG, GC> camBuilder =
       new CanonicalAdjacencyMatrixBuilder<>(

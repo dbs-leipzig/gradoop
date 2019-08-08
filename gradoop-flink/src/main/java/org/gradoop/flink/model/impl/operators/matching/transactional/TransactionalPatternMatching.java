@@ -155,8 +155,7 @@ public class TransactionalPatternMatching<
    * @param graphs graphs with candidates of their elements
    * @return input graph collection with new boolean property
    */
-  private GC hasEmbeddings(GC collection,
-    DataSet<GraphWithCandidates> graphs) {
+  private GC hasEmbeddings(GC collection, DataSet<GraphWithCandidates> graphs) {
     //--------------------------------------------------------------------------
     // run matching algorithm
     //--------------------------------------------------------------------------

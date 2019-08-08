@@ -27,12 +27,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <V> vertex type
  */
-public class PairVertexWithGraphs<V extends Vertex>
-  implements FlatMapFunction<V, Tuple2<V, GradoopId>> {
+public class PairVertexWithGraphs<V extends Vertex> implements FlatMapFunction<V, Tuple2<V, GradoopId>> {
 
   @Override
-  public void flatMap(V v, Collector<Tuple2<V, GradoopId>> collector) throws
-    Exception {
+  public void flatMap(V v, Collector<Tuple2<V, GradoopId>> collector) throws Exception {
     for (GradoopId graphId : v.getGraphIds()) {
       collector.collect(new Tuple2<>(v, graphId));
     }
