@@ -85,15 +85,22 @@ public class TransformGraphTransaction<G extends GraphHead, V extends Vertex, E 
     TransformationFunction<G> graphHeadTransFunc, VertexFactory<V> vertexFactory,
     TransformationFunction<V> vertexTransFunc, EdgeFactory<E> edgeFactory,
     TransformationFunction<E> edgeTransFunc) {
-    this.graphHeadFactory = graphHeadFactory;
-    this.graphHeadTransFunc = graphHeadTransFunc;
-    this.vertexFactory = vertexFactory;
-    this.vertexTransFunc = vertexTransFunc;
-    this.edgeFactory = edgeFactory;
-    this.edgeTransFunc = edgeTransFunc;
+    if (EPGMGraphHead.class.isAssignableFrom(graphHeadFactory.getType()) &&
+      EPGMVertex.class.isAssignableFrom(vertexFactory.getType()) &&
+      EPGMEdge.class.isAssignableFrom(edgeFactory.getType())) {
+      this.graphHeadFactory = graphHeadFactory;
+      this.graphHeadTransFunc = graphHeadTransFunc;
+      this.vertexFactory = vertexFactory;
+      this.vertexTransFunc = vertexTransFunc;
+      this.edgeFactory = edgeFactory;
+      this.edgeTransFunc = edgeTransFunc;
+    } else {
+      throw new UnsupportedOperationException("This map function only supports EPGM graphs");
+    }
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public GraphTransaction map(GraphTransaction transaction) throws Exception {
     if (graphHeadTransFunc != null) {
       transaction.setGraphHead((EPGMGraphHead) graphHeadTransFunc.apply(
