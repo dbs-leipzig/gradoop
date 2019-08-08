@@ -41,8 +41,10 @@ public class NullStrategy implements PropertyValueStrategy {
   public int compare(Object value, Object other) {
     if (value == null && other == null) {
       return 0;
+    } else if (value == null) {
+      return -1;
     }
-    return -1;
+    return 1;
   }
 
   @Override
