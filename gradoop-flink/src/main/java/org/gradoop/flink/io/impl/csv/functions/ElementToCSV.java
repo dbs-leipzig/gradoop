@@ -61,7 +61,7 @@ public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
    * @param type    element type
    * @return property value string
    */
-  String getPropertyString(E element, String type) {
+  protected String getPropertyString(E element, String type) {
     return metaData.getPropertyMetaData(type, element.getLabel()).stream()
       .map(propertyMetaData -> this.getPropertyValueString(propertyMetaData, element))
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
@@ -109,7 +109,7 @@ public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
    * @param collection collection
    * @return CSV string
    */
-  String collectionToCsvString(Collection<?> collection) {
+  protected String collectionToCsvString(Collection<?> collection) {
     return collection.stream()
       .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
       .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
