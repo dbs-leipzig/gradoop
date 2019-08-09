@@ -15,13 +15,17 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
- * Creates a value from one input collection.
+ * A marker interface for instances of {@link BinaryBaseGraphToBaseGraphOperator} that
+ * support the reduction of a collection to a single base graph.
  *
- * @param <V> result type
+ * @param <GC> the type of the graph collection used as input.
+ * @param <LG> the type of the graph used as return value.
  */
-public interface UnaryGraphCollectionToValueOperator<V>
-  extends UnaryBaseGraphCollectionToValueOperator<GraphCollection, V> {
+public interface ReducibleBinaryBaseGraphToBaseGraphOperator<
+  GC extends BaseGraphCollection,
+  LG extends BaseGraph> extends UnaryBaseGraphCollectionToBaseGraphOperator<GC, LG> {
 }

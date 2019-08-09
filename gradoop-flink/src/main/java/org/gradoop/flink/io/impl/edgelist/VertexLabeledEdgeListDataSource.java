@@ -76,7 +76,7 @@ public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    return getGraphCollection().reduce(new ReduceCombination());
+    return getGraphCollection().reduce(new ReduceCombination<>());
   }
 
   @Override

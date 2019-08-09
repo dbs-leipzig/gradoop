@@ -96,7 +96,7 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    return getGraphCollection().reduce(new ReduceCombination());
+    return getGraphCollection().reduce(new ReduceCombination<>());
   }
 
   @Override

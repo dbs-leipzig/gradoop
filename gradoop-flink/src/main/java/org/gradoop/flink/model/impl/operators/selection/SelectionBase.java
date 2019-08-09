@@ -16,12 +16,13 @@
 package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
@@ -29,11 +30,23 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadca
 /**
  * Superclass of selection and distinct operators.
  * Contains logic of vertex and edge selection and updating.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public abstract class SelectionBase implements UnaryCollectionToCollectionOperator {
+public abstract class SelectionBase<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   @Override
-  public abstract GraphCollection execute(GraphCollection collection);
+  public abstract GC execute(GC collection);
 
   /**
    * Selects vertices and edges for a selected subset of graph heads / graph ids.
@@ -44,22 +57,20 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
    *
    * @return selection result
    */
-  protected GraphCollection selectVerticesAndEdges(
-    GraphCollection collection, DataSet<EPGMGraphHead> graphHeads) {
+  protected GC selectVerticesAndEdges(GC collection, DataSet<G> graphHeads) {
 
-    // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIds = graphHeads.map(new Id<EPGMGraphHead>());
+    // get the identifiers of these base graphs
+    DataSet<GradoopId> graphIds = graphHeads.map(new Id<>());
 
     // use graph ids to filter vertices from the actual graph structure
-    DataSet<EPGMVertex> vertices = collection.getVertices()
+    DataSet<V> vertices = collection.getVertices()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<EPGMEdge> edges = collection.getEdges()
+    DataSet<E> edges = collection.getEdges()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    return collection.getFactory()
-      .fromDataSets(graphHeads, vertices, edges);
+    return collection.getFactory().fromDataSets(graphHeads, vertices, edges);
   }
 }
