@@ -22,12 +22,13 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
+import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
 import org.testng.annotations.Test;
 
 import java.util.regex.Pattern;
 
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_TYPE;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_VALUE;
 import static org.testng.Assert.assertEquals;
 
 /**

@@ -83,9 +83,12 @@ public class PropertyValueStrategyFactory {
   }
 
   /**
-   * Compares two values.
-   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy}
-   * will throw an {@code IllegalArgumentException}.
+   * Compares two values.<br>
+   * {@link PropertyValue#NULL_VALUE} is considered to be less than all other properties.
+   * <p>
+   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy} will throw an
+   * {@code IllegalArgumentException}. This behavior violates the requirements of
+   * {@link Comparable#compareTo}.
    *
    * @param value first value.
    * @param other second value.
@@ -93,8 +96,8 @@ public class PropertyValueStrategyFactory {
    * to, or greater than {@code other}.
    */
   public static int compare(Object value, Object other) {
-    if (value == null) {
-      return INSTANCE.nullStrategy.compare(null, other);
+    if (value == null || other == null) {
+      return INSTANCE.nullStrategy.compare(value, other);
     } else {
       PropertyValueStrategy strategy = get(value.getClass());
       return strategy.compare(value, other);

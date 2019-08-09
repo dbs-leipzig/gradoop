@@ -17,7 +17,7 @@ package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.basic.StoreTest;
 import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
 import org.gradoop.storage.impl.accumulo.io.source.IOEdgePredicateTest;
@@ -40,11 +40,11 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
-import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
-import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX;
-import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_USER;
-import static org.gradoop.storage.config.GradoopAccumuloConfig.ZOOKEEPER_HOSTS;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_USER;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ZOOKEEPER_HOSTS;
 
 /**
  * gradoop accumulo test suit

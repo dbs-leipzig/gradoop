@@ -24,6 +24,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
  * @param <V> the type of the return value
  */
 public interface UnaryBaseGraphToValueOperator<G extends BaseGraph, V> extends Operator {
+
   /**
    * Executes the operator on the given graph.
    *

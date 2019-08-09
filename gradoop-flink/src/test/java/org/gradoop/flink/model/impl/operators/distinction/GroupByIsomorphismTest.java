@@ -35,7 +35,7 @@ public class GroupByIsomorphismTest extends DistinctByIsomorphismTestBase {
 
     String propertyKey = "count";
 
-    GraphHeadReduceFunction countFunc = new CountGraphHeads(propertyKey);
+    GraphHeadReduceFunction<EPGMGraphHead> countFunc = new CountGraphHeads<>(propertyKey);
 
     collection = collection.groupByIsomorphism(countFunc);
 

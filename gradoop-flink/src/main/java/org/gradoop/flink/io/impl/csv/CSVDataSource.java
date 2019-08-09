@@ -75,9 +75,11 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public GraphCollection getGraphCollection() {
     GraphCollectionFactory collectionFactory = getConfig().getGraphCollectionFactory();
-    return getCollection(new CSVLineToGraphHead(collectionFactory.getGraphHeadFactory()),
+    return getCollection(
+      new CSVLineToGraphHead(collectionFactory.getGraphHeadFactory()),
       new CSVLineToVertex(collectionFactory.getVertexFactory()),
-      new CSVLineToEdge(collectionFactory.getEdgeFactory()), collectionFactory);
+      new CSVLineToEdge(collectionFactory.getEdgeFactory()),
+      collectionFactory);
   }
 
   /**
@@ -99,9 +101,12 @@ public class CSVDataSource extends CSVBase implements DataSource {
     V extends Vertex,
     E extends Edge,
     LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> GC getCollection(CSVLineToElement<G> csvToGraphHead,
-    CSVLineToElement<V> csvToVertex, CSVLineToElement<E> csvToEdge,
-    BaseGraphCollectionFactory<G, V, E, LG, GC> collectionFactory) {
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> GC getCollection(
+      CSVLineToElement<G> csvToGraphHead,
+      CSVLineToElement<V> csvToVertex,
+      CSVLineToElement<E> csvToEdge,
+      BaseGraphCollectionFactory<G, V, E, LG, GC> collectionFactory) {
+
     // Read the meta data
     DataSet<Tuple3<String, String, String>> metaData =
       new CSVMetaDataSource().readDistributed(getMetaDataPath(), getConfig());
