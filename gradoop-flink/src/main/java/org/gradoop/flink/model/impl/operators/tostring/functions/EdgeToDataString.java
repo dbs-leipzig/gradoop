@@ -16,19 +16,21 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 
 /**
  * represents an edge by a data string (label and properties)
+ *
+ * @param <E> edge type
  */
-public class EdgeToDataString extends ElementToDataString<EPGMEdge> implements
-  EdgeToString<EPGMEdge> {
+public class EdgeToDataString<E extends Edge> extends ElementToDataString<E> implements
+  EdgeToString<E> {
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector<EdgeString> collector)
+  public void flatMap(E edge, Collector<EdgeString> collector)
       throws Exception {
 
     GradoopId sourceId = edge.getSourceId();

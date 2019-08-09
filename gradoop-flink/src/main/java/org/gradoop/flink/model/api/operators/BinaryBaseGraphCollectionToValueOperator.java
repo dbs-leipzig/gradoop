@@ -15,14 +15,17 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+
 /**
- * Creates a (usually 1-element) Boolean dataset based on two input graphs.
+ * Creates a value based on two input graph collections.
  *
- * @param <T> value type
+ * @param <GC> graph collection type
+ * @param <V>  value type
  */
-public interface BinaryCollectionToValueOperator<T> extends Operator {
+public interface BinaryBaseGraphCollectionToValueOperator<GC extends BaseGraphCollection, V>
+  extends Operator {
+
   /**
    * Executes the operator.
    *
@@ -30,6 +33,5 @@ public interface BinaryCollectionToValueOperator<T> extends Operator {
    * @param secondCollection second input collection
    * @return operator result
    */
-  DataSet<T> execute(GraphCollection firstCollection,
-    GraphCollection secondCollection);
+  V execute(GC firstCollection, GC secondCollection);
 }
