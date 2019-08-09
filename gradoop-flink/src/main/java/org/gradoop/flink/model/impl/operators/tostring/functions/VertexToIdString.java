@@ -16,19 +16,21 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**
  * represents a vertex by an id string
+ *
+ * @param <V> vertex type
  */
-public class VertexToIdString extends ElementToDataString<EPGMVertex>
-  implements VertexToString<EPGMVertex> {
+public class VertexToIdString<V extends Vertex> extends ElementToDataString<V>
+  implements VertexToString<V> {
 
   @Override
-  public void flatMap(EPGMVertex vertex, Collector<VertexString> collector)
+  public void flatMap(V vertex, Collector<VertexString> collector)
       throws Exception {
 
     GradoopId vertexId = vertex.getId();

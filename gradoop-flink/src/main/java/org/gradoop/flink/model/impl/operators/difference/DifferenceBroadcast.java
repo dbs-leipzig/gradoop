@@ -16,23 +16,36 @@
 package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Returns a collection with all logical graphs that are contained in the
+ * Returns a collection with all base graphs that are contained in the
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  * <p>
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class DifferenceBroadcast extends Difference {
+public class DifferenceBroadcast<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends Difference<G, V, E, LG, GC> {
 
   /**
    * Computes the resulting vertices by collecting a list of resulting
@@ -42,15 +55,13 @@ public class DifferenceBroadcast extends Difference {
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<EPGMVertex> computeNewVertices(
-    DataSet<EPGMGraphHead> newGraphHeads) {
+  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
 
     DataSet<GradoopId> identifiers = newGraphHeads
-      .map(new Id<EPGMGraphHead>());
+      .map(new Id<>());
 
     return firstCollection.getVertices()
-      .filter(new InAnyGraphBroadcast<EPGMVertex>())
-      .withBroadcastSet(identifiers,
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+      .filter(new InAnyGraphBroadcast<>())
+      .withBroadcastSet(identifiers, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 }

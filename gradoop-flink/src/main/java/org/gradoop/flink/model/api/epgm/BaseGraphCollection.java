@@ -15,10 +15,17 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.epgm.BySameId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -37,6 +44,7 @@ public interface BaseGraphCollection<
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends GraphCollectionLayout<G, V, E>, BaseGraphCollectionOperators<G, V, E, LG, GC> {
+
   /**
    * Returns the Gradoop Flink configuration.
    *
@@ -57,4 +65,37 @@ public interface BaseGraphCollection<
    * @return a factory that can be used to create a {@link LG} instance
    */
   BaseGraphFactory<G, V, E, LG, GC> getGraphFactory();
+
+  //----------------------------------------------------------------------------
+  // Base Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  @Override
+  default LG getGraph(final GradoopId graphID) {
+    // filter vertices and edges based on given graph id
+    DataSet<G> graphHead = getGraphHeads()
+      .filter(new BySameId<>(graphID));
+    DataSet<V> vertices = getVertices()
+      .filter(new InGraph<>(graphID));
+    DataSet<E> edges = getEdges()
+      .filter(new InGraph<>(graphID));
+
+    return getGraphFactory().fromDataSets(graphHead, vertices, edges);
+  }
+
+  @Override
+  default GC getGraphs(final GradoopIdSet identifiers) {
+    DataSet<G> newGraphHeads = this.getGraphHeads()
+      .filter((FilterFunction<G>) graphHead -> identifiers.contains(graphHead.getId()));
+
+    // build new vertex set
+    DataSet<V> vertices = getVertices()
+      .filter(new InAnyGraph<>(identifiers));
+
+    // build new edge set
+    DataSet<E> edges = getEdges()
+      .filter(new InAnyGraph<>(identifiers));
+
+    return getFactory().fromDataSets(newGraphHeads, vertices, edges);
+  }
 }
