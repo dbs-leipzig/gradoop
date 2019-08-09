@@ -16,32 +16,44 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
+import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Returns a collection with all logical graphs that exist in both input
+ * Returns a collection with all base graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
  *
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class IntersectionBroadcast extends Intersection {
+public class IntersectionBroadcast<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends Intersection<G, V, E, LG, GC> {
 
   @Override
-  protected DataSet<EPGMVertex> computeNewVertices(
-    DataSet<EPGMGraphHead> newSubgraphs) {
+  protected DataSet<V> computeNewVertices(DataSet<G> newSubgraphs) {
 
     DataSet<GradoopId> ids = secondCollection.getGraphHeads()
-      .map(new Id<EPGMGraphHead>());
+      .map(new Id<>());
 
     return firstCollection.getVertices()
-      .filter(new InAnyGraphBroadcast<EPGMVertex>())
+      .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(ids, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
 }

@@ -15,19 +15,34 @@
  */
 package org.gradoop.flink.model.impl.operators.combination;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 
 /**
- * Computes the combined graph from a collection of logical graphs.
- * Creates a new logical graph by union of the vertex and edge sets of all graphs
+ * Computes the combined graph from a collection of base graphs.
+ * Creates a new base graph by union of the vertex and edge sets of all graphs
  * contained in the given collection.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
+public class ReduceCombination<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> {
 
   @Override
-  public LogicalGraph execute(GraphCollection collection) {
+  public LG execute(GC collection) {
     return collection.getGraphFactory().fromDataSets(
       collection.getVertices(), collection.getEdges());
   }

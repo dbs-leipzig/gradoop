@@ -633,7 +633,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     GraphCollection input = loader.getGraphCollectionByVariables("input1", "input2", "input3");
     GraphCollection expected = loader.getGraphCollectionByVariables("expected1", "expected2",
       "expected3");
-    GraphCollection result = input.apply(new ApplyAggregation(
+    GraphCollection result = input.apply(new ApplyAggregation<>(
       new SumVertexProperty("a", "sum_a"),
       new SumPlusOne("a", "sum_a_plusone")));
     collectAndAssertTrue(expected.equalsByGraphData(result));

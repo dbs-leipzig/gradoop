@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.base;
 
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 
 import static org.junit.Assert.assertTrue;
@@ -25,7 +25,8 @@ import static org.junit.Assert.assertTrue;
 public abstract class ReducibleBinaryOperatorsTestBase extends BinaryGraphOperatorsTestBase {
 
   protected void checkExpectationsEqualResults(FlinkAsciiGraphLoader loader,
-    UnaryCollectionToGraphOperator operator) throws Exception {
+    UnaryBaseGraphCollectionToBaseGraphOperator<GraphCollection, LogicalGraph> operator)
+    throws Exception {
     // overlap
     GraphCollection col13 = loader.getGraphCollectionByVariables("g1", "g3");
 
