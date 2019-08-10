@@ -71,7 +71,7 @@
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @param type    element type</em>
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * @return property value string</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="64" href="#64">64</a>    String getPropertyString(E element, String type) {
+<a name="64" href="#64">64</a>    <strong class="jxr_keyword">protected</strong> String getPropertyString(E element, String type) {
 <a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> metaData.getPropertyMetaData(type, element.getLabel()).stream()
 <a name="66" href="#66">66</a>        .map(propertyMetaData -&gt; <strong class="jxr_keyword">this</strong>.getPropertyValueString(propertyMetaData, element))
 <a name="67" href="#67">67</a>        .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
@@ -119,7 +119,7 @@
 <a name="109" href="#109">109</a> <em class="jxr_javadoccomment">   * @param collection collection</em>
 <a name="110" href="#110">110</a> <em class="jxr_javadoccomment">   * @return CSV string</em>
 <a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   */</em>
-<a name="112" href="#112">112</a>   String collectionToCsvString(Collection&lt;?&gt; collection) {
+<a name="112" href="#112">112</a>   <strong class="jxr_keyword">protected</strong> String collectionToCsvString(Collection&lt;?&gt; collection) {
 <a name="113" href="#113">113</a>     <strong class="jxr_keyword">return</strong> collection.stream()
 <a name="114" href="#114">114</a>       .map(o -&gt; o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
 <a name="115" href="#115">115</a>       .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, <span class="jxr_string">"["</span>, <span class="jxr_string">"]"</span>));

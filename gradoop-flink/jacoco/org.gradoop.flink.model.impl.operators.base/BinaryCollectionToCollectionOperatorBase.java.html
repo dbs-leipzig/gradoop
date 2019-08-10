@@ -16,43 +16,53 @@
 package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 
 /**
  * Abstract operator implementation which can be used with binary collection
  * to collection operators.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the logical graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L29">public abstract class BinaryCollectionToCollectionOperatorBase</span>
-  implements BinaryCollectionToCollectionOperator {
+<span class="fc" id="L36">public abstract class BinaryCollectionToCollectionOperatorBase&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; {
 
   /**
    * First input collection.
    */
-  protected GraphCollection firstCollection;
+  protected GC firstCollection;
   /**
    * Second input collection.
    */
-  protected GraphCollection secondCollection;
+  protected GC secondCollection;
 
   @Override
-  public GraphCollection execute(
-    GraphCollection firstCollection,
-    GraphCollection secondCollection) {
+  public GC execute(GC firstCollection, GC secondCollection) {
 
     // do some init stuff for the actual operator
-<span class="fc" id="L47">    this.firstCollection = firstCollection;</span>
-<span class="fc" id="L48">    this.secondCollection = secondCollection;</span>
+<span class="fc" id="L57">    this.firstCollection = firstCollection;</span>
+<span class="fc" id="L58">    this.secondCollection = secondCollection;</span>
 
-<span class="fc" id="L50">    final DataSet&lt;EPGMGraphHead&gt; newGraphHeads = computeNewGraphHeads();</span>
-<span class="fc" id="L51">    final DataSet&lt;EPGMVertex&gt; newVertices = computeNewVertices(newGraphHeads);</span>
-<span class="fc" id="L52">    final DataSet&lt;EPGMEdge&gt; newEdges = computeNewEdges(newVertices);</span>
+<span class="fc" id="L60">    final DataSet&lt;G&gt; newGraphHeads = computeNewGraphHeads();</span>
+<span class="fc" id="L61">    final DataSet&lt;V&gt; newVertices = computeNewVertices(newGraphHeads);</span>
+<span class="fc" id="L62">    final DataSet&lt;E&gt; newEdges = computeNewEdges(newVertices);</span>
 
-<span class="fc" id="L54">    return firstCollection.getFactory()</span>
-<span class="fc" id="L55">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
+<span class="fc" id="L64">    return firstCollection.getFactory()</span>
+<span class="fc" id="L65">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
   }
 
   /**
@@ -61,15 +71,14 @@ import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperato
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet&lt;EPGMVertex&gt; computeNewVertices(
-    DataSet&lt;EPGMGraphHead&gt; newGraphHeads);
+  protected abstract DataSet&lt;V&gt; computeNewVertices(DataSet&lt;G&gt; newGraphHeads);
 
   /**
    * Overridden by inheriting classes.
    *
    * @return subgraph dataset of the resulting collection
    */
-  protected abstract DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads();
+  protected abstract DataSet&lt;G&gt; computeNewGraphHeads();
 
   /**
    * Overridden by inheriting classes.
@@ -77,7 +86,7 @@ import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperato
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
    */
-  protected abstract DataSet&lt;EPGMEdge&gt; computeNewEdges(DataSet&lt;EPGMVertex&gt; newVertices);
+  protected abstract DataSet&lt;E&gt; computeNewEdges(DataSet&lt;V&gt; newVertices);
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

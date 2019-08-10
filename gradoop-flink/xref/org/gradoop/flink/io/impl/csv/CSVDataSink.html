@@ -50,7 +50,7 @@
 <a name="40" href="#40">40</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * Path to meta data file that is used to write the output.</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> String metaDataPath;
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String metaDataPath;
 <a name="44" href="#44">44</a>  
 <a name="45" href="#45">45</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   * Creates a new CSV data sink. Computes the meta data based on the given graph.</em>
@@ -135,7 +135,7 @@
 <a name="125" href="#125">125</a> <em class="jxr_javadoccomment">   *</em>
 <a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * @return true, iff reuse is possible</em>
 <a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   */</em>
-<a name="128" href="#128">128</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> reuseMetadata() {
+<a name="128" href="#128">128</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> reuseMetadata() {
 <a name="129" href="#129">129</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>.metaDataPath != <strong class="jxr_keyword">null</strong> &amp;&amp; !<strong class="jxr_keyword">this</strong>.metaDataPath.isEmpty();
 <a name="130" href="#130">130</a>   }
 <a name="131" href="#131">131</a> }

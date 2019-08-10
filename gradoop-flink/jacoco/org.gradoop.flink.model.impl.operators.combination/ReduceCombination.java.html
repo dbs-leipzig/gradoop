@@ -15,21 +15,36 @@
  */
 package org.gradoop.flink.model.impl.operators.combination;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 
 /**
- * Computes the combined graph from a collection of logical graphs.
- * Creates a new logical graph by union of the vertex and edge sets of all graphs
+ * Computes the combined graph from a collection of base graphs.
+ * Creates a new base graph by union of the vertex and edge sets of all graphs
  * contained in the given collection.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L27">public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {</span>
+<span class="fc" id="L36">public class ReduceCombination&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; {
 
   @Override
-  public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L31">    return collection.getGraphFactory().fromDataSets(</span>
-<span class="fc" id="L32">      collection.getVertices(), collection.getEdges());</span>
+  public LG execute(GC collection) {
+<span class="fc" id="L46">    return collection.getGraphFactory().fromDataSets(</span>
+<span class="fc" id="L47">      collection.getVertices(), collection.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

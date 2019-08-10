@@ -643,7 +643,7 @@
 <a name="633" href="#633">633</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"input1"</span>, <span class="jxr_string">"input2"</span>, <span class="jxr_string">"input3"</span>);
 <a name="634" href="#634">634</a>     GraphCollection expected = loader.getGraphCollectionByVariables(<span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>,
 <a name="635" href="#635">635</a>       <span class="jxr_string">"expected3"</span>);
-<a name="636" href="#636">636</a>     GraphCollection result = input.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(
+<a name="636" href="#636">636</a>     GraphCollection result = input.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(
 <a name="637" href="#637">637</a>       <strong class="jxr_keyword">new</strong> SumVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"sum_a"</span>),
 <a name="638" href="#638">638</a>       <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/SumPlusOne.html">SumPlusOne</a>(<span class="jxr_string">"a"</span>, <span class="jxr_string">"sum_a_plusone"</span>)));
 <a name="639" href="#639">639</a>     collectAndAssertTrue(expected.equalsByGraphData(result));

@@ -16,23 +16,36 @@
 package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .GraphsContainmentFilterBroadcast;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Returns a collection with all logical graphs that are contained in the
+ * Returns a collection with all base graphs that are contained in the
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  * &lt;p&gt;
  * This operator implementation requires that a list of subgraph identifiers
  * in the resulting graph collections fits into the workers main memory.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L35">public class DifferenceBroadcast extends Difference {</span>
+<span class="fc" id="L43">public class DifferenceBroadcast&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends Difference&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Computes the resulting vertices by collecting a list of resulting
@@ -42,16 +55,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet&lt;EPGMVertex&gt; computeNewVertices(
-    DataSet&lt;EPGMGraphHead&gt; newGraphHeads) {
+  protected DataSet&lt;V&gt; computeNewVertices(DataSet&lt;G&gt; newGraphHeads) {
 
-<span class="fc" id="L48">    DataSet&lt;GradoopId&gt; identifiers = newGraphHeads</span>
-<span class="fc" id="L49">      .map(new Id&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L60">    DataSet&lt;GradoopId&gt; identifiers = newGraphHeads</span>
+<span class="fc" id="L61">      .map(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L51">    return firstCollection.getVertices()</span>
-<span class="fc" id="L52">      .filter(new InAnyGraphBroadcast&lt;EPGMVertex&gt;())</span>
-<span class="fc" id="L53">      .withBroadcastSet(identifiers,</span>
-        GraphsContainmentFilterBroadcast.GRAPH_IDS);
+<span class="fc" id="L63">    return firstCollection.getVertices()</span>
+<span class="fc" id="L64">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
+<span class="fc" id="L65">      .withBroadcastSet(identifiers, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -26,14 +26,14 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.tostring.api;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * string representation of a graph head</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; graph head type</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> GraphHeadToString&lt;G <strong class="jxr_keyword">extends</strong> EPGMGraphHead&gt;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> GraphHeadToString&lt;G <strong class="jxr_keyword">extends</strong> GraphHead&gt;
 <a name="27" href="#27">27</a>    <strong class="jxr_keyword">extends</strong> MapFunction&lt;G, GraphHeadString&gt; {
 <a name="28" href="#28">28</a>  }
 </pre>

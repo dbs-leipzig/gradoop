@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  * @param &lt;GE&gt; element type
  */
 @FunctionAnnotation.ReadFields(&quot;graphIds&quot;)
-public class InAnyGraph&lt;GE extends EPGMGraphElement&gt; implements CombinableFilter&lt;GE&gt; {
+public class InAnyGraph&lt;GE extends GraphElement&gt; implements CombinableFilter&lt;GE&gt; {
 
   /**
    * graph ids

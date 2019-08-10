@@ -16,31 +16,44 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Computes the overlap graph from a collection of logical graphs.
+ * Computes the overlap graph from a collection of base graphs.
  * Creates a new logical graph containing the overlapping vertex and edge sets
- * of the graphs contained in the given collection. EPGMVertex and edge equality
+ * of the graphs contained in the given collection. Vertex and edge equality
  * is based on their respective identifiers.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L32">public class ReduceOverlap extends OverlapBase implements</span>
-  ReducibleBinaryGraphToGraphOperator {
+<span class="fc" id="L40">public class ReduceOverlap&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends OverlapBase&lt;V, E&gt;
+  implements ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; {
 
   @Override
-  public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L37">    DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads();</span>
+  public LG execute(GC collection) {
+<span class="fc" id="L50">    DataSet&lt;G&gt; graphHeads = collection.getGraphHeads();</span>
 
-<span class="fc" id="L39">    DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(new Id&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L52">    DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L41">    return collection.getGraphFactory().fromDataSets(</span>
-<span class="fc" id="L42">      getVertices(collection.getVertices(), graphIDs),</span>
-<span class="fc" id="L43">      getEdges(collection.getEdges(), graphIDs)</span>
+<span class="fc" id="L54">    return collection.getGraphFactory().fromDataSets(</span>
+<span class="fc" id="L55">      getVertices(collection.getVertices(), graphIDs),</span>
+<span class="fc" id="L56">      getEdges(collection.getEdges(), graphIDs)</span>
     );
   }
 }

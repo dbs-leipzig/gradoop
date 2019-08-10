@@ -17,11 +17,11 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
@@ -31,25 +31,25 @@ import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import java.util.List;
 
 /**
- * Base class for reading an {@link EPGMElement} from CSV. Handles the {@link MetaData} which is
+ * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
  * required to parse the property values.
  *
- * @param &lt;E&gt; EPGM element type
+ * @param &lt;E&gt; element type
  */
-abstract class CSVLineToElement&lt;E extends EPGMElement&gt; extends RichMapFunction&lt;String, E&gt; {
+public abstract class CSVLineToElement&lt;E extends Element&gt; extends RichMapFunction&lt;String, E&gt; {
   /**
-   * Stores the properties for the {@link EPGMElement} to be parsed.
+   * Stores the properties for the {@link Element} to be parsed.
    */
   private final Properties properties;
   /**
-   * Meta data that provides parsers for a specific {@link EPGMElement}.
+   * Meta data that provides parsers for a specific {@link Element}.
    */
   private CSVMetaData metaData;
 
   /**
    * Constructor
    */
-<span class="fc" id="L52">  CSVLineToElement() {</span>
+<span class="fc" id="L52">  public CSVLineToElement() {</span>
 <span class="fc" id="L53">    this.properties = Properties.create();</span>
 <span class="fc" id="L54">  }</span>
 
@@ -70,7 +70,7 @@ abstract class CSVLineToElement&lt;E extends EPGMElement&gt; extends RichMapFunc
    * @param propertyValueString string representation of elements' property values
    * @return parsed properties
    */
-  Properties parseProperties(String type, String label, String propertyValueString) {
+  protected Properties parseProperties(String type, String label, String propertyValueString) {
 <span class="fc" id="L74">    String[] propertyValues = StringEscaper</span>
 <span class="fc" id="L75">      .split(propertyValueString, CSVConstants.VALUE_DELIMITER);</span>
 <span class="fc" id="L76">    List&lt;PropertyMetaData&gt; metaDataList = metaData.getPropertyMetaData(type, label);</span>
@@ -90,7 +90,7 @@ abstract class CSVLineToElement&lt;E extends EPGMElement&gt; extends RichMapFunc
    * @param gradoopIdsString The csv token string.
    * @return gradoop ids contained in the string
    */
-  GradoopIdSet parseGradoopIds(String gradoopIdsString) {
+  protected GradoopIdSet parseGradoopIds(String gradoopIdsString) {
 <span class="fc" id="L94">    String[] gradoopIds = gradoopIdsString</span>
 <span class="fc" id="L95">      .substring(1, gradoopIdsString.length() - 1)</span>
 <span class="fc" id="L96">      .split(CSVConstants.LIST_DELIMITER);</span>

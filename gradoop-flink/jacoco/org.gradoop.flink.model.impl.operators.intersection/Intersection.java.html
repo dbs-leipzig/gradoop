@@ -16,32 +16,46 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.intersection.functions.GroupCountEquals;
 
 /**
- * Returns a collection with all logical graphs that exist in both input
+ * Returns a collection with all base graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
  *
  * @see IntersectionBroadcast
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L30">public class Intersection extends SetOperatorBase {</span>
+<span class="fc" id="L40">public class Intersection&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SetOperatorBase&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Computes new subgraphs by grouping both graph collections by graph
-   * identifier and returning those graphs where the group contains more
-   * than one element.
+   * identifier and returning those graphs where the group contains more than one element.
    *
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
-<span class="fc" id="L41">    return firstCollection.getGraphHeads()</span>
-<span class="fc" id="L42">      .union(secondCollection.getGraphHeads())</span>
-<span class="fc" id="L43">      .groupBy(new Id&lt;EPGMGraphHead&gt;())</span>
-<span class="fc" id="L44">      .reduceGroup(new GroupCountEquals&lt;EPGMGraphHead&gt;(2));</span>
+  protected DataSet&lt;G&gt; computeNewGraphHeads() {
+<span class="fc" id="L55">    return firstCollection.getGraphHeads()</span>
+<span class="fc" id="L56">      .union(secondCollection.getGraphHeads())</span>
+<span class="fc" id="L57">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L58">      .reduceGroup(new GroupCountEquals&lt;&gt;(2));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

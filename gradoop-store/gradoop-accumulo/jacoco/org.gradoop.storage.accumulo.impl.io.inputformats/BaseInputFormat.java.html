@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseInputFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.accumulo.impl.io.inputformats</a> &gt; <span class="el_source">BaseInputFormat.java</span></div><h1>BaseInputFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.accumulo.impl.io.inputformats;
+
+import com.google.common.collect.Lists;
+import org.apache.accumulo.core.client.AccumuloException;
+import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.apache.accumulo.core.client.BatchScanner;
+import org.apache.accumulo.core.client.ClientConfiguration;
+import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.client.ZooKeeperInstance;
+import org.apache.accumulo.core.client.mapred.AccumuloRowInputFormat;
+import org.apache.accumulo.core.client.mapred.RangeInputSplit;
+import org.apache.accumulo.core.client.security.tokens.PasswordToken;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.security.Authorizations;
+import org.apache.flink.api.common.io.GenericInputFormat;
+import org.apache.flink.api.common.io.InputFormat;
+import org.apache.flink.core.io.GenericInputSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.storage.accumulo.impl.predicate.query.AccumuloQueryHolder;
+import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
+import org.gradoop.storage.accumulo.impl.constants.AccumuloDefault;
+import org.gradoop.storage.accumulo.impl.constants.AccumuloTables;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * Common Abstract {@link InputFormat} for gradoop accumulo store
+ *
+ * @param &lt;T&gt; element define in gradoop
+ */
+public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends GenericInputFormat&lt;T&gt; {
+
+  /**
+   * serialize id
+   */
+  private static final int serialVersionUID = 0x1;
+
+  /**
+   * accumulo properties
+   */
+  private final Properties properties;
+
+  /**
+   * predicate filter
+   */
+  private final AccumuloQueryHolder&lt;T&gt; predicate;
+
+  /**
+   * accumulo batch scanner
+   */
+  private transient BatchScanner scanner;
+
+  /**
+   * accumulo row iterator
+   */
+  private transient Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator;
+
+  /**
+   * Create a new input format for gradoop element
+   *
+   * @param properties accumulo properties
+   * @param predicate scan predicate filter
+   */
+  BaseInputFormat(
+    Properties properties,
+    AccumuloQueryHolder&lt;T&gt; predicate
+<span class="fc" id="L96">  ) {</span>
+<span class="fc" id="L97">    this.properties = properties;</span>
+<span class="fc" id="L98">    this.predicate = predicate;</span>
+<span class="fc" id="L99">  }</span>
+
+  /**
+   * Invoke hook after connector initiate
+   */
+  protected abstract void initiate();
+
+  /**
+   * Get table by table prefix definition
+   *
+   * @param prefix prefix defined in store configuration
+   * @return table name
+   */
+  protected abstract String getTableName(String prefix);
+
+  /**
+   * Attach scanner iterator setting
+   *
+   * @param scanner accumulo batch scanner
+   * @param iteratorSettingPriority iterator priority from properties
+   * @param options query options
+   */
+  protected abstract void attachIterator(
+    BatchScanner scanner,
+    int iteratorSettingPriority,
+    Map&lt;String, String&gt; options
+  );
+
+  /**
+   * Decode record instance from result entry
+   * This is a pure client behavior for result decode
+   *
+   * @param row accumulo result
+   * @return gradoop element
+   * @throws IOException on failure
+   */
+  protected abstract T mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException;
+
+  @Override
+  public void open(GenericInputSplit split) throws IOException {
+<span class="fc" id="L139">    super.open(split);</span>
+    try {
+<span class="fc" id="L141">      String user = (String) properties</span>
+<span class="fc" id="L142">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER);</span>
+<span class="fc" id="L143">      String password = (String) properties</span>
+<span class="fc" id="L144">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault.PASSWORD);</span>
+<span class="fc" id="L145">      String instance = (String) properties</span>
+<span class="fc" id="L146">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE);</span>
+<span class="fc" id="L147">      String zkHosts = (String) properties</span>
+<span class="fc" id="L148">        .getOrDefault(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.INSTANCE);</span>
+<span class="fc" id="L149">      String tableName = getTableName((String) properties</span>
+<span class="fc" id="L150">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX));</span>
+<span class="fc" id="L151">      Authorizations auth = (Authorizations) properties</span>
+<span class="fc" id="L152">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
+          AccumuloDefault.AUTHORIZATION);
+<span class="fc" id="L154">      int batchSize = (int) properties</span>
+<span class="fc" id="L155">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
+<span class="fc" id="L156">          AccumuloDefault.BATCH_SCANNER_THREADS);</span>
+<span class="fc" id="L157">      int iteratorPriority = (int) properties</span>
+<span class="fc" id="L158">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY,</span>
+<span class="fc" id="L159">          AccumuloDefault.ITERATOR_PRIORITY);</span>
+
+<span class="fc" id="L161">      Connector conn = new ZooKeeperInstance(instance, zkHosts)</span>
+<span class="fc" id="L162">        .getConnector(user, new PasswordToken(password));</span>
+
+<span class="fc" id="L164">      List&lt;Range&gt; ranges = doSplits(</span>
+<span class="fc" id="L165">        split.getTotalNumberOfSplits(),</span>
+        tableName,
+        user,
+        password,
+        instance,
+        zkHosts,
+        auth);
+
+<span class="fc" id="L173">      Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L174" title="1 of 4 branches missed.">      if (predicate != null &amp;&amp; predicate.getReduceFilter() != null) {</span>
+<span class="fc" id="L175">        options.put(AccumuloTables.KEY_PREDICATE, predicate.getReduceFilter().encode());</span>
+      }
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      if (split.getSplitNumber() + 1 &gt; ranges.size()) {</span>
+<span class="fc" id="L178">        scanner = null;</span>
+<span class="fc" id="L179">        iterator = Collections.emptyIterator();</span>
+      } else {
+<span class="fc" id="L181">        scanner = conn.createBatchScanner(tableName, auth, batchSize);</span>
+<span class="fc" id="L182">        attachIterator(scanner, iteratorPriority, options);</span>
+<span class="fc" id="L183">        scanner.setRanges(Lists.newArrayList(ranges.get(split.getSplitNumber())));</span>
+<span class="fc" id="L184">        iterator = scanner.iterator();</span>
+      }
+
+<span class="fc" id="L187">      initiate();</span>
+<span class="nc" id="L188">    } catch (AccumuloException | AccumuloSecurityException | TableNotFoundException e) {</span>
+<span class="nc" id="L189">      throw new IOException(e);</span>
+<span class="fc" id="L190">    }</span>
+<span class="fc" id="L191">  }</span>
+
+  @Override
+  public boolean reachedEnd() {
+<span class="fc bfc" id="L195" title="All 2 branches covered.">    return !iterator.hasNext();</span>
+  }
+
+  @Override
+  public T nextRecord(T reuse) throws IOException {
+<span class="fc" id="L200">    return mapRow(iterator.next());</span>
+  }
+
+  @Override
+  public void close() throws IOException {
+<span class="fc" id="L205">    super.close();</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">    if (scanner != null) {</span>
+<span class="fc" id="L207">      scanner.close();</span>
+    }
+<span class="fc" id="L209">  }</span>
+
+  /**
+   * Split table into ranges according to {@link AccumuloRowInputFormat#getSplits} suggest
+   *
+   * @param maxSplit max split size
+   * @param tableName split table name
+   * @param user accumulo user
+   * @param password accumulo password
+   * @param instance accumulo instance name
+   * @param zkHosts zookeeper hosts
+   * @param auth accumulo access authorization
+   * @return split range collections
+   */
+  @Nonnull
+  private List&lt;Range&gt; doSplits(
+    int maxSplit,
+    @Nonnull String tableName,
+    @Nonnull String user,
+    @Nonnull String password,
+    @Nonnull String instance,
+    @Nonnull String zkHosts,
+    @Nonnull Authorizations auth
+  ) throws IOException, AccumuloSecurityException {
+<span class="fc" id="L233">    AccumuloRowInputFormat format = new AccumuloRowInputFormat();</span>
+<span class="fc" id="L234">    JobConf conf = new JobConf();</span>
+<span class="fc" id="L235">    AccumuloRowInputFormat.setInputTableName(conf, tableName);</span>
+<span class="fc" id="L236">    AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));</span>
+<span class="fc" id="L237">    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()</span>
+<span class="fc" id="L238">      .withInstance(instance)</span>
+<span class="fc" id="L239">      .withZkHosts(zkHosts));</span>
+<span class="fc" id="L240">    AccumuloRowInputFormat.setScanAuthorizations(conf, auth);</span>
+<span class="pc bpc" id="L241" title="1 of 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getQueryRanges() != null) {</span>
+<span class="nc" id="L242">      AccumuloRowInputFormat.setRanges(conf, predicate.getQueryRanges());</span>
+    }
+<span class="fc" id="L244">    InputSplit[] splits = format.getSplits(conf, maxSplit);</span>
+<span class="fc" id="L245">    return Stream.of(splits)</span>
+<span class="fc" id="L246">      .map(it -&gt; (RangeInputSplit) it)</span>
+<span class="fc" id="L247">      .map(RangeInputSplit::getRange)</span>
+<span class="fc" id="L248">      .collect(Collectors.toList());</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

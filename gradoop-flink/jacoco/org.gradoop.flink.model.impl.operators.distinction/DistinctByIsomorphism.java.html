@@ -16,38 +16,51 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
 import org.gradoop.flink.model.impl.operators.distinction.functions.IdFromGraphHeadString;
 
 /**
- * Returns a distinct collection of logical graphs.
- * Graphs are compared by isomorphism testing.
+ * Returns a distinct collection of base graphs. Graphs are compared by isomorphism testing.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class DistinctByIsomorphism extends GroupByIsomorphism {
+public class DistinctByIsomorphism&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends GroupByIsomorphism&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Default constructor.
    */
   public DistinctByIsomorphism() {
-<span class="fc" id="L36">    super(new FirstGraphHead());</span>
-<span class="fc" id="L37">  }</span>
+<span class="fc" id="L49">    super(new FirstGraphHead&lt;&gt;());</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GC execute(GC collection) {
     // create canonical labels for all graph heads and choose representative for all distinct ones
-<span class="fc" id="L42">    DataSet&lt;GradoopId&gt; graphIds = getCanonicalLabels(collection)</span>
-<span class="fc" id="L43">      .distinct(1)</span>
-<span class="fc" id="L44">      .map(new IdFromGraphHeadString());</span>
+<span class="fc" id="L55">    DataSet&lt;GradoopId&gt; graphIds = getCanonicalLabels(collection)</span>
+<span class="fc" id="L56">      .distinct(1)</span>
+<span class="fc" id="L57">      .map(new IdFromGraphHeadString());</span>
 
-<span class="fc" id="L46">    DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads()</span>
-<span class="fc" id="L47">      .filter(new IdInBroadcast&lt;&gt;())</span>
-<span class="fc" id="L48">      .withBroadcastSet(graphIds, IdInBroadcast.IDS);</span>
+<span class="fc" id="L59">    DataSet&lt;G&gt; graphHeads = collection.getGraphHeads()</span>
+<span class="fc" id="L60">      .filter(new IdInBroadcast&lt;&gt;())</span>
+<span class="fc" id="L61">      .withBroadcastSet(graphIds, IdInBroadcast.IDS);</span>
 
-<span class="fc" id="L50">    return selectVerticesAndEdges(collection, graphHeads);</span>
+<span class="fc" id="L63">    return selectVerticesAndEdges(collection, graphHeads);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

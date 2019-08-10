@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseElementIterator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.accumulo.impl.iterator.tserver</a> &gt; <span class="el_source">BaseElementIterator.java</span></div><h1>BaseElementIterator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.accumulo.impl.iterator.tserver;
+
+import org.apache.accumulo.core.data.ByteSequence;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.iterators.IteratorEnvironment;
+import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
+import org.apache.accumulo.core.util.Pair;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.storage.accumulo.impl.predicate.filter.api.AccumuloElementFilter;
+import org.gradoop.storage.accumulo.impl.constants.AccumuloTables;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * Accumulo Tablet Server Iterator
+ * This Iterator will be created in accumulo tablet server runtime, when executing a partition
+ * range query. A Gradoop element iterator will decode query options as query filter, transform
+ * multi-rows into epgm element and check if this element should be return by predicate. Each
+ * element that fulfill the predicate will be serialized into one row.
+ *
+ * @param &lt;E&gt; gradoop epgm element
+ * @see &lt;a href=&quot;https://accumulo.apache.org/1.9/accumulo_user_manual.html#_iterator_design&quot;&gt;
+ *   accumulo iterator design&lt;/a&gt;
+ */
+<span class="fc" id="L48">public abstract class BaseElementIterator&lt;E extends Element&gt; implements</span>
+  SortedKeyValueIterator&lt;Key, Value&gt; {
+
+  /**
+   * Origin accumulo data source
+   */
+  private SortedKeyValueIterator&lt;Key, Value&gt; source;
+
+  /**
+   * Mapped element iterator, which will handle &quot;next fulfilled element&quot; instrumentation
+   */
+  private InnerIterator seekIterator;
+
+  /**
+   * Serialized top row
+   */
+  private Pair&lt;Key, Value&gt; top;
+
+  /**
+   * EPGMElement filter predicate
+   */
+  private AccumuloElementFilter&lt;E&gt; filter;
+
+  /**
+   * Deserialize from key-value pair
+   *
+   * @param pair k-v pair from accumulo row
+   * @return gradoop element instance
+   * @throws IOException on failure
+   */
+  @Nonnull
+  public abstract E fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException;
+
+  /**
+   * Serialize record to key-value pair
+   *
+   * @param record gradoop element instance
+   * @return k-v pair as accumulo row
+   * @throws IOException on failure
+   */
+  @Nonnull
+  public abstract Pair&lt;Key, Value&gt; toRow(@Nonnull E record) throws IOException;
+
+  /**
+   * Read read next element definition from accumulo store.
+   * Return null if next element does not fulfill filter formula
+   *
+   * @param source origin store source
+   * @return decoded epgm element
+   * @throws IOException on failure
+   */
+  @Nullable
+  public abstract E readLine(
+    @Nonnull SortedKeyValueIterator&lt;Key, Value&gt; source
+  ) throws IOException;
+
+  /**
+   * Get element filter predicate
+   *
+   * @return iterator element filter
+   */
+  protected AccumuloElementFilter&lt;E&gt; getFilter() {
+<span class="nc" id="L110">    return filter;</span>
+  }
+
+  @Override
+  public void init(
+    final SortedKeyValueIterator&lt;Key, Value&gt; source,
+    final Map&lt;String, String&gt; options,
+    final IteratorEnvironment env
+  ) {
+<span class="nc" id="L119">    this.source = source;</span>
+    //read filter predicate
+<span class="nc bnc" id="L121" title="All 4 branches missed.">    if (options != null &amp;&amp; !options.isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">      options.containsKey(AccumuloTables.KEY_PREDICATE)) {</span>
+<span class="nc" id="L123">      this.filter = AccumuloElementFilter.decode(options.get(AccumuloTables.KEY_PREDICATE));</span>
+    } else {
+<span class="nc" id="L125">      this.filter = (AccumuloElementFilter&lt;E&gt;) t -&gt; true;</span>
+    }
+<span class="nc" id="L127">  }</span>
+
+  @Override
+  public boolean hasTop() {
+<span class="nc bnc" id="L131" title="All 2 branches missed.">    return top != null;</span>
+  }
+
+  @Override
+  public void next() throws IOException {
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    E topElement = seekIterator.hasNext() ? seekIterator.next() : null;</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">    top = topElement == null ? null : toRow(topElement);</span>
+<span class="nc" id="L138">  }</span>
+
+  @Override
+  public void seek(
+    final Range range,
+    final Collection&lt;ByteSequence&gt; columnFamilies,
+    final boolean inclusive
+  ) throws IOException {
+    //LOG.info(&quot;seek range {}&quot;, range);
+<span class="nc" id="L147">    source.seek(range, new ArrayList&lt;&gt;(), false);</span>
+<span class="nc" id="L148">    seekIterator = new InnerIterator();</span>
+<span class="nc" id="L149">    next();</span>
+<span class="nc" id="L150">  }</span>
+
+  @Override
+  public Key getTopKey() {
+<span class="nc bnc" id="L154" title="All 2 branches missed.">    return top == null ? null : top.getFirst();</span>
+  }
+
+  @Override
+  public Value getTopValue() {
+<span class="nc bnc" id="L159" title="All 2 branches missed.">    return top == null ? null : top.getSecond();</span>
+  }
+
+  @Override
+  public SortedKeyValueIterator&lt;Key, Value&gt; deepCopy(IteratorEnvironment env) {
+<span class="nc" id="L164">    throw new UnsupportedOperationException(&quot;deep copy is not supported!&quot;);</span>
+  }
+
+  /**
+   * Logical iterator for seeking fulfilled element
+   */
+  private class InnerIterator implements Iterator&lt;E&gt; {
+
+    /**
+     * Next element head
+     */
+    private E head;
+
+    /**
+     * Create a new inner iterator instance
+     */
+<span class="nc" id="L180">    private InnerIterator() {</span>
+<span class="nc" id="L181">      this.head = readHead();</span>
+<span class="nc" id="L182">    }</span>
+
+    /**
+     * Read next head element
+     *
+     * @return edge row head
+     */
+    private E readHead() {
+      E next;
+      do {
+        try {
+<span class="nc" id="L193">          next = readLine(source);</span>
+<span class="nc bnc" id="L194" title="All 4 branches missed.">          if (next != null &amp;&amp; !getFilter().test(next)) {</span>
+<span class="nc" id="L195">            next = null;</span>
+          }
+<span class="nc" id="L197">        } catch (IOException err) {</span>
+<span class="nc" id="L198">          throw new RuntimeException(err);</span>
+<span class="nc" id="L199">        }</span>
+<span class="nc bnc" id="L200" title="All 4 branches missed.">      } while (source.hasTop() &amp;&amp; next == null);</span>
+<span class="nc" id="L201">      return next;</span>
+    }
+
+    @Override
+    public boolean hasNext() {
+<span class="nc bnc" id="L206" title="All 2 branches missed.">      return head != null;</span>
+    }
+
+    @Override
+    public E next() {
+<span class="nc" id="L211">      E result = head;</span>
+<span class="nc" id="L212">      head = readHead();</span>
+<span class="nc" id="L213">      return result;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RowKeyDistributor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.hbase.utils</a> &gt; <span class="el_source">RowKeyDistributor.java</span></div><h1>RowKeyDistributor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.hbase.utils;
+
+import org.apache.hadoop.hbase.util.Bytes;
+
+/**
+ * Singleton helper class providing functions to salt HBase row keys with a prefix.
+ *
+ * This implementation reuses code of &lt;a href=&quot;https://github.com/sematext/HBaseWD&quot;&gt;HBaseWD&lt;/a&gt;
+ * (com.sematext.hbase.wd.RowKeyDistributorByOneBytePrefix). Some code is copied directly or has
+ * only small changes.
+ */
+public class RowKeyDistributor {
+
+  /**
+   * Default number of buckets (which is the max prefix byte)
+   */
+  private static final byte DEFAULT_MAX_PREFIX = (byte) 64;
+
+  /**
+   * Singleton instance
+   */
+<span class="fc" id="L37">  private static RowKeyDistributor INSTANCE = null;</span>
+
+  /**
+   * Internal array of prefixes, initialized in the constructor.
+   */
+  private final byte[][] prefixes;
+
+  /**
+   * The maximum prefix
+   */
+  private byte maxPrefix;
+
+  /**
+   * The next prefix byte (initialized with 0)
+   */
+  private byte nextPrefix;
+
+  /**
+   * Creates an instance of this singleton with setting the max prefix to the default
+   * value {@link RowKeyDistributor#DEFAULT_MAX_PREFIX}.
+   */
+<span class="fc" id="L58">  private RowKeyDistributor() {</span>
+<span class="fc" id="L59">    this.maxPrefix = DEFAULT_MAX_PREFIX;</span>
+<span class="fc" id="L60">    this.prefixes = new byte[Byte.MAX_VALUE][];</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    for (byte i = 0; i &lt; Byte.MAX_VALUE; i++) {</span>
+<span class="fc" id="L62">      prefixes[i] = new byte[] {i};</span>
+    }
+<span class="fc" id="L64">  }</span>
+
+  /**
+   * Static function to return the instance of this RowKeyDistributor.
+   *
+   * @return the instance of this singleton
+   */
+  public static RowKeyDistributor getInstance() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (INSTANCE == null) {</span>
+<span class="fc" id="L73">      INSTANCE = new RowKeyDistributor();</span>
+    }
+<span class="fc" id="L75">    return INSTANCE;</span>
+  }
+
+  /**
+   * Get a row key that is salted with a 1 Byte prefix. The prefix is a random Byte between 0 and
+   * maxPrefix.
+   *
+   * @param originalKey the original key to add the prefix
+   * @return the original key with a prefix byte on the first position
+   */
+  public byte[] getDistributedKey(byte[] originalKey) {
+<span class="fc" id="L86">    byte[] key = Bytes.add(prefixes[nextPrefix++], originalKey);</span>
+<span class="fc" id="L87">    nextPrefix = (byte) (nextPrefix % maxPrefix);</span>
+
+<span class="fc" id="L89">    return key;</span>
+  }
+
+  /**
+   * Get the original key by the given key with a prefix.
+   *
+   * @param adjustedKey the key with a prefix
+   * @return the original key without the prefix
+   */
+  public byte[] getOriginalKey(byte[] adjustedKey) {
+<span class="fc" id="L99">    return Bytes.tail(adjustedKey, adjustedKey.length - 1);</span>
+  }
+
+  /**
+   * Get an array of all possible keys for a given original key.
+   *
+   * @param originalKey the original key
+   * @return an array of size maxPrefix with all possible keys
+   */
+  public byte[][] getAllDistributedKeys(byte[] originalKey) {
+<span class="nc" id="L109">    byte[][] keys = new byte[maxPrefix][];</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">    for (byte i = 0; i &lt; maxPrefix; i++) {</span>
+<span class="nc" id="L111">      keys[i] = Bytes.add(prefixes[i], originalKey);</span>
+    }
+<span class="nc" id="L113">    return keys;</span>
+  }
+
+  /**
+   * Set the bucket count manually. It is used as the maximal prefix.
+   *
+   * @param bucketCount the bucket count as byte
+   */
+  public void setBucketCount(byte bucketCount) {
+<span class="fc" id="L122">    this.maxPrefix = bucketCount;</span>
+<span class="fc" id="L123">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

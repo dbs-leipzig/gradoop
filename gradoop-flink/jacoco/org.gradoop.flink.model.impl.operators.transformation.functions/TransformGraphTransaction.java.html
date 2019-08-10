@@ -16,8 +16,11 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -30,36 +33,43 @@ import java.util.stream.Collectors;
 
 /**
  * Transformation map function for graph transactions.
+ *
+ * Since {@link GraphTransaction} is only implemented for EPGM, this can only be used with EPGM graphs.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
  */
-public class TransformGraphTransaction implements MapFunction&lt;GraphTransaction, GraphTransaction&gt; {
+public class TransformGraphTransaction&lt;G extends GraphHead, V extends Vertex, E extends Edge&gt;
+  implements MapFunction&lt;GraphTransaction, GraphTransaction&gt; {
 
   /**
    * Factory to init modified graph head.
    */
-  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
   /**
    * Graph head modification function
    */
-  private final TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransFunc;
+  private final TransformationFunction&lt;G&gt; graphHeadTransFunc;
 
   /**
    * Factory to init modified vertex.
    */
-  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
+  private final VertexFactory&lt;V&gt; vertexFactory;
 
   /**
    * EPGMVertex modification function
    */
-  private final TransformationFunction&lt;EPGMVertex&gt; vertexTransFunc;
+  private final TransformationFunction&lt;V&gt; vertexTransFunc;
 
   /**
    * Factory to init modified edge.
    */
-  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
+  private final EdgeFactory&lt;E&gt; edgeFactory;
   /**
    * EPGMEdge modification function
    */
-  private final TransformationFunction&lt;EPGMEdge&gt; edgeTransFunc;
+  private final TransformationFunction&lt;E&gt; edgeTransFunc;
 
   /**
    * Constructor
@@ -71,46 +81,53 @@ public class TransformGraphTransaction implements MapFunction&lt;GraphTransactio
    * @param edgeFactory edge factory
    * @param edgeTransFunc edge transformation function
    */
-  public TransformGraphTransaction(GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory,
-    TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransFunc, VertexFactory&lt;EPGMVertex&gt; vertexFactory,
-    TransformationFunction&lt;EPGMVertex&gt; vertexTransFunc, EdgeFactory&lt;EPGMEdge&gt; edgeFactory,
-<span class="fc" id="L77">    TransformationFunction&lt;EPGMEdge&gt; edgeTransFunc) {</span>
-<span class="fc" id="L78">    this.graphHeadFactory = graphHeadFactory;</span>
-<span class="fc" id="L79">    this.graphHeadTransFunc = graphHeadTransFunc;</span>
-<span class="fc" id="L80">    this.vertexFactory = vertexFactory;</span>
-<span class="fc" id="L81">    this.vertexTransFunc = vertexTransFunc;</span>
-<span class="fc" id="L82">    this.edgeFactory = edgeFactory;</span>
-<span class="fc" id="L83">    this.edgeTransFunc = edgeTransFunc;</span>
-<span class="fc" id="L84">  }</span>
+  public TransformGraphTransaction(GraphHeadFactory&lt;G&gt; graphHeadFactory,
+    TransformationFunction&lt;G&gt; graphHeadTransFunc, VertexFactory&lt;V&gt; vertexFactory,
+    TransformationFunction&lt;V&gt; vertexTransFunc, EdgeFactory&lt;E&gt; edgeFactory,
+<span class="fc" id="L87">    TransformationFunction&lt;E&gt; edgeTransFunc) {</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    if (EPGMGraphHead.class.isAssignableFrom(graphHeadFactory.getType()) &amp;&amp;</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">      EPGMVertex.class.isAssignableFrom(vertexFactory.getType()) &amp;&amp;</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">      EPGMEdge.class.isAssignableFrom(edgeFactory.getType())) {</span>
+<span class="fc" id="L91">      this.graphHeadFactory = graphHeadFactory;</span>
+<span class="fc" id="L92">      this.graphHeadTransFunc = graphHeadTransFunc;</span>
+<span class="fc" id="L93">      this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L94">      this.vertexTransFunc = vertexTransFunc;</span>
+<span class="fc" id="L95">      this.edgeFactory = edgeFactory;</span>
+<span class="fc" id="L96">      this.edgeTransFunc = edgeTransFunc;</span>
+    } else {
+<span class="nc" id="L98">      throw new UnsupportedOperationException(&quot;This map function only supports EPGM graphs&quot;);</span>
+    }
+<span class="fc" id="L100">  }</span>
 
   @Override
+  @SuppressWarnings(&quot;unchecked&quot;)
   public GraphTransaction map(GraphTransaction transaction) throws Exception {
-<span class="fc bfc" id="L88" title="All 2 branches covered.">    if (graphHeadTransFunc != null) {</span>
-<span class="fc" id="L89">      transaction.setGraphHead(graphHeadTransFunc.apply(</span>
-<span class="fc" id="L90">        transaction.getGraphHead(),</span>
-<span class="fc" id="L91">        graphHeadFactory.initGraphHead(</span>
-<span class="fc" id="L92">          transaction.getGraphHead().getId(), GradoopConstants.DEFAULT_GRAPH_LABEL)));</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    if (graphHeadTransFunc != null) {</span>
+<span class="fc" id="L106">      transaction.setGraphHead((EPGMGraphHead) graphHeadTransFunc.apply(</span>
+<span class="fc" id="L107">        (G) transaction.getGraphHead(),</span>
+<span class="fc" id="L108">        graphHeadFactory.initGraphHead(</span>
+<span class="fc" id="L109">          transaction.getGraphHead().getId(), GradoopConstants.DEFAULT_GRAPH_LABEL)));</span>
     }
 
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (vertexTransFunc != null) {</span>
-<span class="fc" id="L96">      transaction.setVertices(transaction.getVertices().stream()</span>
-<span class="fc" id="L97">        .map(vertex -&gt; vertexTransFunc.apply(</span>
-          vertex,
-<span class="fc" id="L99">          vertexFactory.initVertex(</span>
-<span class="fc" id="L100">            vertex.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getGraphIds())))</span>
-<span class="fc" id="L101">        .collect(Collectors.toSet()));</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    if (vertexTransFunc != null) {</span>
+<span class="fc" id="L113">      transaction.setVertices(transaction.getVertices().stream()</span>
+<span class="fc" id="L114">        .map(vertex -&gt; (EPGMVertex) vertexTransFunc.apply(</span>
+          (V) vertex,
+<span class="fc" id="L116">          vertexFactory.initVertex(</span>
+<span class="fc" id="L117">            vertex.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getGraphIds())))</span>
+<span class="fc" id="L118">        .collect(Collectors.toSet()));</span>
     }
 
-<span class="fc bfc" id="L104" title="All 2 branches covered.">    if (edgeTransFunc != null) {</span>
-<span class="fc" id="L105">      transaction.setEdges(transaction.getEdges().stream()</span>
-<span class="fc" id="L106">        .map(edge -&gt; edgeTransFunc.apply(</span>
-          edge,
-<span class="fc" id="L108">          edgeFactory.initEdge(</span>
-<span class="fc" id="L109">            edge.getId(), GradoopConstants.DEFAULT_EDGE_LABEL,</span>
-<span class="fc" id="L110">            edge.getSourceId(), edge.getTargetId(), edge.getGraphIds())))</span>
-<span class="fc" id="L111">        .collect(Collectors.toSet()));</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (edgeTransFunc != null) {</span>
+<span class="fc" id="L122">      transaction.setEdges(transaction.getEdges().stream()</span>
+<span class="fc" id="L123">        .map(edge -&gt; (EPGMEdge) edgeTransFunc.apply(</span>
+          (E) edge,
+<span class="fc" id="L125">          edgeFactory.initEdge(</span>
+<span class="fc" id="L126">            edge.getId(), GradoopConstants.DEFAULT_EDGE_LABEL,</span>
+<span class="fc" id="L127">            edge.getSourceId(), edge.getTargetId(), edge.getGraphIds())))</span>
+<span class="fc" id="L128">        .collect(Collectors.toSet()));</span>
     }
-<span class="fc" id="L113">    return transaction;</span>
+<span class="fc" id="L130">    return transaction;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

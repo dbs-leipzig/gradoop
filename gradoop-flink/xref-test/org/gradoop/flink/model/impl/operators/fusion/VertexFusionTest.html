@@ -538,12 +538,12 @@
 <a name="528" href="#528">528</a>       <span class="jxr_string">"(e)-[e_d]-&gt;(d)"</span> +
 <a name="529" href="#529">529</a>       <span class="jxr_string">"]"</span>);
 <a name="530" href="#530">530</a>     GraphCollection sourceGraph = loader.getGraphCollectionByVariables(<span class="jxr_string">"source"</span>);
-<a name="531" href="#531">531</a>     LogicalGraph searchGraph = sourceGraph.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination());
+<a name="531" href="#531">531</a>     LogicalGraph searchGraph = sourceGraph.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination&lt;&gt;());
 <a name="532" href="#532">532</a>     GraphCollection patternGraph = sourceGraph
 <a name="533" href="#533">533</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph&lt;&gt;(<strong class="jxr_keyword">null</strong>, edge -&gt;
 <a name="534" href="#534">534</a>         edge.getPropertyValue(<span class="jxr_string">"difference"</span>).getInt() == 0,
 <a name="535" href="#535">535</a>         Subgraph.Strategy.EDGE_INDUCED))
-<a name="536" href="#536">536</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation((gh, plain) -&gt; {
+<a name="536" href="#536">536</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;((gh, plain) -&gt; {
 <a name="537" href="#537">537</a>         gh.setLabel(<span class="jxr_string">"Combined"</span>);
 <a name="538" href="#538">538</a>         <strong class="jxr_keyword">return</strong> gh;
 <a name="539" href="#539">539</a>       },

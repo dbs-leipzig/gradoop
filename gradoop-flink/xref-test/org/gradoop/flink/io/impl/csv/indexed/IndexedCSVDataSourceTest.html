@@ -73,7 +73,7 @@
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>      GraphCollection graphCollection = getLoaderFromFile(gdlPath)
 <a name="65" href="#65">65</a>        .getGraphCollectionByVariables(<span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>);
-<a name="66" href="#66">66</a>      LogicalGraph expected = graphCollection.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination());
+<a name="66" href="#66">66</a>      LogicalGraph expected = graphCollection.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination&lt;&gt;());
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>      collectAndAssertTrue(input.equalsByElementData(expected));
 <a name="69" href="#69">69</a>    }

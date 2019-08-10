@@ -16,12 +16,13 @@
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
@@ -42,64 +43,76 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 /**
  * Operator deriving a string representation from a graph collection.
  * The representation follows the concept of a canonical adjacency matrix.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class CanonicalAdjacencyMatrixBuilder implements
-  UnaryGraphCollectionToValueOperator&lt;DataSet&lt;String&gt;&gt; {
+public class CanonicalAdjacencyMatrixBuilder&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphCollectionToValueOperator&lt;GC, DataSet&lt;String&gt;&gt; {
 
   /**
    * function describing string representation of graph heads
    */
-  private final GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString;
+  private final GraphHeadToString&lt;G&gt; graphHeadToString;
   /**
    * function describing string representation of vertices
    */
-  private final VertexToString&lt;EPGMVertex&gt; vertexToString;
+  private final VertexToString&lt;V&gt; vertexToString;
   /**
    * function describing string representation of edges
    */
-  private final EdgeToString&lt;EPGMEdge&gt; egeLabelingFunction;
+  private final EdgeToString&lt;E&gt; egeLabelingFunction;
   /**
    * sets mode for either directed or undirected graph
    */
   private final boolean directed;
 
   /**
-   * constructor
+   * Creates a new MatrixBuilder instance.
+   *
    * @param graphHeadToString representation of graph heads
    * @param vertexToString representation of vertices
    * @param edgeLabelingFunction representation of edges
    * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
-    GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
-    VertexToString&lt;EPGMVertex&gt; vertexToString,
-    EdgeToString&lt;EPGMEdge&gt; edgeLabelingFunction,
+    GraphHeadToString&lt;G&gt; graphHeadToString,
+    VertexToString&lt;V&gt; vertexToString,
+    EdgeToString&lt;E&gt; edgeLabelingFunction,
     boolean directed
-<span class="fc" id="L78">  ) {</span>
-<span class="fc" id="L79">    this.graphHeadToString = graphHeadToString;</span>
-<span class="fc" id="L80">    this.vertexToString = vertexToString;</span>
-<span class="fc" id="L81">    this.egeLabelingFunction = edgeLabelingFunction;</span>
-<span class="fc" id="L82">    this.directed = directed;</span>
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L91">  ) {</span>
+<span class="fc" id="L92">    this.graphHeadToString = graphHeadToString;</span>
+<span class="fc" id="L93">    this.vertexToString = vertexToString;</span>
+<span class="fc" id="L94">    this.egeLabelingFunction = edgeLabelingFunction;</span>
+<span class="fc" id="L95">    this.directed = directed;</span>
+<span class="fc" id="L96">  }</span>
 
   @Override
-  public DataSet&lt;String&gt; execute(GraphCollection collection) {
+  public DataSet&lt;String&gt; execute(GC collection) {
 
     // 1-10.
-<span class="fc" id="L89">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = getGraphHeadStrings(collection);</span>
+<span class="fc" id="L102">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = getGraphHeadStrings(collection);</span>
 
     // 11. add empty head to prevent empty result for empty collection
 
-<span class="fc" id="L93">    graphHeadLabels = graphHeadLabels</span>
-<span class="fc" id="L94">      .union(collection</span>
-<span class="fc" id="L95">        .getConfig()</span>
-<span class="fc" id="L96">        .getExecutionEnvironment()</span>
-<span class="fc" id="L97">        .fromElements(new GraphHeadString(GradoopId.get(), &quot;&quot;)));</span>
+<span class="fc" id="L106">    graphHeadLabels = graphHeadLabels</span>
+<span class="fc" id="L107">      .union(collection</span>
+<span class="fc" id="L108">        .getConfig()</span>
+<span class="fc" id="L109">        .getExecutionEnvironment()</span>
+<span class="fc" id="L110">        .fromElements(new GraphHeadString(GradoopId.get(), &quot;&quot;)));</span>
 
     // 12. label collection
 
-<span class="fc" id="L101">    return graphHeadLabels</span>
-<span class="fc" id="L102">      .reduceGroup(new ConcatGraphHeadStrings());</span>
+<span class="fc" id="L114">    return graphHeadLabels</span>
+<span class="fc" id="L115">      .reduceGroup(new ConcatGraphHeadStrings());</span>
   }
 
   /**
@@ -108,101 +121,101 @@ public class CanonicalAdjacencyMatrixBuilder implements
    * @param collection input collection
    * @return (graph id, canonical label) pairs
    */
-  public DataSet&lt;GraphHeadString&gt; getGraphHeadStrings(GraphCollection collection) {
+  public DataSet&lt;GraphHeadString&gt; getGraphHeadStrings(GC collection) {
     // 1. label graph heads
-<span class="fc" id="L113">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = collection.getGraphHeads()</span>
-<span class="fc" id="L114">      .map(graphHeadToString);</span>
+<span class="fc" id="L126">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = collection.getGraphHeads()</span>
+<span class="fc" id="L127">      .map(graphHeadToString);</span>
 
     // 2. label vertices
-<span class="fc" id="L117">    DataSet&lt;VertexString&gt; vertexLabels = collection.getVertices()</span>
-<span class="fc" id="L118">      .flatMap(vertexToString);</span>
+<span class="fc" id="L130">    DataSet&lt;VertexString&gt; vertexLabels = collection.getVertices()</span>
+<span class="fc" id="L131">      .flatMap(vertexToString);</span>
 
     // 3. label edges
-<span class="fc" id="L121">    DataSet&lt;EdgeString&gt; edgeLabels = collection.getEdges()</span>
-<span class="fc" id="L122">      .flatMap(egeLabelingFunction);</span>
+<span class="fc" id="L134">    DataSet&lt;EdgeString&gt; edgeLabels = collection.getEdges()</span>
+<span class="fc" id="L135">      .flatMap(egeLabelingFunction);</span>
 
-<span class="fc bfc" id="L124" title="All 2 branches covered.">    if (directed) {</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    if (directed) {</span>
       // 4. combine labels of parallel edges
-<span class="fc" id="L126">      edgeLabels = edgeLabels</span>
-<span class="fc" id="L127">        .groupBy(0, 1, 2)</span>
-<span class="fc" id="L128">        .reduceGroup(new MultiEdgeStringCombiner());</span>
+<span class="fc" id="L139">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L140">        .groupBy(0, 1, 2)</span>
+<span class="fc" id="L141">        .reduceGroup(new MultiEdgeStringCombiner());</span>
 
       // 5. extend edge labels by vertex labels
 
-<span class="fc" id="L132">      edgeLabels = edgeLabels</span>
-<span class="fc" id="L133">        .join(vertexLabels)</span>
-<span class="fc" id="L134">        .where(0, 1).equalTo(0, 1) // graphId,sourceId = graphId,vertexId</span>
-<span class="fc" id="L135">        .with(new SourceStringUpdater())</span>
-<span class="fc" id="L136">        .join(vertexLabels)</span>
-<span class="fc" id="L137">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
-<span class="fc" id="L138">        .with(new TargetStringUpdater());</span>
+<span class="fc" id="L145">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L146">        .join(vertexLabels)</span>
+<span class="fc" id="L147">        .where(0, 1).equalTo(0, 1) // graphId,sourceId = graphId,vertexId</span>
+<span class="fc" id="L148">        .with(new SourceStringUpdater())</span>
+<span class="fc" id="L149">        .join(vertexLabels)</span>
+<span class="fc" id="L150">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
+<span class="fc" id="L151">        .with(new TargetStringUpdater());</span>
 
       // 6. extend vertex labels by outgoing vertex+edge labels
 
-<span class="fc" id="L142">      DataSet&lt;VertexString&gt; outgoingAdjacencyListLabels =</span>
-<span class="fc" id="L143">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
-<span class="fc" id="L144">          .reduceGroup(new OutgoingAdjacencyList());</span>
+<span class="fc" id="L155">      DataSet&lt;VertexString&gt; outgoingAdjacencyListLabels =</span>
+<span class="fc" id="L156">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
+<span class="fc" id="L157">          .reduceGroup(new OutgoingAdjacencyList());</span>
 
       // 7. extend vertex labels by outgoing vertex+edge labels
 
-<span class="fc" id="L148">      DataSet&lt;VertexString&gt; incomingAdjacencyListLabels =</span>
-<span class="fc" id="L149">        edgeLabels.groupBy(0, 2) // graphId, targetId</span>
-<span class="fc" id="L150">          .reduceGroup(new IncomingAdjacencyList());</span>
+<span class="fc" id="L161">      DataSet&lt;VertexString&gt; incomingAdjacencyListLabels =</span>
+<span class="fc" id="L162">        edgeLabels.groupBy(0, 2) // graphId, targetId</span>
+<span class="fc" id="L163">          .reduceGroup(new IncomingAdjacencyList());</span>
 
       // 8. combine vertex labels
 
-<span class="fc" id="L154">      vertexLabels = vertexLabels</span>
-<span class="fc" id="L155">        .leftOuterJoin(outgoingAdjacencyListLabels)</span>
-<span class="fc" id="L156">        .where(0, 1).equalTo(0, 1)</span>
-<span class="fc" id="L157">        .with(new LabelCombiner&lt;VertexString&gt;())</span>
-<span class="fc" id="L158">        .leftOuterJoin(incomingAdjacencyListLabels)</span>
-<span class="fc" id="L159">        .where(0, 1).equalTo(0, 1)</span>
-<span class="fc" id="L160">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
-<span class="fc" id="L161">    } else {</span>
+<span class="fc" id="L167">      vertexLabels = vertexLabels</span>
+<span class="fc" id="L168">        .leftOuterJoin(outgoingAdjacencyListLabels)</span>
+<span class="fc" id="L169">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L170">        .with(new LabelCombiner&lt;VertexString&gt;())</span>
+<span class="fc" id="L171">        .leftOuterJoin(incomingAdjacencyListLabels)</span>
+<span class="fc" id="L172">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L173">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
+<span class="fc" id="L174">    } else {</span>
     // undirected graph
 
       // 4. union edges with flipped edges and combine labels of parallel edges
 
-<span class="fc" id="L166">      edgeLabels = edgeLabels</span>
-<span class="fc" id="L167">        .union(edgeLabels</span>
-<span class="fc" id="L168">          .map(new SwitchSourceTargetIds()))</span>
-<span class="fc" id="L169">        .groupBy(0, 1, 2)</span>
-<span class="fc" id="L170">        .reduceGroup(new MultiEdgeStringCombiner());</span>
+<span class="fc" id="L179">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L180">        .union(edgeLabels</span>
+<span class="fc" id="L181">          .map(new SwitchSourceTargetIds()))</span>
+<span class="fc" id="L182">        .groupBy(0, 1, 2)</span>
+<span class="fc" id="L183">        .reduceGroup(new MultiEdgeStringCombiner());</span>
 
       // 5. extend edge labels by vertex labels
 
-<span class="fc" id="L174">      edgeLabels = edgeLabels</span>
-<span class="fc" id="L175">        .join(vertexLabels)</span>
-<span class="fc" id="L176">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
-<span class="fc" id="L177">        .with(new TargetStringUpdater());</span>
+<span class="fc" id="L187">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L188">        .join(vertexLabels)</span>
+<span class="fc" id="L189">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
+<span class="fc" id="L190">        .with(new TargetStringUpdater());</span>
 
       // 6/7. extend vertex labels by vertex+edge labels
 
-<span class="fc" id="L181">      DataSet&lt;VertexString&gt; adjacencyListLabels =</span>
-<span class="fc" id="L182">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
-<span class="fc" id="L183">          .reduceGroup(new UndirectedAdjacencyList());</span>
+<span class="fc" id="L194">      DataSet&lt;VertexString&gt; adjacencyListLabels =</span>
+<span class="fc" id="L195">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
+<span class="fc" id="L196">          .reduceGroup(new UndirectedAdjacencyList());</span>
 
       // 8. combine vertex labels
 
-<span class="fc" id="L187">      vertexLabels = vertexLabels</span>
-<span class="fc" id="L188">        .leftOuterJoin(adjacencyListLabels)</span>
-<span class="fc" id="L189">        .where(0, 1).equalTo(0, 1)</span>
-<span class="fc" id="L190">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
+<span class="fc" id="L200">      vertexLabels = vertexLabels</span>
+<span class="fc" id="L201">        .leftOuterJoin(adjacencyListLabels)</span>
+<span class="fc" id="L202">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L203">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
     }
 
     // 9. create adjacency matrix labels
 
-<span class="fc" id="L195">    DataSet&lt;GraphHeadString&gt; adjacencyMatrixLabels = vertexLabels</span>
-<span class="fc" id="L196">      .groupBy(0)</span>
-<span class="fc" id="L197">      .reduceGroup(new AdjacencyMatrix());</span>
+<span class="fc" id="L208">    DataSet&lt;GraphHeadString&gt; adjacencyMatrixLabels = vertexLabels</span>
+<span class="fc" id="L209">      .groupBy(0)</span>
+<span class="fc" id="L210">      .reduceGroup(new AdjacencyMatrix());</span>
 
     // 10. combine graph labels
 
-<span class="fc" id="L201">    graphHeadLabels = graphHeadLabels</span>
-<span class="fc" id="L202">      .leftOuterJoin(adjacencyMatrixLabels)</span>
-<span class="fc" id="L203">      .where(0).equalTo(0)</span>
-<span class="fc" id="L204">      .with(new LabelCombiner&lt;GraphHeadString&gt;());</span>
-<span class="fc" id="L205">    return graphHeadLabels;</span>
+<span class="fc" id="L214">    graphHeadLabels = graphHeadLabels</span>
+<span class="fc" id="L215">      .leftOuterJoin(adjacencyMatrixLabels)</span>
+<span class="fc" id="L216">      .where(0).equalTo(0)</span>
+<span class="fc" id="L217">      .with(new LabelCombiner&lt;GraphHeadString&gt;());</span>
+<span class="fc" id="L218">    return graphHeadLabels;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

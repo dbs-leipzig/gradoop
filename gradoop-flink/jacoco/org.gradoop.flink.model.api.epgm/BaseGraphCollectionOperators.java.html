@@ -15,11 +15,45 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.difference.Difference;
+import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
+import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
+import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
+import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.selection.Selection;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.operators.verify.VerifyCollection;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
@@ -40,8 +74,77 @@ public interface BaseGraphCollectionOperators&lt;
   GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; {
 
   //----------------------------------------------------------------------------
+  // Base Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns base graph from collection using the given identifier. If the graph does not exist,
+   * an empty base graph is returned.
+   *
+   * @param graphID graph identifier
+   * @return base graph with given id or an empty base graph
+   */
+  LG getGraph(final GradoopId graphID);
+
+  /**
+   * Extracts base graphs from collection using their identifiers.
+   *
+   * @param identifiers graph identifiers
+   * @return collection containing requested base graphs
+   */
+  default GC getGraphs(final GradoopId... identifiers) {
+<span class="nc" id="L96">    return getGraphs(GradoopIdSet.fromExisting(identifiers));</span>
+  }
+  /**
+   * Extracts base graphs from collection using their identifiers.
+   *
+   * @param identifiers graph identifiers
+   * @return collection containing requested base graphs
+   */
+  GC getGraphs(final GradoopIdSet identifiers);
+
+  //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Filter containing graphs based on their associated graph head.
+   *
+   * @param predicateFunction predicate function for graph head
+   * @return collection with base graphs that fulfil the predicate
+   */
+  default GC select(final FilterFunction&lt;G&gt; predicateFunction) {
+<span class="fc" id="L117">    return callForCollection(new Selection&lt;&gt;(predicateFunction));</span>
+  }
+
+  /**
+   * Returns the first {@code n} arbitrary logical graphs contained in that collection.
+   *
+   * @param n number of graphs to return from collection
+   * @return subset of the graph collection
+   */
+  default GC limit(int n) {
+<span class="fc" id="L127">    return callForCollection(new Limit&lt;&gt;(n));</span>
+  }
+
+  /**
+   * Matches a given pattern on a graph collection.
+   * The boolean flag {@code returnEmbeddings} specifies, if the return shall be the input graphs with
+   * a new property {@link AddMatchesToProperties#DEFAULT_KEY}, or a new collection consisting of the
+   * constructed embeddings.
+   *
+   * @param query the query pattern in GDL syntax
+   * @param algorithm custom pattern matching algorithm, e.g., {@link DepthSearchMatching}
+   * @param returnEmbeddings if true it returns the embeddings as a new graph collection
+   *                         if false it returns the input collection with a new property with key
+   *                         {@link AddMatchesToProperties#DEFAULT_KEY} and value true/false if the pattern
+   *                         is contained in the respective graph
+   * @return a graph collection containing either the embeddings or the input
+   * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
+   */
+  default GC query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
+<span class="fc" id="L146">    return callForCollection(new TransactionalPatternMatching&lt;&gt;(query, algorithm, returnEmbeddings));</span>
+  }
 
   /**
    * Verifies each graph of this collection, removing dangling edges, i.e. edges pointing to or from
@@ -52,7 +155,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling edges removed.
    */
   default GC verify() {
-<span class="fc" id="L55">    return callForCollection(new VerifyCollection&lt;&gt;());</span>
+<span class="fc" id="L158">    return callForCollection(new VerifyCollection&lt;&gt;());</span>
   }
 
   /**
@@ -64,7 +167,131 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling graph ids removed.
    */
   default GC verifyGraphsContainment() {
-<span class="fc" id="L67">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
+<span class="fc" id="L170">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a collection with all base graphs from two input collections.
+   * Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to build union with
+   * @return union of both collections
+   */
+  default GC union(GC otherCollection) {
+<span class="fc" id="L185">    return callForCollection(new Union&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Returns a collection with all base graphs that exist in both input
+   * collections. Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to build intersect with
+   * @return intersection of both collections
+   */
+  default GC intersect(GC otherCollection) {
+<span class="fc" id="L196">    return callForCollection(new Intersection&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Returns a collection with all base graphs that exist in both input collections.
+   * Graph equality is based on their identifiers.
+   * &lt;p&gt;
+   * Implementation that works faster if {@code otherCollection} is small
+   * (e.g. fits in the workers main memory).
+   *
+   * @param otherCollection collection to build intersect with
+   * @return intersection of both collections
+   */
+  default GC intersectWithSmallResult(GC otherCollection) {
+<span class="fc" id="L210">    return callForCollection(new IntersectionBroadcast&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Returns a collection with all base graphs that are contained in that
+   * collection but not in the other. Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to subtract from that collection
+   * @return difference between that and the other collection
+   */
+  default GC difference(GC otherCollection) {
+<span class="fc" id="L221">    return callForCollection(new Difference&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Returns a collection with all base graphs that are contained in that
+   * collection but not in the other. Graph equality is based on their identifiers.
+   * &lt;p&gt;
+   * Alternate implementation that works faster if the intermediate result
+   * (list of graph identifiers) fits into the workers memory.
+   *
+   * @param otherCollection collection to subtract from that collection
+   * @return difference between that and the other collection
+   */
+  default GC differenceWithSmallResult(GC otherCollection) {
+<span class="fc" id="L235">    return callForCollection(new DifferenceBroadcast&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph (by id).
+   *
+   * @param otherCollection other graph collection
+   * @return 1-element dataset containing true, if equal by graph ids
+   */
+  default DataSet&lt;Boolean&gt; equalsByGraphIds(GC otherCollection) {
+<span class="fc" id="L245">    return callForCollection(new CollectionEqualityByGraphIds&lt;&gt;(), otherCollection);</span>
+  }
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph (by vertex and edge ids).
+   *
+   * @param otherCollection other graph
+   * @return 1-element dataset containing true, if equal by element ids
+   */
+  default DataSet&lt;Boolean&gt; equalsByGraphElementIds(GC otherCollection) {
+<span class="fc" id="L255">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+      new GraphHeadToEmptyString&lt;&gt;(),
+      new VertexToIdString&lt;&gt;(),
+      new EdgeToIdString&lt;&gt;(), true), otherCollection);
+  }
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   * &lt;p&gt;
+   * Equality is defined on the element data contained inside the collection, i.e. vertices and edges.
+   * This is limited to EPGM data (IDs, Label, Properties). All extensions of EPGM are ignored.
+   *
+   * @param otherCollection graph collection to compare with
+   * @return 1-element dataset containing {@code true} if the two collections
+   * are equal or {@code false} if not
+   */
+  default DataSet&lt;Boolean&gt; equalsByGraphElementData(GC otherCollection) {
+<span class="fc" id="L273">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+      new GraphHeadToEmptyString&lt;&gt;(),
+      new VertexToDataString&lt;&gt;(),
+      new EdgeToDataString&lt;&gt;(), true), otherCollection);
+  }
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   * &lt;p&gt;
+   * Equality is defined on the data contained inside the collection, i.e. graph heads, vertices and edges.
+   * This is limited to EPGM data (IDs, Label, Properties). All extensions of EPGM are ignored.
+   *
+   * @param otherCollection graph collection to compare with
+   * @return 1-element dataset containing {@code true} if the two collections
+   * are equal or {@code false} if not
+   */
+  default DataSet&lt;Boolean&gt; equalsByGraphData(GC otherCollection) {
+<span class="fc" id="L291">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+      new GraphHeadToDataString&lt;&gt;(),
+      new VertexToDataString&lt;&gt;(),
+      new EdgeToDataString&lt;&gt;(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------
@@ -80,6 +307,36 @@ public interface BaseGraphCollectionOperators&lt;
   GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator);
 
   /**
+   * Calls the given binary collection to value operator using that graph collection and the
+   * input graph collection.
+   *
+   * @param operator        binary collection to value operator
+   * @param otherCollection second input collection for operator
+   * @param &lt;T&gt; return type
+   * @return result of given operator
+   */
+  &lt;T&gt; T callForCollection(BinaryBaseGraphCollectionToValueOperator&lt;GC, T&gt; operator, GC otherCollection);
+
+  /**
+   * Calls the given binary collection to collection operator using that graph collection and the
+   * input graph collection.
+   *
+   * @param operator        binary collection to collection operator
+   * @param otherCollection second input collection for operator
+   * @return result of given operator
+   */
+  GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator,
+                       GC otherCollection);
+
+  /**
+   * Calls the given unary collection to graph operator for the collection.
+   *
+   * @param operator unary collection to graph operator
+   * @return result of given operator
+   */
+  LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator&lt;GC, LG&gt; operator);
+
+  /**
    * Applies a given unary graph to graph operator (e.g., aggregate) on each
    * base graph in the graph collection.
    *
@@ -87,7 +344,57 @@ public interface BaseGraphCollectionOperators&lt;
    * @return collection with resulting logical graphs
    */
   default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
-<span class="fc" id="L90">    return callForCollection(operator);</span>
+<span class="fc" id="L347">    return callForCollection(operator);</span>
+  }
+
+  /**
+   * Transforms a graph collection into a base graph by applying a
+   * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
+   *
+   * @param operator reducible binary graph to graph operator
+   * @return base graph returned by the operator
+   *
+   * @see Exclusion
+   * @see Overlap
+   * @see Combination
+   */
+  default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; operator) {
+<span class="fc" id="L362">    return callForGraph(operator);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a distinct collection of base graphs. Graph equality is based on graph identifiers.
+   *
+   * @return distinct graph collection
+   */
+  default GC distinctById() {
+<span class="fc" id="L375">    return callForCollection(new DistinctById&lt;&gt;());</span>
+  }
+
+  /**
+   * Groups a graph collection by isomorphism.
+   * Graph equality is based on isomorphism including labels and properties.
+   *
+   * @return distinct graph collection
+   */
+  default GC distinctByIsomorphism() {
+<span class="fc" id="L385">    return callForCollection(new DistinctByIsomorphism&lt;&gt;());</span>
+  }
+
+  /**
+   * Groups a graph collection by isomorphism including labels and values.
+   *
+   * @param reduceFunction function to reduce all graph heads of a group into a single representative one,
+   *                       e.g., to count the number of group members
+   *
+   * @return grouped graph collection
+   */
+  default GC groupByIsomorphism(GraphHeadReduceFunction&lt;G&gt; reduceFunction) {
+<span class="fc" id="L397">    return callForCollection(new GroupByIsomorphism&lt;&gt;(reduceFunction));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

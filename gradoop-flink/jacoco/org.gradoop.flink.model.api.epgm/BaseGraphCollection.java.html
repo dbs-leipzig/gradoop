@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseGraphCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.api.epgm</a> &gt; <span class="el_source">BaseGraphCollection.java</span></div><h1>BaseGraphCollection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.api.epgm;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.epgm.BySameId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+/**
+ * Default interface of a graph collection instance.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; the type of the logical graph
+ * @param &lt;GC&gt; the type of the graph collection that will be created with a provided factory
+ */
+public interface BaseGraphCollection&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  extends GraphCollectionLayout&lt;G, V, E&gt;, BaseGraphCollectionOperators&lt;G, V, E, LG, GC&gt; {
+
+  /**
+   * Returns the Gradoop Flink configuration.
+   *
+   * @return the Gradoop Flink configuration
+   */
+  GradoopFlinkConfig getConfig();
+
+  /**
+   * Get the factory that is responsible for creating an instance of {@link GC}.
+   *
+   * @return a factory that can be used to create a {@link GC} instance
+   */
+  BaseGraphCollectionFactory&lt;G, V, E, LG, GC&gt; getFactory();
+
+  /**
+   * Get the factory that is responsible for creating an instance of {@link LG}.
+   *
+   * @return a factory that can be used to create a {@link LG} instance
+   */
+  BaseGraphFactory&lt;G, V, E, LG, GC&gt; getGraphFactory();
+
+  //----------------------------------------------------------------------------
+  // Base Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  @Override
+  default LG getGraph(final GradoopId graphID) {
+    // filter vertices and edges based on given graph id
+<span class="fc" id="L76">    DataSet&lt;G&gt; graphHead = getGraphHeads()</span>
+<span class="fc" id="L77">      .filter(new BySameId&lt;&gt;(graphID));</span>
+<span class="fc" id="L78">    DataSet&lt;V&gt; vertices = getVertices()</span>
+<span class="fc" id="L79">      .filter(new InGraph&lt;&gt;(graphID));</span>
+<span class="fc" id="L80">    DataSet&lt;E&gt; edges = getEdges()</span>
+<span class="fc" id="L81">      .filter(new InGraph&lt;&gt;(graphID));</span>
+
+<span class="fc" id="L83">    return getGraphFactory().fromDataSets(graphHead, vertices, edges);</span>
+  }
+
+  @Override
+  default GC getGraphs(final GradoopIdSet identifiers) {
+<span class="fc" id="L88">    DataSet&lt;G&gt; newGraphHeads = this.getGraphHeads()</span>
+<span class="fc" id="L89">      .filter((FilterFunction&lt;G&gt;) graphHead -&gt; identifiers.contains(graphHead.getId()));</span>
+
+    // build new vertex set
+<span class="fc" id="L92">    DataSet&lt;V&gt; vertices = getVertices()</span>
+<span class="fc" id="L93">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+
+    // build new edge set
+<span class="fc" id="L96">    DataSet&lt;E&gt; edges = getEdges()</span>
+<span class="fc" id="L97">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+
+<span class="fc" id="L99">    return getFactory().fromDataSets(newGraphHeads, vertices, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

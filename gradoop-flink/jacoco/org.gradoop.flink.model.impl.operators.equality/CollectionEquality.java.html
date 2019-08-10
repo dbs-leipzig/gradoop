@@ -16,11 +16,12 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
@@ -30,39 +31,46 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph collections are equal according to given
  * string representations of graph heads, vertices and edges.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class CollectionEquality
-  implements BinaryCollectionToValueOperator&lt;Boolean&gt; {
+public class CollectionEquality&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphCollectionToValueOperator&lt;GC, DataSet&lt;Boolean&gt;&gt; {
 
   /**
-   * builder to create the string representations of graph collections used for
-   * comparison.
+   * builder to create the string representations of graph collections used for comparison.
    */
-  private final CanonicalAdjacencyMatrixBuilder canonicalAdjacencyMatrixBuilder;
+  private final CanonicalAdjacencyMatrixBuilder&lt;G, V, E, LG, GC&gt; canonicalAdjacencyMatrixBuilder;
 
   /**
-   * constructor to set string representations
+   * Constructor to set string representations.
+   *
    * @param graphHeadToString string representation of graph heads
    * @param vertexToString string representation of vertices
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public CollectionEquality(GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
-    VertexToString&lt;EPGMVertex&gt; vertexToString, EdgeToString&lt;EPGMEdge&gt; edgeToString,
-<span class="fc" id="L52">    boolean directed) {</span>
-    /*
-    sets mode for directed or undirected graphs
-   */
-<span class="fc" id="L56">    this.canonicalAdjacencyMatrixBuilder = new CanonicalAdjacencyMatrixBuilder(</span>
-        graphHeadToString, vertexToString, edgeToString, directed);
-<span class="fc" id="L58">  }</span>
+  public CollectionEquality(GraphHeadToString&lt;G&gt; graphHeadToString,
+<span class="fc" id="L63">    VertexToString&lt;V&gt; vertexToString, EdgeToString&lt;E&gt; edgeToString, boolean directed) {</span>
+    // sets mode for directed or undirected graphs
+<span class="fc" id="L65">    this.canonicalAdjacencyMatrixBuilder = new CanonicalAdjacencyMatrixBuilder&lt;&gt;(</span>
+      graphHeadToString, vertexToString, edgeToString, directed);
+<span class="fc" id="L67">  }</span>
 
   @Override
-  public DataSet&lt;Boolean&gt; execute(GraphCollection firstCollection,
-    GraphCollection secondCollection) {
-<span class="fc" id="L63">    return Equals.cross(</span>
-<span class="fc" id="L64">      canonicalAdjacencyMatrixBuilder.execute(firstCollection),</span>
-<span class="fc" id="L65">      canonicalAdjacencyMatrixBuilder.execute(secondCollection)</span>
+  public DataSet&lt;Boolean&gt; execute(GC firstCollection, GC secondCollection) {
+<span class="fc" id="L71">    return Equals.cross(</span>
+<span class="fc" id="L72">      canonicalAdjacencyMatrixBuilder.execute(firstCollection),</span>
+<span class="fc" id="L73">      canonicalAdjacencyMatrixBuilder.execute(secondCollection)</span>
     );
   }
 }

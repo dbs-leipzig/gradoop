@@ -20,12 +20,12 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -70,10 +70,11 @@ public interface MetaDataSource&lt;M extends MetaData&gt; {
    * @param graphs graph collection
    * @return meta data information
    */
-  default DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromCollection(GraphCollection graphs) {
-<span class="fc" id="L74">    return tuplesFromElements(graphs.getVertices())</span>
-<span class="fc" id="L75">      .union(tuplesFromElements(graphs.getEdges()))</span>
-<span class="fc" id="L76">      .union(tuplesFromElements(graphs.getGraphHeads()));</span>
+  default DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromCollection(
+    BaseGraphCollection&lt;?, ?, ?, ?, ?&gt; graphs) {
+<span class="fc" id="L75">    return tuplesFromElements(graphs.getVertices())</span>
+<span class="fc" id="L76">      .union(tuplesFromElements(graphs.getEdges()))</span>
+<span class="fc" id="L77">      .union(tuplesFromElements(graphs.getGraphHeads()));</span>
   }
 
   /**
@@ -83,22 +84,22 @@ public interface MetaDataSource&lt;M extends MetaData&gt; {
    * @param &lt;E&gt;      EPGM element type
    * @return meta data information
    */
-  static &lt;E extends EPGMElement&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
+  static &lt;E extends Element&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
     DataSet&lt;E&gt; elements) {
-<span class="fc" id="L88">    return elements</span>
-<span class="fc" id="L89">      .map(new ElementToPropertyMetaData&lt;&gt;())</span>
-<span class="fc" id="L90">      .groupBy(0, 1)</span>
-<span class="fc" id="L91">      .reduce(new ReducePropertyMetaData())</span>
-<span class="fc" id="L92">      .map(tuple -&gt; Tuple3.of(</span>
+<span class="fc" id="L89">    return elements</span>
+<span class="fc" id="L90">      .map(new ElementToPropertyMetaData&lt;&gt;())</span>
+<span class="fc" id="L91">      .groupBy(0, 1)</span>
+<span class="fc" id="L92">      .reduce(new ReducePropertyMetaData())</span>
+<span class="fc" id="L93">      .map(tuple -&gt; Tuple3.of(</span>
         tuple.f0,
         tuple.f1,
-<span class="fc" id="L95">        tuple.f2.stream().sorted().collect(</span>
-<span class="fc" id="L96">          Collectors.joining(PropertyMetaData.PROPERTY_DELIMITER))))</span>
-<span class="fc" id="L97">      .returns(new TupleTypeInfo&lt;&gt;(</span>
+<span class="fc" id="L96">        tuple.f2.stream().sorted().collect(</span>
+<span class="fc" id="L97">          Collectors.joining(PropertyMetaData.PROPERTY_DELIMITER))))</span>
+<span class="fc" id="L98">      .returns(new TupleTypeInfo&lt;&gt;(</span>
         BasicTypeInfo.STRING_TYPE_INFO,
         BasicTypeInfo.STRING_TYPE_INFO,
         BasicTypeInfo.STRING_TYPE_INFO))
-<span class="fc" id="L101">      .withForwardedFields(&quot;f0&quot;, &quot;f1&quot;);</span>
+<span class="fc" id="L102">      .withForwardedFields(&quot;f0&quot;, &quot;f1&quot;);</span>
   }
 
   /**

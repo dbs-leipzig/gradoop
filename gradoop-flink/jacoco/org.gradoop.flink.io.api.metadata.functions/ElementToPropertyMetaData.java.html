@@ -18,10 +18,10 @@ package org.gradoop.flink.io.api.metadata.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -34,10 +34,10 @@ import java.util.Set;
 /**
  * (element) -&gt; (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})
  *
- * @param &lt;E&gt; EPGM element type
+ * @param &lt;E&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;label-&gt;f1&quot;)
-public class ElementToPropertyMetaData&lt;E extends EPGMElement&gt;
+public class ElementToPropertyMetaData&lt;E extends Element&gt;
   implements MapFunction&lt;E, Tuple3&lt;String, String, Set&lt;String&gt;&gt;&gt; {
   /**
    * Reduce object instantiations.
@@ -53,25 +53,23 @@ public class ElementToPropertyMetaData&lt;E extends EPGMElement&gt;
 
   @Override
   public Tuple3&lt;String, String, Set&lt;String&gt;&gt; map(E e) throws Exception {
-<span class="fc" id="L56">    Class&lt;? extends EPGMElement&gt; type = e.getClass();</span>
-
-<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (type == EPGMEdge.class) {</span>
-<span class="fc" id="L59">      reuseTuple.f0 = MetaDataSource.EDGE_TYPE;</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">    } else if (type == EPGMVertex.class) {</span>
-<span class="fc" id="L61">      reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;</span>
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    } else if (type == EPGMGraphHead.class) {</span>
-<span class="fc" id="L63">      reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (e instanceof Edge) {</span>
+<span class="fc" id="L57">      reuseTuple.f0 = MetaDataSource.EDGE_TYPE;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    } else if (e instanceof Vertex) {</span>
+<span class="fc" id="L59">      reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    } else if (e instanceof GraphHead) {</span>
+<span class="fc" id="L61">      reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;</span>
     } else {
-<span class="nc" id="L65">      throw new Exception(&quot;Unsupported element class&quot;);</span>
+<span class="nc" id="L63">      throw new Exception(&quot;Unsupported element class: &quot; + e.getClass().getName());</span>
     }
-<span class="fc" id="L67">    reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);</span>
-<span class="fc" id="L68">    reuseTuple.f2.clear();</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (e.getProperties() != null) {</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">      for (Property property : e.getProperties()) {</span>
-<span class="fc" id="L71">        reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));</span>
-<span class="fc" id="L72">      }</span>
+<span class="fc" id="L65">    reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);</span>
+<span class="fc" id="L66">    reuseTuple.f2.clear();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (e.getProperties() != null) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      for (Property property : e.getProperties()) {</span>
+<span class="fc" id="L69">        reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));</span>
+<span class="fc" id="L70">      }</span>
     }
-<span class="fc" id="L74">    return reuseTuple;</span>
+<span class="fc" id="L72">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

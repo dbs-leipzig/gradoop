@@ -17,10 +17,13 @@ package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -29,36 +32,46 @@ import org.gradoop.flink.model.impl.functions.utils.OneSideEmpty;
 
 /**
  * Operator to determine if two collections contain the same graphs by id.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L33">public class CollectionEqualityByGraphIds</span>
-  implements BinaryCollectionToValueOperator&lt;Boolean&gt; {
+<span class="fc" id="L42">public class CollectionEqualityByGraphIds&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphCollectionToValueOperator&lt;GC, DataSet&lt;Boolean&gt;&gt; {
 
   @Override
-  public DataSet&lt;Boolean&gt; execute(GraphCollection firstCollection,
-    GraphCollection secondCollection) {
+  public DataSet&lt;Boolean&gt; execute(GC firstCollection, GC secondCollection) {
 
-<span class="fc" id="L40">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctFirstGraphIds = firstCollection</span>
-<span class="fc" id="L41">      .getGraphHeads()</span>
-<span class="fc" id="L42">      .map(new Id&lt;EPGMGraphHead&gt;())</span>
-<span class="fc" id="L43">      .distinct()</span>
-<span class="fc" id="L44">      .map(new ObjectTo1&lt;&gt;());</span>
+<span class="fc" id="L53">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctFirstGraphIds = firstCollection</span>
+<span class="fc" id="L54">      .getGraphHeads()</span>
+<span class="fc" id="L55">      .map(new Id&lt;&gt;())</span>
+<span class="fc" id="L56">      .distinct()</span>
+<span class="fc" id="L57">      .map(new ObjectTo1&lt;&gt;());</span>
 
-<span class="fc" id="L46">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctSecondGraphIds = secondCollection</span>
-<span class="fc" id="L47">      .getGraphHeads()</span>
-<span class="fc" id="L48">      .map(new Id&lt;EPGMGraphHead&gt;())</span>
-<span class="fc" id="L49">      .distinct()</span>
-<span class="fc" id="L50">      .map(new ObjectTo1&lt;&gt;());</span>
+<span class="fc" id="L59">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctSecondGraphIds = secondCollection</span>
+<span class="fc" id="L60">      .getGraphHeads()</span>
+<span class="fc" id="L61">      .map(new Id&lt;&gt;())</span>
+<span class="fc" id="L62">      .distinct()</span>
+<span class="fc" id="L63">      .map(new ObjectTo1&lt;&gt;());</span>
 
-<span class="fc" id="L52">    DataSet&lt;Boolean&gt; d = distinctFirstGraphIds</span>
-<span class="fc" id="L53">      .fullOuterJoin(distinctSecondGraphIds)</span>
-<span class="fc" id="L54">      .where(0).equalTo(0)</span>
-<span class="fc" id="L55">      .with(new OneSideEmpty&lt;Tuple1&lt;GradoopId&gt;, Tuple1&lt;GradoopId&gt;&gt;())</span>
-<span class="fc" id="L56">      .union(firstCollection.getConfig()</span>
-<span class="fc" id="L57">        .getExecutionEnvironment()</span>
-<span class="fc" id="L58">        .fromElements(false)</span>
+<span class="fc" id="L65">    DataSet&lt;Boolean&gt; d = distinctFirstGraphIds</span>
+<span class="fc" id="L66">      .fullOuterJoin(distinctSecondGraphIds)</span>
+<span class="fc" id="L67">      .where(0).equalTo(0)</span>
+<span class="fc" id="L68">      .with(new OneSideEmpty&lt;Tuple1&lt;GradoopId&gt;, Tuple1&lt;GradoopId&gt;&gt;())</span>
+<span class="fc" id="L69">      .union(firstCollection.getConfig()</span>
+<span class="fc" id="L70">        .getExecutionEnvironment()</span>
+<span class="fc" id="L71">        .fromElements(false)</span>
       );
 
-<span class="fc" id="L61">    return Not.map(Or.reduce(d));</span>
+<span class="fc" id="L74">    return Not.map(Or.reduce(d));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

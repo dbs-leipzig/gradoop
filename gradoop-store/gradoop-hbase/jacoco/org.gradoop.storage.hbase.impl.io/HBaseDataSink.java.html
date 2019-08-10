@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HBaseDataSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.hbase.impl.io</a> &gt; <span class="el_source">HBaseDataSink.java</span></div><h1>HBaseDataSink.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.hbase.impl.io;
+
+import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.hbase.impl.io.functions.BuildEdgeMutation;
+import org.gradoop.storage.hbase.impl.io.functions.BuildGraphHeadMutation;
+import org.gradoop.storage.hbase.impl.io.functions.BuildVertexMutation;
+import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+
+/**
+ * Converts runtime representation of EPGM elements into persistent
+ * representations and writes them to HBase.
+ */
+public class HBaseDataSink extends HBaseBase implements DataSink {
+
+  /**
+   * Creates a new HBase data sink.
+   *
+   * @param epgmStore store implementation
+   * @param flinkConfig gradoop flink execute config
+   */
+  public HBaseDataSink(
+    @Nonnull HBaseEPGMStore epgmStore,
+    @Nonnull GradoopFlinkConfig flinkConfig
+  ) {
+<span class="fc" id="L49">    super(epgmStore, flinkConfig);</span>
+<span class="fc" id="L50">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph) throws IOException {
+<span class="nc" id="L54">    write(logicalGraph, false);</span>
+<span class="nc" id="L55">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection) throws IOException {
+<span class="fc" id="L59">    write(graphCollection, false);</span>
+<span class="fc" id="L60">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+<span class="fc" id="L64">    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);</span>
+<span class="fc" id="L65">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (overWrite) {</span>
+<span class="fc" id="L70">      getStore().truncateTables();</span>
+    }
+
+    // transform graph data to persistent graph data and write it
+<span class="fc" id="L74">    writeGraphHeads(graphCollection);</span>
+
+    // transform vertex data to persistent vertex data and write it
+<span class="fc" id="L77">    writeVertices(graphCollection);</span>
+
+    // transform edge data to persistent edge data and write it
+<span class="fc" id="L80">    writeEdges(graphCollection);</span>
+<span class="fc" id="L81">  }</span>
+
+  /**
+   * Converts runtime graph data to persistent graph data (including vertex
+   * and edge identifiers) and writes it to HBase.
+   *
+   * @param collection Graph collection
+   * @throws IOException if fetching mapreduce instance failed
+   */
+  private void writeGraphHeads(final GraphCollection collection)
+    throws IOException {
+
+    // write (graph-data) to HBase table
+<span class="fc" id="L94">    Job job = Job.getInstance();</span>
+<span class="fc" id="L95">    job.getConfiguration()</span>
+<span class="fc" id="L96">      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getGraphTableName().getNameAsString());</span>
+
+<span class="fc" id="L98">    collection.getGraphHeads()</span>
+<span class="fc" id="L99">      .map(new BuildGraphHeadMutation(getHBaseConfig().getGraphHeadHandler()))</span>
+<span class="fc" id="L100">      .output(new HadoopOutputFormat&lt;&gt;(new TableOutputFormat&lt;&gt;(), job));</span>
+<span class="fc" id="L101">  }</span>
+
+  /**
+   * Converts runtime vertex data to persistent vertex data (includes
+   * incoming and outgoing edge data) and writes it to HBase.
+   *
+   * @param collection Graph collection
+   * @throws IOException if fetching mapreduce instance failed
+   */
+  private void writeVertices(final GraphCollection collection) throws IOException {
+
+    // write (vertex-data) to HBase table
+<span class="fc" id="L113">    Job job = Job.getInstance();</span>
+<span class="fc" id="L114">    job.getConfiguration()</span>
+<span class="fc" id="L115">      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getVertexTableName().getNameAsString());</span>
+
+<span class="fc" id="L117">    collection.getVertices()</span>
+<span class="fc" id="L118">      .map(new BuildVertexMutation(getHBaseConfig().getVertexHandler()))</span>
+<span class="fc" id="L119">      .output(new HadoopOutputFormat&lt;&gt;(new TableOutputFormat&lt;&gt;(), job));</span>
+<span class="fc" id="L120">  }</span>
+
+  /**
+   * Converts runtime edge data to persistent edge data (includes
+   * source/target vertex data) and writes it to HBase.
+   *
+   * @param collection Graph collection
+   * @throws IOException if fetching mapreduce instance failed
+   */
+  private void writeEdges(final GraphCollection collection) throws IOException {
+
+    // write (edge-data) to HBase table
+<span class="fc" id="L132">    Job job = Job.getInstance();</span>
+<span class="fc" id="L133">    job.getConfiguration()</span>
+<span class="fc" id="L134">      .set(TableOutputFormat.OUTPUT_TABLE, getHBaseConfig().getEdgeTableName().getNameAsString());</span>
+
+<span class="fc" id="L136">    collection.getEdges()</span>
+<span class="fc" id="L137">      .map(new BuildEdgeMutation(getHBaseConfig().getEdgeHandler()))</span>
+<span class="fc" id="L138">      .output(new HadoopOutputFormat&lt;&gt;(new TableOutputFormat&lt;&gt;(), job));</span>
+<span class="fc" id="L139">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

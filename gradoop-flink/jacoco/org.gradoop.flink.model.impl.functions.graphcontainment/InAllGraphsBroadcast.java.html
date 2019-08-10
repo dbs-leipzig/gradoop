@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 
 /**
  * True, if an element is contained in all of a set of given graphs.
@@ -24,13 +24,11 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
  * @param &lt;GE&gt; element type
  */
 @FunctionAnnotation.ReadFields(&quot;graphIds&quot;)
-<span class="fc" id="L27">public class InAllGraphsBroadcast</span>
-  &lt;GE extends EPGMGraphElement&gt;
-  extends GraphsContainmentFilterBroadcast&lt;GE&gt; {
+<span class="fc" id="L27">public class InAllGraphsBroadcast&lt;GE extends GraphElement&gt; extends GraphsContainmentFilterBroadcast&lt;GE&gt; {</span>
 
   @Override
   public boolean filter(GE element) throws Exception {
-<span class="fc" id="L33">    return element.getGraphIds().containsAll(this.graphIds);</span>
+<span class="fc" id="L31">    return element.getGraphIds().containsAll(this.graphIds);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

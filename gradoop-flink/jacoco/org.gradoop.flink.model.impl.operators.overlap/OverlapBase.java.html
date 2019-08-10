@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -26,8 +26,11 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @see Overlap
  * @see ReduceOverlap
+ *
+ * @param &lt;V&gt; vertex type
+ * @param &lt;E&gt; edge type
  */
-<span class="fc" id="L30">public abstract class OverlapBase {</span>
+<span class="fc" id="L33">public abstract class OverlapBase&lt;V extends Vertex, E extends Edge&gt; {</span>
 
   /**
    * Filters vertices based on the given graph identifiers.
@@ -36,11 +39,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
    * @param ids       graph identifiers
    * @return filtered vertices
    */
-  protected DataSet&lt;EPGMVertex&gt; getVertices(DataSet&lt;EPGMVertex&gt; vertices,
-    DataSet&lt;GradoopId&gt; ids) {
-<span class="fc" id="L41">    return vertices</span>
-<span class="fc" id="L42">      .filter(new InAllGraphsBroadcast&lt;EPGMVertex&gt;())</span>
-<span class="fc" id="L43">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
+  protected DataSet&lt;V&gt; getVertices(DataSet&lt;V&gt; vertices, DataSet&lt;GradoopId&gt; ids) {
+<span class="fc" id="L43">    return vertices</span>
+<span class="fc" id="L44">      .filter(new InAllGraphsBroadcast&lt;&gt;())</span>
+<span class="fc" id="L45">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
   }
 
   /**
@@ -50,11 +52,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
    * @param ids   graph identifiers
    * @return filtered edges
    */
-  protected DataSet&lt;EPGMEdge&gt; getEdges(DataSet&lt;EPGMEdge&gt; edges,
-    DataSet&lt;GradoopId&gt; ids) {
-<span class="fc" id="L55">    return edges</span>
-<span class="fc" id="L56">      .filter(new InAllGraphsBroadcast&lt;EPGMEdge&gt;())</span>
-<span class="fc" id="L57">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
+  protected DataSet&lt;E&gt; getEdges(DataSet&lt;E&gt; edges, DataSet&lt;GradoopId&gt; ids) {
+<span class="fc" id="L56">    return edges</span>
+<span class="fc" id="L57">      .filter(new InAllGraphsBroadcast&lt;&gt;())</span>
+<span class="fc" id="L58">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

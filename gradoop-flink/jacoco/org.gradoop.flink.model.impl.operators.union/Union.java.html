@@ -16,38 +16,50 @@
 package org.gradoop.flink.model.impl.operators.union;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 
 /**
- * Returns a collection with all logical graphs from two input collections.
+ * Returns a collection with all base graphs from two input collections.
  * Graph equality is based on their identifiers.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L29">public class Union extends SetOperatorBase {</span>
+<span class="fc" id="L37">public class Union&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SetOperatorBase&lt;G, V, E, LG, GC&gt; {
 
   @Override
-  protected DataSet&lt;EPGMVertex&gt; computeNewVertices(
-    DataSet&lt;EPGMGraphHead&gt; newGraphHeads) {
-<span class="fc" id="L34">    return firstCollection.getVertices()</span>
-<span class="fc" id="L35">      .union(secondCollection.getVertices())</span>
-<span class="fc" id="L36">      .distinct(new Id&lt;EPGMVertex&gt;());</span>
+  protected DataSet&lt;V&gt; computeNewVertices(DataSet&lt;G&gt; newGraphHeads) {
+<span class="fc" id="L46">    return firstCollection.getVertices()</span>
+<span class="fc" id="L47">      .union(secondCollection.getVertices())</span>
+<span class="fc" id="L48">      .distinct(new Id&lt;&gt;());</span>
   }
 
   @Override
-  protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
-<span class="fc" id="L41">    return firstCollection.getGraphHeads()</span>
-<span class="fc" id="L42">      .union(secondCollection.getGraphHeads())</span>
-<span class="fc" id="L43">      .distinct(new Id&lt;EPGMGraphHead&gt;());</span>
+  protected DataSet&lt;G&gt; computeNewGraphHeads() {
+<span class="fc" id="L53">    return firstCollection.getGraphHeads()</span>
+<span class="fc" id="L54">      .union(secondCollection.getGraphHeads())</span>
+<span class="fc" id="L55">      .distinct(new Id&lt;&gt;());</span>
   }
 
   @Override
-  protected DataSet&lt;EPGMEdge&gt; computeNewEdges(DataSet&lt;EPGMVertex&gt; newVertices) {
-<span class="fc" id="L48">    return firstCollection.getEdges()</span>
-<span class="fc" id="L49">      .union(secondCollection.getEdges())</span>
-<span class="fc" id="L50">      .distinct(new Id&lt;EPGMEdge&gt;());</span>
+  protected DataSet&lt;E&gt; computeNewEdges(DataSet&lt;V&gt; newVertices) {
+<span class="fc" id="L60">    return firstCollection.getEdges()</span>
+<span class="fc" id="L61">      .union(secondCollection.getEdges())</span>
+<span class="fc" id="L62">      .distinct(new Id&lt;&gt;());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

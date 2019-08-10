@@ -20,43 +20,45 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Initializes a new graph head from a given GradoopId and its lineage information, e.g. the
  * source graph this one was created from.
+ *
+ * @param &lt;G&gt; graph head type
  */
-public class InitGraphHeadWithLineage
-  implements MapFunction&lt;Tuple2&lt;GradoopId, GradoopId&gt;, EPGMGraphHead&gt;, ResultTypeQueryable&lt;EPGMGraphHead&gt; {
+public class InitGraphHeadWithLineage&lt;G extends GraphHead&gt;
+  implements MapFunction&lt;Tuple2&lt;GradoopId, GradoopId&gt;, G&gt;, ResultTypeQueryable&lt;G&gt; {
   /**
-   * EPGMGraphHeadFactory
+   * GraphHeadFactory
    */
-  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param epgmGraphHeadFactory graph head factory
    */
-<span class="fc" id="L44">  public InitGraphHeadWithLineage(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory) {</span>
-<span class="fc" id="L45">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L46">  public InitGraphHeadWithLineage(GraphHeadFactory&lt;G&gt; epgmGraphHeadFactory) {</span>
+<span class="fc" id="L47">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
+<span class="fc" id="L48">  }</span>
 
   @Override
-  public EPGMGraphHead map(Tuple2&lt;GradoopId, GradoopId&gt; idTuple) {
-<span class="fc" id="L50">    EPGMGraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);</span>
-<span class="fc" id="L51">    Properties properties = Properties.createWithCapacity(1);</span>
-<span class="fc" id="L52">    properties.set(&quot;lineage&quot;, idTuple.f1);</span>
-<span class="fc" id="L53">    head.setProperties(properties);</span>
-<span class="fc" id="L54">    return head;</span>
+  public G map(Tuple2&lt;GradoopId, GradoopId&gt; idTuple) {
+<span class="fc" id="L52">    G head = graphHeadFactory.initGraphHead(idTuple.f0);</span>
+<span class="fc" id="L53">    Properties properties = Properties.createWithCapacity(1);</span>
+<span class="fc" id="L54">    properties.set(&quot;lineage&quot;, idTuple.f1);</span>
+<span class="fc" id="L55">    head.setProperties(properties);</span>
+<span class="fc" id="L56">    return head;</span>
   }
 
   @Override
-  public TypeInformation&lt;EPGMGraphHead&gt; getProducedType() {
-<span class="fc" id="L59">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
+  public TypeInformation&lt;G&gt; getProducedType() {
+<span class="fc" id="L61">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

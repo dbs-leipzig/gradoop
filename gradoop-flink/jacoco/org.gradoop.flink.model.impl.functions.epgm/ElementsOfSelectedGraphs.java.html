@@ -19,9 +19,9 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * graphIds (BC)
@@ -31,8 +31,8 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
  *
  * @param &lt;EL&gt; graph element type
  */
-public class ElementsOfSelectedGraphs&lt;EL extends EPGMGraphElement&gt; extends
-  RichFlatMapFunction&lt;EL, Tuple2&lt;GradoopId, EL&gt;&gt; {
+public class ElementsOfSelectedGraphs&lt;EL extends GraphElement&gt;
+  extends RichFlatMapFunction&lt;EL, Tuple2&lt;GradoopId, EL&gt;&gt; {
 
   /**
    * constant string for &quot;graph ids&quot;
@@ -64,15 +64,14 @@ public class ElementsOfSelectedGraphs&lt;EL extends EPGMGraphElement&gt; extends
 <span class="fc" id="L64">  }</span>
 
   @Override
-  public void flatMap(EL el, Collector
-    &lt;Tuple2&lt;GradoopId, EL&gt;&gt; collector) throws Exception {
-<span class="fc bfc" id="L69" title="All 2 branches covered.">    for (GradoopId graphId : el.getGraphIds()) {</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">      if (graphIds.contains(graphId)) {</span>
-<span class="fc" id="L71">        reuse.f0 = graphId;</span>
-<span class="fc" id="L72">        reuse.f1 = el;</span>
-<span class="fc" id="L73">        collector.collect(reuse);</span>
+  public void flatMap(EL element, Collector&lt;Tuple2&lt;GradoopId, EL&gt;&gt; collector) throws Exception {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (GradoopId graphId : element.getGraphIds()) {</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">      if (graphIds.contains(graphId)) {</span>
+<span class="fc" id="L70">        reuse.f0 = graphId;</span>
+<span class="fc" id="L71">        reuse.f1 = element;</span>
+<span class="fc" id="L72">        collector.collect(reuse);</span>
       }
-<span class="fc" id="L75">    }</span>
-<span class="fc" id="L76">  }</span>
+<span class="fc" id="L74">    }</span>
+<span class="fc" id="L75">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

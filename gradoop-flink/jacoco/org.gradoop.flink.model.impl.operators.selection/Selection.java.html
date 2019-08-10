@@ -17,66 +17,48 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 /**
- * Filter logical graphs from a graph collection based on their associated graph
- * head.
+ * Filter base graphs from a graph collection based on their associated graph head.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class Selection extends SelectionBase {
+public class Selection&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SelectionBase&lt;G, V, E, LG, GC&gt; {
 
   /**
    * User-defined predicate function
    */
-  private final FilterFunction&lt;EPGMGraphHead&gt; predicate;
+  private final FilterFunction&lt;G&gt; predicate;
 
   /**
    * Creates a new Selection operator.
    *
    * @param predicate user-defined predicate function
    */
-<span class="fc" id="L43">  public Selection(FilterFunction&lt;EPGMGraphHead&gt; predicate) {</span>
-<span class="fc" id="L44">    this.predicate = checkNotNull(predicate, &quot;Predicate function was null&quot;);</span>
-<span class="fc" id="L45">  }</span>
+<span class="fc" id="L54">  public Selection(FilterFunction&lt;G&gt; predicate) {</span>
+<span class="fc" id="L55">    this.predicate = Objects.requireNonNull(predicate, &quot;Predicate function was null&quot;);</span>
+<span class="fc" id="L56">  }</span>
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-<span class="pc bpc" id="L49" title="1 of 2 branches missed.">    return collection.isTransactionalLayout() ?</span>
-<span class="pc" id="L50">      executeForTxLayout(collection) :</span>
-<span class="fc" id="L51">      executeForGVELayout(collection);</span>
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  private GraphCollection executeForGVELayout(GraphCollection collection) {
-<span class="fc" id="L62">    DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads()</span>
-<span class="fc" id="L63">      .filter(predicate);</span>
-<span class="fc" id="L64">    return selectVerticesAndEdges(collection, graphHeads);</span>
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  private GraphCollection executeForTxLayout(GraphCollection collection) {
-<span class="nc" id="L75">    DataSet&lt;GraphTransaction&gt; filteredTransactions = collection.getGraphTransactions()</span>
-<span class="nc" id="L76">      .filter(new FilterTransactions(predicate));</span>
-
-<span class="nc" id="L78">    return collection.getFactory()</span>
-<span class="nc" id="L79">      .fromTransactions(filteredTransactions);</span>
+  public GC execute(GC collection) {
+<span class="fc" id="L60">    DataSet&lt;G&gt; graphHeads = collection.getGraphHeads().filter(predicate);</span>
+<span class="fc" id="L61">    return selectVerticesAndEdges(collection, graphHeads);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

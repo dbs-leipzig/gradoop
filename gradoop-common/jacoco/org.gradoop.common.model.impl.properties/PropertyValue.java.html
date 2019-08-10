@@ -675,9 +675,17 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
 <span class="fc" id="L675">    return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));</span>
   }
 
+  /**
+   * Compares this to another {@link PropertyValue}. See {@link PropertyValueStrategyFactory#compare}.
+   *
+   * @see PropertyValueStrategyFactory#compare
+   * @param other the property value to be compared.
+   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+   * or greater than the specified object.
+   */
   @Override
   public int compareTo(PropertyValue other) {
-<span class="fc" id="L680">    return PropertyValueStrategyFactory.compare(value, other.value);</span>
+<span class="fc" id="L688">    return PropertyValueStrategyFactory.compare(value, other.value);</span>
   }
 
   /**
@@ -686,8 +694,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return byte size
    */
   public int byteSize() {
-<span class="fc" id="L689">    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);</span>
-<span class="fc" id="L690">    return rawBytes.length;</span>
+<span class="fc" id="L697">    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);</span>
+<span class="fc" id="L698">    return rawBytes.length;</span>
   }
 
   /**
@@ -718,29 +726,29 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
-<span class="fc" id="L721">    PropertyValueStrategyFactory.get(value).write(value, outputView);</span>
-<span class="fc" id="L722">  }</span>
+<span class="fc" id="L729">    PropertyValueStrategyFactory.get(value).write(value, outputView);</span>
+<span class="fc" id="L730">  }</span>
 
   @Override
   public void read(DataInputView inputView) throws IOException {
     // type
-<span class="fc" id="L727">    byte typeByte = inputView.readByte();</span>
+<span class="fc" id="L735">    byte typeByte = inputView.readByte();</span>
     // Apply bitmask to get the actual type.
-<span class="fc" id="L729">    byte type = (byte) (~PropertyValue.FLAG_LARGE &amp; typeByte);</span>
+<span class="fc" id="L737">    byte type = (byte) (~PropertyValue.FLAG_LARGE &amp; typeByte);</span>
 
-<span class="fc" id="L731">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);</span>
+<span class="fc" id="L739">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);</span>
 
-<span class="pc bpc" id="L733" title="1 of 2 branches missed.">    if (strategy == null) {</span>
-<span class="nc" id="L734">      throw new UnsupportedTypeException(&quot;No strategy for type byte from input view found&quot;);</span>
+<span class="pc bpc" id="L741" title="1 of 2 branches missed.">    if (strategy == null) {</span>
+<span class="nc" id="L742">      throw new UnsupportedTypeException(&quot;No strategy for type byte from input view found&quot;);</span>
     } else {
-<span class="fc" id="L736">      value = strategy.read(inputView, typeByte);</span>
+<span class="fc" id="L744">      value = strategy.read(inputView, typeByte);</span>
     }
-<span class="fc" id="L738">  }</span>
+<span class="fc" id="L746">  }</span>
 
   @Override
   public String toString() {
-<span class="fc bfc" id="L742" title="All 2 branches covered.">    return getObject() != null ?</span>
-<span class="fc" id="L743">      getObject().toString() :</span>
+<span class="fc bfc" id="L750" title="All 2 branches covered.">    return getObject() != null ?</span>
+<span class="fc" id="L751">      getObject().toString() :</span>
       GradoopConstants.NULL_STRING;
   }
 }

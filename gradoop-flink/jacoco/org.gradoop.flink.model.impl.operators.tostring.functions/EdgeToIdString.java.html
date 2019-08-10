@@ -16,20 +16,20 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 
 /**
- * represents an edge by an id string
+ * A FlatMap to convert an edge to an id string.
+ *
+ * @param &lt;E&gt; edge type
  */
-<span class="fc" id="L27">public class EdgeToIdString extends ElementToDataString implements</span>
-  EdgeToString&lt;EPGMEdge&gt; {
+<span class="fc" id="L29">public class EdgeToIdString&lt;E extends Edge&gt; extends ElementToDataString&lt;E&gt; implements EdgeToString&lt;E&gt; {</span>
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector&lt;EdgeString&gt; collector)
-      throws Exception {
+  public void flatMap(E edge, Collector&lt;EdgeString&gt; collector) throws Exception {
 
 <span class="fc" id="L34">    GradoopId sourceId = edge.getSourceId();</span>
 <span class="fc" id="L35">    GradoopId targetId = edge.getTargetId();</span>
@@ -38,7 +38,6 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 <span class="fc bfc" id="L38" title="All 2 branches covered.">    for (GradoopId graphId : edge.getGraphIds()) {</span>
 <span class="fc" id="L39">      collector.collect(new EdgeString(graphId, sourceId, targetId, edgeLabel));</span>
 <span class="fc" id="L40">    }</span>
-
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L41">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

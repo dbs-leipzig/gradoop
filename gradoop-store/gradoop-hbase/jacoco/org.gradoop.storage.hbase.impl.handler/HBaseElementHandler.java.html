@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HBaseElementHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.hbase.impl.handler</a> &gt; <span class="el_source">HBaseElementHandler.java</span></div><h1>HBaseElementHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.hbase.impl.handler;
+
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
+import org.gradoop.storage.hbase.impl.constants.HBaseConstants;
+import org.gradoop.storage.hbase.impl.api.ElementHandler;
+import org.gradoop.storage.hbase.utils.RowKeyDistributor;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Handler is used to write label and properties into HBase tables. This is
+ * used by graphs and vertices.
+ */
+<span class="fc" id="L40">public abstract class HBaseElementHandler implements ElementHandler {</span>
+  /**
+   * Byte representation of the meta column family.
+   */
+<span class="fc" id="L44">  static final byte[] CF_META_BYTES = Bytes.toBytes(HBaseConstants.CF_META);</span>
+
+  /**
+   * Byte representation of the label column identifier.
+   */
+<span class="fc" id="L49">  private static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);</span>
+
+  /**
+   * Byte representation of the property type column family.
+   */
+<span class="fc" id="L54">  private static final byte[] CF_PROPERTY_TYPE_BYTES =</span>
+<span class="fc" id="L55">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_TYPE);</span>
+
+  /**
+   * Byte representation of the property value column family.
+   */
+<span class="fc" id="L60">  private static final byte[] CF_PROPERTY_VALUE_BYTES =</span>
+<span class="fc" id="L61">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_VALUE);</span>
+
+  /**
+   * Flag to identify if a pre-splitting of HBase regions should be used
+   */
+  private boolean usePreSplitRegions;
+
+  /**
+   * Flag to identify if a spreading byte should be used as prefix of each row key
+   */
+  private boolean useSpreadingByte;
+
+  /**
+   * {@inheritDoc}
+   * Used for writing the rowKey to HBase.
+   */
+  @Override
+  public byte[] getRowKey(@Nonnull final GradoopId elementId) {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    return useSpreadingByte ?</span>
+<span class="fc" id="L80">      RowKeyDistributor.getInstance().getDistributedKey(elementId.toByteArray()) :</span>
+<span class="fc" id="L81">      elementId.toByteArray();</span>
+  }
+
+  @Override
+  public GradoopId readId(@Nonnull final Result res) {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    if (useSpreadingByte) {</span>
+<span class="fc" id="L87">      return GradoopId.fromByteArray(RowKeyDistributor.getInstance().getOriginalKey(res.getRow()));</span>
+    } else {
+<span class="fc" id="L89">      return GradoopId.fromByteArray(res.getRow());</span>
+    }
+  }
+
+  @Override
+  public Put writeLabel(final Put put, final Element entity) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    return (entity.getLabel() == null) ? put :</span>
+<span class="fc" id="L96">      put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));</span>
+  }
+
+  @Override
+  public Put writeProperty(final Put put, Property property) {
+<span class="fc" id="L101">    byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());</span>
+<span class="fc" id="L102">    byte[] bytesWithoutType = PropertyValueUtils.Bytes.getRawBytesWithoutType(property.getValue());</span>
+<span class="fc" id="L103">    put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);</span>
+<span class="fc" id="L104">    put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);</span>
+<span class="fc" id="L105">    return put;</span>
+  }
+
+  @Override
+  public Put writeProperties(final Put put, final Element entity) {
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">    if (entity.getProperties() != null &amp;&amp; entity.getPropertyCount() &gt; 0) {</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">      for (Property property : entity.getProperties()) {</span>
+<span class="fc" id="L112">        writeProperty(put, property);</span>
+<span class="fc" id="L113">      }</span>
+    }
+<span class="fc" id="L115">    return put;</span>
+  }
+
+  @Override
+  public String readLabel(final Result res) {
+<span class="fc" id="L120">    return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));</span>
+  }
+
+  @Override
+  public Properties readProperties(final Result res) {
+<span class="fc" id="L125">    Properties properties = Properties.create();</span>
+
+    // Get Map&lt;Qualifier, Value&gt; which is Map&lt;PropertyKey, TypeByte&gt;
+<span class="fc" id="L128">    Map&lt;byte[], byte[]&gt; typeFamilyMap = res.getFamilyMap(CF_PROPERTY_TYPE_BYTES);</span>
+    // Get Map&lt;Qualifier, Value&gt; which is Map&lt;PropertyKey, ValueBytesWithoutType&gt;
+<span class="fc" id="L130">    Map&lt;byte[], byte[]&gt; valueFamilyMap = res.getFamilyMap(CF_PROPERTY_VALUE_BYTES);</span>
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (Map.Entry&lt;byte[], byte[]&gt; propertyColumn : typeFamilyMap.entrySet()) {</span>
+<span class="fc" id="L133">      properties.set(</span>
+<span class="fc" id="L134">        Bytes.toString(propertyColumn.getKey()),</span>
+<span class="fc" id="L135">        PropertyValueUtils.Bytes.createFromTypeValueBytes(</span>
+<span class="fc" id="L136">          propertyColumn.getValue(),</span>
+<span class="fc" id="L137">          valueFamilyMap.get(propertyColumn.getKey())));</span>
+<span class="fc" id="L138">    }</span>
+
+<span class="fc" id="L140">    return properties;</span>
+  }
+
+  @Override
+  public boolean isPreSplitRegions() {
+<span class="fc" id="L145">    return this.usePreSplitRegions;</span>
+  }
+
+  @Override
+  public void setPreSplitRegions(boolean usePreSplitRegions) {
+<span class="fc" id="L150">    this.usePreSplitRegions = usePreSplitRegions;</span>
+<span class="fc" id="L151">  }</span>
+
+  @Override
+  public boolean isSpreadingByteUsed() {
+<span class="fc" id="L155">    return this.useSpreadingByte;</span>
+  }
+
+  @Override
+  public void setSpreadingByteUsage(boolean useSpreadingByte) {
+<span class="fc" id="L160">    this.useSpreadingByte = useSpreadingByte;</span>
+<span class="fc" id="L161">  }</span>
+
+  @Override
+  public List&lt;byte[]&gt; getPossibleRowKeys(@Nonnull final GradoopId elementId) {
+<span class="nc" id="L165">    List&lt;byte[]&gt; possibleKeys = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L166">    final byte[][] allDistributedKeys = RowKeyDistributor.getInstance()</span>
+<span class="nc" id="L167">      .getAllDistributedKeys(elementId.toByteArray());</span>
+
+<span class="nc" id="L169">    Collections.addAll(possibleKeys, allDistributedKeys);</span>
+<span class="nc" id="L170">    return possibleKeys;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

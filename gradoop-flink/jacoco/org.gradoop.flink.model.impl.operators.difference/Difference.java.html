@@ -17,38 +17,53 @@ package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.difference.functions.CreateTuple2WithLong;
 import org.gradoop.flink.model.impl.operators.difference.functions.IdOf0InTuple2;
 import org.gradoop.flink.model.impl.operators.difference.functions.RemoveCut;
 
 /**
- * Returns a collection with all logical graphs that are contained in the
+ * Returns a collection with all base graphs that are contained in the
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  *
  * @see DifferenceBroadcast
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L33">public class Difference extends SetOperatorBase {</span>
+<span class="fc" id="L43">public class Difference&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SetOperatorBase&lt;G, V, E, LG, GC&gt; {
 
   @Override
-  protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
-    // assign 1L to each logical graph in the first collection
-<span class="fc" id="L38">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; thisGraphs = firstCollection</span>
-<span class="fc" id="L39">      .getGraphHeads()</span>
-<span class="fc" id="L40">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(1L));</span>
-    // assign 2L to each logical graph in the second collection
-<span class="fc" id="L42">    DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; otherGraphs = secondCollection</span>
-<span class="fc" id="L43">      .getGraphHeads()</span>
-<span class="fc" id="L44">      .map(new CreateTuple2WithLong&lt;EPGMGraphHead&gt;(2L));</span>
+  protected DataSet&lt;G&gt; computeNewGraphHeads() {
+    // assign 1L to each graph in the first collection
+<span class="fc" id="L53">    DataSet&lt;Tuple2&lt;G, Long&gt;&gt; thisGraphs = firstCollection</span>
+<span class="fc" id="L54">      .getGraphHeads()</span>
+<span class="fc" id="L55">      .map(new CreateTuple2WithLong&lt;&gt;(1L));</span>
+    // assign 2L to each graph in the second collection
+<span class="fc" id="L57">    DataSet&lt;Tuple2&lt;G, Long&gt;&gt; otherGraphs = secondCollection</span>
+<span class="fc" id="L58">      .getGraphHeads()</span>
+<span class="fc" id="L59">      .map(new CreateTuple2WithLong&lt;&gt;(2L));</span>
 
-    // union the logical graphs, group them by their identifier and check that
+    // union the graphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
-<span class="fc" id="L48">    return thisGraphs</span>
-<span class="fc" id="L49">      .union(otherGraphs)</span>
-<span class="fc" id="L50">      .groupBy(new IdOf0InTuple2&lt;EPGMGraphHead, Long&gt;())</span>
-<span class="fc" id="L51">      .reduceGroup(new RemoveCut&lt;EPGMGraphHead&gt;());</span>
+<span class="fc" id="L63">    return thisGraphs</span>
+<span class="fc" id="L64">      .union(otherGraphs)</span>
+<span class="fc" id="L65">      .groupBy(new IdOf0InTuple2&lt;&gt;())</span>
+<span class="fc" id="L66">      .reduceGroup(new RemoveCut&lt;&gt;());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

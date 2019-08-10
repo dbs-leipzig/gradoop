@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
    * @param type    element type
    * @return property value string
    */
-  String getPropertyString(E element, String type) {
+  protected String getPropertyString(E element, String type) {
 <span class="fc" id="L65">    return metaData.getPropertyMetaData(type, element.getLabel()).stream()</span>
 <span class="fc" id="L66">      .map(propertyMetaData -&gt; this.getPropertyValueString(propertyMetaData, element))</span>
 <span class="fc" id="L67">      .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));</span>
@@ -109,7 +109,7 @@ import java.util.stream.Collectors;
    * @param collection collection
    * @return CSV string
    */
-  String collectionToCsvString(Collection&lt;?&gt; collection) {
+  protected String collectionToCsvString(Collection&lt;?&gt; collection) {
 <span class="fc" id="L113">    return collection.stream()</span>
 <span class="fc bfc" id="L114" title="All 2 branches covered.">      .map(o -&gt; o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())</span>
 <span class="fc" id="L115">      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, &quot;[&quot;, &quot;]&quot;));</span>

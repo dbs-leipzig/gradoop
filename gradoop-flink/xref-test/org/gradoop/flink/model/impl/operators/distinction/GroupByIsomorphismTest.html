@@ -45,7 +45,7 @@
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>      String propertyKey = <span class="jxr_string">"count"</span>;
 <a name="37" href="#37">37</a>  
-<a name="38" href="#38">38</a>      GraphHeadReduceFunction countFunc = <strong class="jxr_keyword">new</strong> CountGraphHeads(propertyKey);
+<a name="38" href="#38">38</a>      GraphHeadReduceFunction&lt;EPGMGraphHead&gt; countFunc = <strong class="jxr_keyword">new</strong> CountGraphHeads&lt;&gt;(propertyKey);
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>      collection = collection.groupByIsomorphism(countFunc);
 <a name="41" href="#41">41</a>  

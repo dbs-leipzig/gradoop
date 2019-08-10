@@ -84,7 +84,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-<span class="fc" id="L87">    return getGraphCollection().reduce(new ReduceCombination());</span>
+<span class="fc" id="L87">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
   }
 
   @Override

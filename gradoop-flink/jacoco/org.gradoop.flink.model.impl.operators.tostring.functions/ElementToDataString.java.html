@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.Properties;
 
@@ -27,9 +27,10 @@ import java.util.List;
 /**
  * superclass of data-bases string representations of EPGM elements, i.e.,
  * such including label and properties
- * @param &lt;EL&gt; EPGM element type
+ *
+ * @param &lt;EL&gt; element type
  */
-<span class="fc" id="L32">public abstract class ElementToDataString&lt;EL extends EPGMElement&gt; {</span>
+<span class="fc" id="L33">public abstract class ElementToDataString&lt;EL extends Element&gt; {</span>
 
   /**
    * generalization of label and properties string concatenation
@@ -38,31 +39,31 @@ import java.util.List;
    */
   protected String label(EL el) {
 
-<span class="fc" id="L41">    String label = el.getLabel();</span>
+<span class="fc" id="L42">    String label = el.getLabel();</span>
 
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">    if (label == null) {</span>
-<span class="nc" id="L44">      label = &quot;&quot;;</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">    if (label == null) {</span>
+<span class="nc" id="L45">      label = &quot;&quot;;</span>
     }
 
-<span class="fc" id="L47">    label += &quot;{&quot;;</span>
+<span class="fc" id="L48">    label += &quot;{&quot;;</span>
 
-<span class="fc" id="L49">    Properties properties = el.getProperties();</span>
+<span class="fc" id="L50">    Properties properties = el.getProperties();</span>
 
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    if (properties != null) {</span>
-<span class="fc" id="L52">      List&lt;String&gt; propertyLabels = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (properties != null) {</span>
+<span class="fc" id="L53">      List&lt;String&gt; propertyLabels = new ArrayList&lt;&gt;();</span>
 
-<span class="fc bfc" id="L54" title="All 2 branches covered.">      for (Property property : el.getProperties()) {</span>
-<span class="fc" id="L55">        propertyLabels.add(property.toString());</span>
-<span class="fc" id="L56">      }</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">      for (Property property : el.getProperties()) {</span>
+<span class="fc" id="L56">        propertyLabels.add(property.toString());</span>
+<span class="fc" id="L57">      }</span>
 
-<span class="fc" id="L58">      Collections.sort(propertyLabels);</span>
+<span class="fc" id="L59">      Collections.sort(propertyLabels);</span>
 
-<span class="fc" id="L60">      label += StringUtils.join(propertyLabels, &quot;,&quot;);</span>
+<span class="fc" id="L61">      label += StringUtils.join(propertyLabels, &quot;,&quot;);</span>
     }
 
-<span class="fc" id="L63">    label += &quot;}&quot;;</span>
+<span class="fc" id="L64">    label += &quot;}&quot;;</span>
 
-<span class="fc" id="L65">    return label;</span>
+<span class="fc" id="L66">    return label;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

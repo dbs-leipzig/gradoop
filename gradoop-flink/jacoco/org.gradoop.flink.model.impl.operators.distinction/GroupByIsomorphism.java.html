@@ -16,8 +16,11 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.distinction.functions.GraphHeadGroup;
@@ -29,51 +32,62 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * Returns a distinct collection of logical graphs.
- * Graphs are compared by isomorphism testing.
+ * Returns a distinct collection of base graphs. Graphs are compared by isomorphism testing.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class GroupByIsomorphism extends SelectionBase {
+public class GroupByIsomorphism&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SelectionBase&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Distinction function.
    */
-  private final GraphHeadReduceFunction function;
+  private final GraphHeadReduceFunction&lt;G&gt; function;
 
   /**
    * Constructor.
    *
    * @param function reduce function to merge multiple heads of isomorphic graphs
    */
-<span class="fc" id="L47">  public GroupByIsomorphism(GraphHeadReduceFunction function) {</span>
-<span class="fc" id="L48">    this.function = function;</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L60">  public GroupByIsomorphism(GraphHeadReduceFunction&lt;G&gt; function) {</span>
+<span class="fc" id="L61">    this.function = function;</span>
+<span class="fc" id="L62">  }</span>
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-<span class="fc" id="L53">    DataSet&lt;EPGMGraphHead&gt; graphHeads = getCanonicalLabels(collection)</span>
-<span class="fc" id="L54">      .join(collection.getGraphHeads())</span>
-<span class="fc" id="L55">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L56">      .with(new GraphHeadGroup())</span>
-<span class="fc" id="L57">      .groupBy(0)</span>
-<span class="fc" id="L58">      .reduceGroup(function);</span>
+  public GC execute(GC collection) {
+<span class="fc" id="L66">    DataSet&lt;G&gt; graphHeads = getCanonicalLabels(collection)</span>
+<span class="fc" id="L67">      .join(collection.getGraphHeads())</span>
+<span class="fc" id="L68">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L69">      .with(new GraphHeadGroup&lt;&gt;())</span>
+<span class="fc" id="L70">      .groupBy(0)</span>
+<span class="fc" id="L71">      .reduceGroup(function);</span>
 
-<span class="fc" id="L60">    return selectVerticesAndEdges(collection, graphHeads);</span>
+<span class="fc" id="L73">    return selectVerticesAndEdges(collection, graphHeads);</span>
   }
 
   /**
-   * Createas a canonical label for each graph in a collection.
+   * Creates a canonical label for each graph in a collection.
    *
    * @param collection input collection
-   * @return (graph id, label) pairs
+   * @return graph head label set
    */
-  protected DataSet&lt;GraphHeadString&gt; getCanonicalLabels(GraphCollection collection) {
+  DataSet&lt;GraphHeadString&gt; getCanonicalLabels(GC collection) {
     // Init builder for canonical labels
-<span class="fc" id="L71">    CanonicalAdjacencyMatrixBuilder camBuilder = new CanonicalAdjacencyMatrixBuilder(</span>
-      new GraphHeadToEmptyString(),  new VertexToDataString(), new EdgeToDataString(), true);
+<span class="fc" id="L84">    CanonicalAdjacencyMatrixBuilder&lt;G, V, E, LG, GC&gt; camBuilder =</span>
+      new CanonicalAdjacencyMatrixBuilder&lt;&gt;(
+      new GraphHeadToEmptyString&lt;&gt;(),  new VertexToDataString&lt;&gt;(), new EdgeToDataString&lt;&gt;(), true);
 
     // create canonical labels for all graph heads and choose representative for all distinct ones
-<span class="fc" id="L75">    return camBuilder</span>
-<span class="fc" id="L76">      .getGraphHeadStrings(collection);</span>
+<span class="fc" id="L89">    return camBuilder</span>
+<span class="fc" id="L90">      .getGraphHeadStrings(collection);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

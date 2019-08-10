@@ -39,35 +39,37 @@ import java.io.IOException;
 
   @Override
   public int compare(Object value, Object other) {
-<span class="pc bpc" id="L42" title="2 of 4 branches missed.">    if (value == null &amp;&amp; other == null) {</span>
+<span class="fc bfc" id="L42" title="All 4 branches covered.">    if (value == null &amp;&amp; other == null) {</span>
 <span class="fc" id="L43">      return 0;</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">    } else if (value == null) {</span>
+<span class="fc" id="L45">      return -1;</span>
     }
-<span class="nc" id="L45">    return -1;</span>
+<span class="fc" id="L47">    return 1;</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="nc" id="L50">    return false;</span>
+<span class="nc" id="L52">    return false;</span>
   }
 
   @Override
   public Class&lt;?&gt; getType() {
-<span class="nc" id="L55">    return null;</span>
+<span class="nc" id="L57">    return null;</span>
   }
 
   @Override
   public Object get(byte[] bytes) {
-<span class="fc" id="L60">    return null;</span>
+<span class="fc" id="L62">    return null;</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L65">    return Type.NULL.getTypeByte();</span>
+<span class="fc" id="L67">    return Type.NULL.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(Object value) {
-<span class="nc" id="L70">    return new byte[] {getRawType()};</span>
+<span class="nc" id="L72">    return new byte[] {getRawType()};</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

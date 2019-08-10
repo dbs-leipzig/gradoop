@@ -18,20 +18,21 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * (label, graphId) |&gt;&lt;| graphHead =&gt; (label, graphHead)
+ *
+ * @param &lt;G&gt; graph head type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;f1-&gt;f0&quot;)
-<span class="fc" id="L28">public class GraphHeadGroup</span>
-  implements JoinFunction&lt;GraphHeadString, EPGMGraphHead, Tuple2&lt;String, EPGMGraphHead&gt;&gt; {
+<span class="fc" id="L30">public class GraphHeadGroup&lt;G extends GraphHead&gt;</span>
+  implements JoinFunction&lt;GraphHeadString, G, Tuple2&lt;String, G&gt;&gt; {
 
   @Override
-  public Tuple2&lt;String, EPGMGraphHead&gt; join(GraphHeadString graphHeadString,
-    EPGMGraphHead graphHead) throws Exception {
-<span class="fc" id="L34">    return new Tuple2&lt;&gt;(graphHeadString.getLabel(), graphHead);</span>
+  public Tuple2&lt;String, G&gt; join(GraphHeadString graphHeadString, G graphHead) throws Exception {
+<span class="fc" id="L35">    return new Tuple2&lt;&gt;(graphHeadString.getLabel(), graphHead);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

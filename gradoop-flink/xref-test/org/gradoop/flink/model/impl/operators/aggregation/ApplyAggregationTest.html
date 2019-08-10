@@ -91,9 +91,9 @@
 <a name="81" href="#81">81</a>      MinProperty minProperty = <strong class="jxr_keyword">new</strong> MinProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 <a name="82" href="#82">82</a>  
 <a name="83" href="#83">83</a>      GraphCollection outputCollection = inputCollection
-<a name="84" href="#84">84</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minVertexProperty))
-<a name="85" href="#85">85</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minEdgeProperty))
-<a name="86" href="#86">86</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minProperty));
+<a name="84" href="#84">84</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(minVertexProperty))
+<a name="85" href="#85">85</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(minEdgeProperty))
+<a name="86" href="#86">86</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(minProperty));
 <a name="87" href="#87">87</a>  
 <a name="88" href="#88">88</a>      GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
 <a name="89" href="#89">89</a>      GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
@@ -161,9 +161,9 @@
 <a name="151" href="#151">151</a>     MaxProperty maxProperty = <strong class="jxr_keyword">new</strong> MaxProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 <a name="152" href="#152">152</a> 
 <a name="153" href="#153">153</a>     GraphCollection outputCollection = inputCollection
-<a name="154" href="#154">154</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxVertexProperty))
-<a name="155" href="#155">155</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty))
-<a name="156" href="#156">156</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxProperty));
+<a name="154" href="#154">154</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxVertexProperty))
+<a name="155" href="#155">155</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxEdgeProperty))
+<a name="156" href="#156">156</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxProperty));
 <a name="157" href="#157">157</a> 
 <a name="158" href="#158">158</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
 <a name="159" href="#159">159</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
@@ -231,9 +231,9 @@
 <a name="221" href="#221">221</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 <a name="222" href="#222">222</a> 
 <a name="223" href="#223">223</a>     GraphCollection outputCollection = inputCollection
-<a name="224" href="#224">224</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
-<a name="225" href="#225">225</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
-<a name="226" href="#226">226</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty));
+<a name="224" href="#224">224</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumVertexProperty))
+<a name="225" href="#225">225</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumEdgeProperty))
+<a name="226" href="#226">226</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumProperty));
 <a name="227" href="#227">227</a> 
 <a name="228" href="#228">228</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
 <a name="229" href="#229">229</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
@@ -301,9 +301,9 @@
 <a name="291" href="#291">291</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 <a name="292" href="#292">292</a> 
 <a name="293" href="#293">293</a>     GraphCollection outputCollection = inputCollection
-<a name="294" href="#294">294</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
-<a name="295" href="#295">295</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
-<a name="296" href="#296">296</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty));
+<a name="294" href="#294">294</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumVertexProperty))
+<a name="295" href="#295">295</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumEdgeProperty))
+<a name="296" href="#296">296</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumProperty));
 <a name="297" href="#297">297</a> 
 <a name="298" href="#298">298</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
 <a name="299" href="#299">299</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
@@ -355,9 +355,9 @@
 <a name="345" href="#345">345</a> 
 <a name="346" href="#346">346</a>     <strong class="jxr_keyword">try</strong> {
 <a name="347" href="#347">347</a>       collection
-<a name="348" href="#348">348</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY)))
-<a name="349" href="#349">349</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY)))
-<a name="350" href="#350">350</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY)))
+<a name="348" href="#348">348</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(<strong class="jxr_keyword">new</strong> SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY)))
+<a name="349" href="#349">349</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(<strong class="jxr_keyword">new</strong> SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY)))
+<a name="350" href="#350">350</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(<strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY)))
 <a name="351" href="#351">351</a>         .getGraphHeads().print();
 <a name="352" href="#352">352</a>     } <strong class="jxr_keyword">catch</strong> (Exception e) {
 <a name="353" href="#353">353</a>       assertTrue(
@@ -387,9 +387,9 @@
 <a name="377" href="#377">377</a>     Count count = <strong class="jxr_keyword">new</strong> Count();
 <a name="378" href="#378">378</a> 
 <a name="379" href="#379">379</a>     GraphCollection outputCollection = inputCollection
-<a name="380" href="#380">380</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
-<a name="381" href="#381">381</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
-<a name="382" href="#382">382</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count));
+<a name="380" href="#380">380</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(vertexCount))
+<a name="381" href="#381">381</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(edgeCount))
+<a name="382" href="#382">382</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(count));
 <a name="383" href="#383">383</a> 
 <a name="384" href="#384">384</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
 <a name="385" href="#385">385</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
@@ -441,9 +441,9 @@
 <a name="431" href="#431">431</a>     HasLabel hasKnowsElement = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"knows"</span>);
 <a name="432" href="#432">432</a> 
 <a name="433" href="#433">433</a>     collection = collection
-<a name="434" href="#434">434</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasKnows))
-<a name="435" href="#435">435</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasKnowsElement))
-<a name="436" href="#436">436</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasPerson));
+<a name="434" href="#434">434</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasKnows))
+<a name="435" href="#435">435</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasKnowsElement))
+<a name="436" href="#436">436</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasPerson));
 <a name="437" href="#437">437</a> 
 <a name="438" href="#438">438</a>     List&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads().collect();
 <a name="439" href="#439">439</a> 
@@ -481,9 +481,9 @@
 <a name="471" href="#471">471</a>     HasLabel hasThirdLabel = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"thirdLabel"</span>);
 <a name="472" href="#472">472</a> 
 <a name="473" href="#473">473</a>     collection = collection
-<a name="474" href="#474">474</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasSomeLabel))
-<a name="475" href="#475">475</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasOtherLabel))
-<a name="476" href="#476">476</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasThirdLabel));
+<a name="474" href="#474">474</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasSomeLabel))
+<a name="475" href="#475">475</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasOtherLabel))
+<a name="476" href="#476">476</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(hasThirdLabel));
 <a name="477" href="#477">477</a> 
 <a name="478" href="#478">478</a>     List&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads().collect();
 <a name="479" href="#479">479</a> 
@@ -519,9 +519,9 @@
 <a name="509" href="#509">509</a>     SumVertexProperty sumVertexProperty = <strong class="jxr_keyword">new</strong> SumVertexProperty(<span class="jxr_string">"age"</span>);
 <a name="510" href="#510">510</a>     MaxVertexProperty maxVertexProperty = <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"age"</span>);
 <a name="511" href="#511">511</a> 
-<a name="512" href="#512">512</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
-<a name="513" href="#513">513</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxVertexProperty));
-<a name="514" href="#514">514</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty,
+<a name="512" href="#512">512</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumVertexProperty))
+<a name="513" href="#513">513</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxVertexProperty));
+<a name="514" href="#514">514</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumVertexProperty,
 <a name="515" href="#515">515</a>       maxVertexProperty));
 <a name="516" href="#516">516</a> 
 <a name="517" href="#517">517</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -540,9 +540,9 @@
 <a name="530" href="#530">530</a>     SumEdgeProperty sumEdgeProperty = <strong class="jxr_keyword">new</strong> SumEdgeProperty(<span class="jxr_string">"since"</span>);
 <a name="531" href="#531">531</a>     MaxEdgeProperty maxEdgeProperty = <strong class="jxr_keyword">new</strong> MaxEdgeProperty(<span class="jxr_string">"since"</span>);
 <a name="532" href="#532">532</a> 
-<a name="533" href="#533">533</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
-<a name="534" href="#534">534</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty));
-<a name="535" href="#535">535</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty,
+<a name="533" href="#533">533</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumEdgeProperty))
+<a name="534" href="#534">534</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxEdgeProperty));
+<a name="535" href="#535">535</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumEdgeProperty,
 <a name="536" href="#536">536</a>       maxEdgeProperty));
 <a name="537" href="#537">537</a> 
 <a name="538" href="#538">538</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -561,9 +561,9 @@
 <a name="551" href="#551">551</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"since"</span>);
 <a name="552" href="#552">552</a>     MaxProperty maxProperty = <strong class="jxr_keyword">new</strong> MaxProperty(<span class="jxr_string">"since"</span>);
 <a name="553" href="#553">553</a> 
-<a name="554" href="#554">554</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty))
-<a name="555" href="#555">555</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxProperty));
-<a name="556" href="#556">556</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty, maxProperty));
+<a name="554" href="#554">554</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumProperty))
+<a name="555" href="#555">555</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxProperty));
+<a name="556" href="#556">556</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(sumProperty, maxProperty));
 <a name="557" href="#557">557</a> 
 <a name="558" href="#558">558</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
 <a name="559" href="#559">559</a>   }
@@ -584,11 +584,11 @@
 <a name="574" href="#574">574</a>     MaxEdgeProperty maxEdgeProperty = <strong class="jxr_keyword">new</strong> MaxEdgeProperty(<span class="jxr_string">"since"</span>);
 <a name="575" href="#575">575</a> 
 <a name="576" href="#576">576</a>     GraphCollection expected = collection
-<a name="577" href="#577">577</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
-<a name="578" href="#578">578</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
-<a name="579" href="#579">579</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count))
-<a name="580" href="#580">580</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty));
-<a name="581" href="#581">581</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount, edgeCount, count,
+<a name="577" href="#577">577</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(vertexCount))
+<a name="578" href="#578">578</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(edgeCount))
+<a name="579" href="#579">579</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(count))
+<a name="580" href="#580">580</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(maxEdgeProperty));
+<a name="581" href="#581">581</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(vertexCount, edgeCount, count,
 <a name="582" href="#582">582</a>       maxEdgeProperty));
 <a name="583" href="#583">583</a> 
 <a name="584" href="#584">584</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -610,10 +610,10 @@
 <a name="600" href="#600">600</a>     Count count = <strong class="jxr_keyword">new</strong> Count();
 <a name="601" href="#601">601</a> 
 <a name="602" href="#602">602</a>     GraphCollection expected = collection
-<a name="603" href="#603">603</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
-<a name="604" href="#604">604</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
-<a name="605" href="#605">605</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count));
-<a name="606" href="#606">606</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount, edgeCount, count));
+<a name="603" href="#603">603</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(vertexCount))
+<a name="604" href="#604">604</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(edgeCount))
+<a name="605" href="#605">605</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(count));
+<a name="606" href="#606">606</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation&lt;&gt;(vertexCount, edgeCount, count));
 <a name="607" href="#607">607</a> 
 <a name="608" href="#608">608</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
 <a name="609" href="#609">609</a>   }

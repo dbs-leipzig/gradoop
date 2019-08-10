@@ -28,10 +28,10 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Property;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.metadata.MetaDataSource;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -44,10 +44,10 @@
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * (element) -&gt; (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM element type</em>
+<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; element type</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="39" href="#39">39</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"label-&gt;f1"</span>)
-<a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ElementToPropertyMetaData&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt;
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ElementToPropertyMetaData&lt;E <strong class="jxr_keyword">extends</strong> Element&gt;
 <a name="41" href="#41">41</a>    implements MapFunction&lt;E, Tuple3&lt;String, String, Set&lt;String&gt;&gt;&gt; {
 <a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * Reduce object instantiations.</em>
@@ -63,27 +63,25 @@
 <a name="53" href="#53">53</a>  
 <a name="54" href="#54">54</a>    @Override
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> Tuple3&lt;String, String, Set&lt;String&gt;&gt; map(E e) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="56" href="#56">56</a>      Class&lt;? <strong class="jxr_keyword">extends</strong> EPGMElement&gt; type = e.getClass();
-<a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      <strong class="jxr_keyword">if</strong> (type == EPGMEdge.<strong class="jxr_keyword">class</strong>) {
-<a name="59" href="#59">59</a>        reuseTuple.f0 = MetaDataSource.EDGE_TYPE;
-<a name="60" href="#60">60</a>      } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (type == EPGMVertex.<strong class="jxr_keyword">class</strong>) {
-<a name="61" href="#61">61</a>        reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;
-<a name="62" href="#62">62</a>      } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (type == EPGMGraphHead.<strong class="jxr_keyword">class</strong>) {
-<a name="63" href="#63">63</a>        reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;
-<a name="64" href="#64">64</a>      } <strong class="jxr_keyword">else</strong> {
-<a name="65" href="#65">65</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> Exception(<span class="jxr_string">"Unsupported element class"</span>);
-<a name="66" href="#66">66</a>      }
-<a name="67" href="#67">67</a>      reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);
-<a name="68" href="#68">68</a>      reuseTuple.f2.clear();
-<a name="69" href="#69">69</a>      <strong class="jxr_keyword">if</strong> (e.getProperties() != <strong class="jxr_keyword">null</strong>) {
-<a name="70" href="#70">70</a>        <strong class="jxr_keyword">for</strong> (Property property : e.getProperties()) {
-<a name="71" href="#71">71</a>          reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));
-<a name="72" href="#72">72</a>        }
-<a name="73" href="#73">73</a>      }
-<a name="74" href="#74">74</a>      <strong class="jxr_keyword">return</strong> reuseTuple;
-<a name="75" href="#75">75</a>    }
-<a name="76" href="#76">76</a>  }
+<a name="56" href="#56">56</a>      <strong class="jxr_keyword">if</strong> (e instanceof Edge) {
+<a name="57" href="#57">57</a>        reuseTuple.f0 = MetaDataSource.EDGE_TYPE;
+<a name="58" href="#58">58</a>      } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (e instanceof Vertex) {
+<a name="59" href="#59">59</a>        reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;
+<a name="60" href="#60">60</a>      } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (e instanceof GraphHead) {
+<a name="61" href="#61">61</a>        reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;
+<a name="62" href="#62">62</a>      } <strong class="jxr_keyword">else</strong> {
+<a name="63" href="#63">63</a>        <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> Exception(<span class="jxr_string">"Unsupported element class: "</span> + e.getClass().getName());
+<a name="64" href="#64">64</a>      }
+<a name="65" href="#65">65</a>      reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);
+<a name="66" href="#66">66</a>      reuseTuple.f2.clear();
+<a name="67" href="#67">67</a>      <strong class="jxr_keyword">if</strong> (e.getProperties() != <strong class="jxr_keyword">null</strong>) {
+<a name="68" href="#68">68</a>        <strong class="jxr_keyword">for</strong> (Property property : e.getProperties()) {
+<a name="69" href="#69">69</a>          reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));
+<a name="70" href="#70">70</a>        }
+<a name="71" href="#71">71</a>      }
+<a name="72" href="#72">72</a>      <strong class="jxr_keyword">return</strong> reuseTuple;
+<a name="73" href="#73">73</a>    }
+<a name="74" href="#74">74</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

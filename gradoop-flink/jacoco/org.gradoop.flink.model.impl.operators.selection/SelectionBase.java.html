@@ -16,12 +16,13 @@
 package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
@@ -29,11 +30,23 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadca
 /**
  * Superclass of selection and distinct operators.
  * Contains logic of vertex and edge selection and updating.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L33">public abstract class SelectionBase implements UnaryCollectionToCollectionOperator {</span>
+<span class="fc" id="L40">public abstract class SelectionBase&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; {
 
   @Override
-  public abstract GraphCollection execute(GraphCollection collection);
+  public abstract GC execute(GC collection);
 
   /**
    * Selects vertices and edges for a selected subset of graph heads / graph ids.
@@ -44,23 +57,21 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadca
    *
    * @return selection result
    */
-  protected GraphCollection selectVerticesAndEdges(
-    GraphCollection collection, DataSet&lt;EPGMGraphHead&gt; graphHeads) {
+  protected GC selectVerticesAndEdges(GC collection, DataSet&lt;G&gt; graphHeads) {
 
-    // get the identifiers of these logical graphs
-<span class="fc" id="L51">    DataSet&lt;GradoopId&gt; graphIds = graphHeads.map(new Id&lt;EPGMGraphHead&gt;());</span>
+    // get the identifiers of these base graphs
+<span class="fc" id="L63">    DataSet&lt;GradoopId&gt; graphIds = graphHeads.map(new Id&lt;&gt;());</span>
 
     // use graph ids to filter vertices from the actual graph structure
-<span class="fc" id="L54">    DataSet&lt;EPGMVertex&gt; vertices = collection.getVertices()</span>
-<span class="fc" id="L55">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
-<span class="fc" id="L56">      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
+<span class="fc" id="L66">    DataSet&lt;V&gt; vertices = collection.getVertices()</span>
+<span class="fc" id="L67">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
+<span class="fc" id="L68">      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L58">    DataSet&lt;EPGMEdge&gt; edges = collection.getEdges()</span>
-<span class="fc" id="L59">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
-<span class="fc" id="L60">      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
+<span class="fc" id="L70">    DataSet&lt;E&gt; edges = collection.getEdges()</span>
+<span class="fc" id="L71">      .filter(new InAnyGraphBroadcast&lt;&gt;())</span>
+<span class="fc" id="L72">      .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L62">    return collection.getFactory()</span>
-<span class="fc" id="L63">      .fromDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L74">    return collection.getFactory().fromDataSets(graphHeads, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

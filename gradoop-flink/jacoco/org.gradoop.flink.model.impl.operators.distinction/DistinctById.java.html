@@ -15,22 +15,38 @@
  */
 package org.gradoop.flink.model.impl.operators.distinction;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * Returns a distinct collection of logical graphs. Graph heads are compared
+ * Returns a distinct collection of base graphs. Graph heads are compared
  * based on their identifier.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the base graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-<span class="fc" id="L26">public class DistinctById implements UnaryCollectionToCollectionOperator {</span>
+<span class="fc" id="L36">public class DistinctById&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; {
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-<span class="fc" id="L30">    return collection.getFactory().fromDataSets(</span>
-<span class="fc" id="L31">      collection.getGraphHeads().distinct(new Id&lt;&gt;()),</span>
-<span class="fc" id="L32">      collection.getVertices(),</span>
-<span class="fc" id="L33">      collection.getEdges());</span>
+  public GC execute(GC collection) {
+<span class="fc" id="L46">    return collection.getFactory().fromDataSets(</span>
+<span class="fc" id="L47">      collection.getGraphHeads().distinct(new Id&lt;&gt;()),</span>
+<span class="fc" id="L48">      collection.getVertices(),</span>
+<span class="fc" id="L49">      collection.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -516,7 +516,7 @@
 <a name="506" href="#506">506</a>   @Test
 <a name="507" href="#507">507</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCompareTo() {
 <a name="508" href="#508">508</a>     <em class="jxr_comment">// null</em>
-<a name="509" href="#509">509</a>     assertEquals(create(<strong class="jxr_keyword">null</strong>).compareTo(create(<strong class="jxr_keyword">null</strong>)), 0);
+<a name="509" href="#509">509</a>     validateCompareTo(create(<strong class="jxr_keyword">null</strong>), create(<strong class="jxr_keyword">null</strong>), create(12));
 <a name="510" href="#510">510</a>     <em class="jxr_comment">// boolean</em>
 <a name="511" href="#511">511</a>     validateCompareTo(create(false), create(false), create(<strong class="jxr_keyword">true</strong>));
 <a name="512" href="#512">512</a>     <em class="jxr_comment">// short</em>

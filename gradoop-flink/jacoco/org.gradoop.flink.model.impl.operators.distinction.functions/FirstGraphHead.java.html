@@ -17,18 +17,19 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
+ *
+ * @param &lt;G&gt; graph head type
  */
-<span class="fc" id="L26">public class FirstGraphHead implements GraphHeadReduceFunction {</span>
+<span class="fc" id="L28">public class FirstGraphHead&lt;G extends GraphHead&gt; implements GraphHeadReduceFunction&lt;G&gt; {</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
-    Collector&lt;EPGMGraphHead&gt; collector) throws Exception {
-<span class="nc" id="L31">    collector.collect(iterable.iterator().next().f1);</span>
-<span class="nc" id="L32">  }</span>
+  public void reduce(Iterable&lt;Tuple2&lt;String, G&gt;&gt; iterable, Collector&lt;G&gt; collector) throws Exception {
+<span class="nc" id="L32">    collector.collect(iterable.iterator().next().f1);</span>
+<span class="nc" id="L33">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

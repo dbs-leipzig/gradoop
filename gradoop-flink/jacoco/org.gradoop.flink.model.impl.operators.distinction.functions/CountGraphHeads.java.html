@@ -17,15 +17,17 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 import java.util.Iterator;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
+ *
+ * @param &lt;G&gt; graph head type
  */
-public class CountGraphHeads implements GraphHeadReduceFunction {
+public class CountGraphHeads&lt;G extends GraphHead&gt; implements GraphHeadReduceFunction&lt;G&gt; {
 
   /**
    * property key to store graph count.
@@ -37,26 +39,26 @@ public class CountGraphHeads implements GraphHeadReduceFunction {
    *
    * @param propertyKey property key to store graph count.
    */
-<span class="fc" id="L40">  public CountGraphHeads(String propertyKey) {</span>
-<span class="fc" id="L41">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L42">  public CountGraphHeads(String propertyKey) {</span>
+<span class="fc" id="L43">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L44">  }</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
-    Collector&lt;EPGMGraphHead&gt; collector) throws Exception {
-<span class="fc" id="L47">    Iterator&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterator = iterable.iterator();</span>
+  public void reduce(Iterable&lt;Tuple2&lt;String, G&gt;&gt; iterable,
+    Collector&lt;G&gt; collector) throws Exception {
+<span class="fc" id="L49">    Iterator&lt;Tuple2&lt;String, G&gt;&gt; iterator = iterable.iterator();</span>
 
-<span class="fc" id="L49">    EPGMGraphHead graphHead = iterator.next().f1;</span>
-<span class="fc" id="L50">    int count = 1;</span>
+<span class="fc" id="L51">    G graphHead = iterator.next().f1;</span>
+<span class="fc" id="L52">    int count = 1;</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L53">      iterator.next();</span>
-<span class="fc" id="L54">      count++;</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L55">      iterator.next();</span>
+<span class="fc" id="L56">      count++;</span>
     }
 
-<span class="fc" id="L57">    graphHead.setProperty(propertyKey, count);</span>
+<span class="fc" id="L59">    graphHead.setProperty(propertyKey, count);</span>
 
-<span class="fc" id="L59">    collector.collect(graphHead);</span>
-<span class="fc" id="L60">  }</span>
+<span class="fc" id="L61">    collector.collect(graphHead);</span>
+<span class="fc" id="L62">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

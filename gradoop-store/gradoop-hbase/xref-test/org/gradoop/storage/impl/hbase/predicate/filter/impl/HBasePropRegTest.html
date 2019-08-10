@@ -32,55 +32,56 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
-<a name="26" href="#26">26</a>  
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> java.util.regex.Pattern;
-<a name="28" href="#28">28</a>  
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.Assert.assertEquals;
-<a name="32" href="#32">32</a>  
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * Test class for {@link HBasePropReg}</em>
-<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="36" href="#36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropRegTest.html">HBasePropRegTest</a> {
-<a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Test the toHBaseFilter function</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="40" href="#40">40</a>    @Test
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testToHBaseFilter() {
-<a name="42" href="#42">42</a>      String key = <span class="jxr_string">"key"</span>;
-<a name="43" href="#43">43</a>      Pattern pattern = Pattern.compile(<span class="jxr_string">"^FooBar.*$"</span>);
-<a name="44" href="#44">44</a>  
-<a name="45" href="#45">45</a>      HBasePropReg&lt;EPGMVertex&gt; vertexFilter = <strong class="jxr_keyword">new</strong> HBasePropReg&lt;&gt;(key, pattern);
-<a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>      FilterList expectedFilter = <strong class="jxr_keyword">new</strong> FilterList(FilterList.Operator.MUST_PASS_ALL);
-<a name="48" href="#48">48</a>  
-<a name="49" href="#49">49</a>      SingleColumnValueFilter valueFilter = <strong class="jxr_keyword">new</strong> SingleColumnValueFilter(
-<a name="50" href="#50">50</a>        Bytes.toBytesBinary(CF_PROPERTY_VALUE),
-<a name="51" href="#51">51</a>        Bytes.toBytesBinary(key),
-<a name="52" href="#52">52</a>        CompareFilter.CompareOp.EQUAL,
-<a name="53" href="#53">53</a>        <strong class="jxr_keyword">new</strong> RegexStringComparator(pattern.pattern()));
-<a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
-<a name="56" href="#56">56</a>      valueFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
-<a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      SingleColumnValueFilter typeFilter = <strong class="jxr_keyword">new</strong> SingleColumnValueFilter(
-<a name="59" href="#59">59</a>        Bytes.toBytesBinary(CF_PROPERTY_TYPE),
-<a name="60" href="#60">60</a>        Bytes.toBytesBinary(key),
-<a name="61" href="#61">61</a>        CompareFilter.CompareOp.EQUAL,
-<a name="62" href="#62">62</a>        <strong class="jxr_keyword">new</strong> byte[] {Type.STRING.getTypeByte()});
-<a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
-<a name="65" href="#65">65</a>      typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
-<a name="66" href="#66">66</a>  
-<a name="67" href="#67">67</a>      expectedFilter.addFilter(typeFilter);
-<a name="68" href="#68">68</a>      expectedFilter.addFilter(valueFilter);
-<a name="69" href="#69">69</a>  
-<a name="70" href="#70">70</a>      assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
-<a name="71" href="#71">71</a>        <span class="jxr_string">"Failed during filter comparison for key ["</span> + key + <span class="jxr_string">"]."</span>);
-<a name="72" href="#72">72</a>    }
-<a name="73" href="#73">73</a>  }
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
+<a name="27" href="#27">27</a>  
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> java.util.regex.Pattern;
+<a name="29" href="#29">29</a>  
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_TYPE;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_VALUE;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.Assert.assertEquals;
+<a name="33" href="#33">33</a>  
+<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * Test class for {@link HBasePropReg}</em>
+<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropRegTest.html">HBasePropRegTest</a> {
+<a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * Test the toHBaseFilter function</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="41" href="#41">41</a>    @Test
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testToHBaseFilter() {
+<a name="43" href="#43">43</a>      String key = <span class="jxr_string">"key"</span>;
+<a name="44" href="#44">44</a>      Pattern pattern = Pattern.compile(<span class="jxr_string">"^FooBar.*$"</span>);
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>      HBasePropReg&lt;EPGMVertex&gt; vertexFilter = <strong class="jxr_keyword">new</strong> HBasePropReg&lt;&gt;(key, pattern);
+<a name="47" href="#47">47</a>  
+<a name="48" href="#48">48</a>      FilterList expectedFilter = <strong class="jxr_keyword">new</strong> FilterList(FilterList.Operator.MUST_PASS_ALL);
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>      SingleColumnValueFilter valueFilter = <strong class="jxr_keyword">new</strong> SingleColumnValueFilter(
+<a name="51" href="#51">51</a>        Bytes.toBytesBinary(CF_PROPERTY_VALUE),
+<a name="52" href="#52">52</a>        Bytes.toBytesBinary(key),
+<a name="53" href="#53">53</a>        CompareFilter.CompareOp.EQUAL,
+<a name="54" href="#54">54</a>        <strong class="jxr_keyword">new</strong> RegexStringComparator(pattern.pattern()));
+<a name="55" href="#55">55</a>  
+<a name="56" href="#56">56</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
+<a name="57" href="#57">57</a>      valueFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
+<a name="58" href="#58">58</a>  
+<a name="59" href="#59">59</a>      SingleColumnValueFilter typeFilter = <strong class="jxr_keyword">new</strong> SingleColumnValueFilter(
+<a name="60" href="#60">60</a>        Bytes.toBytesBinary(CF_PROPERTY_TYPE),
+<a name="61" href="#61">61</a>        Bytes.toBytesBinary(key),
+<a name="62" href="#62">62</a>        CompareFilter.CompareOp.EQUAL,
+<a name="63" href="#63">63</a>        <strong class="jxr_keyword">new</strong> byte[] {Type.STRING.getTypeByte()});
+<a name="64" href="#64">64</a>  
+<a name="65" href="#65">65</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
+<a name="66" href="#66">66</a>      typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
+<a name="67" href="#67">67</a>  
+<a name="68" href="#68">68</a>      expectedFilter.addFilter(typeFilter);
+<a name="69" href="#69">69</a>      expectedFilter.addFilter(valueFilter);
+<a name="70" href="#70">70</a>  
+<a name="71" href="#71">71</a>      assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
+<a name="72" href="#72">72</a>        <span class="jxr_string">"Failed during filter comparison for key ["</span> + key + <span class="jxr_string">"]."</span>);
+<a name="73" href="#73">73</a>    }
+<a name="74" href="#74">74</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

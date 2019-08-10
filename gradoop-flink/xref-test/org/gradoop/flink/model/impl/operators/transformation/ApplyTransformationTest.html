@@ -40,7 +40,7 @@
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    @Test(expected = IllegalArgumentException.<strong class="jxr_keyword">class</strong>)
 <a name="32" href="#32">32</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMissingFunctions() {
-<a name="33" href="#33">33</a>      <strong class="jxr_keyword">new</strong> ApplyTransformation(<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>);
+<a name="33" href="#33">33</a>      <strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>);
 <a name="34" href="#34">34</a>    }
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    @Test
@@ -62,7 +62,7 @@
 <a name="52" href="#52">52</a>        <strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(expectedEdgeIds));
 <a name="53" href="#53">53</a>  
 <a name="54" href="#54">54</a>      GraphCollection outputCollection = inputCollection
-<a name="55" href="#55">55</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation(
+<a name="55" href="#55">55</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(
 <a name="56" href="#56">56</a>          TransformationTest::transformGraphHead,
 <a name="57" href="#57">57</a>          TransformationTest::transformVertex,
 <a name="58" href="#58">58</a>          TransformationTest::transformEdge));
@@ -102,7 +102,7 @@
 <a name="92" href="#92">92</a>        .getGraphCollectionByVariables(<span class="jxr_string">"g01"</span>, <span class="jxr_string">"g11"</span>);
 <a name="93" href="#93">93</a>  
 <a name="94" href="#94">94</a>      GraphCollection outputCollection = inputCollection
-<a name="95" href="#95">95</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation(
+<a name="95" href="#95">95</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(
 <a name="96" href="#96">96</a>          TransformationTest::transformGraphHead,
 <a name="97" href="#97">97</a>          TransformationTest::transformVertex,
 <a name="98" href="#98">98</a>          TransformationTest::transformEdge));
@@ -122,7 +122,7 @@
 <a name="112" href="#112">112</a>       loader.getGraphCollectionByVariables(<span class="jxr_string">"g02"</span>, <span class="jxr_string">"g12"</span>);
 <a name="113" href="#113">113</a> 
 <a name="114" href="#114">114</a>     GraphCollection outputCollection = inputCollection
-<a name="115" href="#115">115</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation(TransformationTest::transformGraphHead, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>));
+<a name="115" href="#115">115</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(TransformationTest::transformGraphHead, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>));
 <a name="116" href="#116">116</a> 
 <a name="117" href="#117">117</a>     collectAndAssertTrue(
 <a name="118" href="#118">118</a>       outputCollection.equalsByGraphData(expectedCollection));
@@ -139,7 +139,7 @@
 <a name="129" href="#129">129</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g03"</span>, <span class="jxr_string">"g13"</span>);
 <a name="130" href="#130">130</a> 
 <a name="131" href="#131">131</a>     GraphCollection outputCollection = inputCollection
-<a name="132" href="#132">132</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation(<strong class="jxr_keyword">null</strong>, TransformationTest::transformVertex, <strong class="jxr_keyword">null</strong>));
+<a name="132" href="#132">132</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(<strong class="jxr_keyword">null</strong>, TransformationTest::transformVertex, <strong class="jxr_keyword">null</strong>));
 <a name="133" href="#133">133</a> 
 <a name="134" href="#134">134</a>     collectAndAssertTrue(
 <a name="135" href="#135">135</a>       outputCollection.equalsByGraphData(expectedCollection));
@@ -156,7 +156,7 @@
 <a name="146" href="#146">146</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g04"</span>, <span class="jxr_string">"g14"</span>);
 <a name="147" href="#147">147</a> 
 <a name="148" href="#148">148</a>     GraphCollection outputCollection = inputCollection.apply(
-<a name="149" href="#149">149</a>         <strong class="jxr_keyword">new</strong> ApplyTransformation(<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, TransformationTest::transformEdge));
+<a name="149" href="#149">149</a>         <strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;(<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, TransformationTest::transformEdge));
 <a name="150" href="#150">150</a> 
 <a name="151" href="#151">151</a>     collectAndAssertTrue(
 <a name="152" href="#152">152</a>       outputCollection.equalsByGraphData(expectedCollection));
