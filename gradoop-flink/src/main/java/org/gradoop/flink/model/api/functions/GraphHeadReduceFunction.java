@@ -17,7 +17,7 @@ package org.gradoop.flink.model.api.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 
 import java.io.Serializable;
 
@@ -25,7 +25,9 @@ import java.io.Serializable;
  * Marker interface for reduce functions used for group by isomorphism operator.
  * Such functions can be used to calculate aggregates based on graph heads.
  * For example, to count isomorphic graphs in a collection.
+ *
+ * @param <G> graph head type
  */
-public interface GraphHeadReduceFunction
-  extends GroupReduceFunction<Tuple2<String, EPGMGraphHead>, EPGMGraphHead>, Serializable {
+public interface GraphHeadReduceFunction<G extends GraphHead>
+  extends GroupReduceFunction<Tuple2<String, G>, G>, Serializable {
 }
