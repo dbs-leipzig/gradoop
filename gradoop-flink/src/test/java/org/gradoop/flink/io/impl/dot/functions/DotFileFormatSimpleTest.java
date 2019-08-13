@@ -54,18 +54,21 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
     propertiesMap1.put("name", "Tom");
     propertiesMap1.put("age", 25);
     GradoopId idVertex1 = GradoopId.fromString("bbbbbbbbbbbbbbbbbbbbbbbb");
-    EPGMVertex vertex1 = new EPGMVertexFactory().initVertex(idVertex1, "Person", Properties.createFromMap(propertiesMap1));
+    EPGMVertex vertex1 = new EPGMVertexFactory().initVertex(
+            idVertex1, "Person", Properties.createFromMap(propertiesMap1));
     // init vertex 2
     Map<String, Object> propertiesMap2 = new HashMap<>();
     propertiesMap2.put("lan", "EN");
     GradoopId idVertex2 = GradoopId.fromString("cccccccccccccccccccccccc");
-    EPGMVertex vertex2 = new EPGMVertexFactory().initVertex(idVertex2, "Forum", Properties.createFromMap(propertiesMap2));
+    EPGMVertex vertex2 = new EPGMVertexFactory().initVertex(
+            idVertex2, "Forum", Properties.createFromMap(propertiesMap2));
     // init vertex 3
     Map<String, Object> propertiesMap3 = new HashMap<>();
     propertiesMap3.put("name", "Anna");
     propertiesMap3.put("age", 27);
     GradoopId idVertex3 = GradoopId.fromString("dddddddddddddddddddddddd");
-    EPGMVertex vertex3 = new EPGMVertexFactory().initVertex(idVertex3, "Person", Properties.createFromMap(propertiesMap3));
+    EPGMVertex vertex3 = new EPGMVertexFactory().initVertex(
+            idVertex3, "Person", Properties.createFromMap(propertiesMap3));
     // create vertex set
     Set<EPGMVertex> vertices = new HashSet<>();
     vertices.add(vertex1);
@@ -103,11 +106,57 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
       "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Person\",name=\"Anna\",age=\"27\"];\n" +
       "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Person\",name=\"Tom\",age=\"25\"];\n" +
       "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Forum\",lan=\"EN\"];\n" +
-      "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa->vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
-      "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa->vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"hasModerator\"];\n" +
-      "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa->vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
+      "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa->" +
+            "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
+      "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa->" +
+            "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"hasModerator\"];\n" +
+      "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa->" +
+            "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
       "}\n";
 
     assertEquals(expected, dotFileFormat.format(transaction));
+  }
+
+  /**
+   * Tests whether troublesome chars get escaped.
+   */
+  @Test
+  public void testStringEscaping() {
+    EPGMGraphHead graphHead = new EPGMGraphHeadFactory()
+            .initGraphHead(GradoopId.fromString("aaaaaaaaaaaaaaaaaaaaaaaa"), "graph");
+
+    String key = "Title";
+    String value = "In the books Wojo's Weapons, why was Wojo occasionally known to say \"I'm " +
+            "too lazy!\" when asked why he didn't play 1. d4 instead of 1. Nf3?";
+
+    // init vertex 1
+    Map<String, Object> propertiesMap1 = new HashMap<>();
+    propertiesMap1.put(key, value);
+    GradoopId idVertex1 = GradoopId.fromString("bbbbbbbbbbbbbbbbbbbbbbbb");
+    EPGMVertex vertex1 = new EPGMVertexFactory().initVertex(
+            idVertex1, "QuestionPost", Properties.createFromMap(propertiesMap1));
+
+    // create vertex set
+    Set<EPGMVertex> vertices = new HashSet<>();
+    vertices.add(vertex1);
+    // create empty edge set
+    Set<EPGMEdge> edges = new HashSet<>();
+
+    GraphTransaction transactionMock = mock(GraphTransaction.class);
+    when(transactionMock.getGraphHead()).thenReturn(graphHead);
+    when(transactionMock.getVertices()).thenReturn(vertices);
+    when(transactionMock.getEdges()).thenReturn(edges);
+
+
+    DotFileFormatSimple dotFileFormatSimple = new DotFileFormatSimple(true);
+
+    String expected = "subgraph cluster_gaaaaaaaaaaaaaaaaaaaaaaaa{\n" +
+            "label=\"graph\";\n" +
+            "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"QuestionPost\",Title=" +
+            "\"In the books Wojo's Weapons, why was Wojo occasionally known to say &quot;I'm too " +
+            "lazy!&quot; when asked why he didn't play 1. d4 instead of 1. Nf3?\"];\n" +
+            "}\n";
+
+    assertEquals(expected, dotFileFormatSimple.format(transactionMock));;
   }
 }
