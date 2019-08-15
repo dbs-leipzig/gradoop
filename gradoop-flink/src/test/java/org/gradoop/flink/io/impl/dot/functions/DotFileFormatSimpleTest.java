@@ -126,8 +126,7 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
             .initGraphHead(GradoopId.fromString("aaaaaaaaaaaaaaaaaaaaaaaa"), "graph");
 
     String key = "Title";
-    String value = "In the books Wojo's Weapons, why was Wojo occasionally known to say \"I'm " +
-            "too lazy!\" when asked why he didn't play 1. d4 instead of 1. Nf3?";
+    String value = "Why was Wojo occasionally known to say \"I'm too lazy!\"?";
 
     // init vertex 1
     Map<String, Object> propertiesMap1 = new HashMap<>();
@@ -153,10 +152,9 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
     String expected = "subgraph cluster_gaaaaaaaaaaaaaaaaaaaaaaaa{\n" +
             "label=\"graph\";\n" +
             "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"QuestionPost\",Title=" +
-            "\"In the books Wojo's Weapons, why was Wojo occasionally known to say &quot;I'm too " +
-            "lazy!&quot; when asked why he didn't play 1. d4 instead of 1. Nf3?\"];\n" +
+            "\"Why was Wojo occasionally known to say &quot;I'm too lazy!&quot;?\"];\n" +
             "}\n";
 
-    assertEquals(expected, dotFileFormatSimple.format(transactionMock));;
+    assertEquals(expected, dotFileFormatSimple.format(transactionMock));
   }
 }
