@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Vertex;
 
 /**
- * Function filters tuples by the label of {@code V} in the second field.
+ * Function filters tuples by the label of the vertex in the second field.
  *
  * @param <V> vertex type
  */
