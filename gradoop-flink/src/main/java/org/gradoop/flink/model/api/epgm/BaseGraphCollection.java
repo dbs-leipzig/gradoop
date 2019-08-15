@@ -26,6 +26,7 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Default interface of a graph collection instance.
@@ -43,6 +44,13 @@ public interface BaseGraphCollection<
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends GraphCollectionLayout<G, V, E>, BaseGraphCollectionOperators<G, V, E, LG, GC> {
+
+  /**
+   * Returns the Gradoop Flink configuration.
+   *
+   * @return the Gradoop Flink configuration
+   */
+  GradoopFlinkConfig getConfig();
 
   /**
    * Get the factory that is responsible for creating an instance of {@link GC}.

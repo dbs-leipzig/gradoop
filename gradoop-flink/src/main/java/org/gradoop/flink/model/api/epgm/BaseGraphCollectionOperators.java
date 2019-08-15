@@ -56,7 +56,6 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdStrin
 import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.operators.verify.VerifyCollection;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Defines the operators that are available on a {@link BaseGraphCollection}.
@@ -73,13 +72,6 @@ public interface BaseGraphCollectionOperators<
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> {
-
-  /**
-   * Returns the Gradoop Flink configuration.
-   *
-   * @return the Gradoop Flink configuration
-   */
-  GradoopFlinkConfig getConfig();
 
   //----------------------------------------------------------------------------
   // Base Graph / Graph Head Getters
