@@ -173,7 +173,9 @@ public class Subgraph<
    * @return vertex-induced subgraph
    */
   private LG vertexInducedSubgraph(LG superGraph) {
-    DataSet<V> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
+    DataSet<V> filteredVertices = superGraph.getVertices()
+      .filter(vertexFilterFunction)
+      .name(getFormattedName() + " Filter vertices by: " + vertexFilterFunction);
 
     return superGraph.getFactory()
       .fromDataSets(superGraph.getGraphHead(), filteredVertices, superGraph.getEdges())
@@ -188,16 +190,23 @@ public class Subgraph<
    * @return edge-induced subgraph
    */
   private LG edgeInducedSubgraph(LG superGraph) {
-    DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
+    DataSet<E> filteredEdges = superGraph.getEdges()
+      .filter(edgeFilterFunction)
+      .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction);
+
     DataSet<V> inducedVertices = filteredEdges
       .join(superGraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSide<>())
+      .name(getFormattedName() + " Join (sourceId) with vertices and return vertices.")
       .union(filteredEdges
         .join(superGraph.getVertices())
         .where(new TargetId<>()).equalTo(new Id<>())
-        .with(new RightSide<>()))
-      .distinct(new Id<>());
+        .with(new RightSide<>())
+        .name(getFormattedName() + " Join (targetId) with vertices and return vertices."))
+      .name(getFormattedName() + " Union with induced vertices (targetId).")
+      .distinct(new Id<>())
+      .name(getFormattedName() + " Distinct by GradoopId.");
 
     return superGraph.getFactory()
       .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);
@@ -211,13 +220,19 @@ public class Subgraph<
    * @return edge-induced subgraph
    */
   private LG edgeInducedSubgraphProjectFirst(LG superGraph) {
-    DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
+    DataSet<E> filteredEdges = superGraph.getEdges()
+      .filter(edgeFilterFunction)
+      .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction);
+
     DataSet<V> inducedVertices = filteredEdges
       .flatMap(new EdgeToSourceAndTargetId<>())
+      .name(getFormattedName() + " Map edges to source and target ids.")
       .distinct()
+      .name(getFormattedName() + " Distinct by GradoopId.")
       .join(superGraph.getVertices())
       .where("*").equalTo(new Id<>())
-      .with(new RightSide<>());
+      .with(new RightSide<>())
+      .name(getFormattedName() + " Join with vertices and return vertices.");
 
     return superGraph.getFactory()
       .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);
@@ -237,7 +252,12 @@ public class Subgraph<
   private LG subgraph(LG superGraph) {
     return superGraph.getFactory().fromDataSets(
       superGraph.getGraphHead(),
-      superGraph.getVertices().filter(vertexFilterFunction),
-      superGraph.getEdges().filter(edgeFilterFunction));
+      superGraph.getVertices()
+        .filter(vertexFilterFunction)
+        .name(getFormattedName() + " Filter vertices by: " + vertexFilterFunction),
+      superGraph.getEdges()
+        .filter(edgeFilterFunction)
+        .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction));
+
   }
 }

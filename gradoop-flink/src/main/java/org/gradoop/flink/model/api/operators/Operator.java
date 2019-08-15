@@ -19,6 +19,16 @@ package org.gradoop.flink.model.api.operators;
  * Base interface for all EPGM operators.
  */
 public interface Operator {
+
+  /**
+   * Returns the operators name formatted for use in Flink operator names.
+   *
+   * @return operator name formatted with brackets
+   */
+  default String getFormattedName() {
+    return String.format("[%s]", getName());
+  }
+
   /**
    * Returns the operators name.
    * The operator name is the same as the class name, per default.
