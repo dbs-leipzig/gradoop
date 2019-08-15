@@ -22,6 +22,8 @@ import org.apache.flink.table.api.scala.BatchTableEnvironment;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
@@ -70,7 +72,8 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
 
     MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
 
-    CAPFQueryResult result = graph.cypher("MATCH (n1)-->(n2)<--(n3) RETURN n2", metaData);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> result =
+      graph.cypher("MATCH (n1)-->(n2)<--(n3) RETURN n2", metaData);
 
     // because the pattern is symmetric, each result exists twice
     GraphCollection expectedGraphs = loader.getGraphCollectionByVariables(
@@ -92,12 +95,11 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
-    CAPFQuery op = new CAPFQuery(
-      "MATCH (n1)-->(n2)<--(n3) RETURN n2",
-      this.getExecutionEnvironment()
-    );
+    CAPFQuery<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> op =
+      new CAPFQuery<>("MATCH (n1)-->(n2)<--(n3) RETURN n2");
 
-    CAPFQueryResult result = op.execute(graph);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> result =
+      op.execute(graph);
 
     // because the pattern is symmetric, each result exists twice
     GraphCollection expectedGraphs = loader.getGraphCollectionByVariables(
@@ -128,12 +130,11 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
     LogicalGraph graphWithPayload = graph.getFactory()
       .fromDataSets(verticesWithPayload, graph.getEdges());
 
-    CAPFQuery op = new CAPFQuery(
-      "MATCH (n1)-->(n2)<--(n3) RETURN n2",
-      this.getExecutionEnvironment()
-    );
+    CAPFQuery<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> op =
+      new CAPFQuery<>("MATCH (n1)-->(n2)<--(n3) RETURN n2");
 
-    CAPFQueryResult result = op.execute(graphWithPayload);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> result =
+      op.execute(graphWithPayload);
 
     // because the pattern is symmetric, each result exists twice
     GraphCollection expectedGraphs = loader.getGraphCollectionByVariables(
@@ -169,9 +170,8 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
 
     MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
 
-    CAPFQueryResult result = graph.cypher(
-      "MATCH (n1)-->(n2)-->(n3) RETURN n1.id, n2.id, n3.id",
-      metaData);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> result =
+      graph.cypher("MATCH (n1)-->(n2)-->(n3) RETURN n1.id, n2.id, n3.id", metaData);
 
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();
     DataSet<Row> resultDataSet =
@@ -233,10 +233,8 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
 
     MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
 
-    CAPFQueryResult result = graph.cypher(
-      "MATCH (n1) RETURN avg(n1.id)",
-      metaData
-    );
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> result =
+      graph.cypher("MATCH (n1) RETURN avg(n1.id)", metaData);
 
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();
     DataSet<Row> resultDataSet = tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();

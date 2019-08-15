@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.List;
@@ -28,8 +28,10 @@ import java.util.List;
  * Create a graph head from a row while automatically setting properties. The fields between start
  * and end are expected to be the properties in order of the property names, the last field of the
  * row is expected to be a {@link GradoopId}.
+ *
+ * @param <G> graph head type
  */
-public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraphHead> {
+public class CreateGraphHeadWithProperties<G extends GraphHead> implements MapFunction<Row, G> {
 
   /**
    * The start index of fields that will be set as properties of the graph heads.
@@ -44,7 +46,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraph
   /**
    * The factory used to create the graph heads.
    */
-  private GraphHeadFactory<EPGMGraphHead> headFactory;
+  private GraphHeadFactory<G> headFactory;
 
   /**
    * List containing names for the properties to be set.
@@ -62,7 +64,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraph
   public CreateGraphHeadWithProperties(
     int start,
     int end,
-    GraphHeadFactory<EPGMGraphHead> headFactory,
+    GraphHeadFactory<G> headFactory,
     List<String> propertyNames) {
 
     this.start = start;
@@ -72,9 +74,9 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraph
   }
 
   @Override
-  public EPGMGraphHead map(Row row) {
+  public G map(Row row) {
 
-    EPGMGraphHead head = headFactory.initGraphHead((GradoopId) row.getField(row.getArity() - 1));
+    G head = headFactory.initGraphHead((GradoopId) row.getField(row.getArity() - 1));
     Properties props = new Properties();
 
     for (int i = start; i < end; i++) {

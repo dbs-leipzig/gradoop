@@ -19,19 +19,20 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.types.Row;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Collection;
 
 /**
  * RichMapFunction that maps tuples containing a Long id and an vertex to row.
- * A new row field is created for each property that vertices
- * with this label can have.
+ * A new row field is created for each property that vertices with this label can have.
+ *
+ * @param <V> vertex type
  */
 
 @FunctionAnnotation.ForwardedFields("f0->f0")
 @FunctionAnnotation.ReadFields("f1.properties")
-public class VertexToRow extends RichMapFunction<Tuple2<Long, EPGMVertex>, Row> {
+public class VertexToRow<V extends Vertex> extends RichMapFunction<Tuple2<Long, V>, Row> {
 
   /**
    * List of all property keys the edges with this label have.
@@ -54,7 +55,7 @@ public class VertexToRow extends RichMapFunction<Tuple2<Long, EPGMVertex>, Row> 
   }
 
   @Override
-  public Row map(Tuple2<Long, EPGMVertex> tuple) throws Exception {
+  public Row map(Tuple2<Long, V> tuple) throws Exception {
     returnRow.setField(0, tuple.f0);
 
     int i = 1;

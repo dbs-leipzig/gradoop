@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.epgm;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -33,12 +32,11 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
-import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -160,21 +158,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
 
   @Override
-  public CAPFQueryResult cypher(String query) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, this.config.getExecutionEnvironment()
-    );
-    return capfQuery.execute(this);
-  }
-
-  @Override
-  public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, metaData, this.config.getExecutionEnvironment());
-    return capfQuery.execute(this);
-  }
-
-  @Override
   public GraphCollection query(String query) {
     return query(query, new GraphStatistics(1, 1, 1, 1));
   }
@@ -271,6 +254,11 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
+
+  @Override
+  public <T> T callForGraph(UnaryBaseGraphToValueOperator<LogicalGraph, T> operator) {
+    return operator.execute(this);
+  }
 
   @Override
   public LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator) {

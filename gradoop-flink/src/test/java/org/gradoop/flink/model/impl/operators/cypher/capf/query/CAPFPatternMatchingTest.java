@@ -23,6 +23,9 @@ import org.apache.flink.table.sinks.BatchTableSink;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -94,7 +97,8 @@ public class CAPFPatternMatchingTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> capfResult =
+      db.cypher(queryGraph, metaData);
     if (capfResult.containsGraphs()) {
       GraphCollection result = capfResult.getGraphs();
       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
@@ -115,7 +119,8 @@ public class CAPFPatternMatchingTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
+    CAPFQueryResult<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> capfResult =
+      db.cypher(queryGraph, metaData);
     if (capfResult.containsGraphs()) {
       GraphCollection result = capfResult.getGraphs();
       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);

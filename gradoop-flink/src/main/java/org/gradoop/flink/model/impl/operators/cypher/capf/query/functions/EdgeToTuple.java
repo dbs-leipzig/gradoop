@@ -19,12 +19,14 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * MapFunction that maps tuples containing a Long id and an edge to an edge tuple.
+ *
+ * @param <E> edge type
  */
 
 @FunctionAnnotation.ForwardedFields(
@@ -33,9 +35,8 @@ import org.gradoop.common.model.impl.properties.Properties;
     "f1.targetId->f2;" +
     "f1.label->f3;" +
     "f1.properties->f4")
-public class EdgeToTuple
-  implements MapFunction<Tuple2<Long, EPGMEdge>,
-  Tuple5<Long, GradoopId, GradoopId, String, Properties>> {
+public class EdgeToTuple<E extends Edge>
+  implements MapFunction<Tuple2<Long, E>, Tuple5<Long, GradoopId, GradoopId, String, Properties>> {
 
   /**
    * Reduce object instantiations
@@ -43,10 +44,9 @@ public class EdgeToTuple
   private Tuple5<Long, GradoopId, GradoopId, String, Properties> returnTuple = new Tuple5<>();
 
   @Override
-  public Tuple5<Long, GradoopId, GradoopId, String, Properties> map(
-    Tuple2<Long, EPGMEdge> tuple) throws Exception {
+  public Tuple5<Long, GradoopId, GradoopId, String, Properties> map(Tuple2<Long, E> tuple) throws Exception {
 
-    EPGMEdge edge = tuple.f1;
+    E edge = tuple.f1;
 
     returnTuple.f0 = tuple.f0;
     returnTuple.f1 = edge.getSourceId();

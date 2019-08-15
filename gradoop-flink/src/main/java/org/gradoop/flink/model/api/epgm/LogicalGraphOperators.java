@@ -16,14 +16,12 @@
 package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -39,33 +37,6 @@ public interface LogicalGraphOperators {
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
-   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
-   * result is a CAPFQueryResult, containing a flink table that can be converted to a
-   * GraphCollection, if it contains vertices or edges.
-   *
-   * @param query    the query string
-   * @param metaData metaData object
-   * @return the result, containing a flink table and possibly a GraphCollection
-   */
-  CAPFQueryResult cypher(String query, MetaData metaData) throws Exception;
-
-  /**
-   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
-   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
-   * result is a CAPFQueryResult, containing a flink table that can be converted to a
-   * GraphCollection, if it contains vertices or edges.
-   * <p>
-   * In this overloaded function, the property maps are constructed automatically. This is
-   * a lot slower and actually requires the job to be split in two parts to collect the property
-   * maps.
-   *
-   * @param query the query string
-   * @return the result, containing a flink table and possibly a GraphCollection
-   */
-  CAPFQueryResult cypher(String query) throws Exception;
 
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism

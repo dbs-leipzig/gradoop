@@ -25,8 +25,8 @@ import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Base interface for factories that create metadata objects from tuples and files (distributed
- * or locally).
+ * Base interface for factories that create metadata objects from tuples and files (distributed or locally).
  *
  * @param <M> meta data type
  */
@@ -56,10 +55,10 @@ public interface MetaDataSource<M extends MetaData> {
   /**
    * Creates the meta data for the given graph.
    *
-   * @param graph logical graph
+   * @param graph graph to get metadata from
    * @return meta data information
    */
-  default DataSet<Tuple3<String, String, String>> tuplesFromGraph(LogicalGraph graph) {
+  default DataSet<Tuple3<String, String, String>> tuplesFromGraph(BaseGraph<?, ?, ?, ?, ?> graph) {
     return tuplesFromElements(graph.getVertices())
       .union(tuplesFromElements(graph.getEdges()));
   }
@@ -78,10 +77,10 @@ public interface MetaDataSource<M extends MetaData> {
   }
 
   /**
-   * Creates the meta data for the specified data set of EPGM elements.
+   * Creates the meta data for the specified data set of elements.
    *
-   * @param elements EPGM elements
-   * @param <E>      EPGM element type
+   * @param elements elements
+   * @param <E>      element type
    * @return meta data information
    */
   static <E extends Element> DataSet<Tuple3<String, String, String>> tuplesFromElements(

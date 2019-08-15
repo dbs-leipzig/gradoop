@@ -24,13 +24,13 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.calcite.CalciteConfig;
 import org.apache.flink.table.calcite.CalciteConfigBuilder;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddGradoopIdToRow;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddNewGraphs;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AggregateGraphs;
@@ -52,8 +52,19 @@ import java.util.Set;
 
 /**
  * Wrapper containing the results of a CAPF query.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class CAPFQueryResult {
+public class CAPFQueryResult<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
 
   /**
    * Logical optimizer rules to be removed for better optimizer performance.
@@ -81,18 +92,17 @@ public class CAPFQueryResult {
   /**
    * Mapping between the long ids and the original vertices.
    */
-  private DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds;
+  private DataSet<Tuple2<Long, V>> verticesWithIds;
 
   /**
    * Mapping between the long ids and the original edges.
    */
-  private DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds;
+  private DataSet<Tuple2<Long, E>> edgesWithIds;
 
   /**
    * The graph collection factory.
    */
-  private BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-    factory;
+  private BaseGraphCollectionFactory<G, V, E, LG, GC> factory;
 
   /**
    * Constructor;
@@ -104,9 +114,9 @@ public class CAPFQueryResult {
    */
   public CAPFQueryResult(
     CypherResult result,
-    DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds,
-    DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds,
-    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> factory) {
+    DataSet<Tuple2<Long, V>> verticesWithIds,
+    DataSet<Tuple2<Long, E>> edgesWithIds,
+    BaseGraphCollectionFactory<G, V, E, LG, GC> factory) {
     this.records = (CAPFRecords) result.records();
     this.verticesWithIds = verticesWithIds;
     this.edgesWithIds = edgesWithIds;
@@ -132,7 +142,7 @@ public class CAPFQueryResult {
    *
    * @return graphs contained in CAPF query iff there are any, else null
    */
-  public GraphCollection getGraphs() {
+  public GC getGraphs() {
 
     if (!isGraph) {
       return null;
@@ -199,27 +209,27 @@ public class CAPFQueryResult {
     int entityFieldsCount = nodeVars.size() + relVars.size();
     int otherFieldsCount = otherVars.size();
 
-    DataSet<EPGMGraphHead> graphHeads = rowsWithNewIds
-      .map(new CreateGraphHeadWithProperties(
+    DataSet<G> graphHeads = rowsWithNewIds
+      .map(new CreateGraphHeadWithProperties<>(
         entityFieldsCount,
         entityFieldsCount + otherFieldsCount,
         factory.getGraphHeadFactory(),
         otherVarNames)
-      );
+      ).returns(factory.getGraphHeadFactory().getType());
 
     DataSet<Tuple2<Long, GradoopIdSet>> rowsWithGraphIdSets = rowsWithNewIds
       .flatMap(new SplitRow(0, entityFieldsCount))
       .groupBy(0)
       .reduceGroup(new AggregateGraphs<>());
 
-    DataSet<EPGMVertex> vertices =
+    DataSet<V> vertices =
       rowsWithGraphIdSets
         .join(verticesWithIds)
         .where(0)
         .equalTo(0)
         .with(new AddNewGraphs<>());
 
-    DataSet<EPGMEdge> edges =
+    DataSet<E> edges =
       rowsWithGraphIdSets
         .join(edgesWithIds)
         .where(0)

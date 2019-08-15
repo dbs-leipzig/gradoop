@@ -17,20 +17,21 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
-import org.gradoop.flink.model.api.operators.Operator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeLabelFilter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeToTuple;
@@ -68,10 +69,21 @@ import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery
 
 
 /**
- * Execute a cypher query on a LogicalGraph via the CAPF (Cypher for Apache Flink)
- * API.
+ * Execute a cypher query on a LogicalGraph via the CAPF (Cypher for Apache Flink) API.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class CAPFQuery implements Operator {
+public class CAPFQuery<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToValueOperator<LG, CAPFQueryResult> {
 
   /**
    * The query string.
@@ -96,27 +108,21 @@ public class CAPFQuery implements Operator {
   /**
    * Mapping between the long ids and the original vertices.
    */
-  private DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds;
+  private DataSet<Tuple2<Long, V>> verticesWithIds;
 
   /**
    * Mapping between the long ids and the original edges.
    */
-  private DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds;
+  private DataSet<Tuple2<Long, E>> edgesWithIds;
 
   /**
    * Constructor
    *
    * @param query the query string
-   * @param env   the execution environment
    */
-  public CAPFQuery(String query, ExecutionEnvironment env) {
-
+  public CAPFQuery(String query) {
     this.query = query;
-
     this.vertexCount = null;
-    this.session = CAPFSession$.MODULE$.create(
-      new org.apache.flink.api.scala.ExecutionEnvironment(env)
-    );
   }
 
   /**
@@ -124,15 +130,10 @@ public class CAPFQuery implements Operator {
    *
    * @param query    the query string
    * @param metaData metaData object
-   * @param env      the execution environment
    */
-  public CAPFQuery(
-    String query, MetaData metaData, ExecutionEnvironment env) {
-    this.query = query;
+  public CAPFQuery(String query, MetaData metaData) {
+    this(query);
     this.metaData = metaData;
-    this.vertexCount = null;
-    this.session = CAPFSession$.MODULE$.create(
-      new org.apache.flink.api.scala.ExecutionEnvironment(env));
   }
 
   /**
@@ -140,14 +141,19 @@ public class CAPFQuery implements Operator {
    *
    * @param graph the graph that the query shall be executed on
    * @return the result of the query, either a graph collection or a flink table
-   * @throws Exception if the execution or IO fails.
    */
-  public CAPFQueryResult execute(LogicalGraph graph) throws Exception {
+  public CAPFQueryResult<G, V, E, LG, GC> execute(LG graph) {
+    this.session = CAPFSession$.MODULE$.create(
+      new org.apache.flink.api.scala.ExecutionEnvironment(graph.getConfig().getExecutionEnvironment()));
 
     if (metaData == null) {
       graph = transformGraphProperties(graph);
-      metaData = new CSVMetaDataSource()
-        .fromTuples(new CSVMetaDataSource().tuplesFromGraph(graph).collect());
+      try {
+        metaData = new CSVMetaDataSource()
+          .fromTuples(new CSVMetaDataSource().tuplesFromGraph(graph).collect());
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to collect metadata", e);
+      }
     }
     // create flink tables of nodes as required by CAPF
     List<CAPFNodeTable> nodeTables = createNodeTables(graph);
@@ -167,7 +173,7 @@ public class CAPFQuery implements Operator {
       PropertyGraph g = session.readFrom(nodeTables.get(0), tableSeq);
 
       // construct a CAPFQueryResult from the CAPFResult returned by CAPF
-      return new CAPFQueryResult(
+      return new CAPFQueryResult<>(
         g.cypher(
           query,
           g.cypher$default$2(),
@@ -184,16 +190,15 @@ public class CAPFQuery implements Operator {
   }
 
   /**
-   * Transform vertex and edge properties with types not yet supported by CAPF into string
-   * representations.
+   * Transform vertex and edge properties with types not yet supported by CAPF into string representations.
    *
    * @param graph the graph
    * @return a graph with transformed vertex and edge properties
    */
-  private LogicalGraph transformGraphProperties(LogicalGraph graph) {
-    DataSet<EPGMVertex> transformedVertices = graph.getVertices()
+  private LG transformGraphProperties(LG graph) {
+    DataSet<V> transformedVertices = graph.getVertices()
       .map(new PropertyEncoder<>());
-    DataSet<EPGMEdge> transformedEdges = graph.getEdges()
+    DataSet<E> transformedEdges = graph.getEdges()
       .map(new PropertyEncoder<>());
 
     return graph.getFactory().fromDataSets(transformedVertices, transformedEdges);
@@ -207,7 +212,7 @@ public class CAPFQuery implements Operator {
    * @param graph the graph whose vertices should be transformed into CAPF tables
    * @return a list of node tables, one table per vertex label
    */
-  private List<CAPFNodeTable> createNodeTables(LogicalGraph graph) {
+  private List<CAPFNodeTable> createNodeTables(LG graph) {
     List<CAPFNodeTable> nodeTables = new ArrayList<>();
 
     verticesWithIds = graph.getVertices().map(new UniqueIdWithOffset<>());
@@ -233,13 +238,13 @@ public class CAPFQuery implements Operator {
       RowTypeInfo info = new RowTypeInfo(types);
 
       // zip all vertices of one label with a globally unique id
-      DataSet<Tuple2<Long, EPGMVertex>> verticesByLabelWithIds =
-        verticesWithIds.filter(new VertexLabelFilter(label));
+      DataSet<Tuple2<Long, V>> verticesByLabelWithIds =
+        verticesWithIds.filter(new VertexLabelFilter<>(label));
 
       // map vertices to row and wrap in scala DataSet
       org.apache.flink.api.scala.DataSet<Row> scalaRowDataSet =
         new org.apache.flink.api.scala.DataSet<>(
-          verticesByLabelWithIds.map(new VertexToRow(propKeys)).returns(info),
+          verticesByLabelWithIds.map(new VertexToRow<>(propKeys)).returns(info),
           ClassTag$.MODULE$.apply(Row.class)
         );
 
@@ -274,7 +279,7 @@ public class CAPFQuery implements Operator {
    * @param graph the graph whose edges should be transformed into CAPF tables
    * @return a list of edge tables, one table per edge label
    */
-  private List<CAPFRelationshipTable> createRelationshipTables(LogicalGraph graph) {
+  private List<CAPFRelationshipTable> createRelationshipTables(LG graph) {
     List<CAPFRelationshipTable> relTables = new ArrayList<>();
 
     edgesWithIds = graph.getEdges().map(new UniqueIdWithOffset<>())
@@ -282,11 +287,11 @@ public class CAPFQuery implements Operator {
 
     // replace source and target with long ids
     DataSet<Tuple5<Long, Long, Long, String, Properties>> edgeTuples = edgesWithIds
-      .map(new EdgeToTuple())
+      .map(new EdgeToTuple<>())
       .join(verticesWithIds)
-      .where(1).equalTo(new IdOfF1<>()).with(new ReplaceSourceId())
+      .where(1).equalTo(new IdOfF1<>()).with(new ReplaceSourceId<>())
       .join(verticesWithIds)
-      .where(2).equalTo(new IdOfF1<>()).with(new ReplaceTargetId());
+      .where(2).equalTo(new IdOfF1<>()).with(new ReplaceTargetId<>());
 
     // construct a table for each edge label
     for (String label : metaData.getEdgeLabels()) {

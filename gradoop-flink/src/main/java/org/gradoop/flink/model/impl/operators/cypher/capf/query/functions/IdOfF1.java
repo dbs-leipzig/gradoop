@@ -18,16 +18,16 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 /**
- * KeySelector that returns the id of a {@link EPGMElement} in the second field of a tuple.
+ * KeySelector that returns the id of a {@link Element} in the second field of a tuple.
  *
- * @param <E> any EPGMGraphElement
+ * @param <E> any GraphElement
  */
 @FunctionAnnotation.ForwardedFields("f1.id->*")
-public class IdOfF1<E extends EPGMElement> implements KeySelector<Tuple2<Long, E>, GradoopId> {
+public class IdOfF1<E extends Element> implements KeySelector<Tuple2<Long, E>, GradoopId> {
 
   @Override
   public GradoopId getKey(Tuple2<Long, E> tuple) {

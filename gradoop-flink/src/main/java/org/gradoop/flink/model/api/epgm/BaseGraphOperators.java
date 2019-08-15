@@ -19,15 +19,19 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
@@ -72,6 +76,38 @@ public interface BaseGraphOperators<
    */
   default LG copy() {
     return callForGraph(new Cloning<>());
+  }
+
+  /**
+   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the default cypher
+   * morphism strategies, which is vertex homomorphism and edge isomorphism. The result is a CAPFQueryResult,
+   * containing a flink table that can be converted to a graph collection, if it contains vertices or edges.
+   * <p>
+   * In this overloaded function, the property maps are constructed automatically. This is a lot slower
+   * and actually requires the job to be split in two parts to collect the property maps.
+   *
+   * @param query the query string
+   * @return the result, containing a flink table and possibly a graph collection
+   */
+  @SuppressWarnings("unchecked")
+  default CAPFQueryResult<G, V, E, LG, GC> cypher(String query) {
+    CAPFQuery<G, V, E, LG, GC> capfQuery = new CAPFQuery<>(query);
+    return callForGraph(capfQuery);
+  }
+
+  /**
+   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the default cypher
+   * morphism strategies, which is vertex homomorphism and edge isomorphism. The result is a CAPFQueryResult,
+   * containing a flink table that can be converted to a graph collection, if it contains vertices or edges.
+   *
+   * @param query    the query string
+   * @param metaData metaData object
+   * @return the result, containing a flink table and possibly a graph collection
+   */
+  @SuppressWarnings("unchecked")
+  default CAPFQueryResult<G, V, E, LG, GC> cypher(String query, MetaData metaData) {
+    CAPFQuery<G, V, E, LG, GC> capfQuery = new CAPFQuery<>(query, metaData);
+    return callForGraph(capfQuery);
   }
 
   /**
@@ -376,6 +412,15 @@ public interface BaseGraphOperators<
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Calls the given graph to value operator using that graph.
+   *
+   * @param operator unary graph to value operator
+   * @param <T> return type
+   * @return result of given operator
+   */
+  <T> T callForGraph(UnaryBaseGraphToValueOperator<LG, T> operator);
 
   /**
    * Creates a base graph using the given unary graph operator.

@@ -20,6 +20,9 @@
   <suppress checks="LineLength"
             files="SocialNetworkGraph.java"
             lines="0-68"/>
+  <suppress checks="IllegalCatch"
+            files="CAPFQuery.java"
+            lines="150-160"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

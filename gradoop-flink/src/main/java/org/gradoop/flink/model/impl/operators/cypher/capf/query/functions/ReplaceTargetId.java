@@ -19,19 +19,21 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Replace the source GradoopId of an edge tuple with the matching Long id;
+ *
+ * @param <V> vertex type
  */
 
 @FunctionAnnotation.ForwardedFieldsFirst("f0->f0;f1->f1;f3->f3;f4->f4")
 @FunctionAnnotation.ForwardedFieldsSecond("f0->f2")
-public class ReplaceTargetId implements JoinFunction<
+public class ReplaceTargetId<V extends Vertex> implements JoinFunction<
   Tuple5<Long, Long, GradoopId, String, Properties>,
-  Tuple2<Long, EPGMVertex>,
+  Tuple2<Long, V>,
   Tuple5<Long, Long, Long, String, Properties>> {
 
   /**
@@ -42,7 +44,7 @@ public class ReplaceTargetId implements JoinFunction<
   @Override
   public Tuple5<Long, Long, Long, String, Properties> join(
     Tuple5<Long, Long, GradoopId, String, Properties> inputTuple,
-    Tuple2<Long, EPGMVertex> vertexTuple
+    Tuple2<Long, V> vertexTuple
   ) throws Exception {
     returnTuple.f0 = inputTuple.f0;
     returnTuple.f1 = inputTuple.f1;
