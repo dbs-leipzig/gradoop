@@ -17,18 +17,12 @@ package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.temporal.io.api.TemporalDataSink;
-import org.gradoop.temporal.io.api.TemporalDataSource;
-import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSink;
-import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +44,6 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
    * Logical graph to test
    */
   private LogicalGraph testLogicalGraph;
-
-  /**
-   * Temporary test folder to write the test graph.
-   */
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
 
   /**
    * Creates a test temporal graph from the social network loader
@@ -82,49 +70,6 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   @Test
   public void testIsEmpty() throws Exception {
     collectAndAssertFalse(testGraph.isEmpty());
-  }
-
-  /**
-   * Test the {@link TemporalGraph#writeTo(TemporalDataSink)} method.
-   *
-   * @throws Exception in case of failure
-   */
-  @Test
-  public void testWriteTo() throws Exception {
-    String tempFolderPath = testFolder.newFolder().getPath();
-
-    testGraph.writeTo(new TemporalCSVDataSink(tempFolderPath, getConfig()));
-    getExecutionEnvironment().execute();
-
-    TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
-
-    collectAndAssertTrue(dataSource
-      .getTemporalGraph()
-      .toLogicalGraph()
-      .equalsByElementData(testGraph.toLogicalGraph()));
-  }
-
-  /**
-   * Test the {@link TemporalGraph#writeTo(TemporalDataSink, boolean)} method.
-   *
-   * @throws Exception in case of failure
-   */
-  @Test
-  public void testWriteToOverwrite() throws Exception {
-    String tempFolderPath = testFolder.newFolder().getPath();
-
-    testGraph.writeTo(new TemporalCSVDataSink(tempFolderPath, getConfig()));
-    getExecutionEnvironment().execute();
-
-    testGraph.writeTo(new TemporalCSVDataSink(tempFolderPath, getConfig()), true);
-    getExecutionEnvironment().execute();
-
-    TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
-
-    collectAndAssertTrue(dataSource
-      .getTemporalGraph()
-      .toLogicalGraph()
-      .equalsByElementData(testGraph.toLogicalGraph()));
   }
 
   /**
