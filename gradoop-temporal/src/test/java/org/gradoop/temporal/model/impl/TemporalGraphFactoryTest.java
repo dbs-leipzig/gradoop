@@ -41,8 +41,7 @@ import static org.junit.Assert.assertFalse;
 public class TemporalGraphFactoryTest extends TemporalGradoopTestBase {
 
   /**
-   * Test if method {@link TemporalGraphFactory#createEmptyGraph()} creates an empty temporal
-   * graph instance.
+   * Test if method {@link TemporalGraphFactory#createEmptyGraph()} creates an empty temporal graph instance.
    *
    * @throws Exception if counting the elements fails
    */

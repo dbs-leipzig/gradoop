@@ -26,9 +26,8 @@ public enum TemporalAttribute {
    */
   TRANSACTION_TIME,
   /**
-   * The valid time of a temporal element, i.e. the time in which the element's data is considered
-   * valid in a certain context. Validity is therefore depending on the data itself and
-   * maintained by the user.
+   * The valid time of a temporal element, i.e. the time in which the element's data is considered valid in
+   * a certain context. Validity is therefore depending on the data itself and maintained by the user.
    */
   VALID_TIME;
 

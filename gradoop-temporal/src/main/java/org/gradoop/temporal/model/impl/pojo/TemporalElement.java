@@ -24,8 +24,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import java.util.Objects;
 
 /**
- * Base class for all temporal elements. Contains interval definitions for transaction time and
- * valid time.
+ * Base class for all temporal elements. Contains interval definitions for transaction time and valid time.
  */
 public abstract class TemporalElement extends EPGMElement implements Element {
 
@@ -34,7 +33,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    */
   public static final Long DEFAULT_TIME_FROM = Long.MIN_VALUE;
   /**
-   * The default value for unset valid times (validTo and txTo).
+   * The default value for unset times (validTo and txTo).
    */
   public static final Long DEFAULT_TIME_TO = Long.MAX_VALUE;
   /**
@@ -65,26 +64,21 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param validFrom the beginning of the elements validity as unix timestamp in milliseconds
    * @param validTo the end of the elements validity as unix timestamp in milliseconds
    */
-  TemporalElement(GradoopId id, String label, Properties properties, Long validFrom,
-    Long validTo) {
+  TemporalElement(GradoopId id, String label, Properties properties, Long validFrom, Long validTo) {
     super(id, label, properties);
     // Set transaction time beginning to the current system time
     transactionTime = new Tuple2<>(System.currentTimeMillis(), DEFAULT_TIME_TO);
 
-    validTime = new Tuple2<>(DEFAULT_TIME_FROM, DEFAULT_TIME_TO);
-    if (validFrom != null) {
-      this.setValidFrom(validFrom);
-    }
-
-    if (validTo != null) {
-      this.setValidTo(validTo);
-    }
+    Tuple2<Long, Long> newValidTime = new Tuple2<>();
+    newValidTime.f0 = validFrom == null ? DEFAULT_TIME_FROM : validFrom;
+    newValidTime.f1 = validTo == null ? DEFAULT_TIME_TO : validTo;
+    setValidTime(newValidTime);
   }
 
   /**
    * Get the transaction time tuple (tx-from, tx-to). Needed because of Flink's POJO rules.
    *
-   * @return a tuple 2 representing the transaction time interval
+   * @return a {@link Tuple2} representing the transaction time interval
    */
   public Tuple2<Long, Long> getTransactionTime() {
     return transactionTime;
@@ -92,7 +86,8 @@ public abstract class TemporalElement extends EPGMElement implements Element {
 
   /**
    * Set the transaction time tuple (tx-from, tx-to). Needed because of Flink's POJO rules.
-   * @param transactionTime a tuple 2 representing the transaction time interval
+   *
+   * @param transactionTime a {@link Tuple2} representing the transaction time interval
    */
   public void setTransactionTime(Tuple2<Long, Long> transactionTime) {
     Objects.requireNonNull(transactionTime);

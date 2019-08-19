@@ -44,8 +44,7 @@ import static org.junit.Assert.assertEquals;
 public class AverageDurationTest extends TemporalGradoopTestBase {
 
   /**
-   * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for
-   * transaction time.
+   * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for transaction time.
    */
   @Test
   public void testGetIncrementForTxTime() {
@@ -64,8 +63,7 @@ public class AverageDurationTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for valid
-   * time.
+   * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for valid time.
    */
   @Test
   public void testGetIncrementForValidTime() {

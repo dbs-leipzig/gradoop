@@ -17,6 +17,7 @@ package org.gradoop.temporal.io.impl.csv.functions;
 
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -24,7 +25,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import java.util.regex.Matcher;
 
 /**
- * Creates an {@link TemporalGraphHead} from a CSV string. The function uses a {@link org.gradoop.common.model.impl.metadata.MetaData}
+ * Creates an {@link TemporalGraphHead} from a CSV string. The function uses a {@link MetaData}
  * object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
@@ -34,7 +35,7 @@ import java.util.regex.Matcher;
 public class CSVLineToTemporalGraphHead extends CSVLineToTemporalElement<TemporalGraphHead> {
 
   /**
-   * Used to instantiate the vertex.
+   * Used to instantiate the graph head.
    */
   private final GraphHeadFactory<TemporalGraphHead> graphHeadFactory;
 

@@ -32,14 +32,14 @@ import static org.mockito.Mockito.*;
  * handled correctly.
  */
 public class TemporalAggregateFunctionTest extends TemporalGradoopTestBase {
+
   /**
    * A temporal aggregate function used for this test.
-   *
    */
   private TemporalAggregateFunction function;
 
   /**
-   * Set up this tests aggregate function. That functions returns the validFrom time.
+   * Set up this tests aggregate function. The functions returns the validFrom time.
    */
   @Before
   public void setUp() {
@@ -76,7 +76,7 @@ public class TemporalAggregateFunctionTest extends TemporalGradoopTestBase {
   public void testWithNonTemporalAndDefaultValue() {
     TemporalAggregateFunction withDefault = spy(function);
     // Do not call the real method, return some default value instead.
-    doAnswer(i -> PropertyValue.create(0L)).when(withDefault).getNonTemporalDefaultValue(any());
+    doAnswer(i -> PropertyValue.create(0L)).when(withDefault).getNonTemporalIncrement(any());
     Vertex vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
     assertEquals(PropertyValue.create(0L), withDefault.getIncrement(vertex));
   }

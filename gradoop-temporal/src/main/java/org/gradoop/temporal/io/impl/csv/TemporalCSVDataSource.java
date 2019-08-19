@@ -25,8 +25,6 @@ import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.TemporalGraphCollectionFactory;
 import org.gradoop.temporal.util.TemporalGradoopConfig;
 
-import java.io.IOException;
-
 /**
  * A graph data source for CSV files storing temporal graphs.
  * <p>
@@ -53,7 +51,7 @@ public class TemporalCSVDataSource extends CSVDataSource implements TemporalData
   }
 
   @Override
-  public TemporalGraph getTemporalGraph() throws IOException {
+  public TemporalGraph getTemporalGraph() {
     TemporalGraphCollection collection = getTemporalGraphCollection();
     return getConfig().getTemporalGraphFactory()
       .fromDataSets(
@@ -61,7 +59,7 @@ public class TemporalCSVDataSource extends CSVDataSource implements TemporalData
   }
 
   @Override
-  public TemporalGraphCollection getTemporalGraphCollection() throws IOException {
+  public TemporalGraphCollection getTemporalGraphCollection() {
     TemporalGraphCollectionFactory collectionFactory = getConfig().getTemporalGraphCollectionFactory();
     return getCollection(
       new CSVLineToTemporalGraphHead(collectionFactory.getGraphHeadFactory()),

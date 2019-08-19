@@ -25,6 +25,5 @@ import org.gradoop.common.model.api.entities.Element;
  *
  * @param <E> the element type
  */
-public interface TimeIntervalExtractor<E extends Element>
-  extends MapFunction<E, Tuple2<Long, Long>> {
+public interface TimeIntervalExtractor<E extends Element> extends MapFunction<E, Tuple2<Long, Long>> {
 }

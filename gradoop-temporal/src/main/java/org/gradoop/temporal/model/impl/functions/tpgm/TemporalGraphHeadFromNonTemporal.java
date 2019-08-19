@@ -26,8 +26,7 @@ import java.util.Objects;
 
 /**
  * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
- * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
- * information.
+ * default temporal information or, if a timeIntervalExtractor is given, by the extracted time information.
  *
  * @param <G> The (non-temporal) graph-head type.
  */
@@ -55,8 +54,7 @@ public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
 
   /**
    * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
-   * will have valid times extracted from the non-temporal instance by the given
-   * timeIntervalExtractor.
+   * will have valid times extracted from the non-temporal instance by the given timeIntervalExtractor.
    *
    * @param elementFactory factory that is responsible for creating a temporal graph head instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values

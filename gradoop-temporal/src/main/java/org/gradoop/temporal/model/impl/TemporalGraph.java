@@ -16,6 +16,7 @@
 package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -35,9 +36,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatte
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
-import org.gradoop.temporal.model.impl.functions.tpgm.EdgeFromTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadFromTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.VertexFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -50,19 +51,21 @@ import java.io.IOException;
  * A temporal (logical) graph is a base concept of the Temporal Property Graph Model (TPGM) that
  * extends the Extended Property Graph Model (EPGM). The temporal graph inherits the main concepts
  * of the {@link org.gradoop.flink.model.impl.epgm.LogicalGraph} and extends them by temporal
- * attributes. These attributes are two temporal information: the valid-time and transaction time.
- * Both are represented by a Tuple2 of Long values that specify the beginning and end time as unix
+ * attributes. These attributes are two temporal intervals: the valid-time and transaction time.
+ * Both are represented by a {@link Tuple2} of Long values that specify the beginning and end time as unix
  * timestamp in milliseconds.
  *
- * transactionTime: (tx-from [ms], tx-to [ms])
- * validTime: (val-from [ms], val-to [ms])
+ * <ul>
+ *   <li>{@code transactionTime}: {@code (tx-from [ms], tx-to [ms])}</li>
+ *   <li>{@code validTime}: {@code (val-from [ms], val-to [ms])}</li>
+ * </ul>
  *
  * Furthermore, a temporal graph provides operations that are performed on the underlying data.
  * These operations result in either another temporal graph or in a {@link TemporalGraphCollection}.
  *
  * Analogous to a logical graph, a temporal graph is wrapping a layout which defines, how the graph
- * is represented in Apache Flink.
- * Note that the {@link TemporalGraph} also implements that interface and just forward the calls to
+ * is represented in Apache Flink.<br>
+ * Note that the {@link TemporalGraph} also implements that interface and just forwards the calls to
  * the layout. This is just for convenience and API synchronicity.
  */
 public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge,
@@ -222,8 +225,8 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   public LogicalGraph toLogicalGraph() {
     final LogicalGraphFactory logicalGraphFactory = getConfig().getLogicalGraphFactory();
     return logicalGraphFactory.fromDataSets(
-      getGraphHead().map(new GraphHeadFromTemporal(logicalGraphFactory.getGraphHeadFactory())),
-      getVertices().map(new VertexFromTemporal(logicalGraphFactory.getVertexFactory())),
-      getEdges().map(new EdgeFromTemporal(logicalGraphFactory.getEdgeFactory())));
+      getGraphHead().map(new TemporalGraphHeadToGraphHead(logicalGraphFactory.getGraphHeadFactory())),
+      getVertices().map(new TemporalVertexToVertex(logicalGraphFactory.getVertexFactory())),
+      getEdges().map(new TemporalEdgeToEdge(logicalGraphFactory.getEdgeFactory())));
   }
 }

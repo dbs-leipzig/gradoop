@@ -17,6 +17,7 @@ package org.gradoop.temporal.io.impl.csv.functions;
 
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -24,7 +25,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import java.util.regex.Matcher;
 
 /**
- * Creates an {@link TemporalEdge} from a CSV string. The function uses a {@link org.gradoop.common.model.impl.metadata.MetaData}
+ * Creates an {@link TemporalEdge} from a CSV string. The function uses a {@link MetaData}
  * object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:

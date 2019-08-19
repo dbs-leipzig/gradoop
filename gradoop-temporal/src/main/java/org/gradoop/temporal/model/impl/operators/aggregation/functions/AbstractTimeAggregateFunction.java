@@ -72,8 +72,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
 
   /**
    * Get a time stamp as the aggregate value from a temporal element.
-   * The value will be the value of a {@link TemporalAttribute.Field} of a
-   * {@link TemporalAttribute}.
+   * The value will be the value of a {@link TemporalAttribute.Field} of a {@link TemporalAttribute}.
    *
    * @param element The temporal element.
    * @return The value, as a long-type property value.
@@ -89,8 +88,8 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Temporal attribute " + interval + " is not supported " +
-        "by this aggregate function.");
+      throw new IllegalArgumentException("Temporal attribute " + interval +
+        " is not supported by this aggregate function.");
     }
     switch (field) {
     case FROM:
@@ -114,9 +113,9 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    */
   PropertyValue applyAggregateWithDefaults(PropertyValue aggregate, PropertyValue increment,
     BiFunction<PropertyValue, PropertyValue, PropertyValue> comparison) {
-    if (aggregate.isNull() || isDefaultValue(aggregate)) {
-      return isDefaultValue(increment) ? PropertyValue.NULL_VALUE : increment;
-    } else if (increment.isNull() || isDefaultValue(increment)) {
+    if (aggregate.isNull() || isDefaultTime(aggregate)) {
+      return isDefaultTime(increment) ? PropertyValue.NULL_VALUE : increment;
+    } else if (increment.isNull() || isDefaultTime(increment)) {
       return aggregate;
     } else {
       return comparison.apply(aggregate, increment);
@@ -132,7 +131,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    * @param value the property value to check
    * @return true, if the time semantic is valid time and the value equals a default temporal value.
    */
-  private boolean isDefaultValue(PropertyValue value) {
+  private boolean isDefaultTime(PropertyValue value) {
     return interval == TemporalAttribute.VALID_TIME &&
       (value.equals(defaultFromValue) || value.equals(defaultToValue));
   }

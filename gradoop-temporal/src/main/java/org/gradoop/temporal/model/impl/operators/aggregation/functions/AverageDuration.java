@@ -29,11 +29,9 @@ import java.util.Objects;
 /**
  * Calculate the average duration of a time interval of temporal elements.
  * Time intervals can be {@link TemporalAttribute}s.
- * Time intervals with either the start or end time set to the respective default value will be
- * ignored.
+ * Time intervals with either the start or end time set to the respective default value will be ignored.
  */
-public class AverageDuration extends BaseAggregateFunction
-  implements Average, TemporalAggregateFunction {
+public class AverageDuration extends BaseAggregateFunction implements Average, TemporalAggregateFunction {
 
   /**
    * A property value containing the number {@code 1}, as a {@link Long}.
@@ -63,8 +61,7 @@ public class AverageDuration extends BaseAggregateFunction
    * to a default value.
    *
    * @param element The temporal element.
-   * @return The duration of the time interval, in the internal representation used by
-   * {@link Average}.
+   * @return The duration of the time interval, in the internal representation used by {@link Average}.
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {

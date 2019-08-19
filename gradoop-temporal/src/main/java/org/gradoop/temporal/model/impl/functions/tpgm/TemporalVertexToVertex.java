@@ -28,7 +28,7 @@ import java.util.Objects;
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties;graphIds")
-public class VertexFromTemporal implements MapFunction<TemporalVertex, EPGMVertex> {
+public class TemporalVertexToVertex implements MapFunction<TemporalVertex, EPGMVertex> {
 
   /**
    * Used to reduce instantiations
@@ -40,7 +40,7 @@ public class VertexFromTemporal implements MapFunction<TemporalVertex, EPGMVerte
    *
    * @param vertexFactory A factory used to create EPGM vertices.
    */
-  public VertexFromTemporal(VertexFactory<EPGMVertex> vertexFactory) {
+  public TemporalVertexToVertex(VertexFactory<EPGMVertex> vertexFactory) {
     this.reuse = Objects.requireNonNull(vertexFactory).createVertex();
   }
 

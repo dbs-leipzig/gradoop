@@ -33,8 +33,6 @@ import org.gradoop.temporal.io.impl.csv.tuples.TemporalCSVVertex;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 
-import java.io.IOException;
-
 /**
  * A data sink storing graphs and graph collections as CSV files.
  */
@@ -62,22 +60,22 @@ public class TemporalCSVDataSink extends CSVDataSink implements TemporalDataSink
   }
 
   @Override
-  public void write(TemporalGraph temporalGraph) throws IOException {
+  public void write(TemporalGraph temporalGraph) {
     write(temporalGraph, false);
   }
 
   @Override
-  public void write(TemporalGraphCollection temporalGraphCollection) throws IOException {
+  public void write(TemporalGraphCollection temporalGraphCollection) {
     write(temporalGraphCollection, false);
   }
 
   @Override
-  public void write(TemporalGraph temporalGraph, boolean overwrite) throws IOException {
+  public void write(TemporalGraph temporalGraph, boolean overwrite) {
     write(temporalGraph.getCollectionFactory().fromGraph(temporalGraph), overwrite);
   }
 
   @Override
-  public void write(TemporalGraphCollection temporalGraphCollection, boolean overwrite) throws IOException {
+  public void write(TemporalGraphCollection temporalGraphCollection, boolean overwrite) {
     FileSystem.WriteMode writeMode = overwrite ?
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
     DataSet<Tuple3<String, String, String>> metaData;

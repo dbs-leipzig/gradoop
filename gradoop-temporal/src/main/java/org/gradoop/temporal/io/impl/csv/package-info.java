@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * A DataSource and -Sink implementation storing graphs and graph collections as CSV files.
+ * A DataSource and -Sink implementation storing temporal graphs and graph collections as CSV files.
  */
 package org.gradoop.temporal.io.impl.csv;

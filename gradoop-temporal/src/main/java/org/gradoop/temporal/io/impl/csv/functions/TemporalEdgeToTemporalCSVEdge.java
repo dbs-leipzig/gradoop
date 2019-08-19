@@ -32,13 +32,12 @@ public class TemporalEdgeToTemporalCSVEdge extends TemporalElementToCSV<Temporal
   private final TemporalCSVEdge csvEdge = new TemporalCSVEdge();
 
   @Override
-  public TemporalCSVEdge map(TemporalEdge temporalEdge) throws Exception {
+  public TemporalCSVEdge map(TemporalEdge temporalEdge) {
     csvEdge.setId(temporalEdge.getId().toString());
     csvEdge.setGradoopIds(collectionToCsvString(temporalEdge.getGraphIds()));
     csvEdge.setSourceId(temporalEdge.getSourceId().toString());
     csvEdge.setTargetId(temporalEdge.getTargetId().toString());
-    csvEdge.setLabel(StringEscaper.escape(temporalEdge.getLabel(),
-      CSVConstants.ESCAPED_CHARACTERS));
+    csvEdge.setLabel(StringEscaper.escape(temporalEdge.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
     csvEdge.setProperties(getPropertyString(temporalEdge, MetaDataSource.EDGE_TYPE));
     csvEdge.setTemporalData(getTemporalDataString(temporalEdge.getTransactionTime(),
       temporalEdge.getValidTime()));

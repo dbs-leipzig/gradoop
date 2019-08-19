@@ -76,8 +76,7 @@ public class TemporalVertexFactory implements VertexFactory<TemporalVertex>, Ser
   }
 
   @Override
-  public TemporalVertex initVertex(GradoopId id, String label, Properties properties,
-    GradoopIdSet graphIds) {
+  public TemporalVertex initVertex(GradoopId id, String label, Properties properties, GradoopIdSet graphIds) {
     return new TemporalVertex(
       Objects.requireNonNull(id, "Identifier is null."),
       Objects.requireNonNull(label, "Label is null."),

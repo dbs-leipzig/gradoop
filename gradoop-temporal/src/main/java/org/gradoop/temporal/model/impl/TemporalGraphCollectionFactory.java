@@ -47,15 +47,13 @@ import java.util.Map;
 /**
  * Responsible for creating instances of {@link TemporalGraphCollection} based on a specific layout.
  */
-public class TemporalGraphCollectionFactory
-  implements BaseGraphCollectionFactory<
+public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactory<
   TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection> {
 
   /**
    * The factory to create a temporal layout.
    */
-  private GraphCollectionLayoutFactory<TemporalGraphHead, TemporalVertex, TemporalEdge>
-    layoutFactory;
+  private GraphCollectionLayoutFactory<TemporalGraphHead, TemporalVertex, TemporalEdge> layoutFactory;
 
   /**
    * Temporal Gradoop config.
@@ -87,15 +85,13 @@ public class TemporalGraphCollectionFactory
   @Override
   public TemporalGraphCollection fromDataSets(DataSet<TemporalGraphHead> graphHeads,
     DataSet<TemporalVertex> vertices) {
-    return new TemporalGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices),
-      config);
+    return new TemporalGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
   }
 
   @Override
   public TemporalGraphCollection fromDataSets(DataSet<TemporalGraphHead> graphHeads,
     DataSet<TemporalVertex> vertices, DataSet<TemporalEdge> edges) {
-    return new TemporalGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges),
-      config);
+    return new TemporalGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
   @Override
@@ -111,8 +107,7 @@ public class TemporalGraphCollectionFactory
   @Override
   public TemporalGraphCollection fromCollections(Collection<TemporalGraphHead> graphHeads,
     Collection<TemporalVertex> vertices, Collection<TemporalEdge> edges) {
-    return new TemporalGraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges),
-      config);
+    return new TemporalGraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
   @Override
@@ -148,7 +143,7 @@ public class TemporalGraphCollectionFactory
   public TemporalGraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<TemporalVertex, TemporalVertex> vertexMergeReducer,
     GroupReduceFunction<TemporalEdge, TemporalEdge> edgeMergeReducer) {
-    return null;
+    throw new UnsupportedOperationException("This operation is not (yet) supported.");
   }
 
   @Override
@@ -191,10 +186,9 @@ public class TemporalGraphCollectionFactory
   }
 
   /**
-   * Creates a {@link TemporalGraphCollection} instance. By the provided
-   * timestamp extractors, it is possible to extract temporal information from the data to
-   * define a timestamp or time interval that represents the beginning and end of the element's
-   * validity (valid time).
+   * Creates a {@link TemporalGraphCollection} instance. By the provided timestamp extractors, it is
+   * possible to extract temporal information from the data to define a timestamp or time interval that
+   * represents the beginning and end of the element's validity (valid time).
    *
    * @param graphHead graph head DataSet
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads

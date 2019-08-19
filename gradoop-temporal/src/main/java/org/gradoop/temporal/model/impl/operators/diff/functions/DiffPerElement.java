@@ -48,8 +48,7 @@ public class DiffPerElement<E extends TemporalElement> implements FlatMapFunctio
   private final TemporalPredicate second;
 
   /**
-   * Create an instance of this function, setting the two temporal predicates used to determine
-   * the snapshots.
+   * Create an instance of this function, setting the two temporal predicates used to determine the snapshots.
    *
    * @param first  The predicate used for the first snapshot.
    * @param second The predicate used for the second snapshot.

@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalAttribute;
 /**
  * Aggregates the minimum value of a time value for temporal edges.
  * The value will be calculated as the minimum of a {@link TemporalAttribute.Field} of a
- * {@link TemporalAttribute}, ignoring the default value (in this case {@link Long#MAX_VALUE}).
+ * {@link TemporalAttribute}, ignoring the default value (in this case {@link Long#MIN_VALUE}).
  */
 public class MinEdgeTime extends MinTime implements EdgeAggregateFunction {
 

@@ -107,13 +107,12 @@ public class TemporalEdgeFactory implements EdgeFactory<TemporalEdge>, Serializa
    * @return the temporal edge instance
    */
   public TemporalEdge initEdge(GradoopId id, String label, GradoopId sourceVertexId,
-    GradoopId targetVertexId, Properties properties, GradoopIdSet graphIds, Long validFrom,
-    Long validTo) {
+    GradoopId targetVertexId, Properties properties, GradoopIdSet graphIds, Long validFrom, Long validTo) {
     return new TemporalEdge(
       Objects.requireNonNull(id, "Identifier is null."),
       Objects.requireNonNull(label, "Label is null."),
-      Objects.requireNonNull(sourceVertexId, "Source vertex id was null."),
-      Objects.requireNonNull(targetVertexId, "Target vertex id was null."),
+      Objects.requireNonNull(sourceVertexId, "Source vertex id is null."),
+      Objects.requireNonNull(targetVertexId, "Target vertex id is null."),
       properties,
       graphIds,
       validFrom,
@@ -121,10 +120,10 @@ public class TemporalEdgeFactory implements EdgeFactory<TemporalEdge>, Serializa
   }
 
   /**
-   * Helper function to create a TPGM edge from an EPGM edge.
+   * Helper function to create a TPGM edge from any edge.
    * The ids, label and all other information will be inherited.
    *
-   * @param edge the EPGM edge instance
+   * @param edge an edge instance
    * @return a TPGM edge instance with default values at its valid times
    */
   public TemporalEdge fromNonTemporalEdge(Edge edge) {

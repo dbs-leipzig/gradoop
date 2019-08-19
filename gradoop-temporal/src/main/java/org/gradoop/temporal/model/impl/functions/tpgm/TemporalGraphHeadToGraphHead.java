@@ -28,7 +28,7 @@ import java.util.Objects;
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class GraphHeadFromTemporal implements MapFunction<TemporalGraphHead, EPGMGraphHead> {
+public class TemporalGraphHeadToGraphHead implements MapFunction<TemporalGraphHead, EPGMGraphHead> {
 
   /**
    * Used to reduce instantiations.
@@ -40,7 +40,7 @@ public class GraphHeadFromTemporal implements MapFunction<TemporalGraphHead, EPG
    *
    * @param graphHeadFactory A factory used to create EPGM graph heads.
    */
-  public GraphHeadFromTemporal(GraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
+  public TemporalGraphHeadToGraphHead(GraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
     reuse = Objects.requireNonNull(graphHeadFactory).createGraphHead();
   }
 

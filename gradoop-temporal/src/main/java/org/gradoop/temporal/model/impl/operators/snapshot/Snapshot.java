@@ -26,9 +26,8 @@ import java.util.Objects;
 
 /**
  * Extracts a snapshot of a temporal graph using a given temporal predicate.
- * This will calculate the subgraph of a temporal graph induced by the predicate. The graph head is
- * preserved.
- *
+ * This will calculate the subgraph of a temporal graph induced by the predicate. The graph head is preserved.
+ * <p>
  * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
  * {@link TemporalGraph#verify()} operator to validate the graph.
  */

@@ -37,8 +37,8 @@ public class TemporalGraphHead extends TemporalElement implements GraphHead {
    * @param id the Gradoop identifier
    * @param label the label
    * @param properties the graph head properties
-   * @param validFrom the start of the edge validity as timestamp represented as long
-   * @param validTo the end of the edge validity as timestamp represented as long
+   * @param validFrom the start of the graph head validity as timestamp represented as long
+   * @param validTo the end of the graph head validity as timestamp represented as long
    */
   public TemporalGraphHead(GradoopId id, String label, Properties properties, Long validFrom,
     Long validTo) {

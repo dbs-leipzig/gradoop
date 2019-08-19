@@ -16,13 +16,23 @@
 package org.gradoop.temporal.io.impl.csv.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple7;
-import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
 
 /**
  * Tuple representing a temporal edge in a CSV file.
+ * <p>
+ * The tuple fields are:
+ * <ol start="0">
+ *   <li>the ID, as a String</li>
+ *   <li>the IDs of the graphs that contain this edge</li>
+ *   <li>the ID of the source vertex</li>
+ *   <li>the ID of the target vertex</li>
+ *   <li>the label</li>
+ *   <li>the properties, encoded as a String according to the meta data</li>
+ *   <li>the temporal data (transaction- and valid-times)</li>
+ * </ol>
  */
 public class TemporalCSVEdge extends Tuple7<String, String, String, String, String, String, String>
-  implements CSVElement, TemporalCSVElement {
+  implements TemporalCSVElement {
 
   @Override
   public String getId() {

@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Common test utilities for temporal graphs and graph elements.
@@ -78,7 +77,6 @@ public class TemporalGradoopTestUtils {
       assertEquals(firstElement.getTransactionTime(), secondElement.getTransactionTime());
       assertEquals(firstElement.getValidTime(), secondElement.getValidTime());
     }
-    assertFalse("Too many elements in second collection", it2.hasNext());
   }
 
   /**

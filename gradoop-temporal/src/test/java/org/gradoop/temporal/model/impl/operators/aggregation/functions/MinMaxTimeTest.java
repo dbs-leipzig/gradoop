@@ -42,8 +42,7 @@ import static org.gradoop.temporal.model.api.functions.TemporalAttribute.VALID_T
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test for {@link MinTime} and {@link MaxTime} (by testing the respective vertex- and
- * edge-aggregations).
+ * Test for {@link MinTime} and {@link MaxTime} (by testing the respective vertex- and edge-aggregations).
  */
 @RunWith(Parameterized.class)
 public class MinMaxTimeTest extends TemporalGradoopTestBase {
@@ -141,8 +140,7 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   /**
    * Test all {@link MinTime} and {@link MaxTime} related aggregate function where all
    * temporal temporal attributes are set to default values.
-   * This will check if the aggregate values are null, when all of the values are set to
-   * the default value.
+   * This will check if the aggregate values are null, when all of the values are set to the default value.
    *
    * @throws Exception when the execution in Flink fails.
    */

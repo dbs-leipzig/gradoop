@@ -55,10 +55,10 @@ public class TemporalGraphLayoutFactory extends TemporalBaseLayoutFactory
     // update vertices and edges with new graph head id
     vertices = vertices
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("id;label;properties;transactionTime;validTime");
     edges = edges
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties");
+      .withForwardedFields("id;sourceId;targetId;label;properties;transactionTime;validTime");
 
     return new TemporalGVELayout(graphHeadSet, vertices, edges);
   }

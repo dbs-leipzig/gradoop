@@ -34,8 +34,7 @@ abstract class CSVLineToTemporalElement<E extends TemporalElement> extends CSVLi
   /**
    * Data pattern to parse a temporal string representation of transaction and valid time.
    * The pattern contains four groups that capsule numeric values in format
-   * {@code (tx-from,tx-to),(val-from,val-to)} where group 1 contains tx-from value,
-   * group 2 tx-to value, etc.
+   * {@code (tx-from,tx-to),(val-from,val-to)} where group 1 contains tx-from value, group 2 tx-to value, etc.
    */
   static final Pattern TEMPORAL_PATTERN =
     Pattern.compile("\\((-?\\d+),(-?\\d+)\\),\\((-?\\d+),(-?\\d+)\\)");

@@ -15,10 +15,12 @@
  */
 package org.gradoop.temporal.io.impl.csv.tuples;
 
+import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
+
 /**
  * Interface representing a temporal CSVElement in a CSV file.
  */
-public interface TemporalCSVElement {
+public interface TemporalCSVElement extends CSVElement {
   /**
    * Get the temporal data as String representation.
    *

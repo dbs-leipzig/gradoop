@@ -25,11 +25,10 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import java.util.Objects;
 
 /**
- * Initializes a {@link EPGMEdge} from a {@link TemporalEdge} instance by discarding the temporal
- * information.
+ * Initializes a {@link EPGMEdge} from a {@link TemporalEdge} instance by discarding the temporal information.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;label;properties;graphIds")
-public class EdgeFromTemporal implements MapFunction<TemporalEdge, EPGMEdge> {
+public class TemporalEdgeToEdge implements MapFunction<TemporalEdge, EPGMEdge> {
 
   /**
    * Used to reduce instantiations.
@@ -41,12 +40,12 @@ public class EdgeFromTemporal implements MapFunction<TemporalEdge, EPGMEdge> {
    *
    * @param edgeFactory A factory used to create EPGM edges.
    */
-  public EdgeFromTemporal(EdgeFactory<EPGMEdge> edgeFactory) {
+  public TemporalEdgeToEdge(EdgeFactory<EPGMEdge> edgeFactory) {
     this.reuse = Objects.requireNonNull(edgeFactory).createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
   }
 
   @Override
-  public EPGMEdge map(TemporalEdge value) throws Exception {
+  public EPGMEdge map(TemporalEdge value) {
     reuse.setId(value.getId());
     reuse.setLabel(value.getLabel());
     reuse.setSourceId(value.getSourceId());

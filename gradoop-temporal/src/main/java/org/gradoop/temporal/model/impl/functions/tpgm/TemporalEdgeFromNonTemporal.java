@@ -27,8 +27,7 @@ import java.util.Objects;
 
 /**
  * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting either
- * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
- * information.
+ * default temporal information or, if a timeIntervalExtractor is given, by the extracted time information.
  *
  * @param <E> The (non-temporal) edge type.
  */
@@ -55,8 +54,7 @@ public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<
 
   /**
    * Creates an instance of the TemporalEdgeFromNonTemporal map function. The temporal instance
-   * will have valid times extracted from the non-temporal instance by the given
-   * timeIntervalExtractor.
+   * will have valid times extracted from the non-temporal instance by the given timeIntervalExtractor.
    *
    * @param elementFactory factory that is responsible for creating a temporal edge instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values

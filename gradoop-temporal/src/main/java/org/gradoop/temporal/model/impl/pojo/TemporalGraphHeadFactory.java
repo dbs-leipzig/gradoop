@@ -27,8 +27,7 @@ import java.util.Objects;
 /**
  * Factory for creating temporal graph head POJOs.
  */
-public class TemporalGraphHeadFactory implements GraphHeadFactory<TemporalGraphHead>,
-  Serializable {
+public class TemporalGraphHeadFactory implements GraphHeadFactory<TemporalGraphHead>, Serializable {
 
   @Override
   public TemporalGraphHead createGraphHead() {

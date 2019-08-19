@@ -30,6 +30,7 @@ import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
+import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
 
 import java.util.Objects;
@@ -83,8 +84,7 @@ public interface TemporalGraphOperators {
 
   /**
    * Extracts a snapshot of this temporal graph using the temporal predicate
-   * {@code BETWEEN fromTimestamp AND toTimestamp} where both values are timestamps in
-   * milliseconds.
+   * {@code BETWEEN fromTimestamp AND toTimestamp} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
    * @param toTimestamp the to timestamp in milliseconds to query
@@ -98,8 +98,7 @@ public interface TemporalGraphOperators {
 
   /**
    * Extracts a snapshot of this temporal graph using the temporal predicate
-   * {@code CONTAINED IN (fromTimestamp, toTimestamp)} where both values are timestamps in
-   * milliseconds.
+   * {@code CONTAINED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
    * @param toTimestamp the to timestamp in milliseconds to query
@@ -113,8 +112,7 @@ public interface TemporalGraphOperators {
 
   /**
    * Extracts a snapshot of this temporal graph using the temporal predicate
-   * {@code VALID DURING (fromTimestamp, toTimestamp)} where both values are timestamps in
-   * milliseconds.
+   * {@code VALID DURING (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
    * @param toTimestamp the to timestamp in milliseconds to query
@@ -128,8 +126,7 @@ public interface TemporalGraphOperators {
 
   /**
    * Extracts a snapshot of this temporal graph using the temporal predicate
-   * {@code CREATED IN (fromTimestamp, toTimestamp)} where both values are timestamps in
-   * milliseconds.
+   * {@code CREATED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
    * @param toTimestamp the to timestamp in milliseconds to query
@@ -143,8 +140,7 @@ public interface TemporalGraphOperators {
 
   /**
    * Extracts a snapshot of this temporal graph using the temporal predicate
-   * {@code DELETED IN (fromTimestamp, toTimestamp)} where both values are timestamps in
-   * milliseconds.
+   * {@code DELETED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
    * @param toTimestamp the to timestamp in milliseconds to query
@@ -162,7 +158,7 @@ public interface TemporalGraphOperators {
    * snapshot compared to the first snapshot.
    *
    * This operation returns the union of both snapshots with the following changes:
-   * A property with key {@value org.gradoop.temporal.model.impl.operators.diff.Diff#PROPERTY_KEY}
+   * A property with key {@value Diff#PROPERTY_KEY}
    * will be set on each graph element. Its value will be set to
    * <ul>
    *   <li>{@code 0}, if the element is present in both snapshots.</li>
@@ -179,8 +175,7 @@ public interface TemporalGraphOperators {
    * @param secondSnapshot The predicate used to determine the second snapshot.
    * @return A logical graph containing the union of vertex and edge sets of both snapshots,
    * defined by the given two predicate functions. A property with key
-   * {@link org.gradoop.temporal.model.impl.operators.diff.Diff#PROPERTY_KEY} is set on each graph
-   * element with a numerical value (-1, 0, 1) defined above.
+   * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
   TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot);
 
@@ -210,8 +205,7 @@ public interface TemporalGraphOperators {
    * provide statistics for the query planner.
    *
    * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
+   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
    *
    * <pre>
    * <code>graph.query(
@@ -251,8 +245,7 @@ public interface TemporalGraphOperators {
    * the data graph elements is attached to the resulting vertices.
    *
    * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
+   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
    *
    * <pre>
    * <code>graph.query(
@@ -262,7 +255,7 @@ public interface TemporalGraphOperators {
    * </pre>
    *
    * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   * construction pattern defines a new edge of type {@code CO_AUTHOR} between the two entities.
    *
    * @param query Cypher query
    * @param constructionPattern Construction pattern
@@ -317,8 +310,7 @@ public interface TemporalGraphOperators {
   TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator);
 
   /**
-   * Creates a graph collection from that graph using the given unary graph
-   * operator.
+   * Creates a graph collection from that graph using the given unary graph operator.
    *
    * @param operator unary graph to collection operator
    * @return result of given operator

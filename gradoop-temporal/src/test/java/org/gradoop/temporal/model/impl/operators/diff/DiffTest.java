@@ -47,7 +47,6 @@ public class DiffTest extends TemporalGradoopTestBase {
     LogicalGraph inputGraphEpgm = loader.getLogicalGraphByVariable("g3");
     TemporalGraph temporalGraph = toTemporalGraphWithDefaultExtractors(inputGraphEpgm);
     TemporalGraph result = temporalGraph.diff(new AsOf(1543600000000L), new AsOf(1543800000000L));
-    collectAndAssertTrue(loader.getLogicalGraphByVariable("expected").equalsByData(
-      result.toLogicalGraph()));
+    collectAndAssertTrue(loader.getLogicalGraphByVariable("expected").equalsByData(result.toLogicalGraph()));
   }
 }

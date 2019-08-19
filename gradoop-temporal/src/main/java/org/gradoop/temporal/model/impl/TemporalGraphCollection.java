@@ -34,9 +34,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
-import org.gradoop.temporal.model.impl.functions.tpgm.EdgeFromTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadFromTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.VertexFromTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -47,21 +47,20 @@ import java.io.IOException;
 /**
  * A temporal graph collection is a base concept of the Temporal Property Graph Model (TPGM)
  * that extends the Extended Property Graph Model (EPGM). The temporal graph collection
- * inherits the main concepts of the {@link org.gradoop.flink.model.impl.epgm.GraphCollection} and
- * extends them by temporal attributes. These attributes are two temporal information:
+ * inherits the main concepts of the {@link GraphCollection} and
+ * extends them by temporal attributes. These attributes are two temporal intervals:
  * the valid-time and transaction time. Both are represented by a Tuple2 of Long values that specify
  * the beginning and end time as unix timestamp in milliseconds.
- * <p>
- * transactionTime: {@code (tx-from [ms], tx-to [ms])}<br>
- * validTime: {@code (val-from [ms], val-to [ms])}
- * <p>
+ * <ul>
+ *   <li>{@code transactionTime}: {@code (tx-from [ms], tx-to [ms])}</li>
+ *   <li>{@code validTime}: {@code (val-from [ms], val-to [ms])}</li>
+ * </ul>
  * Furthermore, a temporal graph collection provides operations that are performed on the underlying
- * data. These operations result in either another temporal graph collection or in a
- * {@link TemporalGraph}.
+ * data. These operations result in either another temporal graph collection or in a{@link TemporalGraph}.
  * <p>
- * Analogous to a {@link org.gradoop.flink.model.impl.epgm.GraphCollection}, a temporal graph
- * collection is wrapping a layout which defines, how the graph is represented in Apache Flink.
- * Note that the {@link TemporalGraphCollection} also implements that interface and just forward
+ * Analogous to a {@link GraphCollection}, a temporal graph
+ * collection is wrapping a layout which defines, how the graph is represented in Apache Flink.<br>
+ * Note that the {@link TemporalGraphCollection} also implements that interface and just forwards
  * the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class TemporalGraphCollection implements BaseGraphCollection<
@@ -70,7 +69,7 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   TemporalGraphCollectionOperators {
 
   /**
-   * Layout for that temporal graph.
+   * Layout for this temporal graph collection.
    */
   private final GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout;
 
@@ -167,17 +166,17 @@ public class TemporalGraphCollection implements BaseGraphCollection<
 
   @Override
   public boolean isGVELayout() {
-    return true;
+    return this.layout.isGVELayout();
   }
 
   @Override
   public boolean isIndexedGVELayout() {
-    return false;
+    return this.layout.isIndexedGVELayout();
   }
 
   @Override
   public boolean isTransactionalLayout() {
-    return false;
+    return this.layout.isTransactionalLayout();
   }
 
   @Override
@@ -202,9 +201,9 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   public GraphCollection toGraphCollection() {
     final GraphCollectionFactory collectionFactory = this.config.getGraphCollectionFactory();
     return collectionFactory.fromDataSets(
-      getGraphHeads().map(new GraphHeadFromTemporal(collectionFactory.getGraphHeadFactory())),
-      getVertices().map(new VertexFromTemporal(collectionFactory.getVertexFactory())),
-      getEdges().map(new EdgeFromTemporal(collectionFactory.getEdgeFactory())));
+      getGraphHeads().map(new TemporalGraphHeadToGraphHead(collectionFactory.getGraphHeadFactory())),
+      getVertices().map(new TemporalVertexToVertex(collectionFactory.getVertexFactory())),
+      getEdges().map(new TemporalEdgeToEdge(collectionFactory.getEdgeFactory())));
   }
 
   @Override

@@ -36,8 +36,7 @@ public class TemporalVertexToTemporalCSVVertex
   public TemporalCSVVertex map(TemporalVertex temporalVertex) {
     csvVertex.setId(temporalVertex.getId().toString());
     csvVertex.setGradoopIds(collectionToCsvString(temporalVertex.getGraphIds()));
-    csvVertex.setLabel(StringEscaper.escape(temporalVertex.getLabel(),
-      CSVConstants.ESCAPED_CHARACTERS));
+    csvVertex.setLabel(StringEscaper.escape(temporalVertex.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
     csvVertex.setProperties(getPropertyString(temporalVertex, MetaDataSource.VERTEX_TYPE));
     csvVertex.setTemporalData(getTemporalDataString(temporalVertex.getTransactionTime(),
       temporalVertex.getValidTime()));

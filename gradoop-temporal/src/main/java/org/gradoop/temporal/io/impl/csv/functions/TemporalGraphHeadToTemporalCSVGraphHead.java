@@ -33,7 +33,7 @@ public class TemporalGraphHeadToTemporalCSVGraphHead
   private final TemporalCSVGraphHead csvGraphHead = new TemporalCSVGraphHead();
 
   @Override
-  public TemporalCSVGraphHead map(TemporalGraphHead temporalGraphHead) throws Exception {
+  public TemporalCSVGraphHead map(TemporalGraphHead temporalGraphHead) {
     csvGraphHead.setId(temporalGraphHead.getId().toString());
     csvGraphHead.setLabel(StringEscaper.escape(temporalGraphHead.getLabel(),
       CSVConstants.ESCAPED_CHARACTERS));

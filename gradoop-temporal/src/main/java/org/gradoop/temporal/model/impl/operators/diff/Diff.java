@@ -34,7 +34,7 @@ import java.util.Objects;
  * containing the union of both graph element sets. Each element gets a new property named
  * {@link Diff#PROPERTY_KEY} whose value will be a number indicating that an element is either
  * equal in both snapshots (0) or added (1) or removed (-1) in the second snapshot.
- * Elements not present in both snapshots will be discarded.
+ * Elements not present in either snapshots will be discarded.
  * <p>
  * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
  * {@link TemporalGraph#verify()} operator to validate the graph. The graph head is preserved.
@@ -71,8 +71,7 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
   private final TemporalPredicate secondPredicate;
 
   /**
-   * Create an instance of the TPGM diff operator, setting the two predicates used to determine
-   * the snapshots.
+   * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
    *
    * @param firstPredicate  The predicate used for the first snapshot.
    * @param secondPredicate The predicate used for the second snapshot.

@@ -18,11 +18,12 @@ package org.gradoop.temporal.model.api.functions;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 /**
- * An aggregate function used by the {@link org.gradoop.flink.model.impl.operators.aggregation.Aggregation}
- * operator that handles {@link TemporalElement}s separately.
+ * An aggregate function used by the {@link Aggregation} operator that handles {@link TemporalElement}s
+ * separately.
  */
 public interface TemporalAggregateFunction extends AggregateFunction {
 
@@ -30,11 +31,11 @@ public interface TemporalAggregateFunction extends AggregateFunction {
    * Get the increment to be added to the aggregate from an element.
    * The default implementation of this method will check if the element is a temporal element,
    * in that case the increment will be determined by {@link #getIncrement(TemporalElement)}.
-   * Otherwise the value of {@link #getNonTemporalDefaultValue(Element)} will be used.
+   * Otherwise the value of {@link #getNonTemporalIncrement(Element)} will be used.
    * <br>
    * <b>Note: </b> Implementations of the {@link TemporalAggregateFunction} interface should
    * implement {@link #getIncrement(TemporalElement)} (and optionally
-   * {@link #getNonTemporalDefaultValue(Element)}) instead of this method.
+   * {@link #getNonTemporalIncrement(Element)}) instead of this method.
    *
    * @param element element used to get the increment
    * @return The increment, possibly {@code null}.
@@ -45,7 +46,7 @@ public interface TemporalAggregateFunction extends AggregateFunction {
     if (element instanceof TemporalElement) {
       return getIncrement((TemporalElement) element);
     } else {
-      return getNonTemporalDefaultValue(element);
+      return getNonTemporalIncrement(element);
     }
   }
 
@@ -56,7 +57,7 @@ public interface TemporalAggregateFunction extends AggregateFunction {
    * @param element The non-temporal element.
    * @return The default aggregate value.
    */
-  default PropertyValue getNonTemporalDefaultValue(Element element) {
+  default PropertyValue getNonTemporalIncrement(Element element) {
     throw new UnsupportedOperationException("This aggregate function only supports temporal " +
       "elements.");
   }

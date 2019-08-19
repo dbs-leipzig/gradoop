@@ -125,8 +125,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
 
   /**
    * Test the map function on some test elements.
-   * This will try all possible outcomes of the diff and check if the property value is set
-   * accordingly.
+   * This will try all possible outcomes of the diff and check if the property value is set accordingly.
    *
    * @param elementFactory A supplier used to create the test elements.
    * @param <E> The temporal element type to test the map function on.

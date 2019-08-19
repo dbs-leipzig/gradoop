@@ -138,8 +138,7 @@ public class TemporalGraphFactory implements
   }
 
   /**
-   * Creates a {@link TemporalGraph} instance by the given
-   * EPGM graph head, vertex and edge datasets.
+   * Creates a {@link TemporalGraph} instance by the given EPGM graph head, vertex and edge datasets.
    *
    * The method assumes that the given vertices and edges are already assigned to the given
    * graph head.
@@ -147,7 +146,7 @@ public class TemporalGraphFactory implements
    * @param graphHead   1-element graph head DataSet
    * @param vertices    vertex DataSet
    * @param edges       edge DataSet
-   * @return a temporal graph representing the temporal graph data
+   * @return a temporal graph with default temporal data
    */
   public TemporalGraph fromNonTemporalDataSets(
     DataSet<? extends GraphHead> graphHead,
@@ -164,8 +163,7 @@ public class TemporalGraphFactory implements
    * to extract temporal information from the data to define a timestamp or time interval that
    * represents the beginning and end of the element's validity (valid time).
    *
-   * The method assumes that the given vertices and edges are already assigned to the given
-   * graph head.
+   * The method assumes that the given vertices and edges are already assigned to the given graph head.
    *
    * @param graphHead 1-element graph head DataSet
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
@@ -176,7 +174,7 @@ public class TemporalGraphFactory implements
    * @param <G> The graph head type.
    * @param <V> The vertex type.
    * @param <E> The edge type.
-   * @return the logical graph represented as temporal graph with defined valid times
+   * @return a temporal graph with temporal data extracted using extractor functions
    */
   public <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraph fromNonTemporalDataSets(
     DataSet<G> graphHead,

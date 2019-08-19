@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Function used to aggregate temporal attributes.
+ * Functions used to aggregate temporal attributes.
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;

@@ -35,8 +35,7 @@ public class MinTime extends AbstractTimeAggregateFunction {
    * @param interval             The time-interval to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MinTime(String aggregatePropertyKey, TemporalAttribute interval,
-    TemporalAttribute.Field field) {
+  public MinTime(String aggregatePropertyKey, TemporalAttribute interval, TemporalAttribute.Field field) {
     super(aggregatePropertyKey, interval, field);
   }
 

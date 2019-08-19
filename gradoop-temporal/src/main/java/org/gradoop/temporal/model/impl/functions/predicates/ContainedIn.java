@@ -19,8 +19,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
  * Implementation of the <b>ContainedIn</b> temporal predicate.
- * Given a certain time interval, this predicate will match all intervals that are a
- * subset of that interval.
+ * Given a certain time interval, this predicate will match all intervals that are a subset of that interval.
  */
 public class ContainedIn implements TemporalPredicate {
 

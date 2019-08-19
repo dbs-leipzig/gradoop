@@ -59,8 +59,8 @@ public class SnapshotTest extends TemporalGradoopTestBase {
   public String resultGraph;
 
   /**
-   * Run the test. Calls the snapshot operator using a predicate and compares results with the
-   * expected result graph.
+   * Run the test. Calls the snapshot operator using a predicate and compares results with the expected
+   * result graph.
    *
    * @throws Exception when the Execution in Flink fails.
    */

@@ -32,8 +32,7 @@ public class MaxEdgeTime extends MaxTime implements EdgeAggregateFunction {
    * @param interval             The time-interval to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MaxEdgeTime(String aggregatePropertyKey, TemporalAttribute interval,
-    TemporalAttribute.Field field) {
+  public MaxEdgeTime(String aggregatePropertyKey, TemporalAttribute interval, TemporalAttribute.Field field) {
     super(aggregatePropertyKey, interval, field);
   }
 }
