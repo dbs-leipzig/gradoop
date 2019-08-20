@@ -132,9 +132,4 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
 
     return graph.getFactory().fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return PropagatePropertyToNeighbor.class.getName();
-  }
 }
