@@ -105,8 +105,4 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
     return graph.getFactory().fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
-  @Override
-  public String getName() {
-    return EdgeToVertex.class.getName();
-  }
 }

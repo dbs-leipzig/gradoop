@@ -17,6 +17,7 @@ package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -287,6 +288,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   private void checkImportedVertices(List<EPGMVertex> vertices) {
     assertEquals(3, vertices.size());
+    // Check that IDs are unique.
+    assertEquals(3, vertices.stream().map(Vertex::getId).distinct().count());
 
     for (EPGMVertex v : vertices) {
       switch (String.valueOf(v.getPropertyValue("name"))) {
