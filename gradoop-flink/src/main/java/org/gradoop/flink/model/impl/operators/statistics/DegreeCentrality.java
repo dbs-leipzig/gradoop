@@ -45,10 +45,5 @@ public class DegreeCentrality extends DegreeCentralityBase
       .sum(0)
       .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());
   }
-
-  @Override
-  public String getName() {
-    return DegreeCentrality.class.getName();
-  }
 }
 
