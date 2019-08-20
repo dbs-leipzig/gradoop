@@ -22,10 +22,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * A join function updating the source id of an edge from a mapping in the form of a pair with fields:
- * <ul start="0">
+ * <ol start="0">
  *   <li>the old source ID</li>
  *   <li>the new source ID</li>
- * </ul>
+ * </ol>
  * Note that this function can be used with an outer join, in that case the ID will not be updated.
  *
  * @param <E> The edge type.
