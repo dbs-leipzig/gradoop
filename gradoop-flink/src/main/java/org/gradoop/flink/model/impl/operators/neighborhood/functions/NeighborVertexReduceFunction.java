@@ -18,17 +18,19 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
  /**
   * Sets the aggregation result as property for each vertex. All edges together with the
   * relevant vertex and the opposite vertex of the edge were grouped.
+  *
+  * @param <V> vertex type
   */
-public class NeighborVertexReduceFunction
+public class NeighborVertexReduceFunction<V extends Vertex>
   extends NeighborVertexFunction
-  implements GroupReduceFunction<Tuple2<Vertex, Vertex>, Vertex> {
+  implements GroupReduceFunction<Tuple2<V, V>, V> {
 
   /**
    * Valued constructor.
@@ -40,16 +42,16 @@ public class NeighborVertexReduceFunction
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<Vertex, Vertex>> tuples,
-    Collector<Vertex> collector) throws Exception {
+  public void reduce(Iterable<Tuple2<V, V>> tuples,
+    Collector<V> collector) throws Exception {
 
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
-    Vertex vertex = null;
-    Vertex edgeVertex;
+    V vertex = null;
+    V edgeVertex;
     boolean isFirst = true;
 
     // aggregates the value of each opposite vertex of an edge
-    for (Tuple2<Vertex, Vertex> tuple : tuples) {
+    for (Tuple2<V, V> tuple : tuples) {
       edgeVertex = tuple.f0;
       if (isFirst) {
         // the current vertex is the same for each tuple
@@ -61,7 +63,9 @@ public class NeighborVertexReduceFunction
           .aggregate(propertyValue, getFunction().getIncrement(edgeVertex));
       }
     }
-    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
-    collector.collect(vertex);
+    if (vertex != null) {
+      vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
+      collector.collect(vertex);
+    }
   }
 }

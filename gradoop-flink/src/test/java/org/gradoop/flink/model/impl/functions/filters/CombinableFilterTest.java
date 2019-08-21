@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.functions.filters;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -32,11 +32,11 @@ import static org.junit.Assert.assertTrue;
 
 public class CombinableFilterTest extends GradoopFlinkTestBase {
 
-  private CombinableFilter<Object> alwaysTrue = e -> true;
+  private final CombinableFilter<Object> alwaysTrue = e -> true;
 
-  private CombinableFilter<Object> alwaysFalse = e -> false;
+  private final CombinableFilter<Object> alwaysFalse = e -> false;
 
-  private Object testObject = new Object();
+  private final Object testObject = new Object();
 
   @Test
   public void testAnd() throws Exception {
@@ -85,14 +85,14 @@ public class CombinableFilterTest extends GradoopFlinkTestBase {
     LogicalGraph databaseGraph = loader.getLogicalGraph();
     // Filter vertices where
     // (gender = 'f' AND city = 'Leipzig') OR NOT(label = 'Person' OR label = 'Forum')
-    FilterFunction<Vertex> vertexFilterFunction =
-      new ByProperty<Vertex>("gender", PropertyValue.create("f"))
+    FilterFunction<EPGMVertex> vertexFilterFunction =
+      new ByProperty<EPGMVertex>("gender", PropertyValue.create("f"))
       .and(new ByProperty<>("city", PropertyValue.create("Leipzig"))).or(
         new ByLabel<>("Person").or(new ByLabel<>("Forum")).negate());
     // Filter edges where
     // label <> 'hasInterest'
     LogicalGraph subgraph = databaseGraph.subgraph(vertexFilterFunction,
-      new ByLabel<Edge>("hasInterest").negate(), Subgraph.Strategy.BOTH);
+      new ByLabel<EPGMEdge>("hasInterest").negate(), Subgraph.Strategy.BOTH);
     collectAndAssertTrue(subgraph.equalsByElementIds(loader.getLogicalGraphByVariable("expected")));
   }
 }

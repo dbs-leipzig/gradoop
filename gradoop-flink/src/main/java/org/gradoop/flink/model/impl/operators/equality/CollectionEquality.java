@@ -16,11 +16,12 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
@@ -30,36 +31,43 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph collections are equal according to given
  * string representations of graph heads, vertices and edges.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class CollectionEquality
-  implements BinaryCollectionToValueOperator<Boolean> {
+public class CollectionEquality<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphCollectionToValueOperator<GC, DataSet<Boolean>> {
 
   /**
-   * builder to create the string representations of graph collections used for
-   * comparison.
+   * builder to create the string representations of graph collections used for comparison.
    */
-  private final CanonicalAdjacencyMatrixBuilder canonicalAdjacencyMatrixBuilder;
+  private final CanonicalAdjacencyMatrixBuilder<G, V, E, LG, GC> canonicalAdjacencyMatrixBuilder;
 
   /**
-   * constructor to set string representations
+   * Constructor to set string representations.
+   *
    * @param graphHeadToString string representation of graph heads
    * @param vertexToString string representation of vertices
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public CollectionEquality(GraphHeadToString<GraphHead> graphHeadToString,
-    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString,
-    boolean directed) {
-    /*
-    sets mode for directed or undirected graphs
-   */
-    this.canonicalAdjacencyMatrixBuilder = new CanonicalAdjacencyMatrixBuilder(
-        graphHeadToString, vertexToString, edgeToString, directed);
+  public CollectionEquality(GraphHeadToString<G> graphHeadToString,
+    VertexToString<V> vertexToString, EdgeToString<E> edgeToString, boolean directed) {
+    // sets mode for directed or undirected graphs
+    this.canonicalAdjacencyMatrixBuilder = new CanonicalAdjacencyMatrixBuilder<>(
+      graphHeadToString, vertexToString, edgeToString, directed);
   }
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection firstCollection,
-    GraphCollection secondCollection) {
+  public DataSet<Boolean> execute(GC firstCollection, GC secondCollection) {
     return Equals.cross(
       canonicalAdjacencyMatrixBuilder.execute(firstCollection),
       canonicalAdjacencyMatrixBuilder.execute(secondCollection)

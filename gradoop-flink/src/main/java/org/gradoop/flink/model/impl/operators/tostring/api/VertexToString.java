@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**

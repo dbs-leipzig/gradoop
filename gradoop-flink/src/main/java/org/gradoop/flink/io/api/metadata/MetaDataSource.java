@@ -20,12 +20,12 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -70,7 +70,8 @@ public interface MetaDataSource<M extends MetaData> {
    * @param graphs graph collection
    * @return meta data information
    */
-  default DataSet<Tuple3<String, String, String>> tuplesFromCollection(GraphCollection graphs) {
+  default DataSet<Tuple3<String, String, String>> tuplesFromCollection(
+    BaseGraphCollection<?, ?, ?, ?, ?> graphs) {
     return tuplesFromElements(graphs.getVertices())
       .union(tuplesFromElements(graphs.getEdges()))
       .union(tuplesFromElements(graphs.getGraphHeads()));

@@ -16,13 +16,13 @@
 package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * MapFunction, that writes a given property value to the GraphHead.
+ * MapFunction, that writes a given property value to the EPGMGraphHead.
  */
-public class WritePropertyToGraphHeadMap implements MapFunction<GraphHead, GraphHead> {
+public class WritePropertyToGraphHeadMap implements MapFunction<EPGMGraphHead, EPGMGraphHead> {
 
   /**
    * PropertyKey to access the value
@@ -30,15 +30,15 @@ public class WritePropertyToGraphHeadMap implements MapFunction<GraphHead, Graph
   private final String propertyKey;
 
   /**
-   * PropertyValue to store in GraphHead
+   * PropertyValue to store in EPGMGraphHead
    */
   private final PropertyValue propertyValue;
 
   /**
-   * Creates an instance of a MapFunction, that writes a given property value to the GraphHead.
+   * Creates an instance of a MapFunction, that writes a given property value to the EPGMGraphHead.
    *
    * @param propertyKey PropertyKey to access the value
-   * @param propertyValue PropertyValue to store in GraphHead
+   * @param propertyValue PropertyValue to store in EPGMGraphHead
    */
   public WritePropertyToGraphHeadMap(String propertyKey, PropertyValue propertyValue) {
     this.propertyKey = propertyKey;
@@ -46,7 +46,7 @@ public class WritePropertyToGraphHeadMap implements MapFunction<GraphHead, Graph
   }
 
   @Override
-  public GraphHead map(GraphHead graphHead) throws Exception {
+  public EPGMGraphHead map(EPGMGraphHead graphHead) throws Exception {
     graphHead.setProperty(propertyKey, propertyValue);
     return graphHead;
   }

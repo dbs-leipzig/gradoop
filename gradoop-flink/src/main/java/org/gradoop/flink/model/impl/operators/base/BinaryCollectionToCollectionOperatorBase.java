@@ -16,42 +16,52 @@
 package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 
 /**
  * Abstract operator implementation which can be used with binary collection
  * to collection operators.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
+ * @param <GC> type of the graph collection
  */
-public abstract class BinaryCollectionToCollectionOperatorBase
-  implements BinaryCollectionToCollectionOperator {
+public abstract class BinaryCollectionToCollectionOperatorBase<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   /**
    * First input collection.
    */
-  protected GraphCollection firstCollection;
+  protected GC firstCollection;
   /**
    * Second input collection.
    */
-  protected GraphCollection secondCollection;
+  protected GC secondCollection;
 
   @Override
-  public GraphCollection execute(
-    GraphCollection firstCollection,
-    GraphCollection secondCollection) {
+  public GC execute(GC firstCollection, GC secondCollection) {
 
     // do some init stuff for the actual operator
     this.firstCollection = firstCollection;
     this.secondCollection = secondCollection;
 
-    final DataSet<GraphHead> newGraphHeads = computeNewGraphHeads();
-    final DataSet<Vertex> newVertices = computeNewVertices(newGraphHeads);
-    final DataSet<Edge> newEdges = computeNewEdges(newVertices);
+    final DataSet<G> newGraphHeads = computeNewGraphHeads();
+    final DataSet<V> newVertices = computeNewVertices(newGraphHeads);
+    final DataSet<E> newEdges = computeNewEdges(newVertices);
 
-    return firstCollection.getConfig().getGraphCollectionFactory()
+    return firstCollection.getFactory()
       .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
 
@@ -61,15 +71,14 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    * @param newGraphHeads new graph heads
    * @return vertex set of the resulting graph collection
    */
-  protected abstract DataSet<Vertex> computeNewVertices(
-    DataSet<GraphHead> newGraphHeads);
+  protected abstract DataSet<V> computeNewVertices(DataSet<G> newGraphHeads);
 
   /**
    * Overridden by inheriting classes.
    *
    * @return subgraph dataset of the resulting collection
    */
-  protected abstract DataSet<GraphHead> computeNewGraphHeads();
+  protected abstract DataSet<G> computeNewGraphHeads();
 
   /**
    * Overridden by inheriting classes.
@@ -77,6 +86,6 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
    */
-  protected abstract DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices);
+  protected abstract DataSet<E> computeNewEdges(DataSet<V> newVertices);
 
 }

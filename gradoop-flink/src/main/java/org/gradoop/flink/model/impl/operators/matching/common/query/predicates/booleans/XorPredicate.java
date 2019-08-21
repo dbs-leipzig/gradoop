@@ -23,6 +23,8 @@ import org.s1ck.gdl.model.predicates.booleans.Not;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 import org.s1ck.gdl.model.predicates.booleans.Xor;
 
+import java.util.Objects;
+
 /**
  * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
  */
@@ -84,8 +86,7 @@ public class XorPredicate extends QueryPredicate {
 
     XorPredicate that = (XorPredicate) o;
 
-    return xor != null ? xor.equals(that.xor) : that.xor == null;
-
+    return Objects.equals(xor, that.xor);
   }
 
   @Override

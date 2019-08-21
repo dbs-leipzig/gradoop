@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -40,11 +40,11 @@ import static org.hamcrest.core.Is.is;
 public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
 
   @Test
-  public void testMetaDataInitialization() throws Exception {
+  public void testMetaDataInitialization() {
     String sourceVariable = "a";
     String edgeVariable   = "e";
     String targetVariable = "b";
-    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
+    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode<>(
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
@@ -55,11 +55,11 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testMetaDataInitializationWithLoop() throws Exception {
+  public void testMetaDataInitializationWithLoop() {
     String sourceVariable = "a";
     String edgeVariable   = "e";
     String targetVariable = "a";
-    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
+    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode<>(
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
@@ -81,18 +81,20 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     Map<String, Object> edge2Props = new HashMap<>();
     edge2Props.put("foo", 42);
 
-    Edge e1 = new Edge(edge1Id, "a", sourceId, targetId, Properties.createFromMap(edge1Props), new GradoopIdSet());
-    Edge e2 = new Edge(edge2Id, "b", sourceId, targetId, Properties.createFromMap(edge2Props), new GradoopIdSet());
+    EPGMEdge e1 = new EPGMEdge(edge1Id, "a", sourceId, targetId, Properties.createFromMap(edge1Props),
+      new GradoopIdSet());
+    EPGMEdge e2 = new EPGMEdge(edge2Id, "b", sourceId, targetId, Properties.createFromMap(edge2Props),
+      new GradoopIdSet());
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23";
     QueryHandler queryHandler = new QueryHandler(query);
     CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
     Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
 
-    FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      edges, "a", "e", "b", filterPredicate, projectionKeys, false);
+    FilterAndProjectEdgesNode<EPGMEdge> node = new FilterAndProjectEdgesNode<>(edges, "a", "e", "b",
+      filterPredicate, projectionKeys, false);
 
     List<Embedding> filteredEdges = node.execute().collect();
 

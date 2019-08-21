@@ -16,9 +16,9 @@
 package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,21 +44,22 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testCoGroup() throws Exception {
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
-    Vertex v1 = vertexFactory.createVertex("a");
+    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory()
+      .getVertexFactory();
+    EPGMVertex v1 = vertexFactory.createVertex("a");
     Tuple2<GradoopId, PropertyValue> property1 = Tuple2.of(v1.getId(), PropertyValue.create(1L));
-    Vertex v2 = vertexFactory.createVertex("a");
-    Vertex v3 = vertexFactory.createVertex("b");
+    EPGMVertex v2 = vertexFactory.createVertex("a");
+    EPGMVertex v3 = vertexFactory.createVertex("b");
     Tuple2<GradoopId, PropertyValue> property2 = Tuple2.of(v3.getId(), PropertyValue.create(1L));
-    List<Vertex> input = Arrays.asList(v1, v2, v3);
-    List<Vertex> result = getExecutionEnvironment().fromElements(property1, property2)
+    List<EPGMVertex> input = Arrays.asList(v1, v2, v3);
+    List<EPGMVertex> result = getExecutionEnvironment().fromElements(property1, property2)
       .coGroup(getExecutionEnvironment().fromCollection(input))
       .where(0).equalTo(new Id<>())
       .with(new AccumulatePropagatedValues<>("k", Collections.singleton("a")))
       .collect();
     v1.setProperty("k", PropertyValue.create(Collections.singletonList(PropertyValue.create(1L))));
-    List<Vertex> expected = Arrays.asList(v1, v2, v3);
-    Comparator<Vertex> comparator = Comparator.comparing(Vertex::getId);
+    List<EPGMVertex> expected = Arrays.asList(v1, v2, v3);
+    Comparator<EPGMVertex> comparator = Comparator.comparing(EPGMVertex::getId);
     expected.sort(comparator);
     result.sort(comparator);
     assertArrayEquals(expected.toArray(), result.toArray());

@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.fusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -45,7 +45,7 @@ public class VertexFusionUtils {
    * @param <P>        e.g. either vertices or edges
    * @return The filtered collection
    */
-  public static <P extends GraphElement> DataSet<P> areElementsInGraph(DataSet<P> collection,
+  public static <P extends EPGMGraphElement> DataSet<P> areElementsInGraph(DataSet<P> collection,
     LogicalGraph g, boolean inGraph) {
     return collection
       .filter(inGraph ? new InGraphBroadcast<>() : new NotInGraphBroadcast<>())
@@ -63,26 +63,26 @@ public class VertexFusionUtils {
     LogicalGraph superGraph) {
 
     //return the edges from the superGraph that are contained
-    DataSet<Edge> filteredEdges = containment.getGraphHead()
+    DataSet<EPGMEdge> filteredEdges = containment.getGraphHead()
       .first(1)
       .map(new Id<>())
       .cross(superGraph.getEdges())
       .filter(new FilterSubgraphEdges())
       .map(new Value1Of2<>());
 
-    DataSet<Vertex> tobeUnitedWith = filteredEdges
+    DataSet<EPGMVertex> tobeUnitedWith = filteredEdges
       .join(superGraph.getVertices())
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new RightSide<>());
 
-    DataSet<Vertex> newVertices = filteredEdges
+    DataSet<EPGMVertex> newVertices = filteredEdges
       .join(superGraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSide<>())
       .union(tobeUnitedWith)
       .distinct(new Id<>());
 
-    return superGraph.getConfig().getLogicalGraphFactory()
+    return superGraph.getFactory()
       .fromDataSets(newVertices, filteredEdges);
   }
 }

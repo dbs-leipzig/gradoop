@@ -23,15 +23,21 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
-import org.gradoop.common.model.impl.comparators.EPGMIdentifiableComparator;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Identifiable;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.comparators.IdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 
@@ -101,7 +107,13 @@ public class GradoopTestUtils {
   public static final short               SHORT_VAL_e               = (short) 23;
   public static final Set<PropertyValue>  SET_VAL_f                 = new HashSet<>();
 
-  private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
+  private static Comparator<Identifiable> ID_COMPARATOR = new IdentifiableComparator();
+
+  /**
+   * Singleton instance of a EPGM ElementFactoryProvider.
+   */
+  private static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> epgmElementFactoryProvider =
+    null;
 
   static {
     MAP_VAL_9.put(PropertyValue.create(KEY_0), PropertyValue.create(NULL_VAL_0));
@@ -166,6 +178,37 @@ public class GradoopTestUtils {
   }
 
   /**
+   * Returns a {@link ElementFactoryProvider} able to create EPGM elements.
+   *
+   * @return ElementFactoryProvider for EPGM elements
+   */
+  public static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> getEPGMElementFactoryProvider() {
+    if (epgmElementFactoryProvider == null) {
+      epgmElementFactoryProvider = new ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge>() {
+        GraphHeadFactory<EPGMGraphHead> graphHeadFactory = new EPGMGraphHeadFactory();
+        VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
+        EdgeFactory<EPGMEdge> edgeFactory = new EPGMEdgeFactory();
+
+        @Override
+        public GraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
+          return graphHeadFactory;
+        }
+
+        @Override
+        public VertexFactory<EPGMVertex> getVertexFactory() {
+          return vertexFactory;
+        }
+
+        @Override
+        public EdgeFactory<EPGMEdge> getEdgeFactory() {
+          return edgeFactory;
+        }
+      };
+    }
+    return epgmElementFactoryProvider;
+  }
+
+  /**
    * Creates a social network as a basis for tests.
    * <p/>
    * An image of the network can be found in
@@ -174,13 +217,10 @@ public class GradoopTestUtils {
    * @return graph store containing a simple social network for tests.
    * @throws IOException on failure
    */
-  public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
+  public static AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getSocialNetworkLoader()
     throws IOException {
-
-    GradoopConfig<GraphHead, Vertex, Edge> config = GradoopConfig.getDefaultConfig();
-
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
-    return AsciiGraphLoader.fromStream(inputStream, config);
+    return AsciiGraphLoader.fromStream(inputStream, getEPGMElementFactoryProvider());
   }
 
   /**
@@ -232,26 +272,26 @@ public class GradoopTestUtils {
    * @param collection1 first collection
    * @param collection2 second collection
    */
-  public static void validateEPGMElementCollections(
-    Collection<? extends EPGMElement> collection1,
-    Collection<? extends EPGMElement> collection2) {
+  public static void validateElementCollections(
+    Collection<? extends Element> collection1,
+    Collection<? extends Element> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
     assertEquals(String.format(
       "collections of different size: %d and %d", collection1.size(), collection2.size()),
       collection1.size(), collection2.size());
 
-    List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);
+    List<? extends Element> list1 = Lists.newArrayList(collection1);
+    List<? extends Element> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMElement> it1 = list1.iterator();
-    Iterator<? extends EPGMElement> it2 = list2.iterator();
+    Iterator<? extends Element> it1 = list1.iterator();
+    Iterator<? extends Element> it2 = list2.iterator();
 
     while (it1.hasNext()) {
-      validateEPGMElements(
+      validateElements(
         it1.next(),
         it2.next());
     }
@@ -266,23 +306,23 @@ public class GradoopTestUtils {
    * @param collection1 first collection
    * @param collection2 second collection
    */
-  public static void validateEPGMGraphElementCollections(
-    Collection<? extends EPGMGraphElement> collection1,
-    Collection<? extends EPGMGraphElement> collection2) {
+  public static void validateGraphElementCollections(
+    Collection<? extends GraphElement> collection1,
+    Collection<? extends GraphElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
 
-    List<? extends EPGMGraphElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMGraphElement> list2 = Lists.newArrayList(collection2);
+    List<? extends GraphElement> list1 = Lists.newArrayList(collection1);
+    List<? extends GraphElement> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMGraphElement> it1 = list1.iterator();
-    Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
+    Iterator<? extends GraphElement> it1 = list1.iterator();
+    Iterator<? extends GraphElement> it2 = list2.iterator();
 
     while (it1.hasNext()) {
-      validateEPGMGraphElements(it1.next(), it2.next());
+      validateGraphElements(it1.next(), it2.next());
     }
     assertFalse("too many elements in first collection", it1.hasNext());
     assertFalse("too many elements in second collection", it2.hasNext());
@@ -295,7 +335,8 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateEPGMElements(EPGMElement element1, EPGMElement element2) {
+  public static void validateElements(
+    Element element1, Element element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
 
@@ -335,8 +376,8 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateEPGMGraphElements(
-    EPGMGraphElement element1, EPGMGraphElement element2) {
+  public static void validateGraphElements(
+    GraphElement element1, GraphElement element2) {
 
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
@@ -359,8 +400,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]
@@ -381,8 +421,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]
@@ -403,7 +442,6 @@ public class GradoopTestUtils {
    * @return method result
    * @throws Exception in case anything goes wrong
    */
-  @SuppressWarnings("unchecked")
   public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName)
     throws Exception {
     return call(clazz, object, methodName, null, null);

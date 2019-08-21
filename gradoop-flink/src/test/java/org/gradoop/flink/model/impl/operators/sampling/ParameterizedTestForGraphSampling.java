@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
@@ -100,15 +100,15 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
   /**
    * List of original vertices
    */
-  List<Vertex> dbVertices;
+  List<EPGMVertex> dbVertices;
   /**
    * List of original edges
    */
-  List<Edge> dbEdges;
+  List<EPGMEdge> dbEdges;
   /**
    * List of sampled vertices
    */
-  List<Vertex> newVertices;
+  List<EPGMVertex> newVertices;
   /**
    * IDs from sampled vertices
    */
@@ -116,7 +116,7 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
   /**
    * List of sampled edges
    */
-  List<Edge> newEdges;
+  List<EPGMEdge> newEdges;
 
   /**
    * Common Constructor for most samplings
@@ -222,8 +222,9 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
    *
    * @param input The input graph
    * @param output The sampled graph
+   * @throws Exception on failure
    */
-  private void validateGraph(LogicalGraph input, LogicalGraph output) throws Exception {
+  void validateGraph(LogicalGraph input, LogicalGraph output) throws Exception {
     dbVertices = Lists.newArrayList();
     dbEdges = Lists.newArrayList();
     newVertices = Lists.newArrayList();
@@ -240,11 +241,11 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
     assertNotNull("graph was null", output);
 
     newVertexIDs = new HashSet<>();
-    for (Vertex vertex : newVertices) {
+    for (EPGMVertex vertex : newVertices) {
       assertTrue("sampled vertex is not part of the original graph", dbVertices.contains(vertex));
       newVertexIDs.add(vertex.getId());
     }
-    for (Edge edge : newEdges) {
+    for (EPGMEdge edge : newEdges) {
       assertTrue("sampled edge is not part of the original graph", dbEdges.contains(edge));
       assertTrue("sampled edge has source vertex which is not part of the sampled graph",
         newVertexIDs.contains(edge.getSourceId()));
@@ -259,6 +260,7 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
    *
    * @param input The input graph
    * @param output The sampled graph
+   * @throws Exception on failure
    */
-  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output);
+  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception;
 }

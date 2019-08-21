@@ -20,7 +20,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.library.clustering.undirected.GlobalClusteringCoefficient;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -58,11 +58,11 @@ public class GellyGlobalClusteringCoefficientUndirected extends ClusteringCoeffi
 
     double globalValue = global.getResult().getGlobalClusteringCoefficientScore();
 
-    DataSet<GraphHead> resultHead = currentGraph.getGraphHead()
+    DataSet<EPGMGraphHead> resultHead = currentGraph.getGraphHead()
       .map(new WritePropertyToGraphHeadMap(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,
         PropertyValue.create(globalValue)));
 
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+    return currentGraph.getFactory().fromDataSets(
       resultHead, currentGraph.getVertices(), currentGraph.getEdges());
   }
 }

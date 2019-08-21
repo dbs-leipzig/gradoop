@@ -16,10 +16,11 @@
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.neighborhood.functions.NeighborVertexReduceFunction;
@@ -31,8 +32,19 @@ import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple
 
 /**
  * Reduce vertex neighborhood operator.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class ReduceVertexNeighborhood extends VertexNeighborhood {
+public class ReduceVertexNeighborhood<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends VertexNeighborhood<LG> {
 
   /**
    * Valued constructor.
@@ -45,69 +57,68 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Vertex> vertices;
+  public LG execute(LG graph) {
+    DataSet<V> vertices;
     switch (getDirection()) {
     case IN:
       // takes edges and gets the corresponding vertices and applies the aggregate function for
       // vertices of incoming edges
       vertices = graph.getEdges()
         // tuple of source id and target id
-        .map(new VertexIdsFromEdge())
+        .map(new VertexIdsFromEdge<>())
         .join(graph.getVertices())
         .where(1).equalTo(new Id<>())
         // replace the second id with the vertex
-        .with(new VertexToFieldOne<GradoopId, GradoopId>())
+        .with(new VertexToFieldOne<>())
         .join(graph.getVertices())
         // replace the first id with the vertex
         .where(0).equalTo(new Id<>())
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
+        .with(new VertexToFieldZero<>())
         // group by the target vertex
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .groupBy(new IdInTuple<>(1))
         // aggregate values
-        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
+        .reduceGroup(new NeighborVertexReduceFunction<>((VertexAggregateFunction) getFunction()));
       break;
     case OUT:
       // takes edges and gets the corresponding vertices and applies the aggregate function for
       // vertices of outgoing edges
       vertices = graph.getEdges()
         // tuple of target id and source id
-        .map(new VertexIdsFromEdge(true))
+        .map(new VertexIdsFromEdge<>(true))
         .join(graph.getVertices())
         .where(1).equalTo(new Id<>())
         // replace the second id with the vertex
-        .with(new VertexToFieldOne<GradoopId, GradoopId>())
+        .with(new VertexToFieldOne<>())
         .join(graph.getVertices())
         // replace the first id with the vertex
         .where(0).equalTo(new Id<>())
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
+        .with(new VertexToFieldZero<>())
         // group by the target vertex
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .groupBy(new IdInTuple<>(1))
         // aggregate values
-        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
+        .reduceGroup(new NeighborVertexReduceFunction<>((VertexAggregateFunction) getFunction()));
       break;
     case BOTH:
       // takes edges and gets the corresponding vertices and applies the aggregate function for
       // vertices of incoming and outgoing edges
       vertices = graph.getEdges()
         // maps source-target and target-source ids from the edge
-        .flatMap(new ShuffledVertexIdsFromEdge())
+        .flatMap(new ShuffledVertexIdsFromEdge<>())
         .join(graph.getVertices())
         .where(1).equalTo(new Id<>())
         // replace the second id with the vertex
-        .with(new VertexToFieldOne<GradoopId, GradoopId>())
+        .with(new VertexToFieldOne<>())
         .join(graph.getVertices())
         .where(0).equalTo(new Id<>())
         // replace the first id with the vertex
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .with(new VertexToFieldZero<>())
+        .groupBy(new IdInTuple<>(1))
         // aggregate values
-        .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
+        .reduceGroup(new NeighborVertexReduceFunction<>((VertexAggregateFunction) getFunction()));
       break;
     default:
       vertices = null;
     }
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());
+    return graph.getFactory().fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());
   }
 }

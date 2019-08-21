@@ -16,10 +16,10 @@
 package org.gradoop.dataintegration.transformation.impl;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -59,9 +59,9 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
       "City", "name");
 
     LogicalGraph extOneGraph = social.callForGraph(extOne);
-    List<Vertex> city = extOneGraph.getVerticesByLabel("City").collect();
+    List<EPGMVertex> city = extOneGraph.getVerticesByLabel("City").collect();
     Set<String> cityNames = new HashSet<>();
-    for (Vertex v : city) {
+    for (EPGMVertex v : city) {
       String cityName = v.getPropertyValue("name").getString();
       Assert.assertTrue(cityName.equals("Dresden") ||
         cityName.equals("Berlin") ||
@@ -75,7 +75,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Tests whether edges are created properly according to Origin to New Vertex direction.
+   * Tests whether edges are created properly according to Origin to New EPGMVertex direction.
    *
    * @throws Exception If the data could not be loaded or collected properly.
    */
@@ -86,7 +86,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Tests whether edges are created properly according to New Vertex to Origin direction.
+   * Tests whether edges are created properly according to New EPGMVertex to Origin direction.
    *
    * @throws Exception If the data could not be loaded or collected properly.
    */
@@ -125,12 +125,12 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
     long expectedEdgeCount = direction.equals(EdgeDirection.BIDIRECTIONAL) ? 12 : 6;
     Assert.assertEquals(expectedEdgeCount, extractedGraph.getEdgesByLabel("newLabel").count());
 
-    List<Vertex> vertices = new ArrayList<>();
+    List<EPGMVertex> vertices = new ArrayList<>();
     extractedGraph.getVertices()
       .filter(new LabelIsIn<>("Person", "City"))
       .output(new LocalCollectionOutputFormat<>(vertices));
 
-    List<Edge> newEdges = new ArrayList<>();
+    List<EPGMEdge> newEdges = new ArrayList<>();
     extractedGraph
       .getEdgesByLabel("newLabel")
       .output(new LocalCollectionOutputFormat<>(newEdges));
@@ -140,7 +140,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
     Map<GradoopId, String> idMap = new HashMap<>();
     vertices.forEach(v -> idMap.put(v.getId(), v.getPropertyValue("name").getString()));
 
-    for (Edge e : newEdges) {
+    for (EPGMEdge e : newEdges) {
       String sourceName = idMap.get(e.getSourceId());
       String targetName = idMap.get(e.getTargetId());
 
@@ -179,7 +179,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
 
     LogicalGraph extractedGraph = social.callForGraph(extract);
 
-    List<Vertex> vertices = new ArrayList<>();
+    List<EPGMVertex> vertices = new ArrayList<>();
     extractedGraph
       .getVerticesByLabel("City")
       .output(new LocalCollectionOutputFormat<>(vertices));
@@ -202,12 +202,12 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void listPropertyTest() throws Exception {
-    VertexFactory vf = getConfig().getVertexFactory();
-    Vertex v1 = vf.createVertex("foo");
+    VertexFactory<EPGMVertex> vf = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EPGMVertex v1 = vf.createVertex("foo");
     v1.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("m"),
       PropertyValue.create("n"))));
 
-    Vertex v2 = vf.createVertex("foo");
+    EPGMVertex v2 = vf.createVertex("foo");
     v2.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("x"),
       PropertyValue.create("y"), PropertyValue.create("z"))));
 
@@ -217,7 +217,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
     ExtractPropertyFromVertex ext = new ExtractPropertyFromVertex("foo", "a", "A", "key");
     LogicalGraph output = input.callForGraph(ext);
 
-    List<Vertex> createdVertices = new ArrayList<>();
+    List<EPGMVertex> createdVertices = new ArrayList<>();
     output.getVertices()
       .filter(new ByLabel<>("A"))
       .output(new LocalCollectionOutputFormat<>(createdVertices));

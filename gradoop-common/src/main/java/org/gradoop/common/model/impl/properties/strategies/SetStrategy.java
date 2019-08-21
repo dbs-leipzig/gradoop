@@ -20,6 +20,7 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -114,7 +115,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_SET;
+    return Type.SET.getTypeByte();
   }
 
   /**

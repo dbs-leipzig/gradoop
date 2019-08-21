@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood.keyselector;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -42,7 +42,7 @@ public class IdInTuple<T extends Tuple> implements KeySelector<T, GradoopId> {
   }
 
   @Override
-  public GradoopId getKey(T tuple) throws Exception {
-    return ((EPGMGraphElement) tuple.getField(field)).getId();
+  public GradoopId getKey(T tuple) {
+    return ((GraphElement) tuple.getField(field)).getId();
   }
 }

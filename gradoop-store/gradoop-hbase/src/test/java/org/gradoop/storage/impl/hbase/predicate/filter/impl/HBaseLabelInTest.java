@@ -19,14 +19,15 @@ import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.junit.Test;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBaseLabelIn;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-import static org.junit.Assert.assertEquals;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_META;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for {@link HBaseLabelIn}
@@ -41,7 +42,7 @@ public class HBaseLabelInTest {
     String testLabel1 = "test1";
     String testLabel2 = "test2";
 
-    HBaseLabelIn<Edge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
+    HBaseLabelIn<EPGMEdge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
 
     FilterList expectedFilterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
 
@@ -54,6 +55,6 @@ public class HBaseLabelInTest {
       );
       expectedFilterList.addFilter(valueFilter);
     }
-    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter(false).toString());
+    assertEquals(edgeFilter.toHBaseFilter(false).toString(), expectedFilterList.toString());
   }
 }

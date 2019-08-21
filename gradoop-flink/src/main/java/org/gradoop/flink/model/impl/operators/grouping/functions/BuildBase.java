@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -47,7 +47,6 @@ abstract class BuildBase implements Serializable {
    */
   protected BuildBase(boolean useLabel) {
     this.useLabel = useLabel;
-
   }
 
   //----------------------------------------------------------------------------
@@ -74,7 +73,7 @@ abstract class BuildBase implements Serializable {
    * @param groupPropertyValues group property values
    * @param vertexLabelGroup vertex label group
    */
-  protected void setGroupProperties(EPGMAttributed attributed,
+  protected void setGroupProperties(Attributed attributed,
     PropertyValueList groupPropertyValues, LabelGroup vertexLabelGroup) {
 
     Iterator<PropertyValue> valueIterator = groupPropertyValues.iterator();
@@ -94,12 +93,13 @@ abstract class BuildBase implements Serializable {
    * @param values aggregate values
    * @param valueAggregators aggregate functions
    */
-  protected void setAggregateProperties(EPGMAttributed element, PropertyValueList values,
+  protected void setAggregateProperties(Attributed element, PropertyValueList values,
                                         List<AggregateFunction> valueAggregators) {
     if (!valueAggregators.isEmpty()) {
       Iterator<PropertyValue> valueIt = values.iterator();
       for (AggregateFunction valueAggregator : valueAggregators) {
-        element.setProperty(valueAggregator.getAggregatePropertyKey(), valueIt.next());
+        element.setProperty(valueAggregator.getAggregatePropertyKey(),
+          valueAggregator.postAggregate(valueIt.next()));
       }
     }
   }

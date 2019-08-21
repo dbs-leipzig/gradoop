@@ -15,15 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
 /**
- * Utility class to convert an EPGM element ({@link Vertex} and {@link Edge} into an
+ * Utility class to convert an element ({@link Vertex} and {@link Edge} into an
  * {@link Embedding}.
  */
 public class EmbeddingFactory {

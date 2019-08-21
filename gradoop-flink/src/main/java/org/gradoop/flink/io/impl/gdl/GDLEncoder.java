@@ -15,10 +15,10 @@
  */
 package org.gradoop.flink.io.impl.gdl;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -32,8 +32,13 @@ import java.util.stream.Collectors;
 
 /**
  * Encodes data structures using the GDL format.
+ *
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
-public class GDLEncoder {
+public class GDLEncoder<G extends GraphHead, V extends Vertex, E extends Edge> {
+
   /**
    * Marks the beginning of the definition of vertices and edges.
    */
@@ -98,15 +103,15 @@ public class GDLEncoder {
   /**
    * Graph head to encode.
    */
-  private List<GraphHead> graphHeads;
+  private List<G> graphHeads;
   /**
    * Vertices to encode.
    */
-  private List<Vertex> vertices;
+  private List<V> vertices;
   /**
    * Edges to encode.
    */
-  private List<Edge> edges;
+  private List<E> edges;
 
   /**
    * Creates a GDLEncoder using the passed parameters.
@@ -115,7 +120,7 @@ public class GDLEncoder {
    * @param vertices vertices that should be encoded
    * @param edges edges that should be encoded
    */
-  public GDLEncoder(List<GraphHead> graphHeads, List<Vertex> vertices, List<Edge> edges) {
+  public GDLEncoder(List<G> graphHeads, List<V> vertices, List<E> edges) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
@@ -136,34 +141,35 @@ public class GDLEncoder {
 
     StringBuilder result = new StringBuilder();
 
-    for (GraphHead gh : graphHeads) {
+    for (G graphHead : graphHeads) {
       StringBuilder verticesString = new StringBuilder();
       StringBuilder edgesString = new StringBuilder();
 
-      for (Vertex v : vertices) {
-        boolean containedInGraph = v.getGraphIds().contains(gh.getId());
-        boolean firstOccurrence = !usedVertexIds.contains(v.getId());
+      for (V vertex : vertices) {
+        boolean containedInGraph = vertex.getGraphIds().contains(graphHead.getId());
+        boolean firstOccurrence = !usedVertexIds.contains(vertex.getId());
 
-        if (containedInGraph && firstOccurrence) {
-          String vertexString = vertexToGDLString(v, idToVertexName);
-          usedVertexIds.add(v.getId());
+        if (containedInGraph) {
+          String vertexString = vertexToGDLString(vertex, idToVertexName, firstOccurrence);
+          usedVertexIds.add(vertex.getId());
           verticesString.append(vertexString).append(System.lineSeparator());
         }
       }
 
-      for (Edge e : edges) {
-        if (e.getGraphIds().contains(gh.getId())) {
-          boolean firstOccurrence = !usedEdgeIds.contains(e.getId());
-          String edgeString = edgeToGDLString(e, idToVertexName, idToEdgeName, firstOccurrence);
-          usedEdgeIds.add(e.getId());
+      for (E edge : edges) {
+        if (edge.getGraphIds().contains(graphHead.getId())) {
+          boolean firstOccurrence = !usedEdgeIds.contains(edge.getId());
+          String edgeString = edgeToGDLString(edge, idToVertexName, idToEdgeName, firstOccurrence);
+          usedEdgeIds.add(edge.getId());
           edgesString.append(edgeString).append(System.lineSeparator());
         }
       }
 
       result
-        .append(graphHeadToGDLString(gh, idToGraphHeadName))
+        .append(graphHeadToGDLString(graphHead, idToGraphHeadName))
         .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())
-        .append(verticesString).append(System.lineSeparator())
+        .append(verticesString)
+        .append(edgesString.length() > 0 ? System.lineSeparator() : "")
         .append(edgesString)
         .append(GRAPH_ELEMENTS_DEFINITION_END)
         .append(System.lineSeparator()).append(System.lineSeparator());
@@ -177,12 +183,12 @@ public class GDLEncoder {
    * @param graphHeads The graph heads.
    * @return Mapping between graph head and GDL variable name.
    */
-  private Map<GradoopId, String> getGraphHeadNameMapping(List<GraphHead> graphHeads) {
+  private Map<GradoopId, String> getGraphHeadNameMapping(List<G> graphHeads) {
     Map<GradoopId, String> idToGraphHeadName = new HashMap<>(graphHeads.size());
     for (int i = 0; i < graphHeads.size(); i++) {
-      GraphHead g = graphHeads.get(i);
+      G graphHead = graphHeads.get(i);
       String gName = String.format("%s%s", GRAPH_VARIABLE_PREFIX, i);
-      idToGraphHeadName.put(g.getId(), gName);
+      idToGraphHeadName.put(graphHead.getId(), gName);
     }
     return idToGraphHeadName;
   }
@@ -193,12 +199,12 @@ public class GDLEncoder {
    * @param vertices The graph vertices.
    * @return Mapping between vertex and GDL variable name.
    */
-  private Map<GradoopId, String> getVertexNameMapping(List<Vertex> vertices) {
+  private Map<GradoopId, String> getVertexNameMapping(List<V> vertices) {
     Map<GradoopId, String> idToVertexName = new HashMap<>(vertices.size());
     for (int i = 0; i < vertices.size(); i++) {
-      Vertex v = vertices.get(i);
-      String vName = String.format("%s_%s_%s", VERTEX_VARIABLE_PREFIX, v.getLabel(), i);
-      idToVertexName.put(v.getId(), vName);
+      V vertex = vertices.get(i);
+      String vName = String.format("%s_%s_%s", VERTEX_VARIABLE_PREFIX, vertex.getLabel(), i);
+      idToVertexName.put(vertex.getId(), vName);
     }
     return idToVertexName;
   }
@@ -209,12 +215,12 @@ public class GDLEncoder {
    * @param edges The graph edges.
    * @return Mapping between edge and GDL variable name.
    */
-  private Map<GradoopId, String> getEdgeNameMapping(List<Edge> edges) {
+  private Map<GradoopId, String> getEdgeNameMapping(List<E> edges) {
     Map<GradoopId, String> idToEdgeName = new HashMap<>(edges.size());
     for (int i = 0; i < edges.size(); i++) {
-      Edge e = edges.get(i);
-      String eName = String.format("%s_%s_%s", EDGE_VARIABLE_PREFIX, e.getLabel(), i);
-      idToEdgeName.put(e.getId(), eName);
+      E edge = edges.get(i);
+      String eName = String.format("%s_%s_%s", EDGE_VARIABLE_PREFIX, edge.getLabel(), i);
+      idToEdgeName.put(edge.getId(), eName);
     }
     return idToEdgeName;
   }
@@ -222,63 +228,66 @@ public class GDLEncoder {
   /**
    * Returns a GDL formatted graph head string.
    *
-   * @param g graph head
+   * @param graphhead graph head
    * @param idToGraphHeadName mapping from graph head id to its GDL variable name
    * @return GDL formatted string
    */
-  private String graphHeadToGDLString(GraphHead g, Map<GradoopId, String> idToGraphHeadName) {
+  private String graphHeadToGDLString(G graphhead, Map<GradoopId, String> idToGraphHeadName) {
     return String.format("%s:%s %s",
-      idToGraphHeadName.get(g.getId()),
-      g.getLabel(),
-      propertiesToGDLString(g.getProperties()));
+      idToGraphHeadName.get(graphhead.getId()),
+      graphhead.getLabel(),
+      propertiesToGDLString(graphhead.getProperties()));
   }
 
   /**
    * Returns the gdl formatted vertex including the properties and the label on first occurrence
    * or otherwise just the variable name.
    *
-   * @param v The vertex that should be formatted.
+   * @param vertex The vertex that should be formatted.
    * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl
    *                       variable name
+   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
    * @return A GDL formatted vertex string.
    */
-  private String vertexToGDLString(Vertex v, Map<GradoopId, String> idToVertexName)  {
-    return String.format("(%s:%s %s)",
-      idToVertexName.get(v.getId()),
-      v.getLabel(),
-      propertiesToGDLString(v.getProperties()));
+  private String vertexToGDLString(V vertex, Map<GradoopId, String> idToVertexName,
+    boolean firstOccurrence) {
+    if (firstOccurrence) {
+      return String.format("(%s:%s %s)",
+        idToVertexName.get(vertex.getId()),
+        vertex.getLabel(),
+        propertiesToGDLString(vertex.getProperties()));
+    } else {
+      return String.format("(%s)", idToVertexName.get(vertex.getId()));
+    }
   }
 
   /**
    * Returns the GDL formatted edge, including the properties and the label on first occurrence
    * or otherwise just the variable name.
    *
-   * @param e The edge to be formatted.
+   * @param edge The edge to be formatted.
    * @param idToVertexName Maps GradoopId of a vertex to a string that represents the GDL
    *                       variable name
    * @param idToEdgeName Maps GradoopId of an edge to a string that represents the GDL variable
    *                     name.
-   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
+   * @param firstOccurrence Is it the first occurrence of the edge in all graphs?
    * @return A GDL formatted edge string.
    */
-  private String edgeToGDLString(
-    Edge e,
-    Map<GradoopId, String> idToVertexName,
-    Map<GradoopId, String> idToEdgeName,
-    boolean firstOccurrence) {
+  private String edgeToGDLString(E edge, Map<GradoopId, String> idToVertexName,
+    Map<GradoopId, String> idToEdgeName, boolean firstOccurrence) {
     String result;
     if (firstOccurrence) {
       result =  String.format("(%s)-[%s:%s%s]->(%s)",
-        idToVertexName.get(e.getSourceId()),
-        idToEdgeName.get(e.getId()),
-        e.getLabel(),
-        propertiesToGDLString(e.getProperties()),
-        idToVertexName.get(e.getTargetId()));
+        idToVertexName.get(edge.getSourceId()),
+        idToEdgeName.get(edge.getId()),
+        edge.getLabel(),
+        propertiesToGDLString(edge.getProperties()),
+        idToVertexName.get(edge.getTargetId()));
     } else {
       result = String.format("(%s)-[%s]->(%s)",
-        idToVertexName.get(e.getSourceId()),
-        idToEdgeName.get(e.getId()),
-        idToVertexName.get(e.getTargetId()));
+        idToVertexName.get(edge.getSourceId()),
+        idToEdgeName.get(edge.getId()),
+        idToVertexName.get(edge.getTargetId()));
     }
     return result;
   }

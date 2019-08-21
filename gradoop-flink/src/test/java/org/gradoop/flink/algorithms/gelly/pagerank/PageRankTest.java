@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.pagerank;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -94,8 +94,8 @@ public class PageRankTest extends GradoopFlinkTestBase {
    * @param graph The result graph
    */
   private void checkPageRankProperty(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = graph.getVertices().collect();
-    for (Vertex vertex : vertices) {
+    List<EPGMVertex> vertices = graph.getVertices().collect();
+    for (EPGMVertex vertex : vertices) {
       assertTrue(vertex.hasProperty(propertyKey));
       assertTrue(vertex.getPropertyValue(propertyKey).getDouble() > 0d);
     }

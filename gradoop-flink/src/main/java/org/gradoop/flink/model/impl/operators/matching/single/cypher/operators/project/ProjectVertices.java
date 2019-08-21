@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectVertex;
@@ -33,7 +33,7 @@ public class ProjectVertices implements PhysicalOperator {
   /**
    * Input vertices
    */
-  private final DataSet<Vertex> input;
+  private final DataSet<EPGMVertex> input;
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -50,7 +50,7 @@ public class ProjectVertices implements PhysicalOperator {
    * @param input vertices that should be projected
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
-  public ProjectVertices(DataSet<Vertex> input, List<String> propertyKeys) {
+  public ProjectVertices(DataSet<EPGMVertex> input, List<String> propertyKeys) {
     this.input = input;
     this.propertyKeys = propertyKeys;
     this.name = "ProjectVertices";
@@ -62,7 +62,7 @@ public class ProjectVertices implements PhysicalOperator {
    *
    * @param input vertices that will be projected
    */
-  public ProjectVertices(DataSet<Vertex> input) {
+  public ProjectVertices(DataSet<EPGMVertex> input) {
     this.input = input;
     this.propertyKeys = new ArrayList<>();
   }

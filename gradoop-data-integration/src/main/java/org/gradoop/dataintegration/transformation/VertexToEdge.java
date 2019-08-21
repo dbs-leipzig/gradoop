@@ -17,13 +17,15 @@ package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.EdgesFromLocalTransitiveClosure;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple;
 
 import java.util.List;
@@ -72,26 +74,24 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> incomingNeighborhood = Neighborhood
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> incomingNeighborhood = Neighborhood
       .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
         Neighborhood.EdgeDirection.INCOMING);
 
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
       .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
         Neighborhood.EdgeDirection.OUTGOING);
 
-    DataSet<Edge> newEdges = incomingNeighborhood
+    DataSet<EPGMEdge> newEdges = incomingNeighborhood
       .coGroup(outgoingNeighborhood)
       .where(new IdInTuple<>(0))
       .equalTo(new IdInTuple<>(0))
       .with(new EdgesFromLocalTransitiveClosure<>(newEdgeLabel,
-        graph.getFactory().getEdgeFactory()));
+        graph.getFactory().getEdgeFactory()))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getFactory().fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
-  }
-
-  @Override
-  public String getName() {
-    return VertexToEdge.class.getName();
+    return graph.getFactory()
+      .fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges().union(newEdges));
   }
 }

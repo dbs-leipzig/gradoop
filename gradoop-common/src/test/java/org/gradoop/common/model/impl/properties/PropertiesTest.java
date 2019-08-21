@@ -16,15 +16,15 @@
 package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.gradoop.common.GradoopTestUtils.*;
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.AssertJUnit.*;
 
-@SuppressWarnings("Duplicates")
 public class PropertiesTest {
 
   @Test
@@ -176,10 +176,10 @@ public class PropertiesTest {
     // override property
     properties3.set(KEY_1, INT_VAL_2);
 
-    assertTrue("properties were not equal", properties1.equals(properties2));
-    assertFalse("properties were equal", properties1.equals(properties3));
+    assertEquals("properties were not equal", properties2, properties1);
+    assertNotEquals(properties3, properties1, "properties were equal");
 
-    assertTrue("different hash code", properties1.hashCode() == properties2.hashCode());
+    assertEquals("different hash code", properties2.hashCode(), properties1.hashCode());
     assertTrue("same hash code", properties1.hashCode() != properties3.hashCode());
 
     properties1 = Properties.create();
@@ -189,7 +189,7 @@ public class PropertiesTest {
     properties2 = Properties.create();
     properties2.set(KEY_1, BOOL_VAL_1);
 
-    assertFalse("properties were equal", properties1.equals(properties2));
+    assertNotEquals(properties2, properties1, "properties were equal");
     assertTrue("same hash code", properties1.hashCode() != properties2.hashCode());
   }
 

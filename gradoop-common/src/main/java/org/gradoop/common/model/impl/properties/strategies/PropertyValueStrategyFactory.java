@@ -16,9 +16,10 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -82,9 +83,12 @@ public class PropertyValueStrategyFactory {
   }
 
   /**
-   * Compares two values.
-   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy}
-   * will throw an {@code IllegalArgumentException}.
+   * Compares two values.<br>
+   * {@link PropertyValue#NULL_VALUE} is considered to be less than all other properties.
+   * <p>
+   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy} will throw an
+   * {@code IllegalArgumentException}. This behavior violates the requirements of
+   * {@link Comparable#compareTo}.
    *
    * @param value first value.
    * @param other second value.
@@ -92,8 +96,8 @@ public class PropertyValueStrategyFactory {
    * to, or greater than {@code other}.
    */
   public static int compare(Object value, Object other) {
-    if (value == null) {
-      return INSTANCE.nullStrategy.compare(null, other);
+    if (value == null || other == null) {
+      return INSTANCE.nullStrategy.compare(value, other);
     } else {
       PropertyValueStrategy strategy = get(value.getClass());
       return strategy.compare(value, other);
@@ -116,7 +120,7 @@ public class PropertyValueStrategyFactory {
         throw new RuntimeException("Error while serializing object.", e);
       }
     }
-    return new byte[] {PropertyValue.TYPE_NULL};
+    return new byte[] {Type.NULL.getTypeByte()};
   }
 
   /**

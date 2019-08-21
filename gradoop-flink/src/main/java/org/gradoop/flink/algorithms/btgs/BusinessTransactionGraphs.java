@@ -21,9 +21,9 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.btgs.functions.BtgMessenger;
 import org.gradoop.flink.algorithms.btgs.functions.BtgUpdater;
 import org.gradoop.flink.algorithms.btgs.functions.CollectGradoopIds;
@@ -48,7 +48,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Part of the BIIIG approach.
- * EPGMVertex-centric implementation to isolate business transaction graphs.
+ * Vertex-centric implementation to isolate business transaction graphs.
  */
 public class BusinessTransactionGraphs implements
   UnaryGraphToCollectionOperator {
@@ -77,13 +77,13 @@ public class BusinessTransactionGraphs implements
   @Override
   public GraphCollection execute(LogicalGraph iig) {
 
-    DataSet<Vertex> masterVertices = iig.getVertices()
+    DataSet<EPGMVertex> masterVertices = iig.getVertices()
       .filter(new MasterData<>());
 
     LogicalGraph transGraph = iig
       .vertexInducedSubgraph(new TransactionalData<>());
 
-    DataSet<Vertex> transVertices = transGraph
+    DataSet<EPGMVertex> transVertices = transGraph
       .getVertices();
 
     DataSet<org.apache.flink.graph.Edge<GradoopId, NullValue>> transEdges =
@@ -111,12 +111,12 @@ public class BusinessTransactionGraphs implements
       .flatMap(new ExpandGradoopIds<>())
       .map(new SwitchPair<>());
 
-    DataSet<GraphHead> graphHeads = btgVerticesMap
+    DataSet<EPGMGraphHead> graphHeads = btgVerticesMap
       .map(new Value0Of2<>())
-      .map(new NewBtgGraphHead<>(iig.getConfig().getGraphHeadFactory()));
+      .map(new NewBtgGraphHead<>(iig.getFactory().getGraphHeadFactory()));
 
     // filter and update edges
-    DataSet<Edge> btgEdges = iig.getEdges()
+    DataSet<EPGMEdge> btgEdges = iig.getEdges()
       .join(vertexBtgMap)
       .where(new SourceId<>()).equalTo(0)
       .with(new SetBtgId<>());
@@ -144,7 +144,7 @@ public class BusinessTransactionGraphs implements
       .where(new Id<>()).equalTo(0)
       .with(new SetBtgIds<>());
 
-    return iig.getConfig().getGraphCollectionFactory()
+    return iig.getCollectionFactory()
       .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);
   }
 }

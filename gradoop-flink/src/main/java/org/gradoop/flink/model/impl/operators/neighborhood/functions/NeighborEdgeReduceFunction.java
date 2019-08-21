@@ -18,18 +18,21 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Sets the aggregation result as property for each vertex. All edges together with the
  * relevant vertex were grouped.
+ *
+ * @param <E> edge type
+ * @param <V> vertex type
  */
-public class NeighborEdgeReduceFunction
+public class NeighborEdgeReduceFunction<E extends Edge, V extends Vertex>
   extends NeighborEdgeFunction
-  implements GroupReduceFunction<Tuple2<Edge, Vertex>, Vertex> {
+  implements GroupReduceFunction<Tuple2<E, V>, V> {
 
   /**
    * Valued constructor.
@@ -41,15 +44,15 @@ public class NeighborEdgeReduceFunction
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<Edge, Vertex>> tuples, Collector<Vertex> collector) throws
+  public void reduce(Iterable<Tuple2<E, V>> tuples, Collector<V> collector) throws
     Exception {
 
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
-    Vertex vertex = null;
-    Edge edge;
+    V vertex = null;
+    E edge;
     boolean isFirst = true;
 
-    for (Tuple2<Edge, Vertex> tuple: tuples) {
+    for (Tuple2<E, V> tuple: tuples) {
       edge = tuple.f0;
       if (isFirst) {
         //each tuple contains the same vertex
@@ -61,8 +64,10 @@ public class NeighborEdgeReduceFunction
           .aggregate(propertyValue, getFunction().getIncrement(edge));
       }
     }
-    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
-    collector.collect(vertex);
+    if (vertex != null) {
+      vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
+      collector.collect(vertex);
+    }
   }
 }
 

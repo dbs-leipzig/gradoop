@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -90,13 +90,13 @@ public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
   @Override
   public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
-    DataSet<Vertex> newVertices =
+    DataSet<EPGMVertex> newVertices =
       new org.apache.flink.graph.library.linkanalysis.PageRank<GradoopId, NullValue, NullValue>(
         dampingFactor, iterations).setIncludeZeroDegreeVertices(includeZeroDegrees).run(graph)
       .join(currentGraph.getVertices())
       .where(new PageRankResultKey()).equalTo(new Id<>())
       .with(new PageRankToAttribute(propertyKey));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+    return currentGraph.getFactory().fromDataSets(
       currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 }

@@ -76,7 +76,7 @@ public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    return getGraphCollection().reduce(new ReduceCombination());
+    return getGraphCollection().reduce(new ReduceCombination<>());
   }
 
   @Override
@@ -99,7 +99,7 @@ public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
 
     DataSet<ImportVertex<Long>> importVertices = lineTuples
       .<Tuple2<Long, String>>project(0, 1)
-      .union(lineTuples.<Tuple2<Long, String>>project(2, 3))
+      .union(lineTuples.project(2, 3))
       .distinct(0)
       .map(new CreateLabeledImportVertex<>(propertyKey));
 

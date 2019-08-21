@@ -18,16 +18,18 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 
 import java.util.Iterator;
 
 /**
  * Adds a property to a graph that states if the graph contained the embedding.
+ *
+ * @param <G> graph head type
  */
-public class AddMatchesToProperties
-  implements CoGroupFunction<GraphHead, Tuple2<GradoopId, Boolean>, GraphHead> {
+public class AddMatchesToProperties<G extends GraphHead>
+  implements CoGroupFunction<G, Tuple2<GradoopId, Boolean>, G> {
 
   /**
    * default property key
@@ -55,10 +57,10 @@ public class AddMatchesToProperties
   }
 
   @Override
-  public void coGroup(Iterable<GraphHead> heads,
+  public void coGroup(Iterable<G> heads,
     Iterable<Tuple2<GradoopId, Boolean>> matches,
-    Collector<GraphHead> collector) throws Exception {
-    GraphHead graphHead = heads.iterator().next();
+    Collector<G> collector) {
+    G graphHead = heads.iterator().next();
     Iterator<Tuple2<GradoopId, Boolean>> it = matches.iterator();
     if (!it.hasNext()) {
       graphHead.setProperty(propertyKey, false);

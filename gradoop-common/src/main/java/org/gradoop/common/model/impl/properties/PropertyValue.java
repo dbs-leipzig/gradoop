@@ -46,70 +46,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Represents a property value that is {@code null}.
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
-  /**
-   * {@code <property-type>} for empty property value (i.e. {@code null})
-   */
-  public static final transient byte TYPE_NULL         = 0x00;
-  /**
-   * {@code <property-type>} for {@link java.lang.Boolean}
-   */
-  public static final transient byte TYPE_BOOLEAN      = 0x01;
-  /**
-   * {@code <property-type>} for {@link java.lang.Integer}
-   */
-  public static final transient byte TYPE_INTEGER      = 0x02;
-  /**
-   * {@code <property-type>} for {@link java.lang.Long}
-   */
-  public static final transient byte TYPE_LONG         = 0x03;
-  /**
-   * {@code <property-type>} for {@link java.lang.Float}
-   */
-  public static final transient byte TYPE_FLOAT        = 0x04;
-  /**
-   * {@code <property-type>} for {@link java.lang.Double}
-   */
-  public static final transient byte TYPE_DOUBLE       = 0x05;
-  /**
-   * {@code <property-type>} for {@link java.lang.String}
-   */
-  public static final transient byte TYPE_STRING       = 0x06;
-  /**
-   * {@code <property-type>} for {@link BigDecimal}
-   */
-  public static final transient byte TYPE_BIG_DECIMAL  = 0x07;
-  /**
-   * {@code <property-type>} for {@link org.gradoop.common.model.impl.id.GradoopId}
-   */
-  public static final transient byte TYPE_GRADOOP_ID   = 0x08;
-  /**
-   * {@code <property-type>} for {@link java.util.HashMap}
-   */
-  public static final transient byte TYPE_MAP          = 0x09;
-  /**
-   * {@code <property-type>} for {@link java.util.List}
-   */
-  public static final transient byte TYPE_LIST         = 0x0a;
-  /**
-   * {@code <property-type>} for {@link LocalDate}
-   */
-  public static final transient byte TYPE_DATE         = 0x0b;
-  /**
-   * {@code <property-type>} for {@link LocalTime}
-   */
-  public static final transient byte TYPE_TIME         = 0x0c;
-  /**
-   * {@code <property-type>} for {@link LocalDateTime}
-   */
-  public static final transient byte TYPE_DATETIME     = 0x0d;
-  /**
-   * {@code <property-type>} for {@link java.lang.Short}
-   */
-  public static final transient byte TYPE_SHORT        = 0x0e;
-  /**
-   * {@code <property-type>} for {@link java.util.Set}
-   */
-  public static final transient byte TYPE_SET          = 0x0f;
+
   /**
    * Value offset in byte
    */
@@ -220,7 +157,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code null} value
    */
   public boolean isNull() {
-    return getRawBytes()[0] == PropertyValue.TYPE_NULL;
+    return getRawBytes()[0] == Type.NULL.getTypeByte();
   }
 
   /**
@@ -387,8 +324,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (strategy.is(value)) {
       return (T) value;
     }
-    throw new UnsupportedOperationException("Value '" + value + "' of type " +
-      value.getClass().getSimpleName() + ", cannot be accessed as " + clazz.getSimpleName());
+    String type = value == null ? "null" : value.getClass().getSimpleName();
+    throw new UnsupportedOperationException("Value '" + value + "' of type " + type +
+      ", cannot be accessed as " + clazz.getSimpleName());
   }
 
   /**
@@ -737,6 +675,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));
   }
 
+  /**
+   * Compares this to another {@link PropertyValue}. See {@link PropertyValueStrategyFactory#compare}.
+   *
+   * @see PropertyValueStrategyFactory#compare
+   * @param other the property value to be compared.
+   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+   * or greater than the specified object.
+   */
   @Override
   public int compareTo(PropertyValue other) {
     return PropertyValueStrategyFactory.compare(value, other.value);

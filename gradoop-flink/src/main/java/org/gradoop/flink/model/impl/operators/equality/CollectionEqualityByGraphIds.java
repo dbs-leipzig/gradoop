@@ -17,10 +17,13 @@ package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -29,23 +32,33 @@ import org.gradoop.flink.model.impl.functions.utils.OneSideEmpty;
 
 /**
  * Operator to determine if two collections contain the same graphs by id.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class CollectionEqualityByGraphIds
-  implements BinaryCollectionToValueOperator<Boolean> {
+public class CollectionEqualityByGraphIds<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphCollectionToValueOperator<GC, DataSet<Boolean>> {
 
   @Override
-  public DataSet<Boolean> execute(GraphCollection firstCollection,
-    GraphCollection secondCollection) {
+  public DataSet<Boolean> execute(GC firstCollection, GC secondCollection) {
 
     DataSet<Tuple1<GradoopId>> distinctFirstGraphIds = firstCollection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
+      .map(new Id<>())
       .distinct()
       .map(new ObjectTo1<>());
 
     DataSet<Tuple1<GradoopId>> distinctSecondGraphIds = secondCollection
       .getGraphHeads()
-      .map(new Id<GraphHead>())
+      .map(new Id<>())
       .distinct()
       .map(new ObjectTo1<>());
 

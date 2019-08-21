@@ -16,31 +16,45 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.intersection.functions.GroupCountEquals;
 
 /**
- * Returns a collection with all logical graphs that exist in both input
+ * Returns a collection with all base graphs that exist in both input
  * collections. Graph equality is based on their identifiers.
  *
  * @see IntersectionBroadcast
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class Intersection extends SetOperatorBase {
+public class Intersection<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SetOperatorBase<G, V, E, LG, GC> {
 
   /**
    * Computes new subgraphs by grouping both graph collections by graph
-   * identifier and returning those graphs where the group contains more
-   * than one element.
+   * identifier and returning those graphs where the group contains more than one element.
    *
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet<GraphHead> computeNewGraphHeads() {
+  protected DataSet<G> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
       .union(secondCollection.getGraphHeads())
-      .groupBy(new Id<GraphHead>())
-      .reduceGroup(new GroupCountEquals<GraphHead>(2));
+      .groupBy(new Id<>())
+      .reduceGroup(new GroupCountEquals<>(2));
   }
 }

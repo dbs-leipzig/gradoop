@@ -19,8 +19,8 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.junit.Test;
@@ -52,17 +52,17 @@ public class AbstractRichCombinedFilterFunctionTest
     /**
      * The key in the configuration.
      */
-    public static String KEY = "filterKey";
+    public static final String KEY = "filterKey";
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
       assertNotNull("Parameters not set", parameters);
       assertNotNull("RuntimeContext not set", getRuntimeContext());
       expectedValue = parameters.getInteger(KEY, -1);
     }
 
     @Override
-    public boolean filter(Integer value) throws Exception {
+    public boolean filter(Integer value) {
       assertNotNull("Context not set.", getRuntimeContext());
       return value == expectedValue;
     }
@@ -96,24 +96,24 @@ public class AbstractRichCombinedFilterFunctionTest
    */
   @Test
   public void testNotNotOrAnd() throws Exception {
-    VertexFactory factory = getConfig().getVertexFactory();
-    Vertex vertex1 = factory.createVertex();
-    Vertex vertex2 = factory.createVertex();
-    List<Vertex> input = Stream.generate(factory::createVertex).limit(100)
+    VertexFactory<EPGMVertex> factory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EPGMVertex vertex1 = factory.createVertex();
+    EPGMVertex vertex2 = factory.createVertex();
+    List<EPGMVertex> input = Stream.generate(factory::createVertex).limit(100)
       .collect(Collectors.toCollection(ArrayList::new));
     input.add(vertex1);
     input.add(vertex2);
-    List<Vertex> result = getExecutionEnvironment().fromCollection(input)
-      .filter(new Or<>(new And<Vertex>(new IdInBroadcast<>(), new IdInBroadcast<>()),
+    List<EPGMVertex> result = getExecutionEnvironment().fromCollection(input)
+      .filter(new Or<>(new And<EPGMVertex>(new IdInBroadcast<>(), new IdInBroadcast<>()),
           new IdInBroadcast<>()).negate().negate())
       .withBroadcastSet(getExecutionEnvironment()
         .fromElements(vertex1.getId(), vertex2.getId()), IdInBroadcast.IDS).collect();
     assertEquals(2, result.size());
-    result.sort(Comparator.comparing(Vertex::getId));
-    List<Vertex> expected = new ArrayList<>();
+    result.sort(Comparator.comparing(EPGMVertex::getId));
+    List<EPGMVertex> expected = new ArrayList<>();
     expected.add(vertex1);
     expected.add(vertex2);
-    expected.sort(Comparator.comparing(Vertex::getId));
+    expected.sort(Comparator.comparing(EPGMVertex::getId));
     assertArrayEquals(expected.toArray(), result.toArray());
   }
 }

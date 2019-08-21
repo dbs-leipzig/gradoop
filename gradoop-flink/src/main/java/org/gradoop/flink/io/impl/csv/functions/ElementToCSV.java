@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
@@ -36,14 +36,14 @@ import java.util.stream.Collectors;
  * @param <E> EPGM element type
  * @param <T> output tuple type
  */
-public abstract class ElementToCSV<E extends Element, T extends Tuple>
+public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
   extends RichMapFunction<E, T> {
   /**
    * Constant for an empty string.
    */
   private static final String EMPTY_STRING = "";
   /**
-   * Meta data that provides parsers for a specific {@link Element}.
+   * Meta data that provides parsers for a specific {@link EPGMElement}.
    */
   private CSVMetaData metaData;
 
@@ -61,7 +61,7 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * @param type    element type
    * @return property value string
    */
-  String getPropertyString(E element, String type) {
+  protected String getPropertyString(E element, String type) {
     return metaData.getPropertyMetaData(type, element.getLabel()).stream()
       .map(propertyMetaData -> this.getPropertyValueString(propertyMetaData, element))
       .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));
@@ -109,7 +109,7 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * @param collection collection
    * @return CSV string
    */
-  String collectionToCsvString(Collection<?> collection) {
+  protected String collectionToCsvString(Collection<?> collection) {
     return collection.stream()
       .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
       .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));

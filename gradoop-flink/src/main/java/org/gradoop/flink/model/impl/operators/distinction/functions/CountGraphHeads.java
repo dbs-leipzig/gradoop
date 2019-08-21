@@ -17,15 +17,17 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 import java.util.Iterator;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
+ *
+ * @param <G> graph head type
  */
-public class CountGraphHeads implements GraphHeadReduceFunction {
+public class CountGraphHeads<G extends GraphHead> implements GraphHeadReduceFunction<G> {
 
   /**
    * property key to store graph count.
@@ -42,11 +44,11 @@ public class CountGraphHeads implements GraphHeadReduceFunction {
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<String, GraphHead>> iterable,
-    Collector<GraphHead> collector) throws Exception {
-    Iterator<Tuple2<String, GraphHead>> iterator = iterable.iterator();
+  public void reduce(Iterable<Tuple2<String, G>> iterable,
+    Collector<G> collector) throws Exception {
+    Iterator<Tuple2<String, G>> iterator = iterable.iterator();
 
-    GraphHead graphHead = iterator.next().f1;
+    G graphHead = iterator.next().f1;
     int count = 1;
 
     while (iterator.hasNext()) {

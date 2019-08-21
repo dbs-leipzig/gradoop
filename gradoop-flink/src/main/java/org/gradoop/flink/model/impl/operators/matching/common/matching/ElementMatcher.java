@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.matching;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.s1ck.gdl.model.GraphElement;
 
 import java.util.Collection;
@@ -32,7 +32,7 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against all given query elements.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElements query graph elements (vertices/edges)
@@ -57,7 +57,7 @@ public class ElementMatcher {
   /**
    * Returns all query candidate ids for the given EPGM element.
    *
-   * @param dbElement     EPGM element (vertices/edges)
+   * @param dbElement     element (vertices/edges)
    * @param queryElements query graph elements (vertices/edges)
    * @param <EL1>         EPGM element type
    * @param <EL2>         GDL element type
@@ -81,7 +81,7 @@ public class ElementMatcher {
   /**
    * Matches the given data graph element against the given query element.
    *
-   * @param <EL1>         EPGM element type
+   * @param <EL1>         element type
    * @param <EL2>         GDL element type
    * @param dbElement     data graph element (vertex/edge)
    * @param queryElement  query graph element (vertex/edge)
@@ -104,10 +104,13 @@ public class ElementMatcher {
 
       while (match && queryProperties.hasNext()) {
         Map.Entry<String, Object> queryProperty = queryProperties.next();
-        boolean validKey = dbElement.hasProperty(queryProperty.getKey());
-        boolean validValue = dbElement.getPropertyValue(
-          queryProperty.getKey()).getObject().equals(queryProperty.getValue());
-        match = validKey && validValue;
+        // if the property key is not valid, it is not a match
+        if (!dbElement.hasProperty(queryProperty.getKey())) {
+          match = false;
+          break;
+        }
+        match = dbElement.getPropertyValue(queryProperty.getKey()).getObject()
+          .equals(queryProperty.getValue());
       }
     }
     return match;

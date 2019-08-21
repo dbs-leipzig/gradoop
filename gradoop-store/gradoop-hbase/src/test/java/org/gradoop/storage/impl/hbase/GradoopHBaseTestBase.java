@@ -19,11 +19,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.storage.hbase.config.GradoopHBaseConfig;
+import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
+import org.gradoop.storage.hbase.impl.factory.HBaseEPGMStoreFactory;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -54,9 +57,9 @@ public class GradoopHBaseTestBase {
   public static final String PROP_STATUS = "status";
   public static final String PROP_VERTEX_COUNT = "vertexCount";
 
-  private static Collection<GraphHead> socialGraphHeads;
-  private static Collection<Vertex> socialVertices;
-  private static Collection<Edge> socialEdges;
+  private static Collection<EPGMGraphHead> socialGraphHeads;
+  private static Collection<EPGMVertex> socialVertices;
+  private static Collection<EPGMEdge> socialEdges;
 
   //----------------------------------------------------------------------------
   // Cluster related
@@ -72,6 +75,7 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if setting up HBase test cluster fails
    */
+  @BeforeSuite
   public static void setUpHBase() throws Exception {
     if (utility == null) {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
@@ -84,6 +88,7 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if closing HBase test cluster fails
    */
+  @AfterSuite
   public static void tearDownHBase() throws Exception {
     if (utility != null) {
       utility.shutdownMiniCluster();
@@ -100,7 +105,7 @@ public class GradoopHBaseTestBase {
    *
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore() {
+  public static HBaseEPGMStore createEmptyEPGMStore() throws IOException {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
@@ -114,7 +119,7 @@ public class GradoopHBaseTestBase {
    * @param prefix the table prefix
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore(String prefix) {
+  public static HBaseEPGMStore createEmptyEPGMStore(String prefix) throws IOException {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config, prefix);
@@ -131,7 +136,7 @@ public class GradoopHBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore() {
+  public static HBaseEPGMStore openEPGMStore() throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
       GradoopHBaseConfig.getDefaultConfig()
@@ -145,7 +150,7 @@ public class GradoopHBaseTestBase {
    * @param prefix the table prefix
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(String prefix) {
+  public static HBaseEPGMStore openEPGMStore(String prefix) throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
       GradoopHBaseConfig.getDefaultConfig(),
@@ -161,7 +166,8 @@ public class GradoopHBaseTestBase {
    * @param gradoopHBaseConfig the gradoop HBase config to use
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig) {
+  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig)
+    throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(utility.getConfiguration(),
       gradoopHBaseConfig, prefix);
   }
@@ -178,7 +184,7 @@ public class GradoopHBaseTestBase {
    * @return collection of graph heads
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<GraphHead> getSocialGraphHeads() throws IOException {
+  public static Collection<EPGMGraphHead> getSocialGraphHeads() throws IOException {
     if (socialGraphHeads == null) {
       socialGraphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
     }
@@ -192,7 +198,7 @@ public class GradoopHBaseTestBase {
    * @return collection of vertices
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<Vertex> getSocialVertices() throws IOException {
+  public static Collection<EPGMVertex> getSocialVertices() throws IOException {
     if (socialVertices == null) {
       socialVertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
     }
@@ -206,7 +212,7 @@ public class GradoopHBaseTestBase {
    * @return collection of edges
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<Edge> getSocialEdges() throws IOException {
+  public static Collection<EPGMEdge> getSocialEdges() throws IOException {
     if (socialEdges == null) {
       socialEdges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
     }
@@ -221,13 +227,13 @@ public class GradoopHBaseTestBase {
    */
   public static void writeSocialGraphToStore(HBaseEPGMStore epgmStore) throws IOException {
     // write social graph to HBase
-    for (GraphHead g : getSocialGraphHeads()) {
+    for (EPGMGraphHead g : getSocialGraphHeads()) {
       epgmStore.writeGraphHead(g);
     }
-    for (Vertex v : getSocialVertices()) {
+    for (EPGMVertex v : getSocialVertices()) {
       epgmStore.writeVertex(v);
     }
-    for (Edge e : getSocialEdges()) {
+    for (EPGMEdge e : getSocialEdges()) {
       epgmStore.writeEdge(e);
     }
     epgmStore.flush();

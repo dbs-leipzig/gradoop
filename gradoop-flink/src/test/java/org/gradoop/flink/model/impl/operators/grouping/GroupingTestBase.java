@@ -15,23 +15,37 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SumPlusOne;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.gradoop.common.util.GradoopConstants.NULL_STRING;
 
+/**
+ * Test base class for all grouping implementations.
+ */
 public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
+  /**
+   * Get the grouping strategy to be used for each test.
+   *
+   * @return The grouping strategy.
+   */
   public abstract GroupingStrategy getStrategy();
 
   @Test
@@ -87,7 +101,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -119,7 +133,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -158,7 +172,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -183,7 +197,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -211,7 +225,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -245,7 +259,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -297,7 +311,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
@@ -352,7 +366,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
@@ -380,7 +394,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -408,7 +422,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -441,7 +455,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -479,7 +493,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -508,7 +522,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -540,7 +554,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -575,7 +589,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -605,7 +619,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .setStrategy(getStrategy())
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -639,7 +653,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -680,7 +694,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -710,7 +724,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -745,7 +759,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -781,7 +795,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -826,7 +840,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -870,7 +884,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder()
         .useVertexLabel(true)
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -912,7 +926,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -954,7 +968,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -996,7 +1010,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1038,7 +1052,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1080,7 +1094,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1122,7 +1136,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1164,7 +1178,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1206,7 +1220,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1248,7 +1262,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1290,7 +1304,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1338,489 +1352,31 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
         .execute(input);
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
-  //----------------------------------------------------------------------------
-  // Tests for label specific grouping
-  //----------------------------------------------------------------------------
-
+  /**
+   * Test the aggregation with a post-processing step during graph grouping.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
   @Test
-  public void testVertexLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\"})" +
-      "(v01:Forum {topic : \"graph\"})" +
-      "(v02:User  {gender : \"male\"})" +
-      "(v03:User  {gender : \"female\"})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
+  public void testAggregationWithPostAggregateForGraphGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(:A {p: 1L})(:A {p: 2L})(:B {p: -1L})(:B {p: -1L})" +
+      "] expected [" +
+      "(:A {sum_p: 3L, sum_p_plusone: 4L})(:B{sum_p: -2L, sum_p_plusone: -1L})" +
       "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testVertexLabelSpecificNewLabel() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\"})" +
-      "(v01:Forum {topic : \"graph\"})" +
-      "(v02:UserGender {gender : \"male\"})" +
-      "(v03:UserGender {gender : \"female\"})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User", "UserGender", Lists.newArrayList("gender"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testVertexLabelSpecificUnlabeledGrouping() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\"})" +
-      "(v01:Forum {topic : \"graph\"})" +
-      "(v02 {gender : \"male\"})" +
-      "(v03 {gender : \"female\"})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .addVertexGroupingKey("gender")
-      .addVertexLabelGroup("Forum", Lists.newArrayList("topic"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testVertexLabelSpecificAggregators() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L, topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L, topic : \"graph\"})" +
-      "(v02:User {gender : \"male\", sum : 70})" +
-      "(v03:User {gender : \"female\", sum : 20})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addVertexGroupingKey("topic")
-      .addVertexAggregateFunction(new Count("count"))
-      .addVertexLabelGroup("User", Lists.newArrayList("gender"),
-        Lists.newArrayList(new SumProperty("age", "sum")))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-
-  @Test
-  public void testVertexLabelSpecificGlobalAggregator() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L, topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L, topic : \"graph\"})" +
-      "(v02:User {count : 3L, gender : \"male\"})" +
-      "(v03:User {count : 1L, gender : \"female\"})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addGlobalVertexAggregateFunction(new Count("count"))
-      .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testCrossVertexLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {topic : \"rdf\"})" +
-      "(v01:Forum {topic : \"graph\"})" +
-      "(v02:User  {gender : \"male\"})" +
-      "(v03:User  {gender : \"female\"})" +
-      "(v04:User  {age : 20})" +
-      "(v05:User  {age : 30})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v02)-->(v04)" +
-      "(v02)-->(v05)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "(v03)-->(v05)" +
-      "(v04)-->(v00)" +
-      "(v04)-->(v01)" +
-      "(v04)-->(v02)" +
-      "(v04)-->(v03)" +
-      "(v04)-->(v04)" +
-      "(v04)-->(v05)" +
-      "(v05)-->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User", Lists.newArrayList("gender"))
-      .addVertexLabelGroup("User", Lists.newArrayList("age"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testCrossVertexLabelSpecificAggregators() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L,topic : \"graph\"})" +
-      "(v02:User  {count : 3L,gender : \"male\", max : 30})" +
-      "(v03:User  {count : 1L,gender : \"female\", max : 20})" +
-      "(v04:UserAge  {count : 3L,age : 20, sum : 60})" +
-      "(v05:UserAge  {count : 1L,age : 30, sum : 30})" +
-      "(v02)-->(v00)" +
-      "(v02)-->(v01)" +
-      "(v02)-->(v02)" +
-      "(v02)-->(v03)" +
-      "(v02)-->(v04)" +
-      "(v02)-->(v05)" +
-      "(v03)-->(v01)" +
-      "(v03)-->(v02)" +
-      "(v03)-->(v05)" +
-      "(v04)-->(v00)" +
-      "(v04)-->(v01)" +
-      "(v04)-->(v02)" +
-      "(v04)-->(v03)" +
-      "(v04)-->(v04)" +
-      "(v04)-->(v05)" +
-      "(v05)-->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addVertexGroupingKey("topic")
-      .addVertexLabelGroup("User", Lists.newArrayList("gender"),
-        Lists.newArrayList(new Count("count"), new MaxProperty("age", "max")))
-      .addVertexLabelGroup("User", "UserAge", Lists.newArrayList("age"),
-        Lists.newArrayList(new Count("count"), new SumProperty("age", "sum")))
-      .addVertexAggregateFunction(new Count("count"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {until : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014}]->(v01)" +
-      "(v01)-[:knows {since : 2013}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .useEdgeLabel(true)
-      .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeLabelSpecificNewLabel() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {until : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013}]->(v00)" +
-      "(v01)-[:knowsSince {since : 2014}]->(v01)" +
-      "(v01)-[:knowsSince {since : 2013}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .useEdgeLabel(true)
-      .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knows", "knowsSince", Lists.newArrayList("since"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeLabelSpecificUnlabeledGrouping() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[{until : 2014}]->(v00)" +
-      "(v01)-[{until : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014}]->(v01)" +
-      "(v01)-[:knows {since : 2013}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addEdgeGroupingKey("until")
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeLabelSpecificAggregators() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {since : 2013, sum : 6039}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .useEdgeLabel(true)
-      .addEdgeGroupingKey("until")
-      .addEdgeAggregateFunction(new MinProperty("until", "min"))
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumProperty("since", "sum")))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testEdgeLabelSpecificGlobalAggregators() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {count : 2L, until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {count : 3L, until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {count : 2L, since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {count : 3L, since : 2013, sum : 6039}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .addGlobalEdgeAggregateFunction(new Count("count"))
-      .useVertexLabel(true)
-      .useEdgeLabel(true)
-      .addEdgeGroupingKey("until")
-      .addEdgeAggregateFunction(new MinProperty("until", "min"))
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumProperty("since", "sum")))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testCrossEdgeLabelSpecific() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {until : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014}]->(v01)" +
-      "(v01)-[:knows {since : 2013}]->(v01)" +
-      "(v01)-[:knows {}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
-      .addEdgeLabelGroup("knows", Lists.newArrayList())
-      .addEdgeLabelGroup("member", Lists.newArrayList("until"))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  @Test
-  public void testCrossEdgeLabelSpecificAggregators() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(getLabelSpecificInput());
-
-    LogicalGraph input = loader.getLogicalGraphByVariable("input");
-
-    loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum)" +
-      "(v01:User)" +
-      "(v01)-[:member {until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {since : 2013, sum : 6039}]->(v01)" +
-      "(v01)-[:knowsMax {max : 2014}]->(v01)" +
-      "]");
-
-    LogicalGraph output = new Grouping.GroupingBuilder()
-      .useVertexLabel(true)
-      .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumProperty("since", "sum")))
-      .addEdgeLabelGroup("knows", "knowsMax", Lists.newArrayList(),
-        Lists.newArrayList(new MaxProperty("since", "max")))
-      .addEdgeLabelGroup("member", Lists.newArrayList("until"),
-        Lists.newArrayList(new MinProperty("until", "min")))
-      .setStrategy(getStrategy())
-      .build()
-      .execute(input);
-
-    collectAndAssertTrue(
-      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  private String getLabelSpecificInput() {
-    return "input[" +
-      "(v0:Forum {theme : \"db\",topic : \"rdf\"})" +
-      "(v1:Forum {theme : \"db\",topic : \"graph\"})" +
-      "(v2:User {theme : \"db\",gender : \"male\",age : 20})" +
-      "(v3:User {theme : \"db\",gender : \"male\",age : 20})" +
-      "(v4:User {theme : \"db\",gender : \"male\",age : 30})" +
-      "(v5:User {theme : \"db\",gender : \"female\",age : 20})" +
-      "(v2)-[:member {until : 2014}]->(v0)" +
-      "(v3)-[:member {until : 2014}]->(v0)" +
-      "(v3)-[:member {until : 2013}]->(v1)" +
-      "(v4)-[:member {until : 2013}]->(v1)" +
-      "(v5)-[:member {until : 2013}]->(v1)" +
-      "(v2)-[:knows {since : 2014}]->(v3)" +
-      "(v3)-[:knows {since : 2014}]->(v2)" +
-      "(v3)-[:knows {since : 2013}]->(v4)" +
-      "(v3)-[:knows {since : 2013}]->(v5)" +
-      "(v5)-[:knows {since : 2013}]->(v4)" +
-      "]";
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    LogicalGraph result = input.groupBy(
+      Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(new SumVertexProperty("p", "sum_p"),
+        new SumPlusOne("p", "sum_p_plusone")),
+      Collections.emptyList(), Collections.emptyList(), getStrategy());
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 }

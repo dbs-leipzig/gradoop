@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.statistics.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.ArrayList;
@@ -29,11 +29,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Collects the aggregated values for connected components and computes the distribution of
+ * Collects the aggregated component ids from vertices and edges. Extracts the distribution for
  * vertices and edges over this components.
  */
 public class GetConnectedComponentDistributionFlatMap implements
-  FlatMapFunction<GraphHead, Tuple3<String, Long, Long>> {
+  FlatMapFunction<EPGMGraphHead, Tuple3<String, Long, Long>> {
 
   /**
    * Property key to store the component id.
@@ -56,15 +56,8 @@ public class GetConnectedComponentDistributionFlatMap implements
     this.annotateEdges = annotateEdges;
   }
 
-  /**
-   * Collects the aggregated component ids from vertices and edges. Extracts the distribution for
-   * vertices and edges over this components.
-   *
-   * @param graphHead The graph head with the aggregated components
-   * @param out The connected component distribution as {@code Tuple3<String, Long, Long>}
-   */
   @Override
-  public void flatMap(GraphHead graphHead, Collector<Tuple3<String, Long, Long>> out) {
+  public void flatMap(EPGMGraphHead graphHead, Collector<Tuple3<String, Long, Long>> out) {
     List<String> vertexWcc = graphHead.getPropertyValue(
       new AggregateListOfWccVertices(propertyKey).getAggregatePropertyKey()).getList()
       .stream().map(PropertyValue::getString)

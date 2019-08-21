@@ -17,10 +17,11 @@ package org.gradoop.flink.model.impl.operators.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
@@ -29,22 +30,25 @@ import org.gradoop.flink.model.impl.operators.transformation.functions.Transform
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
 
 /**
- * The modification operators is a unary graph operator that takes a logical
+ * The modification operators is a unary graph operator that takes a base
  * graph as input and applies user defined modification functions on the
  * elements of that graph as well as on its graph head.
  *
  * The identity of the elements is preserved.
  *
- * @param <G> the EPGM graph head type
- * @param <V> the EPGM vertex type
- * @param <E> the EPGM edge type
- * @param <LG> the logical graph type
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class Transformation<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Modification function for graph heads
@@ -96,23 +100,22 @@ public class Transformation<
    * @param graphHeads graph heads
    * @param vertices vertices
    * @param edges edges
-   * @param factory the factory that is responsible for creating an instance of the logical graph
-   * @return transformed logical graph
+   * @param factory the factory that is responsible for creating an instance of the base graph
+   * @return transformed base graph
    */
-  @SuppressWarnings("unchecked")
   protected LG executeInternal(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
-    BaseGraphFactory<G, V, E, LG> factory) {
+    BaseGraphFactory<G, V, E, LG, GC> factory) {
 
     DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ? graphHeads
-      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
+      .map(new TransformGraphHead<>(graphHeadTransFunc, factory.getGraphHeadFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;
 
     DataSet<V> transformedVertices = vertexTransFunc != null ? vertices
-      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
+      .map(new TransformVertex<>(vertexTransFunc, factory.getVertexFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;
 
     DataSet<E> transformedEdges = edgeTransFunc != null ? edges
-      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
+      .map(new TransformEdge<>(edgeTransFunc, factory.getEdgeFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;
 
     return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);

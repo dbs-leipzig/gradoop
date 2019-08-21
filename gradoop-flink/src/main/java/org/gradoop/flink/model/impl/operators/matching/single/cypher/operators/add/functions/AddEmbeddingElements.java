@@ -38,7 +38,7 @@ public class AddEmbeddingElements extends RichMapFunction<Embedding, Embedding> 
   }
 
   @Override
-  public Embedding map(Embedding embedding) throws Exception {
+  public Embedding map(Embedding embedding) {
     for (int i = 0; i < count; i++) {
       GradoopId id = GradoopId.get();
       embedding.add(id);

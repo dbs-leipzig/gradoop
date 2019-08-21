@@ -18,14 +18,16 @@ package org.gradoop.storage.impl.accumulo.io;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.accumulo.impl.AccumuloEPGMStore;
+import org.gradoop.storage.accumulo.impl.io.AccumuloDataSink;
+import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
 import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -34,8 +36,8 @@ import org.junit.runners.MethodSorters;
 import java.io.InputStream;
 import java.util.Collection;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 
 /**
  * accumulo data read write test
@@ -50,18 +52,18 @@ public class IOBasicTest extends GradoopFlinkTestBase {
   public void read() throws Exception {
     AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_01));
 
-    Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
-    Collection<Vertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
-    Collection<Edge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
+    Collection<EPGMGraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
+    Collection<EPGMVertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
+    Collection<EPGMEdge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
 
     // write social graph to HBase
-    for (GraphHead g : graphHeads) {
+    for (EPGMGraphHead g : graphHeads) {
       accumuloStore.writeGraphHead(g);
     }
-    for (Vertex v : vertices) {
+    for (EPGMVertex v : vertices) {
       accumuloStore.writeVertex(v);
     }
-    for (Edge e : edges) {
+    for (EPGMEdge e : edges) {
       accumuloStore.writeEdge(e);
     }
     accumuloStore.flush();
@@ -70,9 +72,9 @@ public class IOBasicTest extends GradoopFlinkTestBase {
     GraphCollection collection = new AccumuloDataSource(accumuloStore, flinkConfig)
       .getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -80,11 +82,11 @@ public class IOBasicTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
 
     accumuloStore.close();
   }
@@ -111,15 +113,15 @@ public class IOBasicTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
     accumuloStore.flush();
 
-    validateEPGMElementCollections(loader.getGraphHeads(),
+    validateElementCollections(loader.getGraphHeads(),
       accumuloStore.getGraphSpace().readRemainsAndClose());
-    validateEPGMElementCollections(loader.getVertices(),
+    validateElementCollections(loader.getVertices(),
       accumuloStore.getVertexSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(loader.getVertices(),
+    validateGraphElementCollections(loader.getVertices(),
       accumuloStore.getVertexSpace().readRemainsAndClose());
-    validateEPGMElementCollections(loader.getEdges(),
+    validateElementCollections(loader.getEdges(),
       accumuloStore.getEdgeSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(loader.getEdges(),
+    validateGraphElementCollections(loader.getEdges(),
       accumuloStore.getEdgeSpace().readRemainsAndClose());
 
     accumuloStore.close();

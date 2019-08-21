@@ -23,15 +23,10 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
 
 /**
- * Computes {@link EdgeCount} for a given logical graph and write it in a CSV file.
+ * Computes {@link EdgeCount} for a given logical graph.
  */
 public class EdgeCountPreparer implements UnaryGraphToValueOperator<MapOperator<Long, Tuple1<Long>>> {
 
-  /**
-   * Prepares the statistic for a edge count.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator<Long, Tuple1<Long>> execute(final LogicalGraph graph) {
     return new EdgeCount()

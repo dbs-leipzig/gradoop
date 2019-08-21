@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Maps vertices that are not associated to a graph id
@@ -27,12 +27,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class MapVerticesAsTuplesWithNullId
-  implements MapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
+  implements MapFunction<EPGMVertex, Tuple2<EPGMVertex, GradoopId>> {
 
   /**
    * Reusable returned element
    */
-  private final Tuple2<Vertex, GradoopId> reusable;
+  private final Tuple2<EPGMVertex, GradoopId> reusable;
 
   /**
    * Default constructor
@@ -43,7 +43,7 @@ public class MapVerticesAsTuplesWithNullId
   }
 
   @Override
-  public Tuple2<Vertex, GradoopId> map(Vertex value) throws Exception {
+  public Tuple2<EPGMVertex, GradoopId> map(EPGMVertex value) throws Exception {
     reusable.f0 = value;
     return reusable;
   }

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * Projects an Edge by a set of properties.
  * Edge -> Embedding(GraphElementEmbedding(Edge))
  */
-public class ProjectEdge extends RichMapFunction<Edge, Embedding> {
+public class ProjectEdge extends RichMapFunction<EPGMEdge, Embedding> {
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -48,7 +48,7 @@ public class ProjectEdge extends RichMapFunction<Edge, Embedding> {
   }
 
   @Override
-  public Embedding map(Edge edge) {
+  public Embedding map(EPGMEdge edge) {
     return EmbeddingFactory.fromEdge(edge, propertyKeys, isLoop);
   }
 }

@@ -17,18 +17,20 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 
 import java.util.List;
 
 /**
  * Applies a given predicate on a {@link Vertex} and projects specified property values to the
  * output embedding.
+ *
+ * @param <V> The vertex type.
  */
-public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embedding> {
+public class FilterAndProjectVertex<V extends Vertex> extends RichFlatMapFunction<V, Embedding> {
   /**
    * Predicates used for filtering
    */
@@ -50,7 +52,7 @@ public class FilterAndProjectVertex extends RichFlatMapFunction<Vertex, Embeddin
   }
 
   @Override
-  public void flatMap(Vertex vertex, Collector<Embedding> out) throws Exception {
+  public void flatMap(V vertex, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(vertex)) {
       out.collect(EmbeddingFactory.fromVertex(vertex, projectionPropertyKeys));
     }

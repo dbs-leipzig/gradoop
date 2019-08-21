@@ -18,29 +18,31 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Returns a tuple which contains the source id and the edge and a tuple which contains the
  * target id and same edge.
+ *
+ * @param <E> edge type
  */
-public class VertexIdsWithEdge implements FlatMapFunction<Edge, Tuple2<GradoopId, Edge>> {
+public class VertexIdsWithEdge<E extends Edge> implements FlatMapFunction<E, Tuple2<GradoopId, E>> {
 
   /**
    * Reuse tuple to avoid instantiations.
    */
-  private Tuple2<GradoopId, Edge> reuseTuple;
+  private Tuple2<GradoopId, E> reuseTuple;
 
   /**
    * Constructor which instantiates the reuse tuple.
    */
   public VertexIdsWithEdge() {
-    reuseTuple = new Tuple2<GradoopId, Edge>();
+    reuseTuple = new Tuple2<>();
   }
 
   @Override
-  public void flatMap(Edge edge, Collector<Tuple2<GradoopId, Edge>> collector) throws Exception {
+  public void flatMap(E edge, Collector<Tuple2<GradoopId, E>> collector) throws Exception {
     reuseTuple.setFields(edge.getSourceId(), edge);
     collector.collect(reuseTuple);
     reuseTuple.setFields(edge.getTargetId(), edge);

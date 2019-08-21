@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
@@ -32,12 +32,12 @@ public class GraphDensity implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<GraphHead> newGraphHead = graph
+    DataSet<EPGMGraphHead> newGraphHead = graph
       .aggregate(new VertexCount(), new EdgeCount())
       .getGraphHead()
       .map(new CalculateDensity(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));
 
-    return graph.getConfig().getLogicalGraphFactory()
+    return graph.getFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 }

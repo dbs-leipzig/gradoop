@@ -5,7 +5,7 @@
     <parent>
         <artifactId>gradoop-store</artifactId>
         <groupId>org.gradoop</groupId>
-        <version>0.4.5</version>
+        <version>0.5.0</version>
     </parent>
 
     <artifactId>gradoop-hbase</artifactId>
@@ -13,10 +13,6 @@
 
     <name>Gradoop HBase</name>
 	<description>Read/write graphs from/to HBase</description>
-
-    <properties>
-        <hbaseSuite>**/HBaseTestSuite.class</hbaseSuite>
-    </properties>
 
     <profiles>
         <profile>
@@ -71,10 +67,6 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
                     </plugin>
                 </plugins>
@@ -93,16 +85,22 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include>${hbaseSuite}</include>
-                    </includes>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>gradoop-hbase-testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <properties>
+                        <property>
+                            <name>surefire.testng.verbose</name>
+                            <value>2</value>
+                        </property>
+                    </properties>
                 </configuration>
             </plugin>
             <!-- Creates an extra *-tests.jar which can be used as dependency -->
@@ -196,8 +194,8 @@
         
         <!-- Others -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

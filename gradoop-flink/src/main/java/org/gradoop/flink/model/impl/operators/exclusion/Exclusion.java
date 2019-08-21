@@ -33,49 +33,44 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 
 /**
- * Computes the exclusion graph from two logical graphs.
+ * Computes the exclusion graph from two base graphs.
+ * Reduces the first input graph to contain only vertices and edges that don't exist in
+ * the second graph. The graph head of the first graph is retained. Vertex and edge equality
+ * is based on their respective identifiers.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class Exclusion implements BinaryGraphToGraphOperator {
+public class Exclusion<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
-  /**
-   * Creates a new logical graph containing only vertices and edges that exist
-   * in the first input graph but not in the second input graph. Vertex and edge
-   * equality is based on their respective identifiers.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return first graph without elements from second graph
-   */
   @Override
-  public LogicalGraph execute(
-    LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+  public LG execute(LG firstGraph, LG secondGraph) {
+    DataSet<V> newVertexSet = firstGraph.getVertices()
       .leftOuterJoin(secondGraph.getVertices())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftWhenRightIsNull<>());
 
-    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
-      .join(newVertexSet)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(newVertexSet)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
+    return firstGraph.getFactory()
+      .fromDataSets(firstGraph.getGraphHead(), newVertexSet, firstGraph.getEdges()).verify();
   }
 }

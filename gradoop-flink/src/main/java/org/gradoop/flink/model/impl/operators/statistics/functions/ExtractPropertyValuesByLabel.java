@@ -20,7 +20,7 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -32,7 +32,7 @@ import java.util.Set;
  * @param <T> graph element type
  */
 @FunctionAnnotation.ForwardedFields("label->0.0")
-public class ExtractPropertyValuesByLabel<T extends GraphElement>
+public class ExtractPropertyValuesByLabel<T extends EPGMGraphElement>
   extends RichFlatMapFunction<T, Tuple2<Tuple2<String, String>, Set<PropertyValue>>> {
 
   /**

@@ -15,15 +15,15 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
  * Accepts all elements which have the same label as specified.
  *
- * @param <L> EPGM labeled type
+ * @param <L> labeled type
  */
-public class ByLabel<L extends EPGMLabeled> implements CombinableFilter<L> {
+public class ByLabel<L extends Labeled> implements CombinableFilter<L> {
   /**
    * Label to be filtered on.
    */

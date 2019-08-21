@@ -16,14 +16,9 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.pagerank.PageRank;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
@@ -97,19 +92,6 @@ public class PageRankSampling extends SamplingAlgorithm {
     this.keepVerticesIfSameScore = keepVerticesIfSameScore;
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Vertices are sampled by using the Gradoop-Wrapper of Flinks PageRank-algorithm
-   * {@link PageRank}. If they got different PageRank-scores, all scores are scaled
-   * in a range between 0 and 1.
-   * Then all vertices with a PageRank-score greater or equal/smaller than a given sampling
-   * threshold are retained - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
-   * If ALL vertices got the same PageRank-score, it can be decided whether to sample all
-   * vertices or none of them - depending on the Boolean set in {@code keepVerticesIfSameScore}.
-   * Retains all edges which source- and target-vertices were chosen. There may retain some
-   * unconnected vertices in the sampled graph.
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -119,7 +101,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       maxIteration,
       true).execute(graph);
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
+    graph = graph.getFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
 
     graph = graph
@@ -128,22 +110,12 @@ public class PageRankSampling extends SamplingAlgorithm {
         new SumVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
         new VertexCount());
 
-    DataSet<Vertex> scaledVertices = graph.getVertices()
+    DataSet<EPGMVertex> scaledVertices = graph.getVertices()
       .crossWithTiny(graph.getGraphHead().first(1))
       .with(new AddPageRankScoresToVertexCrossFunction())
       .filter(new PageRankResultVertexFilter(
         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
 
-    DataSet<Edge> newEdges = graph.getEdges()
-      .join(scaledVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(scaledVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    graph = graph.getFactory().fromDataSets(scaledVertices, newEdges);
-
-    return graph;
+    return graph.getFactory().fromDataSets(scaledVertices, graph.getEdges()).verify();
   }
 }

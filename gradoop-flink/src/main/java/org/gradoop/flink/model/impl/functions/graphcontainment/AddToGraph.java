@@ -16,18 +16,16 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 
 /**
  * Adds the given graph head identifier to the graph element.
  *
- * @param <GE> EPGM graph element
+ * @param <GE> graph element
  */
-public class AddToGraph<GE extends GraphElement> implements
-  MapFunction<GE, GE> {
-
+public class AddToGraph<GE extends GraphElement> implements MapFunction<GE, GE> {
   /**
    * Graph head identifier which gets added to the graph element.
    */
@@ -43,7 +41,7 @@ public class AddToGraph<GE extends GraphElement> implements
   }
 
   @Override
-  public GE map(GE graphElement) throws Exception {
+  public GE map(GE graphElement) {
     graphElement.addGraphId(graphHeadId);
     return graphElement;
   }

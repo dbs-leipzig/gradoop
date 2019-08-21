@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import java.util.List;
 
 /**
- * Filters a set of EPGM {@link Edge} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link Edge} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
@@ -41,12 +41,14 @@ import java.util.List;
  * an {@link Embedding}:
  *
  * ([IdEntry(1),IdEntry(0),IdEntry(2)],[PropertyEntry(2017),PropertyEntry(NULL)])
+ *
+ * @param <E> The edge type.
  */
-public class FilterAndProjectEdges implements PhysicalOperator {
+public class FilterAndProjectEdges<E extends Edge> implements PhysicalOperator {
   /**
    * Input graph elements
    */
-  private final DataSet<Edge> input;
+  private final DataSet<E> input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -73,7 +75,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * @param projectionPropertyKeys Property keys used for projection
    * @param isLoop is the edge a loop
    */
-  public FilterAndProjectEdges(DataSet<Edge> input, CNF predicates,
+  public FilterAndProjectEdges(DataSet<E> input, CNF predicates,
     List<String> projectionPropertyKeys, boolean isLoop) {
     this.input = input;
     this.predicates = predicates;
@@ -85,7 +87,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
   @Override
   public DataSet<Embedding> evaluate() {
     return input
-      .flatMap(new FilterAndProjectEdge(predicates, projectionPropertyKeys, isLoop))
+      .flatMap(new FilterAndProjectEdge<>(predicates, projectionPropertyKeys, isLoop))
       .name(getName());
   }
 

@@ -16,8 +16,8 @@
 package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValues;
 import org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairs;
 import org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairs;
@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 
 import java.util.Objects;
 import java.util.Set;
@@ -110,12 +111,12 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     // prepare the edge set, EdgeFilter if propagating edges are given
-    DataSet<Edge> propagateAlong = graph.getEdges();
+    DataSet<EPGMEdge> propagateAlong = graph.getEdges();
     if (propagatingEdgeLabels != null) {
       propagateAlong = propagateAlong.filter(new LabelIsIn<>(propagatingEdgeLabels));
     }
 
-    DataSet<Vertex> newVertices = graph.getVertices()
+    DataSet<EPGMVertex> newVertices = graph.getVertices()
       // Extract properties to propagate
       .flatMap(new BuildIdPropertyValuePairs<>(vertexLabel, propertyKey))
       // Propagate along edges.
@@ -125,13 +126,10 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
       // Update target vertices.
       .coGroup(graph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new AccumulatePropagatedValues<>(targetVertexPropertyKey, targetVertexLabels));
+      .with(new AccumulatePropagatedValues<>(targetVertexPropertyKey, targetVertexLabels))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getFactory().fromDataSets(newVertices, graph.getEdges());
-  }
-
-  @Override
-  public String getName() {
-    return PropagatePropertyToNeighbor.class.getName();
+    return graph.getFactory().fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
   }
 }

@@ -16,13 +16,14 @@
 package org.gradoop.storage.impl.accumulo;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.accumulo.impl.AccumuloEPGMStore;
+import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,15 +46,15 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
     //read vertices by label
-    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = GradoopTestUtils.getSocialNetworkLoader();
+    AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader = GradoopTestUtils.getSocialNetworkLoader();
     // write social graph to Accumulo
-    for (GraphHead g : loader.getGraphHeads()) {
+    for (EPGMGraphHead g : loader.getGraphHeads()) {
       graphStore.writeGraphHead(g);
     }
-    for (Vertex v : loader.getVertices()) {
+    for (EPGMVertex v : loader.getVertices()) {
       graphStore.writeVertex(v);
     }
-    for (Edge e : loader.getEdges()) {
+    for (EPGMEdge e : loader.getEdges()) {
       graphStore.writeEdge(e);
     }
     graphStore.flush();
@@ -110,7 +111,7 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
      * @throws Throwable an Exception thrown by the test.
      */
     void test(
-      AsciiGraphLoader<GraphHead, Vertex, Edge> loader,
+      AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader,
       AccumuloEPGMStore store,
       GradoopFlinkConfig config
     ) throws Throwable;

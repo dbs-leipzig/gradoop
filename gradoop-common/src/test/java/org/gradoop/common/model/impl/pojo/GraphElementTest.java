@@ -18,17 +18,19 @@ package org.gradoop.common.model.impl.pojo;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class GraphElementTest {
 
   @Test
   public void testAddGraphIdNoGraphIds() {
-    GraphElement graphElementMock = mock(GraphElement.class, CALLS_REAL_METHODS);
+    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, CALLS_REAL_METHODS);
 
     GradoopId id = GradoopId.get();
     graphElementMock.addGraphId(id);
@@ -42,7 +44,7 @@ public class GraphElementTest {
     GradoopIdSet idSet = new GradoopIdSet();
     idSet.add(GradoopId.get());
 
-    GraphElement graphElementMock = mock(GraphElement.class, withSettings()
+    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, withSettings()
     .useConstructor(GradoopId.get(), "someLabel", propertiesMock, idSet)
     .defaultAnswer(CALLS_REAL_METHODS));
 

@@ -17,14 +17,16 @@ package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 
 import java.util.List;
 import java.util.Objects;
@@ -76,26 +78,23 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
   public LogicalGraph execute(LogicalGraph graph) {
 
     // determine the vertices the neighborhood should be calculated for
-    DataSet<Vertex> verticesByLabel = graph.getVerticesByLabel(sourceVertexLabel);
+    DataSet<EPGMVertex> verticesByLabel = graph.getVerticesByLabel(sourceVertexLabel);
 
     // prepare the graph
     LogicalGraph reducedGraph = graph
       .vertexInducedSubgraph(new LabelIsIn<>(sourceVertexLabel, neighborhoodVertexLabel));
 
     // determine the neighborhood by edge direction
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhood =
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> neighborhood =
       Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);
 
     // calculate the new edges and add them to the original graph
-    DataSet<Edge> newEdges = neighborhood.flatMap(
-      new CreateCartesianNeighborhoodEdges<>(graph.getConfig().getEdgeFactory(), newEdgeLabel));
+    DataSet<EPGMEdge> newEdges = neighborhood.flatMap(
+      new CreateCartesianNeighborhoodEdges<>(graph.getFactory().getEdgeFactory(), newEdgeLabel))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
-  }
-
-  @Override
-  public String getName() {
-    return ConnectNeighbors.class.getName();
+    return graph.getFactory()
+      .fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges().union(newEdges));
   }
 }

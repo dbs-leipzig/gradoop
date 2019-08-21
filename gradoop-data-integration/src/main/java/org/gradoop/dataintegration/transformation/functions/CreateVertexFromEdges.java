@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Objects;
@@ -34,14 +34,14 @@ import java.util.Objects;
  * @param <V> The vertex type.
  * @param <E> The edge type.
  */
-public class CreateVertexFromEdges<V extends EPGMVertex, E extends EPGMEdge>
+public class CreateVertexFromEdges<V extends Vertex, E extends Edge>
   implements MapFunction<E, Tuple3<V, GradoopId, GradoopId>>,
   ResultTypeQueryable<Tuple3<V, GradoopId, GradoopId>> {
 
   /**
    * The factory vertices are created with.
    */
-  private final EPGMVertexFactory<V> factory;
+  private final VertexFactory<V> factory;
 
   /**
    * Reduce object instantiations.
@@ -54,7 +54,7 @@ public class CreateVertexFromEdges<V extends EPGMVertex, E extends EPGMEdge>
    * @param newVertexLabel The label of the newly created vertex.
    * @param factory        The factory for creating new vertices.
    */
-  public CreateVertexFromEdges(String newVertexLabel, EPGMVertexFactory<V> factory) {
+  public CreateVertexFromEdges(String newVertexLabel, VertexFactory<V> factory) {
     this.factory = Objects.requireNonNull(factory);
     this.reuse = new Tuple3<>(factory.createVertex(newVertexLabel), null, null);
   }

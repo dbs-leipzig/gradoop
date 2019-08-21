@@ -16,12 +16,13 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
@@ -30,7 +31,8 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
  */
-public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
+public class GraphEquality
+  implements BinaryBaseGraphToValueOperator<LogicalGraph, DataSet<Boolean>> {
 
   /**
    * collection equality operator, wrapped by graph equality
@@ -49,8 +51,9 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString<GraphHead> graphHeadToString,
-    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString, boolean directed) {
+  public GraphEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
+    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString,
+    boolean directed) {
     this.directed = directed;
 
     this.collectionEquality =
@@ -59,8 +62,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
 
   @Override
   public DataSet<Boolean> execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    GraphCollectionFactory collectionFactory = firstGraph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      collectionFactory = firstGraph.getCollectionFactory();
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }

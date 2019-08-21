@@ -18,15 +18,13 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
-
 
 /**
- * Updates the id of an EPGM element in a Tuple2 by the GradoopId in the
- * second field.
+ * Updates the id of an element in a Tuple2 by the GradoopId in the second field.
  *
- * @param <EL> EPGM element type
+ * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("graphIds;label;properties")
 @FunctionAnnotation.ForwardedFieldsSecond("*->id")

@@ -20,15 +20,16 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.junit.Test;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.properties.Type;
+import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
+import org.testng.annotations.Test;
 
 import java.util.regex.Pattern;
 
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
-import static org.junit.Assert.assertEquals;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_TYPE;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_VALUE;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for {@link HBasePropReg}
@@ -42,7 +43,7 @@ public class HBasePropRegTest {
     String key = "key";
     Pattern pattern = Pattern.compile("^FooBar.*$");
 
-    HBasePropReg<Vertex> vertexFilter = new HBasePropReg<>(key, pattern);
+    HBasePropReg<EPGMVertex> vertexFilter = new HBasePropReg<>(key, pattern);
 
     FilterList expectedFilter = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
@@ -59,7 +60,7 @@ public class HBasePropRegTest {
       Bytes.toBytesBinary(CF_PROPERTY_TYPE),
       Bytes.toBytesBinary(key),
       CompareFilter.CompareOp.EQUAL,
-      new byte[] {PropertyValue.TYPE_STRING});
+      new byte[] {Type.STRING.getTypeByte()});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);
@@ -67,7 +68,7 @@ public class HBasePropRegTest {
     expectedFilter.addFilter(typeFilter);
     expectedFilter.addFilter(valueFilter);
 
-    assertEquals("Failed during filter comparison for key [" + key + "].",
-      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+    assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
+      "Failed during filter comparison for key [" + key + "].");
   }
 }

@@ -15,15 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.statistics;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-import org.gradoop.flink.model.impl.operators.statistics.functions.AddAverageCCValueToGraphHeadMap;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.average.AverageVertexProperty;
 
 /**
  * Calculates the average local clustering coefficient of a graph and writes it to the graph head.
@@ -40,18 +36,8 @@ public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-    VertexCount vertexCountAggregate = new VertexCount();
-    SumVertexProperty localCCAggregate = new SumVertexProperty(
-      ClusteringCoefficientBase.PROPERTY_KEY_LOCAL);
-
-    graph = new GellyLocalClusteringCoefficientDirected().execute(graph)
-      .aggregate(vertexCountAggregate, localCCAggregate);
-
-    DataSet<GraphHead> graphHead = graph.getGraphHead().map(new AddAverageCCValueToGraphHeadMap(
-        localCCAggregate.getAggregatePropertyKey(), vertexCountAggregate.getAggregatePropertyKey(),
+    return new GellyLocalClusteringCoefficientDirected().execute(graph).aggregate(
+      new AverageVertexProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL,
         PROPERTY_KEY_AVERAGE));
-
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(
-      graphHead, graph.getVertices(), graph.getEdges());
   }
 }

@@ -46,7 +46,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2")
-      .reduce(new ReduceCombination());
+      .reduce(new ReduceCombination<>());
 
     //expected
     loader.initDatabaseFromString("g0 {vertexRollUpGroupingKeys:\"age\"}[" +
@@ -87,7 +87,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3")
-      .reduce(new ReduceCombination());
+      .reduce(new ReduceCombination<>());
 
     //expected
     loader.initDatabaseFromString("g0 {edgeRollUpGroupingKeys:\":label\"}[" +
@@ -120,7 +120,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3")
-      .reduce(new ReduceCombination());
+      .reduce(new ReduceCombination<>());
 
     //expected
     loader.initDatabaseFromString("g0 {vertexRollUpGroupingKeys:\"age,gender,city\"}[" +
@@ -207,7 +207,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3")
-      .reduce(new ReduceCombination());
+      .reduce(new ReduceCombination<>());
 
     //expected
     loader.initDatabaseFromString("g0 {edgeRollUpGroupingKeys:\":label,since,vertexCount\"}[" +

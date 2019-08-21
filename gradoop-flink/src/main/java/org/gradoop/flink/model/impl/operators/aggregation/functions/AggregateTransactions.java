@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
  */
 public class AggregateTransactions implements MapFunction<GraphTransaction, GraphTransaction> {
 
+  /**
+   * Set of all aggregate functions.
+   */
+  private final Set<AggregateFunction> aggregateFunctions;
   /**
    * Set of aggregate vertex functions.
    */
@@ -52,6 +56,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   public AggregateTransactions(Set<AggregateFunction> aggregateFunctions) {
     // initialization logic to avoid instanceOf checking during execution
+    this.aggregateFunctions = aggregateFunctions;
 
     vertexAggregateFunctions = aggregateFunctions.stream()
       .filter(AggregateFunction::isVertexAggregation)
@@ -74,6 +79,10 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     aggregate = aggregateVertices(aggregate, graphTransaction);
     aggregate = aggregateEdges(aggregate, graphTransaction);
 
+    for (AggregateFunction function : aggregateFunctions) {
+      aggregate.computeIfPresent(function.getAggregatePropertyKey(),
+        (k, v) -> function.postAggregate(v));
+    }
     aggregateDefaultValues.forEach(aggregate::putIfAbsent);
 
     aggregate.forEach(graphTransaction.getGraphHead()::setProperty);
@@ -89,7 +98,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   private Map<String, PropertyValue> aggregateVertices(Map<String, PropertyValue> aggregate,
                                                        GraphTransaction graphTransaction) {
-    for (Vertex vertex : graphTransaction.getVertices()) {
+    for (EPGMVertex vertex : graphTransaction.getVertices()) {
       aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);
     }
     return aggregate;
@@ -104,7 +113,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   private Map<String, PropertyValue> aggregateEdges(Map<String, PropertyValue> aggregate,
                                                     GraphTransaction graphTransaction) {
-    for (Edge edge : graphTransaction.getEdges()) {
+    for (EPGMEdge edge : graphTransaction.getEdges()) {
       aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);
     }
     return aggregate;

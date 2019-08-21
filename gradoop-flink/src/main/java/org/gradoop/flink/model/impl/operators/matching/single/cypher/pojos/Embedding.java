@@ -35,7 +35,8 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * This class represents an Embedding, an ordered List of Embedding Entries. Every entry is
- * either a reference to a single Edge or Vertex, or a path (Edge, Vertex, Edge, Vertex, ..., Edge).
+ * either a reference to a single Edge or Vertex, or a
+ * path (Edge, Vertex, Edge, Vertex, ..., Edge).
  * The reference is stored via the elements ID. Additionally the embedding ca store an ordered
  * list of PropertyValues.
  */
@@ -674,11 +675,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     if (!Arrays.equals(propertyData, that.propertyData)) {
       return false;
     }
-    if (!Arrays.equals(idListData, that.idListData)) {
-      return false;
-    }
-
-    return true;
+    return Arrays.equals(idListData, that.idListData);
   }
 
   @Override

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
@@ -71,7 +71,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
         "]" +
         "g2:B[" +
         "(v11:B {id : 0})" +
-        "(v12:A {id : 1})" +
+        "(v12:A {id : 1, abc : 5})" +
         "(v13:A {id : 2})" +
         "(v14:A {id : 3})" +
         "(v15:C {id : 4})" +
@@ -120,10 +120,10 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     for (int i = 0; i < tests.length; i++) {
       String testPattern = tests[i];
 
-      GraphCollection result = coll.match(testPattern, new DepthSearchMatching(), true);
+      GraphCollection result = coll.query(testPattern, new DepthSearchMatching(), true);
 
-      Collection<GraphHead> originalHeads = Lists.newArrayList();
-      Collection<GraphHead> resultHeads = Lists.newArrayList();
+      Collection<EPGMGraphHead> originalHeads = Lists.newArrayList();
+      Collection<EPGMGraphHead> resultHeads = Lists.newArrayList();
 
       coll.getGraphHeads().output(new LocalCollectionOutputFormat<>(
         originalHeads));
@@ -135,7 +135,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
       Map<GradoopId, String> lineageIdMap = new HashMap<>();
 
-      for (GraphHead original : originalHeads) {
+      for (EPGMGraphHead original : originalHeads) {
         lineageIdMap.put(original.getId(), original.getLabel());
       }
 
@@ -144,7 +144,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
       int cCount = 0;
       int dCount = 0;
       int eCount = 0;
-      for (GraphHead head : resultHeads) {
+      for (EPGMGraphHead head : resultHeads) {
         GradoopId id = head.getPropertyValue("lineage").getGradoopId();
         if (lineageIdMap.get(id).equals("A")) {
           aCount++;
@@ -162,11 +162,11 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
           eCount++;
         }
       }
-      assertEquals(aCount, resultCounts[i][0]);
-      assertEquals(bCount, resultCounts[i][1]);
-      assertEquals(cCount, resultCounts[i][2]);
-      assertEquals(dCount, resultCounts[i][3]);
-      assertEquals(eCount, resultCounts[i][4]);
+      assertEquals(resultCounts[i][0], aCount);
+      assertEquals(resultCounts[i][1], bCount);
+      assertEquals(resultCounts[i][2], cCount);
+      assertEquals(resultCounts[i][3], dCount);
+      assertEquals(resultCounts[i][4], eCount);
     }
   }
 
@@ -189,6 +189,9 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     TestData.UNLABELED_PATTERN_1,
     TestData.UNLABELED_PATTERN_2,
     TestData.UNLABELED_PATTERN_3,
+    TestData.PROPERTY_PATTERN_1,
+    TestData.PROPERTY_PATTERN_2,
+    TestData.PROPERTY_PATTERN_3
   };
 
   private long[][] resultCounts = {
@@ -209,6 +212,9 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
     {11, 13, 4, 4, 2},
     {13, 18, 3, 4, 1},
     {2, 3, 0, 0, 0},
-    {3, 5, 0, 0, 0}
+    {3, 5, 0, 0, 0},
+    {1, 2, 0, 0, 0},
+    {0, 0, 0, 0, 0},
+    {0, 2, 0, 0, 0}
   };
 }

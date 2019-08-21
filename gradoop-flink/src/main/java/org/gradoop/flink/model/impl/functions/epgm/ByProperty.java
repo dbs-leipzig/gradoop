@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
@@ -23,9 +23,9 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 /**
  * Accepts all elements which have a property with the specified key or key value combination.
  *
- * @param <E> EPGM element
+ * @param <E> element
  */
-public class ByProperty<E extends EPGMElement> implements CombinableFilter<E> {
+public class ByProperty<E extends Element> implements CombinableFilter<E> {
   /**
    * PropertyKey to be filtered on.
    */
@@ -70,9 +70,7 @@ public class ByProperty<E extends EPGMElement> implements CombinableFilter<E> {
   public boolean filter(E e) throws Exception {
     if (e.hasProperty(key)) {
       if (value != null) {
-        if (e.getPropertyValue(key).equals(value)) {
-          return true;
-        }
+        return e.getPropertyValue(key).equals(value);
       } else {
         return true;
       }

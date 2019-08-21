@@ -15,15 +15,12 @@
  */
 package org.gradoop.common.config;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Basic Gradoop Configuration.
@@ -32,33 +29,7 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class GradoopConfig
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
-
-  /**
-   * Knows how to create {@link GraphHead}
-   */
-  private final GraphHeadFactory graphHeadFactory;
-
-  /**
-   * Knows how to create {@link Vertex}
-   */
-  private final VertexFactory vertexFactory;
-
-  /**
-   *  Knows how to create {@link Edge}
-   */
-  private final EdgeFactory edgeFactory;
-
-  /**
-   * Creates a new Configuration.
-   */
-  @SuppressWarnings("unchecked")
-  protected GradoopConfig() {
-    this.graphHeadFactory = new GraphHeadFactory();
-    this.vertexFactory = new VertexFactory();
-    this.edgeFactory = new EdgeFactory();
-  }
+public class GradoopConfig<G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -66,19 +37,7 @@ public class GradoopConfig
    *
    * @return Default Gradoop configuration.
    */
-  public static GradoopConfig<GraphHead, Vertex, Edge> getDefaultConfig() {
+  public static GradoopConfig<EPGMGraphHead, EPGMVertex, EPGMEdge> getDefaultConfig() {
     return new GradoopConfig<>();
-  }
-
-  public GraphHeadFactory getGraphHeadFactory() {
-    return graphHeadFactory;
-  }
-
-  public VertexFactory getVertexFactory() {
-    return vertexFactory;
-  }
-
-  public EdgeFactory getEdgeFactory() {
-    return edgeFactory;
   }
 }

@@ -22,15 +22,16 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
@@ -55,7 +56,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
@@ -64,10 +64,20 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
 /**
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
+ *
+ * @param <G> The graph head type.
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
+ * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
-public class ExplorativePatternMatching
-  extends PatternMatching
-  implements UnaryGraphToCollectionOperator {
+public class ExplorativePatternMatching<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends PatternMatching<G, V, E, LG, GC> {
+
   /**
    * Name for broadcast set which contains the superstep id.
    */
@@ -125,35 +135,35 @@ public class ExplorativePatternMatching
   }
 
   @Override
-  protected GraphCollection executeForVertex(LogicalGraph graph) {
-    GradoopFlinkConfig config = graph.getConfig();
-    EPGMGraphHeadFactory<GraphHead> graphHeadFactory = config.getGraphHeadFactory();
-    EPGMVertexFactory<Vertex> vertexFactory = config.getVertexFactory();
+  protected GC executeForVertex(LG graph) {
+    BaseGraphFactory<G, V, E, LG, GC> graphFactory = graph.getFactory();
+    GraphHeadFactory<G> graphHeadFactory = graphFactory.getGraphHeadFactory();
+    VertexFactory<V> vertexFactory = graphFactory.getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
-    DataSet<Vertex> matchingVertices = graph.getVertices()
+    DataSet<V> matchingVertices = graph.getVertices()
       .filter(new MatchingVertices<>(getQuery()));
 
     if (!doAttachData()) {
       matchingVertices = matchingVertices
         .map(new Id<>())
         .map(new ObjectTo1<>())
-        .map(new VertexFromId(vertexFactory));
+        .map(new VertexFromId<>(vertexFactory));
     }
 
-    DataSet<Tuple2<Vertex, GraphHead>> pairs = matchingVertices
+    DataSet<Tuple2<V, G>> pairs = matchingVertices
       .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable))
       .returns(new TupleTypeInfo<>(
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
 
-    return config.getGraphCollectionFactory().fromDataSets(
+    return graph.getCollectionFactory().fromDataSets(
       pairs.map(new Value1Of2<>()),
       pairs.map(new Value0Of2<>()));
   }
 
   @Override
-  protected GraphCollection executeForPattern(LogicalGraph graph) {
+  protected GC executeForPattern(LG graph) {
 
     TraversalCode traversalCode = traverser.traverse();
 
@@ -213,15 +223,15 @@ public class ExplorativePatternMatching
 
     DataSet<Element> elements = embeddings
       .flatMap(new ElementsFromEmbedding(traversalCode,
-        graph.getConfig().getGraphHeadFactory(),
-        graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory(),
+        graph.getFactory().getGraphHeadFactory(),
+        graph.getFactory().getVertexFactory(),
+        graph.getFactory().getEdgeFactory(),
         getQueryHandler()
       ));
 
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
-      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), true);
   }
 
 
@@ -353,9 +363,18 @@ public class ExplorativePatternMatching
     /**
      * Instantiates a new {@link ExplorativePatternMatching} operator.
      *
+     * @param <G> The graph head type.
+     * @param <V> The vertex type.
+     * @param <E> The edge type.
+     * @param <LG> The graph type.
+     * @param <GC> The graph collection type.
      * @return operator instance
      */
-    public ExplorativePatternMatching build() {
+    public <G extends GraphHead,
+      V extends Vertex,
+      E extends Edge,
+      LG extends BaseGraph<G, V, E, LG, GC>,
+      GC extends BaseGraphCollection<G, V, E, LG, GC>> ExplorativePatternMatching<G, V, E, LG, GC> build() {
       Objects.requireNonNull(query, "Missing GDL query");
       Objects.requireNonNull(matchStrategy, "Missing match strategy");
       Objects.requireNonNull(traverserStrategy, "Missing iteration strategy");
@@ -363,7 +382,7 @@ public class ExplorativePatternMatching
       Objects.requireNonNull(edgeStepJoinStrategy, "Missing join strategy");
       Objects.requireNonNull(vertexStepJoinStrategy, "Missing join strategy");
 
-      return new ExplorativePatternMatching(query, attachData,
+      return new ExplorativePatternMatching<>(query, attachData,
         matchStrategy, traverserStrategy, traverser, edgeStepJoinStrategy,
         vertexStepJoinStrategy);
     }

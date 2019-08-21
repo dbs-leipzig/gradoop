@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -78,13 +78,13 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true).execute(graph);
 
-    DataSet<Vertex> newVertices = graph.getVertices()
+    DataSet<EPGMVertex> newVertices = graph.getVertices()
       .map(new VertexToDegreeMap(SamplingConstants.DEGREE_PROPERTY_KEY))
       .max(0)
       .cross(graph.getVertices())
       .with(new AddMaxDegreeCrossFunction(SamplingConstants.PROPERTY_KEY_MAX_DEGREE));
 
-    graph = graph.getConfig().getLogicalGraphFactory()
+    graph = graph.getFactory()
       .fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
 
     newVertices = graph.getVertices().filter(new NonUniformVertexRandomFilter<>(
@@ -99,7 +99,7 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
       .map(new PropertyRemover<>(SamplingConstants.OUT_DEGREE_PROPERTY_KEY))
       .map(new PropertyRemover<>(SamplingConstants.PROPERTY_KEY_MAX_DEGREE));
 
-    DataSet<Edge> newEdges = graph.getEdges()
+    DataSet<EPGMEdge> newEdges = graph.getEdges()
       .join(newVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())

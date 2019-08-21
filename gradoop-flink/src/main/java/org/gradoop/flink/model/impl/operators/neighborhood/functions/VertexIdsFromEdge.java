@@ -17,15 +17,17 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Returns a tuple which contains the source id and target id of an edge or a tuple which contains
  * the target id and the source id of the same edge.
+ *
+ * @param <E> edge type
  */
-public class VertexIdsFromEdge
-  implements MapFunction<Edge, Tuple2<GradoopId, GradoopId>> {
+public class VertexIdsFromEdge<E extends Edge>
+  implements MapFunction<E, Tuple2<GradoopId, GradoopId>> {
 
   /**
    * False, if tuple contains of source id and target id. True if tuple contains of target id and
@@ -55,7 +57,7 @@ public class VertexIdsFromEdge
   }
 
   @Override
-  public Tuple2<GradoopId, GradoopId> map(Edge edge) throws Exception {
+  public Tuple2<GradoopId, GradoopId> map(E edge) throws Exception {
     if (switched) {
       reuseTuple.setFields(edge.getTargetId(), edge.getSourceId());
     } else {

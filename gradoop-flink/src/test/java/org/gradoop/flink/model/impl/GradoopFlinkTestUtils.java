@@ -21,15 +21,15 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -65,9 +65,9 @@ public class GradoopFlinkTestUtils {
 
   public static void printLogicalGraph(LogicalGraph graph)
     throws Exception {
-    Collection<GraphHead> graphHeadCollection = Lists.newArrayList();
-    Collection<Vertex> vertexCollection = Lists.newArrayList();
-    Collection<Edge> edgeCollection = Lists.newArrayList();
+    Collection<EPGMGraphHead> graphHeadCollection = Lists.newArrayList();
+    Collection<EPGMVertex> vertexCollection = Lists.newArrayList();
+    Collection<EPGMEdge> edgeCollection = Lists.newArrayList();
 
     graph.getGraphHead().output(
       new LocalCollectionOutputFormat<>(graphHeadCollection));
@@ -78,18 +78,18 @@ public class GradoopFlinkTestUtils {
 
     graph.getConfig().getExecutionEnvironment().execute();
 
-    System.out.println("*** EPGMGraphHead Collection ***");
-    for (EPGMGraphHead g : graphHeadCollection) {
+    System.out.println("*** GraphHead Collection ***");
+    for (GraphHead g : graphHeadCollection) {
       System.out.println(g);
     }
 
-    System.out.println("*** EPGMVertex Collection ***");
-    for (EPGMVertex v : vertexCollection) {
+    System.out.println("*** Vertex Collection ***");
+    for (Vertex v : vertexCollection) {
       System.out.println(v);
     }
 
-    System.out.println("*** EPGMEdge Collection ***");
-    for (EPGMEdge e : edgeCollection) {
+    System.out.println("*** Edge Collection ***");
+    for (Edge e : edgeCollection) {
       System.out.println(e);
     }
   }
@@ -97,9 +97,9 @@ public class GradoopFlinkTestUtils {
   public static void printGraphCollection(GraphCollection collection)
     throws Exception {
 
-    Collection<GraphHead> graphHeadCollection = Lists.newArrayList();
-    Collection<Vertex> vertexCollection = Lists.newArrayList();
-    Collection<Edge> edgeCollection = Lists.newArrayList();
+    Collection<EPGMGraphHead> graphHeadCollection = Lists.newArrayList();
+    Collection<EPGMVertex> vertexCollection = Lists.newArrayList();
+    Collection<EPGMEdge> edgeCollection = Lists.newArrayList();
 
     collection.getGraphHeads().output(
       new LocalCollectionOutputFormat<>(graphHeadCollection));
@@ -110,18 +110,18 @@ public class GradoopFlinkTestUtils {
 
     collection.getConfig().getExecutionEnvironment().execute();
 
-    System.out.println("*** EPGMGraphHead Collection ***");
-    for (EPGMGraphHead g : graphHeadCollection) {
+    System.out.println("*** GraphHead Collection ***");
+    for (GraphHead g : graphHeadCollection) {
       System.out.println(g);
     }
 
-    System.out.println("*** EPGMVertex Collection ***");
-    for (EPGMVertex v : vertexCollection) {
+    System.out.println("*** Vertex Collection ***");
+    for (Vertex v : vertexCollection) {
       System.out.println(v);
     }
 
-    System.out.println("*** EPGMEdge Collection ***");
-    for (EPGMEdge e : edgeCollection) {
+    System.out.println("*** Edge Collection ***");
+    for (Edge e : edgeCollection) {
       System.out.println(e);
     }
   }
@@ -129,7 +129,7 @@ public class GradoopFlinkTestUtils {
   public static void printDirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printDirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+    printDirectedCanonicalAdjacencyMatrix(graph.getCollectionFactory()
       .fromGraph(graph));
   }
 
@@ -145,7 +145,7 @@ public class GradoopFlinkTestUtils {
   public static void printUndirectedCanonicalAdjacencyMatrix(LogicalGraph graph)
     throws Exception {
 
-    printUndirectedCanonicalAdjacencyMatrix(graph.getConfig().getGraphCollectionFactory()
+    printUndirectedCanonicalAdjacencyMatrix(graph.getCollectionFactory()
       .fromGraph(graph));
   }
 
@@ -159,23 +159,23 @@ public class GradoopFlinkTestUtils {
   }
 
   public static void assertEquals(GraphTransaction a, GraphTransaction b) {
-    GradoopTestUtils.validateEPGMElements(a.getGraphHead(), b.getGraphHead());
-    GradoopTestUtils.validateEPGMElementCollections(a.getVertices(), b.getVertices());
-    GradoopTestUtils.validateEPGMElementCollections(a.getEdges(), b.getEdges());
+    GradoopTestUtils.validateElements(a.getGraphHead(), b.getGraphHead());
+    GradoopTestUtils.validateElementCollections(a.getVertices(), b.getVertices());
+    GradoopTestUtils.validateElementCollections(a.getEdges(), b.getEdges());
   }
 
-  private static void assertEqualEdges(EPGMEdge a, EPGMEdge b) {
+  private static void assertEqualEdges(Edge a, Edge b) {
     Assert.assertEquals(a.getSourceId(), b.getSourceId());
     Assert.assertEquals(a.getTargetId(), b.getTargetId());
     assertEqualGraphElements(a, b);
   }
 
-  private static void assertEqualGraphElements(EPGMGraphElement a, EPGMGraphElement b) {
+  private static void assertEqualGraphElements(GraphElement a, GraphElement b) {
     Assert.assertEquals(a.getGraphIds(), b.getGraphIds());
     assertEqualElements(a, b);
   }
 
-  private static void assertEqualElements(EPGMElement a, EPGMElement b) {
+  private static void assertEqualElements(Element a, Element b) {
     Assert.assertEquals(a.getId(), b.getId());
     Assert.assertEquals(a.getLabel(), b.getLabel());
     assertTrue(a.getProperties() == null && b.getProperties() == null ||

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -30,16 +30,10 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateAver
  */
 public class AverageIncomingDegree implements UnaryGraphToGraphOperator {
 
-  /**
-   * Calculates the average incoming degree of the input graph and writes it to the graph head.
-   *
-   * @param graph the input graph
-   * @return LogicalGraph with the average incoming degree value written to the graph head.
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     graph = graph.aggregate(new VertexCount());
-    DataSet<GraphHead> newGraphHead = new IncomingVertexDegrees().execute(graph)
+    DataSet<EPGMGraphHead> newGraphHead = new IncomingVertexDegrees().execute(graph)
       .sum(1)
       .crossWithTiny(graph.getGraphHead().first(1))
       .with(new AddSumDegreesToGraphHeadCrossFunction(
@@ -47,7 +41,7 @@ public class AverageIncomingDegree implements UnaryGraphToGraphOperator {
       .map(new CalculateAverageDegree(
         SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_INCOMING_DEGREE));
 
-    return graph.getConfig().getLogicalGraphFactory()
+    return graph.getFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
 }

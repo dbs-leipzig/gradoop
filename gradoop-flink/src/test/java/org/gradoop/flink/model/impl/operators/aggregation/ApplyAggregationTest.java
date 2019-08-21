@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.runtime.client.JobExecutionException;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -81,15 +81,15 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     MinProperty minProperty = new MinProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(minVertexProperty))
-      .apply(new ApplyAggregation(minEdgeProperty))
-      .apply(new ApplyAggregation(minProperty));
+      .apply(new ApplyAggregation<>(minVertexProperty))
+      .apply(new ApplyAggregation<>(minEdgeProperty))
+      .apply(new ApplyAggregation<>(minProperty));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge minimum not set", graphHead.hasProperty
         (minEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex minimum not set", graphHead.hasProperty
@@ -151,15 +151,15 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     MaxProperty maxProperty = new MaxProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(maxVertexProperty))
-      .apply(new ApplyAggregation(maxEdgeProperty))
-      .apply(new ApplyAggregation(maxProperty));
+      .apply(new ApplyAggregation<>(maxVertexProperty))
+      .apply(new ApplyAggregation<>(maxEdgeProperty))
+      .apply(new ApplyAggregation<>(maxProperty));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge maximum not set",
         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex maximum not set",
@@ -221,15 +221,15 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     SumProperty sumProperty = new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(sumVertexProperty))
-      .apply(new ApplyAggregation(sumEdgeProperty))
-      .apply(new ApplyAggregation(sumProperty));
+      .apply(new ApplyAggregation<>(sumVertexProperty))
+      .apply(new ApplyAggregation<>(sumEdgeProperty))
+      .apply(new ApplyAggregation<>(sumProperty));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("vertex sum not set", graphHead.hasProperty(
         sumVertexProperty.getAggregatePropertyKey()));
       assertTrue("edge sum not set", graphHead.hasProperty(
@@ -291,17 +291,17 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     SumProperty sumProperty = new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(sumVertexProperty))
-      .apply(new ApplyAggregation(sumEdgeProperty))
-      .apply(new ApplyAggregation(sumProperty));
+      .apply(new ApplyAggregation<>(sumVertexProperty))
+      .apply(new ApplyAggregation<>(sumEdgeProperty))
+      .apply(new ApplyAggregation<>(sumProperty));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = outputCollection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       assertTrue("edge sum not set", graphHead.hasProperty(
         sumEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex sum not set", graphHead.hasProperty(
@@ -345,9 +345,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
 
     try {
       collection
-        .apply(new ApplyAggregation(new SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY)))
-        .apply(new ApplyAggregation(new SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY)))
-        .apply(new ApplyAggregation(new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY)))
+        .apply(new ApplyAggregation<>(new SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY)))
+        .apply(new ApplyAggregation<>(new SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY)))
+        .apply(new ApplyAggregation<>(new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY)))
         .getGraphHeads().print();
     } catch (Exception e) {
       assertTrue(
@@ -377,9 +377,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     Count count = new Count();
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyAggregation(vertexCount))
-      .apply(new ApplyAggregation(edgeCount))
-      .apply(new ApplyAggregation(count));
+      .apply(new ApplyAggregation<>(vertexCount))
+      .apply(new ApplyAggregation<>(edgeCount))
+      .apply(new ApplyAggregation<>(count));
 
     GradoopId g0Id = loader.getGraphHeadByVariable("g0").getId();
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
@@ -388,9 +388,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
 
     int graphHeadCount = 0;
 
-    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = outputCollection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       graphHeadCount++;
       assertTrue("vertex count not set", graphHead.hasProperty(
         vertexCount.getAggregatePropertyKey()));
@@ -431,13 +431,13 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     HasLabel hasKnowsElement = new HasLabel("knows");
 
     collection = collection
-      .apply(new ApplyAggregation(hasKnows))
-      .apply(new ApplyAggregation(hasKnowsElement))
-      .apply(new ApplyAggregation(hasPerson));
+      .apply(new ApplyAggregation<>(hasKnows))
+      .apply(new ApplyAggregation<>(hasKnowsElement))
+      .apply(new ApplyAggregation<>(hasPerson));
 
-    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = collection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       // check vertex label
       assertTrue("Property hasVertexLabel_Person not set",
         graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -471,13 +471,13 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     HasLabel hasThirdLabel = new HasLabel("thirdLabel");
 
     collection = collection
-      .apply(new ApplyAggregation(hasSomeLabel))
-      .apply(new ApplyAggregation(hasOtherLabel))
-      .apply(new ApplyAggregation(hasThirdLabel));
+      .apply(new ApplyAggregation<>(hasSomeLabel))
+      .apply(new ApplyAggregation<>(hasOtherLabel))
+      .apply(new ApplyAggregation<>(hasThirdLabel));
 
-    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = collection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       // check edge label
       assertTrue("Property hasEdgeLabel_otherLabel not set",
         graphHead.hasProperty(hasOtherLabel.getAggregatePropertyKey()));
@@ -509,9 +509,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     SumVertexProperty sumVertexProperty = new SumVertexProperty("age");
     MaxVertexProperty maxVertexProperty = new MaxVertexProperty("age");
 
-    GraphCollection expected = collection.apply(new ApplyAggregation(sumVertexProperty))
-      .apply(new ApplyAggregation(maxVertexProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(sumVertexProperty,
+    GraphCollection expected = collection.apply(new ApplyAggregation<>(sumVertexProperty))
+      .apply(new ApplyAggregation<>(maxVertexProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation<>(sumVertexProperty,
       maxVertexProperty));
 
     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -530,9 +530,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     SumEdgeProperty sumEdgeProperty = new SumEdgeProperty("since");
     MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
 
-    GraphCollection expected = collection.apply(new ApplyAggregation(sumEdgeProperty))
-      .apply(new ApplyAggregation(maxEdgeProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(sumEdgeProperty,
+    GraphCollection expected = collection.apply(new ApplyAggregation<>(sumEdgeProperty))
+      .apply(new ApplyAggregation<>(maxEdgeProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation<>(sumEdgeProperty,
       maxEdgeProperty));
 
     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -551,9 +551,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     SumProperty sumProperty = new SumProperty("since");
     MaxProperty maxProperty = new MaxProperty("since");
 
-    GraphCollection expected = collection.apply(new ApplyAggregation(sumProperty))
-      .apply(new ApplyAggregation(maxProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(sumProperty, maxProperty));
+    GraphCollection expected = collection.apply(new ApplyAggregation<>(sumProperty))
+      .apply(new ApplyAggregation<>(maxProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation<>(sumProperty, maxProperty));
 
     collectAndAssertTrue(expected.equalsByGraphData(output));
   }
@@ -574,11 +574,11 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
 
     GraphCollection expected = collection
-      .apply(new ApplyAggregation(vertexCount))
-      .apply(new ApplyAggregation(edgeCount))
-      .apply(new ApplyAggregation(count))
-      .apply(new ApplyAggregation(maxEdgeProperty));
-    GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount, count,
+      .apply(new ApplyAggregation<>(vertexCount))
+      .apply(new ApplyAggregation<>(edgeCount))
+      .apply(new ApplyAggregation<>(count))
+      .apply(new ApplyAggregation<>(maxEdgeProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation<>(vertexCount, edgeCount, count,
       maxEdgeProperty));
 
     collectAndAssertTrue(expected.equalsByGraphData(output));
@@ -600,10 +600,10 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     Count count = new Count();
 
     GraphCollection expected = collection
-      .apply(new ApplyAggregation(vertexCount))
-      .apply(new ApplyAggregation(edgeCount))
-      .apply(new ApplyAggregation(count));
-    GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount, count));
+      .apply(new ApplyAggregation<>(vertexCount))
+      .apply(new ApplyAggregation<>(edgeCount))
+      .apply(new ApplyAggregation<>(count));
+    GraphCollection output = collection.apply(new ApplyAggregation<>(vertexCount, edgeCount, count));
 
     collectAndAssertTrue(expected.equalsByGraphData(output));
   }

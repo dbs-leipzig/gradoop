@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.shortestpaths;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -24,9 +24,9 @@ import org.junit.Test;
 
 public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
   @Test
-  public void testByElementData() throws Exception {
+  public void testByData() throws Exception {
 
-    String graphsDouble = "input[" +
+    String graphsDouble = "input:test[" +
       "(v0 {id:0, vertexValue:0.0d})" +
       "(v1 {id:1, vertexValue:NULL})" +
       "(v2 {id:2, vertexValue:NULL})" +
@@ -40,7 +40,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
       "(v2)-[e5 {edgeValue:5.0d}]->(v4)" +
       "(v3)-[e6 {edgeValue:1.0d}]->(v4)" +
       "]" +
-      "result[" +
+      "result:test[" +
       "(v5 {id:0, vertexValue:0.0d})" +
       "(v6 {id:1, vertexValue:2.0d})" +
       "(v7 {id:2, vertexValue:5.0d})" +
@@ -55,7 +55,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
       "(v8)-[e13 {edgeValue:1.0d}]->(v9)" +
       "]";
 
-    String graphs = "input[" +
+    String graphs = "input:test[" +
         "(v0 {id:0, vertexValue:0.0})" +
         "(v1 {id:1, vertexValue:NULL})" +
         "(v2 {id:2, vertexValue:NULL})" +
@@ -69,7 +69,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
         "(v2)-[e5 {edgeValue:5.0}]->(v4)" +
         "(v3)-[e6 {edgeValue:1.0}]->(v4)" +
         "]" +
-        "result[" +
+        "result:test[" +
         "(v5 {id:0, vertexValue:0.0d})" +
         "(v6 {id:1, vertexValue:2.0d})" +
         "(v7 {id:2, vertexValue:5.0d})" +
@@ -87,25 +87,25 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     //test a graph with double values as input
     FlinkAsciiGraphLoader loaderDouble = getLoaderFromString(graphsDouble);
     LogicalGraph inputDouble = loaderDouble.getLogicalGraphByVariable("input");
-    Vertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
+    EPGMVertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
     GradoopId srcVertexIdDouble = srcVertexDouble.getId();
 
     LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths(srcVertexIdDouble,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expectDouble = loaderDouble.getLogicalGraphByVariable("result");
 
-    collectAndAssertTrue(outputGraphDouble.equalsByElementData(expectDouble));
+    collectAndAssertTrue(outputGraphDouble.equalsByData(expectDouble));
 
   //test a graph with float values as input
     FlinkAsciiGraphLoader loader = getLoaderFromString(graphs);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    Vertex srcVertex = loader.getVertexByVariable("v0");
+    EPGMVertex srcVertex = loader.getVertexByVariable("v0");
     GradoopId srcVertexId = srcVertex.getId();
 
     LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths(srcVertexId,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 
-    collectAndAssertTrue(outputGraph.equalsByElementData(expect));
+    collectAndAssertTrue(outputGraph.equalsByData(expect));
   }
 }

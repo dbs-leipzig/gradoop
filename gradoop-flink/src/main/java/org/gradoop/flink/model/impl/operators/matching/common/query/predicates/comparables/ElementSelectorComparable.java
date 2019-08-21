@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -23,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -77,9 +78,7 @@ public class ElementSelectorComparable extends QueryComparable {
 
     ElementSelectorComparable that = (ElementSelectorComparable) o;
 
-    return elementSelector != null ? elementSelector.equals(that.elementSelector) :
-      that.elementSelector == null;
-
+    return Objects.equals(elementSelector, that.elementSelector);
   }
 
   @Override

@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -64,21 +64,21 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
 
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
-    DataSet<Edge> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
+    DataSet<EPGMEdge> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<Vertex> newSourceVertices = graph.getVertices()
+    DataSet<EPGMVertex> newSourceVertices = graph.getVertices()
       .join(newEdges)
       .where(new Id<>()).equalTo(new SourceId<>())
       .with(new LeftSide<>())
       .distinct(new Id<>());
 
-    DataSet<Vertex> newTargetVertices = graph.getVertices()
+    DataSet<EPGMVertex> newTargetVertices = graph.getVertices()
       .join(newEdges)
       .where(new Id<>()).equalTo(new TargetId<>())
       .with(new LeftSide<>())
       .distinct(new Id<>());
 
-    DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
+    DataSet<EPGMVertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
 
     return graph.getFactory().fromDataSets(newVertices, newEdges);
   }

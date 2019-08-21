@@ -32,14 +32,14 @@ public class VertexToEdgeTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithEdgeCreation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input:test[" +
       "(v0:Blue {a : 3})" +
       "(v1:Green {a : 2})" +
       "(v2:Blue {a : 4})" +
       "(v0)-[{b : 2}]->(v1)" +
       "(v1)-[{b : 4}]->(v2)" +
       "]" +
-      "expected[" +
+      "expected:test[" +
       "(v00:Blue {a : 3})" +
       "(v01:Green {a : 2})" +
       "(v02:Blue {a : 4})" +
@@ -54,6 +54,6 @@ public class VertexToEdgeTest extends GradoopFlinkTestBase {
     VertexToEdge transformation = new VertexToEdge("Green", "foo");
     LogicalGraph transformed = input.callForGraph(transformation);
 
-    collectAndAssertTrue(transformed.equalsByElementData(expected));
+    collectAndAssertTrue(transformed.equalsByData(expected));
   }
 }

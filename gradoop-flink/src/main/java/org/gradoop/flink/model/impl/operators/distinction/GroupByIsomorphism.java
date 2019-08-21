@@ -16,8 +16,11 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.distinction.functions.GraphHeadGroup;
@@ -29,31 +32,41 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * Returns a distinct collection of logical graphs.
- * Graphs are compared by isomorphism testing.
+ * Returns a distinct collection of base graphs. Graphs are compared by isomorphism testing.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class GroupByIsomorphism extends SelectionBase {
+public class GroupByIsomorphism<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SelectionBase<G, V, E, LG, GC> {
 
   /**
    * Distinction function.
    */
-  private final GraphHeadReduceFunction function;
+  private final GraphHeadReduceFunction<G> function;
 
   /**
    * Constructor.
    *
    * @param function reduce function to merge multiple heads of isomorphic graphs
    */
-  public GroupByIsomorphism(GraphHeadReduceFunction function) {
+  public GroupByIsomorphism(GraphHeadReduceFunction<G> function) {
     this.function = function;
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-    DataSet<GraphHead> graphHeads = getCanonicalLabels(collection)
+  public GC execute(GC collection) {
+    DataSet<G> graphHeads = getCanonicalLabels(collection)
       .join(collection.getGraphHeads())
       .where(0).equalTo(new Id<>())
-      .with(new GraphHeadGroup())
+      .with(new GraphHeadGroup<>())
       .groupBy(0)
       .reduceGroup(function);
 
@@ -61,15 +74,16 @@ public class GroupByIsomorphism extends SelectionBase {
   }
 
   /**
-   * Createas a canonical label for each graph in a collection.
+   * Creates a canonical label for each graph in a collection.
    *
    * @param collection input collection
-   * @return (graph id, label) pairs
+   * @return graph head label set
    */
-  protected DataSet<GraphHeadString> getCanonicalLabels(GraphCollection collection) {
+  DataSet<GraphHeadString> getCanonicalLabels(GC collection) {
     // Init builder for canonical labels
-    CanonicalAdjacencyMatrixBuilder camBuilder = new CanonicalAdjacencyMatrixBuilder(
-      new GraphHeadToEmptyString(),  new VertexToDataString(), new EdgeToDataString(), true);
+    CanonicalAdjacencyMatrixBuilder<G, V, E, LG, GC> camBuilder =
+      new CanonicalAdjacencyMatrixBuilder<>(
+      new GraphHeadToEmptyString<>(),  new VertexToDataString<>(), new EdgeToDataString<>(), true);
 
     // create canonical labels for all graph heads and choose representative for all distinct ones
     return camBuilder

@@ -17,15 +17,15 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 import java.util.List;
 
 /**
- * Base class for mapping EPGM elements to representations for mapping.
+ * Base class for mapping elements to representations for mapping.
  *
- * @param <EL> EPGM element type
+ * @param <EL> element type
  * @param <OUT> output type
  */
 public abstract class AbstractBuilder<EL extends Element, OUT> extends RichMapFunction<EL, OUT> {

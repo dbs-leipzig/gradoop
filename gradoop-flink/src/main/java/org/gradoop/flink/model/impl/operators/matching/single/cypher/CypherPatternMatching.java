@@ -18,9 +18,12 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -43,8 +46,19 @@ import static org.gradoop.flink.model.impl.operators.matching.common.debug.Print
 
 /**
  * Implementation of a query engine based on the Cypher graph query language.
+ *
+ * @param <G> The graph head type.
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
+ * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
-public class CypherPatternMatching extends PatternMatching {
+public class CypherPatternMatching<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends PatternMatching<G, V, E, LG, GC> {
   /**
    * Logger
    */
@@ -100,16 +114,16 @@ public class CypherPatternMatching extends PatternMatching {
   }
 
   @Override
-  protected GraphCollection executeForVertex(LogicalGraph graph) {
+  protected GC executeForVertex(LG graph) {
     return executeForPattern(graph);
   }
 
   @Override
-  protected GraphCollection executeForPattern(LogicalGraph graph) {
+  protected GC executeForPattern(LG graph) {
     // Query planning
     QueryHandler queryHandler = getQueryHandler();
     QueryPlan plan =
-      new GreedyPlanner(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()
+      new GreedyPlanner<>(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()
         .getQueryPlan();
 
     // Query execution
@@ -123,17 +137,17 @@ public class CypherPatternMatching extends PatternMatching {
     DataSet<Element> finalElements = this.constructionPattern != null ?
       constructFinalElements(graph, embeddings, embeddingMetaData) :
       embeddings.flatMap(
-        new ElementsFromEmbedding(
-          graph.getConfig().getGraphHeadFactory(),
-          graph.getConfig().getVertexFactory(),
-          graph.getConfig().getEdgeFactory(),
+        new ElementsFromEmbedding<>(
+          graph.getFactory().getGraphHeadFactory(),
+          graph.getFactory().getVertexFactory(),
+          graph.getFactory().getEdgeFactory(),
           embeddingMetaData,
           queryHandler.getSourceTargetVariables()));
 
     // Post processing
     return
       doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
-      PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);
   }
 
   /**
@@ -144,7 +158,7 @@ public class CypherPatternMatching extends PatternMatching {
    * @param embeddingMetaData   Meta information
    * @return                    New set of EmbeddingElements
    */
-  private DataSet<Element> constructFinalElements(LogicalGraph graph, DataSet<Embedding> embeddings,
+  private DataSet<Element> constructFinalElements(LG graph, DataSet<Embedding> embeddings,
     EmbeddingMetaData embeddingMetaData) {
 
     QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);
@@ -165,10 +179,10 @@ public class CypherPatternMatching extends PatternMatching {
       new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());
 
     return addEmbeddingsElements.evaluate().flatMap(
-      new ElementsFromEmbedding(
-        graph.getConfig().getGraphHeadFactory(),
-        graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory(),
+      new ElementsFromEmbedding<>(
+        graph.getFactory().getGraphHeadFactory(),
+        graph.getFactory().getVertexFactory(),
+        graph.getFactory().getEdgeFactory(),
         newMetaData,
         constructionPatternHandler.getSourceTargetVariables(),
         constructionPatternHandler.getLabelsForVariables(newVars)));

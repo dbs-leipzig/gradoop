@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithDouble;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -73,17 +73,16 @@ public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, 
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph)
-    throws Exception {
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph) {
 
-    DataSet<Vertex> newVertices = new org.apache.flink.graph.library.SingleSourceShortestPaths
+    DataSet<EPGMVertex> newVertices = new org.apache.flink.graph.library.SingleSourceShortestPaths
       <GradoopId, NullValue>(srcVertexId, iterations)
       .run(graph)
       .join(currentGraph.getVertices())
       .where(0)
       .equalTo(new Id<>())
       .with(new SingleSourceShortestPathsAttribute(propertyKeyVertex));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-      currentGraph.getEdges());
+    return currentGraph.getFactory()
+      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 }

@@ -20,13 +20,14 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.junit.Test;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBaseLabelReg;
+import org.testng.annotations.Test;
 
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
-import static org.junit.Assert.assertEquals;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_META;
+import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for {@link HBaseLabelReg}
@@ -39,7 +40,7 @@ public class HBaseLabelRegTest {
   @Test
   public void testToHBaseFilter() {
 
-    HBaseLabelReg<Vertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
+    HBaseLabelReg<EPGMVertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
 
     Filter expectedFilter = new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_META),
@@ -48,6 +49,6 @@ public class HBaseLabelRegTest {
       new RegexStringComparator(PATTERN_VERTEX.pattern())
     );
 
-    assertEquals(expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
+    assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString());
   }
 }

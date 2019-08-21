@@ -89,23 +89,19 @@ public class TLFDataSource extends TLFBase implements DataSource {
   }
 
   @Override
-  public LogicalGraph getLogicalGraph() {
-    return getGraphCollection().reduce(new ReduceCombination());
+  public LogicalGraph getLogicalGraph() throws IOException {
+    return getGraphCollection().reduce(new ReduceCombination<>());
   }
 
   @Override
-  public GraphCollection getGraphCollection() {
+  public GraphCollection getGraphCollection() throws IOException {
     DataSet<GraphTransaction> transactions;
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
     DataSet<Tuple2<LongWritable, Text>> input = null;
 
-    try {
-      input = env.createInput(HadoopInputs.readHadoopFile(
-        new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath()));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    input = env.createInput(HadoopInputs.readHadoopFile(
+      new TLFInputFormat(), LongWritable.class, Text.class, getTLFPath()));
 
     // load tlf graphs from file
     assert input != null;

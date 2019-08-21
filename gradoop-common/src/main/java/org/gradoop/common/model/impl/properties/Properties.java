@@ -18,6 +18,7 @@ package org.gradoop.common.model.impl.properties;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Represents the properties of an {@link org.gradoop.common.model.impl.pojo.Element}.
+ * Represents the properties of an {@link EPGMElement}.
  */
 public class Properties implements Iterable<Property>, Value, Serializable {
 
@@ -243,8 +244,7 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
     Properties that = (Properties) o;
 
-    return !(properties != null ? !properties.equals(that.properties) :
-      that.properties != null);
+    return Objects.equals(properties, that.properties);
   }
 
   /**

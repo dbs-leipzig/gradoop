@@ -15,11 +15,12 @@
  */
 package org.gradoop.dataintegration.transformation.impl;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 
@@ -33,12 +34,15 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
  * @param <V> the vertex type
  * @param <E> the edge type
  * @param <LG> type of the logical graph instance
+ * @param <GC> type of the graph collection instance
  */
 public class PropertyTransformation<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Label of the element whose property shall be transformed.
@@ -130,7 +134,7 @@ public class PropertyTransformation<
    */
   @Override
   public LG execute(LG graph) {
-    return new Transformation<G, V, E, LG>(
+    return new Transformation<G, V, E, LG, GC>(
         graphHeadTransformationFunction == null ? null : new BasePropertyTransformationFunction<>(
             propertyKey, graphHeadTransformationFunction, label, newPropertyKey, keepHistory),
         vertexTransformationFunction == null ? null : new BasePropertyTransformationFunction<>(

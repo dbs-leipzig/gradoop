@@ -18,12 +18,12 @@ package org.gradoop.flink.io.impl.csv.indexed;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
@@ -146,22 +146,22 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     // This results in the path "graphs/a_b" because < and > are illegal filename characters.
-    GraphHead graphHead1 = new GraphHeadFactory().createGraphHead("a<b");
-    GraphHead graphHead2 = new GraphHeadFactory().createGraphHead("a>b");
-    DataSet<GraphHead> graphHeads = env.fromElements(graphHead1, graphHead2);
+    EPGMGraphHead graphHead1 = new EPGMGraphHeadFactory().createGraphHead("a<b");
+    EPGMGraphHead graphHead2 = new EPGMGraphHeadFactory().createGraphHead("a>b");
+    DataSet<EPGMGraphHead> graphHeads = env.fromElements(graphHead1, graphHead2);
 
     // This results in the path "vertices/b_c" because < and > are illegal filename characters.
-    Vertex vertex1 = new VertexFactory().createVertex("B<C");
-    Vertex vertex2 = new VertexFactory().createVertex("B>C");
-    DataSet<Vertex> vertices = env.fromElements(vertex1, vertex2)
+    EPGMVertex vertex1 = new EPGMVertexFactory().createVertex("B<C");
+    EPGMVertex vertex2 = new EPGMVertexFactory().createVertex("B>C");
+    DataSet<EPGMVertex> vertices = env.fromElements(vertex1, vertex2)
       .map(new AddToGraph<>(graphHead1))
       .map(new AddToGraph<>(graphHead2))
       .withForwardedFields("id;label;properties");
 
     // This results in the path "edges/c_d" because < and > are illegal filename characters.
-    Edge edge1 = new EdgeFactory().createEdge("c<d", vertex1.getId(), vertex2.getId());
-    Edge edge2 = new EdgeFactory().createEdge("c>d", vertex2.getId(), vertex1.getId());
-    DataSet<Edge> edges = env.fromElements(edge1, edge2)
+    EPGMEdge edge1 = new EPGMEdgeFactory().createEdge("c<d", vertex1.getId(), vertex2.getId());
+    EPGMEdge edge2 = new EPGMEdgeFactory().createEdge("c>d", vertex2.getId(), vertex1.getId());
+    DataSet<EPGMEdge> edges = env.fromElements(edge1, edge2)
       .map(new AddToGraph<>(graphHead1))
       .withForwardedFields("id;label;properties");
 
@@ -211,16 +211,16 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     props.set(GradoopTestUtils.KEY_5, map2);
     props.set(GradoopTestUtils.KEY_6, map3);
 
-    GraphHead graphHead = new GraphHeadFactory().createGraphHead(string1, props);
-    DataSet<GraphHead> graphHeads = env.fromElements(graphHead);
+    EPGMGraphHead graphHead = new EPGMGraphHeadFactory().createGraphHead(string1, props);
+    DataSet<EPGMGraphHead> graphHeads = env.fromElements(graphHead);
 
-    Vertex vertex = new VertexFactory().createVertex(string1, props);
-    DataSet<Vertex> vertices = env.fromElements(vertex)
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex(string1, props);
+    DataSet<EPGMVertex> vertices = env.fromElements(vertex)
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;label;properties");
 
-    Edge edge = new EdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
-    DataSet<Edge> edges = env.fromElements(edge)
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
+    DataSet<EPGMEdge> edges = env.fromElements(edge)
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;label;properties");
 
@@ -296,7 +296,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * @throws Exception if the execution or IO fails.
    */
   private void checkIndexedCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
-    checkIndexedCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+    checkIndexedCSVWrite(tmpPath, input.getCollectionFactory().fromGraph(input));
   }
 
   /**

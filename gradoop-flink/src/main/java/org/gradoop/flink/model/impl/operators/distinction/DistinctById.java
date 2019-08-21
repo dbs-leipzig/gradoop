@@ -15,19 +15,35 @@
  */
 package org.gradoop.flink.model.impl.operators.distinction;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * Returns a distinct collection of logical graphs. Graph heads are compared
+ * Returns a distinct collection of base graphs. Graph heads are compared
  * based on their identifier.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class DistinctById implements UnaryCollectionToCollectionOperator {
+public class DistinctById<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+  public GC execute(GC collection) {
+    return collection.getFactory().fromDataSets(
       collection.getGraphHeads().distinct(new Id<>()),
       collection.getVertices(),
       collection.getEdges());

@@ -20,7 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.importer.impl.csv.functions.CsvRowToProperties;
 import org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex;
 import org.gradoop.flink.io.api.DataSource;
@@ -134,7 +134,7 @@ public class MinimalCSVImporter implements DataSource {
    */
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    DataSet<Vertex> vertices;
+    DataSet<EPGMVertex> vertices;
 
     if (columnNames == null) {
       vertices = readCSVFile(readHeaderRow(), checkReoccurringHeader);
@@ -147,24 +147,25 @@ public class MinimalCSVImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 
   /**
    * Reads the csv file specified by {@link MinimalCSVImporter#path} and converts each valid line
-   * to a {@link Vertex}.
+   * to a {@link EPGMVertex}.
    *
    * @param propertyNames list of the property identifier names
    * @param checkReoccurringHeader set to true if each row of the file should be checked for
    *                               reoccurring of the column property names
    * @return a {@link DataSet} of all vertices from one specific file
    */
-  private DataSet<Vertex> readCSVFile(List<String> propertyNames, boolean checkReoccurringHeader) {
+  private DataSet<EPGMVertex> readCSVFile(List<String> propertyNames, boolean checkReoccurringHeader) {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))
-      .map(new PropertiesToVertex<>(config.getVertexFactory()))
-      .returns(config.getVertexFactory().getType());
+      .map(new PropertiesToVertex<>(config.getLogicalGraphFactory().getVertexFactory()))
+      .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
   }
 
   /**

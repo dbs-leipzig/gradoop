@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.Properties;
 
@@ -27,7 +27,8 @@ import java.util.List;
 /**
  * superclass of data-bases string representations of EPGM elements, i.e.,
  * such including label and properties
- * @param <EL> EPGM element type
+ *
+ * @param <EL> element type
  */
 public abstract class ElementToDataString<EL extends Element> {
 

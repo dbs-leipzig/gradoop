@@ -15,20 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
@@ -94,9 +94,9 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
    */
   @Override
   public GraphCollection execute(LogicalGraph graph) {
-    DataSet<GraphHead> graphHeads = null;
-    DataSet<Vertex> vertices = null;
-    DataSet<Edge> edges = null;
+    DataSet<EPGMGraphHead> graphHeads = null;
+    DataSet<EPGMVertex> vertices = null;
+    DataSet<EPGMEdge> edges = null;
     List<List<String>> groupingKeyCombinations = getGroupingKeyCombinations();
 
     // for each permutation execute a grouping
@@ -106,7 +106,7 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
 
       // add a property to the grouped graph's head to specify the used keys
       PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
-      DataSet<GraphHead> newGraphHead =
+      DataSet<EPGMGraphHead> newGraphHead =
         groupedGraph.getGraphHead().map(new SetProperty<>(getGraphPropertyKey(), groupingKeys));
 
       if (graphHeads != null && vertices != null && edges != null) {
@@ -128,10 +128,10 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
     // DataSets is null.
     GraphCollection collection;
     if (graphHeads != null && vertices != null && edges != null) {
-      collection = graph.getConfig().getGraphCollectionFactory()
+      collection = graph.getCollectionFactory()
         .fromDataSets(graphHeads, vertices, edges);
     } else {
-      collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();
+      collection = graph.getCollectionFactory().createEmptyCollection();
     }
 
     return collection;

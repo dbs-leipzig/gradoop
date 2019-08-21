@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEdge;
@@ -33,7 +33,7 @@ public class ProjectEdges implements PhysicalOperator {
   /**
    * Input edge
    */
-  private final DataSet<Edge> input;
+  private final DataSet<EPGMEdge> input;
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -54,7 +54,7 @@ public class ProjectEdges implements PhysicalOperator {
    * @param propertyKeys List of property names that will be kept in the projection
    * @param isLoop indicates if the edges is a loop
    */
-  public ProjectEdges(DataSet<Edge> input, List<String> propertyKeys, boolean isLoop) {
+  public ProjectEdges(DataSet<EPGMEdge> input, List<String> propertyKeys, boolean isLoop) {
     this.input = input;
     this.propertyKeys = propertyKeys;
     this.name = "ProjectEdges";
@@ -68,7 +68,7 @@ public class ProjectEdges implements PhysicalOperator {
    * @param input vertices that will be projected
    * @param isLoop indicates if the edges is a loop
    */
-  public ProjectEdges(DataSet<Edge> input, boolean isLoop) {
+  public ProjectEdges(DataSet<EPGMEdge> input, boolean isLoop) {
     this(input, new ArrayList<>(), isLoop);
   }
 

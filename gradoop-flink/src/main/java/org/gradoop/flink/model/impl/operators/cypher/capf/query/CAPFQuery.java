@@ -25,8 +25,8 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.api.operators.Operator;
@@ -96,12 +96,12 @@ public class CAPFQuery implements Operator {
   /**
    * Mapping between the long ids and the original vertices.
    */
-  private DataSet<Tuple2<Long, Vertex>> verticesWithIds;
+  private DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds;
 
   /**
    * Mapping between the long ids and the original edges.
    */
-  private DataSet<Tuple2<Long, Edge>> edgesWithIds;
+  private DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds;
 
   /**
    * Constructor
@@ -176,7 +176,7 @@ public class CAPFQuery implements Operator {
         ),
         verticesWithIds,
         edgesWithIds,
-        graph.getConfig()
+        graph.getCollectionFactory()
       );
     }
 
@@ -191,9 +191,9 @@ public class CAPFQuery implements Operator {
    * @return a graph with transformed vertex and edge properties
    */
   private LogicalGraph transformGraphProperties(LogicalGraph graph) {
-    DataSet<Vertex> transformedVertices = graph.getVertices()
+    DataSet<EPGMVertex> transformedVertices = graph.getVertices()
       .map(new PropertyEncoder<>());
-    DataSet<Edge> transformedEdges = graph.getEdges()
+    DataSet<EPGMEdge> transformedEdges = graph.getEdges()
       .map(new PropertyEncoder<>());
 
     return graph.getFactory().fromDataSets(transformedVertices, transformedEdges);
@@ -233,7 +233,7 @@ public class CAPFQuery implements Operator {
       RowTypeInfo info = new RowTypeInfo(types);
 
       // zip all vertices of one label with a globally unique id
-      DataSet<Tuple2<Long, Vertex>> verticesByLabelWithIds =
+      DataSet<Tuple2<Long, EPGMVertex>> verticesByLabelWithIds =
         verticesWithIds.filter(new VertexLabelFilter(label));
 
       // map vertices to row and wrap in scala DataSet

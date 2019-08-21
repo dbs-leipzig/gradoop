@@ -16,8 +16,8 @@
 package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -29,12 +29,12 @@ public class DropPropertiesAndGraphContainment
   @Override
   public GraphTransaction map(GraphTransaction transaction) throws Exception {
 
-    for (Vertex vertex : transaction.getVertices()) {
+    for (EPGMVertex vertex : transaction.getVertices()) {
       vertex.setProperties(null);
       vertex.setGraphIds(null);
     }
 
-    for (Edge edge : transaction.getEdges()) {
+    for (EPGMEdge edge : transaction.getEdges()) {
       edge.setProperties(null);
       edge.setGraphIds(null);
     }

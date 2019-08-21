@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DataSource;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -40,11 +40,11 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Anton");
-    DataSet<Vertex> vertices = getExecutionEnvironment()
-      .fromElements(new VertexFactory().createVertex("Person", properties));
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment()
+      .fromElements(new EPGMVertexFactory().createVertex("Person", properties));
 
-    FilterAndProjectVertices filter =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>());
+    FilterAndProjectVertices<EPGMVertex> filter =
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>());
 
     assertEquals(1, filter.evaluate().count());
   }
@@ -53,19 +53,19 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
   public void testFilterVerticesByProperties() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
-    VertexFactory vertexFactory = new VertexFactory();
+    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex v1 = vertexFactory.createVertex("Person", properties);
+    EPGMVertex v1 = vertexFactory.createVertex("Person", properties);
     properties = Properties.create();
     properties.set("name", "Bob");
-    Vertex v2 = vertexFactory.createVertex("Person", properties);
+    EPGMVertex v2 = vertexFactory.createVertex("Person", properties);
 
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
 
@@ -77,13 +77,13 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
   public void testFilterVerticesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a:Person)");
 
-    VertexFactory vertexFactory = new VertexFactory();
-    Vertex v1 = vertexFactory.createVertex("Person");
-    Vertex v2 = vertexFactory.createVertex("Forum");
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
+    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();
+    EPGMVertex v1 = vertexFactory.createVertex("Person");
+    EPGMVertex v2 = vertexFactory.createVertex("Forum");
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     List<Embedding> result =
-      new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
+      new FilterAndProjectVertices<>(vertices, predicates, new ArrayList<>())
       .evaluate()
       .collect();
 
@@ -97,13 +97,13 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex person = new VertexFactory().createVertex("Person", properties);
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(person);
+    EPGMVertex person = new EPGMVertexFactory().createVertex("Person", properties);
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(person);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVertices<>(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);
@@ -119,13 +119,13 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex person = new VertexFactory().createVertex("Person", properties);
-    DataSource<Vertex> vertices = getExecutionEnvironment().fromElements(person);
+    EPGMVertex person = new EPGMVertexFactory().createVertex("Person", properties);
+    DataSource<EPGMVertex> vertices = getExecutionEnvironment().fromElements(person);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 
     Embedding result =
-      new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
+      new FilterAndProjectVertices<>(vertices, predicates, projectionPropertyKeys)
       .evaluate()
       .collect()
       .get(0);

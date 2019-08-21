@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 import org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges;
@@ -131,7 +131,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph logicalGraph) {
     // filter the vertices by the given label
-    DataSet<Vertex> filteredVertices = logicalGraph
+    DataSet<EPGMVertex> filteredVertices = logicalGraph
       .getVertices()
       .filter(new ByLabel<>(forVerticesOfLabel));
 
@@ -140,33 +140,32 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
       .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));
 
     // extract the new vertices
-    DataSet<Tuple2<Vertex, List<GradoopId>>> newVerticesAndOriginIds;
+    DataSet<Tuple2<EPGMVertex, List<GradoopId>>> newVerticesAndOriginIds;
     if (condense) {
       newVerticesAndOriginIds = candidates
         .groupBy(0)
         .reduceGroup(new CreateNewVertexWithEqualityCondense(
-          logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));
+          logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));
     } else {
       newVerticesAndOriginIds = candidates
-        .map(new CreateNewVertex(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,
+        .map(new CreateNewVertex(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,
           newPropertyName));
     }
 
-    DataSet<Vertex> vertices = newVerticesAndOriginIds
+    DataSet<EPGMVertex> vertices = newVerticesAndOriginIds
       .map(new Value0Of2<>())
       .union(logicalGraph.getVertices());
 
     // the newly created vertices should be linked to the original vertices
-    DataSet<Edge> edges = logicalGraph.getEdges();
+    DataSet<EPGMEdge> edges = logicalGraph.getEdges();
     if (!edgeDirection.equals(EdgeDirection.NONE)) {
       edges = newVerticesAndOriginIds
-        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,
+        .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,
           edgeLabel))
         .union(edges);
     }
 
-    return logicalGraph.getConfig()
-      .getLogicalGraphFactory()
+    return logicalGraph.getFactory()
       .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
   }
 }

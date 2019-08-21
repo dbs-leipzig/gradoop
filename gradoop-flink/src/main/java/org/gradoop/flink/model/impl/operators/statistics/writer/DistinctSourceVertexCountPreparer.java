@@ -27,11 +27,6 @@ import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
  */
 public class DistinctSourceVertexCountPreparer implements UnaryGraphToValueOperator<MapOperator<Long, Tuple1<Long>>> {
 
-  /**
-   * Prepares the statistic for distinct source vertex count.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator<Long, Tuple1<Long>> execute(LogicalGraph graph) {
     return new DistinctSourceIds()
