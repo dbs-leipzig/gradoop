@@ -7,7 +7,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.0</version>
+    <version>0.6.0-SNAPSHOT</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
