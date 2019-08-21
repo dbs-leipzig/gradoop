@@ -20,15 +20,14 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Average;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Calculate the average duration of a time interval of temporal elements.
- * Time intervals can be {@link TemporalAttribute}s.
+ * Calculate the average duration of a time dimension of one given {@link TimeDimension} of temporal elements.
  * Time intervals with either the start or end time set to the respective default value will be ignored.
  */
 public class AverageDuration extends BaseAggregateFunction implements Average, TemporalAggregateFunction {
@@ -39,34 +38,34 @@ public class AverageDuration extends BaseAggregateFunction implements Average, T
   private static final PropertyValue ONE = PropertyValue.create(1L);
 
   /**
-   * Selects which time-interval is considered by this aggregate function.
+   * Selects which time dimension is considered by this aggregate function.
    */
-  private final TemporalAttribute interval;
+  private final TimeDimension dimension;
 
   /**
    * Create an instance of the {@link AverageDuration} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    */
-  public AverageDuration(String aggregatePropertyKey, TemporalAttribute interval) {
+  public AverageDuration(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey);
-    this.interval = Objects.requireNonNull(interval);
+    this.dimension = Objects.requireNonNull(dimension);
   }
 
   /**
-   * Get the duration of a time interval as the aggregate value from a temporal element.
+   * Get the duration of a time dimension as the aggregate value from a temporal element.
    * The duration will be returned in a format used by the {@link Average} aggregation.
-   * The increment will be ignored, if the start of the end time of the time interval is set
+   * The increment will be ignored, if the start of the end time of the time dimension is set
    * to a default value.
    *
    * @param element The temporal element.
-   * @return The duration of the time interval, in the internal representation used by {@link Average}.
+   * @return The duration of the time dimension, in the internal representation used by {@link Average}.
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
     Tuple2<Long, Long> timeInterval;
-    switch (interval) {
+    switch (dimension) {
     case TRANSACTION_TIME:
       timeInterval = element.getTransactionTime();
       break;
@@ -74,7 +73,7 @@ public class AverageDuration extends BaseAggregateFunction implements Average, T
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Temporal attribute " + interval + " is not supported.");
+      throw new IllegalArgumentException("Temporal attribute " + dimension + " is not supported.");
     }
     if (timeInterval.f0 == null || timeInterval.f1 == null ||
       timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||
@@ -90,6 +89,6 @@ public class AverageDuration extends BaseAggregateFunction implements Average, T
 
   @Override
   public String toString() {
-    return String.format("%s(%s)", getClass().getSimpleName(), interval);
+    return String.format("%s(%s)", getClass().getSimpleName(), dimension);
   }
 }

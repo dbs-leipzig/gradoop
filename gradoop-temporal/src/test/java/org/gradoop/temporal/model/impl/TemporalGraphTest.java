@@ -16,6 +16,9 @@
 package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -25,10 +28,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Test class of {@link TemporalGraph}.
@@ -146,5 +152,45 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
     collectAndAssertTrue(resultingLogicalGraph.equalsByData(testLogicalGraph));
     collectAndAssertTrue(resultingLogicalGraph.equalsByElementData(testLogicalGraph));
     collectAndAssertTrue(resultingLogicalGraph.equalsByElementIds(testLogicalGraph));
+  }
+
+  /**
+   * Test the {@link TemporalGraph#fromLogicalGraph(LogicalGraph)} method.
+   */
+  @Test
+  public void testFromLogicalGraph() throws Exception {
+    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(testLogicalGraph);
+
+    Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
+    Collection<TemporalVertex> loadedVertices = new ArrayList<>();
+    Collection<TemporalEdge> loadedEdges = new ArrayList<>();
+
+    temporalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    temporalGraph.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    temporalGraph.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
+
+    Collection<EPGMGraphHead> epgmGraphHeads = new ArrayList<>();
+    Collection<EPGMVertex> epgmVertices = new ArrayList<>();
+    Collection<EPGMEdge> epgmEdges = new ArrayList<>();
+
+    testLogicalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(epgmGraphHeads));
+    testLogicalGraph.getVertices().output(new LocalCollectionOutputFormat<>(epgmVertices));
+    testLogicalGraph.getEdges().output(new LocalCollectionOutputFormat<>(epgmEdges));
+
+    getExecutionEnvironment().execute();
+
+    assertFalse(loadedGraphHeads.isEmpty());
+    assertFalse(loadedVertices.isEmpty());
+    assertFalse(loadedEdges.isEmpty());
+
+    validateElementCollections(epgmGraphHeads, loadedGraphHeads);
+    validateElementCollections(epgmVertices, loadedVertices);
+    validateElementCollections(epgmEdges, loadedEdges);
+    validateGraphElementCollections(epgmVertices, loadedVertices);
+    validateGraphElementCollections(epgmEdges, loadedEdges);
+
+    loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
+    loadedVertices.forEach(this::checkDefaultTemporalElement);
+    loadedEdges.forEach(this::checkDefaultTemporalElement);
   }
 }

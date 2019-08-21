@@ -16,10 +16,10 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 
 /**
- * Calculate the average duration of a time interval of vertices.
+ * Calculates the average duration of a time interval of a defined {@link TimeDimension} of all vertices.
  *
  * @see AverageDuration
  */
@@ -29,9 +29,9 @@ public class AverageVertexDuration extends AverageDuration implements VertexAggr
    * Create an instance of the {@link AverageVertexDuration} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    */
-  public AverageVertexDuration(String aggregatePropertyKey, TemporalAttribute interval) {
-    super(aggregatePropertyKey, interval);
+  public AverageVertexDuration(String aggregatePropertyKey, TimeDimension dimension) {
+    super(aggregatePropertyKey, dimension);
   }
 }

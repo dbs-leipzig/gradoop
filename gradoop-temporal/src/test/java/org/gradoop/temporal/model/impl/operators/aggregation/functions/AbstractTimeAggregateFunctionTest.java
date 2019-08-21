@@ -18,7 +18,7 @@ package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Before;
@@ -46,13 +46,13 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
    * The interval to consider.
    */
   @Parameterized.Parameter
-  public TemporalAttribute interval;
+  public TimeDimension interval;
 
   /**
    * The field in the interval.
    */
   @Parameterized.Parameter(1)
-  public TemporalAttribute.Field field;
+  public TimeDimension.Field field;
 
   /**
    * The expected value.
@@ -99,10 +99,10 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
   @Parameterized.Parameters(name = "{1} of {0}")
   public static Object[][] parameters() {
     return new Object[][] {
-      {TemporalAttribute.TRANSACTION_TIME, TemporalAttribute.Field.FROM, 1L},
-      {TemporalAttribute.TRANSACTION_TIME, TemporalAttribute.Field.TO, 2L},
-      {TemporalAttribute.VALID_TIME, TemporalAttribute.Field.FROM, 3L},
-      {TemporalAttribute.VALID_TIME, TemporalAttribute.Field.TO, 4L}
+      {TimeDimension.TRANSACTION_TIME, TimeDimension.Field.FROM, 1L},
+      {TimeDimension.TRANSACTION_TIME, TimeDimension.Field.TO, 2L},
+      {TimeDimension.VALID_TIME, TimeDimension.Field.FROM, 3L},
+      {TimeDimension.VALID_TIME, TimeDimension.Field.TO, 4L}
     };
   }
 }

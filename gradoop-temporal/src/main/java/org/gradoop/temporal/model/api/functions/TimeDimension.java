@@ -16,18 +16,20 @@
 package org.gradoop.temporal.model.api.functions;
 
 /**
- * Attributes accessible on {@link org.gradoop.temporal.model.impl.pojo.TemporalElement}s.
- * Those attributes are expected to be time intervals.
+ * Attributes accessible on {@link org.gradoop.temporal.model.impl.pojo.TemporalElement}s representing
+ * different time dimensions.
+ * For each dimension, two fields are given to represent a time interval.
  */
-public enum TemporalAttribute {
+public enum TimeDimension {
   /**
-   * The transaction time of a temporal element, i.e. the time interval in which the element is
-   * considered part of the graph database. This interval should be maintained by the system.
+   * The transaction time dimension of a temporal element, i.e. the time interval in which the element is
+   * considered part of the graph store. This interval should be maintained by the system.
    */
   TRANSACTION_TIME,
   /**
-   * The valid time of a temporal element, i.e. the time in which the element's data is considered valid in
-   * a certain context. Validity is therefore depending on the data itself and maintained by the user.
+   * The valid time dimension of a temporal element, i.e. the time in which the element's data is considered
+   * valid in the application context. Validity is therefore depending on the data itself and maintained by
+   * the user.
    */
   VALID_TIME;
 

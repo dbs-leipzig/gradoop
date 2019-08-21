@@ -17,6 +17,9 @@ package org.gradoop.temporal.model.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.io.api.TemporalDataSource;
@@ -32,9 +35,13 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -214,5 +221,45 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
     collectAndAssertTrue(resultingCollection.equalsByGraphData(testCollection));
     collectAndAssertTrue(resultingCollection.equalsByGraphElementData(testCollection));
     collectAndAssertTrue(resultingCollection.equalsByGraphElementIds(testCollection));
+  }
+
+  /**
+   * Test the {@link TemporalGraphCollection#fromGraphCollection(GraphCollection)} method.
+   */
+  @Test
+  public void testFromGraphCollection() throws Exception {
+    TemporalGraphCollection temporalCollection = TemporalGraphCollection.fromGraphCollection(testCollection);
+
+    Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
+    Collection<TemporalVertex> loadedVertices = new ArrayList<>();
+    Collection<TemporalEdge> loadedEdges = new ArrayList<>();
+
+    temporalCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
+    temporalCollection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
+    temporalCollection.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
+
+    Collection<EPGMGraphHead> epgmGraphHeads = new ArrayList<>();
+    Collection<EPGMVertex> epgmVertices = new ArrayList<>();
+    Collection<EPGMEdge> epgmEdges = new ArrayList<>();
+
+    testCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(epgmGraphHeads));
+    testCollection.getVertices().output(new LocalCollectionOutputFormat<>(epgmVertices));
+    testCollection.getEdges().output(new LocalCollectionOutputFormat<>(epgmEdges));
+
+    getExecutionEnvironment().execute();
+
+    assertFalse(loadedGraphHeads.isEmpty());
+    assertFalse(loadedVertices.isEmpty());
+    assertFalse(loadedEdges.isEmpty());
+
+    validateElementCollections(epgmGraphHeads, loadedGraphHeads);
+    validateElementCollections(epgmVertices, loadedVertices);
+    validateElementCollections(epgmEdges, loadedEdges);
+    validateGraphElementCollections(epgmVertices, loadedVertices);
+    validateGraphElementCollections(epgmEdges, loadedEdges);
+
+    loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
+    loadedVertices.forEach(this::checkDefaultTemporalElement);
+    loadedEdges.forEach(this::checkDefaultTemporalElement);
   }
 }

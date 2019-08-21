@@ -142,7 +142,8 @@ class TemporalBaseLayoutFactory implements
     if (config instanceof TemporalGradoopConfig) {
       this.config = (TemporalGradoopConfig) config;
     } else {
-      throw new IllegalArgumentException("The config has to be a temporal Gradoop config.");
+      throw new IllegalArgumentException("The config has to be an instance of [" +
+        TemporalGradoopConfig.class.getSimpleName() + "].");
     }
   }
 

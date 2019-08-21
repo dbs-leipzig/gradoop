@@ -19,7 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
@@ -27,52 +27,50 @@ import java.util.function.BiFunction;
 
 /**
  * An abstract super class for aggregation functions that aggregate a time of a temporal element.
- * Times can be a {@link TemporalAttribute.Field} of a {@link TemporalAttribute}.
+ * Times can be a {@link TimeDimension.Field} of a {@link TimeDimension}.
  */
 public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunction
   implements TemporalAggregateFunction {
 
   /**
-   * Selects which time-interval is considered by this aggregate function.
+   * Selects which time-dimension is considered by this aggregate function.
    */
-  private final TemporalAttribute interval;
+  private final TimeDimension timeDimension;
 
   /**
    * Selects the field of the temporal element to consider.
    */
-  private final TemporalAttribute.Field field;
+  private final TimeDimension.Field field;
 
   /**
    * The property value that is considered as the default 'from' value of this aggregate function.
    * It is ignored during aggregation of valid times.
    */
-  private final PropertyValue defaultFromValue =
-    PropertyValue.create(TemporalElement.DEFAULT_TIME_FROM);
+  private final PropertyValue defaultFromValue = PropertyValue.create(TemporalElement.DEFAULT_TIME_FROM);
 
   /**
    * The property value that is considered as the default 'to' value of this aggregate function.
    * It is ignored during aggregation of valid times.
    */
-  private final PropertyValue defaultToValue =
-    PropertyValue.create(TemporalElement.DEFAULT_TIME_TO);
+  private final PropertyValue defaultToValue = PropertyValue.create(TemporalElement.DEFAULT_TIME_TO);
 
   /**
    * Sets attributes used to initialize this aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
-   * @param field                The field of the time-interval to consider.
+   * @param timeDimension        The time dimension type to consider.
+   * @param field                The field of the time-dimension to consider.
    */
-  public AbstractTimeAggregateFunction(String aggregatePropertyKey, TemporalAttribute interval,
-    TemporalAttribute.Field field) {
+  public AbstractTimeAggregateFunction(String aggregatePropertyKey, TimeDimension timeDimension,
+    TimeDimension.Field field) {
     super(aggregatePropertyKey);
-    this.interval = Objects.requireNonNull(interval);
+    this.timeDimension = Objects.requireNonNull(timeDimension);
     this.field = Objects.requireNonNull(field);
   }
 
   /**
    * Get a time stamp as the aggregate value from a temporal element.
-   * The value will be the value of a {@link TemporalAttribute.Field} of a {@link TemporalAttribute}.
+   * The value will be the value of a {@link TimeDimension.Field} of a {@link TimeDimension}.
    *
    * @param element The temporal element.
    * @return The value, as a long-type property value.
@@ -80,7 +78,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
     final Tuple2<Long, Long> timeInterval;
-    switch (interval) {
+    switch (timeDimension) {
     case TRANSACTION_TIME:
       timeInterval = element.getTransactionTime();
       break;
@@ -88,7 +86,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Temporal attribute " + interval +
+      throw new IllegalArgumentException("Temporal attribute " + timeDimension +
         " is not supported by this aggregate function.");
     }
     switch (field) {
@@ -97,8 +95,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
     case TO:
       return PropertyValue.create(timeInterval.f1);
     default:
-      throw new IllegalArgumentException("Field " + field +
-        " is not supported for time intervals.");
+      throw new IllegalArgumentException("Field " + field + " is not supported for time intervals.");
     }
   }
 
@@ -124,7 +121,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
 
   /**
    * Checks if the given property value is a temporal default value (see {@link TemporalElement}).
-   * If the temporal attribute is a {@link TemporalAttribute#TRANSACTION_TIME}, this function
+   * If the temporal attribute is a {@link TimeDimension#TRANSACTION_TIME}, this function
    * will return {@code false} since the transaction time is system maintained and there are no
    * defaults to check.
    *
@@ -132,12 +129,12 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    * @return true, if the time semantic is valid time and the value equals a default temporal value.
    */
   private boolean isDefaultTime(PropertyValue value) {
-    return interval == TemporalAttribute.VALID_TIME &&
+    return timeDimension == TimeDimension.VALID_TIME &&
       (value.equals(defaultFromValue) || value.equals(defaultToValue));
   }
 
   @Override
   public String toString() {
-    return String.format("%s(%s.%s)", getClass().getSimpleName(), interval, field);
+    return String.format("%s(%s.%s)", getClass().getSimpleName(), timeDimension, field);
   }
 }

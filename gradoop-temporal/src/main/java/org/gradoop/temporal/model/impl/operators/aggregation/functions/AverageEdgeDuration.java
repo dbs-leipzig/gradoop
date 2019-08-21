@@ -16,10 +16,10 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 
 /**
- * Calculate the average duration of a time interval of edges.
+ * Calculates the average duration of a time interval of a defined {@link TimeDimension} of all edges.
  *
  * @see AverageDuration
  */
@@ -29,9 +29,9 @@ public class AverageEdgeDuration extends AverageDuration implements EdgeAggregat
    * Create an instance of the {@link AverageEdgeDuration} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    */
-  public AverageEdgeDuration(String aggregatePropertyKey, TemporalAttribute interval) {
-    super(aggregatePropertyKey, interval);
+  public AverageEdgeDuration(String aggregatePropertyKey, TimeDimension dimension) {
+    super(aggregatePropertyKey, dimension);
   }
 }

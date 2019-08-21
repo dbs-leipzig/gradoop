@@ -58,8 +58,7 @@ public interface TemporalAggregateFunction extends AggregateFunction {
    * @return The default aggregate value.
    */
   default PropertyValue getNonTemporalIncrement(Element element) {
-    throw new UnsupportedOperationException("This aggregate function only supports temporal " +
-      "elements.");
+    throw new UnsupportedOperationException("This aggregate function only supports temporal elements.");
   }
 
   /**

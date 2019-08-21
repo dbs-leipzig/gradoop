@@ -17,13 +17,13 @@ package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 /**
  * Base class for calculating the maximum of a field of a time-interval for temporal
- * elements. If a valid time attribute is used for aggregation, this function ignores the default
- * values ({@link TemporalElement#DEFAULT_TIME_FROM} and {@link TemporalElement#DEFAULT_TIME_TO})
+ * elements. If the dimension {@link TimeDimension#VALID_TIME} is used for aggregation, this function ignores
+ * the default values ({@link TemporalElement#DEFAULT_TIME_FROM} and {@link TemporalElement#DEFAULT_TIME_TO})
  * and handles it the same way as {@code null}.
  */
 public class MaxTime extends AbstractTimeAggregateFunction {
@@ -32,11 +32,11 @@ public class MaxTime extends AbstractTimeAggregateFunction {
    * Sets attributes used to initialize this aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MaxTime(String aggregatePropertyKey, TemporalAttribute interval, TemporalAttribute.Field field) {
-    super(aggregatePropertyKey, interval, field);
+  public MaxTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
+    super(aggregatePropertyKey, dimension, field);
   }
 
   @Override

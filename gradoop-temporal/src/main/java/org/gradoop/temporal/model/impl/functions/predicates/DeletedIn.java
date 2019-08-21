@@ -19,26 +19,27 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
  * Implementation of the <b>DeletedIn</b> temporal predicate.
- * Given a certain time-interval, this predicate will match all intervals ending during that
- * interval.
+ * Given a certain time-interval, this predicate will match all intervals ending during that interval.
+ * <p>
+ * Predicate: queryFrom <= elementTo && elementTo <= queryTo
  */
 public class DeletedIn implements TemporalPredicate {
 
   /**
-   * The start of the query time-interval.
+   * The start of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryFrom;
 
   /**
-   * The end of the query time-interval.
+   * The end of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryTo;
 
   /**
    * Creates a DeletedIn instance with the given time stamps.
    *
-   * @param from The start of the query time-interval.
-   * @param to   the end of the query time-interval.
+   * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
+   * @param to   the end of the query time-interval in Milliseconds since Unix Epoch.
    */
   public DeletedIn(long from, long to) {
     queryFrom = from;

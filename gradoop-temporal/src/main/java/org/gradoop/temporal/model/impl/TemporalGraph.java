@@ -67,6 +67,8 @@ import java.io.IOException;
  * is represented in Apache Flink.<br>
  * Note that the {@link TemporalGraph} also implements that interface and just forwards the calls to
  * the layout. This is just for convenience and API synchronicity.
+ *
+ * @see TemporalGraphOperators
  */
 public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge,
   TemporalGraph, TemporalGraphCollection>, TemporalGraphOperators {
@@ -189,10 +191,10 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   }
 
   @Override
-  public TemporalGraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+  public TemporalGraphCollection query(String query, String constructionPattern,
+    GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
-      attachData, vertexStrategy, edgeStrategy, graphStatistics));
+      true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
   }
 
   //----------------------------------------------------------------------------
@@ -228,5 +230,18 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
       getGraphHead().map(new TemporalGraphHeadToGraphHead(logicalGraphFactory.getGraphHeadFactory())),
       getVertices().map(new TemporalVertexToVertex(logicalGraphFactory.getVertexFactory())),
       getEdges().map(new TemporalEdgeToEdge(logicalGraphFactory.getEdgeFactory())));
+  }
+
+  /**
+   * Convenience API function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with
+   * default values for the temporal attributes.
+   *
+   * @param logicalGraph the existing logical graph instance
+   * @return a temporal graph with default temporal values
+   * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
+   */
+  public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph) {
+    return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()
+      .fromNonTemporalGraph(logicalGraph);
   }
 }

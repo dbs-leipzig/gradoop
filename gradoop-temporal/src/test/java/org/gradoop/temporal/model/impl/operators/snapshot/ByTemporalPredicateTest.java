@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
+import org.gradoop.temporal.model.impl.operators.snapshot.functions.ByTemporalPredicate;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;

@@ -18,7 +18,6 @@ package org.gradoop.temporal.model.api;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
@@ -235,8 +234,7 @@ public interface TemporalGraphOperators {
    * @return graph collection containing matching subgraphs
    */
   default TemporalGraphCollection query(String query, GraphStatistics graphStatistics) {
-    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
-      graphStatistics);
+    return query(query, null, graphStatistics);
   }
 
   /**
@@ -262,40 +260,7 @@ public interface TemporalGraphOperators {
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing the output of the construct pattern
    */
-  default TemporalGraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
-      MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query Cypher query
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query Cypher query
-   * @param constructionPattern Construction pattern
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  TemporalGraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+  TemporalGraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
 
   //----------------------------------------------------------------------------
   // Auxiliary Operators

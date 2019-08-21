@@ -21,7 +21,7 @@ import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -35,10 +35,10 @@ import java.util.Arrays;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static org.gradoop.temporal.model.api.functions.TemporalAttribute.Field.FROM;
-import static org.gradoop.temporal.model.api.functions.TemporalAttribute.Field.TO;
-import static org.gradoop.temporal.model.api.functions.TemporalAttribute.TRANSACTION_TIME;
-import static org.gradoop.temporal.model.api.functions.TemporalAttribute.VALID_TIME;
+import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.FROM;
+import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.TO;
+import static org.gradoop.temporal.model.api.functions.TimeDimension.TRANSACTION_TIME;
+import static org.gradoop.temporal.model.api.functions.TimeDimension.VALID_TIME;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -64,13 +64,13 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
    * The temporal attribute to aggregate.
    */
   @Parameterized.Parameter
-  public TemporalAttribute temporalAttribute;
+  public TimeDimension temporalAttribute;
 
   /**
    * The field of the temporal attribute to aggregate.
    */
   @Parameterized.Parameter(1)
-  public TemporalAttribute.Field field;
+  public TimeDimension.Field field;
 
   /**
    * The expected value for the {@link MaxEdgeTime} function.
@@ -184,8 +184,8 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   /**
    * Get parameters for this test. Those are
    * <ol>
-   * <li>The {@link TemporalAttribute} to aggregate.</li>
-   * <li>The {@link TemporalAttribute.Field} of that attribute to aggregate.</li>
+   * <li>The {@link TimeDimension} to aggregate.</li>
+   * <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
    * <li>The expected result of {@link MaxEdgeTime}.</li>
    * <li>The expected result of {@link MinEdgeTime}.</li>
    * <li>The expected result of {@link MaxVertexTime}.</li>

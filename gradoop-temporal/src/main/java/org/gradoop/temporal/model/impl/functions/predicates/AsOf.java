@@ -21,30 +21,32 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the <b>AsOf</b> predicate.
  * Given a certain time-stamp, this predicate will match all time-stamps before or at that time
  * and all time-intervals containing that time.
+ * <p>
+ * Predicate: elementFrom <= queryTimestamp && elementTo > queryTimestamp
  */
 public class AsOf implements TemporalPredicate {
 
   /**
-   * The timestamp to be matched.
+   * The queryTimestamp to be matched.
    */
-  private final long timeStamp;
+  private final long queryTimestamp;
 
   /**
    * Creates a AsOf instance with the given time-stamp.
    *
-   * @param timestamp The time-stamp to match.
+   * @param timestamp The timestamp to match in Milliseconds since Unix Epoch.
    */
   public AsOf(long timestamp) {
-    timeStamp = timestamp;
+    this.queryTimestamp = timestamp;
   }
 
   @Override
   public boolean test(long from, long to) {
-    return from <= timeStamp && to > timeStamp;
+    return from <= queryTimestamp && to > queryTimestamp;
   }
 
   @Override
   public String toString() {
-    return "AS OF " + timeStamp;
+    return "AS OF " + queryTimestamp;
   }
 }

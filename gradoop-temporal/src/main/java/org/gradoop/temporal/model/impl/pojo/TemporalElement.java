@@ -48,7 +48,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   private Tuple2<Long, Long> validTime;
 
   /**
-   * Default constructor. Needed because of Flink's POJO rules.
+   * Default constructor. Needed because of Flink's POJO rules and serialization.
    */
   public TemporalElement() {
     transactionTime = new Tuple2<>();

@@ -21,24 +21,26 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the <b>Between</b> temporal predicate.
  * Given a certain time-interval, this predicate will match all intervals that start
  * before or at that interval's end and end after the start of that interval.
+ * <p>
+ * Predicate: elementFrom <= queryTo && elementTo > queryFrom
  */
 public class Between implements TemporalPredicate {
 
   /**
-   * The start of the query time-interval.
+   * The start of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryFrom;
 
   /**
-   * The end of the query time-interval.
+   * The end of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryTo;
 
   /**
    * Creates a Between instance with the given time stamps.
    *
-   * @param from The start of the query time-interval.
-   * @param to   The end of the query time-interval.
+   * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
+   * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
    */
   public Between(long from, long to) {
     queryFrom = from;

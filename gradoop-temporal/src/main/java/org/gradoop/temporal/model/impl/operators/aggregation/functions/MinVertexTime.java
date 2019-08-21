@@ -16,12 +16,12 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 
 /**
  * Aggregates the minimum value of a time value for temporal vertices.
- * The value will be calculated as the minimum of a {@link TemporalAttribute.Field} of a
- * {@link TemporalAttribute}, ignoring the default value (in this case {@link Long#MIN_VALUE}).
+ * The value will be calculated as the minimum of a {@link TimeDimension.Field} of a
+ * {@link TimeDimension}, ignoring the default value (in this case {@link Long#MIN_VALUE}).
  */
 public class MinVertexTime extends MinTime implements VertexAggregateFunction {
 
@@ -29,11 +29,10 @@ public class MinVertexTime extends MinTime implements VertexAggregateFunction {
    * Creates an instance of the {@link MinVertexTime} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MinVertexTime(String aggregatePropertyKey, TemporalAttribute interval,
-    TemporalAttribute.Field field) {
-    super(aggregatePropertyKey, interval, field);
+  public MinVertexTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
+    super(aggregatePropertyKey, dimension, field);
   }
 }

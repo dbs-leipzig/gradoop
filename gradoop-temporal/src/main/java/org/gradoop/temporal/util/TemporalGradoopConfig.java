@@ -46,13 +46,14 @@ public class TemporalGradoopConfig extends GradoopFlinkConfig {
 
   /**
    * Creates a new temporal config from an existing {@link GradoopFlinkConfig}.
+   * Use {@link #fromGradoopFlinkConfig(GradoopFlinkConfig)} to use this constructor.
    *
-   * @param oldConfig The existing configuration.
+   * @param existingConfig The existing configuration.
    */
-  protected TemporalGradoopConfig(GradoopFlinkConfig oldConfig) {
-    this(requireNonNull(oldConfig).getExecutionEnvironment(),
-      oldConfig.getLogicalGraphFactory().getLayoutFactory(),
-      oldConfig.getGraphCollectionFactory().getLayoutFactory());
+  private TemporalGradoopConfig(GradoopFlinkConfig existingConfig) {
+    this(requireNonNull(existingConfig).getExecutionEnvironment(),
+      existingConfig.getLogicalGraphFactory().getLayoutFactory(),
+      existingConfig.getGraphCollectionFactory().getLayoutFactory());
   }
 
   /**
@@ -62,7 +63,7 @@ public class TemporalGradoopConfig extends GradoopFlinkConfig {
    * @param epgmLayoutFactory           Factory for creating EPGM graphs.
    * @param epgmCollectionLayoutFactory Factory for creating EPGM graph collections.
    */
-  protected TemporalGradoopConfig(
+  private TemporalGradoopConfig(
     ExecutionEnvironment executionEnvironment,
     LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> epgmLayoutFactory,
     GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> epgmCollectionLayoutFactory) {
@@ -77,7 +78,7 @@ public class TemporalGradoopConfig extends GradoopFlinkConfig {
    * @param config The existing configuration.
    * @return A new temporal Gradoop config.
    */
-  public static TemporalGradoopConfig createConfig(GradoopFlinkConfig config) {
+  public static TemporalGradoopConfig fromGradoopFlinkConfig(GradoopFlinkConfig config) {
     return new TemporalGradoopConfig(config);
   }
 

@@ -62,6 +62,8 @@ import java.io.IOException;
  * collection is wrapping a layout which defines, how the graph is represented in Apache Flink.<br>
  * Note that the {@link TemporalGraphCollection} also implements that interface and just forwards
  * the calls to the layout. This is just for convenience and API synchronicity.
+ *
+ * @see TemporalGraphCollectionOperators
  */
 public class TemporalGraphCollection implements BaseGraphCollection<
     TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>,
@@ -197,6 +199,7 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   //----------------------------------------------------------------------------
   // Utilities
   //----------------------------------------------------------------------------
+
   @Override
   public GraphCollection toGraphCollection() {
     final GraphCollectionFactory collectionFactory = this.config.getGraphCollectionFactory();
@@ -230,5 +233,18 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   public TemporalGraph callForGraph(
     UnaryBaseGraphCollectionToBaseGraphOperator<TemporalGraphCollection, TemporalGraph> operator) {
     return operator.execute(this);
+  }
+
+  /**
+   * Convenience API function to create a {@link TemporalGraphCollection} from an existing
+   * {@link GraphCollection} with default values for the temporal attributes.
+   *
+   * @param graphCollection the existing graph collection instance
+   * @return a temporal graph colection with default temporal values
+   * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
+   */
+  public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection) {
+    return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())
+      .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);
   }
 }

@@ -167,8 +167,7 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
   }
 
   /**
-   * Creates a {@link TemporalGraphCollection} instance by the given EPGM graph head, vertex and
-   * edge datasets.
+   * Creates a {@link TemporalGraphCollection} instance by the given graph head, vertex and edge datasets.
    *
    * @param graphHead graph head DataSet
    * @param vertices vertex DataSet

@@ -20,24 +20,26 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 /**
  * Implementation of the <b>ContainedIn</b> temporal predicate.
  * Given a certain time interval, this predicate will match all intervals that are a subset of that interval.
+ * <p>
+ * Predicate: queryFrom <= elementFrom && elementTo <= queryTo
  */
 public class ContainedIn implements TemporalPredicate {
 
   /**
-   * The start of the query time-interval.
+   * The start of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryFrom;
 
   /**
-   * The end of the query time-interval.
+   * The end of the query time-interval in Milliseconds since Unix Epoch.
    */
   private final long queryTo;
 
   /**
    * Creates a ContainedIn instance with the given time stamps.
    *
-   * @param from The start of the query time-interval.
-   * @param to   The end of the query time-interval.
+   * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
+   * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
    */
   public ContainedIn(long from, long to) {
     queryFrom = from;

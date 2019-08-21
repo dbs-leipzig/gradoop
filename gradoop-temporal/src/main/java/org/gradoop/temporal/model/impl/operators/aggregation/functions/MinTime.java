@@ -17,7 +17,7 @@ package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.gradoop.temporal.model.api.functions.TemporalAttribute;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 /**
@@ -32,11 +32,11 @@ public class MinTime extends AbstractTimeAggregateFunction {
    * Sets attributes used to initialize this aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param interval             The time-interval to consider.
+   * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MinTime(String aggregatePropertyKey, TemporalAttribute interval, TemporalAttribute.Field field) {
-    super(aggregatePropertyKey, interval, field);
+  public MinTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
+    super(aggregatePropertyKey, dimension, field);
   }
 
   @Override
