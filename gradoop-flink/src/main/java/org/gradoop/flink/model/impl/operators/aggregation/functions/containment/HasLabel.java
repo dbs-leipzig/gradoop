@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
 import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
@@ -35,7 +35,7 @@ import java.util.Objects;
  * </ol>
  */
 public class HasLabel extends BaseAggregateFunction
-  implements Or, AggregateFunction, CombinableFilter<EPGMGraphHead> {
+  implements Or, AggregateFunction, CombinableFilter<GraphHead> {
 
   /**
    * Label to check presence of.
@@ -69,7 +69,7 @@ public class HasLabel extends BaseAggregateFunction
   }
 
   @Override
-  public boolean filter(EPGMGraphHead graphHead) throws Exception {
+  public boolean filter(GraphHead graphHead) throws Exception {
     return graphHead.getPropertyValue(getAggregatePropertyKey()).getBoolean();
   }
 }
