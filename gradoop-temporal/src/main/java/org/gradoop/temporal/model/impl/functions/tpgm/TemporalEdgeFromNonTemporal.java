@@ -23,8 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
-import java.util.Objects;
-
 /**
  * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time information.
@@ -63,7 +61,7 @@ public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<
     EdgeFactory<TemporalEdge> elementFactory,
     TimeIntervalExtractor<E> timeIntervalExtractor) {
     this(elementFactory);
-    this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
+    this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
   /**

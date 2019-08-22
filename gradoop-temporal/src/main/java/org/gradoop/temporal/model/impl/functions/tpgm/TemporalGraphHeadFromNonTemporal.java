@@ -22,8 +22,6 @@ import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 
-import java.util.Objects;
-
 /**
  * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
  * default temporal information or, if a timeIntervalExtractor is given, by the extracted time information.
@@ -63,7 +61,7 @@ public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
     GraphHeadFactory<TemporalGraphHead> elementFactory,
     TimeIntervalExtractor<G> timeIntervalExtractor) {
     this(elementFactory);
-    this.timeIntervalExtractor = Objects.requireNonNull(timeIntervalExtractor);
+    this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
   /**
