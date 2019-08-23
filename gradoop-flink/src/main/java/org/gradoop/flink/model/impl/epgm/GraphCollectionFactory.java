@@ -61,6 +61,11 @@ public class GraphCollectionFactory implements
   }
 
   @Override
+  public GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getLayoutFactory() {
+    return layoutFactory;
+  }
+
+  @Override
   public void setLayoutFactory(
     GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);
@@ -116,7 +121,8 @@ public class GraphCollectionFactory implements
   }
 
   @Override
-  public GraphCollection fromGraphs(LogicalGraph... logicalGraphLayouts) {
+public GraphCollection fromGraphs(
+  LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>... logicalGraphLayouts) {
     if (logicalGraphLayouts.length != 0) {
       DataSet<EPGMGraphHead> graphHeads = null;
       DataSet<EPGMVertex> vertices = null;
@@ -126,7 +132,7 @@ public class GraphCollectionFactory implements
         return fromGraph(logicalGraphLayouts[0]);
       }
 
-      for (LogicalGraph logicalGraph : logicalGraphLayouts) {
+      for (LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> logicalGraph : logicalGraphLayouts) {
         graphHeads = (graphHeads == null) ?
           logicalGraph.getGraphHead() : graphHeads.union(logicalGraph.getGraphHead());
         vertices = (vertices == null) ?

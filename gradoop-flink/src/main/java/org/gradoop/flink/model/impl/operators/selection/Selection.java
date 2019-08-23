@@ -17,65 +17,47 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Objects;
 
 /**
- * Filter logical graphs from a graph collection based on their associated graph
- * head.
+ * Filter base graphs from a graph collection based on their associated graph head.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class Selection extends SelectionBase {
+public class Selection<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SelectionBase<G, V, E, LG, GC> {
 
   /**
    * User-defined predicate function
    */
-  private final FilterFunction<EPGMGraphHead> predicate;
+  private final FilterFunction<G> predicate;
 
   /**
    * Creates a new Selection operator.
    *
    * @param predicate user-defined predicate function
    */
-  public Selection(FilterFunction<EPGMGraphHead> predicate) {
-    this.predicate = checkNotNull(predicate, "Predicate function was null");
+  public Selection(FilterFunction<G> predicate) {
+    this.predicate = Objects.requireNonNull(predicate, "Predicate function was null");
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
-    return collection.isTransactionalLayout() ?
-      executeForTxLayout(collection) :
-      executeForGVELayout(collection);
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  private GraphCollection executeForGVELayout(GraphCollection collection) {
-    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads()
-      .filter(predicate);
+  public GC execute(GC collection) {
+    DataSet<G> graphHeads = collection.getGraphHeads().filter(predicate);
     return selectVerticesAndEdges(collection, graphHeads);
-  }
-
-  /**
-   * Executes the operator for collections based on
-   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
-   *
-   * @param collection graph collection
-   * @return result graph collection
-   */
-  private GraphCollection executeForTxLayout(GraphCollection collection) {
-    DataSet<GraphTransaction> filteredTransactions = collection.getGraphTransactions()
-      .filter(new FilterTransactions(predicate));
-
-    return collection.getFactory()
-      .fromTransactions(filteredTransactions);
   }
 }

@@ -26,6 +26,5 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  */
 public interface UnaryBaseGraphCollectionToBaseGraphOperator<
   GC extends BaseGraphCollection,
-  LG extends BaseGraph>
-  extends UnaryBaseGraphCollectionToValueOperator<GC, LG> {
+  LG extends BaseGraph> extends UnaryBaseGraphCollectionToValueOperator<GC, LG> {
 }

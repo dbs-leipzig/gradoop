@@ -16,8 +16,10 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -25,6 +27,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  *
  * @param <V> the vertex type
  */
+@FunctionAnnotation.ForwardedFields("*->properties")
 public class PropertiesToVertex<V extends Vertex> implements MapFunction<Properties, V> {
   /**
    * Reduce object instantiations.
@@ -43,6 +46,7 @@ public class PropertiesToVertex<V extends Vertex> implements MapFunction<Propert
   @Override
   public V map(final Properties value) {
     vertex.setProperties(value);
+    vertex.setId(GradoopId.get());
     return vertex;
   }
 }

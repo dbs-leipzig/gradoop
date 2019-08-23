@@ -55,6 +55,11 @@ public class LogicalGraphFactory
   }
 
   @Override
+  public LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getLayoutFactory() {
+    return layoutFactory;
+  }
+
+  @Override
   public void setLayoutFactory(LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);
     this.layoutFactory = layoutFactory;
