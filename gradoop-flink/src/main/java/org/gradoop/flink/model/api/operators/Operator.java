@@ -16,16 +16,15 @@
 package org.gradoop.flink.model.api.operators;
 
 /**
- * Base interface for all EPGM operators.
+ * Base interface for all graph operators.
  */
 public interface Operator {
   /**
-   * Returns the operators name.
-   * The operator name is the same as the class name, per default.
+   * Returns the operators name. The operator name is the same as the simple class name, per default.
    *
    * @return operator name
    */
   default String getName() {
-    return this.getClass().getName();
+    return this.getClass().getSimpleName();
   }
 }
