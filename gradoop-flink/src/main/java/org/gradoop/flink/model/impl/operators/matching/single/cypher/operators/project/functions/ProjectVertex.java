@@ -23,8 +23,8 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.util.List;
 
 /**
- * Projects a EPGMVertex by a set of properties.
- * EPGMVertex -> Embedding(GraphElementEmbedding(EPGMVertex))
+ * Projects a Vertex by a set of properties.
+ * Vertex -> Embedding(GraphElementEmbedding(Vertex))
  */
 public class ProjectVertex extends RichMapFunction<EPGMVertex, Embedding> {
   /**

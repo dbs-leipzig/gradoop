@@ -27,8 +27,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetIdWithGraphIds;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.LeftSideWithRightGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs;
+import org.gradoop.flink.model.impl.functions.utils.RightSideWithLeftGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs2To1;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 
@@ -118,16 +117,10 @@ public class ApplySubgraph<
    */
   private GC vertexInducedSubgraph(GC collection) {
     DataSet<V> filteredVertices = collection.getVertices().filter(vertexFilterFunction);
-    DataSet<E> inducedEdges = collection.getEdges()
-      .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSideWithRightGraphs<>())
-      .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSideWithRightGraphs<>());
 
     return collection.getFactory()
-      .fromDataSets(collection.getGraphHeads(), filteredVertices, inducedEdges);
+      .fromDataSets(collection.getGraphHeads(), filteredVertices, collection.getEdges())
+      .verify();
   }
 
   /**

@@ -18,30 +18,32 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 
 import java.util.HashMap;
 
 /**
- * (GE) -> (GE (+ EPGMGraphHead), EPGMGraphHead)
+ * (GE) -> (GE (+ GraphHead), GraphHead)
  *
  * Forwarded fields:
  *
  * *->f0: input graph element
  *
- * @param <GE> EPGM graph element type
+ * @param <GE> The graph element type.
+ * @param <G>  The graph head type.
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
-  implements MapFunction<GE, Tuple2<GE, EPGMGraphHead>> {
+public class AddGraphElementToNewGraph<GE extends GraphElement, G extends GraphHead>
+  implements MapFunction<GE, Tuple2<GE, G>> {
+
   /**
-   * EPGM graph head factory
+   * graph head factory
    */
-  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
   /**
    * Variable assigned to the query vertex
    */
@@ -49,7 +51,7 @@ public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
   /**
    * Reduce instantiations
    */
-  private final Tuple2<GE, EPGMGraphHead> reuseTuple;
+  private final Tuple2<GE, G> reuseTuple;
   /**
    * Reuse map for variable mapping
    */
@@ -58,10 +60,10 @@ public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
   /**
    * Constructor
    *
-   * @param graphHeadFactory EPGM graph head factory
+   * @param graphHeadFactory graph head factory
    * @param variable Variable assigned to the only query vertex
    */
-  public AddGraphElementToNewGraph(GraphHeadFactory<EPGMGraphHead> graphHeadFactory,
+  public AddGraphElementToNewGraph(GraphHeadFactory<G> graphHeadFactory,
     String variable) {
     this.graphHeadFactory = graphHeadFactory;
     this.variable = variable;
@@ -70,14 +72,14 @@ public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
   }
 
   @Override
-  public Tuple2<GE, EPGMGraphHead> map(GE value) {
+  public Tuple2<GE, G> map(GE value) {
     reuseVariableMapping.clear();
     reuseVariableMapping.put(
       PropertyValue.create(this.variable),
       PropertyValue.create(value.getId())
     );
 
-    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();
+    G graphHead = graphHeadFactory.createGraphHead();
     graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);
 
     value.addGraphId(graphHead.getId());

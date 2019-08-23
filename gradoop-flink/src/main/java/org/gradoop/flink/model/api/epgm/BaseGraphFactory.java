@@ -43,6 +43,13 @@ public interface BaseGraphFactory<
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends ElementFactoryProvider<G, V, E> {
 
   /**
+   * Get the layout factory responsible for creating a graph layout.
+   *
+   * @return The graph layout factory.
+   */
+  LogicalGraphLayoutFactory<G, V, E> getLayoutFactory();
+
+  /**
    * Sets the layout factory that is responsible for creating a graph layout.
    *
    * @param layoutFactory graph layout factory

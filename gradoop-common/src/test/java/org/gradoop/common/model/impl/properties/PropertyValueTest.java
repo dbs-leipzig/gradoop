@@ -506,7 +506,7 @@ public class PropertyValueTest {
   @Test
   public void testCompareTo() {
     // null
-    assertEquals(create(null).compareTo(create(null)), 0);
+    validateCompareTo(create(null), create(null), create(12));
     // boolean
     validateCompareTo(create(false), create(false), create(true));
     // short

@@ -528,12 +528,12 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "(e)-[e_d]->(d)" +
       "]");
     GraphCollection sourceGraph = loader.getGraphCollectionByVariables("source");
-    LogicalGraph searchGraph = sourceGraph.reduce(new ReduceCombination());
+    LogicalGraph searchGraph = sourceGraph.reduce(new ReduceCombination<>());
     GraphCollection patternGraph = sourceGraph
       .apply(new ApplySubgraph<>(null, edge ->
         edge.getPropertyValue("difference").getInt() == 0,
         Subgraph.Strategy.EDGE_INDUCED))
-      .apply(new ApplyTransformation((gh, plain) -> {
+      .apply(new ApplyTransformation<>((gh, plain) -> {
         gh.setLabel("Combined");
         return gh;
       },

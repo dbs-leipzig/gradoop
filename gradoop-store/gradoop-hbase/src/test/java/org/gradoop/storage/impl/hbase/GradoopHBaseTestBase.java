@@ -22,8 +22,9 @@ import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.hbase.config.GradoopHBaseConfig;
+import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
+import org.gradoop.storage.hbase.impl.factory.HBaseEPGMStoreFactory;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -104,7 +105,7 @@ public class GradoopHBaseTestBase {
    *
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore() {
+  public static HBaseEPGMStore createEmptyEPGMStore() throws IOException {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config);
@@ -118,7 +119,7 @@ public class GradoopHBaseTestBase {
    * @param prefix the table prefix
    * @return empty HBase graph store
    */
-  public static HBaseEPGMStore createEmptyEPGMStore(String prefix) {
+  public static HBaseEPGMStore createEmptyEPGMStore(String prefix) throws IOException {
     Configuration config = utility.getConfiguration();
 
     HBaseEPGMStoreFactory.deleteEPGMStore(config, prefix);
@@ -135,7 +136,7 @@ public class GradoopHBaseTestBase {
    *
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore() {
+  public static HBaseEPGMStore openEPGMStore() throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
       GradoopHBaseConfig.getDefaultConfig()
@@ -149,7 +150,7 @@ public class GradoopHBaseTestBase {
    * @param prefix the table prefix
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(String prefix) {
+  public static HBaseEPGMStore openEPGMStore(String prefix) throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(
       utility.getConfiguration(),
       GradoopHBaseConfig.getDefaultConfig(),
@@ -165,7 +166,8 @@ public class GradoopHBaseTestBase {
    * @param gradoopHBaseConfig the gradoop HBase config to use
    * @return EPGMStore with vertices and edges
    */
-  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig) {
+  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig)
+    throws IOException {
     return HBaseEPGMStoreFactory.createOrOpenEPGMStore(utility.getConfiguration(),
       gradoopHBaseConfig, prefix);
   }

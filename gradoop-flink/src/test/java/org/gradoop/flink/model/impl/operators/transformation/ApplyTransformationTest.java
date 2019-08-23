@@ -30,7 +30,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
-    new ApplyTransformation(null, null, null);
+    new ApplyTransformation<>(null, null, null);
   }
 
   @Test
@@ -52,7 +52,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
       new LocalCollectionOutputFormat<>(expectedEdgeIds));
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(
+      .apply(new ApplyTransformation<>(
         TransformationTest::transformGraphHead,
         TransformationTest::transformVertex,
         TransformationTest::transformEdge));
@@ -92,7 +92,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
       .getGraphCollectionByVariables("g01", "g11");
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(
+      .apply(new ApplyTransformation<>(
         TransformationTest::transformGraphHead,
         TransformationTest::transformVertex,
         TransformationTest::transformEdge));
@@ -112,7 +112,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
       loader.getGraphCollectionByVariables("g02", "g12");
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(TransformationTest::transformGraphHead, null, null));
+      .apply(new ApplyTransformation<>(TransformationTest::transformGraphHead, null, null));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
@@ -129,7 +129,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
       .getGraphCollectionByVariables("g03", "g13");
 
     GraphCollection outputCollection = inputCollection
-      .apply(new ApplyTransformation(null, TransformationTest::transformVertex, null));
+      .apply(new ApplyTransformation<>(null, TransformationTest::transformVertex, null));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
@@ -146,7 +146,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
       .getGraphCollectionByVariables("g04", "g14");
 
     GraphCollection outputCollection = inputCollection.apply(
-        new ApplyTransformation(null, null, TransformationTest::transformEdge));
+        new ApplyTransformation<>(null, null, TransformationTest::transformEdge));
 
     collectAndAssertTrue(
       outputCollection.equalsByGraphData(expectedCollection));
