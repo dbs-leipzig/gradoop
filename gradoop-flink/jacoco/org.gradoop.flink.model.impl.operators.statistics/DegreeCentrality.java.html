@@ -45,11 +45,6 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 <span class="fc" id="L45">      .sum(0)</span>
 <span class="fc" id="L46">      .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());</span>
   }
-
-  @Override
-  public String getName() {
-<span class="nc" id="L51">    return DegreeCentrality.class.getName();</span>
-  }
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

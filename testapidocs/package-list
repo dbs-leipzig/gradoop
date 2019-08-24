@@ -22,10 +22,8 @@ org.gradoop.flink.algorithms.gelly.shortestpaths
 org.gradoop.flink.algorithms.gelly.trianglecounting
 org.gradoop.flink.algorithms.gelly.vertexdegrees
 org.gradoop.flink.io.impl.csv
-org.gradoop.flink.io.impl.csv.conversion
 org.gradoop.flink.io.impl.csv.functions
 org.gradoop.flink.io.impl.csv.indexed
-org.gradoop.flink.io.impl.deprecated.json
 org.gradoop.flink.io.impl.dot
 org.gradoop.flink.io.impl.dot.functions
 org.gradoop.flink.io.impl.edgelist

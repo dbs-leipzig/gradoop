@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 192,
+      <title>File: 187,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -760,20 +760,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.deprecated.json.JSONDataSourceTest.java">org/gradoop/flink/io/impl/deprecated/json/JSONDataSourceTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.CartesianProductTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/join/CartesianProductTest.java</a>
                 </td>
                 <td>
@@ -817,34 +803,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectVerticesTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectVerticesTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.deprecated.json.JSONDataSinkTest.java">org/gradoop/flink/io/impl/deprecated/json/JSONDataSinkTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.csv.conversion.LogicalGraphCSVToCSVTest.java">org/gradoop/flink/io/impl/csv/conversion/LogicalGraphCSVToCSVTest.java</a>
                 </td>
                 <td>
                   0
@@ -1544,20 +1502,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.deprecated.json.JSONIOTest.java">org/gradoop/flink/io/impl/deprecated/json/JSONIOTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.functions.filters.CombinableFilterTest.java">org/gradoop/flink/model/impl/functions/filters/CombinableFilterTest.java</a>
                 </td>
                 <td>
@@ -1587,20 +1531,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.labelpropagation.GradoopLabelPropagationTest.java">org/gradoop/flink/algorithms/gelly/labelpropagation/GradoopLabelPropagationTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.csv.conversion.LogicalGraphIndexedCSVToCSVTest.java">org/gradoop/flink/io/impl/csv/conversion/LogicalGraphIndexedCSVToCSVTest.java</a>
                 </td>
                 <td>
                   0

@@ -16,8 +16,10 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -25,6 +27,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  *
  * @param &lt;V&gt; the vertex type
  */
+@FunctionAnnotation.ForwardedFields(&quot;*-&gt;properties&quot;)
 public class PropertiesToVertex&lt;V extends Vertex&gt; implements MapFunction&lt;Properties, V&gt; {
   /**
    * Reduce object instantiations.
@@ -36,14 +39,15 @@ public class PropertiesToVertex&lt;V extends Vertex&gt; implements MapFunction&l
    *
    * @param vertexFactory the factory that is responsible for creating a vertex
    */
-<span class="fc" id="L39">  public PropertiesToVertex(VertexFactory&lt;V&gt; vertexFactory) {</span>
-<span class="fc" id="L40">    this.vertex = vertexFactory.createVertex();</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L42">  public PropertiesToVertex(VertexFactory&lt;V&gt; vertexFactory) {</span>
+<span class="fc" id="L43">    this.vertex = vertexFactory.createVertex();</span>
+<span class="fc" id="L44">  }</span>
 
   @Override
   public V map(final Properties value) {
-<span class="fc" id="L45">    vertex.setProperties(value);</span>
-<span class="fc" id="L46">    return vertex;</span>
+<span class="fc" id="L48">    vertex.setProperties(value);</span>
+<span class="fc" id="L49">    vertex.setId(GradoopId.get());</span>
+<span class="fc" id="L50">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
