@@ -63,7 +63,7 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = getLoaderFromFile(gdlPath)
       .getGraphCollectionByVariables("expected1", "expected2");
-    LogicalGraph expected = graphCollection.reduce(new ReduceCombination());
+    LogicalGraph expected = graphCollection.reduce(new ReduceCombination<>());
 
     collectAndAssertTrue(input.equalsByElementData(expected));
   }

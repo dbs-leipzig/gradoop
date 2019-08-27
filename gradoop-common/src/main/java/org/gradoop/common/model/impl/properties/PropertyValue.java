@@ -675,6 +675,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));
   }
 
+  /**
+   * Compares this to another {@link PropertyValue}. See {@link PropertyValueStrategyFactory#compare}.
+   *
+   * @see PropertyValueStrategyFactory#compare
+   * @param other the property value to be compared.
+   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+   * or greater than the specified object.
+   */
   @Override
   public int compareTo(PropertyValue other) {
     return PropertyValueStrategyFactory.compare(value, other.value);

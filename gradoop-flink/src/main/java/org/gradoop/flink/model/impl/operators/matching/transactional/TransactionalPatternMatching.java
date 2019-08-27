@@ -18,13 +18,14 @@ package org.gradoop.flink.model.impl.operators.matching.transactional;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.tuple.Project4To0And1;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
@@ -49,8 +50,21 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.function.Ad
 
 /**
  * Operator to match a given pattern on a graph collection
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class TransactionalPatternMatching implements UnaryCollectionToCollectionOperator {
+public class TransactionalPatternMatching<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
+
   /**
    * Query Pattern
    */
@@ -88,7 +102,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GC execute(GC collection) {
 
     //--------------------------------------------------------------------------
     // generate graph-id set witch will be used for generating mappings
@@ -141,8 +155,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
    * @param graphs graphs with candidates of their elements
    * @return input graph collection with new boolean property
    */
-  private GraphCollection hasEmbeddings(GraphCollection collection,
-    DataSet<GraphWithCandidates> graphs) {
+  private GC hasEmbeddings(GC collection, DataSet<GraphWithCandidates> graphs) {
     //--------------------------------------------------------------------------
     // run matching algorithm
     //--------------------------------------------------------------------------
@@ -151,10 +164,10 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // join matches to graph heads
     //--------------------------------------------------------------------------
-    DataSet<EPGMGraphHead> newHeads = collection.getGraphHeads()
+    DataSet<G> newHeads = collection.getGraphHeads()
       .coGroup(matches)
       .where(new Id<>()).equalTo(0)
-      .with(new AddMatchesToProperties());
+      .with(new AddMatchesToProperties<>());
 
     //--------------------------------------------------------------------------
     // return updated graph collection
@@ -171,8 +184,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
    * @param graphs graphs with candidates of their elements
    * @return collection of found embeddings
    */
-  private GraphCollection findEmbeddings(GraphCollection collection,
-    DataSet<GraphWithCandidates> graphs) {
+  private GC findEmbeddings(GC collection, DataSet<GraphWithCandidates> graphs) {
 
     //--------------------------------------------------------------------------
     // run the matching algorithm
@@ -183,9 +195,9 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // create new graph heads
     //--------------------------------------------------------------------------
-    DataSet<EPGMGraphHead> newHeads = embeddings
+    DataSet<G> newHeads = embeddings
       .map(new Project4To0And1<>())
-      .map(new InitGraphHeadWithLineage(collection.getFactory().getGraphHeadFactory()));
+      .map(new InitGraphHeadWithLineage<>(collection.getFactory().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
     // update vertex graphs
@@ -195,7 +207,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());
 
-    DataSet<EPGMVertex> newVertices = verticesWithGraphs
+    DataSet<V> newVertices = verticesWithGraphs
       .join(collection.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new AddGraphsToElements<>());
@@ -208,7 +220,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());
 
-    DataSet<EPGMEdge> newEdges = edgesWithGraphs
+    DataSet<E> newEdges = edgesWithGraphs
       .join(collection.getEdges())
       .where(0).equalTo(new Id<>())
       .with(new AddGraphsToElements<>());
@@ -216,7 +228,6 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // return the embeddings
     //--------------------------------------------------------------------------
-    return collection.getFactory()
-      .fromDataSets(newHeads, newVertices, newEdges);
+    return collection.getFactory().fromDataSets(newHeads, newVertices, newEdges);
   }
 }

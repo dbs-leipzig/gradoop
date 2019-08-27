@@ -30,6 +30,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.iterator.ClosableIterator;
+import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

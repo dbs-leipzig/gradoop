@@ -223,9 +223,4 @@ public class KRandomJumpGellyVCI
     return currentGraph.getFactory().fromDataSets(
       currentGraph.getGraphHead(), visitedVertices, visitedEdges);
   }
-
-  @Override
-  public String getName() {
-    return KRandomJumpGellyVCI.class.getName();
-  }
 }

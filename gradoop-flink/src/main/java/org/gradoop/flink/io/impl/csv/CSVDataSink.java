@@ -40,7 +40,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
   /**
    * Path to meta data file that is used to write the output.
    */
-  private final String metaDataPath;
+  protected final String metaDataPath;
 
   /**
    * Creates a new CSV data sink. Computes the meta data based on the given graph.
@@ -125,7 +125,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
    *
    * @return true, iff reuse is possible
    */
-  private boolean reuseMetadata() {
+  protected boolean reuseMetadata() {
     return this.metaDataPath != null && !this.metaDataPath.isEmpty();
   }
 }

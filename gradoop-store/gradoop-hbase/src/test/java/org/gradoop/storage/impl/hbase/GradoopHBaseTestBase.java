@@ -22,8 +22,9 @@ import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.hbase.config.GradoopHBaseConfig;
+import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
+import org.gradoop.storage.hbase.impl.factory.HBaseEPGMStoreFactory;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
