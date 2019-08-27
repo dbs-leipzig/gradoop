@@ -137,8 +137,8 @@ public abstract class GradoopFlinkTestBase extends TestBaseUtils {
 
     return new MiniClusterWithClientResource(
       new MiniClusterResourceConfiguration.Builder()
-        .setNumberTaskManagers(1)
         .setNumberSlotsPerTaskManager(DEFAULT_PARALLELISM)
+        .setNumberTaskManagers(1)
         .setConfiguration(config).build());
   }
 

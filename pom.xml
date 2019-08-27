@@ -163,7 +163,7 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.flink.version>1.8.1</dep.flink.version>
+        <dep.flink.version>1.9.0</dep.flink.version>
         <dep.flink-shaded-hadoop2.version>2.6.5-1.8.1</dep.flink-shaded-hadoop2.version>
         <dep.gdl.version>0.3</dep.gdl.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
@@ -666,6 +666,12 @@
                 <artifactId>flink-clients_2.11</artifactId>
                 <version>${dep.flink.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime_2.11</artifactId>
+                <version>${dep.flink.version}</version>
             </dependency>
 
             <dependency>

@@ -92,17 +92,17 @@ Latest nightly build (additional repository is required):
 </dependency>
 
 ```
-In any case you also need Apache Flink (version 1.8.1 for the current snapshot). The stable Gradoop release 0.4.5 needs Flink 1.7.2:
+In any case you also need Apache Flink (version 1.9.0 for the current snapshot). The stable Gradoop release 0.5.0 needs Flink 1.7.2:
 ```xml
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-java</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
 </dependency>
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-clients_2.11</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
