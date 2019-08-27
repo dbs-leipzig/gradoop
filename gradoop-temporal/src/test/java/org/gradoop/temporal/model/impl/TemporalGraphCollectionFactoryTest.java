@@ -18,9 +18,6 @@ package org.gradoop.temporal.model.impl;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -228,9 +225,9 @@ public class TemporalGraphCollectionFactoryTest extends TemporalGradoopTestBase 
     graphHead.setProperty(from, PropertyValue.create(5L));
     graphHead.setProperty(to, PropertyValue.create(6L));
 
-    List<GraphHead> heads = Collections.singletonList(graphHead);
-    List<Vertex> vertices = Collections.singletonList(vertex);
-    List<Edge> edges = Collections.singletonList(edge);
+    List<EPGMGraphHead> heads = Collections.singletonList(graphHead);
+    List<EPGMVertex> vertices = Collections.singletonList(vertex);
+    List<EPGMEdge> edges = Collections.singletonList(edge);
 
     TemporalGraphCollection temporalCollection = getConfig().getTemporalGraphCollectionFactory()
       .fromNonTemporalDataSets(getExecutionEnvironment().fromCollection(heads),

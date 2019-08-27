@@ -196,14 +196,20 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
    * @param edges edge DataSet
    * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
    * @return the logical graph represented as temporal graph with defined valid times
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
    */
-  public TemporalGraphCollection fromNonTemporalDataSets(
-    DataSet<GraphHead> graphHead,
-    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
-    DataSet<Vertex> vertices,
-    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
-    DataSet<Edge> edges,
-    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+  public <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> TemporalGraphCollection fromNonTemporalDataSets(
+    DataSet<G> graphHead,
+    TimeIntervalExtractor<G> graphHeadTimeIntervalExtractor,
+    DataSet<V> vertices,
+    TimeIntervalExtractor<V> vertexTimeIntervalExtractor,
+    DataSet<E> edges,
+    TimeIntervalExtractor<E> edgeTimeIntervalExtractor) {
 
     return new TemporalGraphCollection(this.layoutFactory.fromDataSets(
       graphHead.map(new GraphHeadToTemporalGraphHead<>(getGraphHeadFactory(),
