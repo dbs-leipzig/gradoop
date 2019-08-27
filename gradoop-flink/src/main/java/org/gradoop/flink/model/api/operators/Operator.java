@@ -25,6 +25,7 @@ public interface Operator {
   /**
    * Modifies Flink operator names to include the Gradoop operator and its call location.
    *
+   * @param name name to be formatted
    * @return operator name formatted with brackets
    */
   default String formatName(String name) {
