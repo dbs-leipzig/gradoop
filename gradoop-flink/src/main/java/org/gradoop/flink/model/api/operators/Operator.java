@@ -15,18 +15,20 @@
  */
 package org.gradoop.flink.model.api.operators;
 
+import org.apache.flink.api.java.Utils;
+
 /**
  * Base interface for all graph operators.
  */
 public interface Operator {
 
   /**
-   * Returns the operators name formatted for use in Flink operator names.
+   * Modifies Flink operator names to include the Gradoop operator and its call location.
    *
    * @return operator name formatted with brackets
    */
-  default String getFormattedName() {
-    return String.format("[%s]", getName());
+  default String formatName(String name) {
+    return String.format("[%s] %s at %s", getName(), name, Utils.getCallLocationName());
   }
 
   /**

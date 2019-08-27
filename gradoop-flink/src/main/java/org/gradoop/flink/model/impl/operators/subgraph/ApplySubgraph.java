@@ -118,7 +118,7 @@ public class ApplySubgraph<
   private GC vertexInducedSubgraph(GC collection) {
     DataSet<V> filteredVertices = collection.getVertices()
       .filter(vertexFilterFunction)
-      .name(getFormattedName() + " Filter vertices by: " + vertexFilterFunction);
+      .name(formatName("Filter vertices"));
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), filteredVertices, collection.getEdges())
@@ -135,20 +135,21 @@ public class ApplySubgraph<
   private GC edgeInducedSubgraph(GC collection) {
     DataSet<E> filteredEdges = collection.getEdges()
       .filter(edgeFilterFunction)
-      .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction);
+      .name(formatName("Filter edges"));
 
     DataSet<V> inducedVertices = filteredEdges
       .join(collection.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSideWithLeftGraphs<>())
-      .name(getFormattedName() + " Join (sourceId) with vertices per graph and return vertices.")
+      .name(formatName("Join (sourceId) with vertices per graph and return vertices"))
       .union(filteredEdges
         .join(collection.getVertices())
         .where(new TargetId<>()).equalTo(new Id<>())
         .with(new RightSideWithLeftGraphs<>())
-        .name(getFormattedName() + " Join (targetId) with vertices per graph and return vertices."))
+        .name(formatName("Join (targetId) with vertices per graph and return vertices")))
+      .name(formatName("Union induced vertices"))
       .distinct(new Id<>())
-      .name(getFormattedName() + " Distinct by GradoopId.");
+      .name(formatName("Distinct by GradoopId"));
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);
@@ -164,17 +165,17 @@ public class ApplySubgraph<
   private GC edgeInducedSubgraphProjectFirst(GC collection) {
     DataSet<E> filteredEdges = collection.getEdges()
       .filter(edgeFilterFunction)
-      .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction);
+      .name(formatName("Filter edges"));
 
     DataSet<V> inducedVertices = filteredEdges
       .flatMap(new EdgeToSourceAndTargetIdWithGraphIds<>())
-      .name(getFormattedName() + " Map edges to source and target ids per graph.")
+      .name(formatName("Map edges to source and target ids per graph"))
       .distinct(0)
-      .name(getFormattedName() + " Distinct by GradoopId.")
+      .name(formatName("Distinct by GradoopId"))
       .join(collection.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new RightSideWithLeftGraphs2To1<>())
-      .name(getFormattedName() + " Join with vertices per graph and return vertices.");
+      .name(formatName("Join with vertices per graph and return vertices"));
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);
@@ -193,11 +194,11 @@ public class ApplySubgraph<
   private GC subgraph(GC collection) {
     DataSet<V> newVertices = collection.getVertices()
       .filter(vertexFilterFunction)
-      .name(getFormattedName() + " Filter vertices by: " + vertexFilterFunction);
+      .name(formatName("Filter vertices"));
 
     DataSet<E> newEdges = collection.getEdges()
       .filter(edgeFilterFunction)
-      .name(getFormattedName() + " Filter edges by: " + edgeFilterFunction);
+      .name(formatName("Filter edges"));
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), newVertices, newEdges);
