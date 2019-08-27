@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.io.impl.csv;
 
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.io.api.TemporalDataSource;
 import org.gradoop.temporal.model.impl.TemporalGraph;
@@ -47,7 +48,11 @@ public class TemporalCSVSourceAndSinkTest extends TemporalGradoopTestBase {
    */
   @Before
   public void setUp() throws Exception {
-    testGraph = toTemporalGraph(getSocialNetworkLoader().getLogicalGraph());
+    testGraph = toTemporalGraph(getSocialNetworkLoader().getLogicalGraph())
+      .transformGraphHead((current, trans) -> {
+        current.setProperty("testGraphHeadProperty", PropertyValue.create(1L));
+        return current;
+      });
   }
 
   /**
