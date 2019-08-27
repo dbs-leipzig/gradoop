@@ -17,9 +17,14 @@ package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -34,6 +39,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
@@ -198,6 +204,60 @@ public class TemporalGraphCollectionFactoryTest extends TemporalGradoopTestBase 
     loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
     loadedVertices.forEach(this::checkDefaultTemporalElement);
     loadedEdges.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the {@code fromNonTemporalDataSets} method using time interval extractor functions.
+   *
+   * @throws Exception when the execution in Flink fails
+   */
+  @Test
+  public void testFromNonTemporalDataSetsWithExtractors() throws Exception {
+    final String from = "f";
+    final String to = "t";
+    EPGMVertex vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
+    EPGMEdge edge = getConfig().getLogicalGraphFactory().getEdgeFactory()
+      .createEdge(vertex.getId(), vertex.getId());
+    EPGMGraphHead graphHead = getConfig().getLogicalGraphFactory().getGraphHeadFactory().createGraphHead();
+    vertex.addGraphId(graphHead.getId());
+    edge.addGraphId(graphHead.getId());
+    vertex.setProperty(from, PropertyValue.create(1L));
+    vertex.setProperty(to, PropertyValue.create(2L));
+    edge.setProperty(from, PropertyValue.create(3L));
+    edge.setProperty(to, PropertyValue.create(4L));
+    graphHead.setProperty(from, PropertyValue.create(5L));
+    graphHead.setProperty(to, PropertyValue.create(6L));
+
+    List<GraphHead> heads = Collections.singletonList(graphHead);
+    List<Vertex> vertices = Collections.singletonList(vertex);
+    List<Edge> edges = Collections.singletonList(edge);
+
+    TemporalGraphCollection temporalCollection = getConfig().getTemporalGraphCollectionFactory()
+      .fromNonTemporalDataSets(getExecutionEnvironment().fromCollection(heads),
+        e -> Tuple2.of(e.getPropertyValue(from).getLong(), e.getPropertyValue(to).getLong()),
+        getExecutionEnvironment().fromCollection(vertices),
+        e -> Tuple2.of(e.getPropertyValue(from).getLong(), e.getPropertyValue(to).getLong()),
+        getExecutionEnvironment().fromCollection(edges),
+        e -> Tuple2.of(e.getPropertyValue(from).getLong(), e.getPropertyValue(to).getLong()));
+
+    List<TemporalGraphHead> temporalHeads = new ArrayList<>();
+    List<TemporalVertex> temporalVertices = new ArrayList<>();
+    List<TemporalEdge> temporalEdges = new ArrayList<>();
+    temporalCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(temporalHeads));
+    temporalCollection.getVertices().output(new LocalCollectionOutputFormat<>(temporalVertices));
+    temporalCollection.getEdges().output(new LocalCollectionOutputFormat<>(temporalEdges));
+
+    getExecutionEnvironment().execute();
+
+    assertEquals(1, temporalHeads.size());
+    assertEquals(1, temporalVertices.size());
+    assertEquals(1, temporalEdges.size());
+    validateElementCollections(heads, temporalHeads);
+    validateElementCollections(vertices, temporalVertices);
+    validateElementCollections(edges, temporalEdges);
+    assertEquals(Tuple2.of(1L, 2L), temporalVertices.get(0).getValidTime());
+    assertEquals(Tuple2.of(3L, 4L), temporalEdges.get(0).getValidTime());
+    assertEquals(Tuple2.of(5L, 6L), temporalHeads.get(0).getValidTime());
   }
 
   /**
