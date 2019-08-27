@@ -19,6 +19,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
@@ -256,18 +257,20 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
       .getEdgesByLabel("livesIn")
       .output(new LocalCollectionOutputFormat<>(createdEdges));
 
+    // get graph heads
+    List<EPGMGraphHead> graphHeads = new ArrayList<>();
+    socialGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(graphHeads));
+
     getConfig().getExecutionEnvironment().execute();
 
-    // get only graph id from graph head
-    GradoopId socialGraphId = socialGraph.getGraphHead().collect().get(0).getId();
-
     // check if the id of the original graph is assigned to the newly created elements
-    for (EPGMVertex vertex: createdVertices) {
-      Assert.assertTrue(vertex.getGraphIds().contains(socialGraphId));
-    }
-    for (EPGMEdge edge: createdEdges) {
-      Assert.assertTrue(edge.getGraphIds().contains(socialGraphId));
+    for (EPGMGraphHead graphHead: graphHeads) {
+      for (EPGMVertex vertex: createdVertices) {
+        Assert.assertTrue(vertex.getGraphIds().contains(graphHead.getId()));
+      }
+      for (EPGMEdge edge: createdEdges) {
+        Assert.assertTrue(edge.getGraphIds().contains(graphHead.getId()));
+      }
     }
   }
-
 }
