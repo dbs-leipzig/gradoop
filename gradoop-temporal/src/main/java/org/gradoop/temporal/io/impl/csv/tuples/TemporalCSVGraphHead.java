@@ -62,11 +62,6 @@ public class TemporalCSVGraphHead extends Tuple4<String, String, String, String>
   }
 
   @Override
-  public String getTemporalData() {
-    return f3;
-  }
-
-  @Override
   public void setTemporalData(String temporalData) {
     f3 = temporalData;
   }

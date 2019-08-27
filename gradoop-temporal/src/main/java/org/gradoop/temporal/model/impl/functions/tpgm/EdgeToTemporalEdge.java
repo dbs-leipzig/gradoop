@@ -30,7 +30,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
  * @param <E> The (non-temporal) edge type.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;label;properties;graphIds")
-public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<E, TemporalEdge> {
+public class EdgeToTemporalEdge<E extends Edge> implements MapFunction<E, TemporalEdge> {
   /**
    * The user defined timestamp extractor.
    */
@@ -46,7 +46,7 @@ public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<
    *
    * @param elementFactory factory that is responsible for creating a temporal edge instance
    */
-  public TemporalEdgeFromNonTemporal(EdgeFactory<TemporalEdge> elementFactory) {
+  public EdgeToTemporalEdge(EdgeFactory<TemporalEdge> elementFactory) {
     this.reuse = elementFactory.createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
   }
 
@@ -57,22 +57,13 @@ public class TemporalEdgeFromNonTemporal<E extends Edge> implements MapFunction<
    * @param elementFactory factory that is responsible for creating a temporal edge instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalEdgeFromNonTemporal(
+  public EdgeToTemporalEdge(
     EdgeFactory<TemporalEdge> elementFactory,
     TimeIntervalExtractor<E> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
-  /**
-   * Creates a temporal edge instance from the non-temporal. Id's, label and properties will
-   * be kept. If a timeIntervalExtractor is given, the valid time interval will be set with the
-   * extracted information.
-   *
-   * @param value the non-temporal element
-   * @return the temporal element
-   * @throws Exception on failure
-   */
   @Override
   public TemporalEdge map(E value) throws Exception {
     reuse.setId(value.getId());

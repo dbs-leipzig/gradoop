@@ -21,12 +21,6 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
  * Interface representing a temporal CSVElement in a CSV file.
  */
 public interface TemporalCSVElement extends CSVElement {
-  /**
-   * Get the temporal data as String representation.
-   *
-   * @return a String representation of the elements temporal data
-   */
-  String getTemporalData();
 
   /**
    * Set the String representation of the temporal element.

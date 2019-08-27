@@ -120,10 +120,6 @@ public class TemporalCSVEdge extends Tuple7<String, String, String, String, Stri
   }
 
 
-  public String getTemporalData() {
-    return f6;
-  }
-
   @Override
   public void setTemporalData(String temporalData) {
     f6 = temporalData;

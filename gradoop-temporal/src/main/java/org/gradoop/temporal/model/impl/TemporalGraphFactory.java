@@ -27,9 +27,9 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.layout.TemporalGraphLayoutFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -153,9 +153,9 @@ public class TemporalGraphFactory implements
     DataSet<? extends Vertex> vertices,
     DataSet<? extends Edge> edges) {
     return new TemporalGraph(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory())),
-      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory())),
-      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory()))), config);
+      graphHead.map(new GraphHeadToTemporalGraphHead<>(getGraphHeadFactory())),
+      vertices.map(new VertexToTemporalVertex<>(getVertexFactory())),
+      edges.map(new EdgeToTemporalEdge<>(getEdgeFactory()))), config);
   }
 
   /**
@@ -185,11 +185,11 @@ public class TemporalGraphFactory implements
     TimeIntervalExtractor<E> edgeTimeIntervalExtractor) {
 
     return new TemporalGraph(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory(),
+      graphHead.map(new GraphHeadToTemporalGraphHead<>(getGraphHeadFactory(),
         graphHeadTimeIntervalExtractor)),
-      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory(),
+      vertices.map(new VertexToTemporalVertex<>(getVertexFactory(),
         vertexTimeIntervalExtractor)),
-      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory(),
+      edges.map(new EdgeToTemporalEdge<>(getEdgeFactory(),
         edgeTimeIntervalExtractor))), config);
   }
 

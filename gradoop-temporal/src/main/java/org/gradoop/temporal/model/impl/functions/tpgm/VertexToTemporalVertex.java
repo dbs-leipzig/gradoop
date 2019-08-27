@@ -29,7 +29,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
  * @param <V> The (non-temporal) vertex type.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties;graphIds")
-public class TemporalVertexFromNonTemporal<V extends Vertex> implements MapFunction<V, TemporalVertex> {
+public class VertexToTemporalVertex<V extends Vertex> implements MapFunction<V, TemporalVertex> {
   /**
    * The user defined interval extractor, might be {@code null}.
    */
@@ -45,7 +45,7 @@ public class TemporalVertexFromNonTemporal<V extends Vertex> implements MapFunct
    *
    * @param elementFactory factory that is responsible for creating a temporal vertex instance
    */
-  public TemporalVertexFromNonTemporal(VertexFactory<TemporalVertex> elementFactory) {
+  public VertexToTemporalVertex(VertexFactory<TemporalVertex> elementFactory) {
     this.reuse = elementFactory.createVertex();
   }
 
@@ -56,22 +56,13 @@ public class TemporalVertexFromNonTemporal<V extends Vertex> implements MapFunct
    * @param elementFactory factory that is responsible for creating a temporal vertex instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalVertexFromNonTemporal(
+  public VertexToTemporalVertex(
     VertexFactory<TemporalVertex> elementFactory,
     TimeIntervalExtractor<V> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
-  /**
-   * Creates a temporal vertex instance from the non-temporal. Id's, label and properties will
-   * be kept. If a timeIntervalExtractor is given, the valid time interval will be set with the
-   * extracted information.
-   *
-   * @param value the non-temporal element
-   * @return the temporal element
-   * @throws Exception on failure
-   */
   @Override
   public TemporalVertex map(V value) throws Exception {
     reuse.setId(value.getId());

@@ -29,7 +29,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
  * @param <G> The (non-temporal) graph-head type.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
-public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
+public class GraphHeadToTemporalGraphHead<G extends GraphHead>
   implements MapFunction<G, TemporalGraphHead> {
   /**
    * The user defined interval extractor, might be {@code null}.
@@ -46,7 +46,7 @@ public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
    *
    * @param elementFactory factory that is responsible for creating a temporal graph head instance
    */
-  public TemporalGraphHeadFromNonTemporal(GraphHeadFactory<TemporalGraphHead> elementFactory) {
+  public GraphHeadToTemporalGraphHead(GraphHeadFactory<TemporalGraphHead> elementFactory) {
     this.reuse = elementFactory.createGraphHead();
   }
 
@@ -57,22 +57,13 @@ public class TemporalGraphHeadFromNonTemporal<G extends GraphHead>
    * @param elementFactory factory that is responsible for creating a temporal graph head instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalGraphHeadFromNonTemporal(
+  public GraphHeadToTemporalGraphHead(
     GraphHeadFactory<TemporalGraphHead> elementFactory,
     TimeIntervalExtractor<G> timeIntervalExtractor) {
     this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
-  /**
-   * Creates a temporal graph head instance from the non-temporal. Id's, label and properties will
-   * be kept. If a timeIntervalExtractor is given, the valid time interval will be set with the
-   * extracted information.
-   *
-   * @param value the non-temporal element
-   * @return the temporal element
-   * @throws Exception on failure
-   */
   @Override
   public TemporalGraphHead map(G value) throws Exception {
     reuse.setId(value.getId());
