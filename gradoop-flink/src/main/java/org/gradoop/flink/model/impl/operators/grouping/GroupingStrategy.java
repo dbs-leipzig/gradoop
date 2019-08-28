@@ -20,10 +20,14 @@ package org.gradoop.flink.model.impl.operators.grouping;
  */
 public enum GroupingStrategy {
   /**
+   * Grouping group reduce strategy.
+   *
    * @see GroupingGroupReduce
    */
   GROUP_REDUCE,
   /**
+   * Grouping group combine strategy.
+   *
    * @see GroupingGroupCombine
    */
   GROUP_COMBINE

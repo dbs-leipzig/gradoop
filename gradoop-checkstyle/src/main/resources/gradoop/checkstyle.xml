@@ -126,6 +126,7 @@
         <!-- Javadoc must be formatted correctly -->
         <module name="JavadocStyle">
             <property name="checkFirstSentence" value="false"/>
+            <property name="checkEmptyJavadoc" value="true"/>
         </module>
         <!-- Must have class / interface header comments -->
         <module name="JavadocType"/>

@@ -26,6 +26,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 /**
+ * Test class for {@link GraphStatisticsHDFSReader}.
+ *
  * @Ignore annotation can be removed as soon issue #661 is fixed
  * @link https://github.com/dbs-leipzig/gradoop/issues/661
  */
