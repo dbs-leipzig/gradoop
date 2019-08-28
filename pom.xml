@@ -29,6 +29,7 @@
     <modules>
         <module>gradoop-common</module>
         <module>gradoop-flink</module>
+        <module>gradoop-temporal</module>
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
         <module>gradoop-store</module>
