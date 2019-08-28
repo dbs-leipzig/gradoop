@@ -23,8 +23,7 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.CallableGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -57,7 +56,7 @@ public interface BaseGraphOperators<
   V extends Vertex,
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends CallableGraph<LG, GC> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -372,25 +371,4 @@ public interface BaseGraphOperators<
   default LG exclude(LG otherGraph) {
     return callForGraph(new Exclusion<>(), otherGraph);
   }
-
-  //----------------------------------------------------------------------------
-  // Auxiliary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a base graph using the given unary graph operator.
-   *
-   * @param operator unary graph to graph operator
-   * @return result of given operator
-   */
-  LG callForGraph(UnaryBaseGraphToBaseGraphOperator<LG> operator);
-
-  /**
-   * Creates a base graph from that graph and the input graph using the given binary operator.
-   *
-   * @param operator   binary graph to graph operator
-   * @param otherGraph other graph
-   * @return result of given operator
-   */
-  LG callForGraph(BinaryBaseGraphToBaseGraphOperator<LG> operator, LG otherGraph);
 }

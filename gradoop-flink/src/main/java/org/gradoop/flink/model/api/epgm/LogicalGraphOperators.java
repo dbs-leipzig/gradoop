@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.operators.CallableGraph;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators {
+public interface LogicalGraphOperators extends CallableGraph<LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -265,15 +265,6 @@ public interface LogicalGraphOperators {
    * @return result of given operator
    */
   LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs);
-
-  /**
-   * Creates a graph collection from that graph using the given unary graph operator.
-   *
-   * @param operator unary graph to collection operator
-   * @return result of given operator
-   */
-  GraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> operator);
 
   /**
    * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.

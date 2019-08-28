@@ -15,13 +15,16 @@
  */
 package org.gradoop.temporal.model.api;
 
+import org.gradoop.flink.model.api.operators.CallableGraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraphCollection}.
  */
-public interface TemporalGraphCollectionOperators {
+public interface TemporalGraphCollectionOperators
+  extends CallableGraphCollection<TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Utilities

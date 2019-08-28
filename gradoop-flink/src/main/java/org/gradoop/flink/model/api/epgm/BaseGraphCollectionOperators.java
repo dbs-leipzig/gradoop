@@ -23,13 +23,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
-import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.api.operators.CallableGraphCollection;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
@@ -37,7 +31,6 @@ import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
 import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
-import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
@@ -45,7 +38,6 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.Transaction
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.DepthSearchMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
-import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
@@ -71,7 +63,7 @@ public interface BaseGraphCollectionOperators<
   V extends Vertex,
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends CallableGraphCollection<LG, GC> {
 
   //----------------------------------------------------------------------------
   // Base Graph / Graph Head Getters
@@ -242,7 +234,7 @@ public interface BaseGraphCollectionOperators<
    * @return 1-element dataset containing true, if equal by graph ids
    */
   default DataSet<Boolean> equalsByGraphIds(GC otherCollection) {
-    return callForCollection(new CollectionEqualityByGraphIds<>(), otherCollection);
+    return callForValue(new CollectionEqualityByGraphIds<>(), otherCollection);
   }
 
   /**
@@ -252,7 +244,7 @@ public interface BaseGraphCollectionOperators<
    * @return 1-element dataset containing true, if equal by element ids
    */
   default DataSet<Boolean> equalsByGraphElementIds(GC otherCollection) {
-    return callForCollection(new CollectionEquality<>(
+    return callForValue(new CollectionEquality<>(
       new GraphHeadToEmptyString<>(),
       new VertexToIdString<>(),
       new EdgeToIdString<>(), true), otherCollection);
@@ -270,7 +262,7 @@ public interface BaseGraphCollectionOperators<
    * are equal or {@code false} if not
    */
   default DataSet<Boolean> equalsByGraphElementData(GC otherCollection) {
-    return callForCollection(new CollectionEquality<>(
+    return callForValue(new CollectionEquality<>(
       new GraphHeadToEmptyString<>(),
       new VertexToDataString<>(),
       new EdgeToDataString<>(), true), otherCollection);
@@ -288,78 +280,10 @@ public interface BaseGraphCollectionOperators<
    * are equal or {@code false} if not
    */
   default DataSet<Boolean> equalsByGraphData(GC otherCollection) {
-    return callForCollection(new CollectionEquality<>(
+    return callForValue(new CollectionEquality<>(
       new GraphHeadToDataString<>(),
       new VertexToDataString<>(),
       new EdgeToDataString<>(), true), otherCollection);
-  }
-
-  //----------------------------------------------------------------------------
-  // Auxiliary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a graph collection using the given unary graph collection operator.
-   *
-   * @param operator unary graph collection to graph collection operator
-   * @return result of given operator
-   */
-  GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator);
-
-  /**
-   * Calls the given binary collection to value operator using that graph collection and the
-   * input graph collection.
-   *
-   * @param operator        binary collection to value operator
-   * @param otherCollection second input collection for operator
-   * @param <T> return type
-   * @return result of given operator
-   */
-  <T> T callForCollection(BinaryBaseGraphCollectionToValueOperator<GC, T> operator, GC otherCollection);
-
-  /**
-   * Calls the given binary collection to collection operator using that graph collection and the
-   * input graph collection.
-   *
-   * @param operator        binary collection to collection operator
-   * @param otherCollection second input collection for operator
-   * @return result of given operator
-   */
-  GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator,
-                       GC otherCollection);
-
-  /**
-   * Calls the given unary collection to graph operator for the collection.
-   *
-   * @param operator unary collection to graph operator
-   * @return result of given operator
-   */
-  LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator<GC, LG> operator);
-
-  /**
-   * Applies a given unary graph to graph operator (e.g., aggregate) on each
-   * base graph in the graph collection.
-   *
-   * @param operator applicable unary graph to graph operator
-   * @return collection with resulting logical graphs
-   */
-  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator<GC> operator) {
-    return callForCollection(operator);
-  }
-
-  /**
-   * Transforms a graph collection into a base graph by applying a
-   * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
-   *
-   * @param operator reducible binary graph to graph operator
-   * @return base graph returned by the operator
-   *
-   * @see Exclusion
-   * @see Overlap
-   * @see Combination
-   */
-  default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> operator) {
-    return callForGraph(operator);
   }
 
   //----------------------------------------------------------------------------
