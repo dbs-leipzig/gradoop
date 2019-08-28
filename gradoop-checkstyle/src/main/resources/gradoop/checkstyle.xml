@@ -130,7 +130,7 @@
         </module>
         <!-- Must have class / interface header comments -->
         <module name="JavadocType"/>
-        <!-- Require method javadocs, allow undeclared RTE, allow missing
+        <!-- Require method javadocs, allow missing
          javadoc on getters and setters  -->
         <module name="JavadocMethod">
             <property name="allowMissingPropertyJavadoc" value="true"/>
