@@ -208,7 +208,7 @@
                         <version>${plugin.maven-javadoc.version}</version>
                         <configuration>
                             <quiet>true</quiet>
-                            <doclint>all</doclint>
+                            <doclint>none</doclint>
                             <detectOfflineLinks>false</detectOfflineLinks>
                         </configuration>
                         <executions>
