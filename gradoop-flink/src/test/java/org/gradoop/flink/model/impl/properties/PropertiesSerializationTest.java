@@ -62,7 +62,7 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
     // Create a large String. (Fill that String with copies of any char.)
     char[] stringData = new char[PropertyValue.LARGE_PROPERTY_THRESHOLD + 1];
     Arrays.fill(stringData, 'A');
-    String largeString = new String(stringData);
+    String largeString = String.valueOf(stringData);
     PropertyValue largeValue = PropertyValue.create(largeString);
     // Make sure the String actually uses a "large" Property
     assertTrue("PropertyValue not large enough.",
@@ -75,7 +75,7 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
   public void testSmallPropertyValueString() throws Exception {
     char[] stringData = new char[PropertyValue.LARGE_PROPERTY_THRESHOLD - 1];
     Arrays.fill(stringData, 'A');
-    String smallString = new String(stringData);
+    String smallString = String.valueOf(stringData);
     PropertyValue smallValue = PropertyValue.create(smallString);
     // Make sure the String actually uses a "small" Property
     assertTrue("PropertyValue not large enough.",

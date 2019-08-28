@@ -35,10 +35,7 @@ public interface GraphElementHandler extends ElementHandler {
    * @return put with graph identifiers
    * @throws IOException on failure
    */
-  Put writeGraphIds(
-    final Put put,
-    final GraphElement graphElement
-  ) throws IOException;
+  Put writeGraphIds(Put put, GraphElement graphElement) throws IOException;
 
   /**
    * Reads the graph identifiers from the given {@link Result}.
@@ -46,5 +43,5 @@ public interface GraphElementHandler extends ElementHandler {
    * @param res HBase row
    * @return graphs identifiers
    */
-  GradoopIdSet readGraphIds(final Result res);
+  GradoopIdSet readGraphIds(Result res);
 }

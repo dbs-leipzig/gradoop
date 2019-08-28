@@ -41,8 +41,7 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
     Map<ID, L>,
     Map<ID, Properties>,
     Map<ID, AdjacencyListRow<ED, VD>>,
-    Map<ID, AdjacencyListRow<ED, VD>>
-  > {
+    Map<ID, AdjacencyListRow<ED, VD>>> {
 
   /**
    * Default constructor.

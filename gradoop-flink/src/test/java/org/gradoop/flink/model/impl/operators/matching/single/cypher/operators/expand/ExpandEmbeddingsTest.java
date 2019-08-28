@@ -140,7 +140,7 @@ public abstract class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
 
-    assertEveryEmbedding(result, (embedding) -> {
+    assertEveryEmbedding(result, embedding -> {
       assertEquals(3, embedding.getIdList(1).size());
     });
   }
@@ -159,7 +159,7 @@ public abstract class ExpandEmbeddingsTest extends PhysicalOperatorTest {
       ExpandDirection.OUT, new ArrayList<>(), new ArrayList<>(), -1
     ).evaluate();
 
-    assertEveryEmbedding(result, (embedding) -> assertEquals(3, embedding.getIdList(1).size()));
+    assertEveryEmbedding(result, embedding -> assertEquals(3, embedding.getIdList(1).size()));
   }
 
   @Test
@@ -177,7 +177,7 @@ public abstract class ExpandEmbeddingsTest extends PhysicalOperatorTest {
 
     assertEquals(2, result.count());
 
-    assertEmbeddingExists(result, (embedding) ->
+    assertEmbeddingExists(result, embedding ->
       embedding.getId(0).equals(embedding.getId(2)) &&
       embedding.getIdList(1).size() == 0
     );

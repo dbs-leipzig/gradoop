@@ -84,7 +84,7 @@ public interface BaseGraphCollectionOperators<
    * @param graphID graph identifier
    * @return base graph with given id or an empty base graph
    */
-  LG getGraph(final GradoopId graphID);
+  LG getGraph(GradoopId graphID);
 
   /**
    * Extracts base graphs from collection using their identifiers.
@@ -101,7 +101,7 @@ public interface BaseGraphCollectionOperators<
    * @param identifiers graph identifiers
    * @return collection containing requested base graphs
    */
-  GC getGraphs(final GradoopIdSet identifiers);
+  GC getGraphs(GradoopIdSet identifiers);
 
   //----------------------------------------------------------------------------
   // Unary Operators

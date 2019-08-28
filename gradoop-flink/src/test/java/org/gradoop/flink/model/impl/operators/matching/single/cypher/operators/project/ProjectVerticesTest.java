@@ -43,7 +43,7 @@ public class ProjectVerticesTest extends PhysicalOperatorTest {
 
     assertEquals(2, results.count());
 
-    assertEveryEmbedding(results, (embedding) -> {
+    assertEveryEmbedding(results, embedding -> {
       assertEquals(1, embedding.size());
       assertEquals(PropertyValue.create("foo"), embedding.getProperty(0));
       assertEquals(PropertyValue.create("baz"), embedding.getProperty(1));

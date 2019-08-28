@@ -35,7 +35,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param sourceId source vertex id
    * @return put with vertex data
    */
-  Put writeSource(final Put put, final GradoopId sourceId);
+  Put writeSource(Put put, GradoopId sourceId);
 
   /**
    * Reads the source vertex identifier from the given {@link Result}.
@@ -43,7 +43,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase {@link Result}
    * @return source vertex identifier
    */
-  GradoopId readSourceId(final Result res);
+  GradoopId readSourceId(Result res);
 
   /**
    * Adds the target vertex data to the given {@link Put} and returns it.
@@ -52,7 +52,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param targetId target vertex id
    * @return put with vertex data
    */
-  Put writeTarget(final Put put, final GradoopId targetId);
+  Put writeTarget(Put put, GradoopId targetId);
 
   /**
    * Reads the target vertex identifier from the given {@link Result}.
@@ -60,7 +60,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase {@link Result}
    * @return target vertex identifier
    */
-  GradoopId readTargetId(final Result res);
+  GradoopId readTargetId(Result res);
 
   /**
    * Writes the complete edge data to the given {@link Put} and returns it.
@@ -69,7 +69,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param edgeData edge data to be written
    * @return put with edge data
    */
-  Put writeEdge(final Put put, final Edge edgeData);
+  Put writeEdge(Put put, Edge edgeData);
 
   /**
    * Reads the edge data from the given {@link Result}.
@@ -77,7 +77,7 @@ public interface EdgeHandler extends GraphElementHandler {
    * @param res HBase row
    * @return edge data contained in the given result
    */
-  EPGMEdge readEdge(final Result res);
+  EPGMEdge readEdge(Result res);
 
   /**
    * Applies the given ElementQuery to the handler.

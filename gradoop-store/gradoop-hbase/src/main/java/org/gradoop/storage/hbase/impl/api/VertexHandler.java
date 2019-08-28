@@ -34,7 +34,7 @@ public interface VertexHandler extends GraphElementHandler {
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final Vertex vertexData);
+  Put writeVertex(Put put, Vertex vertexData);
 
   /**
    * Reads the vertex data from the given {@link Result}.
@@ -42,7 +42,7 @@ public interface VertexHandler extends GraphElementHandler {
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  EPGMVertex readVertex(final Result res);
+  EPGMVertex readVertex(Result res);
 
   /**
    * Applies the given ElementQuery to the handler.

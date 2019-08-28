@@ -42,7 +42,7 @@ public interface ElementHandler extends Serializable {
    * @return persistent entity identifier
    * @throws IOException on failure
    */
-  byte[] getRowKey(@Nonnull final GradoopId gradoopId) throws IOException;
+  byte[] getRowKey(@Nonnull GradoopId gradoopId) throws IOException;
 
   /**
    * Returns a list of all possible row keys for the given gradoop id according to
@@ -51,7 +51,7 @@ public interface ElementHandler extends Serializable {
    * @param elementId the gradoop id of the element
    * @return a list of all possible row keys
    */
-  List<byte[]> getPossibleRowKeys(@Nonnull final GradoopId elementId);
+  List<byte[]> getPossibleRowKeys(@Nonnull GradoopId elementId);
 
   /**
    * Adds the labels to the given {@link Put} and returns it.
@@ -60,7 +60,7 @@ public interface ElementHandler extends Serializable {
    * @param entity entity to use the label from
    * @return put with label
    */
-  Put writeLabel(final Put put, final Element entity);
+  Put writeLabel(Put put, Element entity);
 
   /**
    * Adds the given property to the {@link Put} and returns it.
@@ -69,7 +69,7 @@ public interface ElementHandler extends Serializable {
    * @param property property
    * @return put with property
    */
-  Put writeProperty(final Put put, final Property property);
+  Put writeProperty(Put put, Property property);
 
   /**
    * Adds all properties of the given element to the given {@link Put} and
@@ -79,7 +79,7 @@ public interface ElementHandler extends Serializable {
    * @param entity entity to use properties from
    * @return put with properties
    */
-  Put writeProperties(final Put put, final Element entity);
+  Put writeProperties(Put put, Element entity);
 
   /**
    * Creates an identifier from a given row {@link Result}.
@@ -88,7 +88,7 @@ public interface ElementHandler extends Serializable {
    * @return entity identifier
    * @throws IOException on failure
    */
-  GradoopId readId(@Nonnull final Result res) throws IOException;
+  GradoopId readId(@Nonnull Result res) throws IOException;
 
   /**
    * Reads the label from the given row {@link Result}.
@@ -96,7 +96,7 @@ public interface ElementHandler extends Serializable {
    * @param res row result
    * @return label contained in the row
    */
-  String readLabel(final Result res);
+  String readLabel(Result res);
 
   /**
    * Reads all properties from the given row {@link Result}.
@@ -104,7 +104,7 @@ public interface ElementHandler extends Serializable {
    * @param res row result
    * @return all properties contained in the row
    */
-  Properties readProperties(final Result res);
+  Properties readProperties(Result res);
 
   /**
    * Creates table based on the given table descriptor.
@@ -113,7 +113,7 @@ public interface ElementHandler extends Serializable {
    * @param tableDescriptor description of the table used by that specific handler
    * @throws IOException on failure
    */
-  void createTable(final Admin admin, final HTableDescriptor tableDescriptor) throws IOException;
+  void createTable(Admin admin, HTableDescriptor tableDescriptor) throws IOException;
 
   /**
    * Enable/Disable the usage of pre-splitting regions at the moment of table creation.

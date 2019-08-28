@@ -42,7 +42,7 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
     DataSet<Embedding> results = operator.evaluate();
 
     assertEquals(2, results.count());
-    assertEveryEmbedding(results, (embedding) -> {
+    assertEveryEmbedding(results, embedding -> {
       assertEquals(3, embedding.size());
       assertEquals(PropertyValue.create("foo"), embedding.getProperty(0));
       assertEquals(PropertyValue.create("bar"), embedding.getProperty(1));

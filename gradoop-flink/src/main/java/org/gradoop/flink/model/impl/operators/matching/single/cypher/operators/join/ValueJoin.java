@@ -112,7 +112,7 @@ public class ValueJoin implements PhysicalOperator {
       Collections.emptyList(),
       Collections.emptyList(),
       JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES
-      );
+    );
   }
 
   /**

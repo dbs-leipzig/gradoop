@@ -20,6 +20,12 @@
   <suppress checks="LineLength"
             files="SocialNetworkGraph.java"
             lines="0-68"/>
+  <suppress checks="IllegalInstantiation"
+            files="PropertyValueTest.java"
+            lines="650-850"/>
+  <suppress checks="IllegalInstantiation"
+            files="PropertyEncoder.java"
+            lines="45-55"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

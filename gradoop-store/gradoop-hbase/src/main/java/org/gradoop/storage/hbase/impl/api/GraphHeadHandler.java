@@ -35,7 +35,7 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param graphData graph data
    * @return put with graph data
    */
-  Put writeGraphHead(final Put put, final GraphHead graphData);
+  Put writeGraphHead(Put put, GraphHead graphData);
 
   /**
    * Reads the graph data from the given result.
@@ -43,7 +43,7 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param res HBase row
    * @return graph entity
    */
-  EPGMGraphHead readGraphHead(final Result res);
+  EPGMGraphHead readGraphHead(Result res);
 
   /**
    * Applies the given ElementQuery to the handler.
