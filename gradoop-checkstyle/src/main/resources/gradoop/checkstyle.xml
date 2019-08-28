@@ -132,8 +132,6 @@
         <!-- Require method javadocs, allow undeclared RTE, allow missing
          javadoc on getters and setters  -->
         <module name="JavadocMethod">
-            <property name="allowUndeclaredRTE" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
         </module>
         <!-- Require field javadoc -->
