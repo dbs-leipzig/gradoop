@@ -66,7 +66,7 @@ public class GroupingNG<
   /**
    * The vertex grouping keys.
    */
-  private final List<GroupingKeyFunction<? super V, ?>> vertexGroupingKeys;
+  private final List<GroupingKeyFunction<V, ?>> vertexGroupingKeys;
 
   /**
    * The vertex aggregate functions.
@@ -76,7 +76,7 @@ public class GroupingNG<
   /**
    * The edge grouping keys.
    */
-  private final List<GroupingKeyFunction<? super E, ?>> edgeGroupingKeys;
+  private final List<GroupingKeyFunction<E, ?>> edgeGroupingKeys;
 
   /**
    * The edge aggregate functions.
@@ -92,9 +92,9 @@ public class GroupingNG<
    * @param edgeAggregateFunctions   The edge aggregate functions.
    * @implNote Label-specific grouping is not supported by this implementation.
    */
-  public GroupingNG(List<GroupingKeyFunction<? super V, ?>> vertexGroupingKeys,
+  public GroupingNG(List<GroupingKeyFunction<V, ?>> vertexGroupingKeys,
     List<AggregateFunction> vertexAggregateFunctions,
-    List<GroupingKeyFunction<? super E, ?>> edgeGroupingKeys,
+    List<GroupingKeyFunction<E, ?>> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
     this.vertexGroupingKeys = Objects.requireNonNull(vertexGroupingKeys);
     this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList() :
@@ -163,7 +163,7 @@ public class GroupingNG<
 
     DataSet<V> superVertices = verticesWithSuperVertex
       .filter(new FilterSuperVertices<>())
-      .map(new BuildSuperVertexFromTuple<>(vertexGroupingKeys, vertexAggregateFunctions,
+      .map(new BuildSuperVertexFromTuple<Tuple, V>(vertexGroupingKeys, vertexAggregateFunctions,
         graph.getFactory().getVertexFactory()));
 
     DataSet<E> superEdges = superEdgeTuples
@@ -210,9 +210,9 @@ public class GroupingNG<
    * @param labelGroups The label groups to convert. (Only the default group is supported.)
    * @return Key functions corresponding to those groups.
    */
-  private static <T extends Element> List<GroupingKeyFunction<? super T, ?>> asKeyFunctions(
+  private static <T extends Element> List<GroupingKeyFunction<T, ?>> asKeyFunctions(
     boolean useLabels, List<LabelGroup> labelGroups) {
-    List<GroupingKeyFunction<? super T, ?>> keyFunctions = new ArrayList<>();
+    List<GroupingKeyFunction<T, ?>> keyFunctions = new ArrayList<>();
     if (useLabels) {
       keyFunctions.add(GroupingKeys.label());
     }

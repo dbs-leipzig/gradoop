@@ -52,7 +52,7 @@ public class BuildSuperEdgeFromTuple<T extends Tuple, E extends Edge>
    * @param aggregateFunctions The aggregate functions.
    * @param edgeFactory        A factory used to create new edges.
    */
-  public BuildSuperEdgeFromTuple(List<GroupingKeyFunction<? super E, ?>> groupingKeys,
+  public BuildSuperEdgeFromTuple(List<GroupingKeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, EdgeFactory<E> edgeFactory) {
     super(TemporalGroupingConstants.EDGE_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(edgeFactory).createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);

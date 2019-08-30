@@ -37,13 +37,15 @@ public interface GroupingKeyFunction<E, K> extends Serializable {
   K getKey(E element);
 
   /**
-   * Get the property key used to store the grouping key on the super-element.
-   * The property key may be {@code null}, the grouping key will not be stored in that case.
+   * Store a grouping key on an element. This is used to store the grouping key on the super element after
+   * grouping. By default nothing will be changed on the element.
    *
-   * @return The property key.
+   * @param element The element where the key should be stored.
+   * @param key     The key to store on the element.
+   * @return The (updated) element.
    */
-  default String getTargetPropertyKey() {
-    return null;
+  default E setAsProperty(E element, Object key) {
+    return element;
   }
 
   /**

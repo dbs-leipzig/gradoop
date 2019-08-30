@@ -51,7 +51,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
    * @param aggregateFunctions The aggregate functions.
    * @param vertexFactory      A factory used to create new vertices.
    */
-  public BuildSuperVertexFromTuple(List<GroupingKeyFunction<? super E, ?>> groupingKeys,
+  public BuildSuperVertexFromTuple(List<GroupingKeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, VertexFactory<E> vertexFactory) {
     super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(vertexFactory).createVertex();

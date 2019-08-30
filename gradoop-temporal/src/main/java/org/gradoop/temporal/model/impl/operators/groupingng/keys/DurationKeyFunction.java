@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
@@ -87,7 +88,11 @@ public class DurationKeyFunction<T extends TemporalElement>
   }
 
   @Override
-  public String getTargetPropertyKey() {
-    return "duration_" + intervalExtractor + "_" + timeUnit;
+  public T setAsProperty(T element, Object key) {
+    if (!(key instanceof Long)) {
+      throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
+    }
+    element.setProperty("duration_" + intervalExtractor + "_" + timeUnit, PropertyValue.create(key));
+    return element;
   }
 }

@@ -20,6 +20,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
+import java.util.Objects;
+
 /**
  * A grouping key function extracting the label.
  *
@@ -39,8 +41,9 @@ public class LabelKeyFunction<T extends Labeled> implements GroupingKeyFunction<
   }
 
   @Override
-  public String getTargetPropertyKey() {
-    return LABEL_KEY;
+  public T setAsProperty(T element, Object key) {
+    element.setLabel(Objects.toString(key));
+    return element;
   }
 
   @Override

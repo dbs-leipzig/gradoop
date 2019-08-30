@@ -27,8 +27,8 @@ import java.util.Objects;
 /**
  * A key function extracting a {@link TimeDimension} from a {@link TemporalElement}.
  */
-public class TimeIntervalKeyFunction<T extends TemporalElement> implements
-  GroupingKeyFunction<T, Tuple2<Long, Long>> {
+public class TimeIntervalKeyFunction<T extends TemporalElement>
+  implements GroupingKeyFunction<T, Tuple2<Long, Long>> {
 
   /**
    * The time interval to extract.
@@ -52,8 +52,7 @@ public class TimeIntervalKeyFunction<T extends TemporalElement> implements
     case TRANSACTION_TIME:
       return element.getTransactionTime();
     default:
-      throw new UnsupportedOperationException(
-        "Time interval not supported by this element: " + timeInterval);
+      throw new UnsupportedOperationException("Time interval not supported by this element: " + timeInterval);
     }
   }
 

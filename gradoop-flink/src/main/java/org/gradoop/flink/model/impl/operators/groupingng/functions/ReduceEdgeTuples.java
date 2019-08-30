@@ -15,10 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.List;
@@ -28,17 +26,7 @@ import java.util.List;
  *
  * @param <T> The tuple type.
  */
-public class ReduceEdgeTuples<T extends Tuple> implements GroupReduceFunction<T, T> {
-
-  /**
-   * The data offset for tuples. Aggregate values are expected to start at this index.
-   */
-  private final int tupleDataOffset;
-
-  /**
-   * The edge aggregate functions.
-   */
-  private final List<AggregateFunction> aggregateFunctions;
+public class ReduceEdgeTuples<T extends Tuple> extends ReduceElementTuples<T> {
 
   /**
    * Initialize this reduce function.
@@ -49,8 +37,7 @@ public class ReduceEdgeTuples<T extends Tuple> implements GroupReduceFunction<T,
    * @param aggregateFunctions The vertex aggregate functions.
    */
   public ReduceEdgeTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
-    this.tupleDataOffset = tupleDataOffset;
-    this.aggregateFunctions = aggregateFunctions;
+    super(tupleDataOffset, aggregateFunctions);
   }
 
   @Override
@@ -61,12 +48,7 @@ public class ReduceEdgeTuples<T extends Tuple> implements GroupReduceFunction<T,
         first = inputTuple;
         continue;
       }
-      for (int i = 0; i < aggregateFunctions.size(); i++) {
-        final PropertyValue aggregate = first.getField(i + tupleDataOffset);
-        final PropertyValue increment = inputTuple.getField(i + tupleDataOffset);
-        first.setField(aggregateFunctions.get(i).aggregate(aggregate, increment),
-          i + tupleDataOffset);
-      }
+      callAggregateFunctions(first, inputTuple);
     }
     out.collect(first);
   }

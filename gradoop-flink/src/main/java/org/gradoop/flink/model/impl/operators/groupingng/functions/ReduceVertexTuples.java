@@ -15,11 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.List;
@@ -32,17 +30,7 @@ import static org.gradoop.flink.model.impl.operators.groupingng.functions.Tempor
  *
  * @param <T> The tuple type.
  */
-public class ReduceVertexTuples<T extends Tuple> implements GroupReduceFunction<T, T> {
-
-  /**
-   * The data offset for tuples. Aggregate values are expected to start at this index.
-   */
-  private final int tupleDataOffset;
-
-  /**
-   * The vertex aggregate functions.
-   */
-  private final List<AggregateFunction> aggregateFunctions;
+public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> {
 
   /**
    * Reduce object instantiations.
@@ -59,8 +47,7 @@ public class ReduceVertexTuples<T extends Tuple> implements GroupReduceFunction<
    * @param aggregateFunctions The vertex aggregate functions.
    */
   public ReduceVertexTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
-    this.tupleDataOffset = tupleDataOffset;
-    this.aggregateFunctions = aggregateFunctions;
+    super(tupleDataOffset, aggregateFunctions);
   }
 
   @Override
@@ -73,13 +60,7 @@ public class ReduceVertexTuples<T extends Tuple> implements GroupReduceFunction<
         reuseSuperVertex = inputTuple.copy();
         isFirst = false;
       } else {
-        // Calculate aggregate values.
-        for (int i = 0; i < aggregateFunctions.size(); i++) {
-          final PropertyValue aggregate = reuseSuperVertex.getField(i + tupleDataOffset);
-          final PropertyValue increment = inputTuple.getField(i + tupleDataOffset);
-          reuseSuperVertex.setField(aggregateFunctions.get(i).aggregate(aggregate, increment),
-            i + tupleDataOffset);
-        }
+        callAggregateFunctions(reuseSuperVertex, inputTuple);
       }
       inputTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
       // Return the updated tuple, used to extract the mapping later.

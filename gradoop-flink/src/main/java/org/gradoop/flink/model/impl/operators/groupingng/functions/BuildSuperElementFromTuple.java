@@ -43,9 +43,9 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
   private final int tupleDataOffset;
 
   /**
-   * The property keys used to store the grouping keys.
+   * The grouping key functions..
    */
-  private final String[] propertyKeys;
+  private final List<GroupingKeyFunction<E, ?>> keyFunctions;
 
   /**
    * The aggregate functions for this element type.
@@ -60,14 +60,10 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @param aggregateFunctions The aggregate functions.
    */
   protected BuildSuperElementFromTuple(int tupleDataOffset,
-    List<GroupingKeyFunction<? super E, ?>> groupingKeys,
+    List<GroupingKeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
-    Objects.requireNonNull(groupingKeys);
-    this.propertyKeys = new String[groupingKeys.size()];
-    for (int i = 0; i < groupingKeys.size(); i++) {
-      propertyKeys[i] = groupingKeys.get(i).getTargetPropertyKey();
-    }
+    this.keyFunctions = Objects.requireNonNull(groupingKeys);
     this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
   }
 
@@ -81,24 +77,15 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    */
   protected E setAggregatePropertiesAndKeys(E element, T tupleData) {
     // Set grouping keys.
-    for (int i = 0; i < propertyKeys.length; i++) {
-      final String propertyKey = propertyKeys[i];
-      if (propertyKey == null) {
-        continue;
-      }
+    for (int i = 0; i < keyFunctions.size(); i++) {
       final Object groupingKey = tupleData.getField(tupleDataOffset + i);
-      if (propertyKey.equals(LabelKeyFunction.LABEL_KEY)) {
-        element.setLabel(groupingKey.toString());
-      } else {
-        element.setProperty(propertyKey, groupingKey instanceof PropertyValue ?
-          (PropertyValue) groupingKey : PropertyValue.create(groupingKey));
-      }
+      element = keyFunctions.get(i).setAsProperty(element, groupingKey);
     }
     // Calculate aggregate values and set them.
     for (int i = 0; i < aggregateFunctions.size(); i++) {
       final AggregateFunction function = aggregateFunctions.get(i);
       element.setProperty(function.getAggregatePropertyKey(),
-        function.postAggregate(tupleData.getField(tupleDataOffset + propertyKeys.length + i)));
+        function.postAggregate(tupleData.getField(tupleDataOffset + keyFunctions.size() + i)));
     }
     return element;
   }

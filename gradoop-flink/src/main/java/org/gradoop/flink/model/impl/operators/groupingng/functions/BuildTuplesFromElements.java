@@ -29,6 +29,8 @@ import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import java.util.List;
 import java.util.Objects;
 
+import static org.gradoop.common.model.impl.properties.PropertyValue.NULL_VALUE;
+
 /**
  * Build a tuple-based representation of elements for grouping.
  * Tuples will contain some Gradoop IDs, all grouping keys followed by all properties to be
@@ -46,7 +48,7 @@ public class BuildTuplesFromElements<E extends Element>
   /**
    * The grouping key functions.
    */
-  private final List<GroupingKeyFunction<? super E, ?>> keys;
+  private final List<GroupingKeyFunction<E, ?>> keys;
 
   /**
    * The aggregate functions.
@@ -76,7 +78,7 @@ public class BuildTuplesFromElements<E extends Element>
    * @param keys               The grouping keys.
    * @param aggregateFunctions The aggregate functions used to determine the aggregate property
    */
-  public BuildTuplesFromElements(int tupleDataOffset, List<GroupingKeyFunction<? super E, ?>> keys,
+  public BuildTuplesFromElements(int tupleDataOffset, List<GroupingKeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     if (tupleDataOffset < 0) {
@@ -126,7 +128,8 @@ public class BuildTuplesFromElements<E extends Element>
       field++;
     }
     for (AggregateFunction aggregateFunction : aggregateFunctions) {
-      reuseTuple.setField(aggregateFunction.getIncrement(element), field);
+      final PropertyValue increment = aggregateFunction.getIncrement(element);
+      reuseTuple.setField(increment == null? NULL_VALUE : increment, field);
       field++;
     }
     return reuseTuple;

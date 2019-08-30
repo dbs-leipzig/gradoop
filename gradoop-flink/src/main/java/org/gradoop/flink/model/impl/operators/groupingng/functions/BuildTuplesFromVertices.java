@@ -37,7 +37,7 @@ public class BuildTuplesFromVertices<E extends Element> extends BuildTuplesFromE
    * @param keys               The grouping keys.
    * @param aggregateFunctions The aggregate functions used to determine the aggregate property
    */
-  public BuildTuplesFromVertices(List<GroupingKeyFunction<? super E, ?>> keys,
+  public BuildTuplesFromVertices(List<GroupingKeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
     super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, keys, aggregateFunctions);
   }
