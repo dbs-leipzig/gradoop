@@ -40,14 +40,18 @@ public class VertexDeduplicationTest extends GradoopFlinkTestBase {
   @Test
   public void testWithGraph() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
-      "(:a {key: 1L})-[:e {att: 1L}]->(:a {key: 1L})-[:e {att: 2L}]->(:b {key: 1L})" +
-      "-[:e {att: 3L}]->(:a {key: 2L})(:a {key: 2L})" +
+      "(va1:a {key: 1L})-[:e {att: 1L}]->(vb1:a {key: 1.0d})-[:e {att: 2L}]->(va2:a {key: 1L})" +
+      "(vc1:a {key: 1L, key2: \"a\"})-[:e {att: 3L}]->(va1)-[:e {att: 4L}]->(b1:b {key: 1L})" +
+      "(vc2:a {key: 1L, key2: \"a\"})" +
+      "(vb2:a {key: 1.0d})-[:e {att: 5L}]->(vb3:a {key: 1.0d})(vd1:a {key: 1L, key2: \"b\"})" +
       "]" +
       "expected [" +
-      "(va:a {key: 1L})-[:e {att: 1L}]->(va)-[:e {att: 2L}]->(:b {key: 1L})-[:e {att: 3L}]->(:a {key: 2L})" +
+      "(da:a {key: 1L})-[:e {att: 1L}]->(db:a {key: 1.0d})-[:e {att: 2L}]->(da)" +
+      "(dc:a {key: 1L, key2: \"a\"})-[:e {att: 3L}]->(da)-[:e {att: 4L}]->(b:b {key: 1L})" +
+      "(db)-[:e {att: 5L}]->(db)(dd:a {key: 1L, key2: \"b\"})" +
       "]");
     LogicalGraph result = loader.getLogicalGraphByVariable("input")
-      .callForGraph(new VertexDeduplication<>("a", Collections.singletonList("key")));
+      .callForGraph(new VertexDeduplication<>("a", Arrays.asList("key", "key2")));
     collectAndAssertTrue(result.equalsByData(loader.getLogicalGraphByVariable("expected")));
   }
 
@@ -57,7 +61,7 @@ public class VertexDeduplicationTest extends GradoopFlinkTestBase {
    * @throws Exception when the execution in Flink fails.
    */
   @Test
-  public void testWithUnknownType() throws Exception {
+  public void testWithUnknownLabel() throws Exception {
     LogicalGraph socialGraph = getSocialNetworkLoader().getLogicalGraph();
     LogicalGraph result = socialGraph
       .callForGraph(new VertexDeduplication<>("NotInTheGraph", Arrays.asList("a", "b")));

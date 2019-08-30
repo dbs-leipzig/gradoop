@@ -16,6 +16,7 @@
 package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -30,6 +31,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> The edge type.
  */
+@FunctionAnnotation.ForwardedFieldsFirst("id;label;properties;targetId;graphIds")
+@FunctionAnnotation.ReadFieldsSecond("*")
 public class UpdateEdgeSource<E extends Edge> implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 
   @Override

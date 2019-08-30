@@ -24,16 +24,15 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.dataintegration.transformation.functions.CreateMappingFromMarkedDuplicates;
 import org.gradoop.dataintegration.transformation.functions.GetPropertiesAsList;
 import org.gradoop.dataintegration.transformation.functions.MarkDuplicatesInGroup;
-import org.gradoop.dataintegration.transformation.functions.RemoveMarkedDuplicates;
 import org.gradoop.dataintegration.transformation.functions.UpdateEdgeSource;
 import org.gradoop.dataintegration.transformation.functions.UpdateEdgeTarget;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.filters.Not;
 
 import java.util.List;
 import java.util.Objects;
@@ -92,8 +91,9 @@ public class VertexDeduplication<
     DataSet<Tuple2<GradoopId, GradoopId>> vertexToDedupVertex = annotatedVertices
       .flatMap(new CreateMappingFromMarkedDuplicates<>())
       .name("Create mapping to deduplicated vertices");
-    DataSet<V> deduplicatedVertices = annotatedVertices.filter(new RemoveMarkedDuplicates<>());
-    DataSet<V> otherVertices = graph.getVertices().filter(new Not<>(new ByLabel<>(label)));
+    DataSet<V> deduplicatedVertices = annotatedVertices
+      .filter(new ByProperty<V>(MarkDuplicatesInGroup.PROPERTY_KEY).negate());
+    DataSet<V> otherVertices = graph.getVertices().filter(new ByLabel<V>(label).negate());
     DataSet<E> updatesEdges = graph.getEdges()
       .leftOuterJoin(vertexToDedupVertex)
       .where(new SourceId<>())
