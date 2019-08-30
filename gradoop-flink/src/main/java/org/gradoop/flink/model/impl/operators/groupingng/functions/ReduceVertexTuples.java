@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -24,8 +24,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.List;
 
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
+import static org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
+import static org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * Reduce vertex tuples, assigning a super vertex ID and calculating aggregate values.

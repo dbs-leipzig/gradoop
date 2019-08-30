@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.impl.id.GradoopId;
-
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * A filter function used to select super vertices from the set of vertex-tuples.
@@ -34,8 +31,8 @@ public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
 
   @Override
   public boolean filter(T t) throws Exception {
-    final GradoopId id = t.getField(VERTEX_TUPLE_ID);
-    final GradoopId superId = t.getField(VERTEX_TUPLE_SUPERID);
+    final GradoopId id = t.getField(TemporalGroupingConstants.VERTEX_TUPLE_ID);
+    final GradoopId superId = t.getField(TemporalGroupingConstants.VERTEX_TUPLE_SUPERID);
     return id.equals(superId);
   }
 }

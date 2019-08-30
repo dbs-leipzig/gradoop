@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping;
+package org.gradoop.flink.model.impl.operators.groupingng;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -27,31 +27,24 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeys;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperEdgeFromTuple;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperVertexFromTuple;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildTuplesFromEdges;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildTuplesFromVertices;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.FilterSuperVertices;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceEdgeTuples;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceVertexTuples;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.UpdateIdField;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildSuperEdgeFromTuple;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildSuperVertexFromTuple;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromEdges;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceEdgeTuples;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceVertexTuples;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromVertices;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.FilterSuperVertices;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
-
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_RESERVED;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_SOURCEID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_TARGETID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * A grouping operator similar to {@link org.gradoop.flink.model.impl.operators.grouping.Grouping}
@@ -63,7 +56,7 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  * @param <LG> The graph type.
  * @param <GC> The graph collection type.
  */
-public class TemporalGrouping<
+public class GroupingNG<
   G extends GraphHead,
   V extends Vertex,
   E extends Edge,
@@ -99,7 +92,7 @@ public class TemporalGrouping<
    * @param edgeAggregateFunctions   The edge aggregate functions.
    * @implNote Label-specific grouping is not supported by this implementation.
    */
-  public TemporalGrouping(List<GroupingKeyFunction<? super V, ?>> vertexGroupingKeys,
+  public GroupingNG(List<GroupingKeyFunction<? super V, ?>> vertexGroupingKeys,
     List<AggregateFunction> vertexAggregateFunctions,
     List<GroupingKeyFunction<? super E, ?>> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
@@ -115,7 +108,7 @@ public class TemporalGrouping<
   /**
    * Instantiate this grouping function.<p>
    * <b>Hint:</b> This constructor is only used for compatibility with the old grouping API. It is
-   * advised to use {@link #TemporalGrouping(List, List, List, List)} instead.<p>
+   * advised to use {@link #GroupingNG(List, List, List, List)} instead.<p>
    * <b>Warning:</b> Label-specific grouping is not (yet) supported by this grouping implementation.
    * An {@link UnsupportedOperationException} will be thrown when any label group other than the
    * default label groups is given.
@@ -125,7 +118,7 @@ public class TemporalGrouping<
    * @param vertexLabelGroup The default vertex label group.
    * @param edgeLabelGroup   The default edge label group.
    */
-  public TemporalGrouping(boolean useVertexLabels, boolean useEdgeLabels,
+  public GroupingNG(boolean useVertexLabels, boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroup, List<LabelGroup> edgeLabelGroup) {
     this(asKeyFunctions(useVertexLabels, vertexLabelGroup), asAggregateFunctions(vertexLabelGroup),
       asKeyFunctions(useEdgeLabels, edgeLabelGroup), asAggregateFunctions(edgeLabelGroup));
@@ -140,30 +133,32 @@ public class TemporalGrouping<
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .name("Create vertex-tuples")
       .groupBy(getInternalVertexGroupingKeys())
-      .reduceGroup(new ReduceVertexTuples<>(VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(),
+      .reduceGroup(new ReduceVertexTuples<>(
+        TemporalGroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(),
         vertexAggregateFunctions))
       .name("Prepare super-vertices");
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId =
-      verticesWithSuperVertex.project(VERTEX_TUPLE_ID, VERTEX_TUPLE_SUPERID);
+      verticesWithSuperVertex.project(
+        TemporalGroupingConstants.VERTEX_TUPLE_ID, TemporalGroupingConstants.VERTEX_TUPLE_SUPERID);
 
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
       .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
       .name("Create edge-tuples")
       .join(idToSuperId)
-      .where(EDGE_TUPLE_SOURCEID)
-      .equalTo(VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(EDGE_TUPLE_SOURCEID))
+      .where(TemporalGroupingConstants.EDGE_TUPLE_SOURCEID)
+      .equalTo(TemporalGroupingConstants.VERTEX_TUPLE_ID)
+      .with(new UpdateIdField<>(TemporalGroupingConstants.EDGE_TUPLE_SOURCEID))
       .name("Update edge-tuples (source ID)")
       .join(idToSuperId)
-      .where(EDGE_TUPLE_TARGETID)
-      .equalTo(VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(EDGE_TUPLE_TARGETID))
+      .where(TemporalGroupingConstants.EDGE_TUPLE_TARGETID)
+      .equalTo(TemporalGroupingConstants.VERTEX_TUPLE_ID)
+      .with(new UpdateIdField<>(TemporalGroupingConstants.EDGE_TUPLE_TARGETID))
       .name("Update edge-tuples (target ID)");
 
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
-        EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
+        TemporalGroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
       .name("Prepare super-edges");
 
     DataSet<V> superVertices = verticesWithSuperVertex
@@ -184,7 +179,7 @@ public class TemporalGrouping<
    * @return The grouping keys, as tuple indices.
    */
   private int[] getInternalEdgeGroupingKeys() {
-    return IntStream.range(0, EDGE_TUPLE_RESERVED + edgeGroupingKeys.size())
+    return IntStream.range(0, TemporalGroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size())
       .toArray();
   }
 
@@ -194,8 +189,8 @@ public class TemporalGrouping<
    * @return The grouping keys, as tuple indices.
    */
   private int[] getInternalVertexGroupingKeys() {
-    return IntStream.range(VERTEX_TUPLE_RESERVED,
-      VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();
+    return IntStream.range(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED,
+      TemporalGroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();
   }
 
   /**

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.keys;
+package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
-import org.gradoop.flink.model.api.tpgm.functions.TemporalAttribute;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -58,7 +58,7 @@ public class DurationKeyFunction<T extends TemporalElement>
    * @param timeInterval The time interval to get the duration of.
    * @param unit         The unit to get the duration as.
    */
-  public DurationKeyFunction(TemporalAttribute timeInterval, TemporalUnit unit) {
+  public DurationKeyFunction(TimeDimension timeInterval, TemporalUnit unit) {
     this.intervalExtractor = new TimeIntervalKeyFunction<>(timeInterval);
     this.timeUnit = Objects.requireNonNull(unit);
     if (unit instanceof ChronoUnit) {

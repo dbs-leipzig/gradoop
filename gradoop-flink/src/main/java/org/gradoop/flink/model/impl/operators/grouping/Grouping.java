@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.TemporalGrouping;
+import org.gradoop.flink.model.impl.operators.groupingng.GroupingNG;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -691,8 +691,7 @@ public abstract class Grouping<
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
         break;
       case GROUP_AS_TUPLES:
-        groupingOperator = new TemporalGrouping<>(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+        groupingOperator = new GroupingNG<>(useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

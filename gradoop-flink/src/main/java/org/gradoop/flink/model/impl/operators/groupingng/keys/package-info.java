@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * An implementation of the graph grouping operator with explicit support for temporal elements.
+ * Contains implementations of grouping key functions.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping;
+package org.gradoop.flink.model.impl.operators.groupingng.keys;

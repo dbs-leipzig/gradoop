@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.keys;
+package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
-import org.gradoop.flink.model.api.tpgm.functions.TemporalAttribute;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -34,18 +34,17 @@ import static java.time.ZoneOffset.UTC;
  *
  * @param <T> The type of the elements to group.
  */
-public class TimeStampKeyFunction<T extends TemporalElement>
-  implements GroupingKeyFunction<T, Long> {
+public class TimeStampKeyFunction<T extends TemporalElement> implements GroupingKeyFunction<T, Long> {
 
   /**
    * The time interval of the temporal element to extract.
    */
-  private final TemporalAttribute timeInterval;
+  private final TimeDimension timeInterval;
 
   /**
    * The field of that interval to extract.
    */
-  private final TemporalAttribute.Field timeIntervalField;
+  private final TimeDimension.Field timeIntervalField;
 
   /**
    * The time field to calculate.
@@ -61,8 +60,8 @@ public class TimeStampKeyFunction<T extends TemporalElement>
    *                          in that case nothing will be calculated, the time stamp will be
    *                          returned as is.
    */
-  public TimeStampKeyFunction(TemporalAttribute timeInterval,
-    TemporalAttribute.Field timeIntervalField, TemporalField fieldOfTimeStamp) {
+  public TimeStampKeyFunction(TimeDimension timeInterval,
+    TimeDimension.Field timeIntervalField, TemporalField fieldOfTimeStamp) {
     this.timeInterval = Objects.requireNonNull(timeInterval);
     this.timeIntervalField = Objects.requireNonNull(timeIntervalField);
     this.fieldOfTimeStamp = fieldOfTimeStamp;

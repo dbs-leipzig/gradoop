@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm.functions.grouping;
+package org.gradoop.flink.model.impl.operators.groupingng;
 
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.api.entities.Labeled;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.LabelKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.PropertyKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelKeyFunction;
+import org.gradoop.flink.model.impl.operators.groupingng.keys.PropertyKeyFunction;
 
 /**
  * A factory class for creating instances of commonly used grouping key functions.
@@ -49,8 +49,7 @@ public class GroupingKeys {
    * @param <T> the type of the elements to group.
    * @return The grouping key function extracting the property with that key.
    */
-  public static <T extends Attributed> GroupingKeyFunction<T, PropertyValue> property(
-    String key) {
+  public static <T extends Attributed> GroupingKeyFunction<T, byte[]> property(String key) {
     return new PropertyKeyFunction<>(key);
   }
 }

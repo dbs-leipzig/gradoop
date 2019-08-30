@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
 import java.util.List;
-
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_RESERVED;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_SOURCEID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_TARGETID;
 
 /**
  * Build a tuple-based representation of edges for grouping.
@@ -42,14 +38,14 @@ public class BuildTuplesFromEdges<E extends Edge> extends BuildTuplesFromElement
    */
   public BuildTuplesFromEdges(List<GroupingKeyFunction<? super E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
-    super(EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
+    super(TemporalGroupingConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
   }
 
   @Override
   public Tuple map(E element) throws Exception {
     final Tuple result = super.map(element);
-    result.setField(element.getSourceId(), EDGE_TUPLE_SOURCEID);
-    result.setField(element.getTargetId(), EDGE_TUPLE_TARGETID);
+    result.setField(element.getSourceId(), TemporalGroupingConstants.EDGE_TUPLE_SOURCEID);
+    result.setField(element.getTargetId(), TemporalGroupingConstants.EDGE_TUPLE_TARGETID);
     return result;
   }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -21,8 +21,8 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.LabelKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelKeyFunction;
 
 import java.util.List;
 import java.util.Objects;

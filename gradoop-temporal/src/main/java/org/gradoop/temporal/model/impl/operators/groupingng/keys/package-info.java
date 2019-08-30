@@ -13,26 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
-import org.gradoop.flink.model.impl.operators.groupingng.GroupingNG;
-
 /**
- * Used to define the grouping strategy which is used for computing the summary graph.
+ * Implementations of grouping key functions used to group by temporal attributes.
  */
-public enum GroupingStrategy {
-  /**
-   * {@see GroupingGroupReduce}
-   */
-  GROUP_REDUCE,
-  /**
-   * {@see GroupingGroupCombine}
-   */
-  GROUP_COMBINE,
-  /**
-   * The grouping implementation based on tuples and key functions.
-   *
-   * @see GroupingNG
-   */
-  GROUP_AS_TUPLES
-}
+package org.gradoop.temporal.model.impl.operators.groupingng.keys;

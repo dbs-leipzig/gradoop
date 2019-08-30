@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.keys;
+package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
-import org.gradoop.flink.model.api.tpgm.functions.TemporalAttribute;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
 
 /**
- * A key function extracting a {@link TemporalAttribute} from a {@link TemporalElement}.
+ * A key function extracting a {@link TimeDimension} from a {@link TemporalElement}.
  */
 public class TimeIntervalKeyFunction<T extends TemporalElement> implements
   GroupingKeyFunction<T, Tuple2<Long, Long>> {
@@ -33,14 +33,14 @@ public class TimeIntervalKeyFunction<T extends TemporalElement> implements
   /**
    * The time interval to extract.
    */
-  private final TemporalAttribute timeInterval;
+  private final TimeDimension timeInterval;
 
   /**
    * Create a new instance of this key function.
    *
    * @param timeInterval The time interval to extract.
    */
-  public TimeIntervalKeyFunction(TemporalAttribute timeInterval) {
+  public TimeIntervalKeyFunction(TimeDimension timeInterval) {
     this.timeInterval = Objects.requireNonNull(timeInterval);
   }
 

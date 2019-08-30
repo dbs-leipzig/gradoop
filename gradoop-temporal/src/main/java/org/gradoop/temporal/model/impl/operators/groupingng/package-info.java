@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 /**
- * Functions used be the temporal graph grouping operator.
+ * Contains the implementation of the temporal grouping operator and related functions.
+ * <p>
+ * <b>Note:</b> This package only contains grouping key functions for temporal information. The actual
+ * implementation of the grouping operator is part of {@code gradoop-flink}.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.temporal.model.impl.operators.groupingng;

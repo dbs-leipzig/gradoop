@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm.functions.grouping;
+package org.gradoop.temporal.model.impl.operators.groupingng;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
-import org.gradoop.flink.model.api.tpgm.functions.TemporalAttribute;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.DurationKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.TimeIntervalKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.TimeStampKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.impl.operators.groupingng.keys.DurationKeyFunction;
+import org.gradoop.temporal.model.impl.operators.groupingng.keys.TimeIntervalKeyFunction;
+import org.gradoop.temporal.model.impl.operators.groupingng.keys.TimeStampKeyFunction;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
@@ -45,7 +46,7 @@ public class TemporalGroupingKeys {
    * @return The grouping key function extracting the duration.
    */
   public static <T extends TemporalElement> GroupingKeyFunction<T, Long> duration(
-    TemporalAttribute interval, TemporalUnit timeUnit) {
+    TimeDimension interval, TemporalUnit timeUnit) {
     return new DurationKeyFunction<>(interval, timeUnit);
   }
 
@@ -57,7 +58,7 @@ public class TemporalGroupingKeys {
    * @return The grouping key function extracting a time interval.
    */
   public static <T extends TemporalElement> GroupingKeyFunction<T, Tuple2<Long, Long>> timeInterval(
-    TemporalAttribute interval) {
+    TimeDimension interval) {
     return new TimeIntervalKeyFunction<>(interval);
   }
 
@@ -70,7 +71,7 @@ public class TemporalGroupingKeys {
    * @return The grouping key function extracting a time stamp.
    */
   public static <T extends TemporalElement> GroupingKeyFunction<T, Long> timeStamp(
-    TemporalAttribute interval, TemporalAttribute.Field intervalField) {
+    TimeDimension interval, TimeDimension.Field intervalField) {
     return timeStamp(interval, intervalField, null);
   }
 
@@ -88,7 +89,7 @@ public class TemporalGroupingKeys {
    * @return The grouping key function extracting the time stamp or part of it.
    */
   public static <T extends TemporalElement> GroupingKeyFunction<T, Long> timeStamp(
-    TemporalAttribute interval, TemporalAttribute.Field intervalField,
+    TimeDimension interval, TimeDimension.Field intervalField,
     TemporalField fieldOfTimeStamp) {
     return new TimeStampKeyFunction<>(interval, intervalField, fieldOfTimeStamp);
   }

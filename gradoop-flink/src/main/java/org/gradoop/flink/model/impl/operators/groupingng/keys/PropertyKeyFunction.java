@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.keys;
+package org.gradoop.flink.model.impl.operators.groupingng.keys;
 
+import org.apache.flink.api.common.typeinfo.BasicArrayTypeInfo;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
 import java.util.Objects;
 
@@ -27,8 +29,7 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class PropertyKeyFunction<T extends Attributed>
-  implements GroupingKeyFunction<T, PropertyValue> {
+public class PropertyKeyFunction<T extends Attributed> implements GroupingKeyFunction<T, byte[]> {
 
   /**
    * The key of the property to group by.
@@ -45,9 +46,9 @@ public class PropertyKeyFunction<T extends Attributed>
   }
 
   @Override
-  public PropertyValue getKey(T element) {
+  public byte[] getKey(T element) {
     final PropertyValue value = element.getPropertyValue(propertyKey);
-    return value == null ? PropertyValue.NULL_VALUE : value;
+    return value == null ? PropertyValue.NULL_VALUE.getRawBytes() : value.getRawBytes();
   }
 
   @Override
@@ -56,7 +57,7 @@ public class PropertyKeyFunction<T extends Attributed>
   }
 
   @Override
-  public TypeInformation<PropertyValue> getType() {
-    return TypeInformation.of(PropertyValue.class);
+  public TypeInformation<byte[]> getType() {
+    return TypeInformation.of(byte[].class);
   }
 }

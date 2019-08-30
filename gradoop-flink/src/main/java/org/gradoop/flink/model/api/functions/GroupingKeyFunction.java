@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm.functions.grouping;
+package org.gradoop.flink.model.api.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 

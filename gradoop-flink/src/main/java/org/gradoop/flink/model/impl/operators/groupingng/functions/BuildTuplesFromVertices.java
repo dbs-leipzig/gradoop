@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
 import java.util.List;
-
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
 
 /**
  * Build a tuple-based representation of vertices for grouping.
@@ -42,13 +39,13 @@ public class BuildTuplesFromVertices<E extends Element> extends BuildTuplesFromE
    */
   public BuildTuplesFromVertices(List<GroupingKeyFunction<? super E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
-    super(VERTEX_TUPLE_RESERVED, keys, aggregateFunctions);
+    super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, keys, aggregateFunctions);
   }
 
   @Override
   public Tuple map(E element) throws Exception {
     final Tuple result = super.map(element);
-    result.setField(element.getId(), VERTEX_TUPLE_ID);
+    result.setField(element.getId(), TemporalGroupingConstants.VERTEX_TUPLE_ID);
     return checkTuple(result);
   }
 

@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
+package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
 import java.util.List;
 import java.util.Objects;
-
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
-import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * Build the final super-vertex from the internal tuple-based representation.
@@ -56,7 +53,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
    */
   public BuildSuperVertexFromTuple(List<GroupingKeyFunction<? super E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, VertexFactory<E> vertexFactory) {
-    super(VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
+    super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(vertexFactory).createVertex();
     vertexType = vertexFactory.getType();
   }
@@ -64,7 +61,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
   @Override
   public E map(T tuple) throws Exception {
     E vertex = setAggregatePropertiesAndKeys(reuse, tuple);
-    vertex.setId(tuple.getField(VERTEX_TUPLE_SUPERID));
+    vertex.setId(tuple.getField(TemporalGroupingConstants.VERTEX_TUPLE_SUPERID));
     return vertex;
   }
 
