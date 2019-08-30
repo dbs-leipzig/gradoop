@@ -32,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +102,7 @@ public class CSVMetaDataSource implements MetaDataSource<CSVMetaData> {
   public CSVMetaData readLocal(String path, Configuration hdfsConfig) throws IOException {
     FileSystem fs = FileSystem.get(hdfsConfig);
     Path file = new Path(path);
-    Charset charset = Charset.forName("UTF-8");
+    Charset charset = StandardCharsets.UTF_8;
 
     if (!fs.exists(file)) {
       throw new FileNotFoundException(path);
