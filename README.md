@@ -170,7 +170,7 @@ scalability and speedup of the operators.
 
 ### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
 
-Demo application for GRADOOP operators
+Demo application for Gradoop operators
 
 ### Version History
 
