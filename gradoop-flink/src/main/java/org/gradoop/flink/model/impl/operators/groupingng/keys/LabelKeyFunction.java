@@ -29,12 +29,6 @@ import java.util.Objects;
  */
 public class LabelKeyFunction<T extends Labeled> implements GroupingKeyFunction<T, String> {
 
-  /**
-   * A property key used to indicate that the value should not actually be stored as a property,
-   * but as the label instead.
-   */
-  public static final String LABEL_KEY = ":label";
-
   @Override
   public String getKey(T element) {
     return element.getLabel();

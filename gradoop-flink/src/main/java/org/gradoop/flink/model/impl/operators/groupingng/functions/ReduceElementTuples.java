@@ -39,6 +39,12 @@ abstract class ReduceElementTuples<T extends Tuple> implements GroupReduceFuncti
    */
   protected final List<AggregateFunction> aggregateFunctions;
 
+  /**
+   * Instantiate this base class, setting the data offset and aggregate functions.
+   *
+   * @param tupleDataOffset    The data offset for aggregate values in the tuple.
+   * @param aggregateFunctions The aggregate functions.
+   */
   protected ReduceElementTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     this.aggregateFunctions = aggregateFunctions;

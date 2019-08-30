@@ -15,8 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.groupingng.keys;
 
-import org.apache.flink.api.common.typeinfo.BasicArrayTypeInfo;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -56,7 +54,7 @@ public class PropertyKeyFunction<T extends Attributed> implements GroupingKeyFun
     if (!(key instanceof byte[])) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
-    element.setProperty(propertyKey, PropertyValue.fromRawBytes(((byte[]) key)));
+    element.setProperty(propertyKey, PropertyValue.fromRawBytes((byte[]) key));
     return element;
   }
 

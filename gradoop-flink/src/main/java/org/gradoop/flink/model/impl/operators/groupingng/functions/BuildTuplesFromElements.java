@@ -129,7 +129,7 @@ public class BuildTuplesFromElements<E extends Element>
     }
     for (AggregateFunction aggregateFunction : aggregateFunctions) {
       final PropertyValue increment = aggregateFunction.getIncrement(element);
-      reuseTuple.setField(increment == null? NULL_VALUE : increment, field);
+      reuseTuple.setField(increment == null ? NULL_VALUE : increment, field);
       field++;
     }
     return reuseTuple;

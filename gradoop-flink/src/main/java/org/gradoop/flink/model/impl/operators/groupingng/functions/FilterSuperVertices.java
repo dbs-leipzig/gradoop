@@ -31,8 +31,8 @@ public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
 
   @Override
   public boolean filter(T t) throws Exception {
-    final GradoopId id = t.getField(TemporalGroupingConstants.VERTEX_TUPLE_ID);
-    final GradoopId superId = t.getField(TemporalGroupingConstants.VERTEX_TUPLE_SUPERID);
+    final GradoopId id = t.getField(GroupingNGConstants.VERTEX_TUPLE_ID);
+    final GradoopId superId = t.getField(GroupingNGConstants.VERTEX_TUPLE_SUPERID);
     return id.equals(superId);
   }
 }

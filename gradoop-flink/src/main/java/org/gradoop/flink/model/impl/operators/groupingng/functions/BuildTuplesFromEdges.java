@@ -38,14 +38,14 @@ public class BuildTuplesFromEdges<E extends Edge> extends BuildTuplesFromElement
    */
   public BuildTuplesFromEdges(List<GroupingKeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
-    super(TemporalGroupingConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
+    super(GroupingNGConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
   }
 
   @Override
   public Tuple map(E element) throws Exception {
     final Tuple result = super.map(element);
-    result.setField(element.getSourceId(), TemporalGroupingConstants.EDGE_TUPLE_SOURCEID);
-    result.setField(element.getTargetId(), TemporalGroupingConstants.EDGE_TUPLE_TARGETID);
+    result.setField(element.getSourceId(), GroupingNGConstants.EDGE_TUPLE_SOURCEID);
+    result.setField(element.getTargetId(), GroupingNGConstants.EDGE_TUPLE_TARGETID);
     return result;
   }
 }

@@ -32,7 +32,7 @@ public class ReduceEdgeTuples<T extends Tuple> extends ReduceElementTuples<T> {
    * Initialize this reduce function.
    *
    * @param tupleDataOffset    The data offset of the tuple. This will be
-   *                           {@value TemporalGroupingConstants#EDGE_TUPLE_RESERVED} {@code +} the
+   *                           {@value GroupingNGConstants#EDGE_TUPLE_RESERVED} {@code +} the
    *                           number of the grouping keys.
    * @param aggregateFunctions The vertex aggregate functions.
    */

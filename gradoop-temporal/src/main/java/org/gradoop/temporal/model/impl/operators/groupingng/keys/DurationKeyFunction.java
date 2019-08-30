@@ -33,9 +33,10 @@ import static java.time.ZoneOffset.UTC;
 
 /**
  * A key function extracting the duration of a temporal attribute.
+ *
+ * @param <T> The type of the temporal elements.
  */
-public class DurationKeyFunction<T extends TemporalElement>
-  implements GroupingKeyFunction<T, Long> {
+public class DurationKeyFunction<T extends TemporalElement> implements GroupingKeyFunction<T, Long> {
 
   /**
    * A key function used to extract the interval from the element.
@@ -75,8 +76,7 @@ public class DurationKeyFunction<T extends TemporalElement>
     final Instant start = Instant.ofEpochMilli(interval.f0);
     final Instant end = Instant.ofEpochMilli(interval.f1);
     if (calculateAsDate) {
-       return LocalDateTime.ofInstant(start, UTC)
-         .until(LocalDateTime.ofInstant(end, UTC), timeUnit);
+      return LocalDateTime.ofInstant(start, UTC).until(LocalDateTime.ofInstant(end, UTC), timeUnit);
     } else {
       return start.until(end, timeUnit);
     }

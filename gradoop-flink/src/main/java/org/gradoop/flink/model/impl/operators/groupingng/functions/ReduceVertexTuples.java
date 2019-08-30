@@ -22,8 +22,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.List;
 
-import static org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
-import static org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
+import static org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants.VERTEX_TUPLE_ID;
+import static org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * Reduce vertex tuples, assigning a super vertex ID and calculating aggregate values.
@@ -41,7 +41,7 @@ public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> 
    * Initialize this reduce function.
    *
    * @param tupleDataOffset    The data offset of the tuple. This will be
-   *                           {@value TemporalGroupingConstants#VERTEX_TUPLE_RESERVED} {@code +}
+   *                           {@value GroupingNGConstants#VERTEX_TUPLE_RESERVED} {@code +}
    *                           the number of the grouping keys.
    *
    * @param aggregateFunctions The vertex aggregate functions.

@@ -39,22 +39,13 @@ public class BuildTuplesFromVertices<E extends Element> extends BuildTuplesFromE
    */
   public BuildTuplesFromVertices(List<GroupingKeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
-    super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, keys, aggregateFunctions);
+    super(GroupingNGConstants.VERTEX_TUPLE_RESERVED, keys, aggregateFunctions);
   }
 
   @Override
   public Tuple map(E element) throws Exception {
     final Tuple result = super.map(element);
-    result.setField(element.getId(), TemporalGroupingConstants.VERTEX_TUPLE_ID);
-    return checkTuple(result);
-  }
-
-  private Tuple checkTuple(Tuple t) {
-    for (int i = 0; i < t.getArity(); i++) {
-      if (t.getField(i) == null) {
-        throw new IllegalStateException("Tuple contains null: " + t);
-      }
-    }
-    return t;
+    result.setField(element.getId(), GroupingNGConstants.VERTEX_TUPLE_ID);
+    return result;
   }
 }

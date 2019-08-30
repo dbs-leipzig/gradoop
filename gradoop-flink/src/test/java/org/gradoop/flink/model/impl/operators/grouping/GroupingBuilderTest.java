@@ -155,8 +155,9 @@ public class GroupingBuilderTest {
         .build();
 
     assertTrue(grouping instanceof Grouping);
-    List<LabelGroup> vertexLabelGroups = ((Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph,
-      GraphCollection>) grouping).getVertexLabelGroups();
+    List<LabelGroup> vertexLabelGroups =
+      ((Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>) grouping)
+        .getVertexLabelGroups();
 
     // first element of vertexLabelGroups is always the defaultVertexLabelGroup, so the label
     // specific group should be at index 1.

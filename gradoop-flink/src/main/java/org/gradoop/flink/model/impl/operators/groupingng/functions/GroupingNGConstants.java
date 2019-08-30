@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.groupingng.functions;
 /**
  * Holds common constants used by functions in grouping.
  */
-public abstract class TemporalGroupingConstants {
+public abstract class GroupingNGConstants {
   /**
    * The index of the vertex ID in the tuple-representation of a vertex.
    */

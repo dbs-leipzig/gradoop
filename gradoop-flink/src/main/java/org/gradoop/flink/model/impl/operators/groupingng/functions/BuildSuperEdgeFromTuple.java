@@ -54,7 +54,7 @@ public class BuildSuperEdgeFromTuple<T extends Tuple, E extends Edge>
    */
   public BuildSuperEdgeFromTuple(List<GroupingKeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, EdgeFactory<E> edgeFactory) {
-    super(TemporalGroupingConstants.EDGE_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
+    super(GroupingNGConstants.EDGE_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(edgeFactory).createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
     edgeType = edgeFactory.getType();
   }
@@ -63,8 +63,8 @@ public class BuildSuperEdgeFromTuple<T extends Tuple, E extends Edge>
   public E map(T tuple) throws Exception {
     E edge = setAggregatePropertiesAndKeys(reuse, tuple);
     edge.setId(GradoopId.get());
-    edge.setSourceId(tuple.getField(TemporalGroupingConstants.EDGE_TUPLE_SOURCEID));
-    edge.setTargetId(tuple.getField(TemporalGroupingConstants.EDGE_TUPLE_TARGETID));
+    edge.setSourceId(tuple.getField(GroupingNGConstants.EDGE_TUPLE_SOURCEID));
+    edge.setTargetId(tuple.getField(GroupingNGConstants.EDGE_TUPLE_TARGETID));
     return edge;
   }
 

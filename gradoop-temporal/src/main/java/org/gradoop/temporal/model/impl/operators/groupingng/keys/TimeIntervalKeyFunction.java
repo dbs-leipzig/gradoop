@@ -26,6 +26,8 @@ import java.util.Objects;
 
 /**
  * A key function extracting a {@link TimeDimension} from a {@link TemporalElement}.
+ *
+ * @param <T> The type of the temporal elements.
  */
 public class TimeIntervalKeyFunction<T extends TemporalElement>
   implements GroupingKeyFunction<T, Tuple2<Long, Long>> {

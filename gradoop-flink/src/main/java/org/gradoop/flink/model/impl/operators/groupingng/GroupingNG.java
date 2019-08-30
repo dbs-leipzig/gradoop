@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildSuperVer
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromEdges;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceEdgeTuples;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceVertexTuples;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.TemporalGroupingConstants;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromVertices;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.FilterSuperVertices;
@@ -134,31 +134,31 @@ public class GroupingNG<
       .name("Create vertex-tuples")
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
-        TemporalGroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(),
+        GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(),
         vertexAggregateFunctions))
       .name("Prepare super-vertices");
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId =
       verticesWithSuperVertex.project(
-        TemporalGroupingConstants.VERTEX_TUPLE_ID, TemporalGroupingConstants.VERTEX_TUPLE_SUPERID);
+        GroupingNGConstants.VERTEX_TUPLE_ID, GroupingNGConstants.VERTEX_TUPLE_SUPERID);
 
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
       .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
       .name("Create edge-tuples")
       .join(idToSuperId)
-      .where(TemporalGroupingConstants.EDGE_TUPLE_SOURCEID)
-      .equalTo(TemporalGroupingConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(TemporalGroupingConstants.EDGE_TUPLE_SOURCEID))
+      .where(GroupingNGConstants.EDGE_TUPLE_SOURCEID)
+      .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
+      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_SOURCEID))
       .name("Update edge-tuples (source ID)")
       .join(idToSuperId)
-      .where(TemporalGroupingConstants.EDGE_TUPLE_TARGETID)
-      .equalTo(TemporalGroupingConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(TemporalGroupingConstants.EDGE_TUPLE_TARGETID))
+      .where(GroupingNGConstants.EDGE_TUPLE_TARGETID)
+      .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
+      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_TARGETID))
       .name("Update edge-tuples (target ID)");
 
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
-        TemporalGroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
+        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
       .name("Prepare super-edges");
 
     DataSet<V> superVertices = verticesWithSuperVertex
@@ -179,7 +179,7 @@ public class GroupingNG<
    * @return The grouping keys, as tuple indices.
    */
   private int[] getInternalEdgeGroupingKeys() {
-    return IntStream.range(0, TemporalGroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size())
+    return IntStream.range(0, GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size())
       .toArray();
   }
 
@@ -189,8 +189,8 @@ public class GroupingNG<
    * @return The grouping keys, as tuple indices.
    */
   private int[] getInternalVertexGroupingKeys() {
-    return IntStream.range(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED,
-      TemporalGroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();
+    return IntStream.range(GroupingNGConstants.VERTEX_TUPLE_RESERVED,
+      GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();
   }
 
   /**
@@ -208,6 +208,7 @@ public class GroupingNG<
    *
    * @param useLabels   Should labels be used for grouping?
    * @param labelGroups The label groups to convert. (Only the default group is supported.)
+   * @param <T> The element type for the grouping key function.
    * @return Key functions corresponding to those groups.
    */
   private static <T extends Element> List<GroupingKeyFunction<T, ?>> asKeyFunctions(

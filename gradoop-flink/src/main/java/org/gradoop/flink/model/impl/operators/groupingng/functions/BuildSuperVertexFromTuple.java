@@ -53,7 +53,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
    */
   public BuildSuperVertexFromTuple(List<GroupingKeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, VertexFactory<E> vertexFactory) {
-    super(TemporalGroupingConstants.VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
+    super(GroupingNGConstants.VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(vertexFactory).createVertex();
     vertexType = vertexFactory.getType();
   }
@@ -61,7 +61,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
   @Override
   public E map(T tuple) throws Exception {
     E vertex = setAggregatePropertiesAndKeys(reuse, tuple);
-    vertex.setId(tuple.getField(TemporalGroupingConstants.VERTEX_TUPLE_SUPERID));
+    vertex.setId(tuple.getField(GroupingNGConstants.VERTEX_TUPLE_SUPERID));
     return vertex;
   }
 
