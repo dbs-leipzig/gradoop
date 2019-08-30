@@ -160,7 +160,18 @@ Contains example pipelines showing use cases for Gradoop.
 ### gradoop-checkstyle
 
 Used to maintain the code style for the whole project.
-    
+
+## Related Repositories
+
+### [Gradoop Benchmarks](https://github.com/dbs-leipzig/gradoop-benchmarks)
+
+This repository contains sets of Gradoop operator benchmarks designed to run on a cluster to measure
+scalability and speedup of the operators.
+
+### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
+
+Demo application for GRADOOP operators
+
 ### Version History
 
 See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at the Wiki pages. 
