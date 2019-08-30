@@ -65,7 +65,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
 
     List<String> lines = readLinesFromEnv();
 
-    checkWriteOutput(lines);
+    checkWriteOutput(lines, DOTDataSink.DotFormat.HTML);
   }
 
   /**
@@ -86,7 +86,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
 
     List<String> lines = readLinesFromEnv();
 
-    checkWriteOutput(lines);
+    checkWriteOutput(lines, DOTDataSink.DotFormat.SIMPLE);
   }
 
   private LogicalGraph initInputGraph() throws Exception {
@@ -108,7 +108,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
       .collect();
   }
 
-  private void checkWriteOutput(List<String> lines) {
+  private void checkWriteOutput(List<String> lines, DOTDataSink.DotFormat format) {
     int countGraphLines = 0;
     int countLines = 0;
     int countSubgraphLines = 0;
@@ -128,9 +128,11 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
         countSubgraphLines++;
       }
 
-      int index = line.indexOf('&');
-      if (index != -1) {
-        assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
+      if (format.equals(DOTDataSink.DotFormat.HTML)) {
+        int index = line.indexOf('&');
+        if (index != -1) {
+          assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
+        }
       }
       countLines++;
     }

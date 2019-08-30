@@ -118,7 +118,7 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Tests whether troublesome chars get escaped.
+   * Tests whether label and property value strings are being escaped according to java string rules.
    */
   @Test
   public void testStringEscaping() {
@@ -133,7 +133,7 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
     propertiesMap1.put(key, value);
     GradoopId idVertex1 = GradoopId.fromString("bbbbbbbbbbbbbbbbbbbbbbbb");
     EPGMVertex vertex1 = new EPGMVertexFactory().initVertex(
-            idVertex1, "QuestionPost", Properties.createFromMap(propertiesMap1));
+            idVertex1, "weird\nlabe\"l", Properties.createFromMap(propertiesMap1));
 
     // create vertex set
     Set<EPGMVertex> vertices = new HashSet<>();
@@ -146,13 +146,12 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
     when(transactionMock.getVertices()).thenReturn(vertices);
     when(transactionMock.getEdges()).thenReturn(edges);
 
-
     DotFileFormatSimple dotFileFormatSimple = new DotFileFormatSimple(true);
 
     String expected = "subgraph cluster_gaaaaaaaaaaaaaaaaaaaaaaaa{\n" +
             "label=\"graph\";\n" +
-            "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"QuestionPost\",Title=" +
-            "\"Why was Wojo occasionally known to say &quot;I'm too lazy!&quot;?\"];\n" +
+            "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"weird\\nlabe\\\"l\"," +
+            "Title=\"Why was Wojo occasionally known to say \\\"I'm too lazy!\\\"?\"];\n" +
             "}\n";
 
     assertEquals(expected, dotFileFormatSimple.format(transactionMock));

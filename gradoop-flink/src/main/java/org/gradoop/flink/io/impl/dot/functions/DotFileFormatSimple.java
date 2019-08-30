@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
 
 /**
  * Converts a GraphTransaction to the following .dot format:
@@ -81,17 +81,17 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
     Properties properties = element.getProperties();
 
     if (properties != null && properties.size() > 0) {
-      builder.append("label=\"").append(escapeHtml4(label)).append("\"");
+      builder.append("label=\"").append(escapeJava(label)).append("\"");
 
       for (Property property: properties) {
         builder.append(",")
-          .append(escapeHtml4(property.getKey()))
+          .append(escapeJava(property.getKey()))
           .append("=\"")
-          .append(escapeHtml4(property.getValue().toString()))
+          .append(escapeJava(property.getValue().toString()))
           .append("\"");
       }
     } else {
-      builder.append("label=\"").append(escapeHtml4(label)).append("\"");
+      builder.append("label=\"").append(escapeJava(label)).append("\"");
     }
   }
 }
