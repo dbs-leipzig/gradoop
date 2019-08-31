@@ -110,3 +110,14 @@ org.gradoop.storage.impl.accumulo.predicate
 org.gradoop.storage.impl.hbase
 org.gradoop.storage.impl.hbase.io
 org.gradoop.storage.impl.hbase.predicate.filter.impl
+org.gradoop.temporal.io.impl.csv
+org.gradoop.temporal.model.api.functions
+org.gradoop.temporal.model.impl
+org.gradoop.temporal.model.impl.functions
+org.gradoop.temporal.model.impl.layout
+org.gradoop.temporal.model.impl.operators.aggregation.functions
+org.gradoop.temporal.model.impl.operators.diff
+org.gradoop.temporal.model.impl.operators.diff.functions
+org.gradoop.temporal.model.impl.operators.snapshot
+org.gradoop.temporal.model.impl.pojo
+org.gradoop.temporal.util

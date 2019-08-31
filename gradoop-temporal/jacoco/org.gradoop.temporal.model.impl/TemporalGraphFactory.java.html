@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalGraphFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl</a> &gt; <span class="el_source">TemporalGraphFactory.java</span></div><h1>TemporalGraphFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
+import org.gradoop.temporal.model.impl.layout.TemporalGraphLayoutFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.util.TemporalGradoopConfig;
+
+import java.util.Collection;
+import java.util.Map;
+
+/**
+ * Responsible for creating instances of {@link TemporalGraph} based on a specific layout.
+ */
+public class TemporalGraphFactory implements
+  BaseGraphFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection&gt; {
+  /**
+   * The factory to create a temporal layout.
+   */
+  private LogicalGraphLayoutFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; layoutFactory;
+  /**
+   * Temporal Gradoop configuration.
+   */
+  private final TemporalGradoopConfig config;
+
+  /**
+   * Creates a new temporal graph factory instance.
+   *
+   * @param config the temporal Gradoop config
+   */
+<span class="fc" id="L61">  public TemporalGraphFactory(TemporalGradoopConfig config) {</span>
+<span class="fc" id="L62">    this.config = Preconditions.checkNotNull(config);</span>
+<span class="fc" id="L63">    this.layoutFactory = new TemporalGraphLayoutFactory();</span>
+<span class="fc" id="L64">    this.layoutFactory.setGradoopFlinkConfig(config);</span>
+<span class="fc" id="L65">  }</span>
+
+  @Override
+  public LogicalGraphLayoutFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; getLayoutFactory() {
+<span class="nc" id="L69">    return layoutFactory;</span>
+  }
+
+  @Override
+  public void setLayoutFactory(
+    LogicalGraphLayoutFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; layoutFactory) {
+<span class="nc" id="L75">    this.layoutFactory = layoutFactory;</span>
+<span class="nc" id="L76">  }</span>
+
+  @Override
+  public TemporalGraph fromDataSets(DataSet&lt;TemporalVertex&gt; vertices) {
+<span class="nc" id="L80">    return new TemporalGraph(this.layoutFactory.fromDataSets(vertices), config);</span>
+  }
+
+  @Override
+  public TemporalGraph fromDataSets(DataSet&lt;TemporalVertex&gt; vertices, DataSet&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L85">    return new TemporalGraph(this.layoutFactory.fromDataSets(vertices, edges), config);</span>
+  }
+
+  @Override
+  public TemporalGraph fromDataSets(DataSet&lt;TemporalGraphHead&gt; graphHead,
+    DataSet&lt;TemporalVertex&gt; vertices, DataSet&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L91">    return new TemporalGraph(this.layoutFactory.fromDataSets(graphHead, vertices, edges), config);</span>
+  }
+
+  @Override
+  public TemporalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
+<span class="nc" id="L97">    return new TemporalGraph(this.layoutFactory.fromIndexedDataSets(vertices, edges), config);</span>
+  }
+
+  @Override
+  public TemporalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHead,
+    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
+<span class="nc" id="L103">    return new TemporalGraph(this.layoutFactory.fromIndexedDataSets(graphHead, vertices, edges),</span>
+      config);
+  }
+
+  @Override
+  public TemporalGraph fromCollections(TemporalGraphHead graphHead,
+    Collection&lt;TemporalVertex&gt; vertices, Collection&lt;TemporalEdge&gt; edges) {
+<span class="nc" id="L110">    return new TemporalGraph(this.layoutFactory.fromCollections(graphHead, vertices, edges),</span>
+      config);
+  }
+
+  @Override
+  public TemporalGraph fromCollections(Collection&lt;TemporalVertex&gt; vertices,
+    Collection&lt;TemporalEdge&gt; edges) {
+<span class="nc" id="L117">    return new TemporalGraph(this.layoutFactory.fromCollections(vertices, edges), config);</span>
+  }
+
+  @Override
+  public TemporalGraph createEmptyGraph() {
+<span class="fc" id="L122">    return new TemporalGraph(this.layoutFactory.createEmptyGraph(), config);</span>
+  }
+
+  @Override
+  public GraphHeadFactory&lt;TemporalGraphHead&gt; getGraphHeadFactory() {
+<span class="fc" id="L127">    return layoutFactory.getGraphHeadFactory();</span>
+  }
+
+  @Override
+  public VertexFactory&lt;TemporalVertex&gt; getVertexFactory() {
+<span class="fc" id="L132">    return layoutFactory.getVertexFactory();</span>
+  }
+
+  @Override
+  public EdgeFactory&lt;TemporalEdge&gt; getEdgeFactory() {
+<span class="fc" id="L137">    return layoutFactory.getEdgeFactory();</span>
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance by the given EPGM graph head, vertex and edge datasets.
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given
+   * graph head.
+   *
+   * @param graphHead   1-element graph head DataSet
+   * @param vertices    vertex DataSet
+   * @param edges       edge DataSet
+   * @return a temporal graph with default temporal data
+   */
+  public TemporalGraph fromNonTemporalDataSets(
+    DataSet&lt;? extends GraphHead&gt; graphHead,
+    DataSet&lt;? extends Vertex&gt; vertices,
+    DataSet&lt;? extends Edge&gt; edges) {
+<span class="fc" id="L155">    return new TemporalGraph(this.layoutFactory.fromDataSets(</span>
+<span class="fc" id="L156">      graphHead.map(new GraphHeadToTemporalGraphHead&lt;&gt;(getGraphHeadFactory())),</span>
+<span class="fc" id="L157">      vertices.map(new VertexToTemporalVertex&lt;&gt;(getVertexFactory())),</span>
+<span class="fc" id="L158">      edges.map(new EdgeToTemporalEdge&lt;&gt;(getEdgeFactory()))), config);</span>
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance. By the provided timestamp extractors, it is possible
+   * to extract temporal information from the data to define a timestamp or time interval that
+   * represents the beginning and end of the element's validity (valid time).
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given graph head.
+   *
+   * @param graphHead 1-element graph head DataSet
+   * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
+   * @param vertices vertex DataSet
+   * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
+   * @param edges edge DataSet
+   * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @param &lt;G&gt; The graph head type.
+   * @param &lt;V&gt; The vertex type.
+   * @param &lt;E&gt; The edge type.
+   * @return a temporal graph with temporal data extracted using extractor functions
+   */
+  public &lt;G extends GraphHead, V extends Vertex, E extends Edge&gt; TemporalGraph fromNonTemporalDataSets(
+    DataSet&lt;G&gt; graphHead,
+    TimeIntervalExtractor&lt;G&gt; graphHeadTimeIntervalExtractor,
+    DataSet&lt;V&gt; vertices,
+    TimeIntervalExtractor&lt;V&gt; vertexTimeIntervalExtractor,
+    DataSet&lt;E&gt; edges,
+    TimeIntervalExtractor&lt;E&gt; edgeTimeIntervalExtractor) {
+
+<span class="fc" id="L187">    return new TemporalGraph(this.layoutFactory.fromDataSets(</span>
+<span class="fc" id="L188">      graphHead.map(new GraphHeadToTemporalGraphHead&lt;&gt;(getGraphHeadFactory(),</span>
+        graphHeadTimeIntervalExtractor)),
+<span class="fc" id="L190">      vertices.map(new VertexToTemporalVertex&lt;&gt;(getVertexFactory(),</span>
+        vertexTimeIntervalExtractor)),
+<span class="fc" id="L192">      edges.map(new EdgeToTemporalEdge&lt;&gt;(getEdgeFactory(),</span>
+        edgeTimeIntervalExtractor))), config);
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance from a (non-temporal) base graph.
+   *
+   * This method calls {@link #fromNonTemporalDataSets(DataSet, DataSet, DataSet)} on the graphs element
+   * data sets.
+   *
+   * @param graph Some base graph.
+   * @return The resulting temporal graph.
+   */
+  public TemporalGraph fromNonTemporalGraph(BaseGraph&lt;?, ?, ?, ?, ?&gt; graph) {
+<span class="fc" id="L206">    return fromNonTemporalDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

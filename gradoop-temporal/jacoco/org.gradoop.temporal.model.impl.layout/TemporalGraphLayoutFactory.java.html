@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalGraphLayoutFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.layout</a> &gt; <span class="el_source">TemporalGraphLayoutFactory.java</span></div><h1>TemporalGraphLayoutFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.layout;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Factory responsible for creating temporal GVE graph layouts.
+ */
+<span class="fc" id="L36">public class TemporalGraphLayoutFactory extends TemporalBaseLayoutFactory</span>
+  implements LogicalGraphLayoutFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; {
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromDataSets(
+    DataSet&lt;TemporalVertex&gt; vertices) {
+<span class="nc" id="L42">    return fromDataSets(vertices, createEdgeDataSet(Collections.emptyList()));</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromDataSets(
+    DataSet&lt;TemporalVertex&gt; vertices, DataSet&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L48">    requireNonNull(vertices, &quot;Vertex DataSet is null&quot;);</span>
+<span class="fc" id="L49">    requireNonNull(edges, &quot;Edge DataSet is null&quot;);</span>
+<span class="fc" id="L50">    TemporalGraphHead graphHead = getGraphHeadFactory().createGraphHead();</span>
+
+<span class="fc" id="L52">    DataSet&lt;TemporalGraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L53">      .fromElements(graphHead);</span>
+
+    // update vertices and edges with new graph head id
+<span class="fc" id="L56">    vertices = vertices</span>
+<span class="fc" id="L57">      .map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L58">      .withForwardedFields(&quot;id;label;properties;transactionTime;validTime&quot;);</span>
+<span class="fc" id="L59">    edges = edges</span>
+<span class="fc" id="L60">      .map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L61">      .withForwardedFields(&quot;id;sourceId;targetId;label;properties;transactionTime;validTime&quot;);</span>
+
+<span class="fc" id="L63">    return new TemporalGVELayout(graphHeadSet, vertices, edges);</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromDataSets(
+    DataSet&lt;TemporalGraphHead&gt; graphHead,
+    DataSet&lt;TemporalVertex&gt; vertices,
+    DataSet&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L71">    requireNonNull(graphHead, &quot;Temporal graphHead DataSet is null.&quot;);</span>
+<span class="fc" id="L72">    requireNonNull(vertices, &quot;Temporal vertex DataSet is null.&quot;);</span>
+<span class="fc" id="L73">    requireNonNull(edges, &quot;Temporal edge DataSet is null.&quot;);</span>
+<span class="fc" id="L74">    return new TemporalGVELayout(graphHead, vertices, edges);</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * Creating a temporal graph layout from an indexed dataset is not supported yet.
+   */
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
+<span class="nc" id="L85">    throw new UnsupportedOperationException(</span>
+      &quot;Creating a temporal graph layout from an indexed dataset is not supported yet.&quot;);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * Creating a temporal graph layout from an indexed dataset is not supported yet.
+   */
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
+<span class="nc" id="L98">    throw new UnsupportedOperationException(</span>
+      &quot;Creating a temporal graph layout from an indexed dataset is not supported yet.&quot;);
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
+    TemporalGraphHead graphHead, Collection&lt;TemporalVertex&gt; vertices,
+    Collection&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L106">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
+
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    List&lt;TemporalGraphHead&gt; graphHeads = graphHead == null ? Collections.emptyList() :</span>
+<span class="pc" id="L109">      Collections.singletonList(graphHead);</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">    if (edges == null) {</span>
+<span class="nc" id="L111">      edges = Collections.emptyList();</span>
+    }
+
+<span class="fc" id="L114">    return fromDataSets(</span>
+<span class="fc" id="L115">      createGraphHeadDataSet(graphHeads),</span>
+<span class="fc" id="L116">      createVertexDataSet(vertices),</span>
+<span class="fc" id="L117">      createEdgeDataSet(edges));</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
+    Collection&lt;TemporalVertex&gt; vertices, Collection&lt;TemporalEdge&gt; edges) {
+<span class="nc" id="L123">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
+<span class="nc" id="L124">    requireNonNull(edges, &quot;Temporal edge collection is null.&quot;);</span>
+<span class="nc" id="L125">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; createEmptyGraph() {
+<span class="fc" id="L130">    return fromCollections(null, Collections.emptyList(), Collections.emptyList());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

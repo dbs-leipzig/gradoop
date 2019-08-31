@@ -162,30 +162,31 @@ public class CypherPatternMatching&lt;
     EmbeddingMetaData embeddingMetaData) {
 
 <span class="fc" id="L164">    QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);</span>
+<span class="fc" id="L165">    constructionPatternHandler.updateGeneratedVariableNames(n -&gt; &quot;_&quot; + n);</span>
 
-<span class="fc" id="L166">    Set&lt;String&gt; queryVars = Sets.newHashSet(embeddingMetaData.getVariables());</span>
-<span class="fc" id="L167">    Set&lt;String&gt; constructionVars = constructionPatternHandler.getAllVariables();</span>
-<span class="fc" id="L168">    Set&lt;String&gt; existingVars = intersection(queryVars, constructionVars).immutableCopy();</span>
-<span class="fc" id="L169">    Set&lt;String&gt; newVars = difference(constructionVars, queryVars).immutableCopy();</span>
+<span class="fc" id="L167">    Set&lt;String&gt; queryVars = Sets.newHashSet(embeddingMetaData.getVariables());</span>
+<span class="fc" id="L168">    Set&lt;String&gt; constructionVars = constructionPatternHandler.getAllVariables();</span>
+<span class="fc" id="L169">    Set&lt;String&gt; existingVars = intersection(queryVars, constructionVars).immutableCopy();</span>
+<span class="fc" id="L170">    Set&lt;String&gt; newVars = difference(constructionVars, queryVars).immutableCopy();</span>
 
-<span class="fc" id="L171">    EmbeddingMetaData newMetaData = computeNewMetaData(</span>
+<span class="fc" id="L172">    EmbeddingMetaData newMetaData = computeNewMetaData(</span>
       embeddingMetaData, constructionPatternHandler, existingVars, newVars);
 
     // project existing embedding elements to new embeddings
-<span class="fc" id="L175">    ProjectEmbeddingsElements projectedEmbeddings =</span>
+<span class="fc" id="L176">    ProjectEmbeddingsElements projectedEmbeddings =</span>
       new ProjectEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
     // add new embedding elements
-<span class="fc" id="L178">    AddEmbeddingsElements addEmbeddingsElements =</span>
-<span class="fc" id="L179">      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());</span>
+<span class="fc" id="L179">    AddEmbeddingsElements addEmbeddingsElements =</span>
+<span class="fc" id="L180">      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());</span>
 
-<span class="fc" id="L181">    return addEmbeddingsElements.evaluate().flatMap(</span>
+<span class="fc" id="L182">    return addEmbeddingsElements.evaluate().flatMap(</span>
       new ElementsFromEmbedding&lt;&gt;(
-<span class="fc" id="L183">        graph.getFactory().getGraphHeadFactory(),</span>
-<span class="fc" id="L184">        graph.getFactory().getVertexFactory(),</span>
-<span class="fc" id="L185">        graph.getFactory().getEdgeFactory(),</span>
+<span class="fc" id="L184">        graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L185">        graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L186">        graph.getFactory().getEdgeFactory(),</span>
         newMetaData,
-<span class="fc" id="L187">        constructionPatternHandler.getSourceTargetVariables(),</span>
-<span class="fc" id="L188">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>
+<span class="fc" id="L188">        constructionPatternHandler.getSourceTargetVariables(),</span>
+<span class="fc" id="L189">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>
   }
 
   /**
@@ -200,22 +201,22 @@ public class CypherPatternMatching&lt;
   private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
     QueryHandler returnPatternHandler, Set&lt;String&gt; existingVariables, Set&lt;String&gt; newVariables) {
     // update meta data
-<span class="fc" id="L203">    EmbeddingMetaData newMetaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L204">    EmbeddingMetaData newMetaData = new EmbeddingMetaData();</span>
 
     // case 1: Filter existing embeddings based on return pattern
-<span class="fc bfc" id="L206" title="All 2 branches covered.">    for (String var : existingVariables) {</span>
-<span class="fc" id="L207">      newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());</span>
-<span class="fc" id="L208">    }</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    for (String var : existingVariables) {</span>
+<span class="fc" id="L208">      newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());</span>
+<span class="fc" id="L209">    }</span>
 
     // case 2: Add new vertices and edges
-<span class="fc bfc" id="L211" title="All 2 branches covered.">    for (String var : newVariables) {</span>
-<span class="fc bfc" id="L212" title="All 2 branches covered.">      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">    for (String var : newVariables) {</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?</span>
         EmbeddingMetaData.EntryType.EDGE :
         EmbeddingMetaData.EntryType.VERTEX;
 
-<span class="fc" id="L216">      newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());</span>
-<span class="fc" id="L217">    }</span>
-<span class="fc" id="L218">    return newMetaData;</span>
+<span class="fc" id="L217">      newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());</span>
+<span class="fc" id="L218">    }</span>
+<span class="fc" id="L219">    return newMetaData;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

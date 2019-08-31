@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.pojo</a> &gt; <span class="el_source">TemporalElement.java</span></div><h1>TemporalElement.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.pojo;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.properties.Properties;
+
+import java.util.Objects;
+
+/**
+ * Base class for all temporal elements. Contains interval definitions for transaction time and valid time.
+ */
+public abstract class TemporalElement extends EPGMElement implements Element {
+
+  /**
+   * The default value for unset times (validFrom and txFrom).
+   */
+<span class="fc" id="L34">  public static final Long DEFAULT_TIME_FROM = Long.MIN_VALUE;</span>
+  /**
+   * The default value for unset times (validTo and txTo).
+   */
+<span class="fc" id="L38">  public static final Long DEFAULT_TIME_TO = Long.MAX_VALUE;</span>
+  /**
+   * Transaction time interval containing the beginning and end of the elements transaction time.
+   * Its values are unix timestamps in milliseconds.
+   */
+  private Tuple2&lt;Long, Long&gt; transactionTime;
+  /**
+   * Valid time interval containing the beginning and end of the elements validity.
+   * Its values are unix timestamps in milliseconds.
+   */
+  private Tuple2&lt;Long, Long&gt; validTime;
+
+  /**
+   * Default constructor. Needed because of Flink's POJO rules and serialization.
+   */
+<span class="fc" id="L53">  public TemporalElement() {</span>
+<span class="fc" id="L54">    transactionTime = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L55">    validTime = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Creates a new temporal graph element.
+   *
+   * @param id the element identifier
+   * @param label the element label
+   * @param properties the element properties
+   * @param validFrom the beginning of the elements validity as unix timestamp in milliseconds
+   * @param validTo the end of the elements validity as unix timestamp in milliseconds
+   */
+  TemporalElement(GradoopId id, String label, Properties properties, Long validFrom, Long validTo) {
+<span class="fc" id="L68">    super(id, label, properties);</span>
+    // Set transaction time beginning to the current system time
+<span class="fc" id="L70">    transactionTime = new Tuple2&lt;&gt;(System.currentTimeMillis(), DEFAULT_TIME_TO);</span>
+
+<span class="fc" id="L72">    Tuple2&lt;Long, Long&gt; newValidTime = new Tuple2&lt;&gt;();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    newValidTime.f0 = validFrom == null ? DEFAULT_TIME_FROM : validFrom;</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    newValidTime.f1 = validTo == null ? DEFAULT_TIME_TO : validTo;</span>
+<span class="fc" id="L75">    setValidTime(newValidTime);</span>
+<span class="fc" id="L76">  }</span>
+
+  /**
+   * Get the transaction time tuple (tx-from, tx-to). Needed because of Flink's POJO rules.
+   *
+   * @return a {@link Tuple2} representing the transaction time interval
+   */
+  public Tuple2&lt;Long, Long&gt; getTransactionTime() {
+<span class="fc" id="L84">    return transactionTime;</span>
+  }
+
+  /**
+   * Set the transaction time tuple (tx-from, tx-to). Needed because of Flink's POJO rules.
+   *
+   * @param transactionTime a {@link Tuple2} representing the transaction time interval
+   */
+  public void setTransactionTime(Tuple2&lt;Long, Long&gt; transactionTime) {
+<span class="fc" id="L93">    Objects.requireNonNull(transactionTime);</span>
+<span class="fc" id="L94">    Objects.requireNonNull(transactionTime.f0);</span>
+<span class="fc" id="L95">    Objects.requireNonNull(transactionTime.f1);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (transactionTime.f0 &gt; transactionTime.f1) {</span>
+<span class="fc" id="L97">      throw new IllegalArgumentException(&quot;tx-from time can not be after tx-to time&quot;);</span>
+    }
+<span class="fc" id="L99">    this.transactionTime = transactionTime;</span>
+<span class="fc" id="L100">  }</span>
+
+  /**
+   * Get the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
+   *
+   * @return a {@link Tuple2} representing the valid time interval
+   */
+  public Tuple2&lt;Long, Long&gt; getValidTime() {
+<span class="fc" id="L108">    return validTime;</span>
+  }
+
+  /**
+   * Set the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
+   *
+   * @param validTime a {@link Tuple2} representing the valid time interval
+   */
+  public void setValidTime(Tuple2&lt;Long, Long&gt; validTime) {
+<span class="fc" id="L117">    Objects.requireNonNull(validTime);</span>
+<span class="fc" id="L118">    Objects.requireNonNull(validTime.f0);</span>
+<span class="fc" id="L119">    Objects.requireNonNull(validTime.f1);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (validTime.f0 &gt; validTime.f1) {</span>
+<span class="fc" id="L121">      throw new IllegalArgumentException(&quot;valid-from time can not be after valid-to time&quot;);</span>
+    }
+<span class="fc" id="L123">    this.validTime = validTime;</span>
+<span class="fc" id="L124">  }</span>
+
+  /**
+   * Get the beginning of the elements validity as unix timestamp in milliseconds.
+   *
+   * @return the beginning of the elements validity as unix timestamp in milliseconds
+   */
+  public Long getValidFrom() {
+<span class="fc" id="L132">    return this.validTime.f0;</span>
+  }
+
+  /**
+   * Sets the beginning of the elements validity as unix timestamp in milliseconds.
+   *
+   * @param validFrom the beginning of the elements validity as unix timestamp in milliseconds
+   */
+  public void setValidFrom(long validFrom) {
+<span class="fc" id="L141">    this.validTime.f0 = validFrom;</span>
+<span class="fc" id="L142">  }</span>
+
+  /**
+   * Get the end of the elements validity as unix timestamp in milliseconds.
+   *
+   * @return the end of the elements validity as unix timestamp in milliseconds
+   */
+  public Long getValidTo() {
+<span class="fc" id="L150">    return this.validTime.f1;</span>
+  }
+
+  /**
+   * Sets the end of the elements validity as unix timestamp in milliseconds.
+   *
+   * @param validTo the end of the elements validity as unix timestamp in milliseconds
+   */
+  public void setValidTo(long validTo) {
+<span class="fc" id="L159">    this.validTime.f1 = validTo;</span>
+<span class="fc" id="L160">  }</span>
+
+  /**
+   * Get the beginning of the elements transaction interval as unix timestamp in milliseconds.
+   *
+   * @return the beginning of the elements transaction interval as unix timestamp in milliseconds
+   */
+  public Long getTxFrom() {
+<span class="fc" id="L168">    return this.transactionTime.f0;</span>
+  }
+
+  /**
+   * Get the end of the elements transaction interval as unix timestamp in milliseconds.
+   *
+   * @return the end of the elements transaction interval as unix timestamp in milliseconds
+   */
+  public Long getTxTo() {
+<span class="fc" id="L177">    return this.transactionTime.f1;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    return String.format(&quot;%s%s%s[tx%s,val%s]{%s}&quot;,</span>
+      id,
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
+      label,
+<span class="fc" id="L186">      getTransactionTime(),</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">      getValidTime(),</span>
+      properties == null ? &quot;&quot; : properties);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

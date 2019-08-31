@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphHeadToTemporalGraphHead.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.functions.tpgm</a> &gt; <span class="el_source">GraphHeadToTemporalGraphHead.java</span></div><h1>GraphHeadToTemporalGraphHead.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.functions.tpgm;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+
+/**
+ * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
+ * default temporal information or, if a timeIntervalExtractor is given, by the extracted time information.
+ *
+ * @param &lt;G&gt; The (non-temporal) graph-head type.
+ */
+@FunctionAnnotation.ForwardedFields(&quot;id;label;properties&quot;)
+public class GraphHeadToTemporalGraphHead&lt;G extends GraphHead&gt;
+  implements MapFunction&lt;G, TemporalGraphHead&gt; {
+  /**
+   * The user defined interval extractor, might be {@code null}.
+   */
+  private TimeIntervalExtractor&lt;G&gt; timeIntervalExtractor;
+  /**
+   * Reuse this instance to reduce instantiations.
+   */
+  private TemporalGraphHead reuse;
+
+  /**
+   * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
+   * will have default temporal information.
+   *
+   * @param elementFactory factory that is responsible for creating a temporal graph head instance
+   */
+<span class="fc" id="L49">  public GraphHeadToTemporalGraphHead(GraphHeadFactory&lt;TemporalGraphHead&gt; elementFactory) {</span>
+<span class="fc" id="L50">    this.reuse = elementFactory.createGraphHead();</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
+   * will have valid times extracted from the non-temporal instance by the given timeIntervalExtractor.
+   *
+   * @param elementFactory factory that is responsible for creating a temporal graph head instance
+   * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
+   */
+  public GraphHeadToTemporalGraphHead(
+    GraphHeadFactory&lt;TemporalGraphHead&gt; elementFactory,
+    TimeIntervalExtractor&lt;G&gt; timeIntervalExtractor) {
+<span class="fc" id="L63">    this(elementFactory);</span>
+<span class="fc" id="L64">    this.timeIntervalExtractor = timeIntervalExtractor;</span>
+<span class="fc" id="L65">  }</span>
+
+  @Override
+  public TemporalGraphHead map(G value) throws Exception {
+<span class="fc" id="L69">    reuse.setId(value.getId());</span>
+<span class="fc" id="L70">    reuse.setLabel(value.getLabel());</span>
+<span class="fc" id="L71">    reuse.setProperties(value.getProperties());</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (timeIntervalExtractor != null) {</span>
+<span class="fc" id="L73">      reuse.setValidTime(timeIntervalExtractor.map(value));</span>
+    }
+<span class="fc" id="L75">    return reuse;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

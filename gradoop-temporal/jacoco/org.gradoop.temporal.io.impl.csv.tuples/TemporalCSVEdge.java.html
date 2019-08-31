@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalCSVEdge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.io.impl.csv.tuples</a> &gt; <span class="el_source">TemporalCSVEdge.java</span></div><h1>TemporalCSVEdge.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.io.impl.csv.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple7;
+
+/**
+ * Tuple representing a temporal edge in a CSV file.
+ * &lt;p&gt;
+ * The tuple fields are:
+ * &lt;ol start=&quot;0&quot;&gt;
+ *   &lt;li&gt;the ID, as a String&lt;/li&gt;
+ *   &lt;li&gt;the IDs of the graphs that contain this edge&lt;/li&gt;
+ *   &lt;li&gt;the ID of the source vertex&lt;/li&gt;
+ *   &lt;li&gt;the ID of the target vertex&lt;/li&gt;
+ *   &lt;li&gt;the label&lt;/li&gt;
+ *   &lt;li&gt;the properties, encoded as a String according to the meta data&lt;/li&gt;
+ *   &lt;li&gt;the temporal data (transaction- and valid-times)&lt;/li&gt;
+ * &lt;/ol&gt;
+ */
+<span class="fc" id="L34">public class TemporalCSVEdge extends Tuple7&lt;String, String, String, String, String, String, String&gt;</span>
+  implements TemporalCSVElement {
+
+  @Override
+  public String getId() {
+<span class="nc" id="L39">    return f0;</span>
+  }
+
+  @Override
+  public void setId(String id) {
+<span class="fc" id="L44">    f0 = id;</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Returns the gradoop ids of the graphs that the edge belongs to.
+   *
+   * @return graph gradoop ids
+   */
+  public String getGradoopIds() {
+<span class="nc" id="L53">    return f1;</span>
+  }
+
+  /**
+   * Sets the gradoop ids of the graphs which contain this edge.
+   *
+   * @param gradoopIds graph gradoop ids
+   */
+  public void setGradoopIds(String gradoopIds) {
+<span class="fc" id="L62">    f1 = gradoopIds;</span>
+<span class="fc" id="L63">  }</span>
+
+  /**
+   * Returns the string that represents the source.
+   *
+   * @return returns the source id.
+   */
+  public String getSourceId() {
+<span class="nc" id="L71">    return f2;</span>
+  }
+
+  /**
+   * Sets the string that represents the source.
+   *
+   * @param sourceId represents the source id.
+   */
+  public void setSourceId(String sourceId) {
+<span class="fc" id="L80">    f2 = sourceId;</span>
+<span class="fc" id="L81">  }</span>
+
+
+  /**
+   * Returns the string that represents the target.
+   *
+   * @return returns the target id.
+   */
+  public String getTargetId() {
+<span class="nc" id="L90">    return f3;</span>
+  }
+
+  /**
+   * Sets the string that represents the target.
+   *
+   * @param targetId represents the target id.
+   */
+  public void setTargetId(String targetId) {
+<span class="fc" id="L99">    f3 = targetId;</span>
+<span class="fc" id="L100">  }</span>
+
+  @Override
+  public String getLabel() {
+<span class="nc" id="L104">    return f4;</span>
+  }
+
+  @Override
+  public void setLabel(String label) {
+<span class="fc" id="L109">    f4 = label;</span>
+<span class="fc" id="L110">  }</span>
+
+  @Override
+  public String getProperties() {
+<span class="nc" id="L114">    return f5;</span>
+  }
+
+  @Override
+  public void setProperties(String properties) {
+<span class="fc" id="L119">    f5 = properties;</span>
+<span class="fc" id="L120">  }</span>
+
+
+  @Override
+  public void setTemporalData(String temporalData) {
+<span class="fc" id="L125">    f6 = temporalData;</span>
+<span class="fc" id="L126">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

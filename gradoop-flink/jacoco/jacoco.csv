@@ -302,7 +302,7 @@ Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,GraphUtilsBase,0,16
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,SearchGraphUtilsBase,0,31,0,2,0,6,0,3,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,SortedSearchGraphUtils,6,85,4,4,0,17,4,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.tostring,CanonicalAdjacencyMatrixBuilder,0,376,0,2,0,69,0,4,0,3
-Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher,CypherPatternMatching,0,229,0,10,0,52,0,12,0,7
+Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher,CypherPatternMatching,0,241,0,10,0,53,0,13,0,8
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.functions,WritePropertyToGraphHeadMap,0,17,0,0,0,6,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.functions,VertexToGellyVertexWithPropertyValue,0,26,0,0,0,7,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.functions,LongTupleToGellyEdgeWithLongValue,0,25,0,0,0,7,0,2,0,2
@@ -395,7 +395,7 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.difference,DifferenceBroadc
 Gradoop Flink,org.gradoop.flink.model.impl.operators.difference,Difference,0,35,0,0,0,11,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,Step,88,66,9,7,11,17,10,6,2,6
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,TraversalCode,12,21,0,0,1,7,1,4,1,4
-Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,QueryHandler,37,558,10,48,7,119,14,60,5,40
+Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,QueryHandler,43,649,11,55,8,139,15,64,5,41
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,DFSTraverser,2,158,3,19,0,34,3,13,0,5
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,GraphMetrics,3,267,0,24,1,54,1,22,1,10
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query,Triple,25,50,3,5,2,14,4,7,1,6

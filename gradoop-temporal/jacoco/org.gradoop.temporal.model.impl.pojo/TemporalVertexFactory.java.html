@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalVertexFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.pojo</a> &gt; <span class="el_source">TemporalVertexFactory.java</span></div><h1>TemporalVertexFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.pojo;
+
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.util.GradoopConstants;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+ * Factory for creating temporal vertex POJOs.
+ */
+<span class="fc" id="L31">public class TemporalVertexFactory implements VertexFactory&lt;TemporalVertex&gt;, Serializable {</span>
+
+  @Override
+  public TemporalVertex createVertex() {
+<span class="fc" id="L35">    return initVertex(GradoopId.get());</span>
+  }
+
+  @Override
+  public TemporalVertex initVertex(GradoopId id) {
+<span class="fc" id="L40">    return initVertex(id, GradoopConstants.DEFAULT_VERTEX_LABEL, null, null);</span>
+  }
+
+  @Override
+  public TemporalVertex createVertex(String label) {
+<span class="nc" id="L45">    return initVertex(GradoopId.get(), label);</span>
+  }
+
+  @Override
+  public TemporalVertex initVertex(GradoopId id, String label) {
+<span class="nc" id="L50">    return initVertex(id, label, null, null);</span>
+  }
+
+  @Override
+  public TemporalVertex createVertex(String label, Properties properties) {
+<span class="nc" id="L55">    return initVertex(GradoopId.get(), label, properties);</span>
+  }
+
+  @Override
+  public TemporalVertex initVertex(GradoopId id, String label, Properties properties) {
+<span class="nc" id="L60">    return initVertex(id, label, properties, null);</span>
+  }
+
+  @Override
+  public TemporalVertex createVertex(String label, GradoopIdSet graphIds) {
+<span class="nc" id="L65">    return initVertex(GradoopId.get(), label, graphIds);</span>
+  }
+
+  @Override
+  public TemporalVertex initVertex(GradoopId id, String label, GradoopIdSet graphIds) {
+<span class="nc" id="L70">    return initVertex(id, label, null, graphIds);</span>
+  }
+
+  @Override
+  public TemporalVertex createVertex(String label, Properties properties, GradoopIdSet graphIds) {
+<span class="nc" id="L75">    return initVertex(GradoopId.get(), label, properties, graphIds);</span>
+  }
+
+  @Override
+  public TemporalVertex initVertex(GradoopId id, String label, Properties properties, GradoopIdSet graphIds) {
+<span class="fc" id="L80">    return new TemporalVertex(</span>
+<span class="fc" id="L81">      Objects.requireNonNull(id, &quot;Identifier is null.&quot;),</span>
+<span class="fc" id="L82">      Objects.requireNonNull(label, &quot;Label is null.&quot;),</span>
+      properties,
+      graphIds,
+      null,
+      null
+    );
+  }
+
+  @Override
+  public Class&lt;TemporalVertex&gt; getType() {
+<span class="nc" id="L92">    return TemporalVertex.class;</span>
+  }
+
+
+  /**
+   * Initializes a temporal vertex based on the given parameters. If the valid times are null,
+   * default values are used.
+   *
+   * @param id              vertex identifier
+   * @param label           vertex label
+   * @param properties      vertex properties
+   * @param graphIds        graphIds, that contain the vertex
+   * @param validFrom       begin of the elements validity as unix timestamp [ms] or null
+   * @param validTo         end of the elements validity as unix timestamp [ms] or null
+   * @return the temporal vertex instance
+   */
+  public TemporalVertex initVertex(GradoopId id, String label, Properties properties,
+    GradoopIdSet graphIds, Long validFrom, Long validTo) {
+<span class="fc" id="L110">    return new TemporalVertex(</span>
+<span class="fc" id="L111">      Objects.requireNonNull(id, &quot;Identifier is null.&quot;),</span>
+<span class="fc" id="L112">      Objects.requireNonNull(label, &quot;Label is null.&quot;),</span>
+      properties,
+      graphIds,
+      validFrom,
+      validTo);
+  }
+
+  /**
+   * Helper function to create a TPGM vertex from an EPGM vertex.
+   * The id, label and all other information will be inherited.
+   *
+   * @param vertex the EPGM vertex instance
+   * @return a TPGM vertex instance with default values at its valid times
+   */
+  public TemporalVertex fromNonTemporalVertex(Vertex vertex) {
+<span class="fc" id="L127">    return initVertex(vertex.getId(), vertex.getLabel(), vertex.getProperties(),</span>
+<span class="fc" id="L128">      vertex.getGraphIds(), null, null);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

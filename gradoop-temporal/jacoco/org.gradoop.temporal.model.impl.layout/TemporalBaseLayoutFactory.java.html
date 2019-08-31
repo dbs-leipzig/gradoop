@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalBaseLayoutFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.layout</a> &gt; <span class="el_source">TemporalBaseLayoutFactory.java</span></div><h1>TemporalBaseLayoutFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.layout;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
+import org.gradoop.flink.model.impl.functions.bool.False;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHeadFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
+import org.gradoop.temporal.util.TemporalGradoopConfig;
+
+import java.util.Collection;
+import java.util.function.Supplier;
+
+import static java.util.Objects.requireNonNull;
+
+/**
+ * A base class for temporal layout factories.
+ */
+class TemporalBaseLayoutFactory implements
+  BaseLayoutFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; {
+
+  /**
+   * The temporal config.
+   */
+  private TemporalGradoopConfig config;
+
+  /**
+   * The graph head factory.
+   */
+  private final GraphHeadFactory&lt;TemporalGraphHead&gt; graphHeadFactory;
+
+  /**
+   * The vertex factory.
+   */
+  private final VertexFactory&lt;TemporalVertex&gt; vertexFactory;
+
+  /**
+   * The edge factory.
+   */
+  private final EdgeFactory&lt;TemporalEdge&gt; edgeFactory;
+
+  /**
+   * Initialize this factory.
+   */
+<span class="fc" id="L69">  TemporalBaseLayoutFactory() {</span>
+<span class="fc" id="L70">    graphHeadFactory = new TemporalGraphHeadFactory();</span>
+<span class="fc" id="L71">    vertexFactory = new TemporalVertexFactory();</span>
+<span class="fc" id="L72">    edgeFactory = new TemporalEdgeFactory();</span>
+<span class="fc" id="L73">  }</span>
+
+  /**
+   * Create a {@link DataSet} from a possible empty collection.
+   *
+   * @param collection   The collection of elements.
+   * @param dummyFactory A factory used to create a dummy element (in case the collection is empty).
+   * @param &lt;E&gt;          The type of the elements.
+   * @return A dataset containing the elements of the collection.
+   */
+  protected &lt;E&gt; DataSet&lt;E&gt; createDataSet(Collection&lt;E&gt; collection, Supplier&lt;E&gt; dummyFactory) {
+<span class="fc" id="L84">    requireNonNull(collection, &quot;Element collection was null&quot;);</span>
+<span class="fc" id="L85">    requireNonNull(dummyFactory, &quot;Dummy element provider was null&quot;);</span>
+
+<span class="fc" id="L87">    final ExecutionEnvironment executionEnvironment = getConfig().getExecutionEnvironment();</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">    if (collection.isEmpty()) {</span>
+<span class="fc" id="L89">      return executionEnvironment.fromElements(dummyFactory.get())</span>
+<span class="fc" id="L90">        .filter(new False&lt;&gt;());</span>
+    } else {
+<span class="fc" id="L92">      return executionEnvironment.fromCollection(collection);</span>
+    }
+  }
+
+  /**
+   * Create a {@link DataSet} from a possibly empty collection of {@link TemporalGraphHead graph heads}.
+   *
+   * @param heads The collection of graph heads.
+   * @return The dataset of graph heads.
+   */
+  protected DataSet&lt;TemporalGraphHead&gt; createGraphHeadDataSet(Collection&lt;TemporalGraphHead&gt; heads) {
+<span class="fc" id="L103">    return createDataSet(heads, () -&gt; getGraphHeadFactory().createGraphHead());</span>
+  }
+
+  /**
+   * Create a {@link DataSet} from a possibly empty collection of {@link TemporalVertex vertices}.
+   *
+   * @param vertices The collection of vertices.
+   * @return The dataset of vertices.
+   */
+  protected DataSet&lt;TemporalVertex&gt; createVertexDataSet(Collection&lt;TemporalVertex&gt; vertices) {
+<span class="fc" id="L113">    return createDataSet(vertices, () -&gt; getVertexFactory().createVertex());</span>
+  }
+
+  /**
+   * Create a {@link DataSet} from a possibly empty collection of {@link TemporalEdge edges}.
+   *
+   * @param edges The collection of edges.
+   * @return The dataset of edges.
+   */
+  protected DataSet&lt;TemporalEdge&gt; createEdgeDataSet(Collection&lt;TemporalEdge&gt; edges) {
+<span class="fc" id="L123">    return createDataSet(edges,</span>
+<span class="fc" id="L124">      () -&gt; getEdgeFactory().createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE));</span>
+  }
+
+  /**
+   * Get the temporal config to be used by this factory.
+   *
+   * @return The config.
+   * @throws IllegalStateException when the config has not been set yet.
+   */
+  protected TemporalGradoopConfig getConfig() {
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">    if (config != null) {</span>
+<span class="fc" id="L135">      return config;</span>
+    }
+<span class="nc" id="L137">    throw new IllegalStateException(&quot;No config is set for this factory.&quot;);</span>
+  }
+
+  @Override
+  public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">    if (config instanceof TemporalGradoopConfig) {</span>
+<span class="fc" id="L143">      this.config = (TemporalGradoopConfig) config;</span>
+    } else {
+<span class="nc" id="L145">      throw new IllegalArgumentException(&quot;The config has to be an instance of [&quot; +</span>
+<span class="nc" id="L146">        TemporalGradoopConfig.class.getSimpleName() + &quot;].&quot;);</span>
+    }
+<span class="fc" id="L148">  }</span>
+
+  @Override
+  public GraphHeadFactory&lt;TemporalGraphHead&gt; getGraphHeadFactory() {
+<span class="fc" id="L152">    return graphHeadFactory;</span>
+  }
+
+  @Override
+  public VertexFactory&lt;TemporalVertex&gt; getVertexFactory() {
+<span class="fc" id="L157">    return vertexFactory;</span>
+  }
+
+  @Override
+  public EdgeFactory&lt;TemporalEdge&gt; getEdgeFactory() {
+<span class="fc" id="L162">    return edgeFactory;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
