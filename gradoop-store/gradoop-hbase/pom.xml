@@ -132,7 +132,7 @@
         <!-- HBase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
+            <artifactId>hbase-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
