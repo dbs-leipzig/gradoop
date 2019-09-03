@@ -96,4 +96,27 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(result.equalsByGraphElementData(expectedCollection));
   }
+
+  /**
+   * Test if construction patterns work when no variables are assigned on construction patterns.
+   */
+  @Test
+  public void testConstructionPatternWithNoVariables() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    GraphCollection result = loader.getLogicalGraph()
+      .query("MATCH (u1)-[:hasInterest]->(i)<-[:hasInterest]-(u2)",
+        "(u1)-[:commonInterest]->(u2)");
+    loader.appendToDatabaseFromString("expected1[" +
+      "(eve)-[:commonInterest]->(alice)" +
+      "] expected2 [" +
+      "(alice)-[:commonInterest]->(eve)" +
+      "] expected3 [" +
+      "(frank)-[:commonInterest]->(dave)" +
+      "] expected4 [" +
+      "(dave)-[:commonInterest]->(frank)" +
+      "]");
+    collectAndAssertTrue(
+      loader.getGraphCollectionByVariables("expected1", "expected2", "expected3", "expected4")
+        .equalsByGraphElementData(result));
+  }
 }

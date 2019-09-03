@@ -28,6 +28,7 @@ import org.s1ck.gdl.model.Vertex;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +82,16 @@ public class QueryHandler {
   private Map<Long, Set<Edge>> targetIdToEdgeCache;
 
   /**
+   * The edge cache of the GDL handler.
+   */
+  private Map<String, Edge> edgeCache;
+
+  /**
+   * The vertex cache of the GDL handler.
+   */
+  private Map<String, Vertex> vertexCache;
+
+  /**
    * Creates a new query handler.
    *
    * @param gdlString GDL query string
@@ -91,6 +102,8 @@ public class QueryHandler {
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(gdlString);
+    edgeCache = gdlHandler.getEdgeCache(true, true);
+    vertexCache = gdlHandler.getVertexCache(true, true);
   }
 
   /**
@@ -138,7 +151,7 @@ public class QueryHandler {
    * @return all vertex variables
    */
   public Set<String> getVertexVariables() {
-    return gdlHandler.getVertexCache().keySet();
+    return vertexCache.keySet();
   }
 
   /**
@@ -147,7 +160,7 @@ public class QueryHandler {
    * @return all edge variables
    */
   public Set<String> getEdgeVariables() {
-    return gdlHandler.getEdgeCache().keySet();
+    return edgeCache.keySet();
   }
 
   /**
@@ -234,7 +247,7 @@ public class QueryHandler {
    * @return True if the variable points to a vertex
    */
   public boolean isVertex(String variable) {
-    return gdlHandler.getVertexCache().containsKey(variable);
+    return vertexCache.containsKey(variable);
   }
 
   /**
@@ -244,7 +257,7 @@ public class QueryHandler {
    * @return True if the variable points to an edge
    */
   public boolean isEdge(String variable) {
-    return gdlHandler.getEdgeCache().containsKey(variable);
+    return edgeCache.containsKey(variable);
   }
 
   /**
@@ -283,7 +296,7 @@ public class QueryHandler {
    * @return vertex or {@code null}
    */
   public Vertex getVertexByVariable(String variable) {
-    return gdlHandler.getVertexCache(true, true).get(variable);
+    return vertexCache.get(variable);
   }
 
 
@@ -295,7 +308,7 @@ public class QueryHandler {
    * @return edge or {@code null}
    */
   public Edge getEdgeByVariable(String variable) {
-    return gdlHandler.getEdgeCache(true, true).get(variable);
+    return edgeCache.get(variable);
   }
 
   /**
@@ -618,5 +631,36 @@ public class QueryHandler {
           keySelector,
           Collectors.mapping(valueSelector, Collectors.toSet())
       ));
+  }
+
+  /**
+   * Update variable names of vertices and edges with a generated variable name.
+   * This will also update the vertex- and edge-caches of this handler.
+   *
+   * @param renameFunction The renaming function, mapping old to new variable names.
+   */
+  public void updateGeneratedVariableNames(Function<String, String> renameFunction) {
+    Set<String> generatedEdgeVariables = gdlHandler.getEdgeCache(false, true).keySet();
+    Set<String> generatedVertexVariables = gdlHandler.getVertexCache(false, true).keySet();
+    Map<String, Vertex> newVertexCache = new HashMap<>();
+    Map<String, Edge> newEdgeCache = new HashMap<>();
+    // Update vertices.
+    for (Vertex vertex : getVertices()) {
+      final String variable = vertex.getVariable();
+      if (generatedVertexVariables.contains(variable)) {
+        vertex.setVariable(renameFunction.apply(variable));
+      }
+      newVertexCache.put(vertex.getVariable(), vertex);
+    }
+    // Update edges.
+    for (Edge edge : getEdges()) {
+      final String variable = edge.getVariable();
+      if (generatedEdgeVariables.contains(variable)) {
+        edge.setVariable(renameFunction.apply(variable));
+      }
+      newEdgeCache.put(edge.getVariable(), edge);
+    }
+    vertexCache = Collections.unmodifiableMap(newVertexCache);
+    edgeCache = Collections.unmodifiableMap(newEdgeCache);
   }
 }
