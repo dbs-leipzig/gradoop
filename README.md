@@ -24,6 +24,8 @@ help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
+* [Evolution Analysis of Large Graphs with Gradoop, ECML PKDD LEG Workshop, September 2019](https://dbs.uni-leipzig.de/file/LEGECML-PKDD_2019_paper_9.pdf)
+* [Temporal Graph Analysis using Gradoop, BTW 2019-Workshopband, März 2019](https://dl.gi.de/bitstream/handle/20.500.12116/21797/C2-1.pdf)
 * [Declarative and distributed graph analytics with GRADOOP, VLDB Demo, August 2018](http://www.vldb.org/pvldb/vol11/p2006-junghanns.pdf)
 * [Cypher-based Graph Pattern Matching in Apache Flink, FlinkForward, September 2017](https://youtu.be/dZ8_v_P1j98)
 * [Cypher-based Graph Pattern Matching in GRADOOP, SIGMOD GRADES Workshop, May 2017](https://dbs.uni-leipzig.de/file/GRADES17_Cypher_in_Gradoop.pdf)
