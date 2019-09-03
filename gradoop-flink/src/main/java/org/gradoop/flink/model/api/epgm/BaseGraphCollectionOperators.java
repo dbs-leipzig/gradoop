@@ -23,7 +23,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
-import org.gradoop.flink.model.api.operators.CallableGraphCollection;
+import org.gradoop.flink.model.api.operators.BaseGraphCollectionOperatorSupport;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
@@ -63,7 +63,7 @@ public interface BaseGraphCollectionOperators<
   V extends Vertex,
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends CallableGraphCollection<LG, GC> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends BaseGraphCollectionOperatorSupport<LG, GC> {
 
   //----------------------------------------------------------------------------
   // Base Graph / Graph Head Getters

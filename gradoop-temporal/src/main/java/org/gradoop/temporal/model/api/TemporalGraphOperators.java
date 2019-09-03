@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.operators.CallableGraph;
+import org.gradoop.flink.model.api.operators.BaseGraphOperatorSupport;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
-public interface TemporalGraphOperators extends CallableGraph<TemporalGraph, TemporalGraphCollection> {
+public interface TemporalGraphOperators extends BaseGraphOperatorSupport<TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators

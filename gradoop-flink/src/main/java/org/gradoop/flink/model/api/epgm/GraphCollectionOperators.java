@@ -17,7 +17,7 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.api.operators.CallableGraphCollection;
+import org.gradoop.flink.model.api.operators.BaseGraphCollectionOperatorSupport;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators extends CallableGraphCollection<LogicalGraph, GraphCollection> {
+public interface GraphCollectionOperators extends BaseGraphCollectionOperatorSupport<LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Auxiliary operators

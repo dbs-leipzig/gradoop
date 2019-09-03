@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  * @param <LG> graph type
  * @param <GC> graph collection type
  */
-public interface CallableGraph<LG extends BaseGraph, GC extends BaseGraphCollection> {
+public interface BaseGraphOperatorSupport<LG extends BaseGraph, GC extends BaseGraphCollection> {
 
   /**
    * Creates a value using the given unary graph to value operator.

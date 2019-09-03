@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.operators.CallableGraph;
+import org.gradoop.flink.model.api.operators.BaseGraphOperatorSupport;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators extends CallableGraph<LogicalGraph, GraphCollection> {
+public interface LogicalGraphOperators extends BaseGraphOperatorSupport<LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators

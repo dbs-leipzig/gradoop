@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.overlap.Overlap;
  * @param <LG> graph type
  * @param <GC> graph collection type
  */
-public interface CallableGraphCollection<LG extends BaseGraph, GC extends BaseGraphCollection> {
+public interface BaseGraphCollectionOperatorSupport<LG extends BaseGraph, GC extends BaseGraphCollection> {
 
   /**
    * Creates a value using the given unary collection to value operator.

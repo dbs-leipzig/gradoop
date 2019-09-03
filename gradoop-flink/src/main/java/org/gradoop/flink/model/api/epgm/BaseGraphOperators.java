@@ -23,7 +23,7 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.operators.CallableGraph;
+import org.gradoop.flink.model.api.operators.BaseGraphOperatorSupport;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -56,7 +56,7 @@ public interface BaseGraphOperators<
   V extends Vertex,
   E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends CallableGraph<LG, GC> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends BaseGraphOperatorSupport<LG, GC> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
