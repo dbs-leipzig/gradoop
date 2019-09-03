@@ -151,10 +151,18 @@ public class GroupingNG<
       .where(GroupingNGConstants.EDGE_TUPLE_SOURCEID)
       .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
       .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_SOURCEID))
+      .withForwardedFieldsFirst(getInternalForwardedFieldsForEdgeUpdate(
+        GroupingNGConstants.EDGE_TUPLE_SOURCEID, false))
+      .withForwardedFieldsSecond(getInternalForwardedFieldsForEdgeUpdate(
+        GroupingNGConstants.EDGE_TUPLE_SOURCEID, true))
       .join(idToSuperId)
       .where(GroupingNGConstants.EDGE_TUPLE_TARGETID)
       .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_TARGETID));
+      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_TARGETID))
+      .withForwardedFieldsFirst(getInternalForwardedFieldsForEdgeUpdate(
+        GroupingNGConstants.EDGE_TUPLE_TARGETID, false))
+      .withForwardedFieldsSecond(getInternalForwardedFieldsForEdgeUpdate(
+        GroupingNGConstants.EDGE_TUPLE_TARGETID, true));
 
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
@@ -195,6 +203,26 @@ public class GroupingNG<
   private String getInternalForwardedFieldsForVertexReduce() {
     return IntStream.of(getInternalVertexGroupingKeys()).mapToObj(i -> "f" + i)
       .collect(Collectors.joining(";"));
+  }
+
+  /**
+   * Get the internal representation of the forwarded fields for the {@link UpdateIdField} steps.
+   * Forwarded fields will be all but the currently updated field for the left side and the new id for
+   * the right side.
+   *
+   * @param targetField The index of the updated field.
+   * @param fromSecond  Return the forwarded fields for the right side of the join if set to true (returns
+   *                    the fields for the left side otherwise).
+   * @return The string containing the forwarded fields info.
+   */
+  private String getInternalForwardedFieldsForEdgeUpdate(int targetField, boolean fromSecond) {
+    if (fromSecond) {
+      return "f1->f" + targetField;
+    } else {
+      return IntStream.range(0,
+        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size() + edgeAggregateFunctions.size())
+        .filter(i -> i != targetField).mapToObj(i -> "f" + i).collect(Collectors.joining(";"));
+    }
   }
 
   /**
