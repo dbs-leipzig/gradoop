@@ -61,6 +61,8 @@ abstract class ReduceElementTuples<T extends Tuple> implements GroupReduceFuncti
     for (int i = 0; i < aggregateFunctions.size(); i++) {
       final PropertyValue aggregate = superTuple.getField(i + tupleDataOffset);
       final PropertyValue increment = inputTuple.getField(i + tupleDataOffset);
+      // Delete the increment from the input tuple as it is not needed anymore.
+      inputTuple.setField(PropertyValue.NULL_VALUE, i + tupleDataOffset);
       if (increment.equals(PropertyValue.NULL_VALUE)) {
         continue;
       } else if (aggregate.equals(PropertyValue.NULL_VALUE)) {

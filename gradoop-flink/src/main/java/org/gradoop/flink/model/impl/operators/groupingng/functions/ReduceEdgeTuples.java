@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.groupingng.functions;
 
+import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -26,7 +27,8 @@ import java.util.List;
  *
  * @param <T> The tuple type.
  */
-public class ReduceEdgeTuples<T extends Tuple> extends ReduceElementTuples<T> {
+public class ReduceEdgeTuples<T extends Tuple> extends ReduceElementTuples<T>
+  implements GroupCombineFunction<T, T> {
 
   /**
    * Initialize this reduce function.
@@ -38,6 +40,11 @@ public class ReduceEdgeTuples<T extends Tuple> extends ReduceElementTuples<T> {
    */
   public ReduceEdgeTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
     super(tupleDataOffset, aggregateFunctions);
+  }
+
+  @Override
+  public void combine(Iterable<T> values, Collector<T> out) throws Exception {
+    reduce(values, out);
   }
 
   @Override

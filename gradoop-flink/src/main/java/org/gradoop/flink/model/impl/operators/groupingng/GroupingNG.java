@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -82,6 +83,11 @@ public class GroupingNG<
    * The edge aggregate functions.
    */
   private final List<AggregateFunction> edgeAggregateFunctions;
+
+  /**
+   * Should a combine step be used before grouping? Note that this currently only affects edges.
+   */
+  private boolean useGroupCombine = true;
 
   /**
    * Instantiate this grouping function.
@@ -133,7 +139,8 @@ public class GroupingNG<
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
-        GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));
+        GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions))
+      .withForwardedFields(getInternalForwardedFieldsForVertexReduce());
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId =
       verticesWithSuperVertex.project(
         GroupingNGConstants.VERTEX_TUPLE_ID, GroupingNGConstants.VERTEX_TUPLE_SUPERID);
@@ -152,7 +159,9 @@ public class GroupingNG<
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
-        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions));
+        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
+      .setCombinable(useGroupCombine)
+      .withForwardedFields(getInternalForwardedFieldsForEdgeReduce());
 
     DataSet<V> superVertices = verticesWithSuperVertex
       .filter(new FilterSuperVertices<>())
@@ -164,6 +173,28 @@ public class GroupingNG<
         graph.getFactory().getEdgeFactory()));
 
     return graph.getFactory().fromDataSets(superVertices, superEdges);
+  }
+
+  /**
+   * Get the internal representation of the forwarded fields for the {@link ReduceEdgeTuples} step.
+   * The forwarded fields for this step will be the grouping keys.
+   *
+   * @return A string containing the field names of all forwarded fields.
+   */
+  private String getInternalForwardedFieldsForEdgeReduce() {
+    return IntStream.of(getInternalEdgeGroupingKeys()).mapToObj(i -> "f" + i)
+      .collect(Collectors.joining(";"));
+  }
+
+  /**
+   * Get the internal representation of the forwarded fields for the {@link ReduceVertexTuples} step.
+   * The forwarded fields for this step will be the grouping keys.
+   *
+   * @return A string containing the field names of all forwarded fields.
+   */
+  private String getInternalForwardedFieldsForVertexReduce() {
+    return IntStream.of(getInternalVertexGroupingKeys()).mapToObj(i -> "f" + i)
+      .collect(Collectors.joining(";"));
   }
 
   /**
@@ -235,5 +266,19 @@ public class GroupingNG<
       }
       return labelGroup;
     }
+  }
+
+  /**
+   * Enable or disable an optional combine step before the reduce step.
+   * Note that this currently only affects the edge reduce step.
+   * <p>
+   * The combine step is enabled by default.
+   *
+   * @param useGroupCombine {@code true}, if a combine step should be used.
+   * @return This operator.
+   */
+  public GroupingNG<G, V, E, LG, GC> setUseGroupCombine(boolean useGroupCombine) {
+    this.useGroupCombine = useGroupCombine;
+    return this;
   }
 }
