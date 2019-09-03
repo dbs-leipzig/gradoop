@@ -42,10 +42,8 @@ public interface GroupingKeyFunction<E, K> extends Serializable {
    *
    * @param element The element where the key should be stored.
    * @param key     The key to store on the element.
-   * @return The (updated) element.
    */
-  default E setAsProperty(E element, Object key) {
-    return element;
+  default void addKeyToElement(E element, Object key) {
   }
 
   /**

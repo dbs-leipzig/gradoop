@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions used be the temporal graph grouping operator.
+ * Functions used by the tuple-based grouping operator.
  */
 package org.gradoop.flink.model.impl.operators.groupingng.functions;

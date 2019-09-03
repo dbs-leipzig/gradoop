@@ -33,11 +33,6 @@ import static org.gradoop.flink.model.impl.operators.groupingng.functions.Groupi
 public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> {
 
   /**
-   * Reduce object instantiations.
-   */
-  private T reuseSuperVertex;
-
-  /**
    * Initialize this reduce function.
    *
    * @param tupleDataOffset    The data offset of the tuple. This will be
@@ -52,23 +47,22 @@ public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> 
 
   @Override
   public void reduce(Iterable<T> input, Collector<T> out) throws Exception {
-    boolean isFirst = true;
+    T superVertexTuple = null;
     GradoopId superVertexId = GradoopId.get();
 
     for (T inputTuple : input) {
-      if (isFirst) {
-        reuseSuperVertex = inputTuple.copy();
-        isFirst = false;
+      if (superVertexTuple == null) {
+        superVertexTuple = inputTuple.copy();
       } else {
-        callAggregateFunctions(reuseSuperVertex, inputTuple);
+        callAggregateFunctions(superVertexTuple, inputTuple);
       }
       inputTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
       // Return the updated tuple, used to extract the mapping later.
       out.collect(inputTuple);
     }
     // Return a super vertex.
-    reuseSuperVertex.setField(superVertexId, VERTEX_TUPLE_ID);
-    reuseSuperVertex.setField(superVertexId, VERTEX_TUPLE_SUPERID);
-    out.collect(reuseSuperVertex);
+    superVertexTuple.setField(superVertexId, VERTEX_TUPLE_ID);
+    superVertexTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
+    out.collect(superVertexTuple);
   }
 }

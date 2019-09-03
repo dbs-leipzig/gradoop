@@ -50,12 +50,11 @@ public class PropertyKeyFunction<T extends Attributed> implements GroupingKeyFun
   }
 
   @Override
-  public T setAsProperty(T element, Object key) {
+  public void addKeyToElement(T element, Object key) {
     if (!(key instanceof byte[])) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
     element.setProperty(propertyKey, PropertyValue.fromRawBytes((byte[]) key));
-    return element;
   }
 
   @Override

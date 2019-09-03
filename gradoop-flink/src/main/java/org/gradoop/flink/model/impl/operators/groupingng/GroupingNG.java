@@ -131,39 +131,32 @@ public class GroupingNG<
     }
     DataSet<Tuple> verticesWithSuperVertex = graph.getVertices()
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
-      .name("Create vertex-tuples")
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
-        GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(),
-        vertexAggregateFunctions))
-      .name("Prepare super-vertices");
+        GroupingNGConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId =
       verticesWithSuperVertex.project(
         GroupingNGConstants.VERTEX_TUPLE_ID, GroupingNGConstants.VERTEX_TUPLE_SUPERID);
 
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
       .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
-      .name("Create edge-tuples")
       .join(idToSuperId)
       .where(GroupingNGConstants.EDGE_TUPLE_SOURCEID)
       .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
       .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_SOURCEID))
-      .name("Update edge-tuples (source ID)")
       .join(idToSuperId)
       .where(GroupingNGConstants.EDGE_TUPLE_TARGETID)
       .equalTo(GroupingNGConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_TARGETID))
-      .name("Update edge-tuples (target ID)");
+      .with(new UpdateIdField<>(GroupingNGConstants.EDGE_TUPLE_TARGETID));
 
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
-        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
-      .name("Prepare super-edges");
+        GroupingNGConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions));
 
     DataSet<V> superVertices = verticesWithSuperVertex
       .filter(new FilterSuperVertices<>())
-      .map(new BuildSuperVertexFromTuple<Tuple, V>(vertexGroupingKeys, vertexAggregateFunctions,
+      .map(new BuildSuperVertexFromTuple<>(vertexGroupingKeys, vertexAggregateFunctions,
         graph.getFactory().getVertexFactory()));
 
     DataSet<E> superEdges = superEdgeTuples

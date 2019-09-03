@@ -35,9 +35,8 @@ public class LabelKeyFunction<T extends Labeled> implements GroupingKeyFunction<
   }
 
   @Override
-  public T setAsProperty(T element, Object key) {
+  public void addKeyToElement(T element, Object key) {
     element.setLabel(Objects.toString(key));
-    return element;
   }
 
   @Override

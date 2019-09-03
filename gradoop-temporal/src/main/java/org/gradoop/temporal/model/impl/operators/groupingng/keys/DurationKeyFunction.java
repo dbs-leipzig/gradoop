@@ -88,11 +88,10 @@ public class DurationKeyFunction<T extends TemporalElement> implements GroupingK
   }
 
   @Override
-  public T setAsProperty(T element, Object key) {
+  public void addKeyToElement(T element, Object key) {
     if (!(key instanceof Long)) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
     element.setProperty("duration_" + intervalExtractor + "_" + timeUnit, PropertyValue.create(key));
-    return element;
   }
 }

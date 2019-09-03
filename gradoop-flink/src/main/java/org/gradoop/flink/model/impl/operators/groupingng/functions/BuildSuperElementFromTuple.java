@@ -77,7 +77,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
     // Set grouping keys.
     for (int i = 0; i < keyFunctions.size(); i++) {
       final Object groupingKey = tupleData.getField(tupleDataOffset + i);
-      element = keyFunctions.get(i).setAsProperty(element, groupingKey);
+      keyFunctions.get(i).addKeyToElement(element, groupingKey);
     }
     // Calculate aggregate values and set them.
     for (int i = 0; i < aggregateFunctions.size(); i++) {
