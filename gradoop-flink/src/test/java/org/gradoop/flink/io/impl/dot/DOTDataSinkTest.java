@@ -128,7 +128,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
         countSubgraphLines++;
       }
 
-      if (format == DOTDataSink.DotFormat.HTML) {
+      if (format.equals(DOTDataSink.DotFormat.HTML)) {
         int index = line.indexOf('&');
         if (index != -1) {
           assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
