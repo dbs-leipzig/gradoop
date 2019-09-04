@@ -37,7 +37,6 @@ import java.util.Set;
  */
 public class PropertyEncoder<E extends Element> implements MapFunction<E, E> {
 
-
   @Override
   public E map(E e) throws Exception {
     if (e.getProperties() != null) {

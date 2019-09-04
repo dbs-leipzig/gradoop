@@ -705,6 +705,11 @@
                 <artifactId>hbase-server</artifactId>
                 <version>${dep.hbase.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-common</artifactId>
+                <version>${dep.hbase.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.hbase</groupId>
