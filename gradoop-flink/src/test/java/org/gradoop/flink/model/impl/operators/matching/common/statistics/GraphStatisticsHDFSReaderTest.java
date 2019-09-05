@@ -15,21 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
-/**
- * @Ignore annotation can be removed as soon issue #661 is fixed
- * @link https://github.com/dbs-leipzig/gradoop/issues/661
- */
-@Ignore
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
 
   private static HBaseTestingUtility utility;
