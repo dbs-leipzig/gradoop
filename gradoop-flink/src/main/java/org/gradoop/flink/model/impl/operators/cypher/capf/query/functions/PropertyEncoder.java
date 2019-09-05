@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,7 +37,6 @@ import java.util.Set;
  */
 public class PropertyEncoder<E extends Element> implements MapFunction<E, E> {
 
-
   @Override
   public E map(E e) throws Exception {
     if (e.getProperties() != null) {
@@ -47,7 +46,7 @@ public class PropertyEncoder<E extends Element> implements MapFunction<E, E> {
       for (Property prop : e.getProperties()) {
         if (classSet.contains(prop.getValue().getType())) {
           e.getProperties().set(prop.getKey(),
-            "CAPFProperty" + new String(prop.getValue().getRawBytes(), Charset.forName("UTF-8")));
+            "CAPFProperty" + new String(prop.getValue().getRawBytes(), StandardCharsets.UTF_8));
         }
       }
     }
