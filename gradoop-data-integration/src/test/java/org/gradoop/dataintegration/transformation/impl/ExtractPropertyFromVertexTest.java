@@ -19,6 +19,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
@@ -31,13 +32,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
+import java.util.Set;
 
 /**
  * Tests for the {@link ExtractPropertyFromVertex} operator.
@@ -110,7 +111,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
   /**
    * A private convenience method for easier testing of different setups in the edge creation process.
    *
-   * @param graph The input graph for the tests.
+   * @param graph     The input graph for the tests.
    * @param direction The edge direction the graph is tested for.
    * @throws Exception Is thrown if the process cant be executed properly.
    */
@@ -174,7 +175,8 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
 
     // this operation should create 6 vertices with the property values:
     // 'Berlin', 3 times 'Dresden', 2 times 'Leipzig'
-    ExtractPropertyFromVertex extract = new ExtractPropertyFromVertex("Person", "city", "City", "name");
+    ExtractPropertyFromVertex extract = new ExtractPropertyFromVertex("Person", "city",
+      "City", "name");
     extract.setCondensation(false);
 
     LogicalGraph extractedGraph = social.callForGraph(extract);
@@ -229,4 +231,46 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
     Assert.assertTrue(properties.containsAll(Arrays.asList("m", "n", "x", "y", "z")));
   }
 
+  /**
+   * Tests graph head ids get assigned to newly created elements.
+   *
+   * @throws Exception If collect doesn't work as expected.
+   */
+  @Test
+  public void containGraphHeadIdTest() throws Exception {
+    LogicalGraph socialGraph = getSocialNetworkLoader().getLogicalGraph();
+
+    // this operation should create 6 vertices with the property values:
+    // 'Berlin', 3 times 'Dresden', 2 times 'Leipzig'
+    ExtractPropertyFromVertex extract = new ExtractPropertyFromVertex("Person", "city",
+      "City", "name", EdgeDirection.ORIGIN_TO_NEWVERTEX, "livesIn");
+
+    LogicalGraph extractedGraph = socialGraph.callForGraph(extract);
+
+    List<EPGMVertex> createdVertices = new ArrayList<>();
+    extractedGraph
+      .getVerticesByLabel("City")
+      .output(new LocalCollectionOutputFormat<>(createdVertices));
+
+    List<EPGMEdge> createdEdges = new ArrayList<>();
+    extractedGraph
+      .getEdgesByLabel("livesIn")
+      .output(new LocalCollectionOutputFormat<>(createdEdges));
+
+    // get graph heads
+    List<EPGMGraphHead> graphHeads = new ArrayList<>();
+    socialGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(graphHeads));
+
+    getConfig().getExecutionEnvironment().execute();
+
+    // check if the id of the original graph is assigned to the newly created elements
+    for (EPGMGraphHead graphHead: graphHeads) {
+      for (EPGMVertex vertex: createdVertices) {
+        Assert.assertTrue(vertex.getGraphIds().contains(graphHead.getId()));
+      }
+      for (EPGMEdge edge: createdEdges) {
+        Assert.assertTrue(edge.getGraphIds().contains(graphHead.getId()));
+      }
+    }
+  }
 }
