@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.util.Preconditions;
+import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
@@ -246,5 +247,14 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())
       .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);
+  }
+
+  /**
+   * Prints the GDL formatted graph collection to the standard output.
+   *
+   * @throws Exception forwarded from dataset print
+   */
+  public void print() throws Exception {
+    GDLConsoleOutput.print(this);
   }
 }

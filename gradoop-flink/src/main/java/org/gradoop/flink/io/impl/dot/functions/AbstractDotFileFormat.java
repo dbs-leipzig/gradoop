@@ -127,7 +127,7 @@ public abstract class AbstractDotFileFormat
         .append(edge.getTargetId())
         .append(suffix)
         .append(" [");
-      // write dot attributes if existent
+      // write dot attributes if present
       writeLabel(builder, edge);
       builder.append("];\n");
     }
