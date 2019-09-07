@@ -23,12 +23,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
  * Reads {@link GraphStatistics} from dedicated files in HDFS.
  */
-<span class="nc" id="L31">public class GraphStatisticsHDFSReader extends GraphStatisticsReader {</span>
+<span class="nc" id="L32">public class GraphStatisticsHDFSReader extends GraphStatisticsReader {</span>
   /**
    * Reads statistics from files contains in the specified directory and creates a
    * {@link GraphStatistics} object from them.
@@ -42,9 +43,9 @@ import java.util.Map;
    */
   public static GraphStatistics read(String inputPath, Configuration configuration)
       throws IOException {
-<span class="nc" id="L45">    FileSystem fs = FileSystem.get(configuration);</span>
-<span class="nc" id="L46">    Path root = new Path(inputPath);</span>
-<span class="nc" id="L47">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+<span class="nc" id="L46">    FileSystem fs = FileSystem.get(configuration);</span>
+<span class="nc" id="L47">    Path root = new Path(inputPath);</span>
+<span class="nc" id="L48">    Charset charset = StandardCharsets.UTF_8;</span>
 
     long vertexCount;
     long edgeCount;
@@ -61,81 +62,81 @@ import java.util.Map;
     Map&lt;String, Long&gt; distinctEdgePropertyValuesByPropertyName;
     Map&lt;String, Long&gt; distinctVertexPropertyValuesByPropertyName;
 
-<span class="nc" id="L64">    Path p = new Path(root, GraphStatisticsReader.FILE_VERTEX_COUNT);</span>
-<span class="nc" id="L65">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L66">      vertexCount = readSingleValue(br.lines());</span>
+<span class="nc" id="L65">    Path p = new Path(root, GraphStatisticsReader.FILE_VERTEX_COUNT);</span>
+<span class="nc" id="L66">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L67">      vertexCount = readSingleValue(br.lines());</span>
     }
 
-<span class="nc" id="L69">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT);</span>
-<span class="nc" id="L70">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L71">      edgeCount = readSingleValue(br.lines());</span>
+<span class="nc" id="L70">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT);</span>
+<span class="nc" id="L71">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L72">      edgeCount = readSingleValue(br.lines());</span>
     }
 
-<span class="nc" id="L74">    p = new Path(root, GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL);</span>
-<span class="nc" id="L75">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L76">      vertexCountByLabel = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L75">    p = new Path(root, GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL);</span>
+<span class="nc" id="L76">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L77">      vertexCountByLabel = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L79">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);</span>
-<span class="nc" id="L80">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L81">      edgeCountByLabel = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L80">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);</span>
+<span class="nc" id="L81">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L82">      edgeCountByLabel = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L84">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL);</span>
-<span class="nc" id="L85">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L86">      edgeCountBySourceVertexAndEdgeLabel = readNestedKeyValueMap(br.lines());</span>
+<span class="nc" id="L85">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL);</span>
+<span class="nc" id="L86">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L87">      edgeCountBySourceVertexAndEdgeLabel = readNestedKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L89">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL);</span>
-<span class="nc" id="L90">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L91">      edgeCountByTargetVertexAndEdgeLabel = readNestedKeyValueMap(br.lines());</span>
+<span class="nc" id="L90">    p = new Path(root, GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL);</span>
+<span class="nc" id="L91">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L92">      edgeCountByTargetVertexAndEdgeLabel = readNestedKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L94">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT);</span>
-<span class="nc" id="L95">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L96">      distinctSourceVertexCount = readSingleValue(br.lines());</span>
+<span class="nc" id="L95">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT);</span>
+<span class="nc" id="L96">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L97">      distinctSourceVertexCount = readSingleValue(br.lines());</span>
     }
 
-<span class="nc" id="L99">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT);</span>
-<span class="nc" id="L100">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L101">      distinctTargetVertexCount = readSingleValue(br.lines());</span>
+<span class="nc" id="L100">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT);</span>
+<span class="nc" id="L101">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L102">      distinctTargetVertexCount = readSingleValue(br.lines());</span>
     }
 
-<span class="nc" id="L104">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);</span>
-<span class="nc" id="L105">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L106">      distinctSourceVertexCountByEdgeLabel = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L105">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);</span>
+<span class="nc" id="L106">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L107">      distinctSourceVertexCountByEdgeLabel = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L109">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL);</span>
-<span class="nc" id="L110">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L111">      distinctTargetVertexCountByEdgeLabel = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L110">    p = new Path(root, GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL);</span>
+<span class="nc" id="L111">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L112">      distinctTargetVertexCountByEdgeLabel = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L114">    p = new Path(root,</span>
+<span class="nc" id="L115">    p = new Path(root,</span>
       GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL);
-<span class="nc" id="L116">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L117">      distinctPropertyValuesByEdgeLabelAndPropertyName = readNestedKeyValueMap(br.lines());</span>
+<span class="nc" id="L117">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L118">      distinctPropertyValuesByEdgeLabelAndPropertyName = readNestedKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L120">    p = new Path(root,</span>
+<span class="nc" id="L121">    p = new Path(root,</span>
       GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
-<span class="nc" id="L122">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L123">      distinctPropertyValuesByVertexLabelAndPropertyName = readNestedKeyValueMap(br.lines());</span>
+<span class="nc" id="L123">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L124">      distinctPropertyValuesByVertexLabelAndPropertyName = readNestedKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L126">    p = new Path(root,</span>
+<span class="nc" id="L127">    p = new Path(root,</span>
       GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES);
-<span class="nc" id="L128">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L129">      distinctEdgePropertyValuesByPropertyName = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L129">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L130">      distinctEdgePropertyValuesByPropertyName = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L132">    p = new Path(root,</span>
+<span class="nc" id="L133">    p = new Path(root,</span>
       GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
-<span class="nc" id="L134">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
-<span class="nc" id="L135">      distinctVertexPropertyValuesByPropertyName = readKeyValueMap(br.lines());</span>
+<span class="nc" id="L135">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(p), charset))) {</span>
+<span class="nc" id="L136">      distinctVertexPropertyValuesByPropertyName = readKeyValueMap(br.lines());</span>
     }
 
-<span class="nc" id="L138">    return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,</span>
+<span class="nc" id="L139">    return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,</span>
       edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
       distinctSourceVertexCount, distinctTargetVertexCount, distinctSourceVertexCountByEdgeLabel,
       distinctTargetVertexCountByEdgeLabel, distinctPropertyValuesByEdgeLabelAndPropertyName,

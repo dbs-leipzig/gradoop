@@ -30,6 +30,8 @@ import org.gradoop.dataintegration.transformation.impl.functions.ExtractProperty
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 
 import java.util.List;
@@ -76,7 +78,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
    * So that every newly created vertex has a unique property value.
    * The default value is 'true'.
    */
-<span class="fc" id="L79">  private boolean condense = true;</span>
+<span class="fc" id="L81">  private boolean condense = true;</span>
 
   /**
    * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
@@ -89,9 +91,9 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
    */
   public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
                                    String newVertexLabel, String newPropertyName) {
-<span class="fc" id="L92">    this(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,</span>
+<span class="fc" id="L94">    this(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,</span>
       EdgeDirection.NONE, null);
-<span class="fc" id="L94">  }</span>
+<span class="fc" id="L96">  }</span>
 
   /**
    * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
@@ -106,16 +108,16 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
    */
   public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
                                    String newVertexLabel, String newPropertyName,
-<span class="fc" id="L109">                                   EdgeDirection edgeDirection, String edgeLabel) {</span>
-<span class="fc" id="L110">    this.forVerticesOfLabel = Preconditions.checkNotNull(forVerticesOfLabel);</span>
-<span class="fc" id="L111">    this.originalPropertyName = Preconditions.checkNotNull(originalPropertyName);</span>
-<span class="fc" id="L112">    this.newVertexLabel = Preconditions.checkNotNull(newVertexLabel);</span>
-<span class="fc" id="L113">    this.newPropertyName = Preconditions.checkNotNull(newPropertyName);</span>
-<span class="fc" id="L114">    this.edgeDirection = Preconditions.checkNotNull(edgeDirection);</span>
-<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
-<span class="fc" id="L116">      this.edgeLabel = Preconditions.checkNotNull(edgeLabel);</span>
+<span class="fc" id="L111">                                   EdgeDirection edgeDirection, String edgeLabel) {</span>
+<span class="fc" id="L112">    this.forVerticesOfLabel = Preconditions.checkNotNull(forVerticesOfLabel);</span>
+<span class="fc" id="L113">    this.originalPropertyName = Preconditions.checkNotNull(originalPropertyName);</span>
+<span class="fc" id="L114">    this.newVertexLabel = Preconditions.checkNotNull(newVertexLabel);</span>
+<span class="fc" id="L115">    this.newPropertyName = Preconditions.checkNotNull(newPropertyName);</span>
+<span class="fc" id="L116">    this.edgeDirection = Preconditions.checkNotNull(edgeDirection);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
+<span class="fc" id="L118">      this.edgeLabel = Preconditions.checkNotNull(edgeLabel);</span>
     }
-<span class="fc" id="L118">  }</span>
+<span class="fc" id="L120">  }</span>
 
   /**
    * This method sets whether property value based condensation should be executed or not.
@@ -125,48 +127,53 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
    *                 So that every newly created vertex has a unique property value.
    */
   public void setCondensation(boolean condense) {
-<span class="fc" id="L128">    this.condense = condense;</span>
-<span class="fc" id="L129">  }</span>
+<span class="fc" id="L130">    this.condense = condense;</span>
+<span class="fc" id="L131">  }</span>
 
   @Override
   public LogicalGraph execute(LogicalGraph logicalGraph) {
     // filter the vertices by the given label
-<span class="fc" id="L134">    DataSet&lt;EPGMVertex&gt; filteredVertices = logicalGraph</span>
-<span class="fc" id="L135">      .getVertices()</span>
-<span class="fc" id="L136">      .filter(new ByLabel&lt;&gt;(forVerticesOfLabel));</span>
+<span class="fc" id="L136">    DataSet&lt;EPGMVertex&gt; filteredVertices = logicalGraph</span>
+<span class="fc" id="L137">      .getVertices()</span>
+<span class="fc" id="L138">      .filter(new ByLabel&lt;&gt;(forVerticesOfLabel));</span>
 
     // calculate new vertices and store the origin for linking
-<span class="fc" id="L139">    DataSet&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; candidates = filteredVertices</span>
-<span class="fc" id="L140">      .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));</span>
+<span class="fc" id="L141">    DataSet&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; candidates = filteredVertices</span>
+<span class="fc" id="L142">      .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));</span>
 
     // extract the new vertices
     DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
-<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (condense) {</span>
-<span class="fc" id="L145">      newVerticesAndOriginIds = candidates</span>
-<span class="fc" id="L146">        .groupBy(0)</span>
-<span class="fc" id="L147">        .reduceGroup(new CreateNewVertexWithEqualityCondense(</span>
-<span class="fc" id="L148">          logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    if (condense) {</span>
+<span class="fc" id="L147">      newVerticesAndOriginIds = candidates</span>
+<span class="fc" id="L148">        .groupBy(0)</span>
+<span class="fc" id="L149">        .reduceGroup(new CreateNewVertexWithEqualityCondense(</span>
+<span class="fc" id="L150">          logicalGraph.getFactory().getVertexFactory(), newVertexLabel, newPropertyName));</span>
     } else {
-<span class="fc" id="L150">      newVerticesAndOriginIds = candidates</span>
-<span class="fc" id="L151">        .map(new CreateNewVertex(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,</span>
+<span class="fc" id="L152">      newVerticesAndOriginIds = candidates</span>
+<span class="fc" id="L153">        .map(new CreateNewVertex(logicalGraph.getFactory().getVertexFactory(), newVertexLabel,</span>
           newPropertyName));
     }
 
-<span class="fc" id="L155">    DataSet&lt;EPGMVertex&gt; vertices = newVerticesAndOriginIds</span>
-<span class="fc" id="L156">      .map(new Value0Of2&lt;&gt;())</span>
-<span class="fc" id="L157">      .union(logicalGraph.getVertices());</span>
+
+<span class="fc" id="L158">    DataSet&lt;EPGMVertex&gt; vertices = newVerticesAndOriginIds</span>
+<span class="fc" id="L159">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L160">      .map(new AddToGraphBroadcast&lt;&gt;())</span>
+<span class="fc" id="L161">      .withBroadcastSet(logicalGraph.getGraphHead().map(new Id&lt;&gt;()), AddToGraphBroadcast.GRAPH_ID)</span>
+<span class="fc" id="L162">      .union(logicalGraph.getVertices());</span>
 
     // the newly created vertices should be linked to the original vertices
-<span class="fc" id="L160">    DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();</span>
-<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
-<span class="fc" id="L162">      edges = newVerticesAndOriginIds</span>
-<span class="fc" id="L163">        .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,</span>
+<span class="fc" id="L165">    DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
+<span class="fc" id="L167">      edges = newVerticesAndOriginIds</span>
+<span class="fc" id="L168">        .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,</span>
           edgeLabel))
-<span class="fc" id="L165">        .union(edges);</span>
+<span class="fc" id="L170">        .map(new AddToGraphBroadcast&lt;&gt;())</span>
+<span class="fc" id="L171">        .withBroadcastSet(logicalGraph.getGraphHead().map(new Id&lt;&gt;()), AddToGraphBroadcast.GRAPH_ID)</span>
+<span class="fc" id="L172">        .union(edges);</span>
     }
 
-<span class="fc" id="L168">    return logicalGraph.getFactory()</span>
-<span class="fc" id="L169">      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);</span>
+<span class="fc" id="L175">    return logicalGraph.getFactory()</span>
+<span class="fc" id="L176">      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

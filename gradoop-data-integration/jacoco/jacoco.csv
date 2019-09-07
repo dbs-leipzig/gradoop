@@ -22,7 +22,7 @@ Gradoop Data Integration,org.gradoop.dataintegration.transformation,ConnectNeigh
 Gradoop Data Integration,org.gradoop.dataintegration.transformation,VertexToEdge,0,77,0,0,0,18,0,2,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation,EdgeToVertex,0,97,0,0,0,20,0,2,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation,PropagatePropertyToNeighbor,0,118,0,2,0,23,0,4,0,3
-Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,ExtractPropertyFromVertex,0,148,0,6,0,36,0,7,0,4
+Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,ExtractPropertyFromVertex,0,174,0,6,0,40,0,7,0,4
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,InvertEdges,0,37,0,2,0,11,0,3,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,BasePropertyTransformationFunction,2,114,1,11,1,26,1,8,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,Neighborhood.EdgeDirection,0,34,0,0,0,4,0,1,0,1

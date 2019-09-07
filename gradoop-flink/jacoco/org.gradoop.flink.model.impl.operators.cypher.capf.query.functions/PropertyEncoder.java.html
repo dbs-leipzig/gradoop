@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,21 +37,20 @@ import java.util.Set;
  */
 <span class="fc" id="L38">public class PropertyEncoder&lt;E extends Element&gt; implements MapFunction&lt;E, E&gt; {</span>
 
-
   @Override
   public E map(E e) throws Exception {
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">    if (e.getProperties() != null) {</span>
-<span class="fc" id="L44">      Class[] classes = {BigDecimal.class, GradoopId.class, Map.class, List.class, LocalDate.class,</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">    if (e.getProperties() != null) {</span>
+<span class="fc" id="L43">      Class[] classes = {BigDecimal.class, GradoopId.class, Map.class, List.class, LocalDate.class,</span>
         LocalTime.class, LocalDateTime.class, Set.class};
-<span class="fc" id="L46">      Set&lt;Class&gt; classSet = new HashSet&lt;&gt;(Arrays.asList(classes));</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">      for (Property prop : e.getProperties()) {</span>
-<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (classSet.contains(prop.getValue().getType())) {</span>
-<span class="fc" id="L49">          e.getProperties().set(prop.getKey(),</span>
-<span class="fc" id="L50">            &quot;CAPFProperty&quot; + new String(prop.getValue().getRawBytes(), Charset.forName(&quot;UTF-8&quot;)));</span>
+<span class="fc" id="L45">      Set&lt;Class&gt; classSet = new HashSet&lt;&gt;(Arrays.asList(classes));</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">      for (Property prop : e.getProperties()) {</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (classSet.contains(prop.getValue().getType())) {</span>
+<span class="fc" id="L48">          e.getProperties().set(prop.getKey(),</span>
+<span class="fc" id="L49">            &quot;CAPFProperty&quot; + new String(prop.getValue().getRawBytes(), StandardCharsets.UTF_8));</span>
         }
-<span class="fc" id="L52">      }</span>
+<span class="fc" id="L51">      }</span>
     }
-<span class="fc" id="L54">    return e;</span>
+<span class="fc" id="L53">    return e;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

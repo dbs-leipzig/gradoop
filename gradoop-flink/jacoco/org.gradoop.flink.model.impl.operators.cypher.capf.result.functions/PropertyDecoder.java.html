@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Decodes String representations of property types not yet supported by CAPF.
@@ -39,7 +39,7 @@ import java.nio.charset.Charset;
 <span class="fc" id="L39">            String encoded = val.getString().substring(12);</span>
 <span class="fc" id="L40">            e.getProperties().set(</span>
 <span class="fc" id="L41">              prop.getKey(),</span>
-<span class="fc" id="L42">              PropertyValue.fromRawBytes(encoded.getBytes(Charset.forName(&quot;UTF-8&quot;))));</span>
+<span class="fc" id="L42">              PropertyValue.fromRawBytes(encoded.getBytes(StandardCharsets.UTF_8)));</span>
           }
         }
 <span class="fc" id="L45">      }</span>

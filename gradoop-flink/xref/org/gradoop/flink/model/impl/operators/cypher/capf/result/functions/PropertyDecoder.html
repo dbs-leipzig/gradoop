@@ -30,7 +30,7 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Property;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.nio.charset.Charset;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.nio.charset.StandardCharsets;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Decodes String representations of property types not yet supported by CAPF.</em>
@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>              String encoded = val.getString().substring(12);
 <a name="40" href="#40">40</a>              e.getProperties().set(
 <a name="41" href="#41">41</a>                prop.getKey(),
-<a name="42" href="#42">42</a>                PropertyValue.fromRawBytes(encoded.getBytes(Charset.forName(<span class="jxr_string">"UTF-8"</span>))));
+<a name="42" href="#42">42</a>                PropertyValue.fromRawBytes(encoded.getBytes(StandardCharsets.UTF_8)));
 <a name="43" href="#43">43</a>            }
 <a name="44" href="#44">44</a>          }
 <a name="45" href="#45">45</a>        }

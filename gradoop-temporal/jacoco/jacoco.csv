@@ -14,8 +14,8 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphCollectionL
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGVELayout,11,48,0,0,4,12,4,8,4,8
 Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,29,64,0,0,3,8,3,8,3,8
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollectionFactory,52,187,0,4,9,32,7,13,7,11
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,45,118,0,0,10,25,10,13,10,13
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,31,134,0,0,5,28,5,16,5,16
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,48,118,0,0,12,25,11,13,11,13
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,34,134,0,0,7,28,6,16,6,16
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphFactory,63,133,0,0,8,20,7,10,7,10
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSource,0,49,0,0,0,12,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSink,16,111,4,4,3,27,4,6,1,5

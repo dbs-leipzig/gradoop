@@ -32,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,77 +42,77 @@ import java.util.stream.Collectors;
 /**
  * Implementation of a meta data factory that reads from csv files.
  */
-<span class="fc" id="L44">public class CSVMetaDataSource implements MetaDataSource&lt;CSVMetaData&gt; {</span>
+<span class="fc" id="L45">public class CSVMetaDataSource implements MetaDataSource&lt;CSVMetaData&gt; {</span>
 
   @Override
   public CSVMetaData fromTuples(List&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataStrings) {
-<span class="fc" id="L48">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; graphMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
-<span class="fc" id="L49">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; vertexMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
-<span class="fc" id="L50">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgeMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
+<span class="fc" id="L49">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; graphMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
+<span class="fc" id="L50">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; vertexMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
+<span class="fc" id="L51">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgeMetaDataMap = new HashMap&lt;&gt;(metaDataStrings.size());</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    for (Tuple3&lt;String, String, String&gt; tuple : metaDataStrings) {</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (Tuple3&lt;String, String, String&gt; tuple : metaDataStrings) {</span>
       List&lt;PropertyMetaData&gt; propertyMetaDataList;
-<span class="fc bfc" id="L54" title="All 2 branches covered.">      if (tuple.f2.length() &gt; 0) {</span>
-<span class="fc" id="L55">        String[] propertyStrings = StringEscaper.split(</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">      if (tuple.f2.length() &gt; 0) {</span>
+<span class="fc" id="L56">        String[] propertyStrings = StringEscaper.split(</span>
           tuple.f2, PropertyMetaData.PROPERTY_DELIMITER);
-<span class="fc" id="L57">        propertyMetaDataList = new ArrayList&lt;&gt;(propertyStrings.length);</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        for (String propertyMetaData : propertyStrings) {</span>
-<span class="fc" id="L59">          String[] propertyMetaDataTokens = StringEscaper.split(</span>
+<span class="fc" id="L58">        propertyMetaDataList = new ArrayList&lt;&gt;(propertyStrings.length);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (String propertyMetaData : propertyStrings) {</span>
+<span class="fc" id="L60">          String[] propertyMetaDataTokens = StringEscaper.split(</span>
             propertyMetaData, PropertyMetaData.PROPERTY_TOKEN_DELIMITER, 2);
-<span class="fc" id="L61">          propertyMetaDataList.add(new PropertyMetaData(</span>
-<span class="fc" id="L62">            StringEscaper.unescape(propertyMetaDataTokens[0]),</span>
+<span class="fc" id="L62">          propertyMetaDataList.add(new PropertyMetaData(</span>
+<span class="fc" id="L63">            StringEscaper.unescape(propertyMetaDataTokens[0]),</span>
             propertyMetaDataTokens[1],
-<span class="fc" id="L64">            CSVMetaDataParser.getPropertyValueParser(propertyMetaDataTokens[1])));</span>
+<span class="fc" id="L65">            CSVMetaDataParser.getPropertyValueParser(propertyMetaDataTokens[1])));</span>
         }
-<span class="fc" id="L66">      } else {</span>
-<span class="fc" id="L67">        propertyMetaDataList = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L67">      } else {</span>
+<span class="fc" id="L68">        propertyMetaDataList = new ArrayList&lt;&gt;(0);</span>
       }
-<span class="fc" id="L69">      String label = StringEscaper.unescape(tuple.f1);</span>
-<span class="pc bpc" id="L70" title="1 of 4 branches missed.">      switch (tuple.f0) {</span>
+<span class="fc" id="L70">      String label = StringEscaper.unescape(tuple.f1);</span>
+<span class="pc bpc" id="L71" title="1 of 4 branches missed.">      switch (tuple.f0) {</span>
       case GRAPH_TYPE:
-<span class="fc" id="L72">        graphMetaDataMap.put(label, propertyMetaDataList);</span>
-<span class="fc" id="L73">        break;</span>
+<span class="fc" id="L73">        graphMetaDataMap.put(label, propertyMetaDataList);</span>
+<span class="fc" id="L74">        break;</span>
       case VERTEX_TYPE:
-<span class="fc" id="L75">        vertexMetaDataMap.put(label, propertyMetaDataList);</span>
-<span class="fc" id="L76">        break;</span>
+<span class="fc" id="L76">        vertexMetaDataMap.put(label, propertyMetaDataList);</span>
+<span class="fc" id="L77">        break;</span>
       case EDGE_TYPE:
-<span class="fc" id="L78">        edgeMetaDataMap.put(label, propertyMetaDataList);</span>
-<span class="fc" id="L79">        break;</span>
+<span class="fc" id="L79">        edgeMetaDataMap.put(label, propertyMetaDataList);</span>
+<span class="fc" id="L80">        break;</span>
       default:
-<span class="nc" id="L81">        throw new IllegalArgumentException(&quot;Type &quot; + tuple.f0 + &quot; is not a valid epgm type &quot; +</span>
+<span class="nc" id="L82">        throw new IllegalArgumentException(&quot;Type &quot; + tuple.f0 + &quot; is not a valid epgm type &quot; +</span>
           &quot;string. Valid strings are g, v and e.&quot;);
       }
-<span class="fc" id="L84">    }</span>
+<span class="fc" id="L85">    }</span>
 
-<span class="fc" id="L86">    return new CSVMetaData(graphMetaDataMap, vertexMetaDataMap, edgeMetaDataMap);</span>
+<span class="fc" id="L87">    return new CSVMetaData(graphMetaDataMap, vertexMetaDataMap, edgeMetaDataMap);</span>
   }
 
   @Override
   public DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; readDistributed(String path, GradoopFlinkConfig
     config) {
-<span class="fc" id="L92">    return config.getExecutionEnvironment()</span>
-<span class="fc" id="L93">      .readTextFile(path)</span>
-<span class="fc" id="L94">      .map(line -&gt; StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))</span>
-<span class="fc" id="L95">      .map(tokens -&gt; Tuple3.of(tokens[0], tokens[1], tokens[2]))</span>
-<span class="fc" id="L96">      .returns(new TypeHint&lt;Tuple3&lt;String, String, String&gt;&gt;() {</span>
+<span class="fc" id="L93">    return config.getExecutionEnvironment()</span>
+<span class="fc" id="L94">      .readTextFile(path)</span>
+<span class="fc" id="L95">      .map(line -&gt; StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))</span>
+<span class="fc" id="L96">      .map(tokens -&gt; Tuple3.of(tokens[0], tokens[1], tokens[2]))</span>
+<span class="fc" id="L97">      .returns(new TypeHint&lt;Tuple3&lt;String, String, String&gt;&gt;() {</span>
       });
   }
 
   @Override
   public CSVMetaData readLocal(String path, Configuration hdfsConfig) throws IOException {
-<span class="fc" id="L102">    FileSystem fs = FileSystem.get(hdfsConfig);</span>
-<span class="fc" id="L103">    Path file = new Path(path);</span>
-<span class="fc" id="L104">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L103">    FileSystem fs = FileSystem.get(hdfsConfig);</span>
+<span class="fc" id="L104">    Path file = new Path(path);</span>
+<span class="fc" id="L105">    Charset charset = StandardCharsets.UTF_8;</span>
 
-<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    if (!fs.exists(file)) {</span>
-<span class="nc" id="L107">      throw new FileNotFoundException(path);</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">    if (!fs.exists(file)) {</span>
+<span class="nc" id="L108">      throw new FileNotFoundException(path);</span>
     } else {
 
-<span class="fc" id="L110">      try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {</span>
-<span class="fc" id="L111">        return fromTuples(br.lines()</span>
-<span class="fc" id="L112">          .map(line -&gt; StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))</span>
-<span class="fc" id="L113">          .map(tokens -&gt; Tuple3.of(tokens[0], tokens[1], tokens[2]))</span>
-<span class="fc" id="L114">          .collect(Collectors.toList()));</span>
+<span class="fc" id="L111">      try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {</span>
+<span class="fc" id="L112">        return fromTuples(br.lines()</span>
+<span class="fc" id="L113">          .map(line -&gt; StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))</span>
+<span class="fc" id="L114">          .map(tokens -&gt; Tuple3.of(tokens[0], tokens[1], tokens[2]))</span>
+<span class="fc" id="L115">          .collect(Collectors.toList()));</span>
       }
     }
   }
