@@ -32,7 +32,13 @@ import java.util.Objects;
 import static java.time.ZoneOffset.UTC;
 
 /**
- * A key function extracting the duration of a temporal attribute.
+ * A key function extracting the duration of a temporal attribute.<p>
+ * This key function extracts a time interval from an element and calculates the duration of that element
+ * in a certain {@link TemporalUnit} (e.g. {@link ChronoUnit#SECONDS seconds}).
+ * Calculations will assume the time zone to be {@link java.time.ZoneOffset#UTC UTC}.<p>
+ * The final grouping key will be stored on the super element as a property with key
+ * {@code duration_INTERVAL_UNIT} where {@code INTERVAL} is the {@link TimeDimension} extracted and
+ * {@code UNIT} the {@link TemporalUnit} to be calculated.
  *
  * @param <T> The type of the temporal elements.
  */
