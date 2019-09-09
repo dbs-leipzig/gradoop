@@ -18,19 +18,31 @@ package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.util.Objects;
 
 import static java.time.ZoneOffset.UTC;
 
 /**
- * A key function extracting a time stamp of a {@link TemporalElement}.
+ * A key function extracting a time stamp of a {@link TemporalElement}.<p>
+ * An optional {@link TemporalField} parameter can be given to this key function. In this case the time stamp
+ * will be converted to a date (with a time zone set to {@link java.time.ZoneOffset#UTC UTC}) and the field
+ * (e. g. {@link ChronoField#MONTH_OF_YEAR month}) will be extracted from that date.<p>
+ * When no {@link TemporalField} is given, the time stamp will be used as is, in milliseconds since unix
+ * epoch.<p>
+ * The final grouping key will be stored on the super element as a property with key
+ * {@code time_INTERVAL_FIELD_CALCULATEDFIELD} where {@code INTERVAL} is the {@link TimeDimension},
+ * {@code FIELD} the {@link TimeDimension.Field} and {@code CALCULATEDFIELD} the {@link TemporalField}
+ * extraced from the element. When no {@link TemporalField} is given, the property will just be called
+ * {@code time_INTERVAL_FIELD}.
  *
  * @param <T> The type of the elements to group.
  */
@@ -52,6 +64,11 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements Grouping
   private final TemporalField fieldOfTimeStamp;
 
   /**
+   * The property key used to store the grouping key on the super-element.
+   */
+  private final String targetPropertyKey;
+
+  /**
    * Create a new instance of this grouping key function.
    *
    * @param timeInterval      The time interval of the temporal element to consider.
@@ -65,6 +82,8 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements Grouping
     this.timeInterval = Objects.requireNonNull(timeInterval);
     this.timeIntervalField = Objects.requireNonNull(timeIntervalField);
     this.fieldOfTimeStamp = fieldOfTimeStamp;
+    this.targetPropertyKey = "time_" + timeInterval + "_" + timeIntervalField +
+      (fieldOfTimeStamp != null ? "_" + fieldOfTimeStamp : "");
   }
 
   @Override
@@ -97,6 +116,14 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements Grouping
     }
     final LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(fieldValue), UTC);
     return fieldOfTimeStamp.getFrom(date);
+  }
+
+  @Override
+  public void addKeyToElement(T element, Object key) {
+    if (!(key instanceof Long)) {
+      throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
+    }
+    element.setProperty(targetPropertyKey, PropertyValue.create(key));
   }
 
   @Override

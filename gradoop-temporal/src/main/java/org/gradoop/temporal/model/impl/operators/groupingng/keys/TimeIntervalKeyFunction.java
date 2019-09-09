@@ -59,6 +59,32 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
   }
 
   @Override
+  public void addKeyToElement(T element, Object key) {
+    if (key instanceof Tuple2) {
+      final Object firstElement = ((Tuple2) key).f0;
+      final Object secondElement = ((Tuple2) key).f1;
+      if ((firstElement instanceof Long) && (secondElement instanceof Long)) {
+        switch (timeInterval) {
+        case VALID_TIME:
+          element.setValidFrom((Long) firstElement);
+          element.setValidTo((Long) secondElement);
+          break;
+        case TRANSACTION_TIME:
+          element.setTransactionTime(Tuple2.of((Long) firstElement, (Long) secondElement));
+          break;
+        default:
+        }
+        return;
+      } else {
+        throw new IllegalArgumentException("Invalid types for tuple key: " +
+          firstElement.getClass().getSimpleName() + ", " + secondElement.getClass().getSimpleName());
+      }
+    } else {
+      throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
+    }
+  }
+
+  @Override
   public TypeInformation<Tuple2<Long, Long>> getType() {
     return TupleTypeInfo.getBasicTupleTypeInfo(Long.TYPE, Long.TYPE);
   }
