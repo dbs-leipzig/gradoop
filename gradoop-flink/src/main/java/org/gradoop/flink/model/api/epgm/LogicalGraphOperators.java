@@ -185,33 +185,6 @@ public interface LogicalGraphOperators {
   LogicalGraph sample(SamplingAlgorithm algorithm);
 
   /**
-   * Checks, if another logical graph contains exactly the same vertices and
-   * edges (by id) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph other);
-
-  /**
-   * Checks, if another logical graph contains vertices and edges with the same
-   * attached data (i.e. label and properties) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
-   */
-  DataSet<Boolean> equalsByElementData(LogicalGraph other);
-
-  /**
-   * Checks, if another logical graph has the same attached data and contains
-   * vertices and edges with the same attached data as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
-   */
-  DataSet<Boolean> equalsByData(LogicalGraph other);
-
-  /**
    * Generates all combinations of the supplied vertex grouping keys according to the definition of
    * the rollUp operation in SQL and uses them together with all edge grouping keys for separate
    * grouping operations. For example, specifying the vertex grouping keys A, B and C leads to
