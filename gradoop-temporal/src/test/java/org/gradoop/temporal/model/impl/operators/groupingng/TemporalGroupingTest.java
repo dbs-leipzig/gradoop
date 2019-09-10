@@ -165,8 +165,8 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
    */
   @Test
   public void testDurationKeyFunctionOnGraph() throws Exception {
-    final long testTimeFrom1 = asMillis("2019.05.01 00:00:00.000");
-    final long testTimeTo1 = asMillis("2019.07.31 00:00:00.000");
+    final long testTimeFrom1 = asMillis("2019.04.20 00:00:00.000");
+    final long testTimeTo1 = asMillis("2019.07.20 00:00:00.000");
     final long testTimeFrom2 = asMillis("2020.08.01 12:00:00.000");
     final long testTimeTo2 = asMillis("2020.11.02 12:00:00.000");
     final long testTimeFrom3 = asMillis("2019.01.01 12:00:00.000");
@@ -202,6 +202,8 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.DAYS));
     TemporalGraph byMonths = input.callForGraph(new GroupingNG<>(vertexKeysMonths, vertexAggregateFunctions,
       Collections.emptyList(), Collections.emptyList()));
+    // TODO: Remove this
+    byMonths.print();
     collectAndAssertTrue(loader.getLogicalGraphByVariable("expected1")
       .equalsByElementData(byMonths.toLogicalGraph()));
     TemporalGraph byDays = input.callForGraph(new GroupingNG<>(vertexKeysDays, vertexAggregateFunctions,
