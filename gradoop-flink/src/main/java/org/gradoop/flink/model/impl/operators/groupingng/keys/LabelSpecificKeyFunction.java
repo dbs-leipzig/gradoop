@@ -1,0 +1,168 @@
+/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.groupingng.keys;
+
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.groupingng.GroupingKeys;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * A grouping key function that extracts grouping keys only for specific labels.
+ *
+ * @param <T> The type of the elements to group.
+ */
+public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyFunction<T, Tuple> {
+
+  /**
+   * A map assigning an internally used number to each label.
+   */
+  private final Map<String, Integer> labelToIndex;
+
+  /**
+   * A list of grouping key functions to be used for each label.
+   */
+  private final List<GroupingKeyFunction<T, ?>> keyFunctions;
+
+  /**
+   * An array of labels to be set on super elements.
+   */
+  private final String[] targetLabels;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple reuseTuple;
+
+  /**
+   * Create an instance of this key function from a list of label groups.
+   * Note that this key function ignores aggregate functions stored in those groups.
+   *
+   * @param groups The label groups.
+   */
+  public LabelSpecificKeyFunction(List<LabelGroup> groups) {
+    this(labelGroupsToMap(Objects.requireNonNull(groups)),
+      groups.stream().collect(Collectors.toMap(LabelGroup::getGroupingLabel, LabelGroup::getGroupLabel)));
+  }
+
+  /**
+   * Create an instance of this key function.
+   *
+   * @param labelsWithKeys    A map assigning a list of key functions to each label.
+   * @param labelToSuperLabel A map assigning a label to be set on the super element for each label.
+   */
+  public LabelSpecificKeyFunction(Map<String, List<GroupingKeyFunction<T, ?>>> labelsWithKeys,
+    Map<String, String> labelToSuperLabel) {
+    final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();
+    if (totalLabels + 1 > Tuple.MAX_ARITY) {
+      throw new IllegalArgumentException("Too many labels. Tuple arity exceeded.");
+    }
+    int labelNr = 0;
+    labelToIndex = new HashMap<>();
+    keyFunctions = new ArrayList<>(totalLabels);
+    targetLabels = new String[totalLabels];
+    for (Map.Entry<String, List<GroupingKeyFunction<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
+      labelToIndex.put(labelToKeys.getKey(), labelNr);
+      targetLabels[labelNr] = labelToKeys.getKey();
+      List<GroupingKeyFunction<T, ?>> keysForLabel = labelToKeys.getValue();
+      keyFunctions.set(labelNr, keysForLabel.size() == 1 ?
+        keysForLabel.get(0) : new CompositeKeyFunction<>(keysForLabel));
+      labelNr++;
+    }
+    if (labelToSuperLabel != null) {
+      for (Map.Entry<String, String> labelUpdateEntry : labelToSuperLabel.entrySet()) {
+        Integer index = labelToIndex.get(labelUpdateEntry.getKey());
+        if (index == null) {
+          continue;
+        }
+        targetLabels[index] = labelUpdateEntry.getValue();
+      }
+    }
+    reuseTuple = Tuple.newInstance(1 + totalLabels);
+  }
+
+  @Override
+  public Tuple getKey(T element) {
+    Integer index = labelToIndex.get(element.getLabel());
+    for (int i = 0; i < keyFunctions.size(); i++) {
+      reuseTuple.setField(PropertyValue.NULL_VALUE, 1 + i);
+    }
+    if (index == null) {
+      index = -1;
+    } else {
+      reuseTuple.setField(keyFunctions.get(index).getKey(element), index);
+    }
+    reuseTuple.setField(index, 0);
+    return reuseTuple;
+  }
+
+  @Override
+  public void addKeyToElement(T element, Object key) {
+    if (!(key instanceof Tuple)) {
+      throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
+    }
+    Integer index = ((Tuple) key).getField(0);
+    if (index == -1) {
+      return;
+    }
+    keyFunctions.get(index).addKeyToElement(element, ((Tuple) key).getField(1 + index));
+  }
+
+  @Override
+  public TypeInformation<Tuple> getType() {
+    TypeInformation[] types = new TypeInformation[1 + keyFunctions.size()];
+    types[0] = BasicTypeInfo.INT_TYPE_INFO;
+    for (int index = 0; index < keyFunctions.size(); index++) {
+      types[1 + index] = keyFunctions.get(index).getType();
+    }
+    return new TupleTypeInfo<>(types);
+  }
+
+  /**
+   * Convert a list of label groups to a map usable with
+   * {@link LabelSpecificKeyFunction#LabelSpecificKeyFunction(Map, Map)}.
+   *
+   * @param labelGroups A list of label groups.
+   * @param <T> The type of elements to group.
+   * @return A map usable with the constructor of this class.
+   */
+  private static <T extends Attributed> Map<String, List<GroupingKeyFunction<T, ?>>> labelGroupsToMap(
+    List<LabelGroup> labelGroups) {
+    Map<String, List<GroupingKeyFunction<T, ?>>> result = new HashMap<>();
+    for (LabelGroup labelGroup : labelGroups) {
+      final String groupingLabel = labelGroup.getGroupingLabel();
+      if (!result.containsKey(groupingLabel)) {
+        result.put(groupingLabel, new ArrayList<>());
+      }
+      List<GroupingKeyFunction<T, ?>> keysForLabel = result.get(groupingLabel);
+      labelGroup.getPropertyKeys().forEach(k -> keysForLabel.add(GroupingKeys.property(k)));
+    }
+    return result;
+  }
+}
