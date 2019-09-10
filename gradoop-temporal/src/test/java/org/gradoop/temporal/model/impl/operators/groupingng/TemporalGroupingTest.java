@@ -202,8 +202,6 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.DAYS));
     TemporalGraph byMonths = input.callForGraph(new GroupingNG<>(vertexKeysMonths, vertexAggregateFunctions,
       Collections.emptyList(), Collections.emptyList()));
-    // TODO: Remove this
-    byMonths.print();
     collectAndAssertTrue(loader.getLogicalGraphByVariable("expected1")
       .equalsByElementData(byMonths.toLogicalGraph()));
     TemporalGraph byDays = input.callForGraph(new GroupingNG<>(vertexKeysDays, vertexAggregateFunctions,
