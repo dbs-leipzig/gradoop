@@ -32,9 +32,11 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
@@ -42,6 +44,9 @@ import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -197,6 +202,22 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
     GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
       true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByElementData(TemporalGraph other) {
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByData(TemporalGraph other) {
+    return callForValue(new GraphEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
   }
 
   //----------------------------------------------------------------------------
