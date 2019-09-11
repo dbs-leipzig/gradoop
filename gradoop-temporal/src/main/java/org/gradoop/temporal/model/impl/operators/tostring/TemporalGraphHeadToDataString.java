@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElem
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 
 /**
- * Represents a temporal graph head by a data string (label, properties, valid time and transaction time).
+ * Represents a temporal graph head by a data string (label, properties and valid time).
  *
  * @param <G> temporal graph head type
  */

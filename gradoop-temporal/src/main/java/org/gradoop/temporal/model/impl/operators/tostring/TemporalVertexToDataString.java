@@ -24,7 +24,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 
 /**
- * Represents a temporal vertex by a data string (label, properties, valid time and transaction time).
+ * Represents a temporal vertex by a data string (label, properties and valid time).
  *
  * @param <V> temporal vertex type
  */

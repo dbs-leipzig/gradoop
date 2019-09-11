@@ -23,7 +23,7 @@ import org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElem
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
 /**
- * Represents an temporal edge by a data string (label, properties, valid time and transaction time).
+ * Represents an temporal edge by a data string (label, properties and valid time).
  *
  * @param <E> temporal edge type
  */

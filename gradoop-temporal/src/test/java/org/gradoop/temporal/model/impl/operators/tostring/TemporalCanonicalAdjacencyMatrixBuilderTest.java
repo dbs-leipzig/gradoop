@@ -28,8 +28,6 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 
-import java.time.temporal.Temporal;
-
 import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_FROM;
 import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_TO;
 import static org.junit.Assert.assertEquals;
