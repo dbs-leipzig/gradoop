@@ -34,6 +34,9 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -154,6 +157,48 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   }
 
   /**
+   * Convert a graph collection to a {@link TemporalGraphCollection} and set temporal attributes using
+   * {@link TimeIntervalExtractor} functions.
+   *
+   * @param collection             The graph collection.
+   * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.
+   * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.
+   * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @return A temporal graph with temporal attributes extracted from the original graph.
+   */
+  protected <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraphCollection
+  toTemporalGraphCollection(
+    BaseGraphCollection<G, V, E, ?, ?> collection,
+    TimeIntervalExtractor<G> graphHeadTimeExtractor,
+    TimeIntervalExtractor<V> vertexTimeExtractor,
+    TimeIntervalExtractor<E> edgeTimeExtractor) {
+    return getConfig().getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
+      collection.getGraphHeads(), graphHeadTimeExtractor, collection.getVertices(), vertexTimeExtractor,
+      collection.getEdges(), edgeTimeExtractor);
+  }
+
+  /**
+   * Convert a graph collection to a {@link TemporalGraphCollection} with time extraction functions.
+   * This will use {@link TemporalGradoopTestUtils#extractTime(Element)} to extract temporal attributes.
+   *
+   * @param collection The graph collection.
+   * @return The temporal graph with extracted temporal information.
+   */
+  protected TemporalGraphCollection toTemporalGraphCollectionWithDefaultExtractors(
+    BaseGraphCollection<?, ?, ?, ?, ?> collection) {
+    // We have to use lambda expressions instead of method references here, otherwise a
+    // ClassCastException will be thrown when those extractor functions are called.
+    // TODO: Find out why.
+    return toTemporalGraphCollection(collection,
+      g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v),
+      e -> TemporalGradoopTestUtils.extractTime(e));
+  }
+
+  /**
    * Check if the temporal graph element has default time values for valid and transaction time.
    *
    * @param element the temporal graph element to check
@@ -186,4 +231,15 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     return getLoaderFromStream(inputStream);
   }
 
+  /**
+   * Returns the encoded file path to a resource.
+   *
+   * @param  relPath the relative path to the resource
+   * @return encoded file path
+   */
+  @Override
+  protected String getFilePath(String relPath) throws UnsupportedEncodingException {
+    return URLDecoder.decode(
+      getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
+  }
 }
