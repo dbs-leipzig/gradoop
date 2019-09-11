@@ -21,6 +21,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 /**
  * Superclass of data-bases string representations of temporal elements,
  * i.e. such including label, properties and valid time.
+ *
+ * @param <EL> temporal element type
  */
 public class TemporalElementToDataString<EL extends TemporalElement> extends ElementToDataString<EL> {
 

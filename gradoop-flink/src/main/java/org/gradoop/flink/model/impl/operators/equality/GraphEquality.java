@@ -30,6 +30,12 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class GraphEquality<
   G extends GraphHead,

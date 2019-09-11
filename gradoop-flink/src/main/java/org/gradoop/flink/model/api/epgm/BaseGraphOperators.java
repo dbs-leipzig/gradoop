@@ -433,6 +433,7 @@ public interface BaseGraphOperators<
    * @param operator   binary graph to graph operator
    * @param otherGraph other graph
    * @return result of given operator
+   * @param <T> type of value
    */
   <T> T callForValue(BinaryBaseGraphToValueOperator<LG, T> operator, LG otherGraph);
 
