@@ -15,26 +15,36 @@
  */
 package org.gradoop.temporal.model.impl.operators.equality;
 
+import org.gradoop.flink.model.impl.functions.epgm.RemoveProperties;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 
+import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_FROM;
+import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_TO;
+
 public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
+  private ApplyTransformation<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
+    TemporalGraphCollection> removeTimeProperties = new ApplyTransformation<>(
+    new RemoveProperties<>(PROPERTY_VALID_FROM, PROPERTY_VALID_TO),
+    new RemoveProperties<>(PROPERTY_VALID_FROM, PROPERTY_VALID_TO),
+    new RemoveProperties<>(PROPERTY_VALID_FROM, PROPERTY_VALID_TO));
 
   @Test
   public void testCollectionEqualityByGraphIds() throws Exception {
@@ -43,9 +53,12 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
     CollectionEqualityByGraphIds<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection> equality = new CollectionEqualityByGraphIds<>();
 
-    TemporalGraphCollection gRef1 = toTemporalGraphCollection(loader.getGraphCollectionByVariables("gRef"));
-    TemporalGraphCollection gRef2 = toTemporalGraphCollection(loader.getGraphCollectionByVariables("gRef"));
-    TemporalGraphCollection gClone = toTemporalGraphCollection(loader.getGraphCollectionByVariables("gClone"));
+    TemporalGraphCollection gRef1 = toTemporalGraphCollectionWithDefaultExtractors(
+      loader.getGraphCollectionByVariables("gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gRef2 = toTemporalGraphCollectionWithDefaultExtractors(
+      loader.getGraphCollectionByVariables("gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gClone = toTemporalGraphCollectionWithDefaultExtractors(
+      loader.getGraphCollectionByVariables("gClone")).apply(removeTimeProperties);
     TemporalGraphCollection gEmpty = getConfig().getTemporalGraphCollectionFactory()
       .createEmptyCollection();
 
@@ -72,14 +85,14 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
       new EdgeToIdString<>(),
       true);
 
-    TemporalGraphCollection gRef = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gClone", "gEmpty"));
-    TemporalGraphCollection gClone = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gClone", "gRef", "gEmpty"));
-    TemporalGraphCollection gSmall = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gRef"));
-    TemporalGraphCollection gDiffId = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gDiffId", "gEmpty"));
+    TemporalGraphCollection gRef = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gClone", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gClone = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gClone", "gRef", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gSmall = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffId = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gDiffId", "gEmpty")).apply(removeTimeProperties);
     TemporalGraphCollection gEmpty = getConfig().getTemporalGraphCollectionFactory()
       .createEmptyCollection();
 
@@ -103,31 +116,31 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
     CollectionEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection> equality = new CollectionEquality<>(
       new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       true
     );
 
-    TemporalGraphCollection gRef = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gClone", "gEmpty"));
-    TemporalGraphCollection gClone = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gClone", "gRef", "gEmpty"));
-    TemporalGraphCollection gSmall = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gRef"));
-    TemporalGraphCollection gDiffData = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gDiffData", "gEmpty"));
+    TemporalGraphCollection gRef = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gClone", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gClone = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gClone", "gRef", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gSmall = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffTime = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gDiffTime", "gEmpty")).apply(removeTimeProperties);
     TemporalGraphCollection gEmpty = getConfig().getTemporalGraphCollectionFactory()
       .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gClone));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gSmall));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
 
     // convenience method
     collectAndAssertTrue(gRef.equalsByGraphElementData(gClone));
-    collectAndAssertFalse(gRef.equalsByGraphElementData(gDiffData));
+    collectAndAssertFalse(gRef.equalsByGraphElementData(gDiffTime));
     collectAndAssertFalse(gRef.equalsByGraphElementData(gSmall));
     collectAndAssertFalse(gRef.equalsByGraphElementData(gEmpty));
   }
@@ -138,36 +151,36 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
     CollectionEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection> equality = new CollectionEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       true
     );
 
-    TemporalGraphCollection gRef = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gEmpty"));
-    TemporalGraphCollection gDiffId = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gDiffId", "gEmpty"));
-    TemporalGraphCollection gClone = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gClone", "gEmpty"));
-    TemporalGraphCollection gSmall = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef"));
-    TemporalGraphCollection gDiffData = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gDiffData", "gEmpty"));
+    TemporalGraphCollection gRef = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffId = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gDiffId", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gClone = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gClone", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gSmall = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffTime = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gDiffTime", "gEmpty")).apply(removeTimeProperties);
     TemporalGraphCollection gEmpty = getConfig().getTemporalGraphCollectionFactory()
       .createEmptyCollection();
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
     collectAndAssertFalse(equality.execute(gRef, gClone));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gSmall));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
 
     // convenience method
     collectAndAssertTrue(gRef.equalsByGraphData(gDiffId));
     collectAndAssertFalse(gRef.equalsByGraphData(gClone));
-    collectAndAssertFalse(gRef.equalsByGraphData(gDiffData));
+    collectAndAssertFalse(gRef.equalsByGraphData(gDiffTime));
     collectAndAssertFalse(gRef.equalsByGraphData(gSmall));
     collectAndAssertFalse(gRef.equalsByGraphData(gEmpty));
   }
@@ -178,24 +191,24 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
     CollectionEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection> equality = new CollectionEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       false
     );
 
-    TemporalGraphCollection gRef = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef", "gEmpty"));
-    TemporalGraphCollection gDiffId = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gDiffId", "gEmpty"));
-    TemporalGraphCollection gClone = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gClone", "gEmpty"));
-    TemporalGraphCollection gRev = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRev", "gEmpty"));
-    TemporalGraphCollection gSmall = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gRef"));
-    TemporalGraphCollection gDiffData = toTemporalGraphCollection(loader
-      .getGraphCollectionByVariables("gDiffData", "gEmpty"));
+    TemporalGraphCollection gRef = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffId = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gDiffId", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gClone = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gClone", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gRev = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRev", "gEmpty")).apply(removeTimeProperties);
+    TemporalGraphCollection gSmall = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gRef")).apply(removeTimeProperties);
+    TemporalGraphCollection gDiffTime = toTemporalGraphCollectionWithDefaultExtractors(loader
+      .getGraphCollectionByVariables("gDiffTime", "gEmpty")).apply(removeTimeProperties);
     TemporalGraphCollection gEmpty = getConfig().getTemporalGraphCollectionFactory()
       .createEmptyCollection();
 
@@ -203,7 +216,7 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
     collectAndAssertTrue(equality.execute(gRef, gRev));
     collectAndAssertFalse(equality.execute(gRef, gClone));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gSmall));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
   }
@@ -220,9 +233,12 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
       true
     );
 
-    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"));
-    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"));
-    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"));
+    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"))
+      .callForGraph(removeTimeProperties);
     TemporalGraph gEmpty = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gEmpty"));
 
     // direct operator call
@@ -243,24 +259,27 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
     GraphEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
       equality = new GraphEquality<>(
       new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       true
     );
 
-    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"));
-    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"));
-    TemporalGraph gDiffData = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffData"));
+    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffTime = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffTime"))
+      .callForGraph(removeTimeProperties);
     TemporalGraph gEmpty = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gEmpty"));
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
 
     // convenience method
     collectAndAssertTrue(gRef.equalsByElementData(gDiffId));
-    collectAndAssertFalse(gRef.equalsByElementData(gDiffData));
+    collectAndAssertFalse(gRef.equalsByElementData(gDiffTime));
     collectAndAssertFalse(gRef.equalsByElementData(gEmpty));
   }
 
@@ -271,28 +290,32 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
     GraphEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
       equality = new GraphEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       true
     );
 
-    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"));
-    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"));
-    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"));
-    TemporalGraph gDiffData = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffData"));
+    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffTime = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffTime"))
+      .callForGraph(removeTimeProperties);
     TemporalGraph gEmpty = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gEmpty"));
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
     collectAndAssertFalse(equality.execute(gRef, gClone));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
 
     // convenience method
     collectAndAssertTrue(gRef.equalsByData(gDiffId));
     collectAndAssertFalse(gRef.equalsByData(gClone));
-    collectAndAssertFalse(gRef.equalsByData(gDiffData));
+    collectAndAssertFalse(gRef.equalsByData(gDiffTime));
     collectAndAssertFalse(gRef.equalsByData(gEmpty));
   }
 
@@ -303,24 +326,29 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
     GraphEquality<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
       equality = new GraphEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(),
       false
     );
 
-    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"));
-    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"));
-    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"));
-    TemporalGraph gDiffData = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffData"));
-    TemporalGraph gRev = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRev"));
+    TemporalGraph gRef = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRef"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gClone = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gClone"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffId = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffId"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gDiffTime = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gDiffTime"))
+      .callForGraph(removeTimeProperties);
+    TemporalGraph gRev = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gRev"))
+      .callForGraph(removeTimeProperties);
     TemporalGraph gEmpty = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("gEmpty"));
 
     // direct operator call
     collectAndAssertTrue(equality.execute(gRef, gDiffId));
     collectAndAssertTrue(equality.execute(gRef, gRev));
     collectAndAssertFalse(equality.execute(gRef, gClone));
-    collectAndAssertFalse(equality.execute(gRef, gDiffData));
+    collectAndAssertFalse(equality.execute(gRef, gDiffTime));
     collectAndAssertFalse(equality.execute(gRef, gEmpty));
   }
 
@@ -330,7 +358,8 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
 
       "gRef:G{dataDiff : false}[" +
       // loop around a1 and edge from a1 to a2
-      "(a1:A{x : 1})-[loop:a{x : 1}]->(a1)-[aa:a{x : 1}]->(a2:A{x : 2})" +
+      "(a1:A{x : 1})-[loop:a{x : 1, __valFrom : 1543400000000L, __valTo : 1543900000000L}]->" +
+      "(a1)-[aa:a{x : 1}]->(a2:A{x : 2, __valFrom : 1543800000000L})" +
       // parallel edge from a1 to b1
       "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1:B)" +
       // cycle of bs
@@ -349,9 +378,10 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
       "(b1)-[cyc1]->(b2)-[:c]->(b3)-[cyc3]->(b1)]" +
 
       // element id copy of gRef
-      // with each one different vertex and edge attribute
-      "gDiffData:G[" +
-      "(a1)-[loop]->(a1)-[:a{y : 1}]->(:A{x : \"diff\"})" +
+      // with each one different vertex and edge valid time
+      "gDiffTime:G[" +
+      "(a1)-[loop]->(a1)-[:a{x : 1, __valFrom : 1543400000000L, __valTo : 1546900000000L}]->" +
+      "(:A{x : 2, __valFrom : 1543300000000L})" +
       "(a1)-[par1]->(b1),(a1)-[par2]->(b1)" +
       "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]" +
 
