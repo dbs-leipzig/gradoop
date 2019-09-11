@@ -19,7 +19,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
- * Defines callFor methods for graphs.
+ * Defines methods for calling operators with this graph as a parameter.
  *
  * @param <LG> graph type
  * @param <GC> graph collection type
@@ -36,7 +36,7 @@ public interface BaseGraphOperatorSupport<LG extends BaseGraph, GC extends BaseG
   <T> T callForValue(UnaryBaseGraphToValueOperator<LG, T> operator);
 
   /**
-   * Calls the given binary graph to value operator using that graph and the input graph.
+   * Calls the given binary graph to value operator using this graph and the input graph.
    *
    * @param operator   binary graph to value operator
    * @param otherGraph second input graph for operator
@@ -56,7 +56,7 @@ public interface BaseGraphOperatorSupport<LG extends BaseGraph, GC extends BaseG
   }
 
   /**
-   * Creates a base graph from that graph and the input graph using the given binary operator.
+   * Creates a base graph from this graph and the input graph using the given binary operator.
    *
    * @param operator   binary graph to graph operator
    * @param otherGraph other graph
@@ -66,7 +66,7 @@ public interface BaseGraphOperatorSupport<LG extends BaseGraph, GC extends BaseG
     return callForValue(operator, otherGraph);
   }
   /**
-   * Creates a graph collection from that graph using the given unary graph operator.
+   * Creates a graph collection from this graph using the given unary graph operator.
    *
    * @param operator unary graph to collection operator
    * @return result of given operator

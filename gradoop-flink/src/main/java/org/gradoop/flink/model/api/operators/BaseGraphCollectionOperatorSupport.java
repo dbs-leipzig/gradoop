@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 
 /**
- * Defines callFor methods for graph collections.
+ * Defines methods for calling operators with this graph collection as a parameter.
  *
  * @param <LG> graph type
  * @param <GC> graph collection type
@@ -39,7 +39,7 @@ public interface BaseGraphCollectionOperatorSupport<LG extends BaseGraph, GC ext
   <T> T callForValue(UnaryBaseGraphCollectionToValueOperator<GC, T> operator);
 
   /**
-   * Calls the given binary collection to value operator using that graph collection and the
+   * Calls the given binary collection to value operator using this graph collection and the
    * input graph collection.
    *
    * @param operator        binary collection to value operator
@@ -60,7 +60,7 @@ public interface BaseGraphCollectionOperatorSupport<LG extends BaseGraph, GC ext
   }
 
   /**
-   * Calls the given binary collection to collection operator using that graph collection and the
+   * Calls the given binary collection to collection operator using this graph collection and the
    * input graph collection.
    *
    * @param operator        binary collection to collection operator
@@ -84,7 +84,7 @@ public interface BaseGraphCollectionOperatorSupport<LG extends BaseGraph, GC ext
   }
 
   /**
-   * Transforms a graph collection into a base graph by applying a
+   * Transforms a graph collection into a graph by applying a
    * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
    *
    * @param operator reducible binary graph to graph operator
