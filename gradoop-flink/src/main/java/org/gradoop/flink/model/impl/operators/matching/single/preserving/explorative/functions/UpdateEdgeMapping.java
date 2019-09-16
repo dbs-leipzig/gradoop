@@ -28,23 +28,19 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 
 /**
  * Extends an embedding with an edge if possible.
- *
- * Read fields first:
- *
+ * <p>
+ * Read fields first:<br>
  * f1.f1: edge mappings
- *
- * Read fields second:
- *
- * f0: edge id
+ * <p>
+ * Read fields second:<br>
+ * f0: edge id<br>
  * f2: next id
- *
- * Forwarded fields first:
- *
+ * <p>
+ * Forwarded fields first:<br>
  * f1.f0: vertex mappings
- *
- * Forwarded fields second:
- *
- * f2->f1: next id -> tie point id
+ * <p>
+ * Forwarded fields second:<br>
+ * {@code f2->f1}: {@code next id -> tie point id}
  *
  * @param <K> key type
  */
@@ -52,8 +48,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 @FunctionAnnotation.ReadFieldsSecond("f0;f2")
 @FunctionAnnotation.ForwardedFieldsFirst("f1.f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f2->f0")
-public class UpdateEdgeMapping<K>
-  extends UpdateMapping<K>
+public class UpdateEdgeMapping<K> extends UpdateMapping<K>
   implements FlatJoinFunction<EmbeddingWithTiePoint<K>, EdgeStep<K>, EmbeddingWithTiePoint<K>> {
   /**
    * Iteration strategy

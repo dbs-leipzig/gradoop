@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 
 /**
- * (edge) -> (targetId, label)
+ * {@code (edge) -> (targetId, label)}
  *
  * @param <E> EPGM edge type
  */

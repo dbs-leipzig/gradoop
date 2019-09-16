@@ -27,20 +27,19 @@ import java.util.List;
 
 /**
  * Alternative FilterAndProjectVertices using Filter + Map operators
- *
+ * <p>
  * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
- *
- * EPGMVertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
- *
+ * <p>
+ * {@code EPGMVertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])}
+ * <p>
  * Example:
- *
- * Given a EPGMVertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
- * projection property keys [name, location] the operator creates an
- * {@link Embedding}:
- *
- * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ * <br>
+ * Given a EPGMVertex {@code (0, "Person", {name:"Alice", age:23})}, a predicate {@code "age = 23"} and
+ * projection property keys {@code [name, location]} the operator creates an {@link Embedding}:
+ * <br>
+ * {@code ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])}
  */
 public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   /**

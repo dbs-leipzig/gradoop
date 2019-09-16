@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
- * (g, V, E) => true, if E not empty
+ * {@code (g, V, E) => true, if E not empty}
  */
 public class NotEmpty implements FilterFunction<GraphTransaction> {
 

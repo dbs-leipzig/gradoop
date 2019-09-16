@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import java.util.Set;
 
 /**
- * (graphHead, {vertex,..}, {edge,..}) => vertex,..
+ * {@code (graphHead, {vertex,..}, {edge,..}) => vertex,..}
  *
  * @param <T> tuple type
  */

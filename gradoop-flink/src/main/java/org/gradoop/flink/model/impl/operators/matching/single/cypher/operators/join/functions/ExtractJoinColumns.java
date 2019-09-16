@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Given a set of columns, this key selector returns a concatenated string containing the
  * identifiers of the specified columns.
- *
- * (id0,id1,...,idn),[0,2] -> "id0id2"
+ * <p>
+ * {@code (id0,id1,...,idn),[0,2] -> "id0id2"}
  */
 public class ExtractJoinColumns implements KeySelector<Embedding, String> {
   /**

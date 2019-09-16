@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Map;
 
 /**
- * Gradoop Graph Transaction => lightweight labeled graph
+ * {@code Gradoop Graph Transaction => lightweight labeled graph}
  */
 public class EPGMGraphTransactionToLabeledGraph implements
   MapFunction<GraphTransaction, LabeledGraphStringString> {

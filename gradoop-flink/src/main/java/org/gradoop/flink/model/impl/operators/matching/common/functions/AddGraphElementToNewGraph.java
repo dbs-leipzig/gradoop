@@ -27,11 +27,11 @@ import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import java.util.HashMap;
 
 /**
- * (GE) -> (GE (+ GraphHead), GraphHead)
- *
+ * {@code (GE) -> (GE (+ GraphHead), GraphHead)}
+ * <p>
  * Forwarded fields:
- *
- * *->f0: input graph element
+ * <p>
+ * {@code *->f0: input graph element}
  *
  * @param <GE> The graph element type.
  * @param <G>  The graph head type.
