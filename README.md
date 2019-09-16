@@ -172,7 +172,7 @@ scalability and speedup of the operators.
 
 ### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
 
-Demo application for Gradoop operators
+Demo application to show the functionalities of the grouping and query operator in an interactive web UI.
 
 ### Version History
 
