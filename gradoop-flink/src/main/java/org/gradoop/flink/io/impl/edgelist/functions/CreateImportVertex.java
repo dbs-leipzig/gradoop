@@ -26,7 +26,7 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
  * <p>
  * Forwarded fields:
  * <br>
- * f0: vertexId
+ * {@code f0}: {@code vertexId}
  *
  * @param <K> comparable key
  */

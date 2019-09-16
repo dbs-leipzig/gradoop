@@ -36,7 +36,7 @@ import java.util.Set;
  * <p>
  * Forwarded fields:
  * <br>
- * f0: graph head id
+ * {@code f0}: {@code graphId}
  */
 @FunctionAnnotation.ForwardedFields("f0")
 public class GraphVerticesEdges implements

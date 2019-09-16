@@ -27,9 +27,9 @@ import org.gradoop.common.util.GradoopConstants;
  * <p>
  * Forwarded fields:
  * <br>
- * {@code f0}:        edgeId<br>
- * {@code f1.f0->f1}: sourceId<br>
- * {@code f1.f1->f2}: targetId
+ * {@code f0}:        {@code edgeId}<br>
+ * {@code f1.f0->f1}: {@code sourceId}<br>
+ * {@code f1.f1->f2}: {@code targetId}
  *
  * @param <K> id type
  */

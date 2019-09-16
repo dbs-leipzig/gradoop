@@ -27,7 +27,7 @@ import org.gradoop.common.util.GradoopConstants;
  * <p>
  * Forwarded fields:
  * <br>
- * f0: vertexId
+ * {@code f0}: {@code vertexId}
  *
  * @param <K> id type
  */

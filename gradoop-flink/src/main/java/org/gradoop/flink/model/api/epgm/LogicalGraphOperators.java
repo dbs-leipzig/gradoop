@@ -43,8 +43,8 @@ public interface LogicalGraphOperators {
   /**
    * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
    * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism.
-   * The result is a CAPFQueryResult, containing a flink table that can be converted to a GraphCollection,
-   * if it contains vertices or edges.
+   * The result is a {@link CAPFQueryResult}, containing a flink table that can be converted to a
+   * {@link GraphCollection}, if it contains vertices or edges.
    *
    * @param query    the query string
    * @param metaData metaData object
