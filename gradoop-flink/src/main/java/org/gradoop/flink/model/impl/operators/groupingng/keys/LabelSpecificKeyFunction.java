@@ -21,8 +21,8 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.groupingng.GroupingKeys;
 
@@ -48,7 +48,7 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
   /**
    * A list of grouping key functions to be used for each label.
    */
-  private final List<GroupingKeyFunction<T, ?>> keyFunctions;
+  private final List<KeyFunctionWithDefaultValue<T, ?>> keyFunctions;
 
   /**
    * An array of labels to be set on super elements.
@@ -77,7 +77,7 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
    * @param labelsWithKeys    A map assigning a list of key functions to each label.
    * @param labelToSuperLabel A map assigning a label to be set on the super element for each label.
    */
-  public LabelSpecificKeyFunction(Map<String, List<GroupingKeyFunction<T, ?>>> labelsWithKeys,
+  public LabelSpecificKeyFunction(Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelsWithKeys,
     Map<String, String> labelToSuperLabel) {
     final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();
     if (totalLabels + 1 > Tuple.MAX_ARITY) {
@@ -87,12 +87,12 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
     labelToIndex = new HashMap<>();
     keyFunctions = new ArrayList<>(totalLabels);
     targetLabels = new String[totalLabels];
-    for (Map.Entry<String, List<GroupingKeyFunction<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
+    for (Map.Entry<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
       labelToIndex.put(labelToKeys.getKey(), labelNr);
       targetLabels[labelNr] = labelToKeys.getKey();
-      List<GroupingKeyFunction<T, ?>> keysForLabel = labelToKeys.getValue();
+      List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = labelToKeys.getValue();
       keyFunctions.set(labelNr, keysForLabel.size() == 1 ?
-        keysForLabel.get(0) : new CompositeKeyFunction<>(keysForLabel));
+        keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues<>(keysForLabel));
       labelNr++;
     }
     if (labelToSuperLabel != null) {
@@ -111,7 +111,7 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
   public Tuple getKey(T element) {
     Integer index = labelToIndex.get(element.getLabel());
     for (int i = 0; i < keyFunctions.size(); i++) {
-      reuseTuple.setField(PropertyValue.NULL_VALUE, 1 + i);
+      reuseTuple.setField(keyFunctions.get(i).getDefaultKey(), 1 + i);
     }
     if (index == null) {
       index = -1;
@@ -132,6 +132,7 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
       return;
     }
     keyFunctions.get(index).addKeyToElement(element, ((Tuple) key).getField(1 + index));
+    element.setLabel(targetLabels[index]);
   }
 
   @Override
@@ -152,15 +153,15 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
    * @param <T> The type of elements to group.
    * @return A map usable with the constructor of this class.
    */
-  private static <T extends Attributed> Map<String, List<GroupingKeyFunction<T, ?>>> labelGroupsToMap(
+  private static <T extends Attributed> Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelGroupsToMap(
     List<LabelGroup> labelGroups) {
-    Map<String, List<GroupingKeyFunction<T, ?>>> result = new HashMap<>();
+    Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> result = new HashMap<>();
     for (LabelGroup labelGroup : labelGroups) {
       final String groupingLabel = labelGroup.getGroupingLabel();
       if (!result.containsKey(groupingLabel)) {
         result.put(groupingLabel, new ArrayList<>());
       }
-      List<GroupingKeyFunction<T, ?>> keysForLabel = result.get(groupingLabel);
+      List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = result.get(groupingLabel);
       labelGroup.getPropertyKeys().forEach(k -> keysForLabel.add(GroupingKeys.property(k)));
     }
     return result;

@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.groupingng;
 
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.api.entities.Labeled;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelKeyFunction;
 import org.gradoop.flink.model.impl.operators.groupingng.keys.PropertyKeyFunction;
 
@@ -38,7 +38,7 @@ public class GroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the label.
    */
-  public static <T extends Labeled> GroupingKeyFunction<T, String> label() {
+  public static <T extends Labeled> KeyFunctionWithDefaultValue<T, String> label() {
     return new LabelKeyFunction<>();
   }
 
@@ -49,7 +49,7 @@ public class GroupingKeys {
    * @param <T> the type of the elements to group.
    * @return The grouping key function extracting the property with that key.
    */
-  public static <T extends Attributed> GroupingKeyFunction<T, byte[]> property(String key) {
+  public static <T extends Attributed> KeyFunctionWithDefaultValue<T, byte[]> property(String key) {
     return new PropertyKeyFunction<>(key);
   }
 }

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class PropertyKeyFunction<T extends Attributed> implements GroupingKeyFunction<T, byte[]> {
+public class PropertyKeyFunction<T extends Attributed> implements KeyFunctionWithDefaultValue<T, byte[]> {
 
   /**
    * The key of the property to group by.
@@ -60,5 +60,10 @@ public class PropertyKeyFunction<T extends Attributed> implements GroupingKeyFun
   @Override
   public TypeInformation<byte[]> getType() {
     return TypeInformation.of(byte[].class);
+  }
+
+  @Override
+  public byte[] getDefaultKey() {
+    return PropertyValue.NULL_VALUE.getRawBytes();
   }
 }

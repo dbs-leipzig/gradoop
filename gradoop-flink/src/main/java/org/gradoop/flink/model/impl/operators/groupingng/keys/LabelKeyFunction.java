@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.Labeled;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class LabelKeyFunction<T extends Labeled> implements GroupingKeyFunction<T, String> {
+public class LabelKeyFunction<T extends Labeled> implements KeyFunctionWithDefaultValue<T, String> {
 
   @Override
   public String getKey(T element) {
@@ -42,5 +42,10 @@ public class LabelKeyFunction<T extends Labeled> implements GroupingKeyFunction<
   @Override
   public TypeInformation<String> getType() {
     return BasicTypeInfo.STRING_TYPE_INFO;
+  }
+
+  @Override
+  public String getDefaultKey() {
+    return "";
   }
 }
