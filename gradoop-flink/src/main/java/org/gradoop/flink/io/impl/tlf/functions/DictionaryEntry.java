@@ -22,7 +22,7 @@ import org.apache.hadoop.io.Text;
 
 /**
  * After the TLF dictionary file has been read with a normal text input
- * format its result text has to be split and formed into {@code Tuple2<Integer, String>}.
+ * format its result text splitting it into {@code Tuple2<Integer, String>}.
  */
 public class DictionaryEntry implements MapFunction<Tuple2<LongWritable, Text>, Tuple2<Integer, String>> {
 
