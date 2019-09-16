@@ -28,8 +28,9 @@ import java.util.Set;
 
 /**
  * This UDF counts the number of distinct property values grouped by a key K
+ * <p>
+ * Reduces {@code <K, Set<PropertyValue>> --> <K, Long>}
  *
- * Reduces <K, Set<PropertyValue>> --> <K, Long>
  * @param <K> the grouping key
  */
 public class CombinePropertyValueDistribution<K> implements
@@ -53,8 +54,9 @@ public class CombinePropertyValueDistribution<K> implements
   }
 
   /**
-   * Extracts sets of property values from tuples and combines them into one set
-   * @param values list of <K, Set<PropertyValue>> tuples
+   * Extracts sets of property values from tuples and combines them into one set.
+   *
+   * @param values list of {@code <K, Set<PropertyValue>>} tuples
    * @return combined set of all PropertyValues
    */
   private Set<PropertyValue> combineSets(List<Tuple2<K, Set<PropertyValue>>> values) {

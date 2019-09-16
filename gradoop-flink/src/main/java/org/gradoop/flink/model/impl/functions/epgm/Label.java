@@ -21,13 +21,12 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.api.entities.Labeled;
 
 /**
- * labeled element => label
+ * {@code labeled element => label}
  *
  * @param <L> labeled type
  */
 @FunctionAnnotation.ForwardedFields("label->*")
-public class Label<L extends Labeled>
-  implements MapFunction<L, String>, KeySelector<L, String> {
+public class Label<L extends Labeled> implements MapFunction<L, String>, KeySelector<L, String> {
 
   @Override
   public String map(L l) throws Exception {

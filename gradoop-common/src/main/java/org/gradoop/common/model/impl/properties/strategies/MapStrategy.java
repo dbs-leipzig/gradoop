@@ -126,6 +126,7 @@ public class MapStrategy
    *
    * @param inputView {@link DataInputViewStreamWrapper} containing data
    * @return a map containing the deserialized data
+   * @throws IOException on failure to read input view
    */
   private Map<PropertyValue, PropertyValue> createMap(DataInputViewStreamWrapper inputView)
     throws IOException {

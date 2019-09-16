@@ -25,7 +25,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import java.util.Set;
 
 /**
- * (graphId, element),.. => (graphId, {element,..})
+ * {@code (graphId, element),.. => (graphId, {element,..})}
+ *
  * @param <EL> graph element type
  */
 public class GraphElementSet<EL extends EPGMGraphElement> implements

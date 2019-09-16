@@ -33,13 +33,12 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Compute function for {@link KRandomJumpGellyVCI}. Vertex values are of type
  * {@link VCIVertexValue}, with fields:
- * <p><ul>
- * <li>f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false}
- * otherwise
+ * <ul>
+ * <li>f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false} otherwise
  * <li>f1: {@code List<Long>} containing all long indices from already visited outgoing edges
- * </ul></p>
+ * </ul>
  * A message of type {@code NullValue} from one vertex to another is a walk respective a jump to
- * this other vertex and therefor considered as one of {@link KRandomJumpGellyVCI#k} walkers.
+ * this other vertex and therefor considered as one of {@code k} walkers.
  */
 public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Long, NullValue> {
 

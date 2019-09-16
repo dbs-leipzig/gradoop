@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CategoryCountableLabel;
 
 /**
- * (category, label, frequency) => label
+ * {@code (category, label, frequency) => label}
  */
 public class LabelOnly implements MapFunction<CategoryCountableLabel, String> {
 
