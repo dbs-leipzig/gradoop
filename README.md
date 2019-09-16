@@ -151,6 +151,11 @@ using DataSet transformations. The module also contains implementations of
 general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
 
+### gradoop-temporal
+
+This module contains a reference implementation of the Temporal Property Graph Model (TPGM) and
+it's operators used to perform graph analysis with respect to the additional time dimension in real-world graphs.
+
 ### gradoop-examples
 
 Contains example pipelines showing use cases for Gradoop. 
