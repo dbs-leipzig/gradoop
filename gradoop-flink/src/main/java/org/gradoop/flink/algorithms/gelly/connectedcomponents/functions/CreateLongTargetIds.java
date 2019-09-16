@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Join function to receive structural information of the graph. Builds edge triples with long id's.
+ * Join function to receive structural information of the graph. Builds edge triples with long ids.
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f1->f1", "f2->f2"})
 @FunctionAnnotation.ForwardedFieldsSecond("f0->f3")
