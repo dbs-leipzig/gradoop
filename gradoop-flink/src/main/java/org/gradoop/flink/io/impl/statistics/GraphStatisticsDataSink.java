@@ -69,71 +69,88 @@ public class GraphStatisticsDataSink implements DataSink {
     StatisticWriter.writeCSV(new DistinctEdgePropertiesByLabelPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL);
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctEdgeProperties()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES);
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctSourceIdsByEdgeLabel()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL);
+        GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctSourceVertexCountPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT);
+        GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctTargetVertexCountPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT);
+        GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctTargetIdsByEdgeLabel()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL);
+        GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctVertexProperties()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES);
+        GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES,
+        overwrite);
     StatisticWriter.writeCSV(new DistinctVertexPropertiesByLabelPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL);
+        GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new EdgeCountPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_EDGE_COUNT);
+        GraphStatisticsReader.FILE_EDGE_COUNT,
+        overwrite);
     StatisticWriter.writeCSV(new EdgeLabelDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL);
+        GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new SourceAndEdgeLabelDistributionPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL);
+        GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new TargetAndEdgeLabelDistributionPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL);
+        GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new VertexCountPreparer()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_VERTEX_COUNT);
+        GraphStatisticsReader.FILE_VERTEX_COUNT,
+        overwrite);
     StatisticWriter.writeCSV(new VertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_VERTEX_DEGREE_DISTRIBUTION);
+        GraphStatisticsReader.FILE_VERTEX_DEGREE_DISTRIBUTION,
+        overwrite);
     StatisticWriter.writeCSV(new VertexLabelDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL);
+        GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL,
+        overwrite);
     StatisticWriter.writeCSV(new IncomingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.INCOMING_VERTEX_DEGREE_DISTRIBUTION);
+        GraphStatisticsReader.INCOMING_VERTEX_DEGREE_DISTRIBUTION,
+        overwrite);
     StatisticWriter.writeCSV(new OutgoingVertexDegreeDistribution()
         .execute(logicalGraph),
         appendSeparator(this.path) +
-        GraphStatisticsReader.OUTGOING_VERTEX_DEGREE_DISTRIBUTION);
+        GraphStatisticsReader.OUTGOING_VERTEX_DEGREE_DISTRIBUTION,
+        overwrite);
   }
 
   @Override
