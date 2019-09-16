@@ -86,11 +86,9 @@ public class VertexDeduplication<
   public LG execute(LG graph) {
     DataSet<V> annotatedVertices = graph.getVerticesByLabel(label)
       .groupBy(new GetPropertiesAsList<>(propertyKeys))
-      .reduceGroup(new MarkDuplicatesInGroup<>())
-      .name("Mark duplicate vertices");
+      .reduceGroup(new MarkDuplicatesInGroup<>());
     DataSet<Tuple2<GradoopId, GradoopId>> vertexToDedupVertex = annotatedVertices
-      .flatMap(new CreateMappingFromMarkedDuplicates<>())
-      .name("Create mapping to deduplicated vertices");
+      .flatMap(new CreateMappingFromMarkedDuplicates<>());
     DataSet<V> deduplicatedVertices = annotatedVertices
       .filter(new ByProperty<V>(MarkDuplicatesInGroup.PROPERTY_KEY).negate());
     DataSet<V> otherVertices = graph.getVertices().filter(new ByLabel<V>(label).negate());
@@ -99,12 +97,10 @@ public class VertexDeduplication<
       .where(new SourceId<>())
       .equalTo(0)
       .with(new UpdateEdgeSource<>())
-      .name("Update edges (source)")
       .leftOuterJoin(vertexToDedupVertex)
       .where(new TargetId<>())
       .equalTo(0)
-      .with(new UpdateEdgeTarget<>())
-      .name("Update edges (target)");
+      .with(new UpdateEdgeTarget<>());
 
     return graph.getFactory().fromDataSets(graph.getGraphHead(),
       otherVertices.union(deduplicatedVertices),
