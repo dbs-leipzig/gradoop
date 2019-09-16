@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * <li>f1: {@code List<Long>} containing all long indices from already visited outgoing edges
  * </ul>
  * A message of type {@code NullValue} from one vertex to another is a walk respective a jump to
- * this other vertex and therefor considered as one of k walkers.
+ * this other vertex and therefor considered as one of {@code k} walkers.
  */
 public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Long, NullValue> {
 
