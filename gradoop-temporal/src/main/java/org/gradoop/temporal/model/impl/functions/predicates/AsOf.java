@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+
 /**
  * Implementation of the <b>AsOf</b> predicate.
  * Given a certain time-stamp, this predicate will match all time-stamps before or at that time
@@ -32,12 +36,22 @@ public class AsOf implements TemporalPredicate {
   private final long queryTimestamp;
 
   /**
-   * Creates a AsOf instance with the given time-stamp.
+   * Creates an AsOf instance with the given time-stamp.
    *
    * @param timestamp The timestamp to match in Milliseconds since Unix Epoch.
    */
   public AsOf(long timestamp) {
     this.queryTimestamp = timestamp;
+  }
+
+  /**
+   * Creates an AsOf instance with the given time-stamp.
+   * The provided {@link LocalDateTime} value will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param timestamp The timestamp to match.
+   */
+  public AsOf(LocalDateTime timestamp) {
+    this.queryTimestamp = convertLocalDateTimeToEpochMilli(timestamp);
   }
 
   @Override

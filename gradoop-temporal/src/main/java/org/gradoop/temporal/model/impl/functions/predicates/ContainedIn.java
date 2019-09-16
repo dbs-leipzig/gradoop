@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+
 /**
  * Implementation of the <b>ContainedIn</b> temporal predicate.
  * Given a certain time interval, this predicate will match all intervals that are a subset of that interval.
@@ -44,6 +48,18 @@ public class ContainedIn implements TemporalPredicate {
   public ContainedIn(long from, long to) {
     queryFrom = from;
     queryTo = to;
+  }
+
+  /**
+   * Creates a ContainedIn instance with the given time-interval.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+  public ContainedIn(LocalDateTime from, LocalDateTime to) {
+    queryFrom = convertLocalDateTimeToEpochMilli(from);
+    queryTo = convertLocalDateTimeToEpochMilli(to);
   }
 
   @Override

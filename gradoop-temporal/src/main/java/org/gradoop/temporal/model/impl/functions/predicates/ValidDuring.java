@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+
 /**
  * Implementation of the <b>ValidDuring</b> temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals that contain that interval.
@@ -36,7 +40,7 @@ public class ValidDuring implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a ValidDuring instance with the given time stamps.
+   * Creates a <b>ValidDuring</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
@@ -44,6 +48,18 @@ public class ValidDuring implements TemporalPredicate {
   public ValidDuring(long from, long to) {
     queryFrom = from;
     queryTo = to;
+  }
+
+  /**
+   * Creates a <b>ValidDuring</b> instance with the given time stamps.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+  public ValidDuring(LocalDateTime from, LocalDateTime to) {
+    queryFrom = convertLocalDateTimeToEpochMilli(from);
+    queryTo = convertLocalDateTimeToEpochMilli(to);
   }
 
   @Override
