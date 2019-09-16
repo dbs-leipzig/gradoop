@@ -139,7 +139,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   protected TemporalGraph toTemporalGraphWithDefaultExtractors(BaseGraph<?, ?, ?, ?, ?> graph) {
     // We have to use lambda expressions instead of method references here, otherwise a
     // ClassCastException will be thrown when those extractor functions are called.
-    // TODO: Find out why.
+    // TODO: Find out why. (#1399)
     return toTemporalGraph(graph,
       g -> TemporalGradoopTestUtils.extractTime(g),
       v -> TemporalGradoopTestUtils.extractTime(v),
@@ -191,7 +191,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     BaseGraphCollection<?, ?, ?, ?, ?> collection) {
     // We have to use lambda expressions instead of method references here, otherwise a
     // ClassCastException will be thrown when those extractor functions are called.
-    // TODO: Find out why.
+    // TODO: Find out why. (#1399)
     return toTemporalGraphCollection(collection,
       g -> TemporalGradoopTestUtils.extractTime(g),
       v -> TemporalGradoopTestUtils.extractTime(v),

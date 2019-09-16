@@ -386,7 +386,7 @@ public interface BaseGraphOperators<
    * Checks, if another graph contains exactly the same vertices and edges (by id) as this graph.
    *
    * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
+   * @return 1-element dataset containing true, iff equal by element ids
    */
   default DataSet<Boolean> equalsByElementIds(LG other) {
     return callForValue(new GraphEquality<>(

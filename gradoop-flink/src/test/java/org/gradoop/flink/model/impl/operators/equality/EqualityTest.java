@@ -63,10 +63,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     CollectionEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new CollectionEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(),
-      true);
+        new GraphHeadToEmptyString<>(),
+        new VertexToIdString<>(),
+        new EdgeToIdString<>(),
+        true
+      );
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");
@@ -98,11 +99,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     CollectionEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new CollectionEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      true
-    );
+        new GraphHeadToEmptyString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        true
+      );
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");
@@ -134,11 +135,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     CollectionEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new CollectionEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      true
-    );
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        true
+      );
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gEmpty");
@@ -174,11 +175,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     CollectionEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new CollectionEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      false
-    );
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        false
+      );
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gEmpty");
@@ -210,11 +211,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     GraphEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new GraphEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new VertexToIdString<>(),
-      new EdgeToIdString<>(),
-      true
-    );
+        new GraphHeadToEmptyString<>(),
+        new VertexToIdString<>(),
+        new EdgeToIdString<>(),
+        true
+      );
 
     LogicalGraph gRef = loader.getLogicalGraphByVariable("gRef");
     LogicalGraph gClone = loader.getLogicalGraphByVariable("gClone");
@@ -238,11 +239,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     GraphEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new GraphEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      true
-    );
+        new GraphHeadToEmptyString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        true
+      );
 
     LogicalGraph gRef = loader.getLogicalGraphByVariable("gRef");
     LogicalGraph gDiffId = loader.getLogicalGraphByVariable("gDiffId");
@@ -267,11 +268,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     GraphEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new GraphEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      true
-    );
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        true
+      );
 
     LogicalGraph gRef = loader.getLogicalGraphByVariable("gRef");
     LogicalGraph gClone = loader.getLogicalGraphByVariable("gClone");
@@ -299,11 +300,11 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
     GraphEquality<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> equality =
       new GraphEquality<>(
-      new GraphHeadToDataString<>(),
-      new VertexToDataString<>(),
-      new EdgeToDataString<>(),
-      false
-    );
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(),
+        false
+      );
 
     LogicalGraph gRef = loader.getLogicalGraphByVariable("gRef");
     LogicalGraph gClone = loader.getLogicalGraphByVariable("gClone");
