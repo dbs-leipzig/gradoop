@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 /**
- * (label, frequency),.. => label->translation
+ * {@code (label, frequency),.. => label->translation}
  * higher frequency leads to lower label
  */
 public class SortedDictionary

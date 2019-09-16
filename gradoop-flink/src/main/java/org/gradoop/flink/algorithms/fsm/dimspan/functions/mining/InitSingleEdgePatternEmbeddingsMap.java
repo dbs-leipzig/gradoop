@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbedding
 
 
 /**
- * graph => (graph, 1-edge pattern -> embeddings)
+ * {@code graph => (graph, 1-edge pattern -> embeddings)}
  */
 public class InitSingleEdgePatternEmbeddingsMap implements MapFunction<int[], GraphWithPatternEmbeddingsMap> {
 
@@ -61,8 +61,7 @@ public class InitSingleEdgePatternEmbeddingsMap implements MapFunction<int[], Gr
     // set compression flags depending on configuration
     compressGraphs = fsmConfig.isGraphCompressionEnabled();
     compressEmbeddings = fsmConfig.isEmbeddingCompressionEnabled();
-    compressPatterns =
-      fsmConfig.getPatternCompressionInStep() == DataflowStep.MAP;
+    compressPatterns = fsmConfig.getPatternCompressionInStep() == DataflowStep.MAP;
   }
 
   @Override

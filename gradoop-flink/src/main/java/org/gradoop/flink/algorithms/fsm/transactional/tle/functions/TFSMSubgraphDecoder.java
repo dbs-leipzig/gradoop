@@ -22,7 +22,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * FSM subgraph -> Gradoop graph transaction.
+ * {@code FSM subgraph -> Gradoop graph transaction}
  */
 public class TFSMSubgraphDecoder extends SubgraphDecoder
   implements MapFunction<TFSMSubgraph, GraphTransaction> {

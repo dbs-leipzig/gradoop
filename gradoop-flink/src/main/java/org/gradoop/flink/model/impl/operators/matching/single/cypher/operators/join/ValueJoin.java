@@ -23,20 +23,16 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractPropertyJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
 
-
 import java.util.Collections;
 import java.util.List;
 
 /**
  * This operator joins two possibly disjunct data sets by predicates only concerning properties.
- * The predicates must include at least one isolated equality predicate
- * e.g.
- * <pre>
- *   MATCH (a:Department), (b)-[:X]->(c:Person {name: "Max") WHERE a.prop = b.prop AND a.prop2 =
- *   b.prop2
- * </pre>
- *
- * The result is always a new embedding with the following constraints.
+ * The predicates must include at least one isolated equality predicate e.g.:
+ * <br>
+ * {@code MATCH (a:Department), (b)-[:X]->(c:Person (name: "Max") WHERE a.prop = b.prop AND a.prop2 = b.prop2}
+ * <p>
+ * The result is always a new embedding with the following constraints:
  * <ul>
  * <li>new entries of the right embedding are always appended to the left embedding</li>
  * <li>all properties from the right side are appended to the properties of the left side

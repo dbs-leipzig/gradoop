@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * graph => embedding(k=1),..
+ * {@code graph => embedding(k=1),..}
  */
 public class CCSSingleEdgeEmbeddings extends SingleEdgeEmbeddings
   implements FlatMapFunction<CCSGraph, CCSSubgraphEmbeddings> {

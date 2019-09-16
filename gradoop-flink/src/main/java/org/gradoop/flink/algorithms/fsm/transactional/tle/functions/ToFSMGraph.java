@@ -25,8 +25,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Map;
 
 /**
- * Superclass of map functions mapping a graph transaction to a FSM-fitted
- * graph format.
+ * Superclass of map functions mapping a graph transaction to a FSM-fitted graph format.
  */
 public abstract class ToFSMGraph {
 
@@ -40,8 +39,7 @@ public abstract class ToFSMGraph {
   protected Map<Integer, String> transformVertices(GraphTransaction graph,
     Map<GradoopId, Integer> vertexIdMap) {
 
-    Map<Integer, String> fsmVertices =
-      Maps.newHashMapWithExpectedSize(graph.getVertices().size());
+    Map<Integer, String> fsmVertices = Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
     int vertexId = 0;
     for (EPGMVertex vertex : graph.getVertices()) {
@@ -61,8 +59,7 @@ public abstract class ToFSMGraph {
    */
   protected Map<Integer, FSMEdge> transformEdges(GraphTransaction graph,
     Map<GradoopId, Integer> vertexIdMap) {
-    Map<Integer, FSMEdge> fsmEdges =
-      Maps.newHashMapWithExpectedSize(graph.getEdges().size());
+    Map<Integer, FSMEdge> fsmEdges = Maps.newHashMapWithExpectedSize(graph.getEdges().size());
 
     int edgeId = 0;
     for (EPGMEdge edge : graph.getEdges()) {

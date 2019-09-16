@@ -20,7 +20,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (pattern, frequency) => (compressed pattern, frequency)
+ * {@code (pattern, frequency) => (compressed pattern, frequency)}
  */
 public class CompressPattern implements MapFunction<WithCount<int[]>, WithCount<int[]>> {
 

@@ -22,7 +22,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 
 /**
- * left, right => left
+ * {@code left, right => left}
  *
  * @param <L> left type
  * @param <R> right type

@@ -39,7 +39,7 @@ public class RenamePropertyKeys<T extends Element> implements TransformationFunc
   /**
    * Constructor
    *
-   * @param keyMappings the map consists of <old Key , new Key>
+   * @param keyMappings the map consists of {@code <old Key , new Key>}
    */
   public RenamePropertyKeys(Map<String, String> keyMappings) {
     this.keyMappings = checkNotNull(keyMappings);

@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * left, right => right (retain graphIds contained in left)
+ * {@code left, right => right} (retain graphIds contained in left)
  *
  * @param <R> right type
  */
