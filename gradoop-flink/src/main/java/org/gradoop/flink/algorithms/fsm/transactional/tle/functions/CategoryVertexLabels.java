@@ -24,7 +24,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CategoryCountab
 import java.util.Set;
 
 /**
- * graph => (category, label, 1)
+ * {@code graph => (category, label, 1)}
  */
 public class CategoryVertexLabels implements
   FlatMapFunction<CCSGraph, CategoryCountableLabel> {

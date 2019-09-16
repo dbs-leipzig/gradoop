@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * FSM subgraph -> Gradoop graph transaction.
+ * {@code FSM subgraph -> Gradoop graph transaction}
  */
 public class CCSSubgraphDecoder extends SubgraphDecoder
   implements MapFunction<CCSSubgraph, GraphTransaction> {

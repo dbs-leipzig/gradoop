@@ -38,10 +38,9 @@ import java.util.Set;
 public class RepresentationConverters {
 
   /**
-   * transaction => adjacency list
+   * {@code transaction => adjacency list}
    *
    * @param transaction (g,V,E)
-   *
    * @param edgeDataFactory edge data factory
    * @param vertexDataFactory vertex data factory
    *
@@ -129,7 +128,7 @@ public class RepresentationConverters {
   }
 
   /**
-   * adjacency list => transaction
+   * {@code adjacency list => transaction}
    *
    * @param adjacencyList adjacency list
    * @return transaction

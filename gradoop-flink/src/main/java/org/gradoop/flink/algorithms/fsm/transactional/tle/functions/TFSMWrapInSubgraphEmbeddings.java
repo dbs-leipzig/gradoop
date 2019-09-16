@@ -22,13 +22,12 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
 
 /**
- * subgraphWithSampleEmbedding => subgraphWithEmbeddings
+ * {@code subgraphWithSampleEmbedding => subgraphWithEmbeddings}
  */
-public class TFSMWrapInSubgraphEmbeddings implements
-  MapFunction<TFSMSubgraph, TFSMSubgraphEmbeddings> {
+public class TFSMWrapInSubgraphEmbeddings implements MapFunction<TFSMSubgraph, TFSMSubgraphEmbeddings> {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
   private final TFSMSubgraphEmbeddings reuseTuple;
 

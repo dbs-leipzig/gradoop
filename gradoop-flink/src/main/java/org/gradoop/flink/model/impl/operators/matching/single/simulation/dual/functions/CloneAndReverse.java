@@ -23,14 +23,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.TripleWithDirection;
 
 /**
- * Clones and reverses the incoming triple:
- *
- * (e,s,t,c) -> (e,s,t,true,c),(e,t,s,false,c)
- *
- * Forwarded fields:
- *
- * f0->f0: edge id
- * f3->f4: query candidates
+ * Clones and reverses the incoming triple:<br>
+ * {@code (e,s,t,c) -> (e,s,t,true,c),(e,t,s,false,c)}
+ * <p>
+ * Forwarded fields:<br>
+ * {@code f0->f0}: edge id<br>
+ * {@code f3->f4}: query candidates
  */
 @FunctionAnnotation.ForwardedFields("f0;f3->f4")
 public class CloneAndReverse implements

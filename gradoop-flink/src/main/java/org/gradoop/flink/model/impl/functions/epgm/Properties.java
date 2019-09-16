@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.api.entities.Element;
 
 /**
- * Element with properties => properties
+ * Element with {@code properties => properties}
  *
  * @param <L> Element type having properties
  */

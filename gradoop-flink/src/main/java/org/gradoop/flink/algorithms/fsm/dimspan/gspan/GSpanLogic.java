@@ -29,7 +29,7 @@ public interface GSpanLogic extends Serializable {
    * Finds all 1-edge patterns and their embeddings in a given graph.
    *
    * @param graph graph
-   * @return pattern -> embeddings (k=1)
+   * @return {@code pattern -> embeddings (k=1)}
    */
   PatternEmbeddingsMap getSingleEdgePatternEmbeddings(int[] graph);
 
@@ -55,8 +55,7 @@ public interface GSpanLogic extends Serializable {
   );
 
   /**
-   * Verifies if a pattern in DFS-code model
-   * is minimal according to gSpan lexicographic order.
+   * Verifies if a pattern in DFS-code model is minimal according to gSpan lexicographic order.
    *
    * @param pattern pattern
    * @return true, if minimal
@@ -72,7 +71,8 @@ public interface GSpanLogic extends Serializable {
   int[] getRightmostPathTimes(int[] pattern);
 
   /**
-   * Turns a pattern in DFS code model into a graph
+   * Turns a pattern in DFS code model into a graph.
+   *
    * @param pattern DFS code
    * @return graph
    */

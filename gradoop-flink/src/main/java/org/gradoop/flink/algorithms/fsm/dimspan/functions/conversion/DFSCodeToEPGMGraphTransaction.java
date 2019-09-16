@@ -35,11 +35,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Set;
 
 /**
- * int-array encoded graph => Gradoop Graph Transaction
+ * {@code int-array encoded graph => Gradoop Graph Transaction}
  */
-public class DFSCodeToEPGMGraphTransaction
-  extends RichMapFunction<WithCount<int[]>, GraphTransaction> {
-
+public class DFSCodeToEPGMGraphTransaction extends RichMapFunction<WithCount<int[]>, GraphTransaction> {
 
   /**
    * flag to enable decompression of patterns (true=enabled)
@@ -71,8 +69,7 @@ public class DFSCodeToEPGMGraphTransaction
    * @param fsmConfig FSM configuration.
    */
   public DFSCodeToEPGMGraphTransaction(DIMSpanConfig fsmConfig) {
-    this.uncompressPatterns =
-      ! fsmConfig.getPatternCompressionInStep().equals(DataflowStep.WITHOUT);
+    this.uncompressPatterns = !fsmConfig.getPatternCompressionInStep().equals(DataflowStep.WITHOUT);
   }
 
   @Override

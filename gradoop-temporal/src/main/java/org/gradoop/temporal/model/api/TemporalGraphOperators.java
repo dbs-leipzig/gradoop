@@ -198,21 +198,19 @@ public interface TemporalGraphOperators {
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * <p>
    * Note, that this method used no statistics about the data graph which may result in bad
    * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
-   *
+   * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   *
-   * <pre>
-   * <code>graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
-   *
+   * <br>
+   * {@code graph.query(
+   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   * "(a)-[:CO_AUTHOR]->(b)")
+   * }
+   * <p>
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
@@ -241,17 +239,15 @@ public interface TemporalGraphOperators {
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   *
-   * <pre>
-   * <code>graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
-   *
+   * <br>
+   * {@code graph.query(
+   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   * "(a)-[:CO_AUTHOR]->(b)")
+   * }
+   * <p>
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type {@code CO_AUTHOR} between the two entities.
    *

@@ -26,16 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * graph => embedding(k=1),..
+ * {@code graph => embedding(k=1),..}
  */
 public class TFSMSingleEdgeEmbeddings extends SingleEdgeEmbeddings
   implements FlatMapFunction<TFSMGraph, TFSMSubgraphEmbeddings> {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
-  private final TFSMSubgraphEmbeddings reuseTuple =
-    new TFSMSubgraphEmbeddings();
+  private final TFSMSubgraphEmbeddings reuseTuple = new TFSMSubgraphEmbeddings();
 
   /**
    * Constructor.

@@ -25,10 +25,9 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import java.util.Iterator;
 
 /**
- * Creates a single graph element which is contained in all graphs that the
- * input elements are contained in.
- *
- * GraphElement* -> GraphElement
+ * Creates a single graph element which is contained in all graphs that the input elements are contained in.
+ * <p>
+ * {@code GraphElement* -> GraphElement}
  *
  * @param <GE> graph element type
  */

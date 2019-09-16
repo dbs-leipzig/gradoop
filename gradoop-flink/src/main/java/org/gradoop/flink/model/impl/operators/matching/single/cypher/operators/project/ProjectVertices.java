@@ -26,7 +26,8 @@ import java.util.List;
 
 /**
  * Projects a Vertex by a set of properties.
- * Vertex -> Embedding(ProjectionEmbedding(Vertex))
+ * <p>
+ * {@code Vertex -> Embedding(ProjectionEmbedding(Vertex))}
  */
 public class ProjectVertices implements PhysicalOperator {
 

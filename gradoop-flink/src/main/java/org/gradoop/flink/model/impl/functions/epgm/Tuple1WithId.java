@@ -22,13 +22,12 @@ import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * element => (elementId)
+ * {@code element => (elementId)}
  *
  * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class Tuple1WithId<EL extends EPGMElement>
-  implements MapFunction<EL, Tuple1<GradoopId>> {
+public class Tuple1WithId<EL extends EPGMElement> implements MapFunction<EL, Tuple1<GradoopId>> {
 
   /**
    * Reduce instantiations

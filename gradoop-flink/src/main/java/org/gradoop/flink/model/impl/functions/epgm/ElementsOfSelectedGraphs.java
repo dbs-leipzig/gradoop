@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * graphIds (BC)
- * element => (graphId, element),..
+ * {@code element => (graphId, element),..}
  *
  * \forall (graphId, element) : graphId \in graphIds
  *

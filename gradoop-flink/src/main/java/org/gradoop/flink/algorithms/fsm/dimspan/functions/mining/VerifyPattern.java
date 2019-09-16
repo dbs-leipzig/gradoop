@@ -24,7 +24,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * DFS code => true, if minimal
+ * {@code DFS code => true, if minimal}
  */
 public class VerifyPattern implements FilterFunction<WithCount<int[]>> {
 

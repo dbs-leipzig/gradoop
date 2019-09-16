@@ -19,14 +19,17 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * Takes an object of type EPGMGraphElement, and creates a tuple2 for each
- *  gradoop id containing in the set of the object and the object.
- * element => (graphId, element)
+ * Takes an object of type {@link GraphElement}, and creates a Tuple2 for each GradoopId containing in the set
+ * of the object and the object.
+ * <p>
+ * {@code element => (graphId, element)}
+ *
  * @param <EL> graph element type
  */
 @FunctionAnnotation.ForwardedFields("*->f1")
