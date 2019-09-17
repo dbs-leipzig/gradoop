@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 
 /**
- * (f0,f1,f2,f3) => (f1,f2,f3)
+ * {@code (f0,f1,f2,f3) => (f1,f2,f3)}
  *
  * @param <T0> f0 type
  * @param <T1> f1 type

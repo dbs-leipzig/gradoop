@@ -22,12 +22,11 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddi
 import java.util.Iterator;
 
 /**
- * (graph, subgraph, embeddings),.. => (graph, "", embeddings)
+ * {@code (graph, subgraph, embeddings),.. => (graph, "", embeddings)}
  *
- * @param <SE>
+ * @param <SE> Subgraph Embeddings type
  */
-public class MergeEmbeddings<SE extends SubgraphEmbeddings>
-  implements GroupReduceFunction<SE, SE> {
+public class MergeEmbeddings<SE extends SubgraphEmbeddings> implements GroupReduceFunction<SE, SE> {
 
   @Override
   public void reduce(Iterable<SE> iterable,

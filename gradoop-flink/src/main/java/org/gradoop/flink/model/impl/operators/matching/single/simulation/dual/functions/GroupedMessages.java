@@ -21,19 +21,17 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 
 /**
  * Combines a collection of messages to a single message.
- *
- * [message] -> message
- *
+ * <p>
+ * {@code [message] -> message}
+ * <p>
  * Forwarded fields:
- *
+ * <br>
  * f0: recipient id
  */
-public class GroupedMessages implements
-  GroupReduceFunction<Message, Message> {
+public class GroupedMessages implements GroupReduceFunction<Message, Message> {
 
   @Override
-  public void reduce(Iterable<Message> messages,
-    Collector<Message> collector) throws Exception {
+  public void reduce(Iterable<Message> messages, Collector<Message> collector) throws Exception {
     boolean first = true;
     Message result = null;
     for (Message message : messages) {

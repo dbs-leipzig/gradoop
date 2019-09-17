@@ -164,7 +164,7 @@ public abstract class PatternMatching<
   /**
    * Returns a mapping between vertex id and property value used for debug.
    *
-   * @return vertex id -> property value mapping
+   * @return {@code vertex id -> property value} mapping
    */
   protected DataSet<Tuple2<GradoopId, PropertyValue>> getVertexMapping() {
     return vertexMapping;
@@ -173,7 +173,7 @@ public abstract class PatternMatching<
   /**
    * Returns a mapping between edge id and property value used for debug.
    *
-   * @return edge id -> property value mapping
+   * @return {@code edge id -> property value} mapping
    */
   protected DataSet<Tuple2<GradoopId, PropertyValue>> getEdgeMapping() {
     return edgeMapping;

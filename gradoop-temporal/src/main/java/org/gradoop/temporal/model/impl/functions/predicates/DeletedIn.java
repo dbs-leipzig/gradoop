@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the <b>DeletedIn</b> temporal predicate.
  * Given a certain time-interval, this predicate will match all intervals ending during that interval.
  * <p>
- * Predicate: queryFrom <= elementTo && elementTo <= queryTo
+ * Predicate: {@code queryFrom <= elementTo && elementTo <= queryTo}
  */
 public class DeletedIn implements TemporalPredicate {
 

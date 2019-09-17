@@ -23,13 +23,13 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * (edgeId, (sourceId, targetId)) => ImportEdge
- *
+ * {@code (edgeId, (sourceId, targetId)) => ImportEdge}
+ * <p>
  * Forwarded fields:
- *
- * f0:        edgeId
- * f1.f0->f1: sourceId
- * f1.f1->f2: targetId
+ * <br>
+ * {@code f0}:        {@code edgeId}<br>
+ * {@code f1.f0->f1}: {@code sourceId}<br>
+ * {@code f1.f1->f2}: {@code targetId}
  *
  * @param <K> id type
  */

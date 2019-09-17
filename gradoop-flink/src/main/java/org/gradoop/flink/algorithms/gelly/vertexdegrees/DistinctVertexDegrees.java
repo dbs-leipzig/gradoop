@@ -31,8 +31,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * A gradoop operator wrapping {@link org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees}.
  * Multiple edges between two vertices will only be counted once per direction.
  * <p>
- * Note: This Gelly implementation count loops between edges like (v1) -> (v2),
- * (v2) -> (v1) as one.
+ * Note: This Gelly implementation count loops between edges like {@code (v1) -> (v2)},
+ * {@code (v2) -> (v1)} as one.
  */
 public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
@@ -66,8 +66,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   }
 
   /**
-   * Constructor for vertex degree with fixed set of whether to output
-   * vertices with an in-degree of zero.
+   * Constructor for vertex degree with fixed set of whether to output vertices with an in-degree of zero.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
@@ -85,11 +84,9 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
-    throws Exception {
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph) throws Exception {
     DataSet<EPGMVertex> newVertices =
-      new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue,
-      NullValue>()
+      new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue, NullValue>()
       .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)
       .run(graph)
       .join(currentGraph.getVertices())
