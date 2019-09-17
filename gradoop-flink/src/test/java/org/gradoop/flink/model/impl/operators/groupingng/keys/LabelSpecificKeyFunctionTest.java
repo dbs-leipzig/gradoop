@@ -114,7 +114,7 @@ public class LabelSpecificKeyFunctionTest extends GradoopFlinkTestBase {
     List<LabelGroup> groups = Arrays.asList(
       new LabelGroup("a", "b", Collections.emptyList(), Collections.emptyList()),
       new LabelGroup("b", "c", Collections.emptyList(), Collections.emptyList()));
-    new LabelSpecificKeyFunction<EPGMVertex>(groups);
+    new LabelSpecificKeyFunction<EPGMVertex>(groups, false);
   }
 
   /**
@@ -128,7 +128,7 @@ public class LabelSpecificKeyFunctionTest extends GradoopFlinkTestBase {
         Collections.emptyList(), Collections.emptyList()),
       new LabelGroup(Grouping.DEFAULT_EDGE_LABEL_GROUP, "d",
         Collections.emptyList(), Collections.emptyList()));
-    new LabelSpecificKeyFunction<>(groups);
+    new LabelSpecificKeyFunction<>(groups, false);
   }
 
   /**

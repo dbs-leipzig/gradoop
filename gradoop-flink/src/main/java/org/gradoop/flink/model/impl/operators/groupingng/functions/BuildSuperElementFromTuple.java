@@ -19,6 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
@@ -74,6 +75,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @return The final element with all set properties.
    */
   protected E setAggregatePropertiesAndKeys(E element, T tupleData) {
+    element.setProperties(Properties.create());
     // Set grouping keys.
     for (int i = 0; i < keyFunctions.size(); i++) {
       final Object groupingKey = tupleData.getField(tupleDataOffset + i);

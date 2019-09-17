@@ -26,25 +26,30 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildSuperEdgeFromTuple;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildSuperVertexFromTuple;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromEdges;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceEdgeTuples;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceVertexTuples;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromVertices;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.LabelSpecificAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.LabelSpecificGlobalAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceEdgeTuples;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceVertexTuples;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
 import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelSpecificKeyFunction;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -253,7 +258,29 @@ public class GroupingNG<
    * @return Aggregate functions corresponding to those groups.
    */
   private static List<AggregateFunction> asAggregateFunctions(List<LabelGroup> labelGroups) {
-    return getDefaultGroup(labelGroups).getAggregateFunctions();
+    LabelGroup defaultGroup = getDefaultGroup(labelGroups);
+    List<AggregateFunction> functions;
+    if (defaultGroup == null) {
+      functions = new ArrayList<>();
+      final Map<String, List<LabelGroup>> byLabel = labelGroups.stream()
+        .collect(Collectors.groupingBy(LabelGroup::getGroupingLabel));
+      byLabel.entrySet().stream().forEach(kv -> {
+        final String key = kv.getKey();
+        if (key.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
+          key.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
+          Set<String> otherLabels = new HashSet<>(byLabel.keySet());
+          otherLabels.removeIf(l -> l.equals(key));
+          kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
+            .forEach(af -> functions.add(new LabelSpecificGlobalAggregatorWrapper(otherLabels, af)));
+        } else {
+          kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
+            .forEach(af -> functions.add(new LabelSpecificAggregatorWrapper(key, af)));
+        }
+      });
+    } else {
+      functions = defaultGroup.getAggregateFunctions();
+    }
+    return functions;
   }
 
   /**
@@ -266,35 +293,33 @@ public class GroupingNG<
    */
   private static <T extends Element> List<GroupingKeyFunction<T, ?>> asKeyFunctions(
     boolean useLabels, List<LabelGroup> labelGroups) {
-    List<GroupingKeyFunction<T, ?>> keyFunctions = new ArrayList<>();
-    if (useLabels) {
-      keyFunctions.add(GroupingKeys.label());
+    LabelGroup defaultGroup = getDefaultGroup(labelGroups);
+    List<GroupingKeyFunction<T, ?>> newKeys = new ArrayList<>();
+    if (defaultGroup == null) {
+      newKeys.add(new LabelSpecificKeyFunction<>(labelGroups, useLabels));
+    } else {
+      defaultGroup.getPropertyKeys().forEach(k -> newKeys.add(GroupingKeys.property(k)));
+      if (useLabels) {
+        newKeys.add(GroupingKeys.label());
+      }
     }
-    if (labelGroups.size() != 1) {
-      keyFunctions.add(new LabelSpecificKeyFunction<>(labelGroups));
-    }
-    getDefaultGroup(labelGroups).getPropertyKeys()
-      .forEach(k -> keyFunctions.add(GroupingKeys.property(k)));
-    return keyFunctions;
+    return newKeys;
   }
 
   /**
-   * For compatibility reasons only: Get the default label group or throw an exception.
+   * For compatibility reasons only: Get the default label group or return {@code null}.
    *
    * @param labelGroups A list of label groups.
-   * @return The default label group, if it is the only label group.
+   * @return The default label group, if it is the only label group and {@code null} otherwise
    */
   private static LabelGroup getDefaultGroup(List<LabelGroup> labelGroups) {
     if (labelGroups.size() != 1) {
-      throw new UnsupportedOperationException(
-        "Label specific grouping is not supported by this implementation.");
+      return null;
     } else {
       LabelGroup labelGroup = labelGroups.get(0);
       if (!(labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP) ||
         labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP))) {
-        throw new UnsupportedOperationException("Label specific grouping is not supported",
-          new IllegalArgumentException(
-            "The list of label groups does not contain the default label group."));
+        return null;
       }
       return labelGroup;
     }

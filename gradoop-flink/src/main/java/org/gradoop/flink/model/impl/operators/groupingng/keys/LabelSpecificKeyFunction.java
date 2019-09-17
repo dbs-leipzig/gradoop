@@ -19,7 +19,6 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
@@ -67,10 +66,11 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
    * Create an instance of this key function from a list of label groups.
    * Note that this key function ignores aggregate functions stored in those groups.
    *
-   * @param groups The label groups.
+   * @param groups    The label groups.
+   * @param useLabels Should labels be used for grouping? (Only affects default group.)
    */
-  public LabelSpecificKeyFunction(List<LabelGroup> groups) {
-    this(labelGroupsToMap(Objects.requireNonNull(groups)),
+  public LabelSpecificKeyFunction(List<LabelGroup> groups, boolean useLabels) {
+    this(labelGroupsToMap(Objects.requireNonNull(groups), useLabels),
       groups.stream().collect(Collectors.toMap(LabelGroup::getGroupingLabel, LabelGroup::getGroupLabel)));
   }
 
@@ -172,11 +172,12 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
    * {@link LabelSpecificKeyFunction#LabelSpecificKeyFunction(Map, Map)}.
    *
    * @param labelGroups A list of label groups.
+   * @param useLabels   Should labels be used for grouping?
    * @param <T> The type of elements to group.
    * @return A map usable with the constructor of this class.
    */
-  private static <T extends Attributed> Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelGroupsToMap(
-    List<LabelGroup> labelGroups) {
+  private static <T extends Element> Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelGroupsToMap(
+    List<LabelGroup> labelGroups, boolean useLabels) {
     Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> result = new HashMap<>();
     for (LabelGroup labelGroup : labelGroups) {
       final String groupingLabel = labelGroup.getGroupingLabel();
@@ -184,6 +185,10 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
         result.put(groupingLabel, new ArrayList<>());
       }
       List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = result.get(groupingLabel);
+      if (groupingLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
+        groupingLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
+        keysForLabel.add(GroupingKeys.label());
+      }
       labelGroup.getPropertyKeys().forEach(k -> keysForLabel.add(GroupingKeys.property(k)));
     }
     return result;
