@@ -37,15 +37,12 @@ import java.util.Stack;
 
 
 /**
- * This is an implementation of a very straight-forward depth-first pattern
- * matching algorithm.
- *
- * The depth-first search is implemented by popping an embedding from
- * a stack, growing it by one vertex and its corresponding edges, and adding
- * the resulting new edges to the top of the stack. If it is not possible to
- * apply a step to an existing embedding, the embedding is removed.
- * This is repeated until all embeddings are either completed
- * (all steps have been applied).
+ * This is an implementation of a very straight-forward depth-first pattern matching algorithm.
+ * <p>
+ * The depth-first search is implemented by popping an embedding from a stack, growing it by one vertex
+ * and its corresponding edges, and adding the resulting new edges to the top of the stack.
+ * If it is not possible to apply a step to an existing embedding, the embedding is removed.
+ * This is repeated until all embeddings are either completed (all steps have been applied).
  */
 public class DepthSearchMatching implements PatternMatchingAlgorithm {
   /**
@@ -53,19 +50,19 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    */
   private static final long serialVersionUID = 42L;
   /**
-   * vertex-id -> vertex candidates
+   * {@code vertex-id -> vertex candidates}
    */
   private Map<GradoopId, boolean[]> vertexDict;
   /**
-   * source-id -> edge-ids
+   * {@code source-id -> edge-ids}
    */
   private Map<GradoopId, Set<GradoopId>> sourceDict;
   /**
-   * target-id -> edge-ids
+   * {@code target-id -> edge-ids}
    */
   private Map<GradoopId, Set<GradoopId>> targetDict;
   /**
-   * edge id -> source-id, target-id, edge candidates
+   * {@code edge id -> source-id, target-id, edge candidates}
    */
   private Map<GradoopId, Tuple3<GradoopId, GradoopId, boolean[]>> edgeDict;
   /**
@@ -354,8 +351,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
   }
 
   /**
-   * Remove all edges that are neither loops nor have source or target vertex
-   * that is in the embedding.
+   * Remove all edges that are neither loops nor have source or target vertex that is in the embedding.
    *
    * @param patternEdges edges to be filtered
    * @param embedding embedding with possible source and target vertices

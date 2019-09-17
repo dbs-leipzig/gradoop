@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * (a,b),(a,c) => (a,{b,c})
- * (a,{b,c}),(a,{d,e}) => (a,{b,c,d,e})
+ * {@code (a,b),(a,c) => (a,{b,c})}<br>
+ * {@code (a,{b,c}),(a,{d,e}) => (a,{b,c,d,e})}
  */
 public class CollectGradoopIds implements
   GroupCombineFunction

@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * t => (t, count)
+ * {@code t => (t, count)}
  *
  * @param <T> data type of t
  */

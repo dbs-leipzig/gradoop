@@ -22,29 +22,27 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 
 /**
  * Merges multiple fat vertices into a single {@link FatVertex}.
- *
- * [fatVertex] -> fatVertex
- *
+ * <p>
+ * {@code [fatVertex] -> fatVertex}
+ * <p>
  * Forwarded fields:
- *
- * f0: vertex id
- *
+ * <ul>
+ * <li>f0: vertex id</li>
+ * </ul>
  * Read fields:
- *
- * f1: vertex query candidates
- * f2: parent ids
- * f3: counters for incoming edge candidates
- * f4: outgoing edges (edgeId, targetId) and their query candidates
- *
+ * <ul>
+ * <li>f1: vertex query candidates</li>
+ * <li>f2: parent ids</li>
+ * <li>f3: counters for incoming edge candidates</li>
+ * <li>f4: outgoing edges (edgeId, targetId) and their query candidates</li>
+ * </ul>
  */
 @FunctionAnnotation.ForwardedFields("f0")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4")
-public class GroupedFatVertices implements
-  GroupReduceFunction<FatVertex, FatVertex> {
+public class GroupedFatVertices implements GroupReduceFunction<FatVertex, FatVertex> {
 
   @Override
-  public void reduce(Iterable<FatVertex> vertices,
-    Collector<FatVertex> collector) throws Exception {
+  public void reduce(Iterable<FatVertex> vertices, Collector<FatVertex> collector) throws Exception {
 
     boolean first = true;
     FatVertex result = null;

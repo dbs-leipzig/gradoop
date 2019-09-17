@@ -22,7 +22,7 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * (label, graphId) |><| graphHead => (label, graphHead)
+ * {@code (label, graphId) |><| graphHead => (label, graphHead)}
  *
  * @param <G> graph head type
  */

@@ -20,7 +20,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
 
 /**
- * bool => (graph, pattern -> embeddings)
+ * {@code bool => (graph, pattern -> embeddings)}
  * workaround for bulk iteration intermediate results
  * graph and map are empty
  */

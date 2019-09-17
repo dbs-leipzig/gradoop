@@ -22,14 +22,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Creates a new {@link GradoopId} for the input element in a Tuple1 and
- * returns both.
+ * Creates a new {@link GradoopId} for the input element in a Tuple1 and returns both.
  *
- * @param <T>
+ * @param <T> element type
  */
 @FunctionAnnotation.ForwardedFields("f0")
-public class PairTupleWithNewId<T>
-  implements MapFunction<Tuple1<T>, Tuple2<T, GradoopId>> {
+public class PairTupleWithNewId<T> implements MapFunction<Tuple1<T>, Tuple2<T, GradoopId>> {
 
   /**
    * Reduce object instantiations

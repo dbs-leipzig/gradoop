@@ -20,14 +20,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
 
 /**
- * graph => id
+ * {@code graph => id}
  *
  * @param <G> graph type
  */
 public class GraphId<G extends FSMGraph> implements KeySelector<G, GradoopId> {
 
   @Override
-  public GradoopId getKey(G graph) throws Exception {
+  public GradoopId getKey(G graph) {
     return graph.getId();
   }
 }

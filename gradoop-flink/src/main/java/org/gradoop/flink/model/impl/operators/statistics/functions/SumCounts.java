@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (object,count1),(object,count2) -> (object,count1 + count2)
+ * {@code (object,count1),(object,count2) -> (object,count1 + count2)}
  *
  * @param <T> object type
  */

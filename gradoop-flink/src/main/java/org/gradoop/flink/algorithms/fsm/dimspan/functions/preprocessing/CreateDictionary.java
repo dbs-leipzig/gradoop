@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.List;
 
 /**
- * (label, frequency),.. => [label,..]
+ * {@code (label, frequency),.. => [label,..]}
  */
 public class CreateDictionary implements GroupReduceFunction<WithCount<String>, String[]> {
 

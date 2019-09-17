@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Filters transactional vertices.
+ *
  * @param <V> vertex type.
  */
 public class TransactionalData<V extends Vertex>
