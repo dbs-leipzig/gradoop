@@ -23,10 +23,12 @@ import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.groupingng.GroupingKeys;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
 
   /**
    * A list of grouping key functions to be used for each label.
+   * The {@code 0}th element of this list is the key function used for the default label group.
    */
   private final List<KeyFunctionWithDefaultValue<T, ?>> keyFunctions;
 
@@ -79,18 +82,38 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
    */
   public LabelSpecificKeyFunction(Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelsWithKeys,
     Map<String, String> labelToSuperLabel) {
+    final boolean hasDefaultVertexGroup = labelsWithKeys.containsKey(Grouping.DEFAULT_VERTEX_LABEL_GROUP);
+    final boolean hasDefaultEdgeGroup = labelsWithKeys.containsKey(Grouping.DEFAULT_EDGE_LABEL_GROUP);
+    final String defaultGroupLabel;
+    if (hasDefaultEdgeGroup && hasDefaultVertexGroup) {
+      throw new IllegalArgumentException("The map contains both default label groups. Only one is expected.");
+    } else if (hasDefaultVertexGroup) {
+      defaultGroupLabel = Grouping.DEFAULT_VERTEX_LABEL_GROUP;
+    } else if (hasDefaultEdgeGroup) {
+      defaultGroupLabel = Grouping.DEFAULT_EDGE_LABEL_GROUP;
+    } else {
+      throw new IllegalArgumentException("The map contains no default label groups. One is expected.");
+    }
     final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();
     if (totalLabels + 1 > Tuple.MAX_ARITY) {
       throw new IllegalArgumentException("Too many labels. Tuple arity exceeded.");
     }
-    int labelNr = 0;
+    int labelNr = 1;
     labelToIndex = new HashMap<>();
-    keyFunctions = new ArrayList<>(totalLabels);
+    // The list needs to be filled initially, the set(int,Object) function will fail otherwise.
+    keyFunctions = new ArrayList<>(Collections.nCopies(totalLabels, null));
     targetLabels = new String[totalLabels];
     for (Map.Entry<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
-      labelToIndex.put(labelToKeys.getKey(), labelNr);
-      targetLabels[labelNr] = labelToKeys.getKey();
-      List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = labelToKeys.getValue();
+      final String key = labelToKeys.getKey();
+      final List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = labelToKeys.getValue();
+      if (key.equals(defaultGroupLabel)) {
+        // Ensure that the keys for the default group are always the 0th position.
+        keyFunctions.set(0, keysForLabel.size() == 1 ?
+          keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues<>(keysForLabel));
+        continue;
+      }
+      labelToIndex.put(key, labelNr);
+      targetLabels[labelNr] = key;
       keyFunctions.set(labelNr, keysForLabel.size() == 1 ?
         keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues<>(keysForLabel));
       labelNr++;
@@ -114,10 +137,10 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
       reuseTuple.setField(keyFunctions.get(i).getDefaultKey(), 1 + i);
     }
     if (index == null) {
-      index = -1;
-    } else {
-      reuseTuple.setField(keyFunctions.get(index).getKey(element), index);
+      index = 0;
     }
+    // The index is used to identify the key function, the 0th position in the tuple set to that index.
+    reuseTuple.setField(keyFunctions.get(index).getKey(element), 1 + index);
     reuseTuple.setField(index, 0);
     return reuseTuple;
   }
@@ -128,11 +151,10 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
     Integer index = ((Tuple) key).getField(0);
-    if (index == -1) {
-      return;
-    }
     keyFunctions.get(index).addKeyToElement(element, ((Tuple) key).getField(1 + index));
-    element.setLabel(targetLabels[index]);
+    if (index != 0) {
+      element.setLabel(targetLabels[index]);
+    }
   }
 
   @Override

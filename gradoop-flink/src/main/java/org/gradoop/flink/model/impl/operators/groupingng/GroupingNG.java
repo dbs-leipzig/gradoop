@@ -39,6 +39,7 @@ import org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGCon
 import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFromVertices;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelSpecificKeyFunction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -268,6 +269,9 @@ public class GroupingNG<
     List<GroupingKeyFunction<T, ?>> keyFunctions = new ArrayList<>();
     if (useLabels) {
       keyFunctions.add(GroupingKeys.label());
+    }
+    if (labelGroups.size() != 1) {
+      keyFunctions.add(new LabelSpecificKeyFunction<>(labelGroups));
     }
     getDefaultGroup(labelGroups).getPropertyKeys()
       .forEach(k -> keyFunctions.add(GroupingKeys.property(k)));
