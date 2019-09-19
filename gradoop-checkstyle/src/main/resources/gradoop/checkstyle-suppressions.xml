@@ -20,6 +20,8 @@
   <suppress checks="LineLength"
             files="SocialNetworkGraph.java"
             lines="0-68"/>
+  <suppress checks=".*"
+            files="[\\/]properties[\\/]bytes[\\/].*\.java$"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

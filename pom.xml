@@ -166,6 +166,7 @@
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.flink.version>1.7.2</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
+        <dep.hadoop.version>2.7.4</dep.hadoop.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.12</dep.junit.version>

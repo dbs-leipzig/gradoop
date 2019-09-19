@@ -119,11 +119,18 @@
 
     <dependencies>
         <!-- Compile dependencies -->
-
-        <!-- HBase -->
         <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-common</artifactId>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${dep.hadoop.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${plugin.maven-spotbugs.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Flink -->
