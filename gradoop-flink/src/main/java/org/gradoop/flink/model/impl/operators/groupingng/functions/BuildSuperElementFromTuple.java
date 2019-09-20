@@ -76,6 +76,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @return The final element with all set properties.
    */
   protected E setAggregatePropertiesAndKeys(E element, T tupleData) {
+    element.setLabel("");
     element.setProperties(Properties.create());
     // Set grouping keys.
     for (int i = 0; i < keyFunctions.size(); i++) {

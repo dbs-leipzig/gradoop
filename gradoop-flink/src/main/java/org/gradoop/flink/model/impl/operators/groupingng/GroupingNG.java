@@ -45,9 +45,7 @@ import org.gradoop.flink.model.impl.operators.groupingng.keys.LabelSpecificKeyFu
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -263,24 +261,20 @@ public class GroupingNG<
     List<AggregateFunction> functions;
     if (defaultGroup == null) {
       functions = new ArrayList<>();
-      final Map<String, List<LabelGroup>> byLabel = labelGroups.stream()
-        .collect(Collectors.groupingBy(LabelGroup::getGroupingLabel));
       AtomicInteger id = new AtomicInteger(0);
-      byLabel.entrySet().stream().forEach(kv -> {
-        final String key = kv.getKey();
-        if (key.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
-          key.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
-          Set<String> otherLabels = new HashSet<>(byLabel.keySet());
-          otherLabels.removeIf(l -> l.equals(key));
-          kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
-            .forEach(af -> functions.add(new LabelSpecificGlobalAggregatorWrapper(otherLabels, af,
-              (short) id.getAndIncrement())));
+      Set<String> allLabels = labelGroups.stream().map(LabelGroup::getGroupingLabel)
+        .collect(Collectors.toSet());
+      for (LabelGroup labelGroup : labelGroups) {
+        final String currentLabel = labelGroup.getGroupingLabel();
+        if (currentLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
+          currentLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
+          labelGroup.getAggregateFunctions().forEach(lga -> functions.add(
+            new LabelSpecificGlobalAggregatorWrapper(allLabels, lga, (short) id.getAndIncrement())));
         } else {
-          kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
-            .forEach(af -> functions.add(new LabelSpecificAggregatorWrapper(key, af,
-              (short) id.getAndIncrement())));
+          labelGroup.getAggregateFunctions().forEach(lga -> functions.add(
+            new LabelSpecificAggregatorWrapper(currentLabel, lga, (short) id.getAndIncrement())));
         }
-      });
+      }
     } else {
       functions = defaultGroup.getAggregateFunctions();
     }

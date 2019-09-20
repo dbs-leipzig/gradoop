@@ -181,15 +181,16 @@ public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyF
     Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> result = new HashMap<>();
     for (LabelGroup labelGroup : labelGroups) {
       final String groupingLabel = labelGroup.getGroupingLabel();
-      if (!result.containsKey(groupingLabel)) {
-        result.put(groupingLabel, new ArrayList<>());
+      if (result.containsKey(groupingLabel)) {
+        throw new UnsupportedOperationException("Duplicate grouping label: " + groupingLabel);
       }
-      List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = result.get(groupingLabel);
-      if (groupingLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
-        groupingLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
+      List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = new ArrayList<>();
+      if ((groupingLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
+        groupingLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) && useLabels) {
         keysForLabel.add(GroupingKeys.label());
       }
       labelGroup.getPropertyKeys().forEach(k -> keysForLabel.add(GroupingKeys.property(k)));
+      result.put(groupingLabel, keysForLabel);
     }
     return result;
   }
