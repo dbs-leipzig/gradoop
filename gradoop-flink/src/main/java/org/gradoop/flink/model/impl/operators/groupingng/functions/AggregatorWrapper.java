@@ -42,7 +42,11 @@ abstract class AggregatorWrapper implements AggregateFunction, AggregateDefaultV
 
   @Override
   public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
-    return wrappedFunction.aggregate(aggregate, increment);
+    if (isAggregated(increment)) {
+      return wrap(wrappedFunction.aggregate(unwrap(aggregate), unwrap(increment)));
+    } else {
+      return aggregate;
+    }
   }
 
   @Override
@@ -52,12 +56,48 @@ abstract class AggregatorWrapper implements AggregateFunction, AggregateDefaultV
 
   @Override
   public PropertyValue postAggregate(PropertyValue result) {
-    return wrappedFunction.postAggregate(result);
+    if (isAggregated(result)) {
+      return wrappedFunction.postAggregate(unwrap(result));
+    } else {
+      return null;
+    }
   }
 
   @Override
   public PropertyValue getDefaultValue() {
     return wrappedFunction instanceof AggregateDefaultValue ?
       ((AggregateDefaultValue) wrappedFunction).getDefaultValue() : PropertyValue.NULL_VALUE;
+  }
+
+  /**
+   * Unwrap a {@link PropertyValue} wrapped by this class.
+   *
+   * @param wrappedValue The wrapped property value.
+   * @return The unwrapped (raw) property value.
+   * @see #wrap(PropertyValue)
+   */
+  protected PropertyValue unwrap(PropertyValue wrappedValue) {
+    return wrappedValue;
+  }
+
+  /**
+   * Wrap a {@link PropertyValue} into an internal representation used by this class.
+   *
+   * @param rawValue The raw property value.
+   * @return The wrapped property value.
+   * @see #unwrap(PropertyValue)
+   */
+  protected PropertyValue wrap(PropertyValue rawValue) {
+    return rawValue;
+  }
+
+  /**
+   * Check if a {@link PropertyValue} should be considered by this function.
+   *
+   * @param value The property value.
+   * @return {@code true}, if the value should be aggregated by this function.
+   */
+  protected boolean isAggregated(PropertyValue value) {
+    return true;
   }
 }

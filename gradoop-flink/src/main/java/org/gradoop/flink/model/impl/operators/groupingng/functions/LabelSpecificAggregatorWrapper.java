@@ -25,7 +25,7 @@ import java.util.Objects;
  * A wrapper for an aggregate function that will only return the increment of elements that have a certain
  * label.
  */
-public class LabelSpecificAggregatorWrapper extends AggregatorWrapper {
+public class LabelSpecificAggregatorWrapper extends AggregatorWrapperWithValue {
 
   /**
    * The expected label of the elements to aggregate.
@@ -37,16 +37,17 @@ public class LabelSpecificAggregatorWrapper extends AggregatorWrapper {
    *
    * @param targetLabel     The expected label.
    * @param wrappedFunction The aggregate function to be used for elements with this label.
+   * @param id              A {@code short} identifying this function internally.
    */
-  public LabelSpecificAggregatorWrapper(String targetLabel, AggregateFunction wrappedFunction) {
-    super(wrappedFunction);
+  public LabelSpecificAggregatorWrapper(String targetLabel, AggregateFunction wrappedFunction, short id) {
+    super(wrappedFunction, PropertyValue.create(id));
     this.targetLabel = Objects.requireNonNull(targetLabel);
   }
 
   @Override
   public PropertyValue getIncrement(Element element) {
     return element.getLabel().equals(targetLabel) ?
-      wrappedFunction.getIncrement(element) :
+      wrap(wrappedFunction.getIncrement(element)) :
       PropertyValue.NULL_VALUE;
   }
 

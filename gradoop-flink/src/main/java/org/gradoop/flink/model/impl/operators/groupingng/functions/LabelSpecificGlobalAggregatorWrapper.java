@@ -26,7 +26,7 @@ import java.util.Set;
  * A wrapper for aggregate functions that will only return the increment of elements that are not contained
  * in any label group.
  */
-public class LabelSpecificGlobalAggregatorWrapper extends AggregatorWrapper {
+public class LabelSpecificGlobalAggregatorWrapper extends AggregatorWrapperWithValue {
 
   /**
    * A set of all labels where label-specific aggregators are defined.
@@ -38,15 +38,16 @@ public class LabelSpecificGlobalAggregatorWrapper extends AggregatorWrapper {
    *
    * @param otherLabels A set of all labels where the aggregation function should <b>not</b> set used.
    * @param function    The aggregation function.
+   * @param id          A {@code short} identifying this function internally.
    */
-  public LabelSpecificGlobalAggregatorWrapper(Set<String> otherLabels, AggregateFunction function) {
-    super(function);
+  public LabelSpecificGlobalAggregatorWrapper(Set<String> otherLabels, AggregateFunction function, short id) {
+    super(function, PropertyValue.create(id));
     this.otherLabels = Objects.requireNonNull(otherLabels);
   }
 
   @Override
   public PropertyValue getIncrement(Element element) {
     return otherLabels.contains(element.getLabel()) ? PropertyValue.NULL_VALUE :
-      wrappedFunction.getIncrement(element);
+      wrap(wrappedFunction.getIncrement(element));
   }
 }

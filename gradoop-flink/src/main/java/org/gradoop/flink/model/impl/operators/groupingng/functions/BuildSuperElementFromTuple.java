@@ -20,6 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
 
@@ -84,8 +85,11 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
     // Calculate aggregate values and set them.
     for (int i = 0; i < aggregateFunctions.size(); i++) {
       final AggregateFunction function = aggregateFunctions.get(i);
-      element.setProperty(function.getAggregatePropertyKey(),
-        function.postAggregate(tupleData.getField(tupleDataOffset + keyFunctions.size() + i)));
+      final PropertyValue postAggregateValue = function.postAggregate(
+        tupleData.getField(tupleDataOffset + keyFunctions.size() + i));
+      if (postAggregateValue != null) {
+        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue);
+      }
     }
     return element;
   }

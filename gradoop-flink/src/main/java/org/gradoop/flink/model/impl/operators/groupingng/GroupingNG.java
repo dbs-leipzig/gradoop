@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -264,6 +265,7 @@ public class GroupingNG<
       functions = new ArrayList<>();
       final Map<String, List<LabelGroup>> byLabel = labelGroups.stream()
         .collect(Collectors.groupingBy(LabelGroup::getGroupingLabel));
+      AtomicInteger id = new AtomicInteger(0);
       byLabel.entrySet().stream().forEach(kv -> {
         final String key = kv.getKey();
         if (key.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
@@ -271,10 +273,12 @@ public class GroupingNG<
           Set<String> otherLabels = new HashSet<>(byLabel.keySet());
           otherLabels.removeIf(l -> l.equals(key));
           kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
-            .forEach(af -> functions.add(new LabelSpecificGlobalAggregatorWrapper(otherLabels, af)));
+            .forEach(af -> functions.add(new LabelSpecificGlobalAggregatorWrapper(otherLabels, af,
+              (short) id.getAndIncrement())));
         } else {
           kv.getValue().stream().flatMap(lg -> lg.getAggregateFunctions().stream())
-            .forEach(af -> functions.add(new LabelSpecificAggregatorWrapper(key, af)));
+            .forEach(af -> functions.add(new LabelSpecificAggregatorWrapper(key, af,
+              (short) id.getAndIncrement())));
         }
       });
     } else {
