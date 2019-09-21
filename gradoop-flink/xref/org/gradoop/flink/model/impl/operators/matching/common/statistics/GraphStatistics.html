@@ -134,10 +134,10 @@
 <a name="124" href="#124">124</a> <em class="jxr_javadoccomment">   * @param distinctTargetVertexCount number of distinct target vertices</em>
 <a name="125" href="#125">125</a> <em class="jxr_javadoccomment">   * @param distinctSourceVertexCountByEdgeLabel number of distinct source vertices by edge label</em>
 <a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * @param distinctTargetVertexCountByEdgeLabel number of distinct target vertices by edge label</em>
-<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @param distinctEdgePropertiesByLabel (label,property) -&gt; distinct values</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @param distinctVertexPropertiesByLabel (label,property) -&gt; distinct values</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param distinctEdgeProperties (edge property) -&gt; distinct values</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param distinctVertexProperties (vertex property) -&gt; distinct values</em>
+<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @param distinctEdgePropertiesByLabel {@code (label,property) -&gt; distinct values}</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @param distinctVertexPropertiesByLabel {@code (label,property) -&gt; distinct values}</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param distinctEdgeProperties {@code (edge property) -&gt; distinct values}</em>
+<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param distinctVertexProperties {@code (vertex property) -&gt; distinct values}</em>
 <a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   */</em>
 <a name="132" href="#132">132</a>   <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatistics.html">GraphStatistics</a>(<strong class="jxr_keyword">long</strong> vertexCount, <strong class="jxr_keyword">long</strong> edgeCount, Map&lt;String, Long&gt; vertexCountByLabel,
 <a name="133" href="#133">133</a>     Map&lt;String, Long&gt; edgeCountByLabel,
@@ -269,8 +269,8 @@
 <a name="259" href="#259">259</a>   }
 <a name="260" href="#260">260</a> 
 <a name="261" href="#261">261</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   * Returns the number of distinct vertex property values for given property name</em>
-<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * Eg (name) -&gt; 20</em>
+<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   * Returns the number of distinct vertex property values for given property name&lt;br&gt;</em>
+<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * Eg {@code (name) -&gt; 20}</em>
 <a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   *</em>
 <a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   * @param propertyName property name</em>
 <a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * @return number of distinct property values for label property name pair</em>
@@ -280,8 +280,8 @@
 <a name="270" href="#270">270</a>   }
 <a name="271" href="#271">271</a> 
 <a name="272" href="#272">272</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">   * Returns the number of distinct edge property values for given property name</em>
-<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">   * Eg (name) -&gt; 20</em>
+<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">   * Returns the number of distinct edge property values for given property name&lt;br&gt;</em>
+<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">   * Eg {@code (name) -&gt; 20}</em>
 <a name="275" href="#275">275</a> <em class="jxr_javadoccomment">   *</em>
 <a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   * @param propertyName property name</em>
 <a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   * @return number of distinct property values for label property name pair</em>
@@ -291,8 +291,8 @@
 <a name="281" href="#281">281</a>   }
 <a name="282" href="#282">282</a> 
 <a name="283" href="#283">283</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="284" href="#284">284</a> <em class="jxr_javadoccomment">   * Returns the number of distinct property values for given vertex label property name pair</em>
-<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">   * Eg (Person, name) -&gt; 20</em>
+<a name="284" href="#284">284</a> <em class="jxr_javadoccomment">   * Returns the number of distinct property values for given vertex label property name pair&lt;br&gt;</em>
+<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">   * Eg {@code (Person, name) -&gt; 20}</em>
 <a name="286" href="#286">286</a> <em class="jxr_javadoccomment">   *</em>
 <a name="287" href="#287">287</a> <em class="jxr_javadoccomment">   * @param vertexLabel vertex label</em>
 <a name="288" href="#288">288</a> <em class="jxr_javadoccomment">   * @param propertyName property name</em>
@@ -304,8 +304,8 @@
 <a name="294" href="#294">294</a>   }
 <a name="295" href="#295">295</a> 
 <a name="296" href="#296">296</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * Returns the number of distinct property values for given edge label property name pair</em>
-<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   * Eg (Person, name) -&gt; 20</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * Returns the number of distinct property values for given edge label property name pair&lt;br&gt;</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   * Eg {@code (Person, name) -&gt; 20}</em>
 <a name="299" href="#299">299</a> <em class="jxr_javadoccomment">   *</em>
 <a name="300" href="#300">300</a> <em class="jxr_javadoccomment">   * @param edgeLabel edge label</em>
 <a name="301" href="#301">301</a> <em class="jxr_javadoccomment">   * @param propertyName property name</em>

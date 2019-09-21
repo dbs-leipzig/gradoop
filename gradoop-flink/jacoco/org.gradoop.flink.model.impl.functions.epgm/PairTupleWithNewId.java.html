@@ -22,25 +22,23 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Creates a new {@link GradoopId} for the input element in a Tuple1 and
- * returns both.
+ * Creates a new {@link GradoopId} for the input element in a Tuple1 and returns both.
  *
- * @param &lt;T&gt;
+ * @param &lt;T&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0&quot;)
-<span class="fc" id="L31">public class PairTupleWithNewId&lt;T&gt;</span>
-  implements MapFunction&lt;Tuple1&lt;T&gt;, Tuple2&lt;T, GradoopId&gt;&gt; {
+<span class="fc" id="L30">public class PairTupleWithNewId&lt;T&gt; implements MapFunction&lt;Tuple1&lt;T&gt;, Tuple2&lt;T, GradoopId&gt;&gt; {</span>
 
   /**
    * Reduce object instantiations
    */
-<span class="fc" id="L37">  private final Tuple2&lt;T, GradoopId&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L35">  private final Tuple2&lt;T, GradoopId&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
   public Tuple2&lt;T, GradoopId&gt; map(Tuple1&lt;T&gt; input) {
-<span class="fc" id="L41">    reuseTuple.f0 = input.f0;</span>
-<span class="fc" id="L42">    reuseTuple.f1 = GradoopId.get();</span>
-<span class="fc" id="L43">    return reuseTuple;</span>
+<span class="fc" id="L39">    reuseTuple.f0 = input.f0;</span>
+<span class="fc" id="L40">    reuseTuple.f1 = GradoopId.get();</span>
+<span class="fc" id="L41">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

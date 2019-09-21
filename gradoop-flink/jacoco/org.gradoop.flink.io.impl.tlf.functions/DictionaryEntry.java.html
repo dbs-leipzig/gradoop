@@ -22,11 +22,9 @@ import org.apache.hadoop.io.Text;
 
 /**
  * After the TLF dictionary file has been read with a normal text input
- * format its result text has to be split and formed into Tuple2&lt;Integer,
- * String&gt;.
+ * format its result text splitting it into {@code Tuple2&lt;Integer, String&gt;}.
  */
-public class DictionaryEntry implements
-  MapFunction&lt;Tuple2&lt;LongWritable, Text&gt;, Tuple2&lt;Integer, String&gt;&gt; {
+public class DictionaryEntry implements MapFunction&lt;Tuple2&lt;LongWritable, Text&gt;, Tuple2&lt;Integer, String&gt;&gt; {
 
   /**
    * Tuple which is used as return variable for the mapping
@@ -36,9 +34,9 @@ public class DictionaryEntry implements
   /**
    * Empty constructor which initializes the return tuple.
    */
-<span class="fc" id="L39">  public DictionaryEntry() {</span>
-<span class="fc" id="L40">    returnTuple = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L37">  public DictionaryEntry() {</span>
+<span class="fc" id="L38">    returnTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Creates a tuple of integer and string from the input text.
@@ -49,10 +47,10 @@ public class DictionaryEntry implements
    */
   @Override
   public Tuple2&lt;Integer, String&gt; map(Tuple2&lt;LongWritable, Text&gt; tuple) throws Exception {
-<span class="fc" id="L52">    String[] stringArray = tuple.getField(1).toString().split(&quot; &quot;);</span>
-<span class="fc" id="L53">    returnTuple.f0 = Integer.parseInt(stringArray[1]);</span>
-<span class="fc" id="L54">    returnTuple.f1 = stringArray[0];</span>
-<span class="fc" id="L55">    return returnTuple;</span>
+<span class="fc" id="L50">    String[] stringArray = tuple.getField(1).toString().split(&quot; &quot;);</span>
+<span class="fc" id="L51">    returnTuple.f0 = Integer.parseInt(stringArray[1]);</span>
+<span class="fc" id="L52">    returnTuple.f1 = stringArray[0];</span>
+<span class="fc" id="L53">    return returnTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

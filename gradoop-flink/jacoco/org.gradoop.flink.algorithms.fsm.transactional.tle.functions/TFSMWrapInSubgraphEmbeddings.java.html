@@ -22,33 +22,32 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
 
 /**
- * subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings
+ * {@code subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings}
  */
-public class TFSMWrapInSubgraphEmbeddings implements
-  MapFunction&lt;TFSMSubgraph, TFSMSubgraphEmbeddings&gt; {
+public class TFSMWrapInSubgraphEmbeddings implements MapFunction&lt;TFSMSubgraph, TFSMSubgraphEmbeddings&gt; {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
   private final TFSMSubgraphEmbeddings reuseTuple;
 
   /**
    * Constructor.
    */
-<span class="fc" id="L38">  public TFSMWrapInSubgraphEmbeddings() {</span>
-<span class="fc" id="L39">    this.reuseTuple = new TFSMSubgraphEmbeddings();</span>
-<span class="fc" id="L40">    this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);</span>
-<span class="fc" id="L41">    this.reuseTuple.setSize(0);</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L37">  public TFSMWrapInSubgraphEmbeddings() {</span>
+<span class="fc" id="L38">    this.reuseTuple = new TFSMSubgraphEmbeddings();</span>
+<span class="fc" id="L39">    this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);</span>
+<span class="fc" id="L40">    this.reuseTuple.setSize(0);</span>
+<span class="fc" id="L41">  }</span>
 
   @Override
   public TFSMSubgraphEmbeddings map(TFSMSubgraph tfsmSubgraph) throws
     Exception {
 
-<span class="fc" id="L48">    reuseTuple.setCanonicalLabel(tfsmSubgraph.getCanonicalLabel());</span>
-<span class="fc" id="L49">    reuseTuple.setEmbeddings(Lists.newArrayList(tfsmSubgraph.getEmbedding()));</span>
+<span class="fc" id="L47">    reuseTuple.setCanonicalLabel(tfsmSubgraph.getCanonicalLabel());</span>
+<span class="fc" id="L48">    reuseTuple.setEmbeddings(Lists.newArrayList(tfsmSubgraph.getEmbedding()));</span>
 
-<span class="fc" id="L51">    return reuseTuple;</span>
+<span class="fc" id="L50">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

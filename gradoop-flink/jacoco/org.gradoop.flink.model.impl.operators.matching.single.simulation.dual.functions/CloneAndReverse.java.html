@@ -23,14 +23,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.TripleWithDirection;
 
 /**
- * Clones and reverses the incoming triple:
- *
- * (e,s,t,c) -&gt; (e,s,t,true,c),(e,t,s,false,c)
- *
- * Forwarded fields:
- *
- * f0-&gt;f0: edge id
- * f3-&gt;f4: query candidates
+ * Clones and reverses the incoming triple:&lt;br&gt;
+ * {@code (e,s,t,c) -&gt; (e,s,t,true,c),(e,t,s,false,c)}
+ * &lt;p&gt;
+ * Forwarded fields:&lt;br&gt;
+ * {@code f0-&gt;f0}: edge id&lt;br&gt;
+ * {@code f3-&gt;f4}: query candidates
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0;f3-&gt;f4&quot;)
 public class CloneAndReverse implements
@@ -44,25 +42,25 @@ public class CloneAndReverse implements
   /**
    * Constructor
    */
-<span class="fc" id="L47">  public CloneAndReverse() {</span>
-<span class="fc" id="L48">    reuseTuple = new TripleWithDirection();</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L45">  public CloneAndReverse() {</span>
+<span class="fc" id="L46">    reuseTuple = new TripleWithDirection();</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
   public void flatMap(TripleWithCandidates&lt;GradoopId&gt; tripleWithCandidates,
     Collector&lt;TripleWithDirection&gt; collector) throws Exception {
-<span class="fc" id="L54">    reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());</span>
-<span class="fc" id="L55">    reuseTuple.setCandidates(tripleWithCandidates.getCandidates());</span>
+<span class="fc" id="L52">    reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());</span>
+<span class="fc" id="L53">    reuseTuple.setCandidates(tripleWithCandidates.getCandidates());</span>
 
-<span class="fc" id="L57">    reuseTuple.setSourceId(tripleWithCandidates.getSourceId());</span>
-<span class="fc" id="L58">    reuseTuple.setTargetId(tripleWithCandidates.getTargetId());</span>
-<span class="fc" id="L59">    reuseTuple.setOutgoing(true);</span>
-<span class="fc" id="L60">    collector.collect(reuseTuple);</span>
+<span class="fc" id="L55">    reuseTuple.setSourceId(tripleWithCandidates.getSourceId());</span>
+<span class="fc" id="L56">    reuseTuple.setTargetId(tripleWithCandidates.getTargetId());</span>
+<span class="fc" id="L57">    reuseTuple.setOutgoing(true);</span>
+<span class="fc" id="L58">    collector.collect(reuseTuple);</span>
 
-<span class="fc" id="L62">    reuseTuple.setSourceId(tripleWithCandidates.getTargetId());</span>
-<span class="fc" id="L63">    reuseTuple.setTargetId(tripleWithCandidates.getSourceId());</span>
-<span class="fc" id="L64">    reuseTuple.setOutgoing(false);</span>
-<span class="fc" id="L65">    collector.collect(reuseTuple);</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L60">    reuseTuple.setSourceId(tripleWithCandidates.getTargetId());</span>
+<span class="fc" id="L61">    reuseTuple.setTargetId(tripleWithCandidates.getSourceId());</span>
+<span class="fc" id="L62">    reuseTuple.setOutgoing(false);</span>
+<span class="fc" id="L63">    collector.collect(reuseTuple);</span>
+<span class="fc" id="L64">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

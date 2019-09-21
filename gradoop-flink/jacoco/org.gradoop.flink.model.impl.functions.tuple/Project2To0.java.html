@@ -21,24 +21,23 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * (f0,f1) =&gt; (f0)
+ * {@code (f0,f1) =&gt; (f0)}
  *
  * @param &lt;T0&gt; f0 type
  * @param &lt;T1&gt; f1 type
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0&quot;)
-<span class="nc" id="L30">public class Project2To0&lt;T0, T1&gt;</span>
-  implements MapFunction&lt;Tuple2&lt;T0, T1&gt;, Tuple1&lt;T0&gt;&gt; {
+<span class="nc" id="L30">public class Project2To0&lt;T0, T1&gt; implements MapFunction&lt;Tuple2&lt;T0, T1&gt;, Tuple1&lt;T0&gt;&gt; {</span>
 
   /**
    * Reduce instantiations
    */
-<span class="nc" id="L36">  private final Tuple1&lt;T0&gt; reuseTuple = new Tuple1&lt;&gt;();</span>
+<span class="nc" id="L35">  private final Tuple1&lt;T0&gt; reuseTuple = new Tuple1&lt;&gt;();</span>
 
   @Override
   public Tuple1&lt;T0&gt; map(Tuple2&lt;T0, T1&gt; pair) throws Exception {
-<span class="nc" id="L40">    reuseTuple.f0 = pair.f0;</span>
-<span class="nc" id="L41">    return reuseTuple;</span>
+<span class="nc" id="L39">    reuseTuple.f0 = pair.f0;</span>
+<span class="nc" id="L40">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

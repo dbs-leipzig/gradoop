@@ -36,20 +36,22 @@ public class HITSToAttributes implements JoinFunction&lt;HITS.Result&lt;GradoopI
   private String hubPropertyKey;
 
   /**
+   * Creates a {@link HITSToAttributes} instance.
+   *
    * @param authorityPropertyKey Property key to store the authority score of a vertex
    * @param hubPropertyKey       Property key to store the hub score of a vertex
    */
-<span class="fc" id="L42">  public HITSToAttributes(String authorityPropertyKey, String hubPropertyKey) {</span>
-<span class="fc" id="L43">    this.authorityPropertyKey = authorityPropertyKey;</span>
-<span class="fc" id="L44">    this.hubPropertyKey = hubPropertyKey;</span>
-<span class="fc" id="L45">  }</span>
+<span class="fc" id="L44">  public HITSToAttributes(String authorityPropertyKey, String hubPropertyKey) {</span>
+<span class="fc" id="L45">    this.authorityPropertyKey = authorityPropertyKey;</span>
+<span class="fc" id="L46">    this.hubPropertyKey = hubPropertyKey;</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
   public EPGMVertex join(HITS.Result&lt;GradoopId&gt; result, EPGMVertex vertex) throws Exception {
-<span class="fc" id="L49">    vertex.setProperty(authorityPropertyKey,</span>
-<span class="fc" id="L50">      PropertyValue.create(result.getAuthorityScore().getValue()));</span>
-<span class="fc" id="L51">    vertex.setProperty(hubPropertyKey, PropertyValue.create(result.getHubScore().getValue()));</span>
-<span class="fc" id="L52">    return vertex;</span>
+<span class="fc" id="L51">    vertex.setProperty(authorityPropertyKey,</span>
+<span class="fc" id="L52">      PropertyValue.create(result.getAuthorityScore().getValue()));</span>
+<span class="fc" id="L53">    vertex.setProperty(hubPropertyKey, PropertyValue.create(result.getHubScore().getValue()));</span>
+<span class="fc" id="L54">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

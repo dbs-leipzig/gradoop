@@ -22,25 +22,24 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Creates a new {@link GradoopId} for the input element and returns both.
+ * &lt;p&gt;
+ * {@code t -&gt; (t, id)}
  *
- * t -&gt; (t, id)
- *
- * @param &lt;T&gt;
+ * @param &lt;T&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;*-&gt;f0&quot;)
-<span class="fc" id="L31">public class PairElementWithNewId&lt;T&gt;</span>
-  implements MapFunction&lt;T, Tuple2&lt;T, GradoopId&gt;&gt; {
+<span class="fc" id="L31">public class PairElementWithNewId&lt;T&gt; implements MapFunction&lt;T, Tuple2&lt;T, GradoopId&gt;&gt; {</span>
 
   /**
    * Reduce object instantiations
    */
-<span class="fc" id="L37">  private final Tuple2&lt;T, GradoopId&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L36">  private final Tuple2&lt;T, GradoopId&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
   public Tuple2&lt;T, GradoopId&gt; map(T input) {
-<span class="fc" id="L41">    reuseTuple.f0 = input;</span>
-<span class="fc" id="L42">    reuseTuple.f1 = GradoopId.get();</span>
-<span class="fc" id="L43">    return reuseTuple;</span>
+<span class="fc" id="L40">    reuseTuple.f0 = input;</span>
+<span class="fc" id="L41">    reuseTuple.f1 = GradoopId.get();</span>
+<span class="fc" id="L42">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -26,8 +26,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.util.Set;
 
 /**
- * Extracts Triples of the form &lt;Tuple1&lt;PropertyName&gt;, PropertyValue&gt; from the given list of
+ * Extracts Triples of the form {@code &lt;Tuple1&lt;PropertyName&gt;, PropertyValue&gt;} from the given list of
  * GraphElements
+ *
  * @param &lt;T&gt; graph element type
  */
 public class ExtractPropertyValues&lt;T extends EPGMGraphElement&gt;
@@ -41,20 +42,20 @@ public class ExtractPropertyValues&lt;T extends EPGMGraphElement&gt;
   /**
    * Creates a new UDF
    */
-<span class="fc" id="L44">  public ExtractPropertyValues() {</span>
-<span class="fc" id="L45">    this.reuseTuple = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L45">  public ExtractPropertyValues() {</span>
+<span class="fc" id="L46">    this.reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
   public void flatMap(T value, Collector&lt;Tuple2&lt;String, Set&lt;PropertyValue&gt;&gt;&gt; out) throws Exception {
-<span class="pc bpc" id="L50" title="1 of 2 branches missed.">    if (value.getProperties() != null) {</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">      for (Property property : value.getProperties()) {</span>
-<span class="fc" id="L52">        reuseTuple.f0 = property.getKey();</span>
-<span class="fc" id="L53">        reuseTuple.f1 = Sets.newHashSet(property.getValue());</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">    if (value.getProperties() != null) {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">      for (Property property : value.getProperties()) {</span>
+<span class="fc" id="L53">        reuseTuple.f0 = property.getKey();</span>
+<span class="fc" id="L54">        reuseTuple.f1 = Sets.newHashSet(property.getValue());</span>
 
-<span class="fc" id="L55">        out.collect(reuseTuple);</span>
-<span class="fc" id="L56">      }</span>
+<span class="fc" id="L56">        out.collect(reuseTuple);</span>
+<span class="fc" id="L57">      }</span>
     }
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L59">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

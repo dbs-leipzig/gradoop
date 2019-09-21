@@ -38,10 +38,9 @@ import java.util.Set;
 <span class="nc" id="L38">public class RepresentationConverters {</span>
 
   /**
-   * transaction =&gt; adjacency list
+   * {@code transaction =&gt; adjacency list}
    *
    * @param transaction (g,V,E)
-   *
    * @param edgeDataFactory edge data factory
    * @param vertexDataFactory vertex data factory
    *
@@ -57,55 +56,55 @@ import java.util.Set;
     MapFunction&lt;EPGMVertex, VD&gt; vertexDataFactory
   ) throws Exception {
 
-<span class="fc" id="L60">    Set&lt;EPGMVertex&gt; vertices = transaction.getVertices();</span>
-<span class="fc" id="L61">    Set&lt;EPGMEdge&gt; edges = transaction.getEdges();</span>
+<span class="fc" id="L59">    Set&lt;EPGMVertex&gt; vertices = transaction.getVertices();</span>
+<span class="fc" id="L60">    Set&lt;EPGMEdge&gt; edges = transaction.getEdges();</span>
 
-<span class="fc" id="L63">    int vertexCount = vertices.size();</span>
+<span class="fc" id="L62">    int vertexCount = vertices.size();</span>
 
-<span class="fc" id="L65">    Map&lt;GradoopId, String&gt; labels =</span>
-<span class="fc" id="L66">      Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());</span>
+<span class="fc" id="L64">    Map&lt;GradoopId, String&gt; labels =</span>
+<span class="fc" id="L65">      Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());</span>
 
     Map&lt;GradoopId, Properties&gt; properties =
-<span class="fc" id="L69">      Maps.newHashMap();</span>
+<span class="fc" id="L68">      Maps.newHashMap();</span>
 
-<span class="fc" id="L71">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows =</span>
-<span class="fc" id="L72">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
+<span class="fc" id="L70">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows =</span>
+<span class="fc" id="L71">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
 
-<span class="fc" id="L74">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows =</span>
-<span class="fc" id="L75">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
+<span class="fc" id="L73">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows =</span>
+<span class="fc" id="L74">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
 
-<span class="fc" id="L77">    Map&lt;GradoopId, EPGMVertex&gt; vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);</span>
+<span class="fc" id="L76">    Map&lt;GradoopId, EPGMVertex&gt; vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);</span>
 
     // VERTICES
-<span class="fc bfc" id="L80" title="All 2 branches covered.">    for (EPGMVertex vertex : vertices) {</span>
-<span class="fc" id="L81">      addLabelsAndProperties(vertex, labels, properties);</span>
-<span class="fc" id="L82">      vertexIndex.put(vertex.getId(), vertex);</span>
-<span class="fc" id="L83">    }</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    for (EPGMVertex vertex : vertices) {</span>
+<span class="fc" id="L80">      addLabelsAndProperties(vertex, labels, properties);</span>
+<span class="fc" id="L81">      vertexIndex.put(vertex.getId(), vertex);</span>
+<span class="fc" id="L82">    }</span>
 
     // EDGES
 
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    for (EPGMEdge edge : edges) {</span>
-<span class="fc" id="L88">      addLabelsAndProperties(edge, labels, properties);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    for (EPGMEdge edge : edges) {</span>
+<span class="fc" id="L87">      addLabelsAndProperties(edge, labels, properties);</span>
 
-<span class="fc" id="L90">      EPGMVertex source = vertexIndex.get(edge.getSourceId());</span>
-<span class="fc" id="L91">      AdjacencyListRow&lt;ED, VD&gt; outgoingRow =</span>
-<span class="fc" id="L92">        outgoingRows.computeIfAbsent(source.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
+<span class="fc" id="L89">      EPGMVertex source = vertexIndex.get(edge.getSourceId());</span>
+<span class="fc" id="L90">      AdjacencyListRow&lt;ED, VD&gt; outgoingRow =</span>
+<span class="fc" id="L91">        outgoingRows.computeIfAbsent(source.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
 
-<span class="fc" id="L94">      VD sourceData = vertexDataFactory.map(source);</span>
+<span class="fc" id="L93">      VD sourceData = vertexDataFactory.map(source);</span>
 
-<span class="fc" id="L96">      EPGMVertex target = vertexIndex.get(edge.getTargetId());</span>
-<span class="fc" id="L97">      AdjacencyListRow&lt;ED, VD&gt; incomingRow =</span>
-<span class="fc" id="L98">        incomingRows.computeIfAbsent(target.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
-<span class="fc" id="L99">      VD targetData = vertexDataFactory.map(target);</span>
+<span class="fc" id="L95">      EPGMVertex target = vertexIndex.get(edge.getTargetId());</span>
+<span class="fc" id="L96">      AdjacencyListRow&lt;ED, VD&gt; incomingRow =</span>
+<span class="fc" id="L97">        incomingRows.computeIfAbsent(target.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
+<span class="fc" id="L98">      VD targetData = vertexDataFactory.map(target);</span>
 
-<span class="fc" id="L101">      ED edgeData = edgeDataFactory.map(edge);</span>
+<span class="fc" id="L100">      ED edgeData = edgeDataFactory.map(edge);</span>
 
-<span class="fc" id="L103">      outgoingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, targetData));</span>
-<span class="fc" id="L104">      incomingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, sourceData));</span>
-<span class="fc" id="L105">    }</span>
+<span class="fc" id="L102">      outgoingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, targetData));</span>
+<span class="fc" id="L103">      incomingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, sourceData));</span>
+<span class="fc" id="L104">    }</span>
 
-<span class="fc" id="L107">    return new AdjacencyList&lt;&gt;(</span>
-<span class="fc" id="L108">      transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);</span>
+<span class="fc" id="L106">    return new AdjacencyList&lt;&gt;(</span>
+<span class="fc" id="L107">      transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);</span>
   }
 
   /**
@@ -120,16 +119,16 @@ import java.util.Set;
     Map&lt;GradoopId, String&gt; labels,
     Map&lt;GradoopId, Properties&gt; properties
   ) {
-<span class="fc" id="L123">    labels.put(element.getId(), element.getLabel());</span>
+<span class="fc" id="L122">    labels.put(element.getId(), element.getLabel());</span>
 
-<span class="fc" id="L125">    Properties propertyList = element.getProperties();</span>
-<span class="fc bfc" id="L126" title="All 4 branches covered.">    if (propertyList != null &amp;&amp; !propertyList.isEmpty()) {</span>
-<span class="fc" id="L127">      properties.put(element.getId(), propertyList);</span>
+<span class="fc" id="L124">    Properties propertyList = element.getProperties();</span>
+<span class="fc bfc" id="L125" title="All 4 branches covered.">    if (propertyList != null &amp;&amp; !propertyList.isEmpty()) {</span>
+<span class="fc" id="L126">      properties.put(element.getId(), propertyList);</span>
     }
-<span class="fc" id="L129">  }</span>
+<span class="fc" id="L128">  }</span>
 
   /**
-   * adjacency list =&gt; transaction
+   * {@code adjacency list =&gt; transaction}
    *
    * @param adjacencyList adjacency list
    * @return transaction
@@ -138,34 +137,34 @@ import java.util.Set;
     GradoopId&gt; adjacencyList) {
 
     // GRAPH HEAD
-<span class="fc" id="L141">    EPGMGraphHead graphHead = adjacencyList.getGraphHead();</span>
+<span class="fc" id="L140">    EPGMGraphHead graphHead = adjacencyList.getGraphHead();</span>
 
-<span class="fc" id="L143">    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());</span>
+<span class="fc" id="L142">    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());</span>
 
-<span class="fc" id="L145">    Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();</span>
-<span class="fc" id="L146">    Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
+<span class="fc" id="L144">    Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();</span>
+<span class="fc" id="L145">    Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
 
     // VERTICES
     for (Map.Entry&lt;GradoopId, AdjacencyListRow&lt;GradoopId, GradoopId&gt;&gt; entry :
-<span class="fc bfc" id="L150" title="All 2 branches covered.">      adjacencyList.getOutgoingRows().entrySet()) {</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">      adjacencyList.getOutgoingRows().entrySet()) {</span>
 
-<span class="fc" id="L152">      GradoopId sourceId = entry.getKey();</span>
-<span class="fc" id="L153">      Properties properties = adjacencyList.getProperties(sourceId);</span>
-<span class="fc" id="L154">      String label = adjacencyList.getLabel(sourceId);</span>
-<span class="fc" id="L155">      vertices.add(new EPGMVertex(sourceId, label, properties, graphIds));</span>
+<span class="fc" id="L151">      GradoopId sourceId = entry.getKey();</span>
+<span class="fc" id="L152">      Properties properties = adjacencyList.getProperties(sourceId);</span>
+<span class="fc" id="L153">      String label = adjacencyList.getLabel(sourceId);</span>
+<span class="fc" id="L154">      vertices.add(new EPGMVertex(sourceId, label, properties, graphIds));</span>
 
       // EDGES
-<span class="fc bfc" id="L158" title="All 2 branches covered.">      for (AdjacencyListCell&lt;GradoopId, GradoopId&gt; cell : entry.getValue().getCells()) {</span>
-<span class="fc" id="L159">        GradoopId edgeId = cell.getEdgeData();</span>
-<span class="fc" id="L160">        label = adjacencyList.getLabel(edgeId);</span>
-<span class="fc" id="L161">        properties = adjacencyList.getProperties(edgeId);</span>
-<span class="fc" id="L162">        GradoopId targetId = cell.getVertexData();</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">      for (AdjacencyListCell&lt;GradoopId, GradoopId&gt; cell : entry.getValue().getCells()) {</span>
+<span class="fc" id="L158">        GradoopId edgeId = cell.getEdgeData();</span>
+<span class="fc" id="L159">        label = adjacencyList.getLabel(edgeId);</span>
+<span class="fc" id="L160">        properties = adjacencyList.getProperties(edgeId);</span>
+<span class="fc" id="L161">        GradoopId targetId = cell.getVertexData();</span>
 
-<span class="fc" id="L164">        edges.add(new EPGMEdge(edgeId, label, sourceId, targetId, properties, graphIds));</span>
-<span class="fc" id="L165">      }</span>
-<span class="fc" id="L166">    }</span>
+<span class="fc" id="L163">        edges.add(new EPGMEdge(edgeId, label, sourceId, targetId, properties, graphIds));</span>
+<span class="fc" id="L164">      }</span>
+<span class="fc" id="L165">    }</span>
 
-<span class="fc" id="L168">    return new GraphTransaction(graphHead, vertices, edges);</span>
+<span class="fc" id="L167">    return new GraphTransaction(graphHead, vertices, edges);</span>
   }
 
 }

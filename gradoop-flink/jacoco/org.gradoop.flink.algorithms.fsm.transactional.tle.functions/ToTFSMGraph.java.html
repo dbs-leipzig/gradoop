@@ -25,22 +25,21 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.TFSMGraph;
 import java.util.Map;
 
 /**
- * graphTransaction =&gt; fsmGraph
+ * {@code graphTransaction =&gt; fsmGraph}
  */
-<span class="fc" id="L30">public class ToTFSMGraph extends ToFSMGraph</span>
-  implements MapFunction&lt;GraphTransaction, TFSMGraph&gt; {
+<span class="fc" id="L30">public class ToTFSMGraph extends ToFSMGraph implements MapFunction&lt;GraphTransaction, TFSMGraph&gt; {</span>
 
   @Override
   public TFSMGraph map(GraphTransaction graph) throws Exception {
 
-<span class="fc" id="L36">    Map&lt;GradoopId, Integer&gt; vertexIdMap =</span>
-<span class="fc" id="L37">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
+<span class="fc" id="L35">    Map&lt;GradoopId, Integer&gt; vertexIdMap =</span>
+<span class="fc" id="L36">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
 
-<span class="fc" id="L39">    Map&lt;Integer, String&gt; fsmVertices = transformVertices(graph, vertexIdMap);</span>
+<span class="fc" id="L38">    Map&lt;Integer, String&gt; fsmVertices = transformVertices(graph, vertexIdMap);</span>
 
-<span class="fc" id="L41">    Map&lt;Integer, FSMEdge&gt; fsmEdges = transformEdges(graph, vertexIdMap);</span>
+<span class="fc" id="L40">    Map&lt;Integer, FSMEdge&gt; fsmEdges = transformEdges(graph, vertexIdMap);</span>
 
-<span class="fc" id="L43">    return new TFSMGraph(graph.getGraphHead().getId(), fsmVertices, fsmEdges);</span>
+<span class="fc" id="L42">    return new TFSMGraph(graph.getGraphHead().getId(), fsmVertices, fsmEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

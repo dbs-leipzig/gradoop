@@ -26,16 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * graph =&gt; embedding(k=1),..
+ * {@code graph =&gt; embedding(k=1),..}
  */
 public class TFSMSingleEdgeEmbeddings extends SingleEdgeEmbeddings
   implements FlatMapFunction&lt;TFSMGraph, TFSMSubgraphEmbeddings&gt; {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
-<span class="fc" id="L37">  private final TFSMSubgraphEmbeddings reuseTuple =</span>
-    new TFSMSubgraphEmbeddings();
+<span class="fc" id="L37">  private final TFSMSubgraphEmbeddings reuseTuple = new TFSMSubgraphEmbeddings();</span>
 
   /**
    * Constructor.
@@ -43,28 +42,28 @@ public class TFSMSingleEdgeEmbeddings extends SingleEdgeEmbeddings
    * @param fsmConfig FSM configuration
    */
   public TFSMSingleEdgeEmbeddings(FSMConfig fsmConfig) {
-<span class="fc" id="L46">    super(fsmConfig);</span>
-<span class="fc" id="L47">  }</span>
+<span class="fc" id="L45">    super(fsmConfig);</span>
+<span class="fc" id="L46">  }</span>
 
   @Override
   public void flatMap(
     TFSMGraph graph, Collector&lt;TFSMSubgraphEmbeddings&gt; out) throws Exception {
 
-<span class="fc" id="L53">    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings =</span>
-<span class="fc" id="L54">      createEmbeddings(graph);</span>
+<span class="fc" id="L52">    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings =</span>
+<span class="fc" id="L53">      createEmbeddings(graph);</span>
 
-<span class="fc" id="L56">    reuseTuple.setGraphId(graph.getId());</span>
-<span class="fc" id="L57">    reuseTuple.setSize(1);</span>
+<span class="fc" id="L55">    reuseTuple.setGraphId(graph.getId());</span>
+<span class="fc" id="L56">    reuseTuple.setSize(1);</span>
 
     for (Map.Entry&lt;String, List&lt;Embedding&gt;&gt; entry :
-<span class="fc bfc" id="L60" title="All 2 branches covered.">      subgraphEmbeddings.entrySet()) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">      subgraphEmbeddings.entrySet()) {</span>
 
-<span class="fc" id="L62">      reuseTuple.setCanonicalLabel(entry.getKey());</span>
-<span class="fc" id="L63">      reuseTuple.setEmbeddings(entry.getValue());</span>
+<span class="fc" id="L61">      reuseTuple.setCanonicalLabel(entry.getKey());</span>
+<span class="fc" id="L62">      reuseTuple.setEmbeddings(entry.getValue());</span>
 
-<span class="fc" id="L65">      out.collect(reuseTuple);</span>
-<span class="fc" id="L66">    }</span>
-<span class="fc" id="L67">  }</span>
+<span class="fc" id="L64">      out.collect(reuseTuple);</span>
+<span class="fc" id="L65">    }</span>
+<span class="fc" id="L66">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

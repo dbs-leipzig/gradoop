@@ -48,137 +48,136 @@
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/gradoop/flink/representation/transactional/RepresentationConverters.html">RepresentationConverters</a> {
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * transaction =&gt; adjacency list</em>
+<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * {@code transaction =&gt; adjacency list}</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * @param transaction (g,V,E)</em>
-<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * @param edgeDataFactory edge data factory</em>
-<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   * @param vertexDataFactory vertex data factory</em>
-<a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * @param &lt;ED&gt; edge data</em>
-<a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * @param &lt;VD&gt; vertex data</em>
-<a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   * @return adjacency list</em>
-<a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
-<a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="54" href="#54">54</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;ED, VD&gt; AdjacencyList&lt;GradoopId, String, ED, VD&gt; getAdjacencyList(
-<a name="55" href="#55">55</a>      <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> transaction,
-<a name="56" href="#56">56</a>      MapFunction&lt;EPGMEdge, ED&gt; edgeDataFactory,
-<a name="57" href="#57">57</a>      MapFunction&lt;EPGMVertex, VD&gt; vertexDataFactory
-<a name="58" href="#58">58</a>    ) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="59" href="#59">59</a>  
-<a name="60" href="#60">60</a>      Set&lt;EPGMVertex&gt; vertices = transaction.getVertices();
-<a name="61" href="#61">61</a>      Set&lt;EPGMEdge&gt; edges = transaction.getEdges();
-<a name="62" href="#62">62</a>  
-<a name="63" href="#63">63</a>      <strong class="jxr_keyword">int</strong> vertexCount = vertices.size();
-<a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      Map&lt;GradoopId, String&gt; labels =
-<a name="66" href="#66">66</a>        Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());
-<a name="67" href="#67">67</a>  
-<a name="68" href="#68">68</a>      Map&lt;GradoopId, Properties&gt; properties =
-<a name="69" href="#69">69</a>        Maps.newHashMap();
-<a name="70" href="#70">70</a>  
-<a name="71" href="#71">71</a>      Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows =
-<a name="72" href="#72">72</a>        Maps.newHashMapWithExpectedSize(vertexCount);
-<a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>      Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows =
-<a name="75" href="#75">75</a>        Maps.newHashMapWithExpectedSize(vertexCount);
-<a name="76" href="#76">76</a>  
-<a name="77" href="#77">77</a>      Map&lt;GradoopId, EPGMVertex&gt; vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);
-<a name="78" href="#78">78</a>  
-<a name="79" href="#79">79</a>      <em class="jxr_comment">// VERTICES</em>
-<a name="80" href="#80">80</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
-<a name="81" href="#81">81</a>        addLabelsAndProperties(vertex, labels, properties);
-<a name="82" href="#82">82</a>        vertexIndex.put(vertex.getId(), vertex);
-<a name="83" href="#83">83</a>      }
-<a name="84" href="#84">84</a>  
-<a name="85" href="#85">85</a>      <em class="jxr_comment">// EDGES</em>
-<a name="86" href="#86">86</a>  
-<a name="87" href="#87">87</a>      <strong class="jxr_keyword">for</strong> (EPGMEdge edge : edges) {
-<a name="88" href="#88">88</a>        addLabelsAndProperties(edge, labels, properties);
-<a name="89" href="#89">89</a>  
-<a name="90" href="#90">90</a>        EPGMVertex source = vertexIndex.get(edge.getSourceId());
-<a name="91" href="#91">91</a>        AdjacencyListRow&lt;ED, VD&gt; outgoingRow =
-<a name="92" href="#92">92</a>          outgoingRows.computeIfAbsent(source.getId(), k -&gt; <strong class="jxr_keyword">new</strong> AdjacencyListRow&lt;&gt;());
-<a name="93" href="#93">93</a>  
-<a name="94" href="#94">94</a>        VD sourceData = vertexDataFactory.map(source);
-<a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>        EPGMVertex target = vertexIndex.get(edge.getTargetId());
-<a name="97" href="#97">97</a>        AdjacencyListRow&lt;ED, VD&gt; incomingRow =
-<a name="98" href="#98">98</a>          incomingRows.computeIfAbsent(target.getId(), k -&gt; <strong class="jxr_keyword">new</strong> AdjacencyListRow&lt;&gt;());
-<a name="99" href="#99">99</a>        VD targetData = vertexDataFactory.map(target);
-<a name="100" href="#100">100</a> 
-<a name="101" href="#101">101</a>       ED edgeData = edgeDataFactory.map(edge);
-<a name="102" href="#102">102</a> 
-<a name="103" href="#103">103</a>       outgoingRow.getCells().add(<strong class="jxr_keyword">new</strong> AdjacencyListCell&lt;&gt;(edgeData, targetData));
-<a name="104" href="#104">104</a>       incomingRow.getCells().add(<strong class="jxr_keyword">new</strong> AdjacencyListCell&lt;&gt;(edgeData, sourceData));
-<a name="105" href="#105">105</a>     }
-<a name="106" href="#106">106</a> 
-<a name="107" href="#107">107</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AdjacencyList&lt;&gt;(
-<a name="108" href="#108">108</a>       transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);
-<a name="109" href="#109">109</a>   }
-<a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="112" href="#112">112</a> <em class="jxr_javadoccomment">   * Adds label and properties of an EPGM element to id-label and id-properties maps.</em>
-<a name="113" href="#113">113</a> <em class="jxr_javadoccomment">   *</em>
-<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @param element EPGM element</em>
-<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   * @param labels id-label map</em>
-<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * @param properties id-properties map</em>
-<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   */</em>
-<a name="118" href="#118">118</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> addLabelsAndProperties(
-<a name="119" href="#119">119</a>     Element element,
-<a name="120" href="#120">120</a>     Map&lt;GradoopId, String&gt; labels,
-<a name="121" href="#121">121</a>     Map&lt;GradoopId, Properties&gt; properties
-<a name="122" href="#122">122</a>   ) {
-<a name="123" href="#123">123</a>     labels.put(element.getId(), element.getLabel());
-<a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>     Properties propertyList = element.getProperties();
-<a name="126" href="#126">126</a>     <strong class="jxr_keyword">if</strong> (propertyList != <strong class="jxr_keyword">null</strong> &amp;&amp; !propertyList.isEmpty()) {
-<a name="127" href="#127">127</a>       properties.put(element.getId(), propertyList);
-<a name="128" href="#128">128</a>     }
-<a name="129" href="#129">129</a>   }
-<a name="130" href="#130">130</a> 
-<a name="131" href="#131">131</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   * adjacency list =&gt; transaction</em>
-<a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   *</em>
-<a name="134" href="#134">134</a> <em class="jxr_javadoccomment">   * @param adjacencyList adjacency list</em>
-<a name="135" href="#135">135</a> <em class="jxr_javadoccomment">   * @return transaction</em>
-<a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   */</em>
-<a name="137" href="#137">137</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> getGraphTransaction(AdjacencyList&lt;GradoopId, String, GradoopId,
-<a name="138" href="#138">138</a>     GradoopId&gt; adjacencyList) {
-<a name="139" href="#139">139</a> 
-<a name="140" href="#140">140</a>     <em class="jxr_comment">// GRAPH HEAD</em>
-<a name="141" href="#141">141</a>     EPGMGraphHead graphHead = adjacencyList.getGraphHead();
-<a name="142" href="#142">142</a> 
-<a name="143" href="#143">143</a>     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
-<a name="144" href="#144">144</a> 
-<a name="145" href="#145">145</a>     Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();
-<a name="146" href="#146">146</a>     Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();
-<a name="147" href="#147">147</a> 
-<a name="148" href="#148">148</a>     <em class="jxr_comment">// VERTICES</em>
-<a name="149" href="#149">149</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;GradoopId, AdjacencyListRow&lt;GradoopId, GradoopId&gt;&gt; entry :
-<a name="150" href="#150">150</a>       adjacencyList.getOutgoingRows().entrySet()) {
-<a name="151" href="#151">151</a> 
-<a name="152" href="#152">152</a>       GradoopId sourceId = entry.getKey();
-<a name="153" href="#153">153</a>       Properties properties = adjacencyList.getProperties(sourceId);
-<a name="154" href="#154">154</a>       String label = adjacencyList.getLabel(sourceId);
-<a name="155" href="#155">155</a>       vertices.add(<strong class="jxr_keyword">new</strong> EPGMVertex(sourceId, label, properties, graphIds));
-<a name="156" href="#156">156</a> 
-<a name="157" href="#157">157</a>       <em class="jxr_comment">// EDGES</em>
-<a name="158" href="#158">158</a>       <strong class="jxr_keyword">for</strong> (AdjacencyListCell&lt;GradoopId, GradoopId&gt; cell : entry.getValue().getCells()) {
-<a name="159" href="#159">159</a>         GradoopId edgeId = cell.getEdgeData();
-<a name="160" href="#160">160</a>         label = adjacencyList.getLabel(edgeId);
-<a name="161" href="#161">161</a>         properties = adjacencyList.getProperties(edgeId);
-<a name="162" href="#162">162</a>         GradoopId targetId = cell.getVertexData();
-<a name="163" href="#163">163</a> 
-<a name="164" href="#164">164</a>         edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(edgeId, label, sourceId, targetId, properties, graphIds));
-<a name="165" href="#165">165</a>       }
-<a name="166" href="#166">166</a>     }
-<a name="167" href="#167">167</a> 
-<a name="168" href="#168">168</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a>(graphHead, vertices, edges);
-<a name="169" href="#169">169</a>   }
-<a name="170" href="#170">170</a> 
-<a name="171" href="#171">171</a> }
+<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * @param edgeDataFactory edge data factory</em>
+<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * @param vertexDataFactory vertex data factory</em>
+<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * @param &lt;ED&gt; edge data</em>
+<a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * @param &lt;VD&gt; vertex data</em>
+<a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * @return adjacency list</em>
+<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
+<a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="53" href="#53">53</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;ED, VD&gt; AdjacencyList&lt;GradoopId, String, ED, VD&gt; getAdjacencyList(
+<a name="54" href="#54">54</a>      <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> transaction,
+<a name="55" href="#55">55</a>      MapFunction&lt;EPGMEdge, ED&gt; edgeDataFactory,
+<a name="56" href="#56">56</a>      MapFunction&lt;EPGMVertex, VD&gt; vertexDataFactory
+<a name="57" href="#57">57</a>    ) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="58" href="#58">58</a>  
+<a name="59" href="#59">59</a>      Set&lt;EPGMVertex&gt; vertices = transaction.getVertices();
+<a name="60" href="#60">60</a>      Set&lt;EPGMEdge&gt; edges = transaction.getEdges();
+<a name="61" href="#61">61</a>  
+<a name="62" href="#62">62</a>      <strong class="jxr_keyword">int</strong> vertexCount = vertices.size();
+<a name="63" href="#63">63</a>  
+<a name="64" href="#64">64</a>      Map&lt;GradoopId, String&gt; labels =
+<a name="65" href="#65">65</a>        Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());
+<a name="66" href="#66">66</a>  
+<a name="67" href="#67">67</a>      Map&lt;GradoopId, Properties&gt; properties =
+<a name="68" href="#68">68</a>        Maps.newHashMap();
+<a name="69" href="#69">69</a>  
+<a name="70" href="#70">70</a>      Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows =
+<a name="71" href="#71">71</a>        Maps.newHashMapWithExpectedSize(vertexCount);
+<a name="72" href="#72">72</a>  
+<a name="73" href="#73">73</a>      Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows =
+<a name="74" href="#74">74</a>        Maps.newHashMapWithExpectedSize(vertexCount);
+<a name="75" href="#75">75</a>  
+<a name="76" href="#76">76</a>      Map&lt;GradoopId, EPGMVertex&gt; vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);
+<a name="77" href="#77">77</a>  
+<a name="78" href="#78">78</a>      <em class="jxr_comment">// VERTICES</em>
+<a name="79" href="#79">79</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
+<a name="80" href="#80">80</a>        addLabelsAndProperties(vertex, labels, properties);
+<a name="81" href="#81">81</a>        vertexIndex.put(vertex.getId(), vertex);
+<a name="82" href="#82">82</a>      }
+<a name="83" href="#83">83</a>  
+<a name="84" href="#84">84</a>      <em class="jxr_comment">// EDGES</em>
+<a name="85" href="#85">85</a>  
+<a name="86" href="#86">86</a>      <strong class="jxr_keyword">for</strong> (EPGMEdge edge : edges) {
+<a name="87" href="#87">87</a>        addLabelsAndProperties(edge, labels, properties);
+<a name="88" href="#88">88</a>  
+<a name="89" href="#89">89</a>        EPGMVertex source = vertexIndex.get(edge.getSourceId());
+<a name="90" href="#90">90</a>        AdjacencyListRow&lt;ED, VD&gt; outgoingRow =
+<a name="91" href="#91">91</a>          outgoingRows.computeIfAbsent(source.getId(), k -&gt; <strong class="jxr_keyword">new</strong> AdjacencyListRow&lt;&gt;());
+<a name="92" href="#92">92</a>  
+<a name="93" href="#93">93</a>        VD sourceData = vertexDataFactory.map(source);
+<a name="94" href="#94">94</a>  
+<a name="95" href="#95">95</a>        EPGMVertex target = vertexIndex.get(edge.getTargetId());
+<a name="96" href="#96">96</a>        AdjacencyListRow&lt;ED, VD&gt; incomingRow =
+<a name="97" href="#97">97</a>          incomingRows.computeIfAbsent(target.getId(), k -&gt; <strong class="jxr_keyword">new</strong> AdjacencyListRow&lt;&gt;());
+<a name="98" href="#98">98</a>        VD targetData = vertexDataFactory.map(target);
+<a name="99" href="#99">99</a>  
+<a name="100" href="#100">100</a>       ED edgeData = edgeDataFactory.map(edge);
+<a name="101" href="#101">101</a> 
+<a name="102" href="#102">102</a>       outgoingRow.getCells().add(<strong class="jxr_keyword">new</strong> AdjacencyListCell&lt;&gt;(edgeData, targetData));
+<a name="103" href="#103">103</a>       incomingRow.getCells().add(<strong class="jxr_keyword">new</strong> AdjacencyListCell&lt;&gt;(edgeData, sourceData));
+<a name="104" href="#104">104</a>     }
+<a name="105" href="#105">105</a> 
+<a name="106" href="#106">106</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> AdjacencyList&lt;&gt;(
+<a name="107" href="#107">107</a>       transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);
+<a name="108" href="#108">108</a>   }
+<a name="109" href="#109">109</a> 
+<a name="110" href="#110">110</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   * Adds label and properties of an EPGM element to id-label and id-properties maps.</em>
+<a name="112" href="#112">112</a> <em class="jxr_javadoccomment">   *</em>
+<a name="113" href="#113">113</a> <em class="jxr_javadoccomment">   * @param element EPGM element</em>
+<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @param labels id-label map</em>
+<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   * @param properties id-properties map</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   */</em>
+<a name="117" href="#117">117</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> addLabelsAndProperties(
+<a name="118" href="#118">118</a>     Element element,
+<a name="119" href="#119">119</a>     Map&lt;GradoopId, String&gt; labels,
+<a name="120" href="#120">120</a>     Map&lt;GradoopId, Properties&gt; properties
+<a name="121" href="#121">121</a>   ) {
+<a name="122" href="#122">122</a>     labels.put(element.getId(), element.getLabel());
+<a name="123" href="#123">123</a> 
+<a name="124" href="#124">124</a>     Properties propertyList = element.getProperties();
+<a name="125" href="#125">125</a>     <strong class="jxr_keyword">if</strong> (propertyList != <strong class="jxr_keyword">null</strong> &amp;&amp; !propertyList.isEmpty()) {
+<a name="126" href="#126">126</a>       properties.put(element.getId(), propertyList);
+<a name="127" href="#127">127</a>     }
+<a name="128" href="#128">128</a>   }
+<a name="129" href="#129">129</a> 
+<a name="130" href="#130">130</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   * {@code adjacency list =&gt; transaction}</em>
+<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   *</em>
+<a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   * @param adjacencyList adjacency list</em>
+<a name="134" href="#134">134</a> <em class="jxr_javadoccomment">   * @return transaction</em>
+<a name="135" href="#135">135</a> <em class="jxr_javadoccomment">   */</em>
+<a name="136" href="#136">136</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> getGraphTransaction(AdjacencyList&lt;GradoopId, String, GradoopId,
+<a name="137" href="#137">137</a>     GradoopId&gt; adjacencyList) {
+<a name="138" href="#138">138</a> 
+<a name="139" href="#139">139</a>     <em class="jxr_comment">// GRAPH HEAD</em>
+<a name="140" href="#140">140</a>     EPGMGraphHead graphHead = adjacencyList.getGraphHead();
+<a name="141" href="#141">141</a> 
+<a name="142" href="#142">142</a>     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
+<a name="143" href="#143">143</a> 
+<a name="144" href="#144">144</a>     Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();
+<a name="145" href="#145">145</a>     Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();
+<a name="146" href="#146">146</a> 
+<a name="147" href="#147">147</a>     <em class="jxr_comment">// VERTICES</em>
+<a name="148" href="#148">148</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;GradoopId, AdjacencyListRow&lt;GradoopId, GradoopId&gt;&gt; entry :
+<a name="149" href="#149">149</a>       adjacencyList.getOutgoingRows().entrySet()) {
+<a name="150" href="#150">150</a> 
+<a name="151" href="#151">151</a>       GradoopId sourceId = entry.getKey();
+<a name="152" href="#152">152</a>       Properties properties = adjacencyList.getProperties(sourceId);
+<a name="153" href="#153">153</a>       String label = adjacencyList.getLabel(sourceId);
+<a name="154" href="#154">154</a>       vertices.add(<strong class="jxr_keyword">new</strong> EPGMVertex(sourceId, label, properties, graphIds));
+<a name="155" href="#155">155</a> 
+<a name="156" href="#156">156</a>       <em class="jxr_comment">// EDGES</em>
+<a name="157" href="#157">157</a>       <strong class="jxr_keyword">for</strong> (AdjacencyListCell&lt;GradoopId, GradoopId&gt; cell : entry.getValue().getCells()) {
+<a name="158" href="#158">158</a>         GradoopId edgeId = cell.getEdgeData();
+<a name="159" href="#159">159</a>         label = adjacencyList.getLabel(edgeId);
+<a name="160" href="#160">160</a>         properties = adjacencyList.getProperties(edgeId);
+<a name="161" href="#161">161</a>         GradoopId targetId = cell.getVertexData();
+<a name="162" href="#162">162</a> 
+<a name="163" href="#163">163</a>         edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(edgeId, label, sourceId, targetId, properties, graphIds));
+<a name="164" href="#164">164</a>       }
+<a name="165" href="#165">165</a>     }
+<a name="166" href="#166">166</a> 
+<a name="167" href="#167">167</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a>(graphHead, vertices, edges);
+<a name="168" href="#168">168</a>   }
+<a name="169" href="#169">169</a> 
+<a name="170" href="#170">170</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

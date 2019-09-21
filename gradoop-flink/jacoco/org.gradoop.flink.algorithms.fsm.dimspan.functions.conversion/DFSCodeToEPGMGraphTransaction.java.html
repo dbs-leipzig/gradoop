@@ -35,11 +35,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Set;
 
 /**
- * int-array encoded graph =&gt; Gradoop Graph Transaction
+ * {@code int-array encoded graph =&gt; Gradoop Graph Transaction}
  */
-public class DFSCodeToEPGMGraphTransaction
-  extends RichMapFunction&lt;WithCount&lt;int[]&gt;, GraphTransaction&gt; {
-
+public class DFSCodeToEPGMGraphTransaction extends RichMapFunction&lt;WithCount&lt;int[]&gt;, GraphTransaction&gt; {
 
   /**
    * flag to enable decompression of patterns (true=enabled)
@@ -58,7 +56,7 @@ public class DFSCodeToEPGMGraphTransaction
   /**
    * utils to interpret and manipulate integer encoded graphs
    */
-<span class="fc" id="L61">  private final GraphUtils graphUtils = new GraphUtilsBase();</span>
+<span class="fc" id="L59">  private final GraphUtils graphUtils = new GraphUtilsBase();</span>
 
   /**
    * Input graph collection size
@@ -70,84 +68,83 @@ public class DFSCodeToEPGMGraphTransaction
    *
    * @param fsmConfig FSM configuration.
    */
-<span class="fc" id="L73">  public DFSCodeToEPGMGraphTransaction(DIMSpanConfig fsmConfig) {</span>
-<span class="fc" id="L74">    this.uncompressPatterns =</span>
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">      ! fsmConfig.getPatternCompressionInStep().equals(DataflowStep.WITHOUT);</span>
-<span class="fc" id="L76">  }</span>
+<span class="fc" id="L71">  public DFSCodeToEPGMGraphTransaction(DIMSpanConfig fsmConfig) {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    this.uncompressPatterns = !fsmConfig.getPatternCompressionInStep().equals(DataflowStep.WITHOUT);</span>
+<span class="fc" id="L73">  }</span>
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L80">    super.open(parameters);</span>
+<span class="fc" id="L77">    super.open(parameters);</span>
 
-<span class="fc" id="L82">    vertexDictionary = getRuntimeContext()</span>
-<span class="fc" id="L83">      .&lt;String[]&gt;getBroadcastVariable(DIMSpanConstants.VERTEX_DICTIONARY).get(0);</span>
+<span class="fc" id="L79">    vertexDictionary = getRuntimeContext()</span>
+<span class="fc" id="L80">      .&lt;String[]&gt;getBroadcastVariable(DIMSpanConstants.VERTEX_DICTIONARY).get(0);</span>
 
-<span class="fc" id="L85">    edgeDictionary = getRuntimeContext()</span>
-<span class="fc" id="L86">      .&lt;String[]&gt;getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);</span>
+<span class="fc" id="L82">    edgeDictionary = getRuntimeContext()</span>
+<span class="fc" id="L83">      .&lt;String[]&gt;getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);</span>
 
 
-<span class="fc" id="L89">    graphCount = getRuntimeContext()</span>
-<span class="fc" id="L90">      .&lt;Long&gt;getBroadcastVariable(DIMSpanConstants.GRAPH_COUNT).get(0);</span>
-<span class="fc" id="L91">  }</span>
+<span class="fc" id="L86">    graphCount = getRuntimeContext()</span>
+<span class="fc" id="L87">      .&lt;Long&gt;getBroadcastVariable(DIMSpanConstants.GRAPH_COUNT).get(0);</span>
+<span class="fc" id="L88">  }</span>
 
   @Override
   public GraphTransaction map(WithCount&lt;int[]&gt; patternWithCount) throws Exception {
 
-<span class="fc" id="L96">    int[] pattern = patternWithCount.getObject();</span>
+<span class="fc" id="L93">    int[] pattern = patternWithCount.getObject();</span>
 
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (uncompressPatterns) {</span>
-<span class="fc" id="L99">      pattern = Simple16Compressor.uncompress(pattern);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    if (uncompressPatterns) {</span>
+<span class="fc" id="L96">      pattern = Simple16Compressor.uncompress(pattern);</span>
     }
 
-<span class="fc" id="L102">    long frequency = patternWithCount.getCount();</span>
+<span class="fc" id="L99">    long frequency = patternWithCount.getCount();</span>
 
 
     // GRAPH HEAD
-<span class="fc" id="L106">    EPGMGraphHead graphHead = new EPGMGraphHead(GradoopId.get(), &quot;&quot;, null);</span>
-<span class="fc" id="L107">    graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);</span>
-<span class="fc" id="L108">    graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);</span>
+<span class="fc" id="L103">    EPGMGraphHead graphHead = new EPGMGraphHead(GradoopId.get(), &quot;&quot;, null);</span>
+<span class="fc" id="L104">    graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);</span>
+<span class="fc" id="L105">    graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);</span>
 
-<span class="fc" id="L110">    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());</span>
+<span class="fc" id="L107">    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());</span>
 
     // VERTICES
-<span class="fc" id="L113">    int[] vertexLabels = graphUtils.getVertexLabels(pattern);</span>
+<span class="fc" id="L110">    int[] vertexLabels = graphUtils.getVertexLabels(pattern);</span>
 
-<span class="fc" id="L115">    GradoopId[] vertexIds = new GradoopId[vertexLabels.length];</span>
+<span class="fc" id="L112">    GradoopId[] vertexIds = new GradoopId[vertexLabels.length];</span>
 
-<span class="fc" id="L117">    Set&lt;EPGMVertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);</span>
+<span class="fc" id="L114">    Set&lt;EPGMVertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);</span>
 
-<span class="fc" id="L119">    int intId = 0;</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">    for (int intLabel : vertexLabels) {</span>
-<span class="fc" id="L121">      String label = vertexDictionary[intLabel];</span>
+<span class="fc" id="L116">    int intId = 0;</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    for (int intLabel : vertexLabels) {</span>
+<span class="fc" id="L118">      String label = vertexDictionary[intLabel];</span>
 
-<span class="fc" id="L123">      GradoopId gradoopId = GradoopId.get();</span>
-<span class="fc" id="L124">      vertices.add(new EPGMVertex(gradoopId, label, null, graphIds));</span>
+<span class="fc" id="L120">      GradoopId gradoopId = GradoopId.get();</span>
+<span class="fc" id="L121">      vertices.add(new EPGMVertex(gradoopId, label, null, graphIds));</span>
 
-<span class="fc" id="L126">      vertexIds[intId] = gradoopId;</span>
-<span class="fc" id="L127">      intId++;</span>
+<span class="fc" id="L123">      vertexIds[intId] = gradoopId;</span>
+<span class="fc" id="L124">      intId++;</span>
     }
 
     // EDGES
-<span class="fc" id="L131">    Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
+<span class="fc" id="L128">    Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
 
-<span class="fc bfc" id="L133" title="All 2 branches covered.">    for (int edgeId = 0; edgeId &lt; graphUtils.getEdgeCount(pattern); edgeId++) {</span>
-<span class="fc" id="L134">      String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">    for (int edgeId = 0; edgeId &lt; graphUtils.getEdgeCount(pattern); edgeId++) {</span>
+<span class="fc" id="L131">      String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];</span>
 
       GradoopId sourceId;
       GradoopId targetId;
 
-<span class="fc bfc" id="L139" title="All 2 branches covered.">      if (graphUtils.isOutgoing(pattern, edgeId)) {</span>
-<span class="fc" id="L140">        sourceId = vertexIds[graphUtils.getFromId(pattern, edgeId)];</span>
-<span class="fc" id="L141">        targetId = vertexIds[graphUtils.getToId(pattern, edgeId)];</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">      if (graphUtils.isOutgoing(pattern, edgeId)) {</span>
+<span class="fc" id="L137">        sourceId = vertexIds[graphUtils.getFromId(pattern, edgeId)];</span>
+<span class="fc" id="L138">        targetId = vertexIds[graphUtils.getToId(pattern, edgeId)];</span>
       } else {
-<span class="fc" id="L143">        sourceId = vertexIds[graphUtils.getToId(pattern, edgeId)];</span>
-<span class="fc" id="L144">        targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];</span>
+<span class="fc" id="L140">        sourceId = vertexIds[graphUtils.getToId(pattern, edgeId)];</span>
+<span class="fc" id="L141">        targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];</span>
       }
 
-<span class="fc" id="L147">      edges.add(new EPGMEdge(GradoopId.get(), label, sourceId, targetId, null, graphIds));</span>
+<span class="fc" id="L144">      edges.add(new EPGMEdge(GradoopId.get(), label, sourceId, targetId, null, graphIds));</span>
     }
 
-<span class="fc" id="L150">    return new GraphTransaction(graphHead, vertices, edges);</span>
+<span class="fc" id="L147">    return new GraphTransaction(graphHead, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

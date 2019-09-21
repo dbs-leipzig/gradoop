@@ -22,43 +22,41 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 
 /**
  * Merges multiple fat vertices into a single {@link FatVertex}.
- *
- * [fatVertex] -&gt; fatVertex
- *
+ * &lt;p&gt;
+ * {@code [fatVertex] -&gt; fatVertex}
+ * &lt;p&gt;
  * Forwarded fields:
- *
- * f0: vertex id
- *
+ * &lt;ul&gt;
+ * &lt;li&gt;f0: vertex id&lt;/li&gt;
+ * &lt;/ul&gt;
  * Read fields:
- *
- * f1: vertex query candidates
- * f2: parent ids
- * f3: counters for incoming edge candidates
- * f4: outgoing edges (edgeId, targetId) and their query candidates
- *
+ * &lt;ul&gt;
+ * &lt;li&gt;f1: vertex query candidates&lt;/li&gt;
+ * &lt;li&gt;f2: parent ids&lt;/li&gt;
+ * &lt;li&gt;f3: counters for incoming edge candidates&lt;/li&gt;
+ * &lt;li&gt;f4: outgoing edges (edgeId, targetId) and their query candidates&lt;/li&gt;
+ * &lt;/ul&gt;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0&quot;)
 @FunctionAnnotation.ReadFields(&quot;f1;f2;f3;f4&quot;)
-<span class="fc" id="L42">public class GroupedFatVertices implements</span>
-  GroupReduceFunction&lt;FatVertex, FatVertex&gt; {
+<span class="fc" id="L42">public class GroupedFatVertices implements GroupReduceFunction&lt;FatVertex, FatVertex&gt; {</span>
 
   @Override
-  public void reduce(Iterable&lt;FatVertex&gt; vertices,
-    Collector&lt;FatVertex&gt; collector) throws Exception {
+  public void reduce(Iterable&lt;FatVertex&gt; vertices, Collector&lt;FatVertex&gt; collector) throws Exception {
 
-<span class="fc" id="L49">    boolean first = true;</span>
-<span class="fc" id="L50">    FatVertex result = null;</span>
+<span class="fc" id="L47">    boolean first = true;</span>
+<span class="fc" id="L48">    FatVertex result = null;</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    for (FatVertex vertex : vertices) {</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">      if (first) {</span>
-<span class="fc" id="L54">        result = vertex;</span>
-<span class="fc" id="L55">        first = false;</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    for (FatVertex vertex : vertices) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">      if (first) {</span>
+<span class="fc" id="L52">        result = vertex;</span>
+<span class="fc" id="L53">        first = false;</span>
       } else {
-<span class="fc" id="L57">        result = merge(result, vertex);</span>
+<span class="fc" id="L55">        result = merge(result, vertex);</span>
       }
-<span class="fc" id="L59">    }</span>
-<span class="fc" id="L60">    collector.collect(result);</span>
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L57">    }</span>
+<span class="fc" id="L58">    collector.collect(result);</span>
+<span class="fc" id="L59">  }</span>
 
   /**
    * Merges two fat vertices.
@@ -69,20 +67,20 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
    */
   private FatVertex merge(FatVertex result, FatVertex diff) {
     // update vertex candidates (CA)
-<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (diff.getCandidates().removeAll(result.getCandidates())) {</span>
-<span class="fc" id="L73">      result.getCandidates().addAll(diff.getCandidates());</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (diff.getCandidates().removeAll(result.getCandidates())) {</span>
+<span class="fc" id="L71">      result.getCandidates().addAll(diff.getCandidates());</span>
     }
     // update parent ids (P_IDs)
-<span class="fc" id="L76">    result.getParentIds().addAll(diff.getParentIds());</span>
+<span class="fc" id="L74">    result.getParentIds().addAll(diff.getParentIds());</span>
     // update incoming edge counts (IN_CA)
-<span class="fc bfc" id="L78" title="All 2 branches covered.">    for (int i = 0; i &lt; diff.getIncomingCandidateCounts().length; i++) {</span>
-<span class="fc" id="L79">      result.getIncomingCandidateCounts()[i] += diff</span>
-<span class="fc" id="L80">        .getIncomingCandidateCounts()[i];</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    for (int i = 0; i &lt; diff.getIncomingCandidateCounts().length; i++) {</span>
+<span class="fc" id="L77">      result.getIncomingCandidateCounts()[i] += diff</span>
+<span class="fc" id="L78">        .getIncomingCandidateCounts()[i];</span>
     }
     // update outgoing edges (OUT_CA)
-<span class="fc" id="L83">    result.getEdgeCandidates().putAll(diff.getEdgeCandidates());</span>
+<span class="fc" id="L81">    result.getEdgeCandidates().putAll(diff.getEdgeCandidates());</span>
 
-<span class="fc" id="L85">    return result;</span>
+<span class="fc" id="L83">    return result;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

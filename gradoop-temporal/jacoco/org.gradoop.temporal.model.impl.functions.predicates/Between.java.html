@@ -22,7 +22,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Given a certain time-interval, this predicate will match all intervals that start
  * before or at that interval's end and end after the start of that interval.
  * &lt;p&gt;
- * Predicate: elementFrom &lt;= queryTo &amp;&amp; elementTo &gt; queryFrom
+ * Predicate: {@code elementFrom &lt;= queryTo &amp;&amp; elementTo &gt; queryFrom}
  */
 public class Between implements TemporalPredicate {
 

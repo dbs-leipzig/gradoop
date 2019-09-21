@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the &lt;b&gt;ValidDuring&lt;/b&gt; temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals that contain that interval.
  * &lt;p&gt;
- * Predicate: elementFrom &lt;= queryFrom &amp;&amp; elementTo &gt;= queryTo
+ * Predicate: {@code elementFrom &lt;= queryFrom &amp;&amp; elementTo &gt;= queryTo}
  */
 public class ValidDuring implements TemporalPredicate {
 

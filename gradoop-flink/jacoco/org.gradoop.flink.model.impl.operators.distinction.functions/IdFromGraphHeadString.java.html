@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
- * (graphId, canonicalLabel) =&gt; graphId
+ * {@code (graphId, canonicalLabel) =&gt; graphId}
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;*&quot;)
 <span class="fc" id="L27">public class IdFromGraphHeadString implements MapFunction&lt;GraphHeadString, GradoopId&gt; {</span>

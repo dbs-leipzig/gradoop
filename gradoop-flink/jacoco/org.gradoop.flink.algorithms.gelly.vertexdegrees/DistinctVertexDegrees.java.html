@@ -31,8 +31,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * A gradoop operator wrapping {@link org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees}.
  * Multiple edges between two vertices will only be counted once per direction.
  * &lt;p&gt;
- * Note: This Gelly implementation count loops between edges like (v1) -&gt; (v2),
- * (v2) -&gt; (v1) as one.
+ * Note: This Gelly implementation count loops between edges like {@code (v1) -&gt; (v2)},
+ * {@code (v2) -&gt; (v1)} as one.
  */
 public class DistinctVertexDegrees extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
 
@@ -66,8 +66,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm&lt;NullValue, N
 <span class="nc" id="L66">  }</span>
 
   /**
-   * Constructor for vertex degree with fixed set of whether to output
-   * vertices with an in-degree of zero.
+   * Constructor for vertex degree with fixed set of whether to output vertices with an in-degree of zero.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
@@ -77,27 +76,25 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm&lt;NullValue, N
    */
   public DistinctVertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut,
     boolean includeZeroDegreeVertices) {
-<span class="fc" id="L80">    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());</span>
-<span class="fc" id="L81">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L82">    this.propertyKeyIn = propertyKeyIn;</span>
-<span class="fc" id="L83">    this.propertyKeyOut = propertyKeyOut;</span>
-<span class="fc" id="L84">    this.includeZeroDegreeVertices = includeZeroDegreeVertices;</span>
-<span class="fc" id="L85">  }</span>
+<span class="fc" id="L79">    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());</span>
+<span class="fc" id="L80">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L81">    this.propertyKeyIn = propertyKeyIn;</span>
+<span class="fc" id="L82">    this.propertyKeyOut = propertyKeyOut;</span>
+<span class="fc" id="L83">    this.includeZeroDegreeVertices = includeZeroDegreeVertices;</span>
+<span class="fc" id="L84">  }</span>
 
   @Override
-  public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
-    throws Exception {
-<span class="fc" id="L90">    DataSet&lt;EPGMVertex&gt; newVertices =</span>
-      new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees&lt;GradoopId, NullValue,
-      NullValue&gt;()
-<span class="fc" id="L93">      .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)</span>
-<span class="fc" id="L94">      .run(graph)</span>
-<span class="fc" id="L95">      .join(currentGraph.getVertices())</span>
-<span class="fc" id="L96">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L97">      .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));</span>
+  public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph) throws Exception {
+<span class="fc" id="L88">    DataSet&lt;EPGMVertex&gt; newVertices =</span>
+      new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees&lt;GradoopId, NullValue, NullValue&gt;()
+<span class="fc" id="L90">      .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)</span>
+<span class="fc" id="L91">      .run(graph)</span>
+<span class="fc" id="L92">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L93">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L94">      .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));</span>
 
-<span class="fc" id="L99">    return currentGraph.getFactory()</span>
-<span class="fc" id="L100">      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());</span>
+<span class="fc" id="L96">    return currentGraph.getFactory()</span>
+<span class="fc" id="L97">      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

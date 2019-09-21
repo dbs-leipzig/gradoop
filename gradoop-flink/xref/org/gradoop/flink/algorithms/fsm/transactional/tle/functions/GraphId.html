@@ -30,14 +30,14 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * graph =&gt; id</em>
+<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * {@code graph =&gt; id}</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; graph type</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GraphId&lt;G <strong class="jxr_keyword">extends</strong> FSMGraph&gt; implements KeySelector&lt;G, GradoopId&gt; {
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>    @Override
-<a name="30" href="#30">30</a>    <strong class="jxr_keyword">public</strong> GradoopId getKey(G graph) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="30" href="#30">30</a>    <strong class="jxr_keyword">public</strong> GradoopId getKey(G graph) {
 <a name="31" href="#31">31</a>      <strong class="jxr_keyword">return</strong> graph.getId();
 <a name="32" href="#32">32</a>    }
 <a name="33" href="#33">33</a>  }

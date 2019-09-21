@@ -21,22 +21,21 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * id1,..,idn =&gt; {id1,..,idn}
+ * {@code id1,..,idn =&gt; {id1,..,idn}}
  */
-<span class="nc" id="L26">public class ToGradoopIdSet</span>
-  implements GroupReduceFunction&lt;GradoopId, GradoopIdSet&gt; {
+<span class="nc" id="L26">public class ToGradoopIdSet implements GroupReduceFunction&lt;GradoopId, GradoopIdSet&gt; {</span>
 
   @Override
   public void reduce(Iterable&lt;GradoopId&gt; iterable,
     Collector&lt;GradoopIdSet&gt; collector) throws Exception {
 
-<span class="nc" id="L33">    GradoopIdSet ids = new GradoopIdSet();</span>
+<span class="nc" id="L32">    GradoopIdSet ids = new GradoopIdSet();</span>
 
-<span class="nc bnc" id="L35" title="All 2 branches missed.">    for (GradoopId id : iterable) {</span>
-<span class="nc" id="L36">      ids.add(id);</span>
-<span class="nc" id="L37">    }</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">    for (GradoopId id : iterable) {</span>
+<span class="nc" id="L35">      ids.add(id);</span>
+<span class="nc" id="L36">    }</span>
 
-<span class="nc" id="L39">    collector.collect(ids);</span>
-<span class="nc" id="L40">  }</span>
+<span class="nc" id="L38">    collector.collect(ids);</span>
+<span class="nc" id="L39">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

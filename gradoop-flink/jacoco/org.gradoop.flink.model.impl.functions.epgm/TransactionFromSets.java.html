@@ -28,15 +28,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * (graphHead) =|&gt;&lt;| (graphId,{vertex,..},{edge,..}) =&gt; (graphHead,{vertex,..},{edge,..})
- *
+ * {@code (graphHead) =|&gt;&lt;| (graphId,{vertex,..},{edge,..}) =&gt; (graphHead,{vertex,..},{edge,..})}
+ * &lt;p&gt;
  * Forwarded fields first:
- *
+ * &lt;br&gt;
  * f0: graph head
- *
+ * &lt;p&gt;
  * Forwarded fields second:
- *
- * f1: vertex set
+ * &lt;br&gt;
+ * f1: vertex set&lt;br&gt;
  * f2: edge set
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;*-&gt;f0&quot;)

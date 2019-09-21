@@ -21,20 +21,19 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Maps an element to a GradoopIdSet of all graph ids the element is
- * contained in.
- *
- * graph-element -&gt; {graph id 1, graph id 2, ..., graph id n}
+ * Maps an element to a GradoopIdSet of all graph ids the element is contained in.
+ * &lt;p&gt;
+ * {@code graph-element -&gt; {graph id 1, graph id 2, ..., graph id n}}
  *
  * @param &lt;GE&gt; EPGM graph element (i.e. vertex / edge)
  */
 @FunctionAnnotation.ForwardedFields(&quot;graphIds-&gt;*&quot;)
-<span class="fc" id="L32">public class ExpandGraphsToIdSet&lt;GE extends EPGMGraphElement&gt;</span>
+<span class="fc" id="L31">public class ExpandGraphsToIdSet&lt;GE extends EPGMGraphElement&gt;</span>
   implements MapFunction&lt;GE, GradoopIdSet&gt; {
 
   @Override
   public GradoopIdSet map(GE ge) {
-<span class="fc" id="L37">    return ge.getGraphIds();</span>
+<span class="fc" id="L36">    return ge.getGraphIds();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

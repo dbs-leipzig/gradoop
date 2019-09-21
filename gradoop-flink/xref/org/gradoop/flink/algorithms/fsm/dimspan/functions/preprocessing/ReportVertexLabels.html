@@ -34,12 +34,12 @@
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
 <a name="25" href="#25">25</a>  
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * graph -&gt; (vertexLabel,1L),..</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * {@code graph -&gt; (vertexLabel,1L),..}</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/dimspan/functions/preprocessing/ReportVertexLabels.html">ReportVertexLabels</a> implements FlatMapFunction&lt;LabeledGraphStringString, WithCount&lt;String&gt;&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * reuse tuple to avoid instantiations</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Reuse tuple to avoid instantiations.</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">private</strong> WithCount&lt;String&gt; reuseTuple = <strong class="jxr_keyword">new</strong> WithCount&lt;&gt;(<strong class="jxr_keyword">null</strong>, 1);
 <a name="35" href="#35">35</a>  

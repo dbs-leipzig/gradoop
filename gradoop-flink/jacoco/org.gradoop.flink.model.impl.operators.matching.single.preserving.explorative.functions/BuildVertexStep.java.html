@@ -21,14 +21,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
 /**
- * (id, [candidates]) -&gt; (id)
- *
- * Forwarded fields:
- *
+ * {@code (id, [candidates]) -&gt; (id)}
+ * &lt;p&gt;
+ * Forwarded fields:&lt;br&gt;
  * f0: vertex id
- *
- * Read fields:
- *
+ * &lt;p&gt;
+ * Read fields:&lt;br&gt;
  * f0: vertex id
  *
  * @param &lt;K&gt; key type
@@ -44,14 +42,14 @@ public class BuildVertexStep&lt;K&gt; implements MapFunction&lt;IdWithCandidates
   /**
    * Constructor
    */
-<span class="fc" id="L47">  public BuildVertexStep() {</span>
-<span class="fc" id="L48">    reuseTuple = new VertexStep&lt;&gt;();</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L45">  public BuildVertexStep() {</span>
+<span class="fc" id="L46">    reuseTuple = new VertexStep&lt;&gt;();</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
   public VertexStep&lt;K&gt; map(IdWithCandidates&lt;K&gt; v) throws Exception {
-<span class="fc" id="L53">    reuseTuple.setVertexId(v.getId());</span>
-<span class="fc" id="L54">    return reuseTuple;</span>
+<span class="fc" id="L51">    reuseTuple.setVertexId(v.getId());</span>
+<span class="fc" id="L52">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

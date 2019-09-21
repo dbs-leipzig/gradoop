@@ -198,21 +198,19 @@ public interface TemporalGraphOperators {
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * &lt;p&gt;
    * Note, that this method used no statistics about the data graph which may result in bad
    * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
-   *
+   * &lt;p&gt;
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   *
-   * &lt;pre&gt;
-   * &lt;code&gt;graph.query(
-   *  &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
-   *  &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
-   * &lt;/code&gt;
-   * &lt;/pre&gt;
-   *
+   * &lt;br&gt;
+   * {@code graph.query(
+   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
+   * }
+   * &lt;p&gt;
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
@@ -221,7 +219,7 @@ public interface TemporalGraphOperators {
    * @return graph collection containing the output of the construct pattern
    */
   default TemporalGraphCollection query(String query, String constructionPattern) {
-<span class="nc" id="L224">    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));</span>
+<span class="nc" id="L222">    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));</span>
   }
 
   /**
@@ -234,24 +232,22 @@ public interface TemporalGraphOperators {
    * @return graph collection containing matching subgraphs
    */
   default TemporalGraphCollection query(String query, GraphStatistics graphStatistics) {
-<span class="nc" id="L237">    return query(query, null, graphStatistics);</span>
+<span class="nc" id="L235">    return query(query, null, graphStatistics);</span>
   }
 
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * &lt;p&gt;
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   *
-   * &lt;pre&gt;
-   * &lt;code&gt;graph.query(
-   *  &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
-   *  &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
-   * &lt;/code&gt;
-   * &lt;/pre&gt;
-   *
+   * &lt;br&gt;
+   * {@code graph.query(
+   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
+   * }
+   * &lt;p&gt;
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type {@code CO_AUTHOR} between the two entities.
    *

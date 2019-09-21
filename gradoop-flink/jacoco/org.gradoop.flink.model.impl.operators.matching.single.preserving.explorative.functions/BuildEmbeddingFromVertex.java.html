@@ -23,10 +23,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.
- *
- * Forwarded fields:
- *
- * f0: vertex id -&gt; tie point
+ * &lt;p&gt;
+ * Forwarded fields:&lt;br&gt;
+ * f0: {@code vertex id -&gt; tie point}
  *
  * @param &lt;K&gt; key type
  */
@@ -50,16 +49,16 @@ public class BuildEmbeddingFromVertex&lt;K&gt;
    */
   public BuildEmbeddingFromVertex(Class&lt;K&gt; keyClazz, Step initialStep,
     long vertexCount, long edgeCount) {
-<span class="fc" id="L53">    super(keyClazz, vertexCount, edgeCount);</span>
-<span class="fc" id="L54">    vertexCandidate = (int) initialStep.getFrom();</span>
-<span class="fc" id="L55">  }</span>
+<span class="fc" id="L52">    super(keyClazz, vertexCount, edgeCount);</span>
+<span class="fc" id="L53">    vertexCandidate = (int) initialStep.getFrom();</span>
+<span class="fc" id="L54">  }</span>
 
   @Override
   public EmbeddingWithTiePoint&lt;K&gt; map(IdWithCandidates&lt;K&gt; v) {
-<span class="fc" id="L59">    reuseEmbeddingWithTiePoint.setTiePointId(v.getId());</span>
+<span class="fc" id="L58">    reuseEmbeddingWithTiePoint.setTiePointId(v.getId());</span>
     // candidate is same for all vertices
-<span class="fc" id="L61">    reuseEmbedding.getVertexMapping()[vertexCandidate] = v.getId();</span>
-<span class="fc" id="L62">    return reuseEmbeddingWithTiePoint;</span>
+<span class="fc" id="L60">    reuseEmbedding.getVertexMapping()[vertexCandidate] = v.getId();</span>
+<span class="fc" id="L61">    return reuseEmbeddingWithTiePoint;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

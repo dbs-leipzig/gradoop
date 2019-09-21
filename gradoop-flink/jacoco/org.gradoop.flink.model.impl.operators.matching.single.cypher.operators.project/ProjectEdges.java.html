@@ -26,7 +26,8 @@ import java.util.List;
 
 /**
  * Projects an Edge by a set of properties.
- * Edge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
+ * &lt;p&gt;
+ * {@code Edge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))}
  */
 public class ProjectEdges implements PhysicalOperator {
 
@@ -54,12 +55,12 @@ public class ProjectEdges implements PhysicalOperator {
    * @param propertyKeys List of property names that will be kept in the projection
    * @param isLoop indicates if the edges is a loop
    */
-<span class="fc" id="L57">  public ProjectEdges(DataSet&lt;EPGMEdge&gt; input, List&lt;String&gt; propertyKeys, boolean isLoop) {</span>
-<span class="fc" id="L58">    this.input = input;</span>
-<span class="fc" id="L59">    this.propertyKeys = propertyKeys;</span>
-<span class="fc" id="L60">    this.name = &quot;ProjectEdges&quot;;</span>
-<span class="fc" id="L61">    this.isLoop = isLoop;</span>
-<span class="fc" id="L62">  }</span>
+<span class="fc" id="L58">  public ProjectEdges(DataSet&lt;EPGMEdge&gt; input, List&lt;String&gt; propertyKeys, boolean isLoop) {</span>
+<span class="fc" id="L59">    this.input = input;</span>
+<span class="fc" id="L60">    this.propertyKeys = propertyKeys;</span>
+<span class="fc" id="L61">    this.name = &quot;ProjectEdges&quot;;</span>
+<span class="fc" id="L62">    this.isLoop = isLoop;</span>
+<span class="fc" id="L63">  }</span>
 
   /**
    * Creates a new edge projection operator wih empty property list
@@ -69,24 +70,24 @@ public class ProjectEdges implements PhysicalOperator {
    * @param isLoop indicates if the edges is a loop
    */
   public ProjectEdges(DataSet&lt;EPGMEdge&gt; input, boolean isLoop) {
-<span class="nc" id="L72">    this(input, new ArrayList&lt;&gt;(), isLoop);</span>
-<span class="nc" id="L73">  }</span>
+<span class="nc" id="L73">    this(input, new ArrayList&lt;&gt;(), isLoop);</span>
+<span class="nc" id="L74">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="fc" id="L77">    return input</span>
-<span class="fc" id="L78">      .map(new ProjectEdge(propertyKeys, isLoop))</span>
-<span class="fc" id="L79">      .name(getName());</span>
+<span class="fc" id="L78">    return input</span>
+<span class="fc" id="L79">      .map(new ProjectEdge(propertyKeys, isLoop))</span>
+<span class="fc" id="L80">      .name(getName());</span>
   }
 
   @Override
   public void setName(String newName) {
-<span class="nc" id="L84">    this.name = newName;</span>
-<span class="nc" id="L85">  }</span>
+<span class="nc" id="L85">    this.name = newName;</span>
+<span class="nc" id="L86">  }</span>
 
   @Override
   public String getName() {
-<span class="fc" id="L89">    return this.name;</span>
+<span class="fc" id="L90">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

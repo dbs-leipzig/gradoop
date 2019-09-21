@@ -27,20 +27,19 @@ import java.util.List;
 
 /**
  * Alternative FilterAndProjectVertices using Filter + Map operators
- *
+ * &lt;p&gt;
  * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
- *
- * EPGMVertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
- *
+ * &lt;p&gt;
+ * {@code EPGMVertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])}
+ * &lt;p&gt;
  * Example:
- *
- * Given a EPGMVertex(0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23}), a predicate &quot;age = 23&quot; and
- * projection property keys [name, location] the operator creates an
- * {@link Embedding}:
- *
- * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ * &lt;br&gt;
+ * Given a EPGMVertex {@code (0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23})}, a predicate {@code &quot;age = 23&quot;} and
+ * projection property keys {@code [name, location]} the operator creates an {@link Embedding}:
+ * &lt;br&gt;
+ * {@code ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])}
  */
 public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   /**
@@ -69,31 +68,31 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
    * @param projectionPropertyKeys Property keys used for projection
    */
   public FilterAndProjectVerticesAlt(DataSet&lt;EPGMVertex&gt; input, CNF predicates,
-<span class="nc" id="L72">    List&lt;String&gt; projectionPropertyKeys) {</span>
-<span class="nc" id="L73">    this.input = input;</span>
-<span class="nc" id="L74">    this.predicates = predicates;</span>
-<span class="nc" id="L75">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="nc" id="L76">    this.setName(&quot;FilterAndProjectVerticesAlt&quot;);</span>
-<span class="nc" id="L77">  }</span>
+<span class="nc" id="L71">    List&lt;String&gt; projectionPropertyKeys) {</span>
+<span class="nc" id="L72">    this.input = input;</span>
+<span class="nc" id="L73">    this.predicates = predicates;</span>
+<span class="nc" id="L74">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="nc" id="L75">    this.setName(&quot;FilterAndProjectVerticesAlt&quot;);</span>
+<span class="nc" id="L76">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="nc" id="L81">    return input</span>
-<span class="nc" id="L82">      .filter(new FilterVertex(predicates))</span>
-<span class="nc" id="L83">      .name(getName())</span>
-<span class="nc" id="L84">      .map(new ProjectVertex(projectionPropertyKeys))</span>
-<span class="nc" id="L85">      .name(getName());</span>
+<span class="nc" id="L80">    return input</span>
+<span class="nc" id="L81">      .filter(new FilterVertex(predicates))</span>
+<span class="nc" id="L82">      .name(getName())</span>
+<span class="nc" id="L83">      .map(new ProjectVertex(projectionPropertyKeys))</span>
+<span class="nc" id="L84">      .name(getName());</span>
 
   }
 
   @Override
   public void setName(String newName) {
-<span class="nc" id="L91">    this.name = newName;</span>
-<span class="nc" id="L92">  }</span>
+<span class="nc" id="L90">    this.name = newName;</span>
+<span class="nc" id="L91">  }</span>
 
   @Override
   public String getName() {
-<span class="nc" id="L96">    return this.name;</span>
+<span class="nc" id="L95">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

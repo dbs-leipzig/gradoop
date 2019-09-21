@@ -26,7 +26,8 @@ import java.util.List;
 
 /**
  * Projects a Vertex by a set of properties.
- * Vertex -&gt; Embedding(ProjectionEmbedding(Vertex))
+ * &lt;p&gt;
+ * {@code Vertex -&gt; Embedding(ProjectionEmbedding(Vertex))}
  */
 public class ProjectVertices implements PhysicalOperator {
 
@@ -50,11 +51,11 @@ public class ProjectVertices implements PhysicalOperator {
    * @param input vertices that should be projected
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
-<span class="fc" id="L53">  public ProjectVertices(DataSet&lt;EPGMVertex&gt; input, List&lt;String&gt; propertyKeys) {</span>
-<span class="fc" id="L54">    this.input = input;</span>
-<span class="fc" id="L55">    this.propertyKeys = propertyKeys;</span>
-<span class="fc" id="L56">    this.name = &quot;ProjectVertices&quot;;</span>
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L54">  public ProjectVertices(DataSet&lt;EPGMVertex&gt; input, List&lt;String&gt; propertyKeys) {</span>
+<span class="fc" id="L55">    this.input = input;</span>
+<span class="fc" id="L56">    this.propertyKeys = propertyKeys;</span>
+<span class="fc" id="L57">    this.name = &quot;ProjectVertices&quot;;</span>
+<span class="fc" id="L58">  }</span>
 
   /**
    * Creates a new vertex projection operator wih empty property list
@@ -62,26 +63,26 @@ public class ProjectVertices implements PhysicalOperator {
    *
    * @param input vertices that will be projected
    */
-<span class="nc" id="L65">  public ProjectVertices(DataSet&lt;EPGMVertex&gt; input) {</span>
-<span class="nc" id="L66">    this.input = input;</span>
-<span class="nc" id="L67">    this.propertyKeys = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L68">  }</span>
+<span class="nc" id="L66">  public ProjectVertices(DataSet&lt;EPGMVertex&gt; input) {</span>
+<span class="nc" id="L67">    this.input = input;</span>
+<span class="nc" id="L68">    this.propertyKeys = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L69">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="fc" id="L72">    return input</span>
-<span class="fc" id="L73">      .map(new ProjectVertex(propertyKeys))</span>
-<span class="fc" id="L74">      .name(getName());</span>
+<span class="fc" id="L73">    return input</span>
+<span class="fc" id="L74">      .map(new ProjectVertex(propertyKeys))</span>
+<span class="fc" id="L75">      .name(getName());</span>
   }
 
   @Override
   public void setName(String newName) {
-<span class="nc" id="L79">    this.name = newName;</span>
-<span class="nc" id="L80">  }</span>
+<span class="nc" id="L80">    this.name = newName;</span>
+<span class="nc" id="L81">  }</span>
 
   @Override
   public String getName() {
-<span class="fc" id="L84">    return this.name;</span>
+<span class="fc" id="L85">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

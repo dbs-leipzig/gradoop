@@ -24,7 +24,8 @@ import java.util.List;
 
 /**
  * Projects a Vertex by a set of properties.
- * Vertex -&gt; Embedding(GraphElementEmbedding(Vertex))
+ * &lt;p&gt;
+ * {@code Vertex -&gt; Embedding(GraphElementEmbedding(Vertex))}
  */
 public class ProjectVertex extends RichMapFunction&lt;EPGMVertex, Embedding&gt; {
   /**
@@ -34,15 +35,16 @@ public class ProjectVertex extends RichMapFunction&lt;EPGMVertex, Embedding&gt; 
 
   /**
    * Creates a new vertex projection function
+   *
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
-<span class="fc" id="L39">  public ProjectVertex(List&lt;String&gt; propertyKeys) {</span>
-<span class="fc" id="L40">    this.propertyKeys = propertyKeys;</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L41">  public ProjectVertex(List&lt;String&gt; propertyKeys) {</span>
+<span class="fc" id="L42">    this.propertyKeys = propertyKeys;</span>
+<span class="fc" id="L43">  }</span>
 
   @Override
   public Embedding map(EPGMVertex vertex) {
-<span class="fc" id="L45">    return EmbeddingFactory.fromVertex(vertex, propertyKeys);</span>
+<span class="fc" id="L47">    return EmbeddingFactory.fromVertex(vertex, propertyKeys);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

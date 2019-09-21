@@ -25,8 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link Edge} and projects specified property values to the
- * output embedding.
+ * Applies a given predicate on a {@link Edge} and projects specified property values to the output embedding.
  *
  * @param &lt;E&gt; The edge type.
  */
@@ -51,17 +50,17 @@ public class FilterAndProjectEdge&lt;E extends Edge&gt; extends RichFlatMapFunct
    * @param projectionPropertyKeys property keys that will be used for projection
    * @param isLoop is the edge a loop
    */
-<span class="fc" id="L54">  public FilterAndProjectEdge(CNF predicates, List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
-<span class="fc" id="L55">    this.predicates = predicates;</span>
-<span class="fc" id="L56">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
-<span class="fc" id="L57">    this.isLoop = isLoop;</span>
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L53">  public FilterAndProjectEdge(CNF predicates, List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
+<span class="fc" id="L54">    this.predicates = predicates;</span>
+<span class="fc" id="L55">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L56">    this.isLoop = isLoop;</span>
+<span class="fc" id="L57">  }</span>
 
   @Override
   public void flatMap(E edge, Collector&lt;Embedding&gt; out) throws Exception {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (predicates.evaluate(edge)) {</span>
-<span class="fc" id="L63">      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (predicates.evaluate(edge)) {</span>
+<span class="fc" id="L62">      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));</span>
     }
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L64">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

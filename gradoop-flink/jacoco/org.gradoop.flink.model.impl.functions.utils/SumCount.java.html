@@ -22,25 +22,23 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.Iterator;
 
 /**
- * (t, count1),..,(t, countN) =&gt; (t, SUM(count1,..,countN))
+ * {@code (t, count1),..,(t, countN) =&gt; (t, SUM(count1,..,countN))}
  *
  * @param &lt;T&gt; data type
  */
-<span class="nc" id="L29">public class SumCount&lt;T&gt;</span>
-  implements GroupCombineFunction&lt;WithCount&lt;T&gt;, WithCount&lt;T&gt;&gt; {
+<span class="nc" id="L29">public class SumCount&lt;T&gt; implements GroupCombineFunction&lt;WithCount&lt;T&gt;, WithCount&lt;T&gt;&gt; {</span>
 
   @Override
-  public void combine(Iterable&lt;WithCount&lt;T&gt;&gt; iterable,
-    Collector&lt;WithCount&lt;T&gt;&gt; collector) throws Exception {
+  public void combine(Iterable&lt;WithCount&lt;T&gt;&gt; iterable, Collector&lt;WithCount&lt;T&gt;&gt; collector) throws Exception {
 
-<span class="nc" id="L36">    Iterator&lt;WithCount&lt;T&gt;&gt; iterator = iterable.iterator();</span>
-<span class="nc" id="L37">    WithCount&lt;T&gt; withCount = iterator.next();</span>
+<span class="nc" id="L34">    Iterator&lt;WithCount&lt;T&gt;&gt; iterator = iterable.iterator();</span>
+<span class="nc" id="L35">    WithCount&lt;T&gt; withCount = iterator.next();</span>
 
-<span class="nc bnc" id="L39" title="All 2 branches missed.">    while (iterator.hasNext()) {</span>
-<span class="nc" id="L40">      withCount.setCount(withCount.getCount() + iterator.next().getCount());</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">    while (iterator.hasNext()) {</span>
+<span class="nc" id="L38">      withCount.setCount(withCount.getCount() + iterator.next().getCount());</span>
     }
 
-<span class="nc" id="L43">    collector.collect(withCount);</span>
-<span class="nc" id="L44">  }</span>
+<span class="nc" id="L41">    collector.collect(withCount);</span>
+<span class="nc" id="L42">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

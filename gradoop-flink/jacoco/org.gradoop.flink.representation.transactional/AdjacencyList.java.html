@@ -24,34 +24,36 @@ import java.util.Map;
 
 /**
  * Traversal optimized representation of a graph transaction.
- *
- * f0 : graph head
- * f1 : vertex/edge id -&gt; label
- * f2 : vertex/edge id -&gt; properties
- * f3 : vertex id -&gt; outgoing adjacency rows
- * f4 : vertex id -&gt; incoming adjacency rows
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@code f0: graph head}&lt;/li&gt;
+ *   &lt;li&gt;{@code f1: vertex/edge id -&gt; label}&lt;/li&gt;
+ *   &lt;li&gt;{@code f2: vertex/edge id -&gt; properties}&lt;/li&gt;
+ *   &lt;li&gt;{@code f3: vertex id -&gt; outgoing adjacency rows}&lt;/li&gt;
+ *   &lt;li&gt;{@code f4: vertex id -&gt; incoming adjacency rows}&lt;/li&gt;
+ * &lt;/ul&gt;
  *
  * @param &lt;ID&gt; ID type
  * @param &lt;L&gt; label type
  * @param &lt;ED&gt; edge data type
  * @param &lt;VD&gt; vertex data type
  */
-public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Comparable&lt;L&gt;, ED, VD&gt; extends
-  Tuple5&lt;EPGMGraphHead,
+public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Comparable&lt;L&gt;, ED, VD&gt;
+  extends Tuple5&lt;
+    EPGMGraphHead,
     Map&lt;ID, L&gt;,
     Map&lt;ID, Properties&gt;,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt;,
-    Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt;
-  &gt; {
+    Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt;&gt; {
 
   /**
    * Default constructor.
    */
-<span class="nc" id="L50">  public AdjacencyList() {</span>
-<span class="nc" id="L51">  }</span>
+<span class="nc" id="L51">  public AdjacencyList() {</span>
+<span class="nc" id="L52">  }</span>
 
   /**
    * Constructor.
+   *
    * @param graphHead graph id
    * @param labels graph, vertex and edge labels
    * @param properties graph, vertex and edge properties
@@ -64,44 +66,43 @@ public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Compara
     Map&lt;ID, Properties&gt; properties,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows) {
-<span class="fc" id="L67">    super(graphHead, labels, properties, outgoingRows, incomingRows);</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L69">    super(graphHead, labels, properties, outgoingRows, incomingRows);</span>
+<span class="fc" id="L70">  }</span>
 
   /**
    * Label accessor.
    *
    * @param elementId graph / vertex / edge id
-   *
    * @return label
    */
   public L getLabel(ID elementId) {
-<span class="fc" id="L78">    return f1.get(elementId);</span>
+<span class="fc" id="L79">    return f1.get(elementId);</span>
   }
 
   /**
    * Property accessor.
-   * @param elementId graph / vertex / edge id
    *
+   * @param elementId graph / vertex / edge id
    * @return property list
    */
   public Properties getProperties(ID elementId) {
-<span class="fc" id="L88">    return f2.get(elementId);</span>
+<span class="fc" id="L89">    return f2.get(elementId);</span>
   }
 
   public EPGMGraphHead getGraphHead() {
-<span class="fc" id="L92">    return f0;</span>
+<span class="fc" id="L93">    return f0;</span>
   }
 
   public void setGraphHead(EPGMGraphHead graphId) {
-<span class="nc" id="L96">    this.f0 = graphId;</span>
-<span class="nc" id="L97">  }</span>
+<span class="nc" id="L97">    this.f0 = graphId;</span>
+<span class="nc" id="L98">  }</span>
 
   public Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; getOutgoingRows() {
-<span class="fc" id="L100">    return f3;</span>
+<span class="fc" id="L101">    return f3;</span>
   }
 
   public Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; getIncomingRows() {
-<span class="nc" id="L104">    return f4;</span>
+<span class="nc" id="L105">    return f4;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

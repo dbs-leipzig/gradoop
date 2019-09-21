@@ -33,13 +33,12 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Compute function for {@link KRandomJumpGellyVCI}. Vertex values are of type
  * {@link VCIVertexValue}, with fields:
- * &lt;p&gt;&lt;ul&gt;
- * &lt;li&gt;f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false}
- * otherwise
+ * &lt;ul&gt;
+ * &lt;li&gt;f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false} otherwise
  * &lt;li&gt;f1: {@code List&lt;Long&gt;} containing all long indices from already visited outgoing edges
- * &lt;/ul&gt;&lt;/p&gt;
+ * &lt;/ul&gt;
  * A message of type {@code NullValue} from one vertex to another is a walk respective a jump to
- * this other vertex and therefor considered as one of {@link KRandomJumpGellyVCI#k} walkers.
+ * this other vertex and therefor considered as one of {@code k} walkers.
  */
 public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue, Long, NullValue&gt; {
 
@@ -95,12 +94,12 @@ public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue,
    *                        neighbor.
    * @param verticesToVisit Number of vertices to visit via walk or jump.
    */
-<span class="fc" id="L98">  public VCIComputeFunction(double jumpProbability, long verticesToVisit) {</span>
-<span class="fc" id="L99">    this.jumpProbability = jumpProbability;</span>
-<span class="fc" id="L100">    this.verticesToVisit = verticesToVisit;</span>
-<span class="fc" id="L101">    this.visitedVerticesAggregator = new LongSumAggregator();</span>
-<span class="fc" id="L102">    this.currentVisitedCount = 0L;</span>
-<span class="fc" id="L103">  }</span>
+<span class="fc" id="L97">  public VCIComputeFunction(double jumpProbability, long verticesToVisit) {</span>
+<span class="fc" id="L98">    this.jumpProbability = jumpProbability;</span>
+<span class="fc" id="L99">    this.verticesToVisit = verticesToVisit;</span>
+<span class="fc" id="L100">    this.visitedVerticesAggregator = new LongSumAggregator();</span>
+<span class="fc" id="L101">    this.currentVisitedCount = 0L;</span>
+<span class="fc" id="L102">  }</span>
 
   /**
    * {@inheritDoc}
@@ -111,14 +110,14 @@ public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue,
    */
   @Override
   public void preSuperstep() {
-<span class="fc" id="L114">    startIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(START_INDICES_BROADCAST_SET);</span>
-<span class="fc" id="L115">    vertexIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(VERTEX_INDICES_BROADCAST_SET);</span>
-<span class="fc" id="L116">    visitedVerticesAggregator = getIterationAggregator(VISITED_VERTICES_AGGREGATOR_NAME);</span>
-<span class="fc" id="L117">    LongValue previousAggregate = getPreviousIterationAggregate(VISITED_VERTICES_AGGREGATOR_NAME);</span>
-<span class="fc bfc" id="L118" title="All 2 branches covered.">    if (previousAggregate != null) {</span>
-<span class="fc" id="L119">      currentVisitedCount += previousAggregate.getValue();</span>
+<span class="fc" id="L113">    startIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(START_INDICES_BROADCAST_SET);</span>
+<span class="fc" id="L114">    vertexIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(VERTEX_INDICES_BROADCAST_SET);</span>
+<span class="fc" id="L115">    visitedVerticesAggregator = getIterationAggregator(VISITED_VERTICES_AGGREGATOR_NAME);</span>
+<span class="fc" id="L116">    LongValue previousAggregate = getPreviousIterationAggregate(VISITED_VERTICES_AGGREGATOR_NAME);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (previousAggregate != null) {</span>
+<span class="fc" id="L118">      currentVisitedCount += previousAggregate.getValue();</span>
     }
-<span class="fc" id="L121">  }</span>
+<span class="fc" id="L120">  }</span>
 
   /**
    * {@inheritDoc}
@@ -133,21 +132,21 @@ public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue,
    */
   @Override
   public void compute(Vertex&lt;Long, VCIVertexValue&gt; vertex, MessageIterator&lt;NullValue&gt; messages) {
-<span class="fc bfc" id="L136" title="All 2 branches covered.">    if (currentVisitedCount &lt; verticesToVisit) {</span>
-<span class="fc" id="L137">      List&lt;Edge&lt;Long, Long&gt;&gt; edgesList = Lists.newArrayList(getEdges());</span>
-<span class="fc" id="L138">      Tuple2&lt;VCIVertexValue, Boolean&gt; valueWithHasChanged = Tuple2.of(vertex.getValue(), false);</span>
-<span class="fc bfc" id="L139" title="All 4 branches covered.">      if (startIndices.contains(vertex.getId()) &amp;&amp; !valueWithHasChanged.f0.isVisited()) {</span>
-<span class="fc" id="L140">        valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
-<span class="fc bfc" id="L141" title="All 2 branches covered.">      } else if (messages.hasNext()) {</span>
-<span class="fc bfc" id="L142" title="All 2 branches covered.">        for (NullValue msg : messages) {</span>
-<span class="fc" id="L143">          valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
-<span class="fc" id="L144">        }</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    if (currentVisitedCount &lt; verticesToVisit) {</span>
+<span class="fc" id="L136">      List&lt;Edge&lt;Long, Long&gt;&gt; edgesList = Lists.newArrayList(getEdges());</span>
+<span class="fc" id="L137">      Tuple2&lt;VCIVertexValue, Boolean&gt; valueWithHasChanged = Tuple2.of(vertex.getValue(), false);</span>
+<span class="fc bfc" id="L138" title="All 4 branches covered.">      if (startIndices.contains(vertex.getId()) &amp;&amp; !valueWithHasChanged.f0.isVisited()) {</span>
+<span class="fc" id="L139">        valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">      } else if (messages.hasNext()) {</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        for (NullValue msg : messages) {</span>
+<span class="fc" id="L142">          valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
+<span class="fc" id="L143">        }</span>
       }
-<span class="fc bfc" id="L146" title="All 2 branches covered.">      if (valueWithHasChanged.f1) {</span>
-<span class="fc" id="L147">        setNewVertexValue(valueWithHasChanged.f0);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">      if (valueWithHasChanged.f1) {</span>
+<span class="fc" id="L146">        setNewVertexValue(valueWithHasChanged.f0);</span>
       }
     }
-<span class="fc" id="L150">  }</span>
+<span class="fc" id="L149">  }</span>
 
   /**
    * Performs a walk to a random neighbor by sending a message to a target from an unvisited
@@ -165,40 +164,40 @@ public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue,
    */
   private Tuple2&lt;VCIVertexValue, Boolean&gt; walkToRandomNeighbor(
     Tuple2&lt;VCIVertexValue, Boolean&gt; valueWithHasChanged, List&lt;Edge&lt;Long, Long&gt;&gt; edgesList) {
-<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (!valueWithHasChanged.f0.isVisited()) {</span>
-<span class="fc" id="L169">      visitedVerticesAggregator.aggregate(1L);</span>
-<span class="fc" id="L170">      valueWithHasChanged.f0.setVisited();</span>
-<span class="fc" id="L171">      valueWithHasChanged.f1 = true;</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    if (!valueWithHasChanged.f0.isVisited()) {</span>
+<span class="fc" id="L168">      visitedVerticesAggregator.aggregate(1L);</span>
+<span class="fc" id="L169">      valueWithHasChanged.f0.setVisited();</span>
+<span class="fc" id="L170">      valueWithHasChanged.f1 = true;</span>
     }
-<span class="pc bpc" id="L173" title="1 of 4 branches missed.">    if ((jumpProbability == 0d) || (jumpProbability &lt; ThreadLocalRandom.current().nextDouble())) {</span>
-<span class="fc" id="L174">      List&lt;Tuple2&lt;Long, Long&gt;&gt; unvisitedNeighborWithEdgeId = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L175" title="All 2 branches covered.">      for (Edge&lt;Long, Long&gt; edge : edgesList) {</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">        if (!valueWithHasChanged.f0.getVisitedOutEdges().contains(edge.getValue())) {</span>
-<span class="fc" id="L177">          unvisitedNeighborWithEdgeId.add(Tuple2.of(edge.getTarget(), edge.getValue()));</span>
+<span class="pc bpc" id="L172" title="1 of 4 branches missed.">    if ((jumpProbability == 0d) || (jumpProbability &lt; ThreadLocalRandom.current().nextDouble())) {</span>
+<span class="fc" id="L173">      List&lt;Tuple2&lt;Long, Long&gt;&gt; unvisitedNeighborWithEdgeId = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">      for (Edge&lt;Long, Long&gt; edge : edgesList) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (!valueWithHasChanged.f0.getVisitedOutEdges().contains(edge.getValue())) {</span>
+<span class="fc" id="L176">          unvisitedNeighborWithEdgeId.add(Tuple2.of(edge.getTarget(), edge.getValue()));</span>
         }
-<span class="fc" id="L179">      }</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">      if (!unvisitedNeighborWithEdgeId.isEmpty()) {</span>
-<span class="fc" id="L181">        int randomIndex = ThreadLocalRandom.current().nextInt(unvisitedNeighborWithEdgeId.size());</span>
-<span class="fc" id="L182">        Long randomNeighborIndex = unvisitedNeighborWithEdgeId.get(randomIndex).f0;</span>
-<span class="fc" id="L183">        valueWithHasChanged.f0.addVisitedOutEdge(unvisitedNeighborWithEdgeId.get(randomIndex).f1);</span>
-<span class="fc" id="L184">        sendMessageTo(randomNeighborIndex, new NullValue());</span>
-<span class="fc" id="L185">        valueWithHasChanged.f1 = true;</span>
-<span class="fc" id="L186">      } else {</span>
-<span class="fc" id="L187">        jumpToRandomVertex();</span>
+<span class="fc" id="L178">      }</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">      if (!unvisitedNeighborWithEdgeId.isEmpty()) {</span>
+<span class="fc" id="L180">        int randomIndex = ThreadLocalRandom.current().nextInt(unvisitedNeighborWithEdgeId.size());</span>
+<span class="fc" id="L181">        Long randomNeighborIndex = unvisitedNeighborWithEdgeId.get(randomIndex).f0;</span>
+<span class="fc" id="L182">        valueWithHasChanged.f0.addVisitedOutEdge(unvisitedNeighborWithEdgeId.get(randomIndex).f1);</span>
+<span class="fc" id="L183">        sendMessageTo(randomNeighborIndex, new NullValue());</span>
+<span class="fc" id="L184">        valueWithHasChanged.f1 = true;</span>
+<span class="fc" id="L185">      } else {</span>
+<span class="fc" id="L186">        jumpToRandomVertex();</span>
       }
-<span class="fc" id="L189">    } else {</span>
-<span class="fc" id="L190">      jumpToRandomVertex();</span>
+<span class="fc" id="L188">    } else {</span>
+<span class="fc" id="L189">      jumpToRandomVertex();</span>
     }
-<span class="fc" id="L192">    return valueWithHasChanged;</span>
+<span class="fc" id="L191">    return valueWithHasChanged;</span>
   }
 
   /**
    * Jumps to a random vertex in the graph by sending a message to this vertex.
    */
   private void jumpToRandomVertex() {
-<span class="fc" id="L199">    int randomIndex = ThreadLocalRandom.current().nextInt(vertexIndices.size());</span>
-<span class="fc" id="L200">    Long randomVertexIndex = vertexIndices.get(randomIndex);</span>
-<span class="fc" id="L201">    sendMessageTo(randomVertexIndex, new NullValue());</span>
-<span class="fc" id="L202">  }</span>
+<span class="fc" id="L198">    int randomIndex = ThreadLocalRandom.current().nextInt(vertexIndices.size());</span>
+<span class="fc" id="L199">    Long randomVertexIndex = vertexIndices.get(randomIndex);</span>
+<span class="fc" id="L200">    sendMessageTo(randomVertexIndex, new NullValue());</span>
+<span class="fc" id="L201">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -25,32 +25,33 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import java.util.Set;
 
 /**
- * (graphId, element),.. =&gt; (graphId, {element,..})
+ * {@code (graphId, element),.. =&gt; (graphId, {element,..})}
+ *
  * @param &lt;EL&gt; graph element type
  */
-<span class="nc" id="L31">public class GraphElementSet&lt;EL extends EPGMGraphElement&gt; implements</span>
+<span class="nc" id="L32">public class GraphElementSet&lt;EL extends EPGMGraphElement&gt; implements</span>
   GroupReduceFunction&lt;Tuple2&lt;GradoopId, EL&gt;, Tuple2&lt;GradoopId, Set&lt;EL&gt;&gt;&gt; {
 
   @Override
   public void reduce(Iterable&lt;Tuple2&lt;GradoopId, EL&gt;&gt; iterable,
     Collector&lt;Tuple2&lt;GradoopId, Set&lt;EL&gt;&gt;&gt; collector) throws Exception {
 
-<span class="nc" id="L38">    boolean first = true;</span>
-<span class="nc" id="L39">    GradoopId graphId = null;</span>
+<span class="nc" id="L39">    boolean first = true;</span>
+<span class="nc" id="L40">    GradoopId graphId = null;</span>
 
-<span class="nc" id="L41">    Set&lt;EL&gt; elements = Sets.newHashSet();</span>
+<span class="nc" id="L42">    Set&lt;EL&gt; elements = Sets.newHashSet();</span>
 
-<span class="nc bnc" id="L43" title="All 2 branches missed.">    for (Tuple2&lt;GradoopId, EL&gt; elementPair : iterable) {</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">    for (Tuple2&lt;GradoopId, EL&gt; elementPair : iterable) {</span>
 
-<span class="nc bnc" id="L45" title="All 2 branches missed.">      if (first) {</span>
-<span class="nc" id="L46">        graphId = elementPair.f0;</span>
-<span class="nc" id="L47">        first = false;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">      if (first) {</span>
+<span class="nc" id="L47">        graphId = elementPair.f0;</span>
+<span class="nc" id="L48">        first = false;</span>
       }
 
-<span class="nc" id="L50">      elements.add(elementPair.f1);</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L51">      elements.add(elementPair.f1);</span>
+<span class="nc" id="L52">    }</span>
 
-<span class="nc" id="L53">    collector.collect(new Tuple2&lt;&gt;(graphId, elements));</span>
-<span class="nc" id="L54">  }</span>
+<span class="nc" id="L54">    collector.collect(new Tuple2&lt;&gt;(graphId, elements));</span>
+<span class="nc" id="L55">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

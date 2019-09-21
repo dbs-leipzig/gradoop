@@ -25,10 +25,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Map;
 
 /**
- * Superclass of map functions mapping a graph transaction to a FSM-fitted
- * graph format.
+ * Superclass of map functions mapping a graph transaction to a FSM-fitted graph format.
  */
-<span class="fc" id="L31">public abstract class ToFSMGraph {</span>
+<span class="fc" id="L30">public abstract class ToFSMGraph {</span>
 
   /**
    * Transforms a graph's vertices.
@@ -40,16 +39,15 @@ import java.util.Map;
   protected Map&lt;Integer, String&gt; transformVertices(GraphTransaction graph,
     Map&lt;GradoopId, Integer&gt; vertexIdMap) {
 
-<span class="fc" id="L43">    Map&lt;Integer, String&gt; fsmVertices =</span>
-<span class="fc" id="L44">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
+<span class="fc" id="L42">    Map&lt;Integer, String&gt; fsmVertices = Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
 
-<span class="fc" id="L46">    int vertexId = 0;</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">    for (EPGMVertex vertex : graph.getVertices()) {</span>
-<span class="fc" id="L48">      vertexIdMap.put(vertex.getId(), vertexId);</span>
-<span class="fc" id="L49">      fsmVertices.put(vertexId, vertex.getLabel());</span>
-<span class="fc" id="L50">      vertexId++;</span>
-<span class="fc" id="L51">    }</span>
-<span class="fc" id="L52">    return fsmVertices;</span>
+<span class="fc" id="L44">    int vertexId = 0;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">    for (EPGMVertex vertex : graph.getVertices()) {</span>
+<span class="fc" id="L46">      vertexIdMap.put(vertex.getId(), vertexId);</span>
+<span class="fc" id="L47">      fsmVertices.put(vertexId, vertex.getLabel());</span>
+<span class="fc" id="L48">      vertexId++;</span>
+<span class="fc" id="L49">    }</span>
+<span class="fc" id="L50">    return fsmVertices;</span>
   }
 
   /**
@@ -61,20 +59,19 @@ import java.util.Map;
    */
   protected Map&lt;Integer, FSMEdge&gt; transformEdges(GraphTransaction graph,
     Map&lt;GradoopId, Integer&gt; vertexIdMap) {
-<span class="fc" id="L64">    Map&lt;Integer, FSMEdge&gt; fsmEdges =</span>
-<span class="fc" id="L65">      Maps.newHashMapWithExpectedSize(graph.getEdges().size());</span>
+<span class="fc" id="L62">    Map&lt;Integer, FSMEdge&gt; fsmEdges = Maps.newHashMapWithExpectedSize(graph.getEdges().size());</span>
 
-<span class="fc" id="L67">    int edgeId = 0;</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (EPGMEdge edge : graph.getEdges()) {</span>
+<span class="fc" id="L64">    int edgeId = 0;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    for (EPGMEdge edge : graph.getEdges()) {</span>
 
-<span class="fc" id="L70">      int sourceId = vertexIdMap.get(edge.getSourceId());</span>
-<span class="fc" id="L71">      int targetId = vertexIdMap.get(edge.getTargetId());</span>
+<span class="fc" id="L67">      int sourceId = vertexIdMap.get(edge.getSourceId());</span>
+<span class="fc" id="L68">      int targetId = vertexIdMap.get(edge.getTargetId());</span>
 
-<span class="fc" id="L73">      fsmEdges.put(edgeId, new FSMEdge(sourceId, edge.getLabel(), targetId));</span>
+<span class="fc" id="L70">      fsmEdges.put(edgeId, new FSMEdge(sourceId, edge.getLabel(), targetId));</span>
 
-<span class="fc" id="L75">      edgeId++;</span>
-<span class="fc" id="L76">    }</span>
-<span class="fc" id="L77">    return fsmEdges;</span>
+<span class="fc" id="L72">      edgeId++;</span>
+<span class="fc" id="L73">    }</span>
+<span class="fc" id="L74">    return fsmEdges;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

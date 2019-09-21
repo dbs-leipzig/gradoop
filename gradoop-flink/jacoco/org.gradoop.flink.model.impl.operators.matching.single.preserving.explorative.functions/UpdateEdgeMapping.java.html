@@ -28,23 +28,19 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 
 /**
  * Extends an embedding with an edge if possible.
- *
- * Read fields first:
- *
+ * &lt;p&gt;
+ * Read fields first:&lt;br&gt;
  * f1.f1: edge mappings
- *
- * Read fields second:
- *
- * f0: edge id
+ * &lt;p&gt;
+ * Read fields second:&lt;br&gt;
+ * f0: edge id&lt;br&gt;
  * f2: next id
- *
- * Forwarded fields first:
- *
+ * &lt;p&gt;
+ * Forwarded fields first:&lt;br&gt;
  * f1.f0: vertex mappings
- *
- * Forwarded fields second:
- *
- * f2-&gt;f1: next id -&gt; tie point id
+ * &lt;p&gt;
+ * Forwarded fields second:&lt;br&gt;
+ * {@code f2-&gt;f1}: {@code next id -&gt; tie point id}
  *
  * @param &lt;K&gt; key type
  */
@@ -52,8 +48,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 @FunctionAnnotation.ReadFieldsSecond(&quot;f0;f2&quot;)
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;f1.f0&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f2-&gt;f0&quot;)
-public class UpdateEdgeMapping&lt;K&gt;
-  extends UpdateMapping&lt;K&gt;
+public class UpdateEdgeMapping&lt;K&gt; extends UpdateMapping&lt;K&gt;
   implements FlatJoinFunction&lt;EmbeddingWithTiePoint&lt;K&gt;, EdgeStep&lt;K&gt;, EmbeddingWithTiePoint&lt;K&gt;&gt; {
   /**
    * Iteration strategy
@@ -73,40 +68,40 @@ public class UpdateEdgeMapping&lt;K&gt;
    */
   public UpdateEdgeMapping(TraversalCode traversalCode,
     MatchStrategy matchStrategy, TraverserStrategy traverserStrategy) {
-<span class="fc" id="L76">    super(traversalCode, matchStrategy);</span>
-<span class="fc" id="L77">    this.traverserStrategy = traverserStrategy;</span>
-<span class="fc" id="L78">  }</span>
+<span class="fc" id="L71">    super(traversalCode, matchStrategy);</span>
+<span class="fc" id="L72">    this.traverserStrategy = traverserStrategy;</span>
+<span class="fc" id="L73">  }</span>
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L82">    super.open(parameters);</span>
+<span class="fc" id="L77">    super.open(parameters);</span>
 
     // get current step in the traversal
-<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {</span>
-<span class="fc" id="L86">      setCurrentStepId(getIterationRuntimeContext().getSuperstepNumber() - 1);</span>
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    } else if (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {</span>
-<span class="fc" id="L88">      setCurrentStepId((int) getRuntimeContext().getBroadcastVariable(</span>
-<span class="fc" id="L89">        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {</span>
+<span class="fc" id="L81">      setCurrentStepId(getIterationRuntimeContext().getSuperstepNumber() - 1);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    } else if (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {</span>
+<span class="fc" id="L83">      setCurrentStepId((int) getRuntimeContext().getBroadcastVariable(</span>
+<span class="fc" id="L84">        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1);</span>
     }
-<span class="fc" id="L91">    initializeVisited();</span>
+<span class="fc" id="L86">    initializeVisited();</span>
 
-<span class="fc" id="L93">    edgeCandidate = (int) getCurrentStep().getVia();</span>
-<span class="fc" id="L94">  }</span>
+<span class="fc" id="L88">    edgeCandidate = (int) getCurrentStep().getVia();</span>
+<span class="fc" id="L89">  }</span>
 
   @Override
   public void join(EmbeddingWithTiePoint&lt;K&gt; embedding, EdgeStep&lt;K&gt; edgeStep,
     Collector&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; collector) throws Exception {
 
-<span class="fc" id="L100">    K edgeId = edgeStep.getEdgeId();</span>
-<span class="fc" id="L101">    K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();</span>
+<span class="fc" id="L95">    K edgeId = edgeStep.getEdgeId();</span>
+<span class="fc" id="L96">    K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();</span>
 
     // traverse if no edge set for that step
-<span class="fc bfc" id="L104" title="All 2 branches covered.">    if (isValidEdge(edgeId, edgeMapping, edgeCandidate)) {</span>
-<span class="fc" id="L105">      edgeMapping[edgeCandidate] = edgeId;</span>
-<span class="fc" id="L106">      embedding.getEmbedding().setEdgeMapping(edgeMapping);</span>
-<span class="fc" id="L107">      embedding.setTiePointId(edgeStep.getNextId());</span>
-<span class="fc" id="L108">      collector.collect(embedding);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (isValidEdge(edgeId, edgeMapping, edgeCandidate)) {</span>
+<span class="fc" id="L100">      edgeMapping[edgeCandidate] = edgeId;</span>
+<span class="fc" id="L101">      embedding.getEmbedding().setEdgeMapping(edgeMapping);</span>
+<span class="fc" id="L102">      embedding.setTiePointId(edgeStep.getNextId());</span>
+<span class="fc" id="L103">      collector.collect(embedding);</span>
     }
-<span class="fc" id="L110">  }</span>
+<span class="fc" id="L105">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

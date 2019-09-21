@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the &lt;b&gt;ContainedIn&lt;/b&gt; temporal predicate.
  * Given a certain time interval, this predicate will match all intervals that are a subset of that interval.
  * &lt;p&gt;
- * Predicate: queryFrom &lt;= elementFrom &amp;&amp; elementTo &lt;= queryTo
+ * Predicate: {@code queryFrom &lt;= elementFrom &amp;&amp; elementTo &lt;= queryTo}
  */
 public class ContainedIn implements TemporalPredicate {
 

@@ -20,26 +20,23 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
 import org.s1ck.gdl.model.Edge;
 
 /**
- * Takes a vertex-edge pair and the corresponding target vertex as input and
- * evaluates, if the triple matches against the query graph. The output is
- * a {@link TripleWithCandidates} containing all query candidates for the
- * triple.
- *
+ * Takes a vertex-edge pair and the corresponding target vertex as input and evaluates, if the triple matches
+ * against the query graph. The output is a {@link TripleWithCandidates} containing all query candidates for
+ * the triple.
+ * &lt;p&gt;
  * Forwarded fields first:
- *
- * f0:      edge id
- * f1:      source vertex id
- * f3-&gt;f2:  target vertex id
+ * &lt;br&gt;
+ * {@code f0}:      edge id&lt;br&gt;
+ * {@code f1}:      source vertex id&lt;br&gt;
+ * {@code f3-&gt;f2}:  target vertex id
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;f0;f1;f3-&gt;f2&quot;)
 public class MatchingTriples extends RichFlatJoinFunction&lt;TripleWithSourceEdgeCandidates&lt;GradoopId&gt;,
@@ -66,44 +63,44 @@ public class MatchingTriples extends RichFlatJoinFunction&lt;TripleWithSourceEdg
    *
    * @param query GDL query
    */
-<span class="fc" id="L69">  public MatchingTriples(final String query) {</span>
-<span class="fc" id="L70">    this.query = query;</span>
-<span class="fc" id="L71">    this.reuseTriple = new TripleWithCandidates&lt;&gt;();</span>
-<span class="fc" id="L72">  }</span>
+<span class="fc" id="L66">  public MatchingTriples(final String query) {</span>
+<span class="fc" id="L67">    this.query = query;</span>
+<span class="fc" id="L68">    this.reuseTriple = new TripleWithCandidates&lt;&gt;();</span>
+<span class="fc" id="L69">  }</span>
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L76">    super.open(parameters);</span>
-<span class="fc" id="L77">    queryHandler = new QueryHandler(query);</span>
-<span class="fc" id="L78">  }</span>
+<span class="fc" id="L73">    super.open(parameters);</span>
+<span class="fc" id="L74">    queryHandler = new QueryHandler(query);</span>
+<span class="fc" id="L75">  }</span>
 
   @Override
   public void join(TripleWithSourceEdgeCandidates&lt;GradoopId&gt; pair,
     IdWithCandidates&lt;GradoopId&gt; target,
     Collector&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; collector) throws Exception {
 
-<span class="fc" id="L85">    boolean[] edgeCandidates = pair.getEdgeCandidates();</span>
-<span class="fc" id="L86">    boolean[] newEdgeCandidates = new boolean[edgeCandidates.length];</span>
-<span class="fc" id="L87">    boolean edgeStillValid = false;</span>
+<span class="fc" id="L82">    boolean[] edgeCandidates = pair.getEdgeCandidates();</span>
+<span class="fc" id="L83">    boolean[] newEdgeCandidates = new boolean[edgeCandidates.length];</span>
+<span class="fc" id="L84">    boolean edgeStillValid = false;</span>
 
-<span class="fc bfc" id="L89" title="All 2 branches covered.">    for (int i = 0; i &lt; edgeCandidates.length; i++) {</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">      if (edgeCandidates[i]) {</span>
-<span class="fc" id="L91">        Edge e = queryHandler.getEdgeById((long) i);</span>
-<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (pair.getSourceCandidates()[e.getSourceVertexId().intValue()] &amp;&amp;</span>
-<span class="fc bfc" id="L93" title="All 2 branches covered.">          target.getCandidates()[e.getTargetVertexId().intValue()]) {</span>
-<span class="fc" id="L94">          newEdgeCandidates[i] = true;</span>
-<span class="fc" id="L95">          edgeStillValid = true;</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    for (int i = 0; i &lt; edgeCandidates.length; i++) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">      if (edgeCandidates[i]) {</span>
+<span class="fc" id="L88">        Edge e = queryHandler.getEdgeById((long) i);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (pair.getSourceCandidates()[e.getSourceVertexId().intValue()] &amp;&amp;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">          target.getCandidates()[e.getTargetVertexId().intValue()]) {</span>
+<span class="fc" id="L91">          newEdgeCandidates[i] = true;</span>
+<span class="fc" id="L92">          edgeStillValid = true;</span>
         }
       }
     }
 
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    if (edgeStillValid) {</span>
-<span class="fc" id="L101">      reuseTriple.setEdgeId(pair.getEdgeId());</span>
-<span class="fc" id="L102">      reuseTriple.setSourceId(pair.getSourceId());</span>
-<span class="fc" id="L103">      reuseTriple.setTargetId(target.getId());</span>
-<span class="fc" id="L104">      reuseTriple.setCandidates(newEdgeCandidates);</span>
-<span class="fc" id="L105">      collector.collect(reuseTriple);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    if (edgeStillValid) {</span>
+<span class="fc" id="L98">      reuseTriple.setEdgeId(pair.getEdgeId());</span>
+<span class="fc" id="L99">      reuseTriple.setSourceId(pair.getSourceId());</span>
+<span class="fc" id="L100">      reuseTriple.setTargetId(target.getId());</span>
+<span class="fc" id="L101">      reuseTriple.setCandidates(newEdgeCandidates);</span>
+<span class="fc" id="L102">      collector.collect(reuseTriple);</span>
     }
-<span class="fc" id="L107">  }</span>
+<span class="fc" id="L104">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the &lt;b&gt;CreatedIn&lt;/b&gt; temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals starting during that interval.
  * &lt;p&gt;
- * Predicate: queryFrom &lt;= elementFrom &amp;&amp; elementFrom &lt;= queryTo
+ * Predicate: {@code queryFrom &lt;= elementFrom &amp;&amp; elementFrom &lt;= queryTo}
  */
 public class CreatedIn implements TemporalPredicate {
 

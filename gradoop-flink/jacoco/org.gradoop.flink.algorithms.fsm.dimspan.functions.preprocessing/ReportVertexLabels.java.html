@@ -24,12 +24,12 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.Set;
 
 /**
- * graph -&gt; (vertexLabel,1L),..
+ * {@code graph -&gt; (vertexLabel,1L),..}
  */
 <span class="fc" id="L29">public class ReportVertexLabels implements FlatMapFunction&lt;LabeledGraphStringString, WithCount&lt;String&gt;&gt; {</span>
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
 <span class="fc" id="L34">  private WithCount&lt;String&gt; reuseTuple = new WithCount&lt;&gt;(null, 1);</span>
 

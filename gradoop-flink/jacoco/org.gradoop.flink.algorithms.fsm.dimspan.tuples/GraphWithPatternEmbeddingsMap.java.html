@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.fsm.dimspan.tuples;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * (graph, pattern-&gt;embeddings)
+ * {@code (graph, pattern-&gt;embeddings)}
  */
 public class GraphWithPatternEmbeddingsMap extends Tuple2&lt;int[], PatternEmbeddingsMap&gt; {
 
@@ -30,12 +30,13 @@ public class GraphWithPatternEmbeddingsMap extends Tuple2&lt;int[], PatternEmbed
 
   /**
    * Constructor.
-   *  @param graph graph
-   * @param patternEmbeddings pattern-&gt;embeddings
+   *
+   * @param graph graph
+   * @param patternEmbeddings {@code pattern-&gt;embeddings}
    */
   public GraphWithPatternEmbeddingsMap(int[] graph, PatternEmbeddingsMap patternEmbeddings) {
-<span class="fc" id="L37">    super(graph, patternEmbeddings);</span>
-<span class="fc" id="L38">  }</span>
+<span class="fc" id="L38">    super(graph, patternEmbeddings);</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Convenience method to check if the element is the &quot;collector&quot;
@@ -43,26 +44,26 @@ public class GraphWithPatternEmbeddingsMap extends Tuple2&lt;int[], PatternEmbed
    * @return true, if collector
    */
   public boolean isFrequentPatternCollector() {
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    return f0.length &lt;= 1;</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    return f0.length &lt;= 1;</span>
   }
 
   // GETTERS AND SETTERS
 
   public int[] getGraph() {
-<span class="fc" id="L52">    return f0;</span>
+<span class="fc" id="L53">    return f0;</span>
   }
 
   public void setGraph(int[] graph) {
-<span class="nc" id="L56">    this.f0 = graph;</span>
-<span class="nc" id="L57">  }</span>
+<span class="nc" id="L57">    this.f0 = graph;</span>
+<span class="nc" id="L58">  }</span>
 
   public PatternEmbeddingsMap getMap() {
-<span class="fc" id="L60">    return f1;</span>
+<span class="fc" id="L61">    return f1;</span>
   }
 
   public void setPatternEmbeddings(PatternEmbeddingsMap patternEmbeddings) {
-<span class="fc" id="L64">    this.f1 = patternEmbeddings;</span>
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L65">    this.f1 = patternEmbeddings;</span>
+<span class="fc" id="L66">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

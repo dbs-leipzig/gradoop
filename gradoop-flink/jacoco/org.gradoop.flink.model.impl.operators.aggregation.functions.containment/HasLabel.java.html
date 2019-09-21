@@ -26,16 +26,13 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 import java.util.Objects;
 
 /**
- * Superclass of aggregate and filter functions that check vertex or edge label
- * presence in a graph.
- *
- * &lt;pre&gt;
+ * Superclass of aggregate and filter functions that check vertex or edge label presence in a graph.
+ * &lt;p&gt;
  * Usage:
  * &lt;ol&gt;
  * &lt;li&gt;aggregate
  * &lt;li&gt;filter using the same UDF instance.
  * &lt;/ol&gt;
- * &lt;/pre&gt;
  */
 public class HasLabel extends BaseAggregateFunction
   implements Or, AggregateFunction, CombinableFilter&lt;GraphHead&gt; {
@@ -51,8 +48,8 @@ public class HasLabel extends BaseAggregateFunction
    * @param label element label to check presence of
    */
   public HasLabel(String label) {
-<span class="fc" id="L54">    this(label, &quot;hasLabel_&quot; + label);</span>
-<span class="fc" id="L55">  }</span>
+<span class="fc" id="L51">    this(label, &quot;hasLabel_&quot; + label);</span>
+<span class="fc" id="L52">  }</span>
 
   /**
    * Creates a new instance of a HasLabel aggregate function.
@@ -61,19 +58,19 @@ public class HasLabel extends BaseAggregateFunction
    * @param aggregatePropertyKey aggregate property key
    */
   public HasLabel(String label, String aggregatePropertyKey) {
-<span class="fc" id="L64">    super(aggregatePropertyKey);</span>
-<span class="fc" id="L65">    Objects.requireNonNull(label);</span>
-<span class="fc" id="L66">    this.label = label;</span>
-<span class="fc" id="L67">  }</span>
+<span class="fc" id="L61">    super(aggregatePropertyKey);</span>
+<span class="fc" id="L62">    Objects.requireNonNull(label);</span>
+<span class="fc" id="L63">    this.label = label;</span>
+<span class="fc" id="L64">  }</span>
 
   @Override
   public PropertyValue getIncrement(Element element) {
-<span class="fc" id="L71">    return PropertyValue.create(element.getLabel().equals(label));</span>
+<span class="fc" id="L68">    return PropertyValue.create(element.getLabel().equals(label));</span>
   }
 
   @Override
   public boolean filter(GraphHead graphHead) throws Exception {
-<span class="nc" id="L76">    return graphHead.getPropertyValue(getAggregatePropertyKey()).getBoolean();</span>
+<span class="nc" id="L73">    return graphHead.getPropertyValue(getAggregatePropertyKey()).getBoolean();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

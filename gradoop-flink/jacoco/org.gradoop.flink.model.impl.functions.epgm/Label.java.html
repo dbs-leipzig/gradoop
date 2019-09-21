@@ -21,22 +21,21 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.api.entities.Labeled;
 
 /**
- * labeled element =&gt; label
+ * {@code labeled element =&gt; label}
  *
  * @param &lt;L&gt; labeled type
  */
 @FunctionAnnotation.ForwardedFields(&quot;label-&gt;*&quot;)
-<span class="fc" id="L29">public class Label&lt;L extends Labeled&gt;</span>
-  implements MapFunction&lt;L, String&gt;, KeySelector&lt;L, String&gt; {
+<span class="fc" id="L29">public class Label&lt;L extends Labeled&gt; implements MapFunction&lt;L, String&gt;, KeySelector&lt;L, String&gt; {</span>
 
   @Override
   public String map(L l) throws Exception {
-<span class="fc" id="L34">    return l.getLabel();</span>
+<span class="fc" id="L33">    return l.getLabel();</span>
   }
 
   @Override
   public String getKey(L l) {
-<span class="nc" id="L39">    return l.getLabel();</span>
+<span class="nc" id="L38">    return l.getLabel();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

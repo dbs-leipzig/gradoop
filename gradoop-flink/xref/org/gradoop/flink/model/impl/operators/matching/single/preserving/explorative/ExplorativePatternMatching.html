@@ -121,284 +121,281 @@
 <a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   * Create new operator instance</em>
 <a name="112" href="#112">112</a> <em class="jxr_javadoccomment">   *</em>
 <a name="113" href="#113">113</a> <em class="jxr_javadoccomment">   * @param query                   GDL query graph</em>
-<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @param attachData              true, if original data shall be attached</em>
-<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   *                                to the result</em>
-<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * @param matchStrategy           match strategy for vertex and edge mappings</em>
-<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   * @param traverserStrategy       iteration strategy for distributed traversal</em>
-<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @param traverser               Traverser used for the query graph</em>
-<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * @param edgeStepJoinStrategy    Join strategy for edge extension</em>
-<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * @param vertexStepJoinStrategy  Join strategy for vertex extension</em>
-<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   */</em>
-<a name="122" href="#122">122</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">ExplorativePatternMatching</a>(String query, <strong class="jxr_keyword">boolean</strong> attachData,
-<a name="123" href="#123">123</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy,
-<a name="124" href="#124">124</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy,
-<a name="125" href="#125">125</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser,
-<a name="126" href="#126">126</a>     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
-<a name="127" href="#127">127</a>     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
-<a name="128" href="#128">128</a>     <strong class="jxr_keyword">super</strong>(query, attachData, LOG);
-<a name="129" href="#129">129</a>     <strong class="jxr_keyword">this</strong>.matchStrategy          = matchStrategy;
-<a name="130" href="#130">130</a>     <strong class="jxr_keyword">this</strong>.traverserStrategy = traverserStrategy;
-<a name="131" href="#131">131</a>     <strong class="jxr_keyword">this</strong>.traverser = traverser;
-<a name="132" href="#132">132</a>     <strong class="jxr_keyword">this</strong>.traverser.setQueryHandler(getQueryHandler());
-<a name="133" href="#133">133</a>     <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy   = edgeStepJoinStrategy;
-<a name="134" href="#134">134</a>     <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = vertexStepJoinStrategy;
-<a name="135" href="#135">135</a>   }
-<a name="136" href="#136">136</a> 
-<a name="137" href="#137">137</a>   @Override
-<a name="138" href="#138">138</a>   <strong class="jxr_keyword">protected</strong> GC executeForVertex(LG graph) {
-<a name="139" href="#139">139</a>     BaseGraphFactory&lt;G, V, E, LG, GC&gt; graphFactory = graph.getFactory();
-<a name="140" href="#140">140</a>     GraphHeadFactory&lt;G&gt; graphHeadFactory = graphFactory.getGraphHeadFactory();
-<a name="141" href="#141">141</a>     VertexFactory&lt;V&gt; vertexFactory = graphFactory.getVertexFactory();
-<a name="142" href="#142">142</a>     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
-<a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     DataSet&lt;V&gt; matchingVertices = graph.getVertices()
-<a name="145" href="#145">145</a>       .filter(<strong class="jxr_keyword">new</strong> MatchingVertices&lt;&gt;(getQuery()));
-<a name="146" href="#146">146</a> 
-<a name="147" href="#147">147</a>     <strong class="jxr_keyword">if</strong> (!doAttachData()) {
-<a name="148" href="#148">148</a>       matchingVertices = matchingVertices
-<a name="149" href="#149">149</a>         .map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="150" href="#150">150</a>         .map(<strong class="jxr_keyword">new</strong> ObjectTo1&lt;&gt;())
-<a name="151" href="#151">151</a>         .map(<strong class="jxr_keyword">new</strong> VertexFromId&lt;&gt;(vertexFactory));
-<a name="152" href="#152">152</a>     }
-<a name="153" href="#153">153</a> 
-<a name="154" href="#154">154</a>     DataSet&lt;Tuple2&lt;V, G&gt;&gt; pairs = matchingVertices
-<a name="155" href="#155">155</a>       .map(<strong class="jxr_keyword">new</strong> AddGraphElementToNewGraph&lt;&gt;(graphHeadFactory, variable))
-<a name="156" href="#156">156</a>       .returns(<strong class="jxr_keyword">new</strong> TupleTypeInfo&lt;&gt;(
-<a name="157" href="#157">157</a>         TypeExtractor.getForClass(vertexFactory.getType()),
-<a name="158" href="#158">158</a>         TypeExtractor.getForClass(graphHeadFactory.getType())));
-<a name="159" href="#159">159</a> 
-<a name="160" href="#160">160</a>     <strong class="jxr_keyword">return</strong> graph.getCollectionFactory().fromDataSets(
-<a name="161" href="#161">161</a>       pairs.map(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;()),
-<a name="162" href="#162">162</a>       pairs.map(<strong class="jxr_keyword">new</strong> Value0Of2&lt;&gt;()));
-<a name="163" href="#163">163</a>   }
-<a name="164" href="#164">164</a> 
-<a name="165" href="#165">165</a>   @Override
-<a name="166" href="#166">166</a>   <strong class="jxr_keyword">protected</strong> GC executeForPattern(LG graph) {
-<a name="167" href="#167">167</a> 
-<a name="168" href="#168">168</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/TraversalCode.html">TraversalCode</a> traversalCode = traverser.traverse();
-<a name="169" href="#169">169</a> 
-<a name="170" href="#170">170</a>     DataSet&lt;Tuple1&lt;Embedding&lt;GradoopId&gt;&gt;&gt; embeddings;
-<a name="171" href="#171">171</a> 
-<a name="172" href="#172">172</a>     <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION ||
-<a name="173" href="#173">173</a>       traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
-<a name="174" href="#174">174</a> 
-<a name="175" href="#175">175</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="176" href="#176">176</a>       <em class="jxr_comment">// Pre-processing (filter candidates)</em>
-<a name="177" href="#177">177</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="178" href="#178">178</a> 
-<a name="179" href="#179">179</a>       DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertices = PreProcessor.filterVertices(
-<a name="180" href="#180">180</a>         graph, getQuery());
-<a name="181" href="#181">181</a> 
-<a name="182" href="#182">182</a>       DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edges = PreProcessor.filterEdges(
-<a name="183" href="#183">183</a>         graph, getQuery());
-<a name="184" href="#184">184</a> 
-<a name="185" href="#185">185</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="186" href="#186">186</a>       <em class="jxr_comment">// Exploration via Traversal</em>
-<a name="187" href="#187">187</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="188" href="#188">188</a> 
-<a name="189" href="#189">189</a>       SetPairTraverser&lt;GradoopId&gt; distributedTraverser;
-<a name="190" href="#190">190</a> 
-<a name="191" href="#191">191</a>       <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
-<a name="192" href="#192">192</a>         distributedTraverser = <strong class="jxr_keyword">new</strong> SetPairBulkTraverser&lt;&gt;(traversalCode, matchStrategy,
-<a name="193" href="#193">193</a>           traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
-<a name="194" href="#194">194</a>           GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
-<a name="195" href="#195">195</a>           getEdgeMapping());
-<a name="196" href="#196">196</a>       } <strong class="jxr_keyword">else</strong> {
-<a name="197" href="#197">197</a>         distributedTraverser = <strong class="jxr_keyword">new</strong> SetPairForLoopTraverser&lt;&gt;(traversalCode, matchStrategy,
-<a name="198" href="#198">198</a>           traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
-<a name="199" href="#199">199</a>           GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
-<a name="200" href="#200">200</a>           getEdgeMapping());
-<a name="201" href="#201">201</a>       }
-<a name="202" href="#202">202</a> 
-<a name="203" href="#203">203</a>       embeddings = distributedTraverser.traverse(vertices, edges);
-<a name="204" href="#204">204</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION) {
-<a name="205" href="#205">205</a>       DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; triples = <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/PreProcessor.html">PreProcessor</a>
-<a name="206" href="#206">206</a>         .filterTriplets(graph, getQuery());
-<a name="207" href="#207">207</a> 
-<a name="208" href="#208">208</a>       TripleTraverser&lt;GradoopId&gt; distributedTraverser = <strong class="jxr_keyword">new</strong> TripleForLoopTraverser&lt;&gt;(
-<a name="209" href="#209">209</a>         traversalCode, matchStrategy,
-<a name="210" href="#210">210</a>         traverser.getQueryHandler().getVertexCount(),
-<a name="211" href="#211">211</a>         traverser.getQueryHandler().getEdgeCount(),
-<a name="212" href="#212">212</a>         GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, getVertexMapping(), getEdgeMapping());
-<a name="213" href="#213">213</a> 
-<a name="214" href="#214">214</a>       embeddings = distributedTraverser.traverse(triples);
-<a name="215" href="#215">215</a> 
-<a name="216" href="#216">216</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="217" href="#217">217</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Unsupported traverser strategy: "</span> + traverserStrategy);
-<a name="218" href="#218">218</a>     }
-<a name="219" href="#219">219</a> 
-<a name="220" href="#220">220</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="221" href="#221">221</a>     <em class="jxr_comment">// Post-Processing (build Graph Collection from embeddings)</em>
-<a name="222" href="#222">222</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="223" href="#223">223</a> 
-<a name="224" href="#224">224</a>     DataSet&lt;Element&gt; elements = embeddings
-<a name="225" href="#225">225</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(traversalCode,
-<a name="226" href="#226">226</a>         graph.getFactory().getGraphHeadFactory(),
-<a name="227" href="#227">227</a>         graph.getFactory().getVertexFactory(),
-<a name="228" href="#228">228</a>         graph.getFactory().getEdgeFactory(),
-<a name="229" href="#229">229</a>         getQueryHandler()
-<a name="230" href="#230">230</a>       ));
-<a name="231" href="#231">231</a> 
-<a name="232" href="#232">232</a>     <strong class="jxr_keyword">return</strong> doAttachData() ?
-<a name="233" href="#233">233</a>       PostProcessor.extractGraphCollectionWithData(elements, graph, <strong class="jxr_keyword">true</strong>) :
-<a name="234" href="#234">234</a>       PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), <strong class="jxr_keyword">true</strong>);
-<a name="235" href="#235">235</a>   }
+<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @param attachData              true, if original data shall be attached to the result</em>
+<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   * @param matchStrategy           match strategy for vertex and edge mappings</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * @param traverserStrategy       iteration strategy for distributed traversal</em>
+<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   * @param traverser               Traverser used for the query graph</em>
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @param edgeStepJoinStrategy    Join strategy for edge extension</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * @param vertexStepJoinStrategy  Join strategy for vertex extension</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   */</em>
+<a name="121" href="#121">121</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">ExplorativePatternMatching</a>(String query, <strong class="jxr_keyword">boolean</strong> attachData,
+<a name="122" href="#122">122</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy,
+<a name="123" href="#123">123</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy,
+<a name="124" href="#124">124</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser,
+<a name="125" href="#125">125</a>     JoinOperatorBase.JoinHint edgeStepJoinStrategy,
+<a name="126" href="#126">126</a>     JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
+<a name="127" href="#127">127</a>     <strong class="jxr_keyword">super</strong>(query, attachData, LOG);
+<a name="128" href="#128">128</a>     <strong class="jxr_keyword">this</strong>.matchStrategy          = matchStrategy;
+<a name="129" href="#129">129</a>     <strong class="jxr_keyword">this</strong>.traverserStrategy = traverserStrategy;
+<a name="130" href="#130">130</a>     <strong class="jxr_keyword">this</strong>.traverser = traverser;
+<a name="131" href="#131">131</a>     <strong class="jxr_keyword">this</strong>.traverser.setQueryHandler(getQueryHandler());
+<a name="132" href="#132">132</a>     <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy   = edgeStepJoinStrategy;
+<a name="133" href="#133">133</a>     <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = vertexStepJoinStrategy;
+<a name="134" href="#134">134</a>   }
+<a name="135" href="#135">135</a> 
+<a name="136" href="#136">136</a>   @Override
+<a name="137" href="#137">137</a>   <strong class="jxr_keyword">protected</strong> GC executeForVertex(LG graph) {
+<a name="138" href="#138">138</a>     BaseGraphFactory&lt;G, V, E, LG, GC&gt; graphFactory = graph.getFactory();
+<a name="139" href="#139">139</a>     GraphHeadFactory&lt;G&gt; graphHeadFactory = graphFactory.getGraphHeadFactory();
+<a name="140" href="#140">140</a>     VertexFactory&lt;V&gt; vertexFactory = graphFactory.getVertexFactory();
+<a name="141" href="#141">141</a>     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
+<a name="142" href="#142">142</a> 
+<a name="143" href="#143">143</a>     DataSet&lt;V&gt; matchingVertices = graph.getVertices()
+<a name="144" href="#144">144</a>       .filter(<strong class="jxr_keyword">new</strong> MatchingVertices&lt;&gt;(getQuery()));
+<a name="145" href="#145">145</a> 
+<a name="146" href="#146">146</a>     <strong class="jxr_keyword">if</strong> (!doAttachData()) {
+<a name="147" href="#147">147</a>       matchingVertices = matchingVertices
+<a name="148" href="#148">148</a>         .map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="149" href="#149">149</a>         .map(<strong class="jxr_keyword">new</strong> ObjectTo1&lt;&gt;())
+<a name="150" href="#150">150</a>         .map(<strong class="jxr_keyword">new</strong> VertexFromId&lt;&gt;(vertexFactory));
+<a name="151" href="#151">151</a>     }
+<a name="152" href="#152">152</a> 
+<a name="153" href="#153">153</a>     DataSet&lt;Tuple2&lt;V, G&gt;&gt; pairs = matchingVertices
+<a name="154" href="#154">154</a>       .map(<strong class="jxr_keyword">new</strong> AddGraphElementToNewGraph&lt;&gt;(graphHeadFactory, variable))
+<a name="155" href="#155">155</a>       .returns(<strong class="jxr_keyword">new</strong> TupleTypeInfo&lt;&gt;(
+<a name="156" href="#156">156</a>         TypeExtractor.getForClass(vertexFactory.getType()),
+<a name="157" href="#157">157</a>         TypeExtractor.getForClass(graphHeadFactory.getType())));
+<a name="158" href="#158">158</a> 
+<a name="159" href="#159">159</a>     <strong class="jxr_keyword">return</strong> graph.getCollectionFactory().fromDataSets(
+<a name="160" href="#160">160</a>       pairs.map(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;()),
+<a name="161" href="#161">161</a>       pairs.map(<strong class="jxr_keyword">new</strong> Value0Of2&lt;&gt;()));
+<a name="162" href="#162">162</a>   }
+<a name="163" href="#163">163</a> 
+<a name="164" href="#164">164</a>   @Override
+<a name="165" href="#165">165</a>   <strong class="jxr_keyword">protected</strong> GC executeForPattern(LG graph) {
+<a name="166" href="#166">166</a> 
+<a name="167" href="#167">167</a>     <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/TraversalCode.html">TraversalCode</a> traversalCode = traverser.traverse();
+<a name="168" href="#168">168</a> 
+<a name="169" href="#169">169</a>     DataSet&lt;Tuple1&lt;Embedding&lt;GradoopId&gt;&gt;&gt; embeddings;
+<a name="170" href="#170">170</a> 
+<a name="171" href="#171">171</a>     <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION ||
+<a name="172" href="#172">172</a>       traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
+<a name="173" href="#173">173</a> 
+<a name="174" href="#174">174</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="175" href="#175">175</a>       <em class="jxr_comment">// Pre-processing (filter candidates)</em>
+<a name="176" href="#176">176</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="177" href="#177">177</a> 
+<a name="178" href="#178">178</a>       DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertices = PreProcessor.filterVertices(
+<a name="179" href="#179">179</a>         graph, getQuery());
+<a name="180" href="#180">180</a> 
+<a name="181" href="#181">181</a>       DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edges = PreProcessor.filterEdges(
+<a name="182" href="#182">182</a>         graph, getQuery());
+<a name="183" href="#183">183</a> 
+<a name="184" href="#184">184</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="185" href="#185">185</a>       <em class="jxr_comment">// Exploration via Traversal</em>
+<a name="186" href="#186">186</a>       <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="187" href="#187">187</a> 
+<a name="188" href="#188">188</a>       SetPairTraverser&lt;GradoopId&gt; distributedTraverser;
+<a name="189" href="#189">189</a> 
+<a name="190" href="#190">190</a>       <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {
+<a name="191" href="#191">191</a>         distributedTraverser = <strong class="jxr_keyword">new</strong> SetPairBulkTraverser&lt;&gt;(traversalCode, matchStrategy,
+<a name="192" href="#192">192</a>           traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
+<a name="193" href="#193">193</a>           GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
+<a name="194" href="#194">194</a>           getEdgeMapping());
+<a name="195" href="#195">195</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="196" href="#196">196</a>         distributedTraverser = <strong class="jxr_keyword">new</strong> SetPairForLoopTraverser&lt;&gt;(traversalCode, matchStrategy,
+<a name="197" href="#197">197</a>           traverser.getQueryHandler().getVertexCount(), traverser.getQueryHandler().getEdgeCount(),
+<a name="198" href="#198">198</a>           GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, vertexStepJoinStrategy, getVertexMapping(),
+<a name="199" href="#199">199</a>           getEdgeMapping());
+<a name="200" href="#200">200</a>       }
+<a name="201" href="#201">201</a> 
+<a name="202" href="#202">202</a>       embeddings = distributedTraverser.traverse(vertices, edges);
+<a name="203" href="#203">203</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.TRIPLES_FOR_LOOP_ITERATION) {
+<a name="204" href="#204">204</a>       DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; triples = <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/PreProcessor.html">PreProcessor</a>
+<a name="205" href="#205">205</a>         .filterTriplets(graph, getQuery());
+<a name="206" href="#206">206</a> 
+<a name="207" href="#207">207</a>       TripleTraverser&lt;GradoopId&gt; distributedTraverser = <strong class="jxr_keyword">new</strong> TripleForLoopTraverser&lt;&gt;(
+<a name="208" href="#208">208</a>         traversalCode, matchStrategy,
+<a name="209" href="#209">209</a>         traverser.getQueryHandler().getVertexCount(),
+<a name="210" href="#210">210</a>         traverser.getQueryHandler().getEdgeCount(),
+<a name="211" href="#211">211</a>         GradoopId.<strong class="jxr_keyword">class</strong>, edgeStepJoinStrategy, getVertexMapping(), getEdgeMapping());
+<a name="212" href="#212">212</a> 
+<a name="213" href="#213">213</a>       embeddings = distributedTraverser.traverse(triples);
+<a name="214" href="#214">214</a> 
+<a name="215" href="#215">215</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="216" href="#216">216</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Unsupported traverser strategy: "</span> + traverserStrategy);
+<a name="217" href="#217">217</a>     }
+<a name="218" href="#218">218</a> 
+<a name="219" href="#219">219</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="220" href="#220">220</a>     <em class="jxr_comment">// Post-Processing (build Graph Collection from embeddings)</em>
+<a name="221" href="#221">221</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>     DataSet&lt;Element&gt; elements = embeddings
+<a name="224" href="#224">224</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(traversalCode,
+<a name="225" href="#225">225</a>         graph.getFactory().getGraphHeadFactory(),
+<a name="226" href="#226">226</a>         graph.getFactory().getVertexFactory(),
+<a name="227" href="#227">227</a>         graph.getFactory().getEdgeFactory(),
+<a name="228" href="#228">228</a>         getQueryHandler()
+<a name="229" href="#229">229</a>       ));
+<a name="230" href="#230">230</a> 
+<a name="231" href="#231">231</a>     <strong class="jxr_keyword">return</strong> doAttachData() ?
+<a name="232" href="#232">232</a>       PostProcessor.extractGraphCollectionWithData(elements, graph, <strong class="jxr_keyword">true</strong>) :
+<a name="233" href="#233">233</a>       PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), <strong class="jxr_keyword">true</strong>);
+<a name="234" href="#234">234</a>   }
+<a name="235" href="#235">235</a> 
 <a name="236" href="#236">236</a> 
-<a name="237" href="#237">237</a> 
-<a name="238" href="#238">238</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * Used for configuring and creating a new {@link ExplorativePatternMatching}</em>
-<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * operator instance.</em>
-<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   */</em>
-<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> {
-<a name="243" href="#243">243</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="244" href="#244">244</a> <em class="jxr_javadoccomment">     * GDL query string</em>
-<a name="245" href="#245">245</a> <em class="jxr_javadoccomment">     */</em>
-<a name="246" href="#246">246</a>     <strong class="jxr_keyword">private</strong> String query;
-<a name="247" href="#247">247</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="248" href="#248">248</a> <em class="jxr_javadoccomment">     * Attach original vertex and edge data</em>
-<a name="249" href="#249">249</a> <em class="jxr_javadoccomment">     */</em>
-<a name="250" href="#250">250</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> attachData;
-<a name="251" href="#251">251</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="252" href="#252">252</a> <em class="jxr_javadoccomment">     * Matching strategy for vertex and edge mappings</em>
-<a name="253" href="#253">253</a> <em class="jxr_javadoccomment">     */</em>
-<a name="254" href="#254">254</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy;
-<a name="255" href="#255">255</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">     * Iteration strategy for traversing the graph</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">     */</em>
-<a name="258" href="#258">258</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy;
-<a name="259" href="#259">259</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="260" href="#260">260</a> <em class="jxr_javadoccomment">     * Provides a traversal description for the distributed traverser</em>
-<a name="261" href="#261">261</a> <em class="jxr_javadoccomment">     */</em>
-<a name="262" href="#262">262</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser;
-<a name="263" href="#263">263</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">     * Join strategy for edge extensions during traversal</em>
-<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">     */</em>
-<a name="266" href="#266">266</a>     <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint edgeStepJoinStrategy;
-<a name="267" href="#267">267</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">     * Join strategy for vertex extensions during traversal</em>
-<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">     */</em>
-<a name="270" href="#270">270</a>     <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint vertexStepJoinStrategy;
-<a name="271" href="#271">271</a> 
-<a name="272" href="#272">272</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">     * Creates a new builder instance</em>
-<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">     */</em>
-<a name="275" href="#275">275</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a>() {
-<a name="276" href="#276">276</a>       <strong class="jxr_keyword">this</strong>.attachData             = false;
-<a name="277" href="#277">277</a>       <strong class="jxr_keyword">this</strong>.matchStrategy          = MatchStrategy.ISOMORPHISM;
-<a name="278" href="#278">278</a>       <strong class="jxr_keyword">this</strong>.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
-<a name="279" href="#279">279</a>       <strong class="jxr_keyword">this</strong>.traverser              = <strong class="jxr_keyword">new</strong> DFSTraverser();
-<a name="280" href="#280">280</a>       <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy   = OPTIMIZER_CHOOSES;
-<a name="281" href="#281">281</a>       <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = OPTIMIZER_CHOOSES;
-<a name="282" href="#282">282</a>     }
-<a name="283" href="#283">283</a> 
-<a name="284" href="#284">284</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">     * Set the GDL query string. e.g. "(a)--&gt;(b)"</em>
-<a name="286" href="#286">286</a> <em class="jxr_javadoccomment">     *</em>
-<a name="287" href="#287">287</a> <em class="jxr_javadoccomment">     * @param query GDL query</em>
-<a name="288" href="#288">288</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="289" href="#289">289</a> <em class="jxr_javadoccomment">     */</em>
-<a name="290" href="#290">290</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setQuery(String query) {
-<a name="291" href="#291">291</a>       <strong class="jxr_keyword">this</strong>.query = query;
-<a name="292" href="#292">292</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="293" href="#293">293</a>     }
-<a name="294" href="#294">294</a> 
-<a name="295" href="#295">295</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">     * Set if the original vertex and edge data shall be attached to the result.</em>
-<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">     *</em>
-<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">     * @param attachData true, iff data shall be attached</em>
-<a name="299" href="#299">299</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="300" href="#300">300</a> <em class="jxr_javadoccomment">     */</em>
-<a name="301" href="#301">301</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setAttachData(<strong class="jxr_keyword">boolean</strong> attachData) {
-<a name="302" href="#302">302</a>       <strong class="jxr_keyword">this</strong>.attachData = attachData;
-<a name="303" href="#303">303</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="304" href="#304">304</a>     }
-<a name="305" href="#305">305</a> 
-<a name="306" href="#306">306</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="307" href="#307">307</a> <em class="jxr_javadoccomment">     * Set matching strategy for vertex and edge embeddings (e.g. isomorphism).</em>
-<a name="308" href="#308">308</a> <em class="jxr_javadoccomment">     *</em>
-<a name="309" href="#309">309</a> <em class="jxr_javadoccomment">     * @param matchStrategy matching strategy</em>
-<a name="310" href="#310">310</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="311" href="#311">311</a> <em class="jxr_javadoccomment">     */</em>
-<a name="312" href="#312">312</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setMatchStrategy(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy) {
-<a name="313" href="#313">313</a>       <strong class="jxr_keyword">this</strong>.matchStrategy = matchStrategy;
-<a name="314" href="#314">314</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="315" href="#315">315</a>     }
-<a name="316" href="#316">316</a> 
-<a name="317" href="#317">317</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="318" href="#318">318</a> <em class="jxr_javadoccomment">     * Set iteration strategy for traversing the graph (e.g. bulk traversal).</em>
-<a name="319" href="#319">319</a> <em class="jxr_javadoccomment">     *</em>
-<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">     * @param traverserStrategy iteration strategy</em>
-<a name="321" href="#321">321</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="322" href="#322">322</a> <em class="jxr_javadoccomment">     */</em>
-<a name="323" href="#323">323</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setTraverserStrategy(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy) {
-<a name="324" href="#324">324</a>       <strong class="jxr_keyword">this</strong>.traverserStrategy = traverserStrategy;
-<a name="325" href="#325">325</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="326" href="#326">326</a>     }
-<a name="327" href="#327">327</a> 
-<a name="328" href="#328">328</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">     * Sets the traverser to describe the distributed graph traversal.</em>
-<a name="330" href="#330">330</a> <em class="jxr_javadoccomment">     *</em>
-<a name="331" href="#331">331</a> <em class="jxr_javadoccomment">     * @param traverser traverser for the query graph</em>
-<a name="332" href="#332">332</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="333" href="#333">333</a> <em class="jxr_javadoccomment">     */</em>
-<a name="334" href="#334">334</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setTraverser(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser) {
-<a name="335" href="#335">335</a>       <strong class="jxr_keyword">this</strong>.traverser = traverser;
-<a name="336" href="#336">336</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="337" href="#337">337</a>     }
-<a name="338" href="#338">338</a> 
-<a name="339" href="#339">339</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="340" href="#340">340</a> <em class="jxr_javadoccomment">     * Sets the join strategy for joining edges during traversal.</em>
-<a name="341" href="#341">341</a> <em class="jxr_javadoccomment">     *</em>
-<a name="342" href="#342">342</a> <em class="jxr_javadoccomment">     * @param edgeStepJoinStrategy join strategy</em>
-<a name="343" href="#343">343</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="344" href="#344">344</a> <em class="jxr_javadoccomment">     */</em>
-<a name="345" href="#345">345</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setEdgeStepJoinStrategy(
-<a name="346" href="#346">346</a>       JoinOperatorBase.JoinHint edgeStepJoinStrategy) {
-<a name="347" href="#347">347</a>       <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy = edgeStepJoinStrategy;
-<a name="348" href="#348">348</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="349" href="#349">349</a>     }
-<a name="350" href="#350">350</a> 
-<a name="351" href="#351">351</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="352" href="#352">352</a> <em class="jxr_javadoccomment">     * Sets the join strategy for joining vertices during traversal.</em>
-<a name="353" href="#353">353</a> <em class="jxr_javadoccomment">     *</em>
-<a name="354" href="#354">354</a> <em class="jxr_javadoccomment">     * @param vertexStepJoinStrategy join strategy</em>
-<a name="355" href="#355">355</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
-<a name="356" href="#356">356</a> <em class="jxr_javadoccomment">     */</em>
-<a name="357" href="#357">357</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setVertexStepJoinStrategy(
-<a name="358" href="#358">358</a>       JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
-<a name="359" href="#359">359</a>       <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = vertexStepJoinStrategy;
-<a name="360" href="#360">360</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="361" href="#361">361</a>     }
-<a name="362" href="#362">362</a> 
-<a name="363" href="#363">363</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="364" href="#364">364</a> <em class="jxr_javadoccomment">     * Instantiates a new {@link ExplorativePatternMatching} operator.</em>
-<a name="365" href="#365">365</a> <em class="jxr_javadoccomment">     *</em>
-<a name="366" href="#366">366</a> <em class="jxr_javadoccomment">     * @param &lt;G&gt; The graph head type.</em>
-<a name="367" href="#367">367</a> <em class="jxr_javadoccomment">     * @param &lt;V&gt; The vertex type.</em>
-<a name="368" href="#368">368</a> <em class="jxr_javadoccomment">     * @param &lt;E&gt; The edge type.</em>
-<a name="369" href="#369">369</a> <em class="jxr_javadoccomment">     * @param &lt;LG&gt; The graph type.</em>
-<a name="370" href="#370">370</a> <em class="jxr_javadoccomment">     * @param &lt;GC&gt; The graph collection type.</em>
-<a name="371" href="#371">371</a> <em class="jxr_javadoccomment">     * @return operator instance</em>
-<a name="372" href="#372">372</a> <em class="jxr_javadoccomment">     */</em>
-<a name="373" href="#373">373</a>     <strong class="jxr_keyword">public</strong> &lt;G <strong class="jxr_keyword">extends</strong> GraphHead,
-<a name="374" href="#374">374</a>       V <strong class="jxr_keyword">extends</strong> Vertex,
-<a name="375" href="#375">375</a>       E <strong class="jxr_keyword">extends</strong> Edge,
-<a name="376" href="#376">376</a>       LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
-<a name="377" href="#377">377</a>       GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; ExplorativePatternMatching&lt;G, V, E, LG, GC&gt; build() {
-<a name="378" href="#378">378</a>       Objects.requireNonNull(query, <span class="jxr_string">"Missing GDL query"</span>);
-<a name="379" href="#379">379</a>       Objects.requireNonNull(matchStrategy, <span class="jxr_string">"Missing match strategy"</span>);
-<a name="380" href="#380">380</a>       Objects.requireNonNull(traverserStrategy, <span class="jxr_string">"Missing iteration strategy"</span>);
-<a name="381" href="#381">381</a>       Objects.requireNonNull(traverser, <span class="jxr_string">"Missing traverser"</span>);
-<a name="382" href="#382">382</a>       Objects.requireNonNull(edgeStepJoinStrategy, <span class="jxr_string">"Missing join strategy"</span>);
-<a name="383" href="#383">383</a>       Objects.requireNonNull(vertexStepJoinStrategy, <span class="jxr_string">"Missing join strategy"</span>);
-<a name="384" href="#384">384</a> 
-<a name="385" href="#385">385</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ExplorativePatternMatching&lt;&gt;(query, attachData,
-<a name="386" href="#386">386</a>         matchStrategy, traverserStrategy, traverser, edgeStepJoinStrategy,
-<a name="387" href="#387">387</a>         vertexStepJoinStrategy);
-<a name="388" href="#388">388</a>     }
-<a name="389" href="#389">389</a> 
-<a name="390" href="#390">390</a>   }
-<a name="391" href="#391">391</a> }
+<a name="237" href="#237">237</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   * Used for configuring and creating a new {@link ExplorativePatternMatching} operator instance.</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   */</em>
+<a name="240" href="#240">240</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> {
+<a name="241" href="#241">241</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">     * GDL query string</em>
+<a name="243" href="#243">243</a> <em class="jxr_javadoccomment">     */</em>
+<a name="244" href="#244">244</a>     <strong class="jxr_keyword">private</strong> String query;
+<a name="245" href="#245">245</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="246" href="#246">246</a> <em class="jxr_javadoccomment">     * Attach original vertex and edge data</em>
+<a name="247" href="#247">247</a> <em class="jxr_javadoccomment">     */</em>
+<a name="248" href="#248">248</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> attachData;
+<a name="249" href="#249">249</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="250" href="#250">250</a> <em class="jxr_javadoccomment">     * Matching strategy for vertex and edge mappings</em>
+<a name="251" href="#251">251</a> <em class="jxr_javadoccomment">     */</em>
+<a name="252" href="#252">252</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy;
+<a name="253" href="#253">253</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="254" href="#254">254</a> <em class="jxr_javadoccomment">     * Iteration strategy for traversing the graph</em>
+<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">     */</em>
+<a name="256" href="#256">256</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy;
+<a name="257" href="#257">257</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">     * Provides a traversal description for the distributed traverser</em>
+<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">     */</em>
+<a name="260" href="#260">260</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser;
+<a name="261" href="#261">261</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">     * Join strategy for edge extensions during traversal</em>
+<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">     */</em>
+<a name="264" href="#264">264</a>     <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint edgeStepJoinStrategy;
+<a name="265" href="#265">265</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">     * Join strategy for vertex extensions during traversal</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">     */</em>
+<a name="268" href="#268">268</a>     <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint vertexStepJoinStrategy;
+<a name="269" href="#269">269</a> 
+<a name="270" href="#270">270</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="271" href="#271">271</a> <em class="jxr_javadoccomment">     * Creates a new builder instance</em>
+<a name="272" href="#272">272</a> <em class="jxr_javadoccomment">     */</em>
+<a name="273" href="#273">273</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a>() {
+<a name="274" href="#274">274</a>       <strong class="jxr_keyword">this</strong>.attachData             = false;
+<a name="275" href="#275">275</a>       <strong class="jxr_keyword">this</strong>.matchStrategy          = MatchStrategy.ISOMORPHISM;
+<a name="276" href="#276">276</a>       <strong class="jxr_keyword">this</strong>.traverserStrategy      = TraverserStrategy.SET_PAIR_BULK_ITERATION;
+<a name="277" href="#277">277</a>       <strong class="jxr_keyword">this</strong>.traverser              = <strong class="jxr_keyword">new</strong> DFSTraverser();
+<a name="278" href="#278">278</a>       <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy   = OPTIMIZER_CHOOSES;
+<a name="279" href="#279">279</a>       <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = OPTIMIZER_CHOOSES;
+<a name="280" href="#280">280</a>     }
+<a name="281" href="#281">281</a> 
+<a name="282" href="#282">282</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="283" href="#283">283</a> <em class="jxr_javadoccomment">     * Set the GDL query string. e.g. {@code (a)--&gt;(b)}</em>
+<a name="284" href="#284">284</a> <em class="jxr_javadoccomment">     *</em>
+<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">     * @param query GDL query</em>
+<a name="286" href="#286">286</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="287" href="#287">287</a> <em class="jxr_javadoccomment">     */</em>
+<a name="288" href="#288">288</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setQuery(String query) {
+<a name="289" href="#289">289</a>       <strong class="jxr_keyword">this</strong>.query = query;
+<a name="290" href="#290">290</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="291" href="#291">291</a>     }
+<a name="292" href="#292">292</a> 
+<a name="293" href="#293">293</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">     * Set if the original vertex and edge data shall be attached to the result.</em>
+<a name="295" href="#295">295</a> <em class="jxr_javadoccomment">     *</em>
+<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">     * @param attachData true, iff data shall be attached</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">     */</em>
+<a name="299" href="#299">299</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setAttachData(<strong class="jxr_keyword">boolean</strong> attachData) {
+<a name="300" href="#300">300</a>       <strong class="jxr_keyword">this</strong>.attachData = attachData;
+<a name="301" href="#301">301</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="302" href="#302">302</a>     }
+<a name="303" href="#303">303</a> 
+<a name="304" href="#304">304</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="305" href="#305">305</a> <em class="jxr_javadoccomment">     * Set matching strategy for vertex and edge embeddings (e.g. isomorphism).</em>
+<a name="306" href="#306">306</a> <em class="jxr_javadoccomment">     *</em>
+<a name="307" href="#307">307</a> <em class="jxr_javadoccomment">     * @param matchStrategy matching strategy</em>
+<a name="308" href="#308">308</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="309" href="#309">309</a> <em class="jxr_javadoccomment">     */</em>
+<a name="310" href="#310">310</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setMatchStrategy(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy) {
+<a name="311" href="#311">311</a>       <strong class="jxr_keyword">this</strong>.matchStrategy = matchStrategy;
+<a name="312" href="#312">312</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="313" href="#313">313</a>     }
+<a name="314" href="#314">314</a> 
+<a name="315" href="#315">315</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="316" href="#316">316</a> <em class="jxr_javadoccomment">     * Set iteration strategy for traversing the graph (e.g. bulk traversal).</em>
+<a name="317" href="#317">317</a> <em class="jxr_javadoccomment">     *</em>
+<a name="318" href="#318">318</a> <em class="jxr_javadoccomment">     * @param traverserStrategy iteration strategy</em>
+<a name="319" href="#319">319</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">     */</em>
+<a name="321" href="#321">321</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setTraverserStrategy(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy) {
+<a name="322" href="#322">322</a>       <strong class="jxr_keyword">this</strong>.traverserStrategy = traverserStrategy;
+<a name="323" href="#323">323</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="324" href="#324">324</a>     }
+<a name="325" href="#325">325</a> 
+<a name="326" href="#326">326</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="327" href="#327">327</a> <em class="jxr_javadoccomment">     * Sets the traverser to describe the distributed graph traversal.</em>
+<a name="328" href="#328">328</a> <em class="jxr_javadoccomment">     *</em>
+<a name="329" href="#329">329</a> <em class="jxr_javadoccomment">     * @param traverser traverser for the query graph</em>
+<a name="330" href="#330">330</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="331" href="#331">331</a> <em class="jxr_javadoccomment">     */</em>
+<a name="332" href="#332">332</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setTraverser(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Traverser.html">Traverser</a> traverser) {
+<a name="333" href="#333">333</a>       <strong class="jxr_keyword">this</strong>.traverser = traverser;
+<a name="334" href="#334">334</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="335" href="#335">335</a>     }
+<a name="336" href="#336">336</a> 
+<a name="337" href="#337">337</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="338" href="#338">338</a> <em class="jxr_javadoccomment">     * Sets the join strategy for joining edges during traversal.</em>
+<a name="339" href="#339">339</a> <em class="jxr_javadoccomment">     *</em>
+<a name="340" href="#340">340</a> <em class="jxr_javadoccomment">     * @param edgeStepJoinStrategy join strategy</em>
+<a name="341" href="#341">341</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="342" href="#342">342</a> <em class="jxr_javadoccomment">     */</em>
+<a name="343" href="#343">343</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setEdgeStepJoinStrategy(
+<a name="344" href="#344">344</a>       JoinOperatorBase.JoinHint edgeStepJoinStrategy) {
+<a name="345" href="#345">345</a>       <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy = edgeStepJoinStrategy;
+<a name="346" href="#346">346</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="347" href="#347">347</a>     }
+<a name="348" href="#348">348</a> 
+<a name="349" href="#349">349</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="350" href="#350">350</a> <em class="jxr_javadoccomment">     * Sets the join strategy for joining vertices during traversal.</em>
+<a name="351" href="#351">351</a> <em class="jxr_javadoccomment">     *</em>
+<a name="352" href="#352">352</a> <em class="jxr_javadoccomment">     * @param vertexStepJoinStrategy join strategy</em>
+<a name="353" href="#353">353</a> <em class="jxr_javadoccomment">     * @return modified builder</em>
+<a name="354" href="#354">354</a> <em class="jxr_javadoccomment">     */</em>
+<a name="355" href="#355">355</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativePatternMatching.html">Builder</a> setVertexStepJoinStrategy(
+<a name="356" href="#356">356</a>       JoinOperatorBase.JoinHint vertexStepJoinStrategy) {
+<a name="357" href="#357">357</a>       <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = vertexStepJoinStrategy;
+<a name="358" href="#358">358</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="359" href="#359">359</a>     }
+<a name="360" href="#360">360</a> 
+<a name="361" href="#361">361</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="362" href="#362">362</a> <em class="jxr_javadoccomment">     * Instantiates a new {@link ExplorativePatternMatching} operator.</em>
+<a name="363" href="#363">363</a> <em class="jxr_javadoccomment">     *</em>
+<a name="364" href="#364">364</a> <em class="jxr_javadoccomment">     * @param &lt;G&gt; The graph head type.</em>
+<a name="365" href="#365">365</a> <em class="jxr_javadoccomment">     * @param &lt;V&gt; The vertex type.</em>
+<a name="366" href="#366">366</a> <em class="jxr_javadoccomment">     * @param &lt;E&gt; The edge type.</em>
+<a name="367" href="#367">367</a> <em class="jxr_javadoccomment">     * @param &lt;LG&gt; The graph type.</em>
+<a name="368" href="#368">368</a> <em class="jxr_javadoccomment">     * @param &lt;GC&gt; The graph collection type.</em>
+<a name="369" href="#369">369</a> <em class="jxr_javadoccomment">     * @return operator instance</em>
+<a name="370" href="#370">370</a> <em class="jxr_javadoccomment">     */</em>
+<a name="371" href="#371">371</a>     <strong class="jxr_keyword">public</strong> &lt;G <strong class="jxr_keyword">extends</strong> GraphHead,
+<a name="372" href="#372">372</a>       V <strong class="jxr_keyword">extends</strong> Vertex,
+<a name="373" href="#373">373</a>       E <strong class="jxr_keyword">extends</strong> Edge,
+<a name="374" href="#374">374</a>       LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
+<a name="375" href="#375">375</a>       GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; ExplorativePatternMatching&lt;G, V, E, LG, GC&gt; build() {
+<a name="376" href="#376">376</a>       Objects.requireNonNull(query, <span class="jxr_string">"Missing GDL query"</span>);
+<a name="377" href="#377">377</a>       Objects.requireNonNull(matchStrategy, <span class="jxr_string">"Missing match strategy"</span>);
+<a name="378" href="#378">378</a>       Objects.requireNonNull(traverserStrategy, <span class="jxr_string">"Missing iteration strategy"</span>);
+<a name="379" href="#379">379</a>       Objects.requireNonNull(traverser, <span class="jxr_string">"Missing traverser"</span>);
+<a name="380" href="#380">380</a>       Objects.requireNonNull(edgeStepJoinStrategy, <span class="jxr_string">"Missing join strategy"</span>);
+<a name="381" href="#381">381</a>       Objects.requireNonNull(vertexStepJoinStrategy, <span class="jxr_string">"Missing join strategy"</span>);
+<a name="382" href="#382">382</a> 
+<a name="383" href="#383">383</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> ExplorativePatternMatching&lt;&gt;(query, attachData, matchStrategy, traverserStrategy, traverser,
+<a name="384" href="#384">384</a>         edgeStepJoinStrategy, vertexStepJoinStrategy);
+<a name="385" href="#385">385</a>     }
+<a name="386" href="#386">386</a> 
+<a name="387" href="#387">387</a>   }
+<a name="388" href="#388">388</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

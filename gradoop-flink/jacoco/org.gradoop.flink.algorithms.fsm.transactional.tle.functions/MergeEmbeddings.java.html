@@ -22,27 +22,26 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddi
 import java.util.Iterator;
 
 /**
- * (graph, subgraph, embeddings),.. =&gt; (graph, &quot;&quot;, embeddings)
+ * {@code (graph, subgraph, embeddings),.. =&gt; (graph, &quot;&quot;, embeddings)}
  *
- * @param &lt;SE&gt;
+ * @param &lt;SE&gt; Subgraph Embeddings type
  */
-<span class="fc" id="L29">public class MergeEmbeddings&lt;SE extends SubgraphEmbeddings&gt;</span>
-  implements GroupReduceFunction&lt;SE, SE&gt; {
+<span class="fc" id="L29">public class MergeEmbeddings&lt;SE extends SubgraphEmbeddings&gt; implements GroupReduceFunction&lt;SE, SE&gt; {</span>
 
   @Override
   public void reduce(Iterable&lt;SE&gt; iterable,
     Collector&lt;SE&gt; collector) throws Exception {
 
-<span class="fc" id="L36">    Iterator&lt;SE&gt; iterator = iterable.iterator();</span>
+<span class="fc" id="L35">    Iterator&lt;SE&gt; iterator = iterable.iterator();</span>
 
-<span class="fc" id="L38">    SE out = iterator.next();</span>
-<span class="fc" id="L39">    out.setCanonicalLabel(&quot;&quot;);</span>
+<span class="fc" id="L37">    SE out = iterator.next();</span>
+<span class="fc" id="L38">    out.setCanonicalLabel(&quot;&quot;);</span>
 
-<span class="fc bfc" id="L41" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L42">      out.getEmbeddings().addAll(iterator.next().getEmbeddings());</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L41">      out.getEmbeddings().addAll(iterator.next().getEmbeddings());</span>
     }
 
-<span class="fc" id="L45">    collector.collect(out);</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L44">    collector.collect(out);</span>
+<span class="fc" id="L45">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

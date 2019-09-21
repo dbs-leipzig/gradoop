@@ -24,8 +24,8 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 /**
  * Computes the weakly connected components of a graph structure. Uses the gradoop wrapper
  * {@link ValueWeaklyConnectedComponents} of Flinks ConnectedComponents.
- *
- * Returns a mapping of VertexId -&gt; ComponentId
+ * &lt;p&gt;
+ * Returns a mapping of {@code VertexId -&gt; ComponentId}
  */
 public class ConnectedComponentsDistributionAsValues
   implements UnaryGraphToValueOperator&lt;DataSet&lt;Tuple2&lt;Long, Long&gt;&gt;&gt; {

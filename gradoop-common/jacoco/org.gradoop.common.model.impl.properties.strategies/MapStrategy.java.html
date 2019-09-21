@@ -126,28 +126,29 @@ import java.util.Map;
    *
    * @param inputView {@link DataInputViewStreamWrapper} containing data
    * @return a map containing the deserialized data
+   * @throws IOException on failure to read input view
    */
   private Map&lt;PropertyValue, PropertyValue&gt; createMap(DataInputViewStreamWrapper inputView)
     throws IOException {
     PropertyValue key;
     PropertyValue value;
 
-<span class="fc" id="L135">    Map&lt;PropertyValue, PropertyValue&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L136">    Map&lt;PropertyValue, PropertyValue&gt; map = new HashMap&lt;&gt;();</span>
 
     try {
-<span class="fc bfc" id="L138" title="All 2 branches covered.">      while (inputView.available() &gt; 0) {</span>
-<span class="fc" id="L139">        key = new PropertyValue();</span>
-<span class="fc" id="L140">        key.read(inputView);</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">      while (inputView.available() &gt; 0) {</span>
+<span class="fc" id="L140">        key = new PropertyValue();</span>
+<span class="fc" id="L141">        key.read(inputView);</span>
 
-<span class="fc" id="L142">        value = new PropertyValue();</span>
-<span class="fc" id="L143">        value.read(inputView);</span>
+<span class="fc" id="L143">        value = new PropertyValue();</span>
+<span class="fc" id="L144">        value.read(inputView);</span>
 
-<span class="fc" id="L145">        map.put(key, value);</span>
+<span class="fc" id="L146">        map.put(key, value);</span>
       }
-<span class="nc" id="L147">    } catch (IOException e) {</span>
-<span class="nc" id="L148">      throw new IOException(&quot;Error reading PropertyValue with MapStrategy.&quot;, e);</span>
-<span class="fc" id="L149">    }</span>
-<span class="fc" id="L150">    return map;</span>
+<span class="nc" id="L148">    } catch (IOException e) {</span>
+<span class="nc" id="L149">      throw new IOException(&quot;Error reading PropertyValue with MapStrategy.&quot;, e);</span>
+<span class="fc" id="L150">    }</span>
+<span class="fc" id="L151">    return map;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

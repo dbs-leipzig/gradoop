@@ -30,24 +30,24 @@ import java.util.Map;
  * Filters a set of {@link Triple} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
- *
- * Triple -&gt; Embedding( [PropertyEntry(SourceVertexId)], [PropertyEntry(EdgeId)], PropertyEntry
- * (TargetVertexId)])
- *
+ * &lt;p&gt;
+ * {@code Triple -&gt; Embedding( [PropertyEntry(SourceVertexId)], [PropertyEntry(EdgeId)], PropertyEntry
+ * (TargetVertexId)])}
+ * &lt;p&gt;
  * Example:
- *
+ * &lt;br&gt;
  * Given a Triple
- * (
+ * {@code (
  *   p1: SourceVertex(0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23, location: &quot;Sweden&quot;}),
  *   e1: Edge(1, &quot;knows&quot;, {}),
  *   p2: TargetVertex(2, &quot;Person&quot;, {name:&quot;Bob&quot;, age:23})
- * ),
- * a predicate &quot;p1.name = &quot;Alice&quot; AND p1.age &lt;= p2.age&quot; and
- * projection property keys {p1: [name, location], e1: [], p2: [name, location] the operator creates
+ * )},
+ * a predicate {@code &quot;p1.name = &quot;Alice&quot; AND p1.age &lt;= p2.age&quot;} and
+ * projection property keys {@code p1: [name, location], e1: [], p2: [name, location]} the operator creates
  * an {@link Embedding}:
- *
- * ([IdEntry(0),IdEntry(1),IdEntry(2)],[PropertyEntry(&quot;Alice&quot;),PropertyEntry(&quot;Sweden&quot;),
- * PropertyEntry(&quot;Bob&quot;),PropertyEntry(NULL)])
+ * &lt;br&gt;
+ * {@code ([IdEntry(0),IdEntry(1),IdEntry(2)],[PropertyEntry(&quot;Alice&quot;),PropertyEntry(&quot;Sweden&quot;),
+ * PropertyEntry(&quot;Bob&quot;),PropertyEntry(NULL)])}
  */
 public class FilterAndProjectTriples implements PhysicalOperator {
   /**

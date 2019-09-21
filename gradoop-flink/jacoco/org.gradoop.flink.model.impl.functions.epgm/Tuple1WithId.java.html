@@ -22,23 +22,22 @@ import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * element =&gt; (elementId)
+ * {@code element =&gt; (elementId)}
  *
  * @param &lt;EL&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
-<span class="nc" id="L30">public class Tuple1WithId&lt;EL extends EPGMElement&gt;</span>
-  implements MapFunction&lt;EL, Tuple1&lt;GradoopId&gt;&gt; {
+<span class="nc" id="L30">public class Tuple1WithId&lt;EL extends EPGMElement&gt; implements MapFunction&lt;EL, Tuple1&lt;GradoopId&gt;&gt; {</span>
 
   /**
    * Reduce instantiations
    */
-<span class="nc" id="L36">  private final Tuple1&lt;GradoopId&gt; reuseTuple = new Tuple1&lt;&gt;();</span>
+<span class="nc" id="L35">  private final Tuple1&lt;GradoopId&gt; reuseTuple = new Tuple1&lt;&gt;();</span>
 
   @Override
   public Tuple1&lt;GradoopId&gt; map(EL element) throws Exception {
-<span class="nc" id="L40">    reuseTuple.f0 = element.getId();</span>
-<span class="nc" id="L41">    return reuseTuple;</span>
+<span class="nc" id="L39">    reuseTuple.f0 = element.getId();</span>
+<span class="nc" id="L40">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -33,8 +33,7 @@ import org.gradoop.storage.hbase.impl.api.VertexHandler;
 import java.io.IOException;
 
 /**
- * Manages {@link EPGMGraphInput} instances which can be
- * used to store an EPGM instance in HBase.
+ * Manages {@link EPGMGraphInput} instances which can be used to store an EPGM instance in HBase.
  */
 public class HBaseEPGMStoreFactory {
 
@@ -52,6 +51,7 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig Gradoop configuration
    * @param prefix        prefix for HBase table name
    * @return a graph store instance or {@code null in the case of errors}
+   * @throws IOException on failure
    */
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
@@ -75,32 +75,33 @@ public class HBaseEPGMStoreFactory {
    * @param gradoopHBaseConfig  Gradoop HBase configuration
    *
    * @return EPGM store instance or {@code null in the case of errors}
+   * @throws IOException on failure
    */
   public static HBaseEPGMStore createOrOpenEPGMStore(
     final Configuration config,
     final GradoopHBaseConfig gradoopHBaseConfig) throws IOException {
 
-<span class="fc" id="L83">    Connection connection = ConnectionFactory.createConnection(config);</span>
-<span class="fc" id="L84">    createTablesIfNotExists(</span>
-<span class="fc" id="L85">      connection.getAdmin(),</span>
-<span class="fc" id="L86">      gradoopHBaseConfig.getVertexHandler(),</span>
-<span class="fc" id="L87">      gradoopHBaseConfig.getEdgeHandler(),</span>
-<span class="fc" id="L88">      gradoopHBaseConfig.getGraphHeadHandler(),</span>
-<span class="fc" id="L89">      gradoopHBaseConfig.getVertexTableName(),</span>
-<span class="fc" id="L90">      gradoopHBaseConfig.getEdgeTableName(),</span>
-<span class="fc" id="L91">      gradoopHBaseConfig.getGraphTableName()</span>
+<span class="fc" id="L84">    Connection connection = ConnectionFactory.createConnection(config);</span>
+<span class="fc" id="L85">    createTablesIfNotExists(</span>
+<span class="fc" id="L86">      connection.getAdmin(),</span>
+<span class="fc" id="L87">      gradoopHBaseConfig.getVertexHandler(),</span>
+<span class="fc" id="L88">      gradoopHBaseConfig.getEdgeHandler(),</span>
+<span class="fc" id="L89">      gradoopHBaseConfig.getGraphHeadHandler(),</span>
+<span class="fc" id="L90">      gradoopHBaseConfig.getVertexTableName(),</span>
+<span class="fc" id="L91">      gradoopHBaseConfig.getEdgeTableName(),</span>
+<span class="fc" id="L92">      gradoopHBaseConfig.getGraphTableName()</span>
     );
 
-<span class="fc" id="L94">    Table graphDataTable = connection.getTable(gradoopHBaseConfig.getGraphTableName());</span>
-<span class="fc" id="L95">    Table vertexDataTable = connection.getTable(gradoopHBaseConfig.getVertexTableName());</span>
-<span class="fc" id="L96">    Table edgeDataTable = connection.getTable(gradoopHBaseConfig.getEdgeTableName());</span>
+<span class="fc" id="L95">    Table graphDataTable = connection.getTable(gradoopHBaseConfig.getGraphTableName());</span>
+<span class="fc" id="L96">    Table vertexDataTable = connection.getTable(gradoopHBaseConfig.getVertexTableName());</span>
+<span class="fc" id="L97">    Table edgeDataTable = connection.getTable(gradoopHBaseConfig.getEdgeTableName());</span>
 
-<span class="fc" id="L98">    return new HBaseEPGMStore(</span>
+<span class="fc" id="L99">    return new HBaseEPGMStore(</span>
       graphDataTable,
       vertexDataTable,
       edgeDataTable,
       gradoopHBaseConfig,
-<span class="fc" id="L103">      connection.getAdmin()</span>
+<span class="fc" id="L104">      connection.getAdmin()</span>
     );
   }
 
@@ -110,9 +111,9 @@ public class HBaseEPGMStoreFactory {
    * @param config Hadoop configuration
    */
   public static void deleteEPGMStore(final Configuration config) {
-<span class="fc" id="L113">    deleteEPGMStore(config, HBaseConstants.DEFAULT_TABLE_VERTICES,</span>
+<span class="fc" id="L114">    deleteEPGMStore(config, HBaseConstants.DEFAULT_TABLE_VERTICES,</span>
       HBaseConstants.DEFAULT_TABLE_EDGES, HBaseConstants.DEFAULT_TABLE_GRAPHS);
-<span class="fc" id="L115">  }</span>
+<span class="fc" id="L116">  }</span>
 
   /**
    * Deletes the graph store which table names have the specified prefix.
@@ -121,13 +122,13 @@ public class HBaseEPGMStoreFactory {
    * @param prefix table prefix
    */
   public static void deleteEPGMStore(final Configuration config, String prefix) {
-<span class="fc" id="L124">    deleteEPGMStore(</span>
+<span class="fc" id="L125">    deleteEPGMStore(</span>
       config,
       prefix + HBaseConstants.DEFAULT_TABLE_VERTICES,
       prefix + HBaseConstants.DEFAULT_TABLE_EDGES,
       prefix + HBaseConstants.DEFAULT_TABLE_GRAPHS
     );
-<span class="fc" id="L130">  }</span>
+<span class="fc" id="L131">  }</span>
 
   /**
    * Deletes the graph store based on the given table names.
@@ -143,17 +144,17 @@ public class HBaseEPGMStoreFactory {
     final String edgeTableName,
     final String graphTableName
   ) {
-<span class="fc" id="L146">    try (Connection connection = ConnectionFactory.createConnection(config)) {</span>
-<span class="fc" id="L147">      deleteTablesIfExists(</span>
-<span class="fc" id="L148">        connection.getAdmin(),</span>
-<span class="fc" id="L149">        TableName.valueOf(vertexTableName),</span>
-<span class="fc" id="L150">        TableName.valueOf(edgeTableName),</span>
-<span class="fc" id="L151">        TableName.valueOf(graphTableName)</span>
+<span class="fc" id="L147">    try (Connection connection = ConnectionFactory.createConnection(config)) {</span>
+<span class="fc" id="L148">      deleteTablesIfExists(</span>
+<span class="fc" id="L149">        connection.getAdmin(),</span>
+<span class="fc" id="L150">        TableName.valueOf(vertexTableName),</span>
+<span class="fc" id="L151">        TableName.valueOf(edgeTableName),</span>
+<span class="fc" id="L152">        TableName.valueOf(graphTableName)</span>
       );
-<span class="nc" id="L153">    } catch (IOException e) {</span>
-<span class="nc" id="L154">      e.printStackTrace();</span>
-<span class="fc" id="L155">    }</span>
-<span class="fc" id="L156">  }</span>
+<span class="nc" id="L154">    } catch (IOException e) {</span>
+<span class="nc" id="L155">      e.printStackTrace();</span>
+<span class="fc" id="L156">    }</span>
+<span class="fc" id="L157">  }</span>
 
   /**
    * Creates the tables used by the graph store.
@@ -177,18 +178,18 @@ public class HBaseEPGMStoreFactory {
     final TableName graphTableName
   ) throws IOException {
 
-<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (!admin.tableExists(vertexTableName)) {</span>
-<span class="fc" id="L181">      vertexHandler.createTable(admin, new HTableDescriptor(vertexTableName));</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    if (!admin.tableExists(vertexTableName)) {</span>
+<span class="fc" id="L182">      vertexHandler.createTable(admin, new HTableDescriptor(vertexTableName));</span>
     }
-<span class="fc bfc" id="L183" title="All 2 branches covered.">    if (!admin.tableExists(edgeTableName)) {</span>
-<span class="fc" id="L184">      edgeHandler.createTable(admin, new HTableDescriptor(edgeTableName));</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">    if (!admin.tableExists(edgeTableName)) {</span>
+<span class="fc" id="L185">      edgeHandler.createTable(admin, new HTableDescriptor(edgeTableName));</span>
     }
-<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (!admin.tableExists(graphTableName)) {</span>
-<span class="fc" id="L187">      graphHeadHandler.createTable(admin, new HTableDescriptor(graphTableName));</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">    if (!admin.tableExists(graphTableName)) {</span>
+<span class="fc" id="L188">      graphHeadHandler.createTable(admin, new HTableDescriptor(graphTableName));</span>
     }
 
-<span class="fc" id="L190">    admin.close();</span>
-<span class="fc" id="L191">  }</span>
+<span class="fc" id="L191">    admin.close();</span>
+<span class="fc" id="L192">  }</span>
 
   /**
    * Deletes the tables given tables.
@@ -206,18 +207,18 @@ public class HBaseEPGMStoreFactory {
     final TableName graphDataTableName
   ) throws IOException {
 
-<span class="fc bfc" id="L209" title="All 2 branches covered.">    if (admin.tableExists(vertexDataTableName)) {</span>
-<span class="fc" id="L210">      deleteTable(admin, vertexDataTableName);</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">    if (admin.tableExists(vertexDataTableName)) {</span>
+<span class="fc" id="L211">      deleteTable(admin, vertexDataTableName);</span>
     }
-<span class="fc bfc" id="L212" title="All 2 branches covered.">    if (admin.tableExists(edgeDataTableName)) {</span>
-<span class="fc" id="L213">      deleteTable(admin, edgeDataTableName);</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">    if (admin.tableExists(edgeDataTableName)) {</span>
+<span class="fc" id="L214">      deleteTable(admin, edgeDataTableName);</span>
     }
-<span class="fc bfc" id="L215" title="All 2 branches covered.">    if (admin.tableExists(graphDataTableName)) {</span>
-<span class="fc" id="L216">      deleteTable(admin, graphDataTableName);</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (admin.tableExists(graphDataTableName)) {</span>
+<span class="fc" id="L217">      deleteTable(admin, graphDataTableName);</span>
     }
 
-<span class="fc" id="L219">    admin.close();</span>
-<span class="fc" id="L220">  }</span>
+<span class="fc" id="L220">    admin.close();</span>
+<span class="fc" id="L221">  }</span>
 
   /**
    * Deletes a HBase table.
@@ -227,8 +228,8 @@ public class HBaseEPGMStoreFactory {
    * @throws IOException on failure
    */
   private static void deleteTable(final Admin admin, final TableName tableName) throws IOException {
-<span class="fc" id="L230">    admin.disableTable(tableName);</span>
-<span class="fc" id="L231">    admin.deleteTable(tableName);</span>
-<span class="fc" id="L232">  }</span>
+<span class="fc" id="L231">    admin.disableTable(tableName);</span>
+<span class="fc" id="L232">    admin.deleteTable(tableName);</span>
+<span class="fc" id="L233">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

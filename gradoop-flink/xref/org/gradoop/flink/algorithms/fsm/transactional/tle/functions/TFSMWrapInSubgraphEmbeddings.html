@@ -32,35 +32,34 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings</em>
+<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * {@code subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings}</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/functions/TFSMWrapInSubgraphEmbeddings.html">TFSMWrapInSubgraphEmbeddings</a> implements
-<a name="28" href="#28">28</a>    MapFunction&lt;TFSMSubgraph, TFSMSubgraphEmbeddings&gt; {
-<a name="29" href="#29">29</a>  
-<a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * reuse tuple to avoid instantiations</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="33" href="#33">33</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a> reuseTuple;
-<a name="34" href="#34">34</a>  
-<a name="35" href="#35">35</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   * Constructor.</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="38" href="#38">38</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/functions/TFSMWrapInSubgraphEmbeddings.html">TFSMWrapInSubgraphEmbeddings</a>() {
-<a name="39" href="#39">39</a>      <strong class="jxr_keyword">this</strong>.reuseTuple = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a>();
-<a name="40" href="#40">40</a>      <strong class="jxr_keyword">this</strong>.reuseTuple.setGraphId(GradoopId.NULL_VALUE);
-<a name="41" href="#41">41</a>      <strong class="jxr_keyword">this</strong>.reuseTuple.setSize(0);
-<a name="42" href="#42">42</a>    }
-<a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>    @Override
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a> map(<a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraph.html">TFSMSubgraph</a> tfsmSubgraph) <strong class="jxr_keyword">throws</strong>
-<a name="46" href="#46">46</a>      Exception {
-<a name="47" href="#47">47</a>  
-<a name="48" href="#48">48</a>      reuseTuple.setCanonicalLabel(tfsmSubgraph.getCanonicalLabel());
-<a name="49" href="#49">49</a>      reuseTuple.setEmbeddings(Lists.newArrayList(tfsmSubgraph.getEmbedding()));
-<a name="50" href="#50">50</a>  
-<a name="51" href="#51">51</a>      <strong class="jxr_keyword">return</strong> reuseTuple;
-<a name="52" href="#52">52</a>    }
-<a name="53" href="#53">53</a>  }
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/functions/TFSMWrapInSubgraphEmbeddings.html">TFSMWrapInSubgraphEmbeddings</a> implements MapFunction&lt;TFSMSubgraph, TFSMSubgraphEmbeddings&gt; {
+<a name="28" href="#28">28</a>  
+<a name="29" href="#29">29</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   * Reuse tuple to avoid instantiations.</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="32" href="#32">32</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a> reuseTuple;
+<a name="33" href="#33">33</a>  
+<a name="34" href="#34">34</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * Constructor.</em>
+<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/functions/TFSMWrapInSubgraphEmbeddings.html">TFSMWrapInSubgraphEmbeddings</a>() {
+<a name="38" href="#38">38</a>      <strong class="jxr_keyword">this</strong>.reuseTuple = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a>();
+<a name="39" href="#39">39</a>      <strong class="jxr_keyword">this</strong>.reuseTuple.setGraphId(GradoopId.NULL_VALUE);
+<a name="40" href="#40">40</a>      <strong class="jxr_keyword">this</strong>.reuseTuple.setSize(0);
+<a name="41" href="#41">41</a>    }
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>    @Override
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraphEmbeddings.html">TFSMSubgraphEmbeddings</a> map(<a href="../../../../../../../../org/gradoop/flink/algorithms/fsm/transactional/tle/tuples/TFSMSubgraph.html">TFSMSubgraph</a> tfsmSubgraph) <strong class="jxr_keyword">throws</strong>
+<a name="45" href="#45">45</a>      Exception {
+<a name="46" href="#46">46</a>  
+<a name="47" href="#47">47</a>      reuseTuple.setCanonicalLabel(tfsmSubgraph.getCanonicalLabel());
+<a name="48" href="#48">48</a>      reuseTuple.setEmbeddings(Lists.newArrayList(tfsmSubgraph.getEmbedding()));
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>      <strong class="jxr_keyword">return</strong> reuseTuple;
+<a name="51" href="#51">51</a>    }
+<a name="52" href="#52">52</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

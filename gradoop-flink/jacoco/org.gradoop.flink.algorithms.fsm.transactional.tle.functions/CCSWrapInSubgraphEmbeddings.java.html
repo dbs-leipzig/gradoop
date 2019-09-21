@@ -22,34 +22,33 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraphEmbeddings;
 
 /**
- * subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings
+ * {@code subgraphWithSampleEmbedding =&gt; subgraphWithEmbeddings}
  */
-public class CCSWrapInSubgraphEmbeddings implements
-  MapFunction&lt;CCSSubgraph, CCSSubgraphEmbeddings&gt; {
+public class CCSWrapInSubgraphEmbeddings implements MapFunction&lt;CCSSubgraph, CCSSubgraphEmbeddings&gt; {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
   private final CCSSubgraphEmbeddings reuseTuple;
 
   /**
    * Constructor.
    */
-<span class="nc" id="L38">  public CCSWrapInSubgraphEmbeddings() {</span>
-<span class="nc" id="L39">    this.reuseTuple = new CCSSubgraphEmbeddings();</span>
-<span class="nc" id="L40">    this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);</span>
-<span class="nc" id="L41">  }</span>
+<span class="nc" id="L37">  public CCSWrapInSubgraphEmbeddings() {</span>
+<span class="nc" id="L38">    this.reuseTuple = new CCSSubgraphEmbeddings();</span>
+<span class="nc" id="L39">    this.reuseTuple.setGraphId(GradoopId.NULL_VALUE);</span>
+<span class="nc" id="L40">  }</span>
 
   @Override
   public CCSSubgraphEmbeddings map(CCSSubgraph subgraph) throws
     Exception {
 
-<span class="nc" id="L47">    reuseTuple.setCanonicalLabel(subgraph.getCanonicalLabel());</span>
-<span class="nc" id="L48">    reuseTuple.setCategory(subgraph.getCategory());</span>
-<span class="nc" id="L49">    reuseTuple.setSize(subgraph.getEmbedding().getEdges().size());</span>
-<span class="nc" id="L50">    reuseTuple.setEmbeddings(Lists.newArrayList(subgraph.getEmbedding()));</span>
+<span class="nc" id="L46">    reuseTuple.setCanonicalLabel(subgraph.getCanonicalLabel());</span>
+<span class="nc" id="L47">    reuseTuple.setCategory(subgraph.getCategory());</span>
+<span class="nc" id="L48">    reuseTuple.setSize(subgraph.getEmbedding().getEdges().size());</span>
+<span class="nc" id="L49">    reuseTuple.setEmbeddings(Lists.newArrayList(subgraph.getEmbedding()));</span>
 
-<span class="nc" id="L52">    return reuseTuple;</span>
+<span class="nc" id="L51">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

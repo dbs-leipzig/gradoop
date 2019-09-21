@@ -39,7 +39,7 @@
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Finds all 1-edge patterns and their embeddings in a given graph.</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * @param graph graph</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * @return pattern -&gt; embeddings (k=1)</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * @return {@code pattern -&gt; embeddings (k=1)}</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="34" href="#34">34</a>    <a href="../../../../../../../org/gradoop/flink/algorithms/fsm/dimspan/tuples/PatternEmbeddingsMap.html">PatternEmbeddingsMap</a> getSingleEdgePatternEmbeddings(<strong class="jxr_keyword">int</strong>[] graph);
 <a name="35" href="#35">35</a>  
@@ -65,24 +65,24 @@
 <a name="55" href="#55">55</a>    );
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Verifies if a pattern in DFS-code model</em>
-<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * is minimal according to gSpan lexicographic order.</em>
-<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @param pattern pattern</em>
-<a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * @return true, if minimal</em>
-<a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="64" href="#64">64</a>    <strong class="jxr_keyword">boolean</strong> isMinimal(<strong class="jxr_keyword">int</strong>[] pattern);
-<a name="65" href="#65">65</a>  
-<a name="66" href="#66">66</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * Calculates the rightmost path of a given pattern.</em>
-<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * @param pattern input pattern</em>
-<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   * @return rightmost path (vertex times)</em>
-<a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="72" href="#72">72</a>    <strong class="jxr_keyword">int</strong>[] getRightmostPathTimes(<strong class="jxr_keyword">int</strong>[] pattern);
-<a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="75" href="#75">75</a>  <em class="jxr_javadoccomment">   * Turns a pattern in DFS code model into a graph</em>
+<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Verifies if a pattern in DFS-code model is minimal according to gSpan lexicographic order.</em>
+<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * @param pattern pattern</em>
+<a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @return true, if minimal</em>
+<a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="63" href="#63">63</a>    <strong class="jxr_keyword">boolean</strong> isMinimal(<strong class="jxr_keyword">int</strong>[] pattern);
+<a name="64" href="#64">64</a>  
+<a name="65" href="#65">65</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   * Calculates the rightmost path of a given pattern.</em>
+<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * @param pattern input pattern</em>
+<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * @return rightmost path (vertex times)</em>
+<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="71" href="#71">71</a>    <strong class="jxr_keyword">int</strong>[] getRightmostPathTimes(<strong class="jxr_keyword">int</strong>[] pattern);
+<a name="72" href="#72">72</a>  
+<a name="73" href="#73">73</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="74" href="#74">74</a>  <em class="jxr_javadoccomment">   * Turns a pattern in DFS code model into a graph.</em>
+<a name="75" href="#75">75</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   * @param pattern DFS code</em>
 <a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   * @return graph</em>
 <a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   */</em>

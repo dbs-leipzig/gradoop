@@ -24,20 +24,22 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
  * Add all gradoop ids in the second field of the first tuple to the element.
- * id:el{id1} join (id, {id2, id3}) -&gt; id:el{id1, id2, id3}
+ * &lt;p&gt;
+ * {@code id:el{id1} join (id, {id2, id3}) -&gt; id:el{id1, id2, id3}}
+ *
  * @param &lt;EL&gt; epgm graph element type
  */
 @FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;id;label;properties&quot;)
-<span class="fc" id="L32">public class AddGraphsToElements&lt;EL extends GraphElement&gt;</span>
+<span class="fc" id="L34">public class AddGraphsToElements&lt;EL extends GraphElement&gt;</span>
   implements JoinFunction&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;, EL, EL&gt; {
 
   @Override
   public EL join(
     Tuple2&lt;GradoopId, GradoopIdSet&gt; left,
     EL right) {
-<span class="nc" id="L39">    right.getGraphIds().addAll(left.f1);</span>
-<span class="nc" id="L40">    return right;</span>
+<span class="nc" id="L41">    right.getGraphIds().addAll(left.f1);</span>
+<span class="nc" id="L42">    return right;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

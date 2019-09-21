@@ -33,12 +33,12 @@
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Returns one Tuple2&lt;GradoopId, T&gt; per id contained in the first field.</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; any type</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="29" href="#29">29</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f1"</span>)
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ExpandFirstField&lt;T&gt;
-<a name="31" href="#31">31</a>    implements FlatMapFunction&lt;Tuple2&lt;GradoopIdSet, T&gt;, Tuple2&lt;GradoopId, T&gt;&gt; {
+<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Returns one {@code Tuple2&lt;GradoopId, T&gt;} per id contained in the first field.</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; any type</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="30" href="#30">30</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f1"</span>)
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ExpandFirstField&lt;T&gt; implements FlatMapFunction&lt;Tuple2&lt;GradoopIdSet, T&gt;, Tuple2&lt;GradoopId, T&gt;&gt; {
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * Reduce instantiation</em>

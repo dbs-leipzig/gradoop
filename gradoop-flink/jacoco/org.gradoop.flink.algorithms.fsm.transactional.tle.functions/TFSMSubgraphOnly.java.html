@@ -20,28 +20,26 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
 
 /**
- * (graphId, size, canonicalLabel, embeddings)
- *   =&gt; (canonicalLabel, frequency=1, sample embedding)
+ * {@code (graphId, size, canonicalLabel, embeddings) =&gt; (canonicalLabel, frequency=1, sample embedding)}
  */
-<span class="fc" id="L26">public class TFSMSubgraphOnly</span>
-  implements MapFunction&lt;TFSMSubgraphEmbeddings, TFSMSubgraph&gt; {
+<span class="fc" id="L25">public class TFSMSubgraphOnly implements MapFunction&lt;TFSMSubgraphEmbeddings, TFSMSubgraph&gt; {</span>
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
-<span class="fc" id="L32">  private final TFSMSubgraph reuseTuple = new TFSMSubgraph(null, 1L, null);</span>
+<span class="fc" id="L30">  private final TFSMSubgraph reuseTuple = new TFSMSubgraph(null, 1L, null);</span>
 
   @Override
   public TFSMSubgraph map(
     TFSMSubgraphEmbeddings subgraphEmbeddings) throws Exception {
 
-<span class="fc" id="L38">    reuseTuple</span>
-<span class="fc" id="L39">      .setCanonicalLabel(subgraphEmbeddings.getCanonicalLabel());</span>
+<span class="fc" id="L36">    reuseTuple</span>
+<span class="fc" id="L37">      .setCanonicalLabel(subgraphEmbeddings.getCanonicalLabel());</span>
 
-<span class="fc" id="L41">    reuseTuple</span>
-<span class="fc" id="L42">      .setEmbedding(subgraphEmbeddings.getEmbeddings().iterator().next());</span>
+<span class="fc" id="L39">    reuseTuple</span>
+<span class="fc" id="L40">      .setEmbedding(subgraphEmbeddings.getEmbeddings().iterator().next());</span>
 
-<span class="fc" id="L44">    return reuseTuple;</span>
+<span class="fc" id="L42">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

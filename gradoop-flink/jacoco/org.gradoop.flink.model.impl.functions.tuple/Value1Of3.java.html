@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
- * (f0,f1,f2) =&gt; f1
+ * {@code (f0,f1,f2) =&gt; f1}
  *
  * @param &lt;T0&gt; f0 type
  * @param &lt;T1&gt; f1 type
@@ -29,17 +29,16 @@ import org.apache.flink.api.java.tuple.Tuple3;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f1-&gt;*&quot;)
 <span class="nc" id="L31">public class Value1Of3&lt;T0, T1, T2&gt;</span>
-  implements
-  MapFunction&lt;Tuple3&lt;T0, T1, T2&gt;, T1&gt;, KeySelector&lt;Tuple3&lt;T0, T1, T2&gt;, T1&gt; {
+  implements MapFunction&lt;Tuple3&lt;T0, T1, T2&gt;, T1&gt;, KeySelector&lt;Tuple3&lt;T0, T1, T2&gt;, T1&gt; {
 
   @Override
   public T1 map(Tuple3&lt;T0, T1, T2&gt; triple) throws Exception {
-<span class="nc" id="L37">    return triple.f1;</span>
+<span class="nc" id="L36">    return triple.f1;</span>
   }
 
   @Override
   public T1 getKey(Tuple3&lt;T0, T1, T2&gt; triple) throws Exception {
-<span class="nc" id="L42">    return triple.f1;</span>
+<span class="nc" id="L41">    return triple.f1;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

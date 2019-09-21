@@ -48,7 +48,7 @@ public class CreateLongSourceIds
    *
    * @param tuple holds information about long id and gradoop id of a vertex
    * @param edge holds information about source and target vertices
-   * @return tuple &lt;vertexID&lt;Long&gt;&gt;,vertexID&lt;GradoopID&gt;&gt;,sourceID&lt;Long&gt;&gt;,targetID&lt;GradoopID&gt;&gt;
+   * @return tuple {@code &lt;vertexID&lt;Long&gt;,vertexID&lt;GradoopID&gt;,sourceID&lt;Long&gt;,targetID&lt;GradoopID&gt;&gt;}
    */
   @Override
   public Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; join(Tuple2&lt;Long, GradoopId&gt; tuple, EPGMEdge edge) {

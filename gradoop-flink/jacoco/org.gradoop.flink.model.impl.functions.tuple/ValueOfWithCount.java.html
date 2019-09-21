@@ -19,14 +19,15 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (object, count) =&gt; object
+ * {@code (object, count) =&gt; object}
+ *
  * @param &lt;T&gt; value type
  */
-<span class="fc" id="L25">public class ValueOfWithCount&lt;T&gt; implements MapFunction&lt;WithCount&lt;T&gt;, T&gt; {</span>
+<span class="fc" id="L26">public class ValueOfWithCount&lt;T&gt; implements MapFunction&lt;WithCount&lt;T&gt;, T&gt; {</span>
 
   @Override
   public T map(WithCount&lt;T&gt; value) throws Exception {
-<span class="fc" id="L29">    return value.getObject();</span>
+<span class="fc" id="L30">    return value.getObject();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

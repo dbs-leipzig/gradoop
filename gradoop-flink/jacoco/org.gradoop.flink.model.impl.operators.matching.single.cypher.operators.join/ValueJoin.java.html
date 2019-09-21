@@ -23,20 +23,16 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.P
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractPropertyJoinColumns;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
 
-
 import java.util.Collections;
 import java.util.List;
 
 /**
  * This operator joins two possibly disjunct data sets by predicates only concerning properties.
- * The predicates must include at least one isolated equality predicate
- * e.g.
- * &lt;pre&gt;
- *   MATCH (a:Department), (b)-[:X]-&gt;(c:Person {name: &quot;Max&quot;) WHERE a.prop = b.prop AND a.prop2 =
- *   b.prop2
- * &lt;/pre&gt;
- *
- * The result is always a new embedding with the following constraints.
+ * The predicates must include at least one isolated equality predicate e.g.:
+ * &lt;br&gt;
+ * {@code MATCH (a:Department), (b)-[:X]-&gt;(c:Person (name: &quot;Max&quot;) WHERE a.prop = b.prop AND a.prop2 = b.prop2}
+ * &lt;p&gt;
+ * The result is always a new embedding with the following constraints:
  * &lt;ul&gt;
  * &lt;li&gt;new entries of the right embedding are always appended to the left embedding&lt;/li&gt;
  * &lt;li&gt;all properties from the right side are appended to the properties of the left side
@@ -102,18 +98,18 @@ public class ValueJoin implements PhysicalOperator {
     List&lt;Integer&gt; leftJoinProperties, List&lt;Integer&gt; rightJoinProperties,
     int rightColumns) {
 
-<span class="fc" id="L105">    this(</span>
+<span class="fc" id="L101">    this(</span>
       left, right,
       leftJoinProperties,
       rightJoinProperties,
       rightColumns,
-<span class="fc" id="L110">      Collections.emptyList(),</span>
-<span class="fc" id="L111">      Collections.emptyList(),</span>
-<span class="fc" id="L112">      Collections.emptyList(),</span>
-<span class="fc" id="L113">      Collections.emptyList(),</span>
+<span class="fc" id="L106">      Collections.emptyList(),</span>
+<span class="fc" id="L107">      Collections.emptyList(),</span>
+<span class="fc" id="L108">      Collections.emptyList(),</span>
+<span class="fc" id="L109">      Collections.emptyList(),</span>
       JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES
       );
-<span class="fc" id="L116">  }</span>
+<span class="fc" id="L112">  }</span>
 
   /**
    * New value equi join operator
@@ -133,45 +129,45 @@ public class ValueJoin implements PhysicalOperator {
     List&lt;Integer&gt; leftJoinProperties, List&lt;Integer&gt; rightJoinProperties, int rightColumns,
     List&lt;Integer&gt; distinctVertexColumnsLeft, List&lt;Integer&gt; distinctVertexColumnsRight,
     List&lt;Integer&gt; distinctEdgeColumnsLeft, List&lt;Integer&gt; distinctEdgeColumnsRight,
-<span class="fc" id="L136">    JoinOperatorBase.JoinHint joinHint) {</span>
+<span class="fc" id="L132">    JoinOperatorBase.JoinHint joinHint) {</span>
 
-<span class="fc" id="L138">    this.left = left;</span>
-<span class="fc" id="L139">    this.right = right;</span>
-<span class="fc" id="L140">    this.leftJoinProperties = leftJoinProperties;</span>
-<span class="fc" id="L141">    this.rightJoinProperties = rightJoinProperties;</span>
-<span class="fc" id="L142">    this.rightColumns = rightColumns;</span>
-<span class="fc" id="L143">    this.distinctVertexColumnsLeft = distinctVertexColumnsLeft;</span>
-<span class="fc" id="L144">    this.distinctVertexColumnsRight = distinctVertexColumnsRight;</span>
-<span class="fc" id="L145">    this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft;</span>
-<span class="fc" id="L146">    this.distinctEdgeColumnsRight = distinctEdgeColumnsRight;</span>
-<span class="fc" id="L147">    this.joinHint = joinHint;</span>
-<span class="fc" id="L148">    this.setName(&quot;ValueJoin&quot;);</span>
-<span class="fc" id="L149">  }</span>
+<span class="fc" id="L134">    this.left = left;</span>
+<span class="fc" id="L135">    this.right = right;</span>
+<span class="fc" id="L136">    this.leftJoinProperties = leftJoinProperties;</span>
+<span class="fc" id="L137">    this.rightJoinProperties = rightJoinProperties;</span>
+<span class="fc" id="L138">    this.rightColumns = rightColumns;</span>
+<span class="fc" id="L139">    this.distinctVertexColumnsLeft = distinctVertexColumnsLeft;</span>
+<span class="fc" id="L140">    this.distinctVertexColumnsRight = distinctVertexColumnsRight;</span>
+<span class="fc" id="L141">    this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft;</span>
+<span class="fc" id="L142">    this.distinctEdgeColumnsRight = distinctEdgeColumnsRight;</span>
+<span class="fc" id="L143">    this.joinHint = joinHint;</span>
+<span class="fc" id="L144">    this.setName(&quot;ValueJoin&quot;);</span>
+<span class="fc" id="L145">  }</span>
 
   @Override
   public DataSet&lt;Embedding&gt; evaluate() {
-<span class="fc" id="L153">    return left.join(right, joinHint)</span>
-<span class="fc" id="L154">      .where(new ExtractPropertyJoinColumns(leftJoinProperties))</span>
-<span class="fc" id="L155">      .equalTo(new ExtractPropertyJoinColumns(rightJoinProperties))</span>
-<span class="fc" id="L156">      .with(new MergeEmbeddings(</span>
+<span class="fc" id="L149">    return left.join(right, joinHint)</span>
+<span class="fc" id="L150">      .where(new ExtractPropertyJoinColumns(leftJoinProperties))</span>
+<span class="fc" id="L151">      .equalTo(new ExtractPropertyJoinColumns(rightJoinProperties))</span>
+<span class="fc" id="L152">      .with(new MergeEmbeddings(</span>
         rightColumns,
-<span class="fc" id="L158">        Lists.newArrayListWithCapacity(0),</span>
+<span class="fc" id="L154">        Lists.newArrayListWithCapacity(0),</span>
         distinctVertexColumnsLeft,
         distinctVertexColumnsRight,
         distinctEdgeColumnsLeft,
         distinctEdgeColumnsRight
       ))
-<span class="fc" id="L164">      .name(getName());</span>
+<span class="fc" id="L160">      .name(getName());</span>
   }
 
   @Override
   public void setName(String newName) {
-<span class="fc" id="L169">    this.name = newName;</span>
-<span class="fc" id="L170">  }</span>
+<span class="fc" id="L165">    this.name = newName;</span>
+<span class="fc" id="L166">  }</span>
 
   @Override
   public String getName() {
-<span class="fc" id="L174">    return this.name;</span>
+<span class="fc" id="L170">    return this.name;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

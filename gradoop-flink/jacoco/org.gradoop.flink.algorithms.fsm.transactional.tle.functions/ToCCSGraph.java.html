@@ -26,26 +26,25 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import java.util.Map;
 
 /**
- * graphTransaction =&gt; categorizedGraph
+ * {@code graphTransaction =&gt; categorizedGraph}
  */
-<span class="nc" id="L31">public class ToCCSGraph extends ToFSMGraph</span>
-  implements MapFunction&lt;GraphTransaction, CCSGraph&gt; {
+<span class="nc" id="L31">public class ToCCSGraph extends ToFSMGraph implements MapFunction&lt;GraphTransaction, CCSGraph&gt; {</span>
 
   @Override
   public CCSGraph map(GraphTransaction graph) throws Exception {
 
-<span class="nc" id="L37">    String category = graph.getGraphHead().getPropertyValue(</span>
-<span class="nc" id="L38">      CategoryCharacteristicSubgraphs.CATEGORY_KEY).toString();</span>
+<span class="nc" id="L36">    String category = graph.getGraphHead().getPropertyValue(</span>
+<span class="nc" id="L37">      CategoryCharacteristicSubgraphs.CATEGORY_KEY).toString();</span>
 
-<span class="nc" id="L40">    Map&lt;GradoopId, Integer&gt; vertexIdMap =</span>
-<span class="nc" id="L41">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
+<span class="nc" id="L39">    Map&lt;GradoopId, Integer&gt; vertexIdMap =</span>
+<span class="nc" id="L40">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
 
-<span class="nc" id="L43">    Map&lt;Integer, String&gt; fsmVertices = transformVertices(graph, vertexIdMap);</span>
+<span class="nc" id="L42">    Map&lt;Integer, String&gt; fsmVertices = transformVertices(graph, vertexIdMap);</span>
 
-<span class="nc" id="L45">    Map&lt;Integer, FSMEdge&gt; fsmEdges = transformEdges(graph, vertexIdMap);</span>
+<span class="nc" id="L44">    Map&lt;Integer, FSMEdge&gt; fsmEdges = transformEdges(graph, vertexIdMap);</span>
 
-<span class="nc" id="L47">    return new CCSGraph(</span>
-<span class="nc" id="L48">      category, graph.getGraphHead().getId(), fsmVertices, fsmEdges);</span>
+<span class="nc" id="L46">    return new CCSGraph(</span>
+<span class="nc" id="L47">      category, graph.getGraphHead().getId(), fsmVertices, fsmEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

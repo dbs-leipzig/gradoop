@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 
 /**
- * (f0,f1,f2,f3) =&gt; (f0,f1)
+ * {@code (f0,f1,f2,f3) =&gt; (f0,f1)}
  *
  * @param &lt;T0&gt; f0 type
  * @param &lt;T1&gt; f1 type
@@ -29,18 +29,17 @@ import org.apache.flink.api.java.tuple.Tuple4;
  * @param &lt;T3&gt; f3 type
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0;f1&quot;)
-<span class="fc" id="L32">public class Project4To0And1&lt;T0, T1, T2, T3&gt;</span>
-  implements MapFunction&lt;Tuple4&lt;T0, T1, T2, T3&gt;, Tuple2&lt;T0, T1&gt;&gt; {
+<span class="fc" id="L32">public class Project4To0And1&lt;T0, T1, T2, T3&gt; implements MapFunction&lt;Tuple4&lt;T0, T1, T2, T3&gt;, Tuple2&lt;T0, T1&gt;&gt; {</span>
 
   /**
    * Reduce instantiations
    */
-<span class="fc" id="L38">  private final Tuple2&lt;T0, T1&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L37">  private final Tuple2&lt;T0, T1&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
   public Tuple2&lt;T0, T1&gt; map(Tuple4&lt;T0, T1, T2, T3&gt; quad) throws Exception {
-<span class="fc" id="L42">    reuseTuple.setFields(quad.f0, quad.f1);</span>
-<span class="fc" id="L43">    return reuseTuple;</span>
+<span class="fc" id="L41">    reuseTuple.setFields(quad.f0, quad.f1);</span>
+<span class="fc" id="L42">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

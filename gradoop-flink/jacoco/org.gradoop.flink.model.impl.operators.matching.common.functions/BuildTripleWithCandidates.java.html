@@ -28,12 +28,13 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
 
 /**
  * Converts an EPGM edge to a {@link TripleWithCandidates} tuple.
- *
+ * &lt;p&gt;
  * Forwarded fields:
- *
- * id -&gt; f0:        edge id
- * sourceId -&gt; f1:  source vertex id
- * targetId -&gt; f1:  target vertex id
+ * &lt;ul&gt;
+ * &lt;li&gt;edge id: {@code id -&gt; f0}&lt;/li&gt;
+ * &lt;li&gt;source vertex id: {@code sourceId -&gt; f1}&lt;/li&gt;
+ * &lt;li&gt;target vertex id: {@code targetId -&gt; f1}&lt;/li&gt;
+ * &lt;/ul&gt;
  *
  * @param &lt;E&gt; EPGM edge type
  */
@@ -62,25 +63,25 @@ public class BuildTripleWithCandidates&lt;E extends Edge&gt;
    * @param query GDL query
    */
   public BuildTripleWithCandidates(String query) {
-<span class="fc" id="L65">    super(query);</span>
-<span class="fc" id="L66">    reuseTuple = new TripleWithCandidates&lt;&gt;();</span>
-<span class="fc" id="L67">  }</span>
+<span class="fc" id="L66">    super(query);</span>
+<span class="fc" id="L67">    reuseTuple = new TripleWithCandidates&lt;&gt;();</span>
+<span class="fc" id="L68">  }</span>
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L71">    super.open(parameters);</span>
-<span class="fc" id="L72">    queryEdges = getQueryHandler().getEdges();</span>
-<span class="fc" id="L73">    edgeCount  = queryEdges.size();</span>
-<span class="fc" id="L74">  }</span>
+<span class="fc" id="L72">    super.open(parameters);</span>
+<span class="fc" id="L73">    queryEdges = getQueryHandler().getEdges();</span>
+<span class="fc" id="L74">    edgeCount  = queryEdges.size();</span>
+<span class="fc" id="L75">  }</span>
 
   @Override
   public TripleWithCandidates&lt;GradoopId&gt; map(E e) throws Exception {
-<span class="fc" id="L78">    reuseTuple.setEdgeId(e.getId());</span>
-<span class="fc" id="L79">    reuseTuple.setSourceId(e.getSourceId());</span>
-<span class="fc" id="L80">    reuseTuple.setTargetId(e.getTargetId());</span>
-<span class="fc" id="L81">    reuseTuple.setCandidates(</span>
-<span class="fc" id="L82">      getCandidates(edgeCount, ElementMatcher.getMatches(e, queryEdges, DEFAULT_EDGE_LABEL)));</span>
-<span class="fc" id="L83">    return reuseTuple;</span>
+<span class="fc" id="L79">    reuseTuple.setEdgeId(e.getId());</span>
+<span class="fc" id="L80">    reuseTuple.setSourceId(e.getSourceId());</span>
+<span class="fc" id="L81">    reuseTuple.setTargetId(e.getTargetId());</span>
+<span class="fc" id="L82">    reuseTuple.setCandidates(</span>
+<span class="fc" id="L83">      getCandidates(edgeCount, ElementMatcher.getMatches(e, queryEdges, DEFAULT_EDGE_LABEL)));</span>
+<span class="fc" id="L84">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

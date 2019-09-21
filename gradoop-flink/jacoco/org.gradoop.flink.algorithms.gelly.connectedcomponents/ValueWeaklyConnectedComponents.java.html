@@ -38,7 +38,7 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
  * A gradoop operator wrapping Flinks ScatterGatherIteration-Algorithm for ConnectedComponents
  * {@link org.apache.flink.graph.library.ConnectedComponents}.
  *
- * Returns a mapping of VertexId -&gt; ComponentId
+ * Returns a mapping of {@code VertexId -&gt; ComponentId}
  */
 public class ValueWeaklyConnectedComponents
   extends BaseGellyAlgorithm&lt;Long, Long, NullValue, DataSet&lt;Tuple2&lt;Long, Long&gt;&gt;&gt; {

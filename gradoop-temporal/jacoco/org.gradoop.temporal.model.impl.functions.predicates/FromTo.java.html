@@ -21,7 +21,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Implementation of the &lt;b&gt;FromTo&lt;/b&gt; temporal predicate.
  * Given a time-interval, this predicate will match all intervals that were valid during that interval.
  * &lt;p&gt;
- * Predicate: elementFrom &lt; queryTo &amp;&amp; elementTo &gt; queryFrom
+ * Predicate: {@code elementFrom &lt; queryTo &amp;&amp; elementTo &gt; queryFrom}
  */
 public class FromTo implements TemporalPredicate {
 

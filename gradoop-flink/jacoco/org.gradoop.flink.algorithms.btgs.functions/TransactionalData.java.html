@@ -21,15 +21,16 @@ import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Filters transactional vertices.
+ *
  * @param &lt;V&gt; vertex type.
  */
-<span class="fc" id="L26">public class TransactionalData&lt;V extends Vertex&gt;</span>
+<span class="fc" id="L27">public class TransactionalData&lt;V extends Vertex&gt;</span>
   implements FilterFunction&lt;V&gt; {
 
   @Override
   public boolean filter(V v) throws Exception {
-<span class="fc" id="L31">    return v.getPropertyValue(BusinessTransactionGraphs.SUPERTYPE_KEY)</span>
-<span class="fc" id="L32">      .getString().equals(</span>
+<span class="fc" id="L32">    return v.getPropertyValue(BusinessTransactionGraphs.SUPERTYPE_KEY)</span>
+<span class="fc" id="L33">      .getString().equals(</span>
         BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL);
   }
 }

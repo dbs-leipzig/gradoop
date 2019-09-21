@@ -22,7 +22,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
  * Given a certain time-stamp, this predicate will match all time-stamps before or at that time
  * and all time-intervals containing that time.
  * &lt;p&gt;
- * Predicate: elementFrom &lt;= queryTimestamp &amp;&amp; elementTo &gt; queryTimestamp
+ * Predicate: {@code elementFrom &lt;= queryTimestamp &amp;&amp; elementTo &gt; queryTimestamp}
  */
 public class AsOf implements TemporalPredicate {
 

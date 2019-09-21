@@ -19,14 +19,17 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * Takes an object of type EPGMGraphElement, and creates a tuple2 for each
- *  gradoop id containing in the set of the object and the object.
- * element =&gt; (graphId, element)
+ * Takes an object of type {@link GraphElement}, and creates a Tuple2 for each GradoopId containing in the set
+ * of the object and the object.
+ * &lt;p&gt;
+ * {@code element =&gt; (graphId, element)}
+ *
  * @param &lt;EL&gt; graph element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;*-&gt;f1&quot;)
@@ -41,22 +44,22 @@ public class GraphElementExpander&lt;EL extends EPGMGraphElement&gt;
   /**
    * constructor
    */
-<span class="fc" id="L44">  public GraphElementExpander() {</span>
-<span class="fc" id="L45">    reuse = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L47">  public GraphElementExpander() {</span>
+<span class="fc" id="L48">    reuse = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L49">  }</span>
 
   @Override
   public void flatMap(EL element, Collector&lt;Tuple2&lt;GradoopId, EL&gt;&gt; collector) throws Exception {
-<span class="fc" id="L50">    reuse.f1 = element;</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    for (GradoopId graphId : element.getGraphIds()) {</span>
-<span class="fc" id="L52">      reuse.f0 = graphId;</span>
-<span class="fc" id="L53">      collector.collect(reuse);</span>
-<span class="fc" id="L54">    }</span>
+<span class="fc" id="L53">    reuse.f1 = element;</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (GradoopId graphId : element.getGraphIds()) {</span>
+<span class="fc" id="L55">      reuse.f0 = graphId;</span>
+<span class="fc" id="L56">      collector.collect(reuse);</span>
+<span class="fc" id="L57">    }</span>
     // assign entities with no graph to the DB graph
-<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (element.getGraphCount() == 0) {</span>
-<span class="fc" id="L57">      reuse.f0 = GradoopConstants.DB_GRAPH_ID;</span>
-<span class="fc" id="L58">      collector.collect(reuse);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    if (element.getGraphCount() == 0) {</span>
+<span class="fc" id="L60">      reuse.f0 = GradoopConstants.DB_GRAPH_ID;</span>
+<span class="fc" id="L61">      collector.collect(reuse);</span>
     }
-<span class="fc" id="L60">  }</span>
+<span class="fc" id="L63">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

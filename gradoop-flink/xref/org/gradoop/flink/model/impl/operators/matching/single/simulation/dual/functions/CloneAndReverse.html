@@ -33,48 +33,46 @@
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.TripleWithDirection;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Clones and reverses the incoming triple:</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * (e,s,t,c) -&gt; (e,s,t,true,c),(e,t,s,false,c)</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * Forwarded fields:</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> * f0-&gt;f0: edge id</em>
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * f3-&gt;f4: query candidates</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="35" href="#35">35</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f0;f3-&gt;f4"</span>)
-<a name="36" href="#36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/CloneAndReverse.html">CloneAndReverse</a> implements
-<a name="37" href="#37">37</a>    FlatMapFunction&lt;TripleWithCandidates&lt;GradoopId&gt;, TripleWithDirection&gt; {
-<a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * Reduce instantiations</em>
-<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/tuples/TripleWithDirection.html">TripleWithDirection</a> reuseTuple;
-<a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * Constructor</em>
-<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/CloneAndReverse.html">CloneAndReverse</a>() {
-<a name="48" href="#48">48</a>      reuseTuple = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/tuples/TripleWithDirection.html">TripleWithDirection</a>();
-<a name="49" href="#49">49</a>    }
-<a name="50" href="#50">50</a>  
-<a name="51" href="#51">51</a>    @Override
-<a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(TripleWithCandidates&lt;GradoopId&gt; tripleWithCandidates,
-<a name="53" href="#53">53</a>      Collector&lt;TripleWithDirection&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="54" href="#54">54</a>      reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());
-<a name="55" href="#55">55</a>      reuseTuple.setCandidates(tripleWithCandidates.getCandidates());
-<a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>      reuseTuple.setSourceId(tripleWithCandidates.getSourceId());
-<a name="58" href="#58">58</a>      reuseTuple.setTargetId(tripleWithCandidates.getTargetId());
-<a name="59" href="#59">59</a>      reuseTuple.setOutgoing(<strong class="jxr_keyword">true</strong>);
-<a name="60" href="#60">60</a>      collector.collect(reuseTuple);
-<a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      reuseTuple.setSourceId(tripleWithCandidates.getTargetId());
-<a name="63" href="#63">63</a>      reuseTuple.setTargetId(tripleWithCandidates.getSourceId());
-<a name="64" href="#64">64</a>      reuseTuple.setOutgoing(false);
-<a name="65" href="#65">65</a>      collector.collect(reuseTuple);
-<a name="66" href="#66">66</a>    }
-<a name="67" href="#67">67</a>  }
+<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Clones and reverses the incoming triple:&lt;br&gt;</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * {@code (e,s,t,c) -&gt; (e,s,t,true,c),(e,t,s,false,c)}</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Forwarded fields:&lt;br&gt;</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * {@code f0-&gt;f0}: edge id&lt;br&gt;</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * {@code f3-&gt;f4}: query candidates</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="33" href="#33">33</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f0;f3-&gt;f4"</span>)
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/CloneAndReverse.html">CloneAndReverse</a> implements
+<a name="35" href="#35">35</a>    FlatMapFunction&lt;TripleWithCandidates&lt;GradoopId&gt;, TripleWithDirection&gt; {
+<a name="36" href="#36">36</a>  
+<a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Reduce instantiations</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/tuples/TripleWithDirection.html">TripleWithDirection</a> reuseTuple;
+<a name="41" href="#41">41</a>  
+<a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * Constructor</em>
+<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/CloneAndReverse.html">CloneAndReverse</a>() {
+<a name="46" href="#46">46</a>      reuseTuple = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/tuples/TripleWithDirection.html">TripleWithDirection</a>();
+<a name="47" href="#47">47</a>    }
+<a name="48" href="#48">48</a>  
+<a name="49" href="#49">49</a>    @Override
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(TripleWithCandidates&lt;GradoopId&gt; tripleWithCandidates,
+<a name="51" href="#51">51</a>      Collector&lt;TripleWithDirection&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="52" href="#52">52</a>      reuseTuple.setEdgeId(tripleWithCandidates.getEdgeId());
+<a name="53" href="#53">53</a>      reuseTuple.setCandidates(tripleWithCandidates.getCandidates());
+<a name="54" href="#54">54</a>  
+<a name="55" href="#55">55</a>      reuseTuple.setSourceId(tripleWithCandidates.getSourceId());
+<a name="56" href="#56">56</a>      reuseTuple.setTargetId(tripleWithCandidates.getTargetId());
+<a name="57" href="#57">57</a>      reuseTuple.setOutgoing(<strong class="jxr_keyword">true</strong>);
+<a name="58" href="#58">58</a>      collector.collect(reuseTuple);
+<a name="59" href="#59">59</a>  
+<a name="60" href="#60">60</a>      reuseTuple.setSourceId(tripleWithCandidates.getTargetId());
+<a name="61" href="#61">61</a>      reuseTuple.setTargetId(tripleWithCandidates.getSourceId());
+<a name="62" href="#62">62</a>      reuseTuple.setOutgoing(false);
+<a name="63" href="#63">63</a>      collector.collect(reuseTuple);
+<a name="64" href="#64">64</a>    }
+<a name="65" href="#65">65</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

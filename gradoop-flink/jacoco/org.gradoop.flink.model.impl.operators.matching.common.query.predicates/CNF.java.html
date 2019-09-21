@@ -27,29 +27,29 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Represents a collection conjunct OrPredicates
- * This can be used to represent a CNF
+ * Represents a collection conjunct OrPredicates. This can be used to represent a CNF.
  */
 public class CNF extends PredicateCollection&lt;CNFElement&gt; {
 
   /**
-   * Creates a new conjunctive normal form with empty predicate list
+   * Creates a new conjunctive normal form with empty predicate list.
    */
-<span class="fc" id="L38">  public CNF() {</span>
-<span class="fc" id="L39">    this.predicates = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L37">  public CNF() {</span>
+<span class="fc" id="L38">    this.predicates = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L39">  }</span>
 
   /**
-   * Creates a new conjunctive normal form with given predicate list
+   * Creates a new conjunctive normal form with given predicate list.
    *
    * @param predicates predicates
    */
-<span class="fc" id="L47">  public CNF(List&lt;CNFElement&gt; predicates) {</span>
-<span class="fc" id="L48">    this.predicates = predicates;</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L46">  public CNF(List&lt;CNFElement&gt; predicates) {</span>
+<span class="fc" id="L47">    this.predicates = predicates;</span>
+<span class="fc" id="L48">  }</span>
 
   /**
-   * Copy constructor for CNF
+   * Copy constructor for CNF.
+   *
    * @param copyValue CNF to copy
    */
   public CNF(CNF copyValue) {
@@ -117,12 +117,12 @@ public class CNF extends PredicateCollection&lt;CNFElement&gt; {
   }
 
   /**
-   * Filters all disjunctions that could be evaluated with the given variable and returns
-   * them in a new CNF
-   *
+   * Filters all disjunctions that could be evaluated with the given variable and returns them in a new CNF.
+   * &lt;p&gt;
    * Example:
-   * Given myFilter = CNF((a = b) And (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))
-   * myFilter.getSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))
+   * &lt;br&gt;
+   * Given {@code myFilter = CNF((a = b) And (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))}&lt;br&gt;
+   * {@code myFilter.getSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))}
    *
    * @param variable variable that must be included in the disjunction
    * @return CNF containing only the specified variable
@@ -135,80 +135,83 @@ public class CNF extends PredicateCollection&lt;CNFElement&gt; {
 
   /**
    * Filters all disjunctions that could be evaluated with the given set of variables and returns
-   * them in a new CNF
-   *
+   * them in a new CNF.
+   * &lt;p&gt;
    * Example:
-   * Given myFilter = CNF((a = b) And (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))
-   * myFilter.getSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))
+   * &lt;br&gt;
+   * Given {@code myFilter = CNF((a = b) And (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))}&lt;br&gt;
+   * {@code myFilter.getSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))}
    *
    * @param variables set of variables that must be included in the disjunction
    * @return CNF containing only variables covered by the input list
    */
   public CNF getSubCNF(Set&lt;String&gt; variables) {
-<span class="fc" id="L148">    List&lt;CNFElement&gt; filtered = predicates</span>
-<span class="fc" id="L149">      .stream()</span>
-<span class="fc" id="L150">      .filter(p -&gt; variables.containsAll(p.getVariables()))</span>
-<span class="fc" id="L151">      .collect(Collectors.toList());</span>
+<span class="fc" id="L149">    List&lt;CNFElement&gt; filtered = predicates</span>
+<span class="fc" id="L150">      .stream()</span>
+<span class="fc" id="L151">      .filter(p -&gt; variables.containsAll(p.getVariables()))</span>
+<span class="fc" id="L152">      .collect(Collectors.toList());</span>
 
-<span class="fc" id="L153">    return new CNF(filtered);</span>
+<span class="fc" id="L154">    return new CNF(filtered);</span>
   }
 
   /**
    * Filters all disjunctions that could be evaluated with the given variable and removes
-   * them from the CNF. The filtered predicates will be returned in a new CNF
-   *
+   * them from the CNF. The filtered predicates will be returned in a new CNF.
+   * &lt;p&gt;
    * Example:
-   * Given myFilter = CNF((a = 10) AND (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))
-   * myFilter.removeSubCNF(a) =&gt; CNF(a = 10)
-   * and myFilter == CNF((b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))
+   * &lt;br&gt;
+   * Given {@code myFilter = CNF((a = 10) AND (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))}&lt;br&gt;
+   * {@code myFilter.removeSubCNF(a) =&gt; CNF(a = 10)}&lt;br&gt;
+   * and {@code myFilter == CNF((b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))}
    *
    * @param variable variable that must be included in the disjunction
    * @return CNF containing only variables covered by the input list
    */
   public CNF removeSubCNF(String variable) {
-<span class="fc" id="L169">    Set&lt;String&gt; variables = new HashSet&lt;&gt;(1);</span>
-<span class="fc" id="L170">    variables.add(variable);</span>
-<span class="fc" id="L171">    return removeSubCNF(variables);</span>
+<span class="fc" id="L171">    Set&lt;String&gt; variables = new HashSet&lt;&gt;(1);</span>
+<span class="fc" id="L172">    variables.add(variable);</span>
+<span class="fc" id="L173">    return removeSubCNF(variables);</span>
   }
 
   /**
    * Filters all disjunctions that could be evaluated with the given set of variables and removes
-   * them from the CNF. The filtered predicates will be returned in a new CNF
-   *
+   * them from the CNF. The filtered predicates will be returned in a new CNF.
+   * &lt;p&gt;
    * Example:
-   * Given myFilter = CNF((a = b) AND (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))
-   * myFilter.removeSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))
-   * and myFilter == CNF((c = false) AND (a = c))
+   * &lt;br&gt;
+   * Given {@code myFilter = CNF((a = b) AND (b &gt; 5 OR a &gt; 10) AND (c = false) AND (a = c))}&lt;br&gt;
+   * {@code myFilter.removeSubCNF(a,b) =&gt; CNF((a = b) And (b &gt; 5 OR a &gt; 10))}&lt;br&gt;
+   * and {@code myFilter == CNF((c = false) AND (a = c))}
    *
    * @param variables set of variables that must be included in the disjunction
    * @return CNF containing only variables covered by the input list
    */
   public CNF removeSubCNF(Set&lt;String&gt; variables) {
-<span class="fc" id="L187">    Map&lt;Boolean, List&lt;CNFElement&gt;&gt; filtered = predicates</span>
-<span class="fc" id="L188">      .stream()</span>
-<span class="fc" id="L189">      .collect(Collectors.partitioningBy(p -&gt; variables.containsAll(p.getVariables())));</span>
+<span class="fc" id="L190">    Map&lt;Boolean, List&lt;CNFElement&gt;&gt; filtered = predicates</span>
+<span class="fc" id="L191">      .stream()</span>
+<span class="fc" id="L192">      .collect(Collectors.partitioningBy(p -&gt; variables.containsAll(p.getVariables())));</span>
 
-<span class="fc" id="L191">    this.predicates = filtered.get(false);</span>
+<span class="fc" id="L194">    this.predicates = filtered.get(false);</span>
 
-<span class="fc" id="L193">    return new CNF(filtered.get(true));</span>
+<span class="fc" id="L196">    return new CNF(filtered.get(true));</span>
   }
 
   @Override
   public Set&lt;String&gt; getVariables() {
-<span class="fc" id="L198">    Set&lt;String&gt; variables = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L199" title="All 2 branches covered.">    for (CNFElement cnfElement : predicates) {</span>
-<span class="fc" id="L200">      variables.addAll(cnfElement.getVariables());</span>
-<span class="fc" id="L201">    }</span>
-<span class="fc" id="L202">    return variables;</span>
+<span class="fc" id="L201">    Set&lt;String&gt; variables = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    for (CNFElement cnfElement : predicates) {</span>
+<span class="fc" id="L203">      variables.addAll(cnfElement.getVariables());</span>
+<span class="fc" id="L204">    }</span>
+<span class="fc" id="L205">    return variables;</span>
   }
 
   @Override
   public Set&lt;String&gt; getPropertyKeys(String variable) {
-<span class="fc" id="L207">    Set&lt;String&gt; properties = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">    for (CNFElement cnfElement : predicates) {</span>
-<span class="fc" id="L209">      properties.addAll(cnfElement.getPropertyKeys(variable));</span>
-<span class="fc" id="L210">    }</span>
-<span class="fc" id="L211">    return properties;</span>
+<span class="fc" id="L210">    Set&lt;String&gt; properties = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">    for (CNFElement cnfElement : predicates) {</span>
+<span class="fc" id="L212">      properties.addAll(cnfElement.getPropertyKeys(variable));</span>
+<span class="fc" id="L213">    }</span>
+<span class="fc" id="L214">    return properties;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Set;
 
 /**
- * transaction -&gt; (vertexLabel,1L),..
+ * {@code transaction -&gt; (vertexLabel,1L),..}
  */
 <span class="fc" id="L30">public class VertexLabels</span>
   implements FlatMapFunction&lt;GraphTransaction, WithCount&lt;String&gt;&gt; {

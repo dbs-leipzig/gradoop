@@ -28,18 +28,16 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Converts an EPGM vertex to a {@link IdWithCandidates} tuple.
- *
- * vertex -&gt; (vertexId, vertexCandidates)
- *
- * Forwarded Fields:
- *
- * id-&gt;f0: vertex id
+ * &lt;p&gt;
+ * {@code vertex -&gt; (vertexId, vertexCandidates)}
+ * &lt;p&gt;
+ * Forwarded Fields:&lt;br&gt;
+ * {@code id-&gt;f0: vertex id}
  *
  * @param &lt;V&gt; EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
-public class BuildIdWithCandidates&lt;V extends Vertex&gt;
-  extends AbstractBuilder&lt;V, IdWithCandidates&lt;GradoopId&gt;&gt; {
+public class BuildIdWithCandidates&lt;V extends Vertex&gt; extends AbstractBuilder&lt;V, IdWithCandidates&lt;GradoopId&gt;&gt; {
   /**
    * serial version uid
    */
@@ -63,23 +61,23 @@ public class BuildIdWithCandidates&lt;V extends Vertex&gt;
    * @param query GDL query
    */
   public BuildIdWithCandidates(String query) {
-<span class="fc" id="L66">    super(query);</span>
-<span class="fc" id="L67">    reuseTuple = new IdWithCandidates&lt;&gt;();</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L64">    super(query);</span>
+<span class="fc" id="L65">    reuseTuple = new IdWithCandidates&lt;&gt;();</span>
+<span class="fc" id="L66">  }</span>
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L72">    super.open(parameters);</span>
-<span class="fc" id="L73">    queryVertices = getQueryHandler().getVertices();</span>
-<span class="fc" id="L74">    vertexCount   = queryVertices.size();</span>
-<span class="fc" id="L75">  }</span>
+<span class="fc" id="L70">    super.open(parameters);</span>
+<span class="fc" id="L71">    queryVertices = getQueryHandler().getVertices();</span>
+<span class="fc" id="L72">    vertexCount   = queryVertices.size();</span>
+<span class="fc" id="L73">  }</span>
 
   @Override
   public IdWithCandidates&lt;GradoopId&gt; map(V v) throws Exception {
-<span class="fc" id="L79">    reuseTuple.setId(v.getId());</span>
-<span class="fc" id="L80">    reuseTuple.setCandidates(getCandidates(vertexCount,</span>
-<span class="fc" id="L81">      ElementMatcher.getMatches(v, queryVertices, DEFAULT_VERTEX_LABEL)));</span>
-<span class="fc" id="L82">    return reuseTuple;</span>
+<span class="fc" id="L77">    reuseTuple.setId(v.getId());</span>
+<span class="fc" id="L78">    reuseTuple.setCandidates(getCandidates(vertexCount,</span>
+<span class="fc" id="L79">      ElementMatcher.getMatches(v, queryVertices, DEFAULT_VERTEX_LABEL)));</span>
+<span class="fc" id="L80">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Given a set of property columns, this key selector returns a concatenated string containing the
  * property values of the specified columns.
- *
- * (&quot;Foo&quot;,42,0.5),[0,2] -&gt; &quot;Foo0.5&quot;
+ * &lt;p&gt;
+ * {@code (&quot;Foo&quot;,42,0.5),[0,2] -&gt; &quot;Foo0.5&quot;}
  */
 public class ExtractPropertyJoinColumns implements KeySelector&lt;Embedding, String&gt; {
   /**

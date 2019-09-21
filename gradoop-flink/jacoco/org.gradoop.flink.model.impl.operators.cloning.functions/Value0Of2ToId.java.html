@@ -29,18 +29,17 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0.id-&gt;f0;f1&quot;)
 <span class="fc" id="L31">public class Value0Of2ToId&lt;EL extends Element, T&gt;</span>
-  implements
-  MapFunction&lt;Tuple2&lt;EL, T&gt;, Tuple2&lt;GradoopId, T&gt;&gt; {
+  implements MapFunction&lt;Tuple2&lt;EL, T&gt;, Tuple2&lt;GradoopId, T&gt;&gt; {
 
   /**
    * Reduce object instantiation.
    */
-<span class="fc" id="L38">  private final Tuple2&lt;GradoopId, T&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L37">  private final Tuple2&lt;GradoopId, T&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
   public Tuple2&lt;GradoopId, T&gt; map(Tuple2&lt;EL, T&gt; tuple2) {
-<span class="fc" id="L42">    reuseTuple.setFields(tuple2.f0.getId(), tuple2.f1);</span>
-<span class="fc" id="L43">    return reuseTuple;</span>
+<span class="fc" id="L41">    reuseTuple.setFields(tuple2.f0.getId(), tuple2.f1);</span>
+<span class="fc" id="L42">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

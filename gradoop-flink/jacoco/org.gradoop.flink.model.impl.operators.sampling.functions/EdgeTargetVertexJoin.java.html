@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Joins to get the edge target:
- * (edge,edge.targetId,bool-source),(target) -&gt; (edge,bool-source,(bool)target[propertyKey])
+ * Joins to get the edge target:&lt;br&gt;
+ * {@code (edge,edge.targetId,bool-source),(target) -&gt; (edge,bool-source,(bool)target[propertyKey])}
  */
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;f0-&gt;f0&quot;, &quot;f2-&gt;f1&quot;})
 @FunctionAnnotation.ReadFieldsSecond(&quot;properties&quot;)

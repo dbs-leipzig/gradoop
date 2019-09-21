@@ -136,30 +136,31 @@
 <a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   *</em>
 <a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @param inputView {@link DataInputViewStreamWrapper} containing data</em>
 <a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @return a map containing the deserialized data</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   */</em>
-<a name="130" href="#130">130</a>   <strong class="jxr_keyword">private</strong> Map&lt;PropertyValue, PropertyValue&gt; createMap(DataInputViewStreamWrapper inputView)
-<a name="131" href="#131">131</a>     <strong class="jxr_keyword">throws</strong> IOException {
-<a name="132" href="#132">132</a>     <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a> key;
-<a name="133" href="#133">133</a>     <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a> value;
-<a name="134" href="#134">134</a> 
-<a name="135" href="#135">135</a>     Map&lt;PropertyValue, PropertyValue&gt; map = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a name="136" href="#136">136</a> 
-<a name="137" href="#137">137</a>     <strong class="jxr_keyword">try</strong> {
-<a name="138" href="#138">138</a>       <strong class="jxr_keyword">while</strong> (inputView.available() &gt; 0) {
-<a name="139" href="#139">139</a>         key = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a>();
-<a name="140" href="#140">140</a>         key.read(inputView);
-<a name="141" href="#141">141</a> 
-<a name="142" href="#142">142</a>         value = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a>();
-<a name="143" href="#143">143</a>         value.read(inputView);
-<a name="144" href="#144">144</a> 
-<a name="145" href="#145">145</a>         map.put(key, value);
-<a name="146" href="#146">146</a>       }
-<a name="147" href="#147">147</a>     } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a name="148" href="#148">148</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"Error reading PropertyValue with MapStrategy."</span>, e);
-<a name="149" href="#149">149</a>     }
-<a name="150" href="#150">150</a>     <strong class="jxr_keyword">return</strong> map;
-<a name="151" href="#151">151</a>   }
-<a name="152" href="#152">152</a> }
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @throws IOException on failure to read input view</em>
+<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   */</em>
+<a name="131" href="#131">131</a>   <strong class="jxr_keyword">private</strong> Map&lt;PropertyValue, PropertyValue&gt; createMap(DataInputViewStreamWrapper inputView)
+<a name="132" href="#132">132</a>     <strong class="jxr_keyword">throws</strong> IOException {
+<a name="133" href="#133">133</a>     <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a> key;
+<a name="134" href="#134">134</a>     <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a> value;
+<a name="135" href="#135">135</a> 
+<a name="136" href="#136">136</a>     Map&lt;PropertyValue, PropertyValue&gt; map = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a name="137" href="#137">137</a> 
+<a name="138" href="#138">138</a>     <strong class="jxr_keyword">try</strong> {
+<a name="139" href="#139">139</a>       <strong class="jxr_keyword">while</strong> (inputView.available() &gt; 0) {
+<a name="140" href="#140">140</a>         key = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a>();
+<a name="141" href="#141">141</a>         key.read(inputView);
+<a name="142" href="#142">142</a> 
+<a name="143" href="#143">143</a>         value = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/common/model/impl/properties/PropertyValue.html">PropertyValue</a>();
+<a name="144" href="#144">144</a>         value.read(inputView);
+<a name="145" href="#145">145</a> 
+<a name="146" href="#146">146</a>         map.put(key, value);
+<a name="147" href="#147">147</a>       }
+<a name="148" href="#148">148</a>     } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a name="149" href="#149">149</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IOException(<span class="jxr_string">"Error reading PropertyValue with MapStrategy."</span>, e);
+<a name="150" href="#150">150</a>     }
+<a name="151" href="#151">151</a>     <strong class="jxr_keyword">return</strong> map;
+<a name="152" href="#152">152</a>   }
+<a name="153" href="#153">153</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

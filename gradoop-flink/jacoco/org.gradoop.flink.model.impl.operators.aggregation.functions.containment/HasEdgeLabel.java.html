@@ -19,14 +19,12 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate and filter function to check presence of an edge label in a graph.
- *
- * &lt;pre&gt;
+ * &lt;p&gt;
  * Usage:
  * &lt;ol&gt;
  * &lt;li&gt;aggregate
  * &lt;li&gt;filter using the same UDF instance.
  * &lt;/ol&gt;
- * &lt;/pre&gt;
  */
 public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
 
@@ -36,8 +34,8 @@ public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
    * @param label edge label to check presence of
    */
   public HasEdgeLabel(String label) {
-<span class="fc" id="L39">    super(label, &quot;hasEdgeLabel_&quot; + label);</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L37">    super(label, &quot;hasEdgeLabel_&quot; + label);</span>
+<span class="fc" id="L38">  }</span>
 
   /**
    * Creates a new instance of a HasEdgeLabel aggregate function.
@@ -46,7 +44,7 @@ public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
    * @param aggregatePropertyKey aggregate property key
    */
   public HasEdgeLabel(String label, String aggregatePropertyKey) {
-<span class="nc" id="L49">    super(label, aggregatePropertyKey);</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L47">    super(label, aggregatePropertyKey);</span>
+<span class="nc" id="L48">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

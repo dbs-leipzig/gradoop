@@ -219,6 +219,8 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
    * @param zkHosts zookeeper hosts
    * @param auth accumulo access authorization
    * @return split range collections
+   * @throws IOException on failure
+   * @throws AccumuloSecurityException on security error
    */
   @Nonnull
   private List&lt;Range&gt; doSplits(
@@ -230,22 +232,22 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
     @Nonnull String zkHosts,
     @Nonnull Authorizations auth
   ) throws IOException, AccumuloSecurityException {
-<span class="fc" id="L233">    AccumuloRowInputFormat format = new AccumuloRowInputFormat();</span>
-<span class="fc" id="L234">    JobConf conf = new JobConf();</span>
-<span class="fc" id="L235">    AccumuloRowInputFormat.setInputTableName(conf, tableName);</span>
-<span class="fc" id="L236">    AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));</span>
-<span class="fc" id="L237">    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()</span>
-<span class="fc" id="L238">      .withInstance(instance)</span>
-<span class="fc" id="L239">      .withZkHosts(zkHosts));</span>
-<span class="fc" id="L240">    AccumuloRowInputFormat.setScanAuthorizations(conf, auth);</span>
-<span class="pc bpc" id="L241" title="1 of 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getQueryRanges() != null) {</span>
-<span class="nc" id="L242">      AccumuloRowInputFormat.setRanges(conf, predicate.getQueryRanges());</span>
+<span class="fc" id="L235">    AccumuloRowInputFormat format = new AccumuloRowInputFormat();</span>
+<span class="fc" id="L236">    JobConf conf = new JobConf();</span>
+<span class="fc" id="L237">    AccumuloRowInputFormat.setInputTableName(conf, tableName);</span>
+<span class="fc" id="L238">    AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));</span>
+<span class="fc" id="L239">    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()</span>
+<span class="fc" id="L240">      .withInstance(instance)</span>
+<span class="fc" id="L241">      .withZkHosts(zkHosts));</span>
+<span class="fc" id="L242">    AccumuloRowInputFormat.setScanAuthorizations(conf, auth);</span>
+<span class="pc bpc" id="L243" title="1 of 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getQueryRanges() != null) {</span>
+<span class="nc" id="L244">      AccumuloRowInputFormat.setRanges(conf, predicate.getQueryRanges());</span>
     }
-<span class="fc" id="L244">    InputSplit[] splits = format.getSplits(conf, maxSplit);</span>
-<span class="fc" id="L245">    return Stream.of(splits)</span>
-<span class="fc" id="L246">      .map(it -&gt; (RangeInputSplit) it)</span>
-<span class="fc" id="L247">      .map(RangeInputSplit::getRange)</span>
-<span class="fc" id="L248">      .collect(Collectors.toList());</span>
+<span class="fc" id="L246">    InputSplit[] splits = format.getSplits(conf, maxSplit);</span>
+<span class="fc" id="L247">    return Stream.of(splits)</span>
+<span class="fc" id="L248">      .map(it -&gt; (RangeInputSplit) it)</span>
+<span class="fc" id="L249">      .map(RangeInputSplit::getRange)</span>
+<span class="fc" id="L250">      .collect(Collectors.toList());</span>
   }
 
 }

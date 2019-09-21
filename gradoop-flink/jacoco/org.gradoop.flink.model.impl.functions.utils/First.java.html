@@ -19,14 +19,15 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 
 /**
- * t1,t2,..,tn =&gt; t1
+ * {@code t1,t2,..,tn =&gt; t1}
+ *
  * @param &lt;T&gt; data type
  */
-<span class="fc" id="L25">public class First&lt;T&gt; implements GroupReduceFunction&lt;T, T&gt; {</span>
+<span class="fc" id="L26">public class First&lt;T&gt; implements GroupReduceFunction&lt;T, T&gt; {</span>
 
   @Override
   public void reduce(Iterable&lt;T&gt; iterable, Collector&lt;T&gt; collector) throws Exception {
-<span class="fc" id="L29">    collector.collect(iterable.iterator().next());</span>
-<span class="fc" id="L30">  }</span>
+<span class="fc" id="L30">    collector.collect(iterable.iterator().next());</span>
+<span class="fc" id="L31">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

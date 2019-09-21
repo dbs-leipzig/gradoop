@@ -22,8 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Join function to receive structural information of the graph.
- * Builds edge triples with long id's.
+ * Join function to receive structural information of the graph. Builds edge triples with long ids.
  */
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;f0-&gt;f0&quot;, &quot;f1-&gt;f1&quot;, &quot;f2-&gt;f2&quot;})
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f0-&gt;f3&quot;)
@@ -39,25 +38,25 @@ public class CreateLongTargetIds
   /**
    * Creates an instance of this join function.
    */
-<span class="fc" id="L42">  public CreateLongTargetIds() {</span>
-<span class="fc" id="L43">    reuse = new Tuple4&lt;&gt;();</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L41">  public CreateLongTargetIds() {</span>
+<span class="fc" id="L42">    reuse = new Tuple4&lt;&gt;();</span>
+<span class="fc" id="L43">  }</span>
 
   /**
    * Builds triples with long id's for every edge.
    *
    * @param edgeTuple intermediate join result.
    * @param uniqueVertex unique vertex identifier.
-   * @return tuple &lt;vertexID&lt;Long&gt;&gt;,vertexID&lt;GradoopID&gt;&gt;,sourceID&lt;Long&gt;&gt;,targetID&lt;Long&gt;&gt;
+   * @return tuple {@code &lt;vertexID&lt;Long&gt;,vertexID&lt;GradoopID&gt;,sourceID&lt;Long&gt;,targetID&lt;Long&gt;&gt;}
    */
   @Override
   public Tuple4&lt;Long, GradoopId, Long, Long&gt; join(
     Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; edgeTuple, Tuple2&lt;Long, GradoopId&gt; uniqueVertex) {
-<span class="fc" id="L56">    reuse.f0 = edgeTuple.f0;</span>
-<span class="fc" id="L57">    reuse.f1 = edgeTuple.f1;</span>
-<span class="fc" id="L58">    reuse.f2 = edgeTuple.f2;</span>
-<span class="fc" id="L59">    reuse.f3 = uniqueVertex.f0;</span>
-<span class="fc" id="L60">    return reuse;</span>
+<span class="fc" id="L55">    reuse.f0 = edgeTuple.f0;</span>
+<span class="fc" id="L56">    reuse.f1 = edgeTuple.f1;</span>
+<span class="fc" id="L57">    reuse.f2 = edgeTuple.f2;</span>
+<span class="fc" id="L58">    reuse.f3 = uniqueVertex.f0;</span>
+<span class="fc" id="L59">    return reuse;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

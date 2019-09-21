@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.verify.Verify;
 /**
  * Extracts a subgraph from each base graph in a graph collection using
  * the given filter functions. The graph head stays unchanged for the subgraph.
- * &lt;p/&gt;
+ * &lt;p&gt;
  * The operator is able to:
  * &lt;ol&gt;
  * &lt;li&gt;extract vertex-induced subgraph&lt;/li&gt;
@@ -60,15 +60,13 @@ public class ApplySubgraph&lt;
 
   /**
    * Creates a new sub graph operator instance.
-   * &lt;p/&gt;
+   * &lt;p&gt;
    * If both parameters are not {@code null}, the operator returns the subgraph
    * defined by filtered vertices and edges.
-   * &lt;p/&gt;
-   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the
-   * vertex-induced subgraph.
-   * &lt;p/&gt;
-   * If the {@code vertexFilterFunction} is {@code null}, the operator returns
-   * the edge-induced subgraph.
+   * &lt;p&gt;
+   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the vertex-induced subgraph.
+   * &lt;p&gt;
+   * If the {@code vertexFilterFunction} is {@code null}, the operator returns the edge-induced subgraph.
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
@@ -76,36 +74,36 @@ public class ApplySubgraph&lt;
    */
   public ApplySubgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
     FilterFunction&lt;E&gt; edgeFilterFunction, Strategy strategy) {
-<span class="fc" id="L79">    super(vertexFilterFunction, edgeFilterFunction, strategy);</span>
-<span class="fc" id="L80">  }</span>
+<span class="fc" id="L77">    super(vertexFilterFunction, edgeFilterFunction, strategy);</span>
+<span class="fc" id="L78">  }</span>
 
   @Override
   public GC executeForGVELayout(GC collection) {
 
     GC result;
-<span class="pc bpc" id="L86" title="1 of 5 branches missed.">    switch (strategy) {</span>
+<span class="pc bpc" id="L84" title="1 of 5 branches missed.">    switch (strategy) {</span>
     case BOTH:
-<span class="fc" id="L88">      result = subgraph(collection);</span>
-<span class="fc" id="L89">      break;</span>
+<span class="fc" id="L86">      result = subgraph(collection);</span>
+<span class="fc" id="L87">      break;</span>
     case VERTEX_INDUCED:
-<span class="fc" id="L91">      result = vertexInducedSubgraph(collection);</span>
-<span class="fc" id="L92">      break;</span>
+<span class="fc" id="L89">      result = vertexInducedSubgraph(collection);</span>
+<span class="fc" id="L90">      break;</span>
     case EDGE_INDUCED:
-<span class="fc" id="L94">      result = edgeInducedSubgraph(collection);</span>
-<span class="fc" id="L95">      break;</span>
+<span class="fc" id="L92">      result = edgeInducedSubgraph(collection);</span>
+<span class="fc" id="L93">      break;</span>
     case EDGE_INDUCED_PROJECT_FIRST:
-<span class="fc" id="L97">      result = edgeInducedSubgraphProjectFirst(collection);</span>
-<span class="fc" id="L98">      break;</span>
+<span class="fc" id="L95">      result = edgeInducedSubgraphProjectFirst(collection);</span>
+<span class="fc" id="L96">      break;</span>
     default:
-<span class="nc" id="L100">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
+<span class="nc" id="L98">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
     }
 
-<span class="fc" id="L103">    return result;</span>
+<span class="fc" id="L101">    return result;</span>
   }
 
   @Override
   public GC executeForTxLayout(GC collection) {
-<span class="nc" id="L108">    return executeForGVELayout(collection);</span>
+<span class="nc" id="L106">    return executeForGVELayout(collection);</span>
   }
 
   /**
@@ -116,11 +114,11 @@ public class ApplySubgraph&lt;
    * @return collection of vertex-induced subgraphs
    */
   private GC vertexInducedSubgraph(GC collection) {
-<span class="fc" id="L119">    DataSet&lt;V&gt; filteredVertices = collection.getVertices().filter(vertexFilterFunction);</span>
+<span class="fc" id="L117">    DataSet&lt;V&gt; filteredVertices = collection.getVertices().filter(vertexFilterFunction);</span>
 
-<span class="fc" id="L121">    return collection.getFactory()</span>
-<span class="fc" id="L122">      .fromDataSets(collection.getGraphHeads(), filteredVertices, collection.getEdges())</span>
-<span class="fc" id="L123">      .verify();</span>
+<span class="fc" id="L119">    return collection.getFactory()</span>
+<span class="fc" id="L120">      .fromDataSets(collection.getGraphHeads(), filteredVertices, collection.getEdges())</span>
+<span class="fc" id="L121">      .verify();</span>
   }
 
   /**
@@ -131,19 +129,19 @@ public class ApplySubgraph&lt;
    * @return collection of edge-induced subgraphs
    */
   private GC edgeInducedSubgraph(GC collection) {
-<span class="fc" id="L134">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
-<span class="fc" id="L135">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
-<span class="fc" id="L136">      .join(collection.getVertices())</span>
-<span class="fc" id="L137">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L138">      .with(new RightSideWithLeftGraphs&lt;&gt;())</span>
-<span class="fc" id="L139">      .union(filteredEdges</span>
-<span class="fc" id="L140">        .join(collection.getVertices())</span>
-<span class="fc" id="L141">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L142">        .with(new RightSideWithLeftGraphs&lt;&gt;()))</span>
-<span class="fc" id="L143">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L132">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L133">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L134">      .join(collection.getVertices())</span>
+<span class="fc" id="L135">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L136">      .with(new RightSideWithLeftGraphs&lt;&gt;())</span>
+<span class="fc" id="L137">      .union(filteredEdges</span>
+<span class="fc" id="L138">        .join(collection.getVertices())</span>
+<span class="fc" id="L139">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L140">        .with(new RightSideWithLeftGraphs&lt;&gt;()))</span>
+<span class="fc" id="L141">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L145">    return collection.getFactory()</span>
-<span class="fc" id="L146">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
+<span class="fc" id="L143">    return collection.getFactory()</span>
+<span class="fc" id="L144">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
   }
 
   /**
@@ -154,34 +152,34 @@ public class ApplySubgraph&lt;
    * @return collection of edge-induced subgraph
    */
   private GC edgeInducedSubgraphProjectFirst(GC collection) {
-<span class="fc" id="L157">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
-<span class="fc" id="L158">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
-<span class="fc" id="L159">      .flatMap(new EdgeToSourceAndTargetIdWithGraphIds&lt;&gt;())</span>
-<span class="fc" id="L160">      .distinct(0)</span>
-<span class="fc" id="L161">      .join(collection.getVertices())</span>
-<span class="fc" id="L162">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L163">      .with(new RightSideWithLeftGraphs2To1&lt;&gt;());</span>
+<span class="fc" id="L155">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L156">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L157">      .flatMap(new EdgeToSourceAndTargetIdWithGraphIds&lt;&gt;())</span>
+<span class="fc" id="L158">      .distinct(0)</span>
+<span class="fc" id="L159">      .join(collection.getVertices())</span>
+<span class="fc" id="L160">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L161">      .with(new RightSideWithLeftGraphs2To1&lt;&gt;());</span>
 
-<span class="fc" id="L165">    return collection.getFactory()</span>
-<span class="fc" id="L166">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
+<span class="fc" id="L163">    return collection.getFactory()</span>
+<span class="fc" id="L164">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
   }
 
   /**
    * Returns one subgraph for each of the given supergraphs.
    * The subgraphs are defined by the vertices that fulfil the vertex filter
    * function and edges that fulfill the edge filter function.
-   *
+   * &lt;p&gt;
    * Note, that the operator does not verify the consistency of the resulting graph.
    *
    * @param collection collection of supergraphs
    * @return collection of subgraphs
    */
   private GC subgraph(GC collection) {
-<span class="fc" id="L180">    DataSet&lt;V&gt; newVertices = collection.getVertices().filter(vertexFilterFunction);</span>
-<span class="fc" id="L181">    DataSet&lt;E&gt; newEdges = collection.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L178">    DataSet&lt;V&gt; newVertices = collection.getVertices().filter(vertexFilterFunction);</span>
+<span class="fc" id="L179">    DataSet&lt;E&gt; newEdges = collection.getEdges().filter(edgeFilterFunction);</span>
 
-<span class="fc" id="L183">    return collection.getFactory()</span>
-<span class="fc" id="L184">      .fromDataSets(collection.getGraphHeads(), newVertices, newEdges);</span>
+<span class="fc" id="L181">    return collection.getFactory()</span>
+<span class="fc" id="L182">      .fromDataSets(collection.getGraphHeads(), newVertices, newEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
