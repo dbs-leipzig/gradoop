@@ -129,14 +129,6 @@
         <url>https://travis-ci.org/dbs-leipzig/gradoop/</url>
     </ciManagement>
 
-    <repositories>
-        <repository>
-            <id>dbleipzig</id>
-            <name>DB Leipzig Archiva</name>
-            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <site>
             <id>site_gradoop</id>
