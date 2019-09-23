@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> The edge type.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id;label;properties;targetId;graphIds")
+@FunctionAnnotation.NonForwardedFieldsFirst("sourceId")
 @FunctionAnnotation.ReadFieldsSecond("*")
 public class UpdateEdgeSource<E extends Edge> implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 
