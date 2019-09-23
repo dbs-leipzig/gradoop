@@ -21,11 +21,11 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * edge -> (targetId, firstGraphId)
+ * {@code edge -> (targetId, firstGraphId)}
+ *
  * @param <E> edge type
  */
-public class TargetIdBtgId<E extends Edge> implements
-  MapFunction<E, Tuple2<GradoopId, GradoopId>> {
+public class TargetIdBtgId<E extends Edge> implements MapFunction<E, Tuple2<GradoopId, GradoopId>> {
 
   @Override
   public Tuple2<GradoopId, GradoopId> map(E e) throws Exception {

@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import java.util.Set;
 
 /**
- * graph => (category, label, 1)
+ * {@code graph => (category, label, 1)}
  */
 public class CategoryEdgeLabels implements
   FlatMapFunction<CCSGraph, CategoryCountableLabel> {

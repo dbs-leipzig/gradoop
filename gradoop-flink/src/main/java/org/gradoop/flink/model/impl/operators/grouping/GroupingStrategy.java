@@ -22,11 +22,15 @@ import org.gradoop.flink.model.impl.operators.groupingng.GroupingNG;
  */
 public enum GroupingStrategy {
   /**
-   * {@see GroupingGroupReduce}
+   * Grouping group reduce strategy.
+   *
+   * @see GroupingGroupReduce
    */
   GROUP_REDUCE,
   /**
-   * {@see GroupingGroupCombine}
+   * Grouping group combine strategy.
+   *
+   * @see GroupingGroupCombine
    */
   GROUP_COMBINE,
   /**

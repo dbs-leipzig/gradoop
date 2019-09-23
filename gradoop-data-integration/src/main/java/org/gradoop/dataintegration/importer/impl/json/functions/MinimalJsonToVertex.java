@@ -37,10 +37,10 @@ import java.util.Objects;
  * <p>
  * Example:
  * <p>
- * <pre>{@code {
+ * {@code {
  * "id":0,
  * "name":"Alice","gender":"female","age":42
- * }}</pre>
+ * }}
  */
 public class MinimalJsonToVertex implements MapFunction<String, EPGMVertex> {
 

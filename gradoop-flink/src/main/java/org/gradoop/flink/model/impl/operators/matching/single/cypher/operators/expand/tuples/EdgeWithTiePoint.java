@@ -21,10 +21,10 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 
 /**
  * Represents an Edge with an extracted tie point
- *
- * f0 -> edge join key
- * f1 -> edge id
- * f2 -> edge expand key
+ * <p>
+ * {@code f0 -> edge join key}<br>
+ * {@code f1 -> edge id}<br>
+ * {@code f2 -> edge expand key}
  */
 public class EdgeWithTiePoint extends Tuple3<GradoopId, GradoopId, GradoopId> {
 

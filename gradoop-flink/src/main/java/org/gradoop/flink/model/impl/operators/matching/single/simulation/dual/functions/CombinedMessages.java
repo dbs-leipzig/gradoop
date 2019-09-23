@@ -24,11 +24,10 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 
 /**
  * Combines a collection of deletions to a single message.
- *
- * [deletion] -> message
- *
- * Forwarded fields:
- *
+ * <p>
+ * {@code [deletion] -> message}
+ * <p>
+ * Forwarded fields:<br>
  * f0: recipient id
  */
 @FunctionAnnotation.ForwardedFields("f0")
@@ -41,8 +40,7 @@ public class CombinedMessages implements
   private final Message reuseMessage = new Message();
 
   @Override
-  public void combine(Iterable<Deletion> deletions,
-    Collector<Message> collector) throws Exception {
+  public void combine(Iterable<Deletion> deletions, Collector<Message> collector) {
     reuseMessage.setSenderIds(Lists.newArrayList());
     reuseMessage.setDeletions(Lists.newArrayList());
     reuseMessage.setMessageTypes(Lists.newArrayList());

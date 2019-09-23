@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 
 /**
- * object -> (object)
+ * {@code object -> (object)}
  *
  * @param <T> input type
  */

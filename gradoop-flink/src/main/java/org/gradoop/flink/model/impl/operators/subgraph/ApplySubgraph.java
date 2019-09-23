@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.verify.Verify;
 /**
  * Extracts a subgraph from each base graph in a graph collection using
  * the given filter functions. The graph head stays unchanged for the subgraph.
- * <p/>
+ * <p>
  * The operator is able to:
  * <ol>
  * <li>extract vertex-induced subgraph</li>
@@ -60,15 +60,13 @@ public class ApplySubgraph<
 
   /**
    * Creates a new sub graph operator instance.
-   * <p/>
+   * <p>
    * If both parameters are not {@code null}, the operator returns the subgraph
    * defined by filtered vertices and edges.
-   * <p/>
-   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the
-   * vertex-induced subgraph.
-   * <p/>
-   * If the {@code vertexFilterFunction} is {@code null}, the operator returns
-   * the edge-induced subgraph.
+   * <p>
+   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the vertex-induced subgraph.
+   * <p>
+   * If the {@code vertexFilterFunction} is {@code null}, the operator returns the edge-induced subgraph.
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
@@ -170,7 +168,7 @@ public class ApplySubgraph<
    * Returns one subgraph for each of the given supergraphs.
    * The subgraphs are defined by the vertices that fulfil the vertex filter
    * function and edges that fulfill the edge filter function.
-   *
+   * <p>
    * Note, that the operator does not verify the consistency of the resulting graph.
    *
    * @param collection collection of supergraphs

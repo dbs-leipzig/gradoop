@@ -21,10 +21,9 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Maps an element to a GradoopIdSet of all graph ids the element is
- * contained in.
- *
- * graph-element -> {graph id 1, graph id 2, ..., graph id n}
+ * Maps an element to a GradoopIdSet of all graph ids the element is contained in.
+ * <p>
+ * {@code graph-element -> {graph id 1, graph id 2, ..., graph id n}}
  *
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */

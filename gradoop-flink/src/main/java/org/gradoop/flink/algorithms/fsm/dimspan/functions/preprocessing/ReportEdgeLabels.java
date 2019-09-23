@@ -24,12 +24,12 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 import java.util.Set;
 
 /**
- * graph -> (edgeLabel,1L),..
+ * {@code graph -> (edgeLabel,1L),..}
  */
 public class ReportEdgeLabels implements FlatMapFunction<LabeledGraphIntString, WithCount<String>> {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
   private WithCount<String> reuseTuple = new WithCount<>(null, 1);
 
