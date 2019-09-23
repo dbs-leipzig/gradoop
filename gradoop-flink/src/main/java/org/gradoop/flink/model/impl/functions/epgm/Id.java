@@ -22,13 +22,12 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * element => elementId
+ * {@code element => elementId}
  *
  * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("id->*")
-public class Id<EL extends Element>
-  implements MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
+public class Id<EL extends Element> implements MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
 
   @Override
   public GradoopId map(EL element) throws Exception {

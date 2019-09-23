@@ -44,7 +44,7 @@ public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
    * @param expandColumn specifies the input column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
-   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param direction direction of the expansion (see {@link ExpandDirection})
    * @param distinctVertexColumns indices of distinct input vertex columns
    * @param distinctEdgeColumns indices of distinct input edge columns
    * @param closingColumn defines the column which should be equal with the paths end
@@ -67,7 +67,7 @@ public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
    * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
    * @param upperBound specifies the maximum hops we want to expand
-   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param direction direction of the expansion (see {@link ExpandDirection})
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end
@@ -88,7 +88,7 @@ public class ExpandEmbeddingsBulk extends ExpandEmbeddings {
    * @param candidateEdges candidate edges along which we expand
    * @param expandColumn specifies the column that represents the vertex from which we expand
    * @param lowerBound specifies the minimum hops we want to expand
-   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param direction direction of the expansion (see {@link ExpandDirection})
    * @param distinctVertexColumns indices of distinct vertex columns
    * @param distinctEdgeColumns indices of distinct edge columns
    * @param closingColumn defines the column which should be equal with the paths end

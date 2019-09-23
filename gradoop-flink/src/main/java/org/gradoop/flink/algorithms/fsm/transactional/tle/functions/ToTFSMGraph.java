@@ -25,10 +25,9 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.TFSMGraph;
 import java.util.Map;
 
 /**
- * graphTransaction => fsmGraph
+ * {@code graphTransaction => fsmGraph}
  */
-public class ToTFSMGraph extends ToFSMGraph
-  implements MapFunction<GraphTransaction, TFSMGraph> {
+public class ToTFSMGraph extends ToFSMGraph implements MapFunction<GraphTransaction, TFSMGraph> {
 
   @Override
   public TFSMGraph map(GraphTransaction graph) throws Exception {

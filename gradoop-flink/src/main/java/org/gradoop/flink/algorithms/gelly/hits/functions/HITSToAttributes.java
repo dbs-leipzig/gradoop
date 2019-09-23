@@ -36,6 +36,8 @@ public class HITSToAttributes implements JoinFunction<HITS.Result<GradoopId>, EP
   private String hubPropertyKey;
 
   /**
+   * Creates a {@link HITSToAttributes} instance.
+   *
    * @param authorityPropertyKey Property key to store the authority score of a vertex
    * @param hubPropertyKey       Property key to store the hub score of a vertex
    */

@@ -37,18 +37,17 @@ import java.util.Set;
 
 /**
  * Validates the neighborhood of a {@link FatVertex} according to the query.
- *
+ * <p>
  * For each query vertex candidate, the flatMap function checks if the vertex
  * has the corresponding incident incoming and outgoing edges. If this is not
  * the case, the vertex sends delete messages to all of its neighbors.
- *
- * fatVertex -> [deletion]
- *
- * f0->f1: vertexId -> senderId
+ * <p>
+ * {@code fatVertex -> [deletion]}
+ * <p>
+ * {@code f0->f1: vertexId -> senderId}
  */
 @FunctionAnnotation.ForwardedFields("f0->f1")
-public class ValidateNeighborhood
-  extends RichFlatMapFunction<FatVertex, Deletion> {
+public class ValidateNeighborhood extends RichFlatMapFunction<FatVertex, Deletion> {
 
   /**
    * serial version uid
@@ -87,8 +86,7 @@ public class ValidateNeighborhood
   }
 
   @Override
-  public void flatMap(FatVertex fatVertex, Collector<Deletion> collector) throws
-    Exception {
+  public void flatMap(FatVertex fatVertex, Collector<Deletion> collector) throws Exception {
 
     List<Long> deletions = Lists
       .newArrayListWithCapacity(fatVertex.getCandidates().size());
@@ -106,8 +104,7 @@ public class ValidateNeighborhood
   }
 
   /**
-   * Validates if the given query vertex candidate is a valid candidate for the
-   * vertex.
+   * Validates if the given query vertex candidate is a valid candidate for the vertex.
    *
    * @param vQ vertex candidate
    * @param fatVertex vertex
