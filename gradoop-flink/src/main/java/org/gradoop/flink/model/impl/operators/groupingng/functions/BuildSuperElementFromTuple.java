@@ -22,7 +22,7 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +45,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
   /**
    * The grouping key functions..
    */
-  private final List<GroupingKeyFunction<E, ?>> keyFunctions;
+  private final List<KeyFunction<E, ?>> keyFunctions;
 
   /**
    * The aggregate functions for this element type.
@@ -60,7 +60,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @param aggregateFunctions The aggregate functions.
    */
   protected BuildSuperElementFromTuple(int tupleDataOffset,
-    List<GroupingKeyFunction<E, ?>> groupingKeys,
+    List<KeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     this.keyFunctions = Objects.requireNonNull(groupingKeys);

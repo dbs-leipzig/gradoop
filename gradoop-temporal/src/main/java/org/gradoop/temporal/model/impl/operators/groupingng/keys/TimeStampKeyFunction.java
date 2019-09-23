@@ -19,7 +19,7 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -46,7 +46,7 @@ import static java.time.ZoneOffset.UTC;
  *
  * @param <T> The type of the elements to group.
  */
-public class TimeStampKeyFunction<T extends TemporalElement> implements GroupingKeyFunction<T, Long> {
+public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunction<T, Long> {
 
   /**
    * The time interval of the temporal element to extract.

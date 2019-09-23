@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-public class TupleBasedGroupingTest extends GroupingTestBase {
+public class TupleBasedGroupingTest extends LabelSpecificGroupingTestBase {
   @Override
   public GroupingStrategy getStrategy() {
     return GroupingStrategy.GROUP_AS_TUPLES;

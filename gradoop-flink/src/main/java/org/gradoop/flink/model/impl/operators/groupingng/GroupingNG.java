@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -37,7 +37,7 @@ import org.gradoop.flink.model.impl.operators.groupingng.functions.BuildTuplesFr
 import org.gradoop.flink.model.impl.operators.groupingng.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.GroupingNGConstants;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.LabelSpecificAggregatorWrapper;
-import org.gradoop.flink.model.impl.operators.groupingng.functions.LabelSpecificGlobalAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.groupingng.functions.UnlabeledGroupAggregatorWrapper;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceEdgeTuples;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.ReduceVertexTuples;
 import org.gradoop.flink.model.impl.operators.groupingng.functions.UpdateIdField;
@@ -72,7 +72,7 @@ public class GroupingNG<
   /**
    * The vertex grouping keys.
    */
-  private final List<GroupingKeyFunction<V, ?>> vertexGroupingKeys;
+  private final List<KeyFunction<V, ?>> vertexGroupingKeys;
 
   /**
    * The vertex aggregate functions.
@@ -82,7 +82,7 @@ public class GroupingNG<
   /**
    * The edge grouping keys.
    */
-  private final List<GroupingKeyFunction<E, ?>> edgeGroupingKeys;
+  private final List<KeyFunction<E, ?>> edgeGroupingKeys;
 
   /**
    * The edge aggregate functions.
@@ -103,9 +103,9 @@ public class GroupingNG<
    * @param edgeAggregateFunctions   The edge aggregate functions.
    * @implNote Label-specific grouping is not supported by this implementation.
    */
-  public GroupingNG(List<GroupingKeyFunction<V, ?>> vertexGroupingKeys,
+  public GroupingNG(List<KeyFunction<V, ?>> vertexGroupingKeys,
     List<AggregateFunction> vertexAggregateFunctions,
-    List<GroupingKeyFunction<E, ?>> edgeGroupingKeys,
+    List<KeyFunction<E, ?>> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
     this.vertexGroupingKeys = Objects.requireNonNull(vertexGroupingKeys);
     this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList() :
@@ -269,7 +269,7 @@ public class GroupingNG<
         if (currentLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||
           currentLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {
           labelGroup.getAggregateFunctions().forEach(lga -> functions.add(
-            new LabelSpecificGlobalAggregatorWrapper(allLabels, lga, (short) id.getAndIncrement())));
+            new UnlabeledGroupAggregatorWrapper(allLabels, lga, (short) id.getAndIncrement())));
         } else {
           labelGroup.getAggregateFunctions().forEach(lga -> functions.add(
             new LabelSpecificAggregatorWrapper(currentLabel, lga, (short) id.getAndIncrement())));
@@ -289,10 +289,10 @@ public class GroupingNG<
    * @param <T> The element type for the grouping key function.
    * @return Key functions corresponding to those groups.
    */
-  private static <T extends Element> List<GroupingKeyFunction<T, ?>> asKeyFunctions(
+  private static <T extends Element> List<KeyFunction<T, ?>> asKeyFunctions(
     boolean useLabels, List<LabelGroup> labelGroups) {
     LabelGroup defaultGroup = getDefaultGroup(labelGroups);
-    List<GroupingKeyFunction<T, ?>> newKeys = new ArrayList<>();
+    List<KeyFunction<T, ?>> newKeys = new ArrayList<>();
     if (defaultGroup == null) {
       newKeys.add(new LabelSpecificKeyFunction<>(labelGroups, useLabels));
     } else {

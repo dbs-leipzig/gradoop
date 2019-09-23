@@ -16,7 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.groupingng;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
@@ -73,7 +73,7 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       "({__valFrom:" + testTimeFrom2 + "L, __valTo: " + testTimeTo2 + "L, min_a: 7L, max_a: 8L, count: 2L})" +
       "]");
     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("input"));
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexGroupingKeys = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexGroupingKeys = Collections.singletonList(
       TemporalGroupingKeys.timeInterval(VALID_TIME));
     List<AggregateFunction> vertexAggregateFunctions = Arrays.asList(
       new MaxVertexProperty("a", "max_a"),
@@ -135,14 +135,14 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       new VertexCount("count"));
     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("input"));
     // Test with no TemporalField calculated
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysValidFrom = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysValidFrom = Collections.singletonList(
       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM));
     TemporalGraph expected1 = toTemporalGraph(loader.getLogicalGraphByVariable("expected1"));
     TemporalGraph result1 = input.callForGraph(new GroupingNG<>(vertexKeysValidFrom, vertexAggregateFunctions,
       Collections.emptyList(), Collections.emptyList()));
     collectAndAssertTrue(result1.toLogicalGraph().equalsByElementData(expected1.toLogicalGraph()));
     // Test with two TemporalFields calculated
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysValidFrom2 = Arrays.asList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysValidFrom2 = Arrays.asList(
       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.MONTH_OF_YEAR),
       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.YEAR));
     TemporalGraph expected2 = toTemporalGraph(loader.getLogicalGraphByVariable("expected2"));
@@ -150,7 +150,7 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       vertexAggregateFunctions, Collections.emptyList(), Collections.emptyList()));
     collectAndAssertTrue(result2.toLogicalGraph().equalsByElementData(expected2.toLogicalGraph()));
     // Test with validTo time
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysValidTo = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysValidTo = Collections.singletonList(
       TemporalGroupingKeys.timeStamp(VALID_TIME, TO, ChronoField.MILLI_OF_SECOND));
     TemporalGraph expected3 = toTemporalGraph(loader.getLogicalGraphByVariable("expected3"));
     TemporalGraph result3 = input.callForGraph(new GroupingNG<>(vertexKeysValidTo, vertexAggregateFunctions,
@@ -196,9 +196,9 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       new MinVertexProperty("a", "min_a"),
       new VertexCount("count"));
     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("input"));
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysMonths = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysMonths = Collections.singletonList(
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MONTHS));
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysDays = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysDays = Collections.singletonList(
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.DAYS));
     TemporalGraph byMonths = input.callForGraph(new GroupingNG<>(vertexKeysMonths, vertexAggregateFunctions,
       Collections.emptyList(), Collections.emptyList()));
@@ -208,9 +208,9 @@ public class TemporalGroupingTest extends TemporalGradoopTestBase {
       Collections.emptyList(), Collections.emptyList()));
     collectAndAssertTrue(loader.getLogicalGraphByVariable("expected2")
       .equalsByElementData(byDays.toLogicalGraph()));
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysMinutes = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysMinutes = Collections.singletonList(
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MINUTES));
-    List<GroupingKeyFunction<TemporalVertex, ?>> vertexKeysMillis = Collections.singletonList(
+    List<KeyFunction<TemporalVertex, ?>> vertexKeysMillis = Collections.singletonList(
       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MILLIS));
     TemporalGraph input2 = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable("input2"));
     TemporalGraph byMinutes = input2.callForGraph(new GroupingNG<>(vertexKeysMinutes,

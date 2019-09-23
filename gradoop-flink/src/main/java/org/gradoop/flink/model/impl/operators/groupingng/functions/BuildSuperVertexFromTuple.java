@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +51,7 @@ public class BuildSuperVertexFromTuple<T extends Tuple, E extends Vertex>
    * @param aggregateFunctions The aggregate functions.
    * @param vertexFactory      A factory used to create new vertices.
    */
-  public BuildSuperVertexFromTuple(List<GroupingKeyFunction<E, ?>> groupingKeys,
+  public BuildSuperVertexFromTuple(List<KeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions, VertexFactory<E> vertexFactory) {
     super(GroupingNGConstants.VERTEX_TUPLE_RESERVED, groupingKeys, aggregateFunctions);
     reuse = Objects.requireNonNull(vertexFactory).createVertex();

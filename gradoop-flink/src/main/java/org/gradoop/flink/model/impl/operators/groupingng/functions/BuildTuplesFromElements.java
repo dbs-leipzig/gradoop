@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +48,7 @@ public class BuildTuplesFromElements<E extends Element>
   /**
    * The grouping key functions.
    */
-  private final List<GroupingKeyFunction<E, ?>> keys;
+  private final List<KeyFunction<E, ?>> keys;
 
   /**
    * The aggregate functions.
@@ -78,7 +78,7 @@ public class BuildTuplesFromElements<E extends Element>
    * @param keys               The grouping keys.
    * @param aggregateFunctions The aggregate functions used to determine the aggregate property
    */
-  public BuildTuplesFromElements(int tupleDataOffset, List<GroupingKeyFunction<E, ?>> keys,
+  public BuildTuplesFromElements(int tupleDataOffset, List<KeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     if (tupleDataOffset < 0) {
@@ -123,7 +123,7 @@ public class BuildTuplesFromElements<E extends Element>
   @Override
   public Tuple map(E element) throws Exception {
     int field = tupleDataOffset;
-    for (GroupingKeyFunction<? super E, ?> key : keys) {
+    for (KeyFunction<? super E, ?> key : keys) {
       reuseTuple.setField(key.getKey(element), field);
       field++;
     }

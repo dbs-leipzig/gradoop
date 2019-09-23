@@ -20,16 +20,16 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import java.io.Serializable;
 
 /**
- * A key function used in grouping. This function will extract an object as a grouping key from
- * another object.
+ * A function extracting a key from an element. This key may be used as a grouping key.
+ * The key with be an object of a certain type, depending on this function.
  *
  * @param <E> The type of the object from which the grouping key is extracted.
  * @param <K> The type of the extracted key.
  */
-public interface GroupingKeyFunction<E, K> extends Serializable {
+public interface KeyFunction<E, K> extends Serializable {
 
   /**
-   * Get the grouping key from the element.
+   * Get the key from the element.
    *
    * @param element The element to extract the key from.
    * @return The key.
@@ -37,11 +37,13 @@ public interface GroupingKeyFunction<E, K> extends Serializable {
   K getKey(E element);
 
   /**
-   * Store a grouping key on an element. This is used to store the grouping key on the super element after
-   * grouping. By default nothing will be changed on the element.
+   * Store a key on an element.<p>
+   * This is used to store the grouping key on the super element after grouping.<p>
+   * The default implementation of this function does not change the element.
    *
    * @param element The element where the key should be stored.
-   * @param key     The key to store on the element.
+   * @param key     The key to store on the element. The type of the key is expected to be the same as the
+   *                type of keys extracted by this key function.
    */
   default void addKeyToElement(E element, Object key) {
   }

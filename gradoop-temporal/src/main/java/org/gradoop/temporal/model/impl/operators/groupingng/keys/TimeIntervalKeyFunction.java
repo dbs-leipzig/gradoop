@@ -18,7 +18,7 @@ package org.gradoop.temporal.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -30,7 +30,7 @@ import java.util.Objects;
  * @param <T> The type of the temporal elements.
  */
 public class TimeIntervalKeyFunction<T extends TemporalElement>
-  implements GroupingKeyFunction<T, Tuple2<Long, Long>> {
+  implements KeyFunction<T, Tuple2<Long, Long>> {
 
   /**
    * The time interval to extract.

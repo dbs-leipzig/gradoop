@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.groupingng.functions;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class BuildTuplesFromEdges<E extends Edge> extends BuildTuplesFromElement
    * @param keys               The grouping keys.
    * @param aggregateFunctions The aggregate functions used to determine the aggregate property
    */
-  public BuildTuplesFromEdges(List<GroupingKeyFunction<E, ?>> keys,
+  public BuildTuplesFromEdges(List<KeyFunction<E, ?>> keys,
     List<AggregateFunction> aggregateFunctions) {
     super(GroupingNGConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
   }

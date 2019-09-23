@@ -16,7 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.groupingng;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.operators.groupingng.keys.DurationKeyFunction;
 import org.gradoop.temporal.model.impl.operators.groupingng.keys.TimeIntervalKeyFunction;
@@ -45,7 +45,7 @@ public class TemporalGroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the duration.
    */
-  public static <T extends TemporalElement> GroupingKeyFunction<T, Long> duration(
+  public static <T extends TemporalElement> KeyFunction<T, Long> duration(
     TimeDimension interval, TemporalUnit timeUnit) {
     return new DurationKeyFunction<>(interval, timeUnit);
   }
@@ -57,7 +57,7 @@ public class TemporalGroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting a time interval.
    */
-  public static <T extends TemporalElement> GroupingKeyFunction<T, Tuple2<Long, Long>> timeInterval(
+  public static <T extends TemporalElement> KeyFunction<T, Tuple2<Long, Long>> timeInterval(
     TimeDimension interval) {
     return new TimeIntervalKeyFunction<>(interval);
   }
@@ -70,7 +70,7 @@ public class TemporalGroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting a time stamp.
    */
-  public static <T extends TemporalElement> GroupingKeyFunction<T, Long> timeStamp(
+  public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField) {
     return timeStamp(interval, intervalField, null);
   }
@@ -88,7 +88,7 @@ public class TemporalGroupingKeys {
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the time stamp or part of it.
    */
-  public static <T extends TemporalElement> GroupingKeyFunction<T, Long> timeStamp(
+  public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField,
     TemporalField fieldOfTimeStamp) {
     return new TimeStampKeyFunction<>(interval, intervalField, fieldOfTimeStamp);

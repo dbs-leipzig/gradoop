@@ -20,7 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> The type of the elements to group.
  */
-public class LabelSpecificKeyFunction<T extends Element> implements GroupingKeyFunction<T, Tuple> {
+public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<T, Tuple> {
 
   /**
    * A map assigning an internally used number to each label.

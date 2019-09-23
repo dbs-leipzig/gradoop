@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.groupingng.keys;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.flink.model.api.functions.GroupingKeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,12 +29,12 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class CompositeKeyFunction<T> implements GroupingKeyFunction<T, Tuple> {
+public class CompositeKeyFunction<T> implements KeyFunction<T, Tuple> {
 
   /**
    * A list of grouping key functions combined in this key function.
    */
-  private final List<GroupingKeyFunction<T, ?>> componentFunctions;
+  private final List<KeyFunction<T, ?>> componentFunctions;
 
   /**
    * Reduce object instantiations.
@@ -46,7 +46,7 @@ public class CompositeKeyFunction<T> implements GroupingKeyFunction<T, Tuple> {
    *
    * @param keyFunctions The key functions to be combined.
    */
-  public CompositeKeyFunction(List<GroupingKeyFunction<T, ?>> keyFunctions) {
+  public CompositeKeyFunction(List<KeyFunction<T, ?>> keyFunctions) {
     this.componentFunctions = Objects.requireNonNull(keyFunctions);
     if (keyFunctions.size() > Tuple.MAX_ARITY) {
       throw new IllegalArgumentException("Too many keys. Maximum tuple arity exceeded.");
