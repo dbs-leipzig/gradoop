@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,8 +17,6 @@
  */
 package org.gradoop.common.model.impl.properties.bytes;
 
-import org.apache.log4j.Logger;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -27,7 +25,7 @@ import java.security.PrivilegedAction;
 public class UnsafeAvailChecker {
 
   private static final String CLASS_NAME = "sun.misc.Unsafe";
-  private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
+  //private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
   private static boolean avail = false;
   private static boolean unaligned = false;
 
@@ -41,9 +39,11 @@ public class UnsafeAvailChecker {
           f.setAccessible(true);
           return f.get(null) != null;
         } catch (Throwable e) {
-          LOG.warn("sun.misc.Unsafe is not available/accessible", e);
+          //LOG.warn("sun.misc.Unsafe is not available/accessible", e);
+          System.out.println("Platzhalter");
+          throw new RuntimeException(e);
         }
-        return false;
+        //return false;
       }
     });
     // When Unsafe itself is not available/accessible consider unaligned as false.
@@ -60,8 +60,10 @@ public class UnsafeAvailChecker {
           m.setAccessible(true);
           unaligned = (Boolean) m.invoke(null);
         } catch (Exception e) {
-          LOG.warn("java.nio.Bits#unaligned() check failed."
-            + "Unsafe based read/write of primitive types won't be used", e);
+          //LOG.warn("java.nio.Bits#unaligned() check failed."
+          //  + "Unsafe based read/write of primitive types won't be used", e);
+          System.out.println("Platzhalter");
+          throw new RuntimeException(e);
         }
       }
     }

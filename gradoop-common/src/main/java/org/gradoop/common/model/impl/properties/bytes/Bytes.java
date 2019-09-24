@@ -1,18 +1,21 @@
 package org.gradoop.common.model.impl.properties.bytes;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.hadoop.io.RawComparator;
 import sun.misc.Unsafe;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 
 /**
  * Utility class that handles byte arrays, conversions to/from other types,
  * comparisons, hash code generation, manufacturing keys for HashMaps or
  * HashSets, etc.
+ *
+ * This file is copied from {@code org.apache.hbase:hbase-common} version TODO
+ * Package path {@code org.apache.hadoop.hbase.util.Bytes}
  */
 @SuppressFBWarnings({"EI_EXPOSE_REP", "SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"})
 public class Bytes implements Comparable<Bytes> {
@@ -191,7 +194,7 @@ public class Bytes implements Comparable<Bytes> {
   /**
    * Byte array comparator class.
    */
-  public static class ByteArrayComparator implements RawComparator<byte []> {
+  public static class ByteArrayComparator implements Comparator<byte []> {
     /**
      * Constructor
      */
@@ -202,7 +205,7 @@ public class Bytes implements Comparable<Bytes> {
     public int compare(byte [] left, byte [] right) {
       return compareTo(left, right);
     }
-    @Override
+
     public int compare(byte [] b1, int s1, int l1, byte [] b2, int s2, int l2) {
       return LexicographicalComparerHolder.BEST_COMPARER.
         compareTo(b1, s1, l1, b2, s2, l2);
@@ -212,7 +215,7 @@ public class Bytes implements Comparable<Bytes> {
   /**
    * Use comparing byte arrays, byte-by-byte
    */
-  public final static RawComparator<byte []> BYTES_RAWCOMPARATOR = new ByteArrayComparator();
+  public final static ByteArrayComparator BYTES_RAWCOMPARATOR = new ByteArrayComparator();
 
   /**
    * Put bytes at the specified byte array position.

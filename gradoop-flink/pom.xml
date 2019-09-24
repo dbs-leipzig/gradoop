@@ -150,7 +150,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-shaded-hadoop2</artifactId>
-	</dependency>
+	    </dependency>
 
         <!-- CAPF -->
         <dependency>
@@ -177,13 +177,6 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-testing-util</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-server</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

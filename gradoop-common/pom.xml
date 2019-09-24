@@ -120,9 +120,16 @@
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${dep.hadoop.version}</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>11.0.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
             <scope>compile</scope>
         </dependency>
 
@@ -151,21 +158,6 @@
         </dependency>
 
         <!-- Test dependencies -->
-
-        <!-- HBase -->
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-testing-util</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-server</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Others -->
         <dependency>

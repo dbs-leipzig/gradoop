@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,7 +17,6 @@
  */
 package org.gradoop.common.model.impl.properties.bytes;
 
-import org.apache.log4j.Logger;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -26,7 +25,7 @@ import java.security.PrivilegedAction;
 
 public final class UnsafeAccess {
 
-  private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
+  //private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
 
   public static final Unsafe theUnsafe;
 
@@ -42,9 +41,10 @@ public final class UnsafeAccess {
           f.setAccessible(true);
           return f.get(null);
         } catch (Throwable e) {
-          LOG.warn("sun.misc.Unsafe is not accessible", e);
+          //LOG.warn("sun.misc.Unsafe is not accessible", e);
+          throw new RuntimeException(e);
         }
-        return null;
+        //return null;
       }
     });
 
