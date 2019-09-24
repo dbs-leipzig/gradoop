@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
@@ -34,7 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-import org.gradoop.flink.model.impl.operators.groupingng.GroupingNG;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGroupingUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -667,15 +667,18 @@ public abstract class Grouping<
       }
 
       // adding the global aggregators to the associated label groups
-      for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
-        for (AggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
-          vertexLabelGroup.addAggregateFunction(aggregateFunction);
+      if (strategy != GroupingStrategy.GROUP_WITH_KEYFUNCTIONS) {
+        // global aggregate functions can be handled separately for KeyedGrouping
+        for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
+          for (AggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
+            vertexLabelGroup.addAggregateFunction(aggregateFunction);
+          }
         }
-      }
 
-      for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
-        for (AggregateFunction aggregateFunction : globalEdgeAggregateFunctions) {
-          edgeLabelGroup.addAggregateFunction(aggregateFunction);
+        for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
+          for (AggregateFunction aggregateFunction : globalEdgeAggregateFunctions) {
+            edgeLabelGroup.addAggregateFunction(aggregateFunction);
+          }
         }
       }
 
@@ -690,8 +693,10 @@ public abstract class Grouping<
         groupingOperator = new GroupingGroupCombine<>(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
         break;
-      case GROUP_AS_TUPLES:
-        groupingOperator = new GroupingNG<>(useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+      case GROUP_WITH_KEYFUNCTIONS:
+        groupingOperator = KeyedGroupingUtils.createInstance(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          globalVertexAggregateFunctions, globalEdgeAggregateFunctions);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

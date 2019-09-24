@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
 /**
- * Test for the keyed grouping implementation.
+ * Contains implementations of grouping key functions.
  */
-public class TupleBasedGroupingTest extends LabelSpecificGroupingTestBase {
-  @Override
-  public GroupingStrategy getStrategy() {
-    return GroupingStrategy.GROUP_WITH_KEYFUNCTIONS;
-  }
-}
+package org.gradoop.flink.model.impl.operators.keyedgrouping.keys;
