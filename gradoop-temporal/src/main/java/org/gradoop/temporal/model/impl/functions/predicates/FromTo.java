@@ -25,7 +25,7 @@ import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTim
  * Implementation of the <b>FromTo</b> temporal predicate.
  * Given a time-interval, this predicate will match all intervals that were valid during that interval.
  * <p>
- * Predicate: elementFrom < queryTo && elementTo > queryFrom
+ * Predicate: {@code elementFrom < queryTo && elementTo > queryFrom}
  */
 public class FromTo implements TemporalPredicate {
 

@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 
 /**
- * (id,label1),(id,label2) -> (label1,label2)
+ * {@code (id,label1),(id,label2) -> (label1,label2)}
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1")

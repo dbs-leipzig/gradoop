@@ -219,6 +219,8 @@ public abstract class BaseInputFormat<T extends EPGMElement> extends GenericInpu
    * @param zkHosts zookeeper hosts
    * @param auth accumulo access authorization
    * @return split range collections
+   * @throws IOException on failure
+   * @throws AccumuloSecurityException on security error
    */
   @Nonnull
   private List<Range> doSplits(

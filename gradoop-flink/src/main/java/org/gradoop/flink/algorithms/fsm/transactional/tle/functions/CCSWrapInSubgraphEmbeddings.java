@@ -22,13 +22,12 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraphEmbeddings;
 
 /**
- * subgraphWithSampleEmbedding => subgraphWithEmbeddings
+ * {@code subgraphWithSampleEmbedding => subgraphWithEmbeddings}
  */
-public class CCSWrapInSubgraphEmbeddings implements
-  MapFunction<CCSSubgraph, CCSSubgraphEmbeddings> {
+public class CCSWrapInSubgraphEmbeddings implements MapFunction<CCSSubgraph, CCSSubgraphEmbeddings> {
 
   /**
-   * reuse tuple to avoid instantiations
+   * Reuse tuple to avoid instantiations.
    */
   private final CCSSubgraphEmbeddings reuseTuple;
 

@@ -27,10 +27,12 @@ import java.util.stream.Collectors;
 
 /**
  * Element Query Formula
- *
+ * <p>
  * A element query contains
- *  - id range set (which define the query id range of result element)
- *  - element filter expression (which define should a result element be return from server)
+ * <ul>
+ * <li>id range set (which define the query id range of result element)</li>
+ * <li>element filter expression (which define should a result element be return from server)</li>
+ * </ul>
  *
  * @see Query#elements()
  * @param <FilterImpl> filter implement type
@@ -88,7 +90,7 @@ public class ElementQuery<FilterImpl extends ElementFilter> implements Serializa
   }
 
   /**
-   * [Builder] - (set range) -> BuilderWithRange -(set filter) -> ElementQuery
+   * {@code [Builder] - (set range) -> BuilderWithRange -(set filter) -> ElementQuery}
    */
   public static class Builder {
 
@@ -140,7 +142,7 @@ public class ElementQuery<FilterImpl extends ElementFilter> implements Serializa
   }
 
   /**
-   * Builder - (set range) -> [BuilderWithRange] -(set filter) -> ElementQuery
+   * {@code Builder - (set range) -> [BuilderWithRange] -(set filter) -> ElementQuery}
    */
   public static class BuilderWithRange {
 

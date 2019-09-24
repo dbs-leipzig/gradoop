@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * graph-element -> (graphId, id)*
+ * {@code graph-element -> (graphId, id)*}
  *
  * @param <GE> EPGM graph element type
  */

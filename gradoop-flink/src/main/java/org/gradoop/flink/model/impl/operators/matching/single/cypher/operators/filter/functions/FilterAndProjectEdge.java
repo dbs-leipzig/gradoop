@@ -25,8 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link Edge} and projects specified property values to the
- * output embedding.
+ * Applies a given predicate on a {@link Edge} and projects specified property values to the output embedding.
  *
  * @param <E> The edge type.
  */

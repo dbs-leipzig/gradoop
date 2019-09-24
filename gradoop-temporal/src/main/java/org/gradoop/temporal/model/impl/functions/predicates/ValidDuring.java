@@ -25,7 +25,7 @@ import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTim
  * Implementation of the <b>ValidDuring</b> temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals that contain that interval.
  * <p>
- * Predicate: elementFrom <= queryFrom && elementTo >= queryTo
+ * Predicate: {@code elementFrom <= queryFrom && elementTo >= queryTo}
  */
 public class ValidDuring implements TemporalPredicate {
 

@@ -26,7 +26,8 @@ import java.util.List;
 
 /**
  * Projects an Edge by a set of properties.
- * Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
+ * <p>
+ * {@code Edge -> Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))}
  */
 public class ProjectEdges implements PhysicalOperator {
 

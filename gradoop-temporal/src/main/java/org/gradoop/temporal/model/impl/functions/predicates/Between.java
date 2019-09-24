@@ -26,7 +26,7 @@ import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTim
  * Given a certain time-interval, this predicate will match all intervals that start
  * before or at that interval's end and end after the start of that interval.
  * <p>
- * Predicate: elementFrom <= queryTo && elementTo > queryFrom
+ * Predicate: {@code elementFrom <= queryTo && elementTo > queryFrom}
  */
 public class Between implements TemporalPredicate {
 

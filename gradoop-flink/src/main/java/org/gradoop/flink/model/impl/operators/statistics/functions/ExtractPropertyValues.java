@@ -26,8 +26,9 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.util.Set;
 
 /**
- * Extracts Triples of the form <Tuple1<PropertyName>, PropertyValue> from the given list of
+ * Extracts Triples of the form {@code <Tuple1<PropertyName>, PropertyValue>} from the given list of
  * GraphElements
+ *
  * @param <T> graph element type
  */
 public class ExtractPropertyValues<T extends EPGMGraphElement>

@@ -25,7 +25,7 @@ import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTim
  * Implementation of the <b>CreatedIn</b> temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals starting during that interval.
  * <p>
- * Predicate: queryFrom <= elementFrom && elementFrom <= queryTo
+ * Predicate: {@code queryFrom <= elementFrom && elementFrom <= queryTo}
  */
 public class CreatedIn implements TemporalPredicate {
 

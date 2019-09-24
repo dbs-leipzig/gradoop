@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * (g, V, E) => adjacencyList
+ * {@code (G, V, E) => adjacencyList}
  * for undirected graph
  */
 public class ToUndirectedAdjacencyList implements

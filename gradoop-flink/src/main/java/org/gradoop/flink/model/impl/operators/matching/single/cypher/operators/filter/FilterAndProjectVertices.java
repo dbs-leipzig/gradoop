@@ -28,16 +28,16 @@ import java.util.List;
  * Filters a set of {@link Vertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
- *
- * Vertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
- *
+ * <p>
+ * {@code Vertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])}
+ * <p>
  * Example:
- *
- * Given a Vertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
+ * <br>
+ * Given a Vertex {@code (0, "Person", {name:"Alice", age:23})}, a predicate {@code "age = 23"} and
  * projection property keys [name, location] the operator creates an
  * {@link Embedding}:
- *
- * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ * <br>
+ * {@code ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])}
  *
  * @param <V> The vertex type.
  */
