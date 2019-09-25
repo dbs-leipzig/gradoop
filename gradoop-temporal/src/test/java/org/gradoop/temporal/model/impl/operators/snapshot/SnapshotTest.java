@@ -94,8 +94,10 @@ public class SnapshotTest extends TemporalGradoopTestBase {
 
     getConfig().getExecutionEnvironment().execute();
 
-    List<String> resultVertexLabels = resultVertices.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
-    List<String> resultEdgeLabels = resultEdges.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
+    List<String> resultVertexLabels =
+      resultVertices.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
+    List<String> resultEdgeLabels =
+      resultEdges.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
 
     assertEquals(expectedVertices.length, resultVertices.size());
     assertEquals(expectedEdges.length, resultEdges.size());
@@ -113,23 +115,32 @@ public class SnapshotTest extends TemporalGradoopTestBase {
   @Parameterized.Parameters(name = "{0} ({1})")
   public static Iterable<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-      {new All(),               TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E2, E3, E4, E5}},
-      {new AsOf(3L),            TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
-      {new Between(2L, 3L),     TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
+      {new All(), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E4, E5}},
+      {new AsOf(3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
+      {new Between(2L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
       {new ContainedIn(0L, 5L), TimeDimension.VALID_TIME, new String[] {V4}, new String[] {E3, E5}},
-      {new CreatedIn(2L, 5L),   TimeDimension.VALID_TIME, new String[] {V3, V4}, new String[] {E4, E5}},
-      {new DeletedIn(6L, 10L),  TimeDimension.VALID_TIME, new String[] {V3, V5}, new String[] {E2, E4}},
-      {new FromTo(1L, 3L),      TimeDimension.VALID_TIME, new String[] {V1, V2, V5}, new String[] {E1}},
+      {new CreatedIn(2L, 5L), TimeDimension.VALID_TIME, new String[] {V3, V4}, new String[] {E4, E5}},
+      {new DeletedIn(6L, 10L), TimeDimension.VALID_TIME, new String[] {V3, V5}, new String[] {E2, E4}},
+      {new FromTo(1L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V5}, new String[] {E1}},
       {new ValidDuring(3L, 8L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
 
-      {new All(),               TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E2, E3, E4, E5}},
-      {new AsOf(3L),            TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E3, E5}},
-      {new Between(4L, 8L),     TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E4, E5}},
-      {new ContainedIn(2L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V4, V5}, new String[] {E3, E4, E5}},
-      {new CreatedIn(0L, 5L),   TimeDimension.TRANSACTION_TIME, new String[] {V2, V3, V4, V5}, new String[] {E1, E2, E3, E5}},
-      {new DeletedIn(5L, 10L),  TimeDimension.TRANSACTION_TIME, new String[] {V3, V4, V5}, new String[] {E4, E5}},
-      {new FromTo(2L, 6L),      TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E3, E5}},
-      {new ValidDuring(1L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3}, new String[] {E1}}
+      {new All(), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E4, E5}},
+      {new AsOf(3L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E3, E5}},
+      {new Between(4L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E4, E5}},
+      {new ContainedIn(2L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V4, V5},
+        new String[] {E3, E4, E5}},
+      {new CreatedIn(0L, 5L), TimeDimension.TRANSACTION_TIME, new String[] {V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E5}},
+      {new DeletedIn(5L, 10L), TimeDimension.TRANSACTION_TIME, new String[] {V3, V4, V5},
+        new String[] {E4, E5}},
+      {new FromTo(2L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E3, E5}},
+      {new ValidDuring(1L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3},
+        new String[] {E1}}
     });
   }
 }
