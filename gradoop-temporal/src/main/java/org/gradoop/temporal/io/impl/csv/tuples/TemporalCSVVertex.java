@@ -81,11 +81,6 @@ public class TemporalCSVVertex extends Tuple5<String, String, String, String, St
   }
 
   @Override
-  public String getTemporalData() {
-    return f4;
-  }
-
-  @Override
   public void setTemporalData(String temporalData) {
     f4 = temporalData;
   }

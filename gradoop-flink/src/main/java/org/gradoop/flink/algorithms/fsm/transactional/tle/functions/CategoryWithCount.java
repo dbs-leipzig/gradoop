@@ -20,7 +20,7 @@ import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.CCSGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * graph => (category, 1)
+ * {@code graph => (category, 1)}
  */
 public class CategoryWithCount
   implements MapFunction<CCSGraph, WithCount<String>> {

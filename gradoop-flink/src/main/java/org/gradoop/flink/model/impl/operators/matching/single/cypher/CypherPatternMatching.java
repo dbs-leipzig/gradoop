@@ -162,6 +162,7 @@ public class CypherPatternMatching<
     EmbeddingMetaData embeddingMetaData) {
 
     QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);
+    constructionPatternHandler.updateGeneratedVariableNames(n -> "_" + n);
 
     Set<String> queryVars = Sets.newHashSet(embeddingMetaData.getVariables());
     Set<String> constructionVars = constructionPatternHandler.getAllVariables();

@@ -28,12 +28,13 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
 
 /**
  * Converts an EPGM edge to a {@link TripleWithCandidates} tuple.
- *
+ * <p>
  * Forwarded fields:
- *
- * id -> f0:        edge id
- * sourceId -> f1:  source vertex id
- * targetId -> f1:  target vertex id
+ * <ul>
+ * <li>edge id: {@code id -> f0}</li>
+ * <li>source vertex id: {@code sourceId -> f1}</li>
+ * <li>target vertex id: {@code targetId -> f1}</li>
+ * </ul>
  *
  * @param <E> EPGM edge type
  */

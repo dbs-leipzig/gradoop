@@ -31,9 +31,9 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.layout.TemporalGraphCollectionLayoutFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -179,9 +179,9 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
     DataSet<? extends Vertex> vertices,
     DataSet<? extends Edge> edges) {
     return new TemporalGraphCollection(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory())),
-      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory())),
-      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory()))), config);
+      graphHead.map(new GraphHeadToTemporalGraphHead<>(getGraphHeadFactory())),
+      vertices.map(new VertexToTemporalVertex<>(getVertexFactory())),
+      edges.map(new EdgeToTemporalEdge<>(getEdgeFactory()))), config);
   }
 
   /**
@@ -196,21 +196,27 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
    * @param edges edge DataSet
    * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
    * @return the logical graph represented as temporal graph with defined valid times
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
    */
-  public TemporalGraphCollection fromNonTemporalDataSets(
-    DataSet<GraphHead> graphHead,
-    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
-    DataSet<Vertex> vertices,
-    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
-    DataSet<Edge> edges,
-    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+  public <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge> TemporalGraphCollection fromNonTemporalDataSets(
+    DataSet<G> graphHead,
+    TimeIntervalExtractor<G> graphHeadTimeIntervalExtractor,
+    DataSet<V> vertices,
+    TimeIntervalExtractor<V> vertexTimeIntervalExtractor,
+    DataSet<E> edges,
+    TimeIntervalExtractor<E> edgeTimeIntervalExtractor) {
 
     return new TemporalGraphCollection(this.layoutFactory.fromDataSets(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal<>(getGraphHeadFactory(),
+      graphHead.map(new GraphHeadToTemporalGraphHead<>(getGraphHeadFactory(),
         graphHeadTimeIntervalExtractor)),
-      vertices.map(new TemporalVertexFromNonTemporal<>(getVertexFactory(),
+      vertices.map(new VertexToTemporalVertex<>(getVertexFactory(),
         vertexTimeIntervalExtractor)),
-      edges.map(new TemporalEdgeFromNonTemporal<>(getEdgeFactory(),
+      edges.map(new EdgeToTemporalEdge<>(getEdgeFactory(),
         edgeTimeIntervalExtractor))), config);
   }
 

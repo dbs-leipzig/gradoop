@@ -19,7 +19,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (object, count) => object
+ * {@code (object, count) => object}
+ *
  * @param <T> value type
  */
 public class ValueOfWithCount<T> implements MapFunction<WithCount<T>, T> {

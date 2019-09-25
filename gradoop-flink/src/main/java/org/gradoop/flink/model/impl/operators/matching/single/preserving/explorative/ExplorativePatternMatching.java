@@ -111,8 +111,7 @@ public class ExplorativePatternMatching<
    * Create new operator instance
    *
    * @param query                   GDL query graph
-   * @param attachData              true, if original data shall be attached
-   *                                to the result
+   * @param attachData              true, if original data shall be attached to the result
    * @param matchStrategy           match strategy for vertex and edge mappings
    * @param traverserStrategy       iteration strategy for distributed traversal
    * @param traverser               Traverser used for the query graph
@@ -236,8 +235,7 @@ public class ExplorativePatternMatching<
 
 
   /**
-   * Used for configuring and creating a new {@link ExplorativePatternMatching}
-   * operator instance.
+   * Used for configuring and creating a new {@link ExplorativePatternMatching} operator instance.
    */
   public static final class Builder {
     /**
@@ -275,14 +273,14 @@ public class ExplorativePatternMatching<
     public Builder() {
       this.attachData             = false;
       this.matchStrategy          = MatchStrategy.ISOMORPHISM;
-      this.traverserStrategy = TraverserStrategy.SET_PAIR_BULK_ITERATION;
+      this.traverserStrategy      = TraverserStrategy.SET_PAIR_BULK_ITERATION;
       this.traverser              = new DFSTraverser();
       this.edgeStepJoinStrategy   = OPTIMIZER_CHOOSES;
       this.vertexStepJoinStrategy = OPTIMIZER_CHOOSES;
     }
 
     /**
-     * Set the GDL query string. e.g. "(a)-->(b)"
+     * Set the GDL query string. e.g. {@code (a)-->(b)}
      *
      * @param query GDL query
      * @return modified builder
@@ -382,9 +380,8 @@ public class ExplorativePatternMatching<
       Objects.requireNonNull(edgeStepJoinStrategy, "Missing join strategy");
       Objects.requireNonNull(vertexStepJoinStrategy, "Missing join strategy");
 
-      return new ExplorativePatternMatching<>(query, attachData,
-        matchStrategy, traverserStrategy, traverser, edgeStepJoinStrategy,
-        vertexStepJoinStrategy);
+      return new ExplorativePatternMatching<>(query, attachData, matchStrategy, traverserStrategy, traverser,
+        edgeStepJoinStrategy, vertexStepJoinStrategy);
     }
 
   }

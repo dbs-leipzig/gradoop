@@ -104,11 +104,10 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
   @Override
   public TemporalGraph execute(TemporalGraph graph) {
     DataSet<TemporalVertex> transformedVertices = graph.getVertices()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension))
-      .name("Diff vertices of [" + firstPredicate + "] and [" + secondPredicate + "]");
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
     DataSet<TemporalEdge> transformedEdges = graph.getEdges()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension))
-      .name("Diff edges of [" + firstPredicate + "] and [" + secondPredicate + "]");
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
+
     return graph.getFactory().fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);
   }
 }

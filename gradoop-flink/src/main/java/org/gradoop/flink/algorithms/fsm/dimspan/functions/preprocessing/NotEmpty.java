@@ -20,7 +20,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
 import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtilsBase;
 
 /**
- * (V, E) => true, if E not empty
+ * {@code (V, E) => true, if E not empty}
  */
 public class NotEmpty implements FilterFunction<int[]> {
 

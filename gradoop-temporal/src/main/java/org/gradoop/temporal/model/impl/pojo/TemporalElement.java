@@ -103,7 +103,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   /**
    * Get the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
    *
-   * @return a tuple 2 representing the valid time interval
+   * @return a {@link Tuple2} representing the valid time interval
    */
   public Tuple2<Long, Long> getValidTime() {
     return validTime;
@@ -111,7 +111,8 @@ public abstract class TemporalElement extends EPGMElement implements Element {
 
   /**
    * Set the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
-   * @param validTime a tuple 2 representing the valid time interval
+   *
+   * @param validTime a {@link Tuple2} representing the valid time interval
    */
   public void setValidTime(Tuple2<Long, Long> validTime) {
     Objects.requireNonNull(validTime);

@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.fsm.dimspan.config;
 
 /**
- * Dictionary coding options
+ * Dictionary coding options.
  */
 public enum DictionaryType implements Comparable<DictionaryType> {
   /**
@@ -24,11 +24,11 @@ public enum DictionaryType implements Comparable<DictionaryType> {
    */
   RANDOM,
   /**
-   * Higher label frequency <=> lower label (original gSpan)
+   * {@code Higher label frequency <=> lower label} (original gSpan)
    */
   INVERSE_PROPORTIONAL,
   /**
-   * Higher label frequency <=> higher label
+   * {@code Higher label frequency <=> higher label}
    */
   PROPORTIONAL,
   /**

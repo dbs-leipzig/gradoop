@@ -19,14 +19,12 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate and filter function to check presence of an edge label in a graph.
- *
- * <pre>
+ * <p>
  * Usage:
  * <ol>
  * <li>aggregate
  * <li>filter using the same UDF instance.
  * </ol>
- * </pre>
  */
 public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
 

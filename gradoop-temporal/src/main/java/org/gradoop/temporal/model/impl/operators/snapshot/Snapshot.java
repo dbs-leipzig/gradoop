@@ -72,12 +72,10 @@ public class Snapshot implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph
   public TemporalGraph execute(TemporalGraph superGraph) {
     DataSet<TemporalVertex> vertices = superGraph.getVertices()
       // Filter vertices
-      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension))
-      .name("Snapshot vertices by [" + temporalPredicate + "]");
+      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension));
     DataSet<TemporalEdge> edges = superGraph.getEdges()
       // Filter edges
-      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension))
-      .name("Snapshot edges by [" + temporalPredicate + "]");
+      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension));
 
     return superGraph.getFactory().fromDataSets(superGraph.getGraphHead(), vertices, edges);
   }

@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import java.util.Set;
 
 /**
- * transaction -> (edgeLabel,1L),..
+ * {@code transaction -> (edgeLabel,1L),..}
  */
 public class EdgeLabels
   implements FlatMapFunction<GraphTransaction, WithCount<String>> {

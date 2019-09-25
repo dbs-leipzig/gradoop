@@ -22,10 +22,9 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Takes a graph element as input and collects all graph ids the element is
- * contained in.
- *
- * graph-element -> {graph id 1, graph id 2, ..., graph id n}
+ * Takes a graph element as input and collects all graph ids the element is contained in.
+ * <p>
+ * {@code graph-element -> {graph id 1, graph id 2, ..., graph id n}}
  *
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */

@@ -20,26 +20,25 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.common.tuples
-  .IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
 /**
  * Filters vertex-edge pairs based on their corresponding candidates.
- *
+ * <p>
  * Forwarded Fields Second:
- *
- * f0:      edge id
- * f1:      source vertex id
- * f2->f3:  target vertex id
+ * <ul>
+ * <li>edge id: {@code f0}</li>
+ * <li>source vertex id: {@code f1}</li>
+ * <li>source vertex id: {@code f2->f3}</li>
+ * </ul>
  */
 @FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2->f3")
 public class MatchingPairs extends RichFlatJoinFunction
-  <IdWithCandidates<GradoopId>, TripleWithCandidates<GradoopId>,
-    TripleWithSourceEdgeCandidates<GradoopId>> {
+  <IdWithCandidates<GradoopId>, TripleWithCandidates<GradoopId>, TripleWithSourceEdgeCandidates<GradoopId>> {
+
   /**
    * serial version uid
    */
