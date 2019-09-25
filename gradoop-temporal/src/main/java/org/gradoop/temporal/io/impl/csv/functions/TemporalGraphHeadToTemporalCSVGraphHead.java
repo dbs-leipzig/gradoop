@@ -37,7 +37,7 @@ public class TemporalGraphHeadToTemporalCSVGraphHead
     csvGraphHead.setId(temporalGraphHead.getId().toString());
     csvGraphHead.setLabel(StringEscaper.escape(temporalGraphHead.getLabel(),
       CSVConstants.ESCAPED_CHARACTERS));
-    csvGraphHead.setProperties(getPropertyString(temporalGraphHead, MetaDataSource.VERTEX_TYPE));
+    csvGraphHead.setProperties(getPropertyString(temporalGraphHead, MetaDataSource.GRAPH_TYPE));
     csvGraphHead.setTemporalData(getTemporalDataString(temporalGraphHead.getTransactionTime(),
       temporalGraphHead.getValidTime()));
     return csvGraphHead;
