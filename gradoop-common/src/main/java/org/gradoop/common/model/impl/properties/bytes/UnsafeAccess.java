@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,9 +21,13 @@ import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+/**
+ * This implementation reuses much of the code of HBase's UnsafeAccess
+ * (org.apache.hadoop.hbase.util.UnsafeAccess).
+ * This can be found in org.apache.hbase:hbase-common
+ * Much of the code is copied directly or has only small changes.
+ */
 public final class UnsafeAccess {
-
-  //private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
 
   public static final Unsafe theUnsafe;
 
@@ -41,10 +43,9 @@ public final class UnsafeAccess {
           f.setAccessible(true);
           return f.get(null);
         } catch (Throwable e) {
-          //LOG.warn("sun.misc.Unsafe is not accessible", e);
-          throw new RuntimeException(e);
+          System.out.println("sun.misc.Unsafe is not accessible");
         }
-        //return null;
+        return null;
       }
     });
 
@@ -55,5 +56,7 @@ public final class UnsafeAccess {
     }
   }
 
-  private UnsafeAccess(){}
+  private UnsafeAccess(){
+    // private constructor to avoid instantiation
+  }
 }

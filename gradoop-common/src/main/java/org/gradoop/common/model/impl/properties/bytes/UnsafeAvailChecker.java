@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,10 +20,15 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+/**
+ * This implementation reuses much of the code of HBase's UnsafeAvailChecker
+ * (org.apache.hadoop.hbase.util.UnsafeAvailChecker).
+ * This can be found in org.apache.hbase:hbase-common
+ * Much of the code is copied directly or has only small changes.
+ */
 public class UnsafeAvailChecker {
 
   private static final String CLASS_NAME = "sun.misc.Unsafe";
-  //private static final Logger LOG = Logger.getLogger(UnsafeAvailChecker.class);
   private static boolean avail = false;
   private static boolean unaligned = false;
 
@@ -39,11 +42,9 @@ public class UnsafeAvailChecker {
           f.setAccessible(true);
           return f.get(null) != null;
         } catch (Throwable e) {
-          //LOG.warn("sun.misc.Unsafe is not available/accessible", e);
-          System.out.println("Platzhalter");
-          throw new RuntimeException(e);
+          System.out.println("sun.misc.Unsafe is not available/accessible");
         }
-        //return false;
+        return false;
       }
     });
     // When Unsafe itself is not available/accessible consider unaligned as false.

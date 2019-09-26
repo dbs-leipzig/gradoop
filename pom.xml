@@ -423,6 +423,7 @@
                     <version>${plugin.maven-spotbugs.version}</version>
                     <configuration>
                         <xmlOutput>true</xmlOutput>
+                        <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                     </configuration>
                     <executions>
                         <execution>
@@ -791,12 +792,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${dep.guava.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-annotations</artifactId>
-                <version>${plugin.maven-spotbugs.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

@@ -129,11 +129,6 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-        </dependency>
-
         <!-- Flink -->
         <dependency>
             <groupId>org.apache.flink</groupId>
