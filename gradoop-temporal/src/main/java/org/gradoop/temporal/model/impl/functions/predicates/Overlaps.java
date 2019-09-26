@@ -19,7 +19,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 import java.time.LocalDateTime;
 
-import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
 
 /**
  * Implementation of the <b>Overlaps</b> temporal predicate.
@@ -47,8 +47,8 @@ public class Overlaps implements TemporalPredicate {
    * @param to   The end of the query time-interval.
    */
   public Overlaps(LocalDateTime from, LocalDateTime to) {
-    this.queryFrom = convertLocalDateTimeToEpochMilli(from);
-    this.queryTo = convertLocalDateTimeToEpochMilli(to);
+    this.queryFrom = toEpochMilli(from);
+    this.queryTo = toEpochMilli(to);
   }
 
   /**

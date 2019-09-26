@@ -17,7 +17,16 @@ package org.gradoop.temporal.model.impl.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
-import org.gradoop.temporal.model.impl.functions.predicates.*;
+import org.gradoop.temporal.model.impl.functions.predicates.AsOf;
+import org.gradoop.temporal.model.impl.functions.predicates.Between;
+import org.gradoop.temporal.model.impl.functions.predicates.ContainedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
+import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
+import org.gradoop.temporal.model.impl.functions.predicates.Overlaps;
+import org.gradoop.temporal.model.impl.functions.predicates.Precedes;
+import org.gradoop.temporal.model.impl.functions.predicates.Succeeds;
+import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;

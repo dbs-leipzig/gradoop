@@ -19,7 +19,7 @@ import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 import java.time.LocalDateTime;
 
-import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
 
 /**
  * Implementation of the <b>DeletedIn</b> temporal predicate.
@@ -58,8 +58,8 @@ public class DeletedIn implements TemporalPredicate {
    * @param to The end of the query time-interval.
    */
   public DeletedIn(LocalDateTime from, LocalDateTime to) {
-    queryFrom = convertLocalDateTimeToEpochMilli(from);
-    queryTo = convertLocalDateTimeToEpochMilli(to);
+    queryFrom = toEpochMilli(from);
+    queryTo = toEpochMilli(to);
   }
 
   @Override

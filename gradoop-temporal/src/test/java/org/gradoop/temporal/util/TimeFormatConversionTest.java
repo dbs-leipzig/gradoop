@@ -20,13 +20,23 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 
-import static org.gradoop.temporal.util.TimeFormatConversion.convertLocalDateTimeToEpochMilli;
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
 
+/**
+ * Test class of {@link TimeFormatConversion}.
+ */
 public class TimeFormatConversionTest {
 
+  /**
+   * Tests whether {@link TimeFormatConversion#toEpochMilli(LocalDateTime)} converts a given {@link LocalDateTime}
+   * object to the correct number of milliseconds since Unix Epoch, if UTC is assumed.
+   */
   @Test
-  public void convertLocalDateTimeToEpochMilliTest() {
-    LocalDateTime dateTime = LocalDateTime.of(1970, 1, 1, 0, 0);
-    Assert.assertEquals(0, convertLocalDateTimeToEpochMilli(dateTime));
+  public void toEpochMilliTest() {
+    LocalDateTime unixEpoch = LocalDateTime.of(1970, 1, 1, 0, 0);
+    LocalDateTime oneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
+
+    Assert.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
+    Assert.assertEquals(0L, toEpochMilli(unixEpoch));
   }
 }

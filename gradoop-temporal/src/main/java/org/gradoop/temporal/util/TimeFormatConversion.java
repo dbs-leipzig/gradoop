@@ -27,10 +27,10 @@ public class TimeFormatConversion {
      * Converts a {@link LocalDateTime} object and converts it to respective milliseconds since Unix Epoch.
      * The assumed time zone is UTC.
      *
-     * @param time time stamp to be converted to milliseconds since Unix Epoch.
+     * @param time time value to be converted to milliseconds since Unix Epoch.
      * @return Representation of the the provided time stamp in milliseconds since Unix Epoch.
      */
-  public static long convertLocalDateTimeToEpochMilli(LocalDateTime time) {
+  public static long toEpochMilli(LocalDateTime time) {
     return time.toInstant(ZoneOffset.UTC).toEpochMilli();
   }
 }
