@@ -130,6 +130,7 @@
                                     <include>org.antlr:antlr4-runtime</include>
                                     <!-- DIMSpan dependencies -->
                                     <include>me.lemire.integercompression:*</include>
+                                    <include>com.google.guava:*</include>
                                     <!-- capf example dependencies -->
                                     <include>org.opencypher:*</include>
                                     <include>org.apache.flink:flink-table_2.11</include>
