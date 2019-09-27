@@ -27,6 +27,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.functions.filters.Not;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperEdgeFromTuple;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperVertexFromTuple;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromEdges;
@@ -39,13 +40,20 @@ import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdFi
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A grouping operator similar to {@link org.gradoop.flink.model.impl.operators.grouping.Grouping}
- * that uses key functions to determine grouping keys.
+ * Group a graph based on some key functions.<p>
+ * This operator is initialized with {@link List lists} of {@link KeyFunction key functions} and
+ * {@link AggregateFunction aggregate functions}. The output of this operator is the grouped graph
+ * (also called summarized graph or summary graph) which is calculated by reducing similar vertices and
+ * edges to single elements, called super-vertices and -edges respectively. Elements are considered similar
+ * if the values of the key functions are all equal.<p>
+ * The aggregate functions will summarize certain property values of similar elements and store the result
+ * on the super-elements.<p>
+ * This implementation will use tuples to represent elements during the execution of this operator.
+ * These tuples will contain IDs, the values of key functions and the aggregate values for each element
+ * and super-element.
  *
  * @param <G> The graph head type.
  * @param <V> The vertex type.
@@ -92,13 +100,18 @@ public class KeyedGrouping<
    * @param vertexAggregateFunctions The vertex aggregate functions.
    * @param edgeGroupingKeys         The edge grouping keys.
    * @param edgeAggregateFunctions   The edge aggregate functions.
-   * @implNote Label-specific grouping is not supported by this implementation.
    */
   public KeyedGrouping(List<KeyFunction<V, ?>> vertexGroupingKeys,
     List<AggregateFunction> vertexAggregateFunctions,
     List<KeyFunction<E, ?>> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
-    this.vertexGroupingKeys = Objects.requireNonNull(vertexGroupingKeys);
+    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
+      // Grouping with no keys is not supported, we therefore add a custom key function that returns a
+      // constant as a pseudo-key for every element.
+      this.vertexGroupingKeys = Collections.singletonList(GroupingKeys.nothing());
+    } else {
+      this.vertexGroupingKeys = vertexGroupingKeys;
+    }
     this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList() :
       vertexAggregateFunctions;
     this.edgeGroupingKeys = edgeGroupingKeys == null ? Collections.emptyList() :
@@ -109,97 +122,52 @@ public class KeyedGrouping<
 
   @Override
   public LG execute(LG graph) {
-    if (vertexGroupingKeys.isEmpty() && edgeGroupingKeys.isEmpty()) {
-      return graph;
-    }
+    /* First we create tuple representations of each vertex.
+       Those tuples will then be grouped by the respective key fields (the fields containing the values
+       extracted by the key functions) and reduced to assign a super vertex and to calculate aggregates. */
     DataSet<Tuple> verticesWithSuperVertex = graph.getVertices()
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
-        GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions))
-      .withForwardedFields(getInternalForwardedFieldsForVertexReduce());
-    DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId =
-      verticesWithSuperVertex.project(
-        GroupingConstants.VERTEX_TUPLE_ID, GroupingConstants.VERTEX_TUPLE_SUPERID);
+        GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));
+    /* Extract a mapping from vertex-ID to super-vertex-ID from the result of the vertex-reduce step. */
+    DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId = verticesWithSuperVertex
+      .filter(new Not<>(new FilterSuperVertices<>()))
+      .project(GroupingConstants.VERTEX_TUPLE_ID, GroupingConstants.VERTEX_TUPLE_SUPERID);
 
+    /* Create tuple representations of each edge and update the source- and target-ids of those tuples with
+       with the mapping extracted in the previous step. Edges will then point from and to super-vertices. */
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
       .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
       .join(idToSuperId)
       .where(GroupingConstants.EDGE_TUPLE_SOURCEID)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
       .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_SOURCEID))
-      .withForwardedFieldsFirst(getInternalForwardedFieldsForEdgeUpdate(
-        GroupingConstants.EDGE_TUPLE_SOURCEID, false))
-      .withForwardedFieldsSecond(getInternalForwardedFieldsForEdgeUpdate(
-        GroupingConstants.EDGE_TUPLE_SOURCEID, true))
       .join(idToSuperId)
       .where(GroupingConstants.EDGE_TUPLE_TARGETID)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_TARGETID))
-      .withForwardedFieldsFirst(getInternalForwardedFieldsForEdgeUpdate(
-        GroupingConstants.EDGE_TUPLE_TARGETID, false))
-      .withForwardedFieldsSecond(getInternalForwardedFieldsForEdgeUpdate(
-        GroupingConstants.EDGE_TUPLE_TARGETID, true));
+      .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_TARGETID));
 
+    /* Group the edge-tuples by the key fields and vertex IDs and reduce them to single elements. */
     DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
         GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
-      .setCombinable(useGroupCombine)
-      .withForwardedFields(getInternalForwardedFieldsForEdgeReduce());
+      .setCombinable(useGroupCombine);
 
+    /* Rebuild super-vertices from vertex-tuples. Those new vertices contain the data extracted by the key
+       functions and aggregated by the aggregate functions. */
     DataSet<V> superVertices = verticesWithSuperVertex
       .filter(new FilterSuperVertices<>())
       .map(new BuildSuperVertexFromTuple<>(vertexGroupingKeys, vertexAggregateFunctions,
         graph.getFactory().getVertexFactory()));
 
+    /* Rebuild super-edges from edge-tuples. */
     DataSet<E> superEdges = superEdgeTuples
       .map(new BuildSuperEdgeFromTuple<>(edgeGroupingKeys, edgeAggregateFunctions,
         graph.getFactory().getEdgeFactory()));
 
     return graph.getFactory().fromDataSets(superVertices, superEdges);
-  }
-
-  /**
-   * Get the internal representation of the forwarded fields for the {@link ReduceEdgeTuples} step.
-   * The forwarded fields for this step will be the grouping keys.
-   *
-   * @return A string containing the field names of all forwarded fields.
-   */
-  private String getInternalForwardedFieldsForEdgeReduce() {
-    return IntStream.of(getInternalEdgeGroupingKeys()).mapToObj(i -> "f" + i)
-      .collect(Collectors.joining(";"));
-  }
-
-  /**
-   * Get the internal representation of the forwarded fields for the {@link ReduceVertexTuples} step.
-   * The forwarded fields for this step will be the grouping keys.
-   *
-   * @return A string containing the field names of all forwarded fields.
-   */
-  private String getInternalForwardedFieldsForVertexReduce() {
-    return IntStream.of(getInternalVertexGroupingKeys()).mapToObj(i -> "f" + i)
-      .collect(Collectors.joining(";"));
-  }
-
-  /**
-   * Get the internal representation of the forwarded fields for the {@link UpdateIdField} steps.
-   * Forwarded fields will be all but the currently updated field for the left side and the new id for
-   * the right side.
-   *
-   * @param targetField The index of the updated field.
-   * @param fromSecond  Return the forwarded fields for the right side of the join if set to true (returns
-   *                    the fields for the left side otherwise).
-   * @return The string containing the forwarded fields info.
-   */
-  private String getInternalForwardedFieldsForEdgeUpdate(int targetField, boolean fromSecond) {
-    if (fromSecond) {
-      return "f1->f" + targetField;
-    } else {
-      return IntStream.range(0,
-        GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size() + edgeAggregateFunctions.size())
-        .filter(i -> i != targetField).mapToObj(i -> "f" + i).collect(Collectors.joining(";"));
-    }
   }
 
   /**

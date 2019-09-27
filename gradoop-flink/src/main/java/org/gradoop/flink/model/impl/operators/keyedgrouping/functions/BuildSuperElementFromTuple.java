@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,13 +38,12 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
   implements MapFunction<T, E>, ResultTypeQueryable<E> {
 
   /**
-   * The data offset for tuples. Grouping keys and aggregate values are expected to start at this
-   * index.
+   * The data offset for tuples. Grouping keys and aggregate values are expected to start at this index.
    */
   private final int tupleDataOffset;
 
   /**
-   * The grouping key functions..
+   * The grouping key functions.
    */
   private final List<KeyFunction<E, ?>> keyFunctions;
 
@@ -59,7 +59,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @param groupingKeys       The grouping key functions.
    * @param aggregateFunctions The aggregate functions.
    */
-  protected BuildSuperElementFromTuple(int tupleDataOffset,
+  BuildSuperElementFromTuple(int tupleDataOffset,
     List<KeyFunction<E, ?>> groupingKeys,
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
@@ -75,7 +75,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
    * @param tupleData The internal tuple-based representation of the element.
    * @return The final element with all set properties.
    */
-  protected E setAggregatePropertiesAndKeys(E element, T tupleData) {
+  E setAggregatePropertiesAndKeys(E element, T tupleData) {
     element.setLabel("");
     element.setProperties(Properties.create());
     // Set grouping keys.
@@ -89,7 +89,8 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
       final PropertyValue postAggregateValue = function.postAggregate(
         tupleData.getField(tupleDataOffset + keyFunctions.size() + i));
       if (postAggregateValue != null) {
-        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue);
+        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue.isNull() ?
+          AggregateUtil.getDefaultAggregate(function) : postAggregateValue);
       }
     }
     return element;

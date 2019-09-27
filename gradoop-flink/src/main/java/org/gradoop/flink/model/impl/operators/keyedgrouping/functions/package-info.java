@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions used by the tuple-based grouping operator.
+ * Functions used by the key-function based grouping operator.
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;

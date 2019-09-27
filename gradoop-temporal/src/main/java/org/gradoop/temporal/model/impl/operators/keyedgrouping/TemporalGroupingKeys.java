@@ -30,7 +30,7 @@ import java.time.temporal.TemporalUnit;
  * A factory class for creating instances of commonly used grouping key functions for grouping
  * on temporal attributes.
  */
-public class TemporalGroupingKeys {
+public final class TemporalGroupingKeys {
   /**
    * No instances of this class are needed.
    */
@@ -44,6 +44,7 @@ public class TemporalGroupingKeys {
    * @param timeUnit The unit in which the duration is measured.
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the duration.
+   * @see DurationKeyFunction
    */
   public static <T extends TemporalElement> KeyFunction<T, Long> duration(
     TimeDimension interval, TemporalUnit timeUnit) {
@@ -56,6 +57,7 @@ public class TemporalGroupingKeys {
    * @param interval The time interval to group by.
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting a time interval.
+   * @see TimeIntervalKeyFunction
    */
   public static <T extends TemporalElement> KeyFunction<T, Tuple2<Long, Long>> timeInterval(
     TimeDimension interval) {
@@ -69,6 +71,7 @@ public class TemporalGroupingKeys {
    * @param intervalField The field of that time interval to consider.
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting a time stamp.
+   * @see TimeStampKeyFunction
    */
   public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField) {
@@ -87,6 +90,7 @@ public class TemporalGroupingKeys {
    *                         (May be {@code null}, in that case the time stamp will be used as is.)
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the time stamp or part of it.
+   * @see TimeStampKeyFunction
    */
   public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField,

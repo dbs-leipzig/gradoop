@@ -86,8 +86,8 @@ public final class KeyedGroupingUtils {
   /**
    * Convert label groups to key functions.
    *
-   * @param useLabels   Should labels be used for grouping?
-   * @param labelGroups The label groups to convert. (Only the default group is supported.)
+   * @param useLabels   Flag used to indicate whether labels of elements should be used as grouping keys.
+   * @param labelGroups The label groups to convert.
    * @param <T> The element type for the key function.
    * @return Key functions corresponding to those groups.
    */

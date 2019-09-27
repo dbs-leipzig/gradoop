@@ -37,8 +37,7 @@ import static org.gradoop.common.model.impl.properties.PropertyValue.NULL_VALUE;
  * aggregated.
  * <p>
  * <i>Note: </i> This function sets all grouping keys and aggregate values, make sure to set
- * additional
- * fields, if {@code tupleDataOffset} is not {@code 0}.
+ * additional fields, if {@code tupleDataOffset} is not {@code 0}.
  *
  * @param <E> The element type.
  */
@@ -82,15 +81,14 @@ public class BuildTuplesFromElements<E extends Element>
     List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     if (tupleDataOffset < 0) {
-      throw new IllegalArgumentException(
-        "The number of reserved tuple fields must not be negative.");
+      throw new IllegalArgumentException("The number of reserved tuple fields must not be negative.");
     }
     this.keys = Objects.requireNonNull(keys);
     this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
     final int tupleSize = tupleDataOffset + keys.size() + aggregateFunctions.size();
     if (tupleSize > Tuple.MAX_ARITY) {
-      throw new UnsupportedOperationException("Number of elements is too high for tuple: " +
-        tupleSize);
+      throw new UnsupportedOperationException("Number of elements is too high for tuple: " + tupleSize +
+        " (max.: " + Tuple.MAX_ARITY + ")");
     }
     elementTypes = new TypeInformation[tupleSize];
     for (int i = 0; i < tupleDataOffset; i++) {
@@ -113,11 +111,7 @@ public class BuildTuplesFromElements<E extends Element>
 
   @Override
   public TypeInformation<Tuple> getProducedType() {
-    TypeInformation<?>[] componentTypes = new TypeInformation[elementTypes.length];
-    for (int i = 0; i < componentTypes.length; i++) {
-      componentTypes[i] = elementTypes[i];
-    }
-    return new TupleTypeInfo<>(componentTypes);
+    return new TupleTypeInfo<>(elementTypes);
   }
 
   @Override

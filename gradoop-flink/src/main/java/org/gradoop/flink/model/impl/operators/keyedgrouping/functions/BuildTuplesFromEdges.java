@@ -36,8 +36,7 @@ public class BuildTuplesFromEdges<E extends Edge> extends BuildTuplesFromElement
    * @param keys               The grouping keys.
    * @param aggregateFunctions The aggregate functions used to determine the aggregate property
    */
-  public BuildTuplesFromEdges(List<KeyFunction<E, ?>> keys,
-    List<AggregateFunction> aggregateFunctions) {
+  public BuildTuplesFromEdges(List<KeyFunction<E, ?>> keys, List<AggregateFunction> aggregateFunctions) {
     super(GroupingConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);
   }
 

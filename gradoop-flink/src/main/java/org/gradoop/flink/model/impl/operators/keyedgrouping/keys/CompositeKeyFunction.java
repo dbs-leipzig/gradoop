@@ -34,7 +34,7 @@ public class CompositeKeyFunction<T> implements KeyFunction<T, Tuple> {
   /**
    * A list of grouping key functions combined in this key function.
    */
-  private final List<KeyFunction<T, ?>> componentFunctions;
+  private final List<? extends KeyFunction<T, ?>> componentFunctions;
 
   /**
    * Reduce object instantiations.
@@ -46,10 +46,11 @@ public class CompositeKeyFunction<T> implements KeyFunction<T, Tuple> {
    *
    * @param keyFunctions The key functions to be combined.
    */
-  public CompositeKeyFunction(List<KeyFunction<T, ?>> keyFunctions) {
+  public CompositeKeyFunction(List<? extends KeyFunction<T, ?>> keyFunctions) {
     this.componentFunctions = Objects.requireNonNull(keyFunctions);
     if (keyFunctions.size() > Tuple.MAX_ARITY) {
-      throw new IllegalArgumentException("Too many keys. Maximum tuple arity exceeded.");
+      throw new IllegalArgumentException("Too many keys. Maximum tuple arity exceeded: " +
+        keyFunctions.size() + " (max.: " + Tuple.MAX_ARITY + ")");
     }
     reuseTuple = Tuple.newInstance(componentFunctions.size());
   }

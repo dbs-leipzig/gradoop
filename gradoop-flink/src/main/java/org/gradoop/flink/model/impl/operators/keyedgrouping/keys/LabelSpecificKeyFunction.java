@@ -90,7 +90,8 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
     }
     final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();
     if (totalLabels + 1 > Tuple.MAX_ARITY) {
-      throw new IllegalArgumentException("Too many labels. Tuple arity exceeded.");
+      throw new IllegalArgumentException("Too many labels. Tuple arity exceeded: " + (totalLabels + 1) +
+        " (max.: " + Tuple.MAX_ARITY + ")");
     }
     int labelNr = 1;
     labelToIndex = new HashMap<>();

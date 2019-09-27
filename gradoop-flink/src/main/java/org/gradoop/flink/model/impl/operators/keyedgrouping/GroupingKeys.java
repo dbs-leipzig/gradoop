@@ -21,19 +21,18 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.CompositeKeyFunction;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.ConstantKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelSpecificKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.PropertyKeyFunction;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A factory class for creating instances of commonly used grouping key functions.
  */
-public class GroupingKeys {
+public final class GroupingKeys {
 
   /**
    * No instances of this class are needed.
@@ -46,6 +45,7 @@ public class GroupingKeys {
    *
    * @param <T> The type of the elements to group.
    * @return The grouping key function extracting the label.
+   * @see LabelKeyFunction
    */
   public static <T extends Labeled> KeyFunctionWithDefaultValue<T, String> label() {
     return new LabelKeyFunction<>();
@@ -61,6 +61,7 @@ public class GroupingKeys {
    * group}) to a list of key functions.
    * @param <T> The type of the elements to group.
    * @return The label-specific key function.
+   * @see LabelSpecificKeyFunction
    */
   public static <T extends Element> KeyFunction<T, Tuple> labelSpecific(
     Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> keysPerLabel) {
@@ -76,6 +77,7 @@ public class GroupingKeys {
    *                     can be {@code null} and does not have to contain all labels.
    * @param <T> The type of the elements to group.
    * @return The label-specific key function with label updates.
+   * @see LabelSpecificKeyFunction
    */
   public static <T extends Element> KeyFunction<T, Tuple> labelSpecific(
     Map<String, List<KeyFunctionWithDefaultValue<T, ?>>> keysPerLabel, Map<String, String> groupLabels) {
@@ -84,13 +86,14 @@ public class GroupingKeys {
 
   /**
    * Group by nothing. This will effectively reduce all elements to the same group.
-   * Note that this will only be effective if no other key function in used.
+   * Note that this will only be effective if no other key function is used.
    *
    * @param <T> The type of the elements to group.
    * @return A key function extracting the same key for every element.
+   * @see ConstantKeyFunction
    */
-  public static <T> KeyFunction<T, Tuple> nothing() {
-    return new CompositeKeyFunction<>(Collections.emptyList());
+  public static <T> KeyFunctionWithDefaultValue<T, Boolean> nothing() {
+    return new ConstantKeyFunction<>();
   }
 
   /**
@@ -99,6 +102,7 @@ public class GroupingKeys {
    * @param key The property key.
    * @param <T> the type of the elements to group.
    * @return The grouping key function extracting the property with that key.
+   * @see PropertyKeyFunction
    */
   public static <T extends Attributed> KeyFunctionWithDefaultValue<T, byte[]> property(String key) {
     return new PropertyKeyFunction<>(key);

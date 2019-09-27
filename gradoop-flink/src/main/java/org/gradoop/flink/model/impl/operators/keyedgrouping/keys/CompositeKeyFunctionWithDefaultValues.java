@@ -16,10 +16,8 @@
 package org.gradoop.flink.model.impl.operators.keyedgrouping.keys;
 
 import org.apache.flink.api.java.tuple.Tuple;
-import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +41,7 @@ public class CompositeKeyFunctionWithDefaultValues<T> extends CompositeKeyFuncti
    * @param groupingKeyFunctions The key functions to be combined.
    */
   public CompositeKeyFunctionWithDefaultValues(List<KeyFunctionWithDefaultValue<T, ?>> groupingKeyFunctions) {
-    super(castKeys(groupingKeyFunctions));
+    super(groupingKeyFunctions);
     defaultValue = Tuple.newInstance(groupingKeyFunctions.size());
     for (int index = 0; index < groupingKeyFunctions.size(); index++) {
       defaultValue.setField(groupingKeyFunctions.get(index).getDefaultKey(), index);
@@ -53,18 +51,5 @@ public class CompositeKeyFunctionWithDefaultValues<T> extends CompositeKeyFuncti
   @Override
   public Tuple getDefaultKey() {
     return defaultValue;
-  }
-
-  /**
-   * Cast a list of keys with default values to a list of regular keys.
-   *
-   * @param keys The list of keys with default values.
-   * @param <T> The type of the elements to group.
-   * @return A list of keys without default values.
-   */
-  private static <T> List<KeyFunction<T, ?>> castKeys(List<KeyFunctionWithDefaultValue<T, ?>> keys) {
-    List<KeyFunction<T, ?>> convertedKeys = new ArrayList<>(keys.size());
-    convertedKeys.addAll(keys);
-    return convertedKeys;
   }
 }

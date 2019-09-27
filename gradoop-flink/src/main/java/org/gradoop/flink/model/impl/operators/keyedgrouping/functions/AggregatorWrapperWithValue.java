@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Arrays;
@@ -27,7 +28,12 @@ import java.util.Objects;
  * containing some property value and the original aggregate value.
  * The additional value is used to identify aggregate values used by this function.
  */
-abstract class AggregatorWrapperWithValue extends AggregatorWrapper {
+abstract class AggregatorWrapperWithValue implements AggregateFunction, AggregateDefaultValue {
+
+  /**
+   * The actual aggregate function.
+   */
+  protected final AggregateFunction wrappedFunction;
 
   /**
    * The additional value stored with the property value.
@@ -42,11 +48,17 @@ abstract class AggregatorWrapperWithValue extends AggregatorWrapper {
    * @param identifyingValue The additional value used to identify values to be aggregated.
    */
   AggregatorWrapperWithValue(AggregateFunction wrappedFunction, PropertyValue identifyingValue) {
-    super(wrappedFunction);
+    this.wrappedFunction = Objects.requireNonNull(wrappedFunction);
     this.identifyingValue = Objects.requireNonNull(identifyingValue);
   }
 
-  @Override
+  /**
+     * Unwrap a {@link PropertyValue} wrapped by this class.
+     *
+     * @param wrappedValue The wrapped property value.
+     * @return The unwrapped (raw) property value.
+     * @see #wrap(PropertyValue)
+     */
   protected PropertyValue unwrap(PropertyValue wrappedValue) {
     if (wrappedValue.isNull()) {
       return wrappedValue;
@@ -54,12 +66,23 @@ abstract class AggregatorWrapperWithValue extends AggregatorWrapper {
     return wrappedValue.getList().get(1);
   }
 
-  @Override
+  /**
+     * Wrap a {@link PropertyValue} into an internal representation used by this class.
+     *
+     * @param rawValue The raw property value.
+     * @return The wrapped property value.
+     * @see #unwrap(PropertyValue)
+     */
   protected PropertyValue wrap(PropertyValue rawValue) {
     return PropertyValue.create(Arrays.asList(identifyingValue, rawValue));
   }
 
-  @Override
+  /**
+     * Check if a {@link PropertyValue} should be considered by this function.
+     *
+     * @param value The property value.
+     * @return {@code true}, if the value should be aggregated by this function.
+     */
   protected boolean isAggregated(PropertyValue value) {
     if (!value.isList()) {
       return false;
@@ -69,5 +92,34 @@ abstract class AggregatorWrapperWithValue extends AggregatorWrapper {
       return false;
     }
     return identifyingValue.equals(values.get(0));
+  }
+
+  @Override
+  public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
+    if (isAggregated(increment)) {
+      return wrap(wrappedFunction.aggregate(unwrap(aggregate), unwrap(increment)));
+    } else {
+      return aggregate;
+    }
+  }
+
+  @Override
+  public String getAggregatePropertyKey() {
+    return wrappedFunction.getAggregatePropertyKey();
+  }
+
+  @Override
+  public PropertyValue postAggregate(PropertyValue result) {
+    if (isAggregated(result)) {
+      return wrappedFunction.postAggregate(unwrap(result));
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public PropertyValue getDefaultValue() {
+    return wrappedFunction instanceof AggregateDefaultValue ?
+      ((AggregateDefaultValue) wrappedFunction).getDefaultValue() : PropertyValue.NULL_VALUE;
   }
 }

@@ -26,7 +26,14 @@ import static org.gradoop.flink.model.impl.operators.keyedgrouping.functions.Gro
 import static org.gradoop.flink.model.impl.operators.keyedgrouping.functions.GroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
- * Reduce vertex tuples, assigning a super vertex ID and calculating aggregate values.
+ * Reduce vertex tuples, assigning a super vertex ID and calculating aggregate values. This function outputs
+ * two kinds of tuples:
+ * <ul>
+ *   <li>A tuple storing the vertex ID, the ID a super vertex (to be created afterwards), keys and
+ *   aggregate values (which are cleared after aggregation, since they are not used after aggregation).</li>
+ *   <li>A tuple representing the super vertex, storing the keys and aggregation results for the group.
+ *   The super vertex is identified by having the same vertex ID and super vertex ID.</li>
+ * </ul>
  *
  * @param <T> The tuple type.
  */
@@ -52,15 +59,18 @@ public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> 
 
     for (T inputTuple : input) {
       if (superVertexTuple == null) {
+        // Copy the first tuple to be used as the super-vertex tuple.
         superVertexTuple = inputTuple.copy();
       } else {
+        // Call aggregate functions for every other tuple of the group.
         callAggregateFunctions(superVertexTuple, inputTuple);
       }
+      // Assign the super-vertex ID.
       inputTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
       // Return the updated tuple, used to extract the mapping later.
       out.collect(inputTuple);
     }
-    // Return a super vertex.
+    // Return the super vertex.
     superVertexTuple.setField(superVertexId, VERTEX_TUPLE_ID);
     superVertexTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
     out.collect(superVertexTuple);

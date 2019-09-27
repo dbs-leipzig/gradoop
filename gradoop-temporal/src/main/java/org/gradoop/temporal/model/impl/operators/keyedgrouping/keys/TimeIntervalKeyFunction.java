@@ -25,7 +25,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import java.util.Objects;
 
 /**
- * A key function extracting a {@link TimeDimension} from a {@link TemporalElement}.
+ * A key function extracting a time interval of a {@link TimeDimension} from a {@link TemporalElement}.
  *
  * @param <T> The type of the temporal elements.
  */
@@ -74,7 +74,6 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
           break;
         default:
         }
-        return;
       } else {
         throw new IllegalArgumentException("Invalid types for tuple key: " +
           firstElement.getClass().getSimpleName() + ", " + secondElement.getClass().getSimpleName());

@@ -15,6 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.GroupingKeys;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Test for the keyed grouping implementation.
  */
@@ -22,5 +36,24 @@ public class TupleBasedGroupingTest extends LabelSpecificGroupingTestBase {
   @Override
   public GroupingStrategy getStrategy() {
     return GroupingStrategy.GROUP_WITH_KEYFUNCTIONS;
+  }
+
+  /**
+   * Test the tuple-based grouping implementation with the {@link GroupingKeys#nothing()} key function.
+   */
+  @Test
+  public void testGroupVerticesWithEmptyKeyFunction() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    loader.appendToDatabaseFromString("expected[" +
+      "(expectedVertex {vertexCount: 3L})-[{edgeCount: 4L}]->(expectedVertex)" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("g0");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    List<KeyFunction<EPGMVertex, ?>> vertexKeys = Collections.singletonList(GroupingKeys.nothing());
+    List<AggregateFunction> vertexAggregations = Collections.singletonList(new VertexCount());
+    List<AggregateFunction> edgeAggregations = Collections.singletonList(new EdgeCount());
+    LogicalGraph result = input.callForGraph(
+      new KeyedGrouping<>(vertexKeys, vertexAggregations, Collections.emptyList(), edgeAggregations));
+    collectAndAssertTrue(result.equalsByElementData(expected));
   }
 }

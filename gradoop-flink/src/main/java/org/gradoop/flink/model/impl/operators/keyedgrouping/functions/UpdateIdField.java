@@ -21,12 +21,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Update a field of Tuple with another {@link GradoopId}.
+ * Update a tuple field with a certain index to a value from another tuple.
+ * The left side of this join function is the tuple to be updated and the right side a {@link Tuple2}
+ * with the old and new value.
  *
  * @param <T> The input- and result-tuple type.
  */
-public class UpdateIdField<T extends Tuple>
-  implements JoinFunction<T, Tuple2<GradoopId, GradoopId>, T> {
+public class UpdateIdField<T extends Tuple> implements JoinFunction<T, Tuple2<GradoopId, GradoopId>, T> {
 
   /**
    * The index of the field to update.

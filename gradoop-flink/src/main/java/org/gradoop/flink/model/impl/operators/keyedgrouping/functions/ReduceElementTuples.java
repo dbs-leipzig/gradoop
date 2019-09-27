@@ -32,12 +32,12 @@ abstract class ReduceElementTuples<T extends Tuple> implements GroupReduceFuncti
   /**
    * The data offset for tuples. Aggregate values are expected to start at this index.
    */
-  protected final int tupleDataOffset;
+  private final int tupleDataOffset;
 
   /**
    * The aggregate functions.
    */
-  protected final List<AggregateFunction> aggregateFunctions;
+  private final List<AggregateFunction> aggregateFunctions;
 
   /**
    * Instantiate this base class, setting the data offset and aggregate functions.
@@ -45,7 +45,7 @@ abstract class ReduceElementTuples<T extends Tuple> implements GroupReduceFuncti
    * @param tupleDataOffset    The data offset for aggregate values in the tuple.
    * @param aggregateFunctions The aggregate functions.
    */
-  protected ReduceElementTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
+  ReduceElementTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {
     this.tupleDataOffset = tupleDataOffset;
     this.aggregateFunctions = aggregateFunctions;
   }
@@ -56,19 +56,21 @@ abstract class ReduceElementTuples<T extends Tuple> implements GroupReduceFuncti
    * @param superTuple       The tuple storing the current aggregate values.
    * @param inputTuple       The tuple storing the increment values.
    */
-  protected void callAggregateFunctions(T superTuple, T inputTuple) {
+  void callAggregateFunctions(T superTuple, T inputTuple) {
     // Calculate aggregate values.
     for (int i = 0; i < aggregateFunctions.size(); i++) {
       final PropertyValue aggregate = superTuple.getField(i + tupleDataOffset);
       final PropertyValue increment = inputTuple.getField(i + tupleDataOffset);
       // Delete the increment from the input tuple as it is not needed anymore.
       inputTuple.setField(PropertyValue.NULL_VALUE, i + tupleDataOffset);
-      if (increment.equals(PropertyValue.NULL_VALUE)) {
-        continue;
-      } else if (aggregate.equals(PropertyValue.NULL_VALUE)) {
-        superTuple.setField(increment, i + tupleDataOffset);
-      } else {
-        superTuple.setField(aggregateFunctions.get(i).aggregate(aggregate, increment), i + tupleDataOffset);
+      // Do not aggregate if the increment is null.
+      if (!increment.equals(PropertyValue.NULL_VALUE)) {
+        if (aggregate.equals(PropertyValue.NULL_VALUE)) {
+          // If the aggregate is null, use the increment as the new initial value.
+          superTuple.setField(increment, i + tupleDataOffset);
+        } else {
+          superTuple.setField(aggregateFunctions.get(i).aggregate(aggregate, increment), i + tupleDataOffset);
+        }
       }
     }
   }

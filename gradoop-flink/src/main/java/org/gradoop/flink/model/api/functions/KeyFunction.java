@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 /**
  * A function extracting a key from an element. This key may be used as a grouping key.
- * The key with be an object of a certain type, depending on this function.
+ * The key will be an object of a certain type, depending on this function.
  *
  * @param <E> The type of the object from which the grouping key is extracted.
  * @param <K> The type of the extracted key.
