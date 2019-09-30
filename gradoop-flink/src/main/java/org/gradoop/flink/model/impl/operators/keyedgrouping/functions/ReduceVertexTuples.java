@@ -71,6 +71,11 @@ public class ReduceVertexTuples<T extends Tuple> extends ReduceElementTuples<T> 
       out.collect(inputTuple);
     }
     // Return the super vertex.
+    if (superVertexTuple == null) {
+      // This should not happen, since the reduce function can not be called on an empty group.
+      throw new IllegalStateException(
+        "Super-vertex was not initialized. Do not call this function on empty groups.");
+    }
     superVertexTuple.setField(superVertexId, VERTEX_TUPLE_ID);
     superVertexTuple.setField(superVertexId, VERTEX_TUPLE_SUPERID);
     out.collect(superVertexTuple);

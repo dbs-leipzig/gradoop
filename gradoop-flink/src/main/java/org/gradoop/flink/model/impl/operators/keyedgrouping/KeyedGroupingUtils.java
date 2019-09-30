@@ -31,7 +31,6 @@ import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UnlabeledG
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelSpecificKeyFunction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,32 +132,6 @@ public final class KeyedGroupingUtils {
     Map<String, String> labelUpdateMap = labelGroups.stream()
       .collect(Collectors.toMap(LabelGroup::getGroupingLabel, LabelGroup::getGroupLabel));
     return new LabelSpecificKeyFunction<>(keyFunctions, labelUpdateMap);
-  }
-
-  /**
-   * Create a new instance of the {@link KeyedGrouping} operator from a list of vertex and edge label groups.
-   *
-   * @param useVertexLabels   Group by vertex label.
-   * @param useEdgeLabels     Group by edge label.
-   * @param vertexLabelGroups The vertex label groups.
-   * @param edgeLabelGroups   The edge label groups.
-   * @param <G>  The graph head type.
-   * @param <V>  The vertex type.
-   * @param <E>  The edge type.
-   * @param <LG> The graph type.
-   * @param <GC> The graph collection type.
-   * @return A new instance of the grouping operator.
-   */
-  public static <
-    G extends GraphHead,
-    V extends Vertex,
-    E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> KeyedGrouping<G, V, E, LG, GC> createInstance(
-      boolean useVertexLabels, boolean useEdgeLabels,
-      List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups) {
-    return createInstance(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
-      Collections.emptyList(), Collections.emptyList());
   }
 
   /**
