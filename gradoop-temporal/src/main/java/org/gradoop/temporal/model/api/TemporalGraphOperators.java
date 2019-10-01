@@ -32,8 +32,6 @@ import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
 
-import java.util.Objects;
-
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
