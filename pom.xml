@@ -653,7 +653,6 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -666,7 +665,6 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients_2.11</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -748,7 +746,6 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>

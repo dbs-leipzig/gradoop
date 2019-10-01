@@ -77,23 +77,6 @@
         </profile>
     </profiles>
 
-
-    <dependencies>
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-flink</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-data-integration</artifactId>
-        </dependency>
-    </dependencies>
-
-
     <build>
         <plugins>
             <plugin>
@@ -148,4 +131,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-flink</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-data-integration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_2.11</artifactId>
+        </dependency>
+    </dependencies>
 </project>
