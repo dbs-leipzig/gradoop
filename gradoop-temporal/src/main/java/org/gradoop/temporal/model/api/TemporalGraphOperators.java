@@ -66,7 +66,7 @@ public interface TemporalGraphOperators {
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-    return callForGraph(new Snapshot(Objects.requireNonNull(predicate), Objects.requireNonNull(dimension)));
+    return callForGraph(new Snapshot(predicate, dimension));
   }
 
   /**
