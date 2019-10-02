@@ -13,4 +13,8 @@
         <Class name="org.gradoop.common.model.impl.properties.bytes.Bytes$ByteArrayComparator" />
         <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE" />
     </Match>
+    <Match>
+        <Class name="org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>
