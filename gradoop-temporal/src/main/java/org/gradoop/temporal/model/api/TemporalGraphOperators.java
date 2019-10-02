@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.operators.BaseGraphOperatorSupport;
+import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
@@ -30,13 +30,17 @@ import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.Objects;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
-public interface TemporalGraphOperators extends BaseGraphOperatorSupport<TemporalGraph, TemporalGraphCollection> {
+public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraphHead, TemporalVertex,
+  TemporalEdge, TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators

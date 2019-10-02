@@ -15,16 +15,19 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.operators.BaseGraphCollectionOperatorSupport;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionOperators;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraphCollection}.
  */
-public interface TemporalGraphCollectionOperators
-  extends BaseGraphCollectionOperatorSupport<TemporalGraph, TemporalGraphCollection> {
+public interface TemporalGraphCollectionOperators extends BaseGraphCollectionOperators<TemporalGraphHead,
+  TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Utilities
