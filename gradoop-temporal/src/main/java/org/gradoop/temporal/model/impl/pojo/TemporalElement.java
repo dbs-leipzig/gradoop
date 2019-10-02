@@ -169,12 +169,30 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
+   * Set the beginning of the elements transaction interval as unix timestamp in milliseconds.
+   *
+   * @param txFrom the beginning of the elements transaction interval as unit timestamp in milliseconds
+   */
+  public void setTxFrom(long txFrom) {
+    this.transactionTime.f0 = txFrom;
+  }
+
+  /**
    * Get the end of the elements transaction interval as unix timestamp in milliseconds.
    *
    * @return the end of the elements transaction interval as unix timestamp in milliseconds
    */
   public Long getTxTo() {
     return this.transactionTime.f1;
+  }
+
+  /**
+   * Set the end of the elements transaction interval as unix timestamp in milliseconds.
+   *
+   * @param txTo the end of the elements transaction interval as unix timestamp in milliseconds
+   */
+  public void setTxTo(long txTo) {
+    this.transactionTime.f1 = txTo;
   }
 
   @Override

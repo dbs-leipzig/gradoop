@@ -70,7 +70,8 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
           element.setValidTo((Long) secondElement);
           break;
         case TRANSACTION_TIME:
-          element.setTransactionTime(Tuple2.of((Long) firstElement, (Long) secondElement));
+          element.setTxFrom((Long) firstElement);
+          element.setTxTo((Long) secondElement);
           break;
         default:
         }
