@@ -17,6 +17,7 @@ package org.gradoop.temporal.util;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 
 /**
  * Utility class that provides methods for the conversion of different time formats.
@@ -31,6 +32,7 @@ public class TimeFormatConversion {
      * @return Representation of the the provided time stamp in milliseconds since Unix Epoch.
      */
   public static long toEpochMilli(LocalDateTime time) {
+    Objects.requireNonNull(time);
     return time.toInstant(ZoneOffset.UTC).toEpochMilli();
   }
 }

@@ -36,7 +36,7 @@ public class AsOf implements TemporalPredicate {
   private final long queryTimestamp;
 
   /**
-   * Creates an AsOf instance with the given time-stamp.
+   * Creates an <b>AsOf</b> instance with the given time-stamp.
    *
    * @param timestamp The timestamp to match in Milliseconds since Unix Epoch.
    */
@@ -45,7 +45,7 @@ public class AsOf implements TemporalPredicate {
   }
 
   /**
-   * Creates an AsOf instance with the given time-stamp.
+   * Creates an <b>AsOf</b> instance with the given time-stamp.
    * The provided {@link LocalDateTime} value will be converted to milliseconds since Unix Epoch for UTC time zone.
    *
    * @param timestamp The timestamp to match.

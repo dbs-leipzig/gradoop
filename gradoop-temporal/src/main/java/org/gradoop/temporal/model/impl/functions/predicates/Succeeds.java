@@ -25,7 +25,7 @@ import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
  * Implementation of the <b>Precedes</b> predicate.
  * Given a certain time stamp, this predicate will match all all all time-stamps that succeed it.
  * <p>
- * Predicate: from >= queryFrom && from >= queryTo
+ * Predicate: {@code from >= queryFrom && from >= queryTo}
  */
 public class Succeeds implements TemporalPredicate {
 
@@ -40,7 +40,7 @@ public class Succeeds implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a Succeeds instance with the given time-interval.
+   * Creates a <b>Succeeds</b> instance with the given time-interval.
    * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
    *
    * @param from The beginning of the query time-interval.
@@ -52,7 +52,7 @@ public class Succeeds implements TemporalPredicate {
   }
 
   /**
-   * Creates a Succeeds instance with the given time-interval.
+   * Creates a <b>Succeeds</b> instance with the given time-interval.
    *
    * @param from The beginning of the interval to match in milliseconds since Unix Epoch.
    * @param to   The end of the interval to match in milliseconds since Unix Epoch.

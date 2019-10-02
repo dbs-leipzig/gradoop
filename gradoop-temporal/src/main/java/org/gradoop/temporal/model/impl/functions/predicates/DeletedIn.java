@@ -40,7 +40,7 @@ public class DeletedIn implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a DeletedIn instance with the given time stamps.
+   * Creates a <b>DeletedIn</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   the end of the query time-interval in Milliseconds since Unix Epoch.
@@ -51,7 +51,7 @@ public class DeletedIn implements TemporalPredicate {
   }
 
   /**
-   * Creates a DeletedIn instance with the given time-interval.
+   * Creates a <b>DeletedIn</b> instance with the given time-interval.
    * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
    *
    * @param from The beginning of the query time-interval.

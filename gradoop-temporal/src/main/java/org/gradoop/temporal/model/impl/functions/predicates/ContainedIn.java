@@ -40,7 +40,7 @@ public class ContainedIn implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a ContainedIn instance with the given time stamps.
+   * Creates a <b>ContainedIn</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
@@ -51,7 +51,7 @@ public class ContainedIn implements TemporalPredicate {
   }
 
   /**
-   * Creates a ContainedIn instance with the given time-interval.
+   * Creates a <b>ContainedIn</b> instance with the given time-interval.
    * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
    *
    * @param from The beginning of the query time-interval.
