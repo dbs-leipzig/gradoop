@@ -50,13 +50,13 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
    */
   private static final Logger LOG = Logger.getLogger(Printer.class);
   /**
-   * Mapping gradoopId -> propertyValue
+   * Mapping {@code gradoopId -> propertyValue}
    *
    * The value is used to represent the vertex with the corresponding id.
    */
   protected Map<K, PropertyValue> vertexMap;
   /**
-   * Mapping gradoopId -> propertyValue
+   * Mapping {@code gradoopId -> propertyValue}
    *
    * The value is used to represent the edge with the corresponding id.
    */

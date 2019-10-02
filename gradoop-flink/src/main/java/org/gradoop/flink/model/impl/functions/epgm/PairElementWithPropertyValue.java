@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * element -> (elementId, propertyValue)
+ * {@code element -> (elementId, propertyValue)}
  *
  * @param <EL> element type
  */

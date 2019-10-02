@@ -24,6 +24,9 @@ import org.junit.BeforeClass;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Test class for {@link GraphStatisticsHDFSReader}.
+ */
 public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
 
   private static HBaseTestingUtility utility;

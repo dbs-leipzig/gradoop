@@ -22,14 +22,13 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Creates a new {@link GradoopId} for the input element and returns both.
+ * <p>
+ * {@code t -> (t, id)}
  *
- * t -> (t, id)
- *
- * @param <T>
+ * @param <T> element type
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class PairElementWithNewId<T>
-  implements MapFunction<T, Tuple2<T, GradoopId>> {
+public class PairElementWithNewId<T> implements MapFunction<T, Tuple2<T, GradoopId>> {
 
   /**
    * Reduce object instantiations

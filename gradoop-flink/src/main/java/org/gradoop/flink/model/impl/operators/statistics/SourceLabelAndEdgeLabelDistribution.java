@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.ToSourceIdWit
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Computes the distribution of source and edge labels, e.g. the exact amount of (:A)-[:a]->(),
+ * Computes the distribution of source and edge labels, e.g. the exact amount of {@code (:A)-[:a]->()},
  * for each existing source/edge label combination.
  */
 public class SourceLabelAndEdgeLabelDistribution

@@ -24,7 +24,8 @@ import java.util.List;
 
 /**
  * Projects a Vertex by a set of properties.
- * Vertex -> Embedding(GraphElementEmbedding(Vertex))
+ * <p>
+ * {@code Vertex -> Embedding(GraphElementEmbedding(Vertex))}
  */
 public class ProjectVertex extends RichMapFunction<EPGMVertex, Embedding> {
   /**
@@ -34,6 +35,7 @@ public class ProjectVertex extends RichMapFunction<EPGMVertex, Embedding> {
 
   /**
    * Creates a new vertex projection function
+   *
    * @param propertyKeys List of propertyKeys that will be kept in the projection
    */
   public ProjectVertex(List<String> propertyKeys) {

@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.GraphElement;
 
 /**
- * left, right => left (retain graphIds contained in right)
+ * {@code left, right => left} (retain graphIds contained in right)
  *
  * @param <L> left type
  * @param <R> right type

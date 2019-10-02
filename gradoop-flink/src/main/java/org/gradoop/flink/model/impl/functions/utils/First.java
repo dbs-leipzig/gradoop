@@ -19,7 +19,8 @@ import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
 
 /**
- * t1,t2,..,tn => t1
+ * {@code t1,t2,..,tn => t1}
+ *
  * @param <T> data type
  */
 public class First<T> implements GroupReduceFunction<T, T> {

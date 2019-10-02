@@ -35,16 +35,29 @@ import java.io.IOException;
 
 /**
  * Used to read/write EPGM edge data from/to a HBase table.
- * <p>
- * Edge data in HBase:
- * <p>
- * |---------|---------------------------------------------|-------|
- * | row-key | meta                                        | data  |
- * |---------|----------|------------|------------|--------|-------|
- * | "0"     | label    | source     | target     | graphs | since |
- * |         |----------|------------|------------|--------|-------|
- * |         | "knows"  | <Person.0> | <Person.1> | [0,1]  | 2014  |
- * |---------|----------|------------|------------|--------|-------|
+ * <table border="1">
+ *   <caption>Edge data in HBase</caption>
+ *   <tr>
+ *     <td>row-key</td>
+ *     <td colspan="3">meta</td>
+ *     <td>data</td>
+ *   </tr>
+ *   <tr>
+ *     <td rowspan="2">"0"</td>
+ *     <td>label</td>
+ *     <td>source</td>
+ *     <td>target</td>
+ *     <td>graphs</td>
+ *     <td>since</td>
+ *   </tr>
+ *   <tr>
+ *     <td>"knows"</td>
+ *     <td>{@code <Person.0>}</td>
+ *     <td>{@code <Person.1>}</td>
+ *     <td>[0,1]</td>
+ *     <td>2014</td>
+ *   </tr>
+ * </table>
  */
 public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHandler {
 

@@ -21,14 +21,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
 /**
- * (id, [candidates]) -> (id)
- *
- * Forwarded fields:
- *
+ * {@code (id, [candidates]) -> (id)}
+ * <p>
+ * Forwarded fields:<br>
  * f0: vertex id
- *
- * Read fields:
- *
+ * <p>
+ * Read fields:<br>
  * f0: vertex id
  *
  * @param <K> key type
