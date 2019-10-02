@@ -13,41 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
 
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
- * A wrapper for aggregate functions that will only return the increment of elements that are not contained
- * in any label group.
+ * A wrapper for an aggregate function that will only return the increment of elements that have a certain
+ * label.
  */
-public class UnlabeledGroupAggregatorWrapper extends AggregatorWrapperWithValue {
+public class LabelSpecificAggregatorWrapper extends AggregatorWrapperWithValue {
 
   /**
-   * A set of all labels where label-specific aggregators are defined.
+   * The expected label of the elements to aggregate.
    */
-  private final Set<String> otherLabels;
+  private final String targetLabel;
 
   /**
    * Create a new instance of this wrapper.
    *
-   * @param otherLabels A set of all labels where the aggregation function should <b>not</b> set used.
-   * @param function    The aggregation function.
-   * @param id          A {@code short} identifying this function internally.
+   * @param targetLabel     The expected label.
+   * @param wrappedFunction The aggregate function to be used for elements with this label.
+   * @param id              A {@code short} identifying this function internally.
    */
-  public UnlabeledGroupAggregatorWrapper(Set<String> otherLabels, AggregateFunction function, short id) {
-    super(function, PropertyValue.create(id));
-    this.otherLabels = Objects.requireNonNull(otherLabels);
+  public LabelSpecificAggregatorWrapper(String targetLabel, AggregateFunction wrappedFunction, short id) {
+    super(wrappedFunction, PropertyValue.create(id));
+    this.targetLabel = Objects.requireNonNull(targetLabel);
   }
 
   @Override
   public PropertyValue getIncrement(Element element) {
-    return otherLabels.contains(element.getLabel()) ? PropertyValue.NULL_VALUE :
-      wrap(wrappedFunction.getIncrement(element));
+    return element.getLabel().equals(targetLabel) ?
+      wrap(wrappedFunction.getIncrement(element)) :
+      PropertyValue.NULL_VALUE;
   }
+
 }

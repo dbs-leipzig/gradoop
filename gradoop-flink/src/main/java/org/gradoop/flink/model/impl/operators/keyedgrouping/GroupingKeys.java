@@ -23,7 +23,7 @@ import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.ConstantKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelKeyFunction;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelSpecificKeyFunction;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.PropertyKeyFunction;
 
 import java.util.List;

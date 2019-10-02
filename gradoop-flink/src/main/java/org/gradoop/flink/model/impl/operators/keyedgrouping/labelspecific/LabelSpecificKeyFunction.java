@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.keyedgrouping.keys;
+package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -23,6 +23,7 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.CompositeKeyFunctionWithDefaultValues;
 
 import java.util.ArrayList;
 import java.util.Collections;

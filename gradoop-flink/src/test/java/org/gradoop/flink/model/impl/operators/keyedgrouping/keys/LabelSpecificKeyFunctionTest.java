@@ -29,6 +29,7 @@ import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGroupingUtils;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificKeyFunction;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -26,9 +26,9 @@ import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.LabelSpecificAggregatorWrapper;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UnlabeledGroupAggregatorWrapper;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelSpecificKeyFunction;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.UnlabeledGroupAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificKeyFunction;
 
 import java.util.ArrayList;
 import java.util.HashMap;

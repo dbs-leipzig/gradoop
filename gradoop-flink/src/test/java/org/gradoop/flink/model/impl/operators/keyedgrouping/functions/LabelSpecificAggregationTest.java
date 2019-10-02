@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificAggregatorWrapper;
 import org.junit.Test;
 
 import java.util.Arrays;

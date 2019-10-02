@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
