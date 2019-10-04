@@ -25,7 +25,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import java.util.Objects;
 
 /**
- * A key function extracting a time interval of a {@link TimeDimension} from a {@link TemporalElement}.
+ * A key function extracting a value of a {@link TimeDimension} from a {@link TemporalElement}.
  *
  * @param <T> The type of the temporal elements.
  */
@@ -33,28 +33,29 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
   implements KeyFunction<T, Tuple2<Long, Long>> {
 
   /**
-   * The time interval to extract.
+   * The time dimension to extract from.
    */
-  private final TimeDimension timeInterval;
+  private final TimeDimension timeDimension;
 
   /**
    * Create a new instance of this key function.
    *
-   * @param timeInterval The time interval to extract.
+   * @param timeDimension The time dimension to extract.
    */
-  public TimeIntervalKeyFunction(TimeDimension timeInterval) {
-    this.timeInterval = Objects.requireNonNull(timeInterval);
+  public TimeIntervalKeyFunction(TimeDimension timeDimension) {
+    this.timeDimension = Objects.requireNonNull(timeDimension);
   }
 
   @Override
   public Tuple2<Long, Long> getKey(T element) {
-    switch (timeInterval) {
+    switch (timeDimension) {
     case VALID_TIME:
       return element.getValidTime();
     case TRANSACTION_TIME:
       return element.getTransactionTime();
     default:
-      throw new UnsupportedOperationException("Time interval not supported by this element: " + timeInterval);
+      throw new UnsupportedOperationException("Time dimension not supported by this element: " +
+        timeDimension);
     }
   }
 
@@ -64,7 +65,7 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
       final Object firstElement = ((Tuple2) key).f0;
       final Object secondElement = ((Tuple2) key).f1;
       if ((firstElement instanceof Long) && (secondElement instanceof Long)) {
-        switch (timeInterval) {
+        switch (timeDimension) {
         case VALID_TIME:
           element.setValidFrom((Long) firstElement);
           element.setValidTo((Long) secondElement);
@@ -91,6 +92,6 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
 
   @Override
   public String toString() {
-    return timeInterval.toString();
+    return timeDimension.toString();
   }
 }

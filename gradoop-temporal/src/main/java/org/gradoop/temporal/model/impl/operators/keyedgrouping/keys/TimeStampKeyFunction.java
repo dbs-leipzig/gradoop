@@ -49,14 +49,14 @@ import static java.time.ZoneOffset.UTC;
 public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunction<T, Long> {
 
   /**
-   * The time interval of the temporal element to extract.
+   * The time dimension of the temporal element to extract.
    */
-  private final TimeDimension timeInterval;
+  private final TimeDimension timeDimension;
 
   /**
-   * The field of that interval to extract.
+   * The field of that dimension to extract.
    */
-  private final TimeDimension.Field timeIntervalField;
+  private final TimeDimension.Field timeDimensionField;
 
   /**
    * The time field to calculate.
@@ -71,25 +71,25 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
   /**
    * Create a new instance of this grouping key function.
    *
-   * @param timeInterval      The time interval of the temporal element to consider.
-   * @param timeIntervalField The field of that time interval to consider.
-   * @param fieldOfTimeStamp  The time field of that field to calculate. May be {@code null},
-   *                          in that case nothing will be calculated, the time stamp will be
-   *                          returned as is.
+   * @param timeDimension      The time dimension of the temporal element to consider.
+   * @param timeDimensionField The field of that time dimension to consider.
+   * @param fieldOfTimeStamp   The time field of that field to calculate. May be {@code null},
+   *                           in that case nothing will be calculated, the time stamp will be
+   *                           returned as is.
    */
-  public TimeStampKeyFunction(TimeDimension timeInterval,
-    TimeDimension.Field timeIntervalField, TemporalField fieldOfTimeStamp) {
-    this.timeInterval = Objects.requireNonNull(timeInterval);
-    this.timeIntervalField = Objects.requireNonNull(timeIntervalField);
+  public TimeStampKeyFunction(TimeDimension timeDimension,
+    TimeDimension.Field timeDimensionField, TemporalField fieldOfTimeStamp) {
+    this.timeDimension = Objects.requireNonNull(timeDimension);
+    this.timeDimensionField = Objects.requireNonNull(timeDimensionField);
     this.fieldOfTimeStamp = fieldOfTimeStamp;
-    this.targetPropertyKey = "time_" + timeInterval + "_" + timeIntervalField +
+    this.targetPropertyKey = "time_" + timeDimension + "_" + timeDimensionField +
       (fieldOfTimeStamp != null ? "_" + fieldOfTimeStamp : "");
   }
 
   @Override
   public Long getKey(T element) {
     final Tuple2<Long, Long> interval;
-    switch (timeInterval) {
+    switch (timeDimension) {
     case TRANSACTION_TIME:
       interval = element.getTransactionTime();
       break;
@@ -98,10 +98,10 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
       break;
     default:
       throw new UnsupportedOperationException(
-        "Time interval not supported by this element: " + timeInterval);
+        "Time interval not supported by this element: " + timeDimension);
     }
     final Long fieldValue;
-    switch (timeIntervalField) {
+    switch (timeDimensionField) {
     case FROM:
       fieldValue = interval.f0;
       break;
@@ -109,7 +109,7 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
       fieldValue = interval.f1;
       break;
     default:
-      throw new UnsupportedOperationException("Field is not supported: " + timeIntervalField);
+      throw new UnsupportedOperationException("Field is not supported: " + timeDimensionField);
     }
     if (fieldOfTimeStamp == null) {
       return fieldValue;

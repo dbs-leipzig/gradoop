@@ -63,11 +63,11 @@ public class DurationKeyFunction<T extends TemporalElement> implements KeyFuncti
   /**
    * Create a new instance of this grouping key function.
    *
-   * @param timeInterval The time interval to get the duration of.
-   * @param unit         The unit to get the duration as.
+   * @param timeDimension The time dimension to get the duration of.
+   * @param unit          The unit to get the duration as.
    */
-  public DurationKeyFunction(TimeDimension timeInterval, TemporalUnit unit) {
-    this.intervalExtractor = new TimeIntervalKeyFunction<>(timeInterval);
+  public DurationKeyFunction(TimeDimension timeDimension, TemporalUnit unit) {
+    this.intervalExtractor = new TimeIntervalKeyFunction<>(timeDimension);
     this.timeUnit = Objects.requireNonNull(unit);
     if (unit instanceof ChronoUnit) {
       calculateAsDate = ((ChronoUnit) unit).compareTo(ChronoUnit.DAYS) >= 0;
