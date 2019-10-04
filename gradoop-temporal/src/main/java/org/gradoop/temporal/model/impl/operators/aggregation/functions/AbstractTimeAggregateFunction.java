@@ -86,7 +86,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Unknown dimension.");
+      throw new IllegalArgumentException("Unknown dimension [" + timeDimension + "].");
     }
     switch (field) {
     case FROM:
@@ -94,7 +94,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
     case TO:
       return PropertyValue.create(timeInterval.f1);
     default:
-      throw new IllegalArgumentException("Field " + field + " is not supported for time intervals.");
+      throw new IllegalArgumentException("Field [" + field + "] is not supported for time intervals.");
     }
   }
 

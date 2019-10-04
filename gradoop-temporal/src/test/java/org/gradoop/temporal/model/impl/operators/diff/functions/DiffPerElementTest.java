@@ -239,7 +239,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
   }
 
   @Parameterized.Parameters(name = "{0}")
-  public static Iterable<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{TimeDimension.VALID_TIME}, {TimeDimension.TRANSACTION_TIME}});
+  public static Iterable<Object> parameters() {
+    return Arrays.asList(new Object[] {TimeDimension.VALID_TIME, TimeDimension.TRANSACTION_TIME});
   }
 }

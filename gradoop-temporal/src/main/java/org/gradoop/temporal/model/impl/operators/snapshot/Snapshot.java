@@ -41,11 +41,11 @@ public class Snapshot implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph
    * Used temporal predicate.
    */
   private final TemporalPredicate temporalPredicate;
+
   /**
    * Specifies the time dimension that will be considered by the operator.
-   * The default is {@link TimeDimension#VALID_TIME}.
    */
-  private TimeDimension dimension = TimeDimension.VALID_TIME;
+  private TimeDimension dimension;
 
   /**
    * Creates an instance of the snapshot operator with the given temporal predicate.
@@ -54,7 +54,7 @@ public class Snapshot implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph
    * @param predicate The temporal predicate.
    */
   public Snapshot(TemporalPredicate predicate) {
-    temporalPredicate = Objects.requireNonNull(predicate, "No predicate was given.");
+    this(predicate, TimeDimension.VALID_TIME);
   }
 
   /**
@@ -64,20 +64,18 @@ public class Snapshot implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph
    * @param dimension The time dimension that will be considered by the operator.
    */
   public Snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-    this(predicate);
-    this.dimension = Objects.requireNonNull(dimension, "No time dimension selected.");
+    this.temporalPredicate = Objects.requireNonNull(predicate, "No predicate given.");
+    this.dimension = Objects.requireNonNull(dimension, "No time dimension given.");
   }
 
   @Override
   public TemporalGraph execute(TemporalGraph superGraph) {
     DataSet<TemporalVertex> vertices = superGraph.getVertices()
       // Filter vertices
-      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension))
-      .name("Snapshot vertices by [" + temporalPredicate + "]");
+      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension));
     DataSet<TemporalEdge> edges = superGraph.getEdges()
       // Filter edges
-      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension))
-      .name("Snapshot edges by [" + temporalPredicate + "]");
+      .filter(new ByTemporalPredicate<>(temporalPredicate, dimension));
 
     return superGraph.getFactory().fromDataSets(superGraph.getGraphHead(), vertices, edges);
   }

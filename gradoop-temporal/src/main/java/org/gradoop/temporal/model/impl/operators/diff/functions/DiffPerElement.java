@@ -33,7 +33,6 @@ import java.util.Objects;
  *
  * @param <E> The element type.
  */
-@FunctionAnnotation.ReadFields("validTime")
 @FunctionAnnotation.NonForwardedFields("properties")
 public class DiffPerElement<E extends TemporalElement> implements FlatMapFunction<E, E> {
 
@@ -49,22 +48,8 @@ public class DiffPerElement<E extends TemporalElement> implements FlatMapFunctio
 
   /**
    * Specifies the time dimension that will be considered by the operator.
-   * Will be {@link TimeDimension#VALID_TIME} by default.
    */
-  private TimeDimension dimension = TimeDimension.VALID_TIME;
-
-  /**
-   * Create an instance of this function, setting the two temporal predicates used to determine the snapshots.
-   * By default, valid times will be used by the predicate. To use transaction times, use
-   * {@link DiffPerElement#DiffPerElement(TemporalPredicate, TemporalPredicate, TimeDimension)} instead.
-   *
-   * @param first  The predicate used for the first snapshot.
-   * @param second The predicate used for the second snapshot.
-   */
-  public DiffPerElement(TemporalPredicate first, TemporalPredicate second) {
-    this.first = Objects.requireNonNull(first);
-    this.second = Objects.requireNonNull(second);
-  }
+  private TimeDimension dimension;
 
   /**
    * Create an instance of this function, setting the two temporal predicates used to determine the snapshots.
@@ -74,7 +59,8 @@ public class DiffPerElement<E extends TemporalElement> implements FlatMapFunctio
    * @param dimension The time dimension that will be used.
    */
   public DiffPerElement(TemporalPredicate first, TemporalPredicate second, TimeDimension dimension) {
-    this(first, second);
+    this.first = Objects.requireNonNull(first);
+    this.second = Objects.requireNonNull(second);
     this.dimension = Objects.requireNonNull(dimension);
   }
 
@@ -90,7 +76,7 @@ public class DiffPerElement<E extends TemporalElement> implements FlatMapFunctio
       timeValues = value.getTransactionTime();
       break;
     default:
-      throw new IllegalArgumentException("Unknown dimension.");
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
     }
 
     boolean inFirst = first.test(timeValues.f0, timeValues.f1);

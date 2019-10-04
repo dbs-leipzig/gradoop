@@ -73,9 +73,8 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
 
   /**
    * Specifies the time dimension that will be considered by the operator.
-   * Will be {@link TimeDimension#VALID_TIME} by default.
    */
-  private TimeDimension dimension = TimeDimension.VALID_TIME;
+  private TimeDimension dimension;
 
   /**
    * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
@@ -86,8 +85,7 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
    * @param secondPredicate The predicate used for the second snapshot.
    */
   public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate) {
-    this.firstPredicate = Objects.requireNonNull(firstPredicate);
-    this.secondPredicate = Objects.requireNonNull(secondPredicate);
+    this(firstPredicate, secondPredicate, TimeDimension.VALID_TIME);
   }
   /**
    * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
@@ -97,18 +95,17 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
    * @param dimension The time dimension that will be used.
    */
   public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate, TimeDimension dimension) {
-    this(firstPredicate, secondPredicate);
-    this.dimension = Objects.requireNonNull(dimension);
+    this.firstPredicate = Objects.requireNonNull(firstPredicate, "No first predicate given.");
+    this.secondPredicate = Objects.requireNonNull(secondPredicate, "No second predicate given.");
+    this.dimension = Objects.requireNonNull(dimension, "No time dimension given.");
   }
 
   @Override
   public TemporalGraph execute(TemporalGraph graph) {
     DataSet<TemporalVertex> transformedVertices = graph.getVertices()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension))
-      .name("Diff vertices of [" + firstPredicate + "] and [" + secondPredicate + "]");
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
     DataSet<TemporalEdge> transformedEdges = graph.getEdges()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension))
-      .name("Diff edges of [" + firstPredicate + "] and [" + secondPredicate + "]");
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
     return graph.getFactory().fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);
   }
 }

@@ -55,7 +55,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    */
   private TemporalGradoopConfig config;
 
-  /**
+  /*
    * Constants used as labels inside a test graph.
    */
   protected static final String V1 = "v1";

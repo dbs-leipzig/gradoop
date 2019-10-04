@@ -137,7 +137,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
     case TRANSACTION_TIME:
       return this.transactionTime;
     default:
-      throw new IllegalArgumentException("Unknown dimension.");
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
     }
   }
 

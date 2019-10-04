@@ -37,20 +37,9 @@ public class ByTemporalPredicate<T extends TemporalElement> implements Combinabl
 
   /**
    * Specifies the time dimension that will be considered by the predicate.
-   * {@link TimeDimension#VALID_TIME} is used by default.
    */
-  private TimeDimension dimension = TimeDimension.VALID_TIME;
+  private TimeDimension dimension;
 
-  /**
-   * Creates a filter instance from a temporal predicate that considers the valid times by default.
-   * Use {@link ByTemporalPredicate#ByTemporalPredicate(TemporalPredicate, TimeDimension)} if you will apply
-   * the predicate at the transaction time.
-   *
-   * @param predicate The temporal predicate to check.
-   */
-  public ByTemporalPredicate(TemporalPredicate predicate) {
-    condition = Objects.requireNonNull(predicate, "No predicate was given.");
-  }
 
   /**
    * Creates a filter instance from a temporal predicate and a time dimension.
@@ -59,8 +48,8 @@ public class ByTemporalPredicate<T extends TemporalElement> implements Combinabl
    * @param dimension The time dimension that will be considered by the predicate.
    */
   public ByTemporalPredicate(TemporalPredicate predicate, TimeDimension dimension) {
-    this(predicate);
-    this.dimension = Objects.requireNonNull(dimension, "No time dimension selected.");
+    this.condition = Objects.requireNonNull(predicate, "No predicate given.");
+    this.dimension = Objects.requireNonNull(dimension, "No time dimension given.");
   }
 
   @Override
