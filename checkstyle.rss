@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 1737,
+      <title>File: 1742,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -3309,6 +3309,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicateTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/booleans/OrPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.functions.predicates.Succeeds.java">org/gradoop/temporal/model/impl/functions/predicates/Succeeds.java</a>
                 </td>
                 <td>
                   0
@@ -8950,6 +8964,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.util.TimeFormatConversion.java">org/gradoop/temporal/util/TimeFormatConversion.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportVertexLabels.java">org/gradoop/flink/algorithms/fsm/dimspan/functions/preprocessing/ReportVertexLabels.java</a>
                 </td>
                 <td>
@@ -9441,6 +9469,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.pagerank.functions.package-info.java">org/gradoop/flink/algorithms/gelly/pagerank/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.functions.predicates.Precedes.java">org/gradoop/temporal/model/impl/functions/predicates/Precedes.java</a>
                 </td>
                 <td>
                   0
@@ -11639,6 +11681,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.package-info.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.util.TimeFormatConversionTest.java">org/gradoop/temporal/util/TimeFormatConversionTest.java</a>
                 </td>
                 <td>
                   0
@@ -18849,6 +18905,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.hits.functions.HITSToAttributes.java">org/gradoop/flink/algorithms/gelly/hits/functions/HITSToAttributes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.functions.predicates.Overlaps.java">org/gradoop/temporal/model/impl/functions/predicates/Overlaps.java</a>
                 </td>
                 <td>
                   0

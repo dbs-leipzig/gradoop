@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the &lt;b&gt;Between&lt;/b&gt; temporal predicate.
  * Given a certain time-interval, this predicate will match all intervals that start
@@ -37,24 +41,36 @@ public class Between implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a Between instance with the given time stamps.
+   * Creates a &lt;b&gt;Between&lt;/b&gt; instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
    */
-<span class="fc" id="L45">  public Between(long from, long to) {</span>
-<span class="fc" id="L46">    queryFrom = from;</span>
-<span class="fc" id="L47">    queryTo = to;</span>
-<span class="fc" id="L48">  }</span>
+<span class="fc" id="L49">  public Between(long from, long to) {</span>
+<span class="fc" id="L50">    queryFrom = from;</span>
+<span class="fc" id="L51">    queryTo = to;</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Creates a &lt;b&gt;Between&lt;/b&gt; instance with the given time stamps.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+<span class="nc" id="L61">  public Between(LocalDateTime from, LocalDateTime to) {</span>
+<span class="nc" id="L62">    queryFrom = toEpochMilli(from);</span>
+<span class="nc" id="L63">    queryTo = toEpochMilli(to);</span>
+<span class="nc" id="L64">  }</span>
 
   @Override
   public boolean test(long from, long to) {
-<span class="fc bfc" id="L52" title="All 4 branches covered.">    return from &lt;= queryTo &amp;&amp; to &gt; queryFrom;</span>
+<span class="fc bfc" id="L68" title="All 4 branches covered.">    return from &lt;= queryTo &amp;&amp; to &gt; queryFrom;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L57">    return &quot;BETWEEN &quot; + queryFrom + &quot; AND &quot; + queryTo;</span>
+<span class="fc" id="L73">    return &quot;BETWEEN &quot; + queryFrom + &quot; AND &quot; + queryTo;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

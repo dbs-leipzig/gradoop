@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the &lt;b&gt;AsOf&lt;/b&gt; predicate.
  * Given a certain time-stamp, this predicate will match all time-stamps before or at that time
@@ -32,22 +36,32 @@ public class AsOf implements TemporalPredicate {
   private final long queryTimestamp;
 
   /**
-   * Creates a AsOf instance with the given time-stamp.
+   * Creates an &lt;b&gt;AsOf&lt;/b&gt; instance with the given time-stamp.
    *
    * @param timestamp The timestamp to match in Milliseconds since Unix Epoch.
    */
-<span class="fc" id="L39">  public AsOf(long timestamp) {</span>
-<span class="fc" id="L40">    this.queryTimestamp = timestamp;</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L43">  public AsOf(long timestamp) {</span>
+<span class="fc" id="L44">    this.queryTimestamp = timestamp;</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Creates an &lt;b&gt;AsOf&lt;/b&gt; instance with the given time-stamp.
+   * The provided {@link LocalDateTime} value will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param timestamp The timestamp to match.
+   */
+<span class="nc" id="L53">  public AsOf(LocalDateTime timestamp) {</span>
+<span class="nc" id="L54">    this.queryTimestamp = toEpochMilli(timestamp);</span>
+<span class="nc" id="L55">  }</span>
 
   @Override
   public boolean test(long from, long to) {
-<span class="fc bfc" id="L45" title="All 4 branches covered.">    return from &lt;= queryTimestamp &amp;&amp; to &gt; queryTimestamp;</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">    return from &lt;= queryTimestamp &amp;&amp; to &gt; queryTimestamp;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L50">    return &quot;AS OF &quot; + queryTimestamp;</span>
+<span class="fc" id="L64">    return &quot;AS OF &quot; + queryTimestamp;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the &lt;b&gt;DeletedIn&lt;/b&gt; temporal predicate.
  * Given a certain time-interval, this predicate will match all intervals ending during that interval.
@@ -36,24 +40,36 @@ public class DeletedIn implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a DeletedIn instance with the given time stamps.
+   * Creates a &lt;b&gt;DeletedIn&lt;/b&gt; instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   the end of the query time-interval in Milliseconds since Unix Epoch.
    */
-<span class="fc" id="L44">  public DeletedIn(long from, long to) {</span>
-<span class="fc" id="L45">    queryFrom = from;</span>
-<span class="fc" id="L46">    queryTo = to;</span>
-<span class="fc" id="L47">  }</span>
+<span class="fc" id="L48">  public DeletedIn(long from, long to) {</span>
+<span class="fc" id="L49">    queryFrom = from;</span>
+<span class="fc" id="L50">    queryTo = to;</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Creates a &lt;b&gt;DeletedIn&lt;/b&gt; instance with the given time-interval.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+<span class="nc" id="L60">  public DeletedIn(LocalDateTime from, LocalDateTime to) {</span>
+<span class="nc" id="L61">    queryFrom = toEpochMilli(from);</span>
+<span class="nc" id="L62">    queryTo = toEpochMilli(to);</span>
+<span class="nc" id="L63">  }</span>
 
   @Override
   public boolean test(long from, long to) {
-<span class="fc bfc" id="L51" title="All 4 branches covered.">    return queryFrom &lt;= to &amp;&amp; to &lt;= queryTo;</span>
+<span class="fc bfc" id="L67" title="All 4 branches covered.">    return queryFrom &lt;= to &amp;&amp; to &lt;= queryTo;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L56">    return String.format(&quot;DELETED IN (%d, %d)&quot;, queryFrom, queryTo);</span>
+<span class="fc" id="L72">    return String.format(&quot;DELETED IN (%d, %d)&quot;, queryFrom, queryTo);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
