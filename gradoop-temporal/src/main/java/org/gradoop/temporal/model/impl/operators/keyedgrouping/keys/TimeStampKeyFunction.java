@@ -41,7 +41,7 @@ import static java.time.ZoneOffset.UTC;
  * The final grouping key will be stored on the super element as a property with key
  * {@code time_INTERVAL_FIELD_CALCULATEDFIELD} where {@code INTERVAL} is the {@link TimeDimension},
  * {@code FIELD} the {@link TimeDimension.Field} and {@code CALCULATEDFIELD} the {@link TemporalField}
- * extraced from the element. When no {@link TemporalField} is given, the property will just be called
+ * extracted from the element. When no {@link TemporalField} is given, the property will just be called
  * {@code time_INTERVAL_FIELD}.
  *
  * @param <T> The type of the elements to group.
