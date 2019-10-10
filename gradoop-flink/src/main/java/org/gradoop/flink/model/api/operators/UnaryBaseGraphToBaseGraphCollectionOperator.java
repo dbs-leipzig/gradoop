@@ -24,6 +24,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  * @param <LG> the type of the graph used as input
  * @param <GC> the type of the graph used as return value
  */
-public interface UnaryBaseGraphToBaseGraphCollectionOperator<LG extends BaseGraph,
+public interface UnaryBaseGraphToBaseGraphCollectionOperator<
+  LG extends BaseGraph,
   GC extends BaseGraphCollection> extends UnaryBaseGraphToValueOperator<LG, GC> {
 }

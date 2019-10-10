@@ -36,8 +36,8 @@ import java.util.List;
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators extends BaseGraphOperators<EPGMGraphHead, EPGMVertex, EPGMEdge,
-  LogicalGraph, GraphCollection> {
+public interface LogicalGraphOperators
+  extends BaseGraphOperators<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators

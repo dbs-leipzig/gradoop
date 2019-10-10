@@ -28,8 +28,8 @@ import java.io.IOException;
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators extends BaseGraphCollectionOperators<EPGMGraphHead, EPGMVertex,
-  EPGMEdge, LogicalGraph, GraphCollection> {
+public interface GraphCollectionOperators
+  extends BaseGraphCollectionOperators<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Auxiliary operators

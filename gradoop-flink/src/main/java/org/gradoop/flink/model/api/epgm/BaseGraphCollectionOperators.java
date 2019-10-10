@@ -355,6 +355,17 @@ public interface BaseGraphCollectionOperators<
   <T> T callForValue(BinaryBaseGraphCollectionToValueOperator<GC, T> operator, GC otherCollection);
 
   /**
+   * Calls the given unary collection to graph operator using this graph collection to get a graph of type
+   * {@link LG}.
+   *
+   * @param operator unary collection to graph operator
+   * @return result of given operator
+   */
+  default LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator<GC, LG> operator) {
+    return callForValue(operator);
+  }
+
+  /**
    * Creates a graph collection using the given unary graph collection operator.
    *
    * @param operator unary graph collection to graph collection operator
@@ -400,16 +411,6 @@ public interface BaseGraphCollectionOperators<
    * @see Combination
    */
   default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> operator) {
-    return callForValue(operator);
-  }
-
-  /**
-   * Calls the given unary collection to graph operator for the collection.
-   *
-   * @param operator unary collection to graph operator
-   * @return result of given operator
-   */
-  default LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator<GC, LG> operator) {
     return callForValue(operator);
   }
 }
