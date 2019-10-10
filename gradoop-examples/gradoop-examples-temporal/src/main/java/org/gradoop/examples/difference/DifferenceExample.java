@@ -22,7 +22,6 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * A self contained example on how to use the difference operator of Gradoop's TPGM model designed to analyse
@@ -62,15 +61,11 @@ public class DifferenceExample {
     TemporalGraph bikeGraph = TemporalCitiBikeGraph.getTemporalGraph(GradoopFlinkConfig.createConfig(env));
 
     // the rentals are captured in August 2019 so we define two query intervals to compare
-    long firstQueryPeriodStart = LocalDateTime.of(2019, 8, 1, 0, 0, 0)
-      .toInstant(ZoneOffset.UTC).toEpochMilli();
-    long firstQueryPeriodEnd = LocalDateTime.of(2019, 8, 16, 0, 0, 0)
-      .toInstant(ZoneOffset.UTC).toEpochMilli();
+    LocalDateTime firstQueryPeriodStart = LocalDateTime.of(2019, 8, 1, 0, 0, 0);
+    LocalDateTime firstQueryPeriodEnd = LocalDateTime.of(2019, 8, 16, 0, 0, 0);
 
-    long secondQueryPeriodStart = LocalDateTime.of(2019, 8, 10, 0, 0, 0)
-      .toInstant(ZoneOffset.UTC).toEpochMilli();
-    long secondQueryPeriodEnd = LocalDateTime.of(2019, 9, 1, 0, 0, 0)
-      .toInstant(ZoneOffset.UTC).toEpochMilli();
+    LocalDateTime secondQueryPeriodStart = LocalDateTime.of(2019, 8, 10, 0, 0, 0);
+    LocalDateTime secondQueryPeriodEnd = LocalDateTime.of(2019, 9, 1, 0, 0, 0);
 
     // apply the diff operator with two predicates of type "FROM t1 TO t2"
     TemporalGraph annotatedDiffGraph = bikeGraph

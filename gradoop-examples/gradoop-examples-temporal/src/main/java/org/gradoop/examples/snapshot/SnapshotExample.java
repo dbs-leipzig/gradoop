@@ -19,9 +19,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.TemporalCitiBikeGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -65,9 +65,7 @@ public class SnapshotExample {
 
     // apply the snapshot operator of type "FROM t1 TO t2"
     TemporalGraph retrievedSnapshot = bikeGraph
-      .fromTo(
-        startInterval.toInstant(ZoneOffset.UTC).toEpochMilli(),
-        endInterval.toInstant(ZoneOffset.UTC).toEpochMilli())
+      .snapshot(new FromTo(startInterval, endInterval))
       .verify();
 
     // print graph, which now contains only trips happened between 10th and 20th August 2019
