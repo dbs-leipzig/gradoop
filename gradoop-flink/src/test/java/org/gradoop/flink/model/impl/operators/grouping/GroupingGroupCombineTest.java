@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-public class GroupingGroupCombineTest extends LabelSpecificGroupingTestBase {
+public class GroupingGroupCombineTest extends LabelSpecificWithCrossGroupingTestBase {
 
   @Override
   public GroupingStrategy getStrategy() {

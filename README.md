@@ -24,6 +24,8 @@ help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
+* [Evolution Analysis of Large Graphs with Gradoop, ECML PKDD LEG Workshop, September 2019](https://dbs.uni-leipzig.de/file/LEGECML-PKDD_2019_paper_9.pdf)
+* [Temporal Graph Analysis using Gradoop, BTW 2019-Workshopband, March 2019](https://dl.gi.de/bitstream/handle/20.500.12116/21797/C2-1.pdf)
 * [Declarative and distributed graph analytics with GRADOOP, VLDB Demo, August 2018](http://www.vldb.org/pvldb/vol11/p2006-junghanns.pdf)
 * [Cypher-based Graph Pattern Matching in Apache Flink, FlinkForward, September 2017](https://youtu.be/dZ8_v_P1j98)
 * [Cypher-based Graph Pattern Matching in GRADOOP, SIGMOD GRADES Workshop, May 2017](https://dbs.uni-leipzig.de/file/GRADES17_Cypher_in_Gradoop.pdf)
@@ -149,6 +151,11 @@ using DataSet transformations. The module also contains implementations of
 general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
 
+### gradoop-temporal
+
+This module contains a reference implementation of the Temporal Property Graph Model (TPGM) and
+it's operators used to perform graph analysis with respect to the additional time dimension in real-world graphs.
+
 ### gradoop-examples
 
 Contains example pipelines showing use cases for Gradoop. 
@@ -160,7 +167,18 @@ Contains example pipelines showing use cases for Gradoop.
 ### gradoop-checkstyle
 
 Used to maintain the code style for the whole project.
-    
+
+## Related Repositories
+
+### [Gradoop Benchmarks](https://github.com/dbs-leipzig/gradoop-benchmarks)
+
+This repository contains sets of Gradoop operator benchmarks designed to run on a cluster to measure
+scalability and speedup of the operators.
+
+### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
+
+Demo application to show the functionalities of the grouping and query operator in an interactive web UI.
+
 ### Version History
 
 See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at the Wiki pages. 
