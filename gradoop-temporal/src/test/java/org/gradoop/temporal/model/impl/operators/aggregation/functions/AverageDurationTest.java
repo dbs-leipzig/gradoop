@@ -32,8 +32,8 @@ import java.util.Arrays;
 
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.gradoop.flink.model.impl.operators.aggregation.functions.average.Average.IGNORED_VALUE;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.TRANSACTION_TIME;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.VALID_TIME;
+import static org.gradoop.temporal.model.api.TimeDimension.TRANSACTION_TIME;
+import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_FROM;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_TO;
 import static org.junit.Assert.assertEquals;

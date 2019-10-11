@@ -18,7 +18,7 @@ package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Before;
