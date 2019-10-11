@@ -22,6 +22,7 @@ import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -29,8 +30,11 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -41,7 +45,14 @@ import static org.junit.Assert.fail;
 /**
  * Test for the {@link DiffPerElement} map function.
  */
+@RunWith(Parameterized.class)
 public class DiffPerElementTest extends TemporalGradoopTestBase {
+
+  /**
+   * The temporal dimension to test.
+   */
+  @Parameterized.Parameter
+  public TimeDimension dimension;
 
   /**
    * A temporal predicate accepting all ranges.
@@ -131,12 +142,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    * @param <E> The temporal element type to test the map function on.
    * @throws Exception When the flat map operation throws an exception.
    */
-  private <E extends TemporalElement> void runTestForElement(Supplier<E> elementFactory) throws
-    Exception {
+  private <E extends TemporalElement> void runTestForElement(Supplier<E> elementFactory) throws Exception {
     // The element will be present in both snapshots, it is "equal".
     E testElement = elementFactory.get();
     testElement.setValidTime(TEST_TIME);
-    List<E> results = runFlatMapFunction(new DiffPerElement<>(ALL, ALL), testElement);
+    List<E> results = runFlatMapFunction(new DiffPerElement<>(ALL, ALL, dimension), testElement);
     assertEquals(1, results.size());
     E result = results.get(0);
     assertSame(testElement, result); // The function should return the same instance.
@@ -145,7 +155,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     // The element will only be present in the first snapshot, it is "removed".
     testElement = elementFactory.get();
     testElement.setValidTime(TEST_TIME);
-    results = runFlatMapFunction(new DiffPerElement<>(ALL, NONE), testElement);
+    results = runFlatMapFunction(new DiffPerElement<>(ALL, NONE, dimension), testElement);
     assertEquals(1, results.size());
     result = results.get(0);
     assertSame(testElement, result);
@@ -154,7 +164,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     // The element will only be present in the second snapshot, it is "added".
     testElement = elementFactory.get();
     testElement.setValidTime(TEST_TIME);
-    results = runFlatMapFunction(new DiffPerElement<>(NONE, ALL), testElement);
+    results = runFlatMapFunction(new DiffPerElement<>(NONE, ALL, dimension), testElement);
     assertEquals(1, results.size());
     result = results.get(0);
     assertSame(testElement, result);
@@ -163,7 +173,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     // The element will be present in neither snapshot, it should be removed.
     testElement = elementFactory.get();
     testElement.setValidTime(TEST_TIME);
-    results = runFlatMapFunction(new DiffPerElement<>(NONE, NONE), testElement);
+    results = runFlatMapFunction(new DiffPerElement<>(NONE, NONE, dimension), testElement);
     assertEquals(0, results.size());
   }
 
@@ -174,8 +184,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    * @param <E> The temporal element type to test the map function on.
    * @throws Exception when the execution in Flink fails.
    */
-  private <E extends TemporalElement> void runTestOnDataSet(Supplier<E> elementFactory)
-    throws Exception {
+  private <E extends TemporalElement> void runTestOnDataSet(Supplier<E> elementFactory) throws Exception {
     // A predicate used to check if a range was valid before 0 (unix timestamp).
     TemporalPredicate beforeEpoch = (from, to) -> from < 0;
     // A predicate used to check if a range was valid after 0 (unix timestamp).
@@ -189,19 +198,23 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     E neverValid = elementFactory.get();
     neverValid.setLabel("never");
     neverValid.setValidTime(Tuple2.of(0L, 0L));
+    neverValid.setTransactionTime(Tuple2.of(0L, 0L));
     E validBeforeEpoch = elementFactory.get();
     validBeforeEpoch.setLabel("before");
     validBeforeEpoch.setValidTime(Tuple2.of(-1L, 0L));
+    validBeforeEpoch.setTransactionTime(Tuple2.of(-1L, 0L));
     E validAfterEpoch = elementFactory.get();
     validAfterEpoch.setLabel("after");
     validAfterEpoch.setValidTime(Tuple2.of(0L, 1L));
+    validAfterEpoch.setTransactionTime(Tuple2.of(0L, 1L));
     E validInBoth = elementFactory.get();
     validInBoth.setLabel("both");
     validInBoth.setValidTime(Tuple2.of(-1L, 1L));
+    validInBoth.setTransactionTime(Tuple2.of(-1L, 1L));
     // A diff is called, comparing the dataset before and after epoch.
     List<E> result = getExecutionEnvironment()
       .fromElements(neverValid, validAfterEpoch, validBeforeEpoch, validInBoth)
-      .flatMap(new DiffPerElement<>(beforeEpoch, afterEpoch)).collect();
+      .flatMap(new DiffPerElement<>(beforeEpoch, afterEpoch, dimension)).collect();
     assertEquals(3, result.size());
     assertEquals(3, result.stream().map(Element::getLabel).distinct().count());
     // Check if each of the test elements has the correct property value set.
@@ -223,5 +236,10 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
         fail("Unknown label.");
       }
     }
+  }
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Iterable<Object> parameters() {
+    return Arrays.asList(new Object[] {TimeDimension.VALID_TIME, TimeDimension.TRANSACTION_TIME});
   }
 }

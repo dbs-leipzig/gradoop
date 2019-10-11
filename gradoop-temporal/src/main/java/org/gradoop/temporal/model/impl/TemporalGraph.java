@@ -35,11 +35,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphSt
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
-import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
-import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -184,11 +182,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  @Override
-  public TemporalGraph diff(TemporalPredicate firstSnapShot, TemporalPredicate secondSnapshot) {
-    return callForGraph(new Diff(firstSnapShot, secondSnapshot));
-  }
 
   @Override
   public TemporalGraphCollection query(String query, String constructionPattern,
