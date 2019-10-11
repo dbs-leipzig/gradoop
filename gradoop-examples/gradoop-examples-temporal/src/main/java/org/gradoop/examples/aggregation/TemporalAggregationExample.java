@@ -19,7 +19,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.TemporalCitiBikeGraph;
 import org.gradoop.examples.common.functions.TransformLongPropertiesToDateTime;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.AverageVertexDuration;
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxVertexTime;

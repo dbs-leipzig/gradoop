@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.GroupingKeys;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.AverageDuration;
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxTime;
