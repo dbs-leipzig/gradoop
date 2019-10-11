@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -52,7 +53,7 @@ public class GroupingBuilderTest {
    */
   @Test
   public void testGroupReduceStrategy() {
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .useVertexLabel(true)
       .build();
@@ -66,7 +67,7 @@ public class GroupingBuilderTest {
    */
   @Test
   public void testGroupCombineStrategy() {
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_COMBINE)
       .useVertexLabel(true)
       .build();
@@ -80,13 +81,13 @@ public class GroupingBuilderTest {
    */
   @Test
   public void testGroupByVertexLabels() {
-
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .build();
 
-    assertTrue(grouping.useVertexLabels());
+    assertTrue(grouping instanceof Grouping);
+    assertTrue(((Grouping) grouping).useVertexLabels());
   }
 
   /**
@@ -96,12 +97,13 @@ public class GroupingBuilderTest {
   @Test
   public void testGroupByEdgeLabels() {
 
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .useEdgeLabel(true)
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .build();
 
-    assertTrue(grouping.useEdgeLabels());
+    assertTrue(grouping instanceof Grouping);
+    assertTrue(((Grouping) grouping).useEdgeLabels());
   }
 
   /**
@@ -111,12 +113,13 @@ public class GroupingBuilderTest {
   @Test
   public void testGroupByVertexProperty() {
 
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .addVertexGroupingKey("")
       .build();
 
-    assertTrue(grouping.useVertexProperties());
+    assertTrue(grouping instanceof Grouping);
+    assertTrue(((Grouping) grouping).useVertexProperties());
   }
 
   /**
@@ -126,12 +129,13 @@ public class GroupingBuilderTest {
   @Test
   public void testGroupByEdgeProperty() {
 
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .addEdgeGroupingKey("")
       .build();
 
-    assertTrue(grouping.useEdgeProperties());
+    assertTrue(grouping instanceof Grouping);
+    assertTrue(((Grouping) grouping).useEdgeProperties());
   }
 
   /**
@@ -144,13 +148,16 @@ public class GroupingBuilderTest {
     String testGroupLabel = "testGroup";
     ImmutableList<String> testGroupingKeys = ImmutableList.of("a", "b");
 
-    Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> grouping =
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping =
       new Grouping.GroupingBuilder()
         .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .addVertexLabelGroup(testGroupLabel, testGroupingKeys)
         .build();
 
-    List<LabelGroup> vertexLabelGroups = grouping.getVertexLabelGroups();
+    assertTrue(grouping instanceof Grouping);
+    List<LabelGroup> vertexLabelGroups =
+      ((Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>) grouping)
+        .getVertexLabelGroups();
 
     // first element of vertexLabelGroups is always the defaultVertexLabelGroup, so the label
     // specific group should be at index 1.
@@ -170,13 +177,15 @@ public class GroupingBuilderTest {
     String testGroupLabel = "testGroup";
     ImmutableList<String> testGroupingKeys = ImmutableList.of("a", "b");
 
-    Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> grouping =
+    UnaryBaseGraphToBaseGraphOperator<LogicalGraph> grouping =
       new Grouping.GroupingBuilder()
         .setStrategy(GroupingStrategy.GROUP_REDUCE)
         .addEdgeLabelGroup(testGroupLabel, testGroupingKeys)
         .build();
 
-    List<LabelGroup> edgeLabelGroups = grouping.getEdgeLabelGroups();
+    List<LabelGroup> edgeLabelGroups =
+      ((Grouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>) grouping)
+        .getEdgeLabelGroups();
 
     // first element of edgeLabelGroups is always the defaultEdgeLabelGroup, so the label
     // specific group should be at index 1.
