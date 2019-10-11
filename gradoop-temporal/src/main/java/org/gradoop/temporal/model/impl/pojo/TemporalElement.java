@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.temporal.model.api.TimeDimension;
 
 import java.util.Objects;
 
@@ -121,6 +122,23 @@ public abstract class TemporalElement extends EPGMElement implements Element {
       throw new IllegalArgumentException("valid-from time can not be after valid-to time");
     }
     this.validTime = validTime;
+  }
+
+  /**
+   * Get the time tuple (from, to) regarding to the given {@link TimeDimension}.
+   *
+   * @param dimension the time dimension of the returned values
+   * @return a tuple 2 representing the time interval of the given dimension
+   */
+  public Tuple2<Long, Long> getTimeByDimension(TimeDimension dimension) {
+    switch (Objects.requireNonNull(dimension)) {
+    case VALID_TIME:
+      return this.validTime;
+    case TRANSACTION_TIME:
+      return this.transactionTime;
+    default:
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
+    }
   }
 
   /**

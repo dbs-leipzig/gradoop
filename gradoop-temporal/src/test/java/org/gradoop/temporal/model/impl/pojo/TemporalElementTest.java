@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.pojo;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -89,6 +90,55 @@ public class TemporalElementTest {
     elementMock.setTxTo(txTo);
     assertEquals(txFrom, elementMock.getTxFrom());
     assertEquals(txTo, elementMock.getTxTo());
+  }
+
+  /**
+   * Test {@link TemporalElement#getTimeByDimension(TimeDimension)} with valid time dimension.
+   */
+  @Test
+  public void testTimeGetterWithValidTimeDimension() {
+    Long validFrom = 42L;
+    Long validTo = 52L;
+
+    TemporalElement elementMock = mock(TemporalElement.class, withSettings()
+      .useConstructor(GradoopId.get(), null, null, null, null)
+      .defaultAnswer(CALLS_REAL_METHODS));
+
+    elementMock.setValidFrom(validFrom);
+    elementMock.setValidTo(validTo);
+
+    assertEquals(validFrom, elementMock.getTimeByDimension(TimeDimension.VALID_TIME).f0);
+    assertEquals(validTo, elementMock.getTimeByDimension(TimeDimension.VALID_TIME).f1);
+  }
+
+  /**
+   * Test {@link TemporalElement#getTimeByDimension(TimeDimension)} with tx time dimension.
+   */
+  @Test
+  public void testTimeGetterWithTxTimeDimension() {
+    Long txFrom = 42L;
+    Long txTo = 52L;
+
+    TemporalElement elementMock = mock(TemporalElement.class, withSettings()
+      .useConstructor(GradoopId.get(), null, null, null, null)
+      .defaultAnswer(CALLS_REAL_METHODS));
+
+    elementMock.setTransactionTime(new Tuple2<>(txFrom, txTo));
+
+    assertEquals(txFrom, elementMock.getTimeByDimension(TimeDimension.TRANSACTION_TIME).f0);
+    assertEquals(txTo, elementMock.getTimeByDimension(TimeDimension.TRANSACTION_TIME).f1);
+  }
+
+  /**
+   * Test {@link TemporalElement#getTimeByDimension(TimeDimension)} with null dimension.
+   */
+  @Test(expected = NullPointerException.class)
+  public void testTimeGetterWithNullTimeDimension() {
+    TemporalElement elementMock = mock(TemporalElement.class, withSettings()
+      .useConstructor(GradoopId.get(), null, null, null, null)
+      .defaultAnswer(CALLS_REAL_METHODS));
+
+    elementMock.getTimeByDimension(null);
   }
 
   /**

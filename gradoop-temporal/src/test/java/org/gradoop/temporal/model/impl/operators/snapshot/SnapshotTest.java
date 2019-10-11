@@ -15,8 +15,9 @@
  */
 package org.gradoop.temporal.model.impl.operators.snapshot;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.functions.predicates.All;
@@ -27,12 +28,21 @@ import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for the snapshot operator for temporal graphs.
@@ -47,16 +57,22 @@ public class SnapshotTest extends TemporalGradoopTestBase {
   public TemporalPredicate predicate;
 
   /**
-   * The variable name of the input graph.
+   * The temporal dimension to test.
    */
   @Parameterized.Parameter(1)
-  public String inputGraph;
+  public TimeDimension dimension;
+
+  /**
+   * The variable name of the input graph.
+   */
+  @Parameterized.Parameter(2)
+  public String[] expectedVertices;
 
   /**
    * The expected result graph for the ascii graph loader.
    */
-  @Parameterized.Parameter(2)
-  public String resultGraph;
+  @Parameterized.Parameter(3)
+  public String[] expectedEdges;
 
   /**
    * Run the test. Calls the snapshot operator using a predicate and compares results with the expected
@@ -66,40 +82,65 @@ public class SnapshotTest extends TemporalGradoopTestBase {
    */
   @Test
   public void runTest() throws Exception {
-    FlinkAsciiGraphLoader loader = getTemporalSocialNetworkLoader();
-    loader.appendToDatabaseFromString(resultGraph);
-    TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(inputGraph));
-    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
-    TemporalGraph result = input.callForGraph(new Snapshot(predicate));
-    collectAndAssertTrue(result.toLogicalGraph().equalsByElementData(expected));
+    TemporalGraph inputGraph = getTestGraphWithValues();
+
+    Collection<TemporalVertex> resultVertices = new HashSet<>();
+    Collection<TemporalEdge> resultEdges = new HashSet<>();
+
+    TemporalGraph resultGraph = inputGraph.callForGraph(new Snapshot(predicate, dimension));
+
+    resultGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
+    resultGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
+
+    getConfig().getExecutionEnvironment().execute();
+
+    List<String> resultVertexLabels =
+      resultVertices.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
+    List<String> resultEdgeLabels =
+      resultEdges.stream().map(EPGMElement::getLabel).collect(Collectors.toList());
+
+    assertEquals(expectedVertices.length, resultVertices.size());
+    assertEquals(expectedEdges.length, resultEdges.size());
+
+    Arrays.stream(expectedVertices).map(resultVertexLabels::contains).forEach(Assert::assertTrue);
+    Arrays.stream(expectedEdges).map(resultEdgeLabels::contains).forEach(Assert::assertTrue);
   }
 
   /**
    * Parameters for this parametrized test.
    *
-   * @return An array containing arrays in the form of {@code {predicate, inputGraph,
+   * @return An array containing arrays in the form of {@code {predicate, dimension, inputGraph,
    * extraGraphData}}.
    */
-  @Parameterized.Parameters(name = "{1} {0}")
+  @Parameterized.Parameters(name = "{0} ({1})")
   public static Iterable<Object[]> parameters() {
-    // Another test graph with more validTo times.
-    final String g4 = "g4[(t1:A {__valFrom: 1543700000000L, __valTo: 1543900000000L})-->" +
-      "(t2:B {__valFrom: 1543700000000L})-->(t3:C {__valTo: 1543800000000L})-->" +
-      "(t4:D {__valFrom: 1543600000000L, __valTo: 1543800000000L})-->" +
-      "(t5:F {__valFrom: 1543700000000L, __valTo: 1544000000000L})]";
     return Arrays.asList(new Object[][] {
-      {new All(), "g0",
-        "expected[(eve)-[eka]->(alice)-[akb]->(bob)(eve)-[ekb]->(bob)-[bka]->(alice)]"},
-      {new AsOf(1543600000000L), "g0", "expected[(alice)-[akb]->(bob)-[bka]->(alice)]"},
-      {new Between(1543500000000L, 1543800000000L), "g0",
-        "expected[(eve)-[eka]->(alice)-[akb]->(bob)-[bka]->(alice)]"},
-      {new ContainedIn(1543700000000L, 1543900000000L), "g4", g4 + "expected[(t1)]"},
-      {new CreatedIn(1543500000000L, 1543800000000L), "g0", "expected[(eve)(bob)]"},
-      {new DeletedIn(1543900000000L, 1543900000000L), "g4", g4 + "expected[(t1)]"},
-      {new FromTo(1543500000000L, 1543800000000L), "g0",
-        "expected[(alice)-[akb]->(bob)-[bka]->(alice)]"},
-      {new ValidDuring(1543600000000L, 1543800000000L), "g3",
-        "expected[(gps)-[:hasMember]->(carol)]"}
+      {new All(), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E4, E5}},
+      {new AsOf(3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
+      {new Between(2L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
+      {new ContainedIn(0L, 5L), TimeDimension.VALID_TIME, new String[] {V4}, new String[] {E3, E5}},
+      {new CreatedIn(2L, 5L), TimeDimension.VALID_TIME, new String[] {V3, V4}, new String[] {E4, E5}},
+      {new DeletedIn(6L, 10L), TimeDimension.VALID_TIME, new String[] {V3, V5}, new String[] {E2, E4}},
+      {new FromTo(1L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V5}, new String[] {E1}},
+      {new ValidDuring(3L, 8L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
+
+      {new All(), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E4, E5}},
+      {new AsOf(3L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E3, E5}},
+      {new Between(4L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E4, E5}},
+      {new ContainedIn(2L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V4, V5},
+        new String[] {E3, E4, E5}},
+      {new CreatedIn(0L, 5L), TimeDimension.TRANSACTION_TIME, new String[] {V2, V3, V4, V5},
+        new String[] {E1, E2, E3, E5}},
+      {new DeletedIn(5L, 10L), TimeDimension.TRANSACTION_TIME, new String[] {V3, V4, V5},
+        new String[] {E4, E5}},
+      {new FromTo(2L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
+        new String[] {E1, E3, E5}},
+      {new ValidDuring(1L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3},
+        new String[] {E1}}
     });
   }
 }

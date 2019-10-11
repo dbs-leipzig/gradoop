@@ -36,9 +36,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.FROM;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.TO;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.VALID_TIME;
+import static org.gradoop.temporal.model.api.TimeDimension.Field.FROM;
+import static org.gradoop.temporal.model.api.TimeDimension.Field.TO;
+import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
 
 /**
  * Tests for grouping using temporal key extractor functions.

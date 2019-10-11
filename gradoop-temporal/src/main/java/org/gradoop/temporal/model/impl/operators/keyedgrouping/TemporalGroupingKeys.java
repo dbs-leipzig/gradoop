@@ -17,7 +17,7 @@ package org.gradoop.temporal.model.impl.operators.keyedgrouping;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.api.functions.KeyFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.DurationKeyFunction;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.TimeIntervalKeyFunction;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.TimeStampKeyFunction;

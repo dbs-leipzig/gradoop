@@ -19,7 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
@@ -86,8 +86,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Temporal attribute " + timeDimension +
-        " is not supported by this aggregate function.");
+      throw new IllegalArgumentException("Unknown dimension [" + timeDimension + "].");
     }
     switch (field) {
     case FROM:
@@ -95,7 +94,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
     case TO:
       return PropertyValue.create(timeInterval.f1);
     default:
-      throw new IllegalArgumentException("Field " + field + " is not supported for time intervals.");
+      throw new IllegalArgumentException("Field [" + field + "] is not supported for time intervals.");
     }
   }
 
