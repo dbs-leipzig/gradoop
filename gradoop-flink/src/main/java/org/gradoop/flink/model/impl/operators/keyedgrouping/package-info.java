@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
-public class GroupingGroupReduceTest extends LabelSpecificWithCrossGroupingTestBase {
-
-  @Override
-  public GroupingStrategy getStrategy() {
-    return GroupingStrategy.GROUP_REDUCE;
-  }
-}
+/**
+ * An implementation of the graph grouping operator supporting grouping on keys extracted from graph-elements
+ * with user-defined key functions.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping;
