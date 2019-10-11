@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
-public class GroupingGroupReduceTest extends LabelSpecificWithCrossGroupingTestBase {
-
-  @Override
-  public GroupingStrategy getStrategy() {
-    return GroupingStrategy.GROUP_REDUCE;
-  }
-}
+/**
+ * Contains the implementation of the temporal grouping operator and related functions.
+ * <p>
+ * <b>Note:</b> This package only contains grouping key functions for temporal information. The actual
+ * implementation of the grouping operator is part of {@code gradoop-flink}.
+ */
+package org.gradoop.temporal.model.impl.operators.keyedgrouping;

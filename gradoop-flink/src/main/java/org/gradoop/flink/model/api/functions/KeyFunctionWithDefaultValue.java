@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.grouping;
-
-import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
+package org.gradoop.flink.model.api.functions;
 
 /**
- * Used to define the grouping strategy which is used for computing the summary graph.
+ * A (grouping) key function with a default value. The value will be used in some cases where the key can
+ * not be determined or when this key function is not applicable for an element.<p>
+ * This key function will work exactly like a {@link KeyFunction} in most cases.
+ *
+ * @param <E> The type of the object from which the grouping key is extracted.
+ * @param <K> The type of the extracted key.
  */
-public enum GroupingStrategy {
+public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K> {
+
   /**
-   * Grouping group reduce strategy.
+   * Get the default key value for all elements.
    *
-   * @see GroupingGroupReduce
+   * @return The default key.
    */
-  GROUP_REDUCE,
-  /**
-   * Grouping group combine strategy.
-   *
-   * @see GroupingGroupCombine
-   */
-  GROUP_COMBINE,
-  /**
-   * The grouping implementation based on tuples and key functions.
-   *
-   * @see KeyedGrouping
-   */
-  GROUP_WITH_KEYFUNCTIONS
+  K getDefaultKey();
 }
