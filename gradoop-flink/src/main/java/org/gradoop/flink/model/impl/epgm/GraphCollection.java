@@ -26,10 +26,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -138,29 +136,14 @@ public class GraphCollection implements
   //----------------------------------------------------------------------------
 
   @Override
-  public GraphCollection callForCollection(
-    UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> operator) {
+  public <T> T callForValue(UnaryBaseGraphCollectionToValueOperator<GraphCollection, T> operator) {
     return operator.execute(this);
   }
 
   @Override
-  public GraphCollection callForCollection(
-    BinaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> operator,
-    GraphCollection otherCollection) {
+  public <T> T callForValue(BinaryBaseGraphCollectionToValueOperator<GraphCollection, T> operator,
+                            GraphCollection otherCollection) {
     return operator.execute(this, otherCollection);
-  }
-
-  @Override
-  public <T> T callForCollection(
-    BinaryBaseGraphCollectionToValueOperator<GraphCollection, T> operator,
-    GraphCollection otherCollection) {
-    return operator.execute(this, otherCollection);
-  }
-
-  @Override
-  public LogicalGraph callForGraph(
-    UnaryBaseGraphCollectionToBaseGraphOperator<GraphCollection, LogicalGraph> operator) {
-    return operator.execute(this);
   }
 
   //----------------------------------------------------------------------------
