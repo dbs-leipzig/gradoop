@@ -22,10 +22,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -202,38 +200,23 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   //----------------------------------------------------------------------------
 
   @Override
+  public <T> T callForValue(UnaryBaseGraphCollectionToValueOperator<TemporalGraphCollection, T> operator) {
+    return operator.execute(this);
+  }
+
+  @Override
+  public <T> T callForValue(BinaryBaseGraphCollectionToValueOperator<TemporalGraphCollection, T> operator,
+                            TemporalGraphCollection otherCollection) {
+    return operator.execute(this, otherCollection);
+  }
+
+  @Override
   public GraphCollection toGraphCollection() {
     final GraphCollectionFactory collectionFactory = this.config.getGraphCollectionFactory();
     return collectionFactory.fromDataSets(
       getGraphHeads().map(new TemporalGraphHeadToGraphHead(collectionFactory.getGraphHeadFactory())),
       getVertices().map(new TemporalVertexToVertex(collectionFactory.getVertexFactory())),
       getEdges().map(new TemporalEdgeToEdge(collectionFactory.getEdgeFactory())));
-  }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    UnaryBaseGraphCollectionToBaseGraphCollectionOperator<TemporalGraphCollection> operator) {
-    return operator.execute(this);
-  }
-
-  @Override
-  public <T> T callForCollection(
-    BinaryBaseGraphCollectionToValueOperator<TemporalGraphCollection, T> operator,
-    TemporalGraphCollection otherCollection) {
-    return operator.execute(this, otherCollection);
-  }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    BinaryBaseGraphCollectionToBaseGraphCollectionOperator<TemporalGraphCollection> operator,
-    TemporalGraphCollection otherCollection) {
-    return operator.execute(this, otherCollection);
-  }
-
-  @Override
-  public TemporalGraph callForGraph(
-    UnaryBaseGraphCollectionToBaseGraphOperator<TemporalGraphCollection, TemporalGraph> operator) {
-    return operator.execute(this);
   }
 
   /**
