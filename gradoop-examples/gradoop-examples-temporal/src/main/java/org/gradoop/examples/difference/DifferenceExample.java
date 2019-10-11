@@ -77,8 +77,6 @@ public class DifferenceExample {
     // print graph, which now contains the union of both snapshots with annotated elements
     // _diff: 0 (in both snapshots); _diff: 1 (only in second snapshot); _diff: -1 (only in first snapshot)
     annotatedDiffGraph.print();
-
-    env.execute("Difference example.");
   }
 
 }

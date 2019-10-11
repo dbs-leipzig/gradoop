@@ -79,8 +79,5 @@ public class TemporalAggregationExample {
       // since the aggregated values are stored into the graph head, we only need to print them
       .getGraphHead()
       .print();
-
-    env.execute("Aggregation example");
   }
-
 }

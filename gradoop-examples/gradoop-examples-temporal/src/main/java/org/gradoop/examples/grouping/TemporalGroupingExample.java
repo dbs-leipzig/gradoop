@@ -101,7 +101,5 @@ public class TemporalGroupingExample {
 
     // print the grouped and aggregated graph
     groupedGraph.print();
-
-    env.execute("Temporal grouping example.");
   }
 }

@@ -70,7 +70,5 @@ public class SnapshotExample {
 
     // print graph, which now contains only trips happened between 10th and 20th August 2019
     retrievedSnapshot.print();
-
-    env.execute("Snapshot example.");
   }
 }
