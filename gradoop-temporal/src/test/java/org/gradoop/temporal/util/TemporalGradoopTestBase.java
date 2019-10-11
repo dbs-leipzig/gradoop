@@ -34,6 +34,9 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,6 +45,20 @@ import static org.junit.Assert.assertTrue;
  * A base class for tests using the temporal property graph model.
  */
 public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
+
+  /**
+   * The time format used for formatted date strings.
+   *
+   * @see SimpleDateFormat detailed description of date formats
+   */
+  public static final String DATE_FORMAT = "yyyy.MM.dd kk:mm:ss.SSS";
+
+  /**
+   * A formatter used to convert date strings to milliseconds.
+   *
+   * @see #DATE_FORMAT
+   */
+  private final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT, Locale.GERMANY);
 
   /**
    * The config used for tests.
@@ -186,4 +203,18 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     return getLoaderFromStream(inputStream);
   }
 
+  /**
+   * Convert a formatted date/time string to the time format (milliseconds since unix epoch) used by Gradoop.
+   * The date string is expected to be formatted according to {@link #DATE_FORMAT}.
+   *
+   * @param dateTimeString The date string.
+   * @return The time in milliseconds since unix epoch.
+   */
+  protected long asMillis(String dateTimeString) {
+    try {
+      return dateFormatter.parse(dateTimeString).getTime();
+    } catch (ParseException pe) {
+      throw new IllegalArgumentException("Failed to parse date.", pe);
+    }
+  }
 }

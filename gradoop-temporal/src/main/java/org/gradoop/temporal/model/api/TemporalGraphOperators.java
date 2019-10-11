@@ -15,8 +15,7 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
@@ -31,13 +30,17 @@ import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.Objects;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
-public interface TemporalGraphOperators {
+public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraphHead, TemporalVertex,
+  TemporalEdge, TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
@@ -257,27 +260,6 @@ public interface TemporalGraphOperators {
    * @return graph collection containing the output of the construct pattern
    */
   TemporalGraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
-
-  //----------------------------------------------------------------------------
-  // Auxiliary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a temporal graph using the given unary graph operator.
-   *
-   * @param operator unary graph to graph operator
-   * @return result of given operator
-   */
-  TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator);
-
-  /**
-   * Creates a graph collection from that graph using the given unary graph operator.
-   *
-   * @param operator unary graph to collection operator
-   * @return result of given operator
-   */
-  TemporalGraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<TemporalGraph, TemporalGraphCollection> operator);
 
   //----------------------------------------------------------------------------
   // Utilities
