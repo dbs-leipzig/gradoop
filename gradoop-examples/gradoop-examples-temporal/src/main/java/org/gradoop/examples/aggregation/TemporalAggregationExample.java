@@ -17,7 +17,7 @@ package org.gradoop.examples.aggregation;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.TemporalCitiBikeGraph;
-import org.gradoop.examples.aggregation.functions.TransformLongToDateTime;
+import org.gradoop.examples.common.functions.TransformLongPropertiesToDateTime;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.model.api.functions.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
@@ -72,7 +72,8 @@ public class TemporalAggregationExample {
         new MaxVertexTime("lastStart", TimeDimension.VALID_TIME, TimeDimension.Field.FROM),
         new MaxVertexTime("lastEnd", TimeDimension.VALID_TIME, TimeDimension.Field.TO))
       // since the aggregated values are 'long' values, we transform them into 'LocalDateTime' values
-      .transformGraphHead(new TransformLongToDateTime())
+      .transformGraphHead(
+        new TransformLongPropertiesToDateTime<>("earliestStart", "earliestEnd", "lastStart", "lastEnd"))
       // we additionally calculate the average trip duration
       .aggregate(new AverageVertexDuration("avgDuration", TimeDimension.VALID_TIME))
       // since the aggregated values are stored into the graph head, we only need to print them

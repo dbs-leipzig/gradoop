@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions related to the temporal aggregation operator example
+ * Examples related to the key-based grouping operator with temporal grouping key functions
  */
-package org.gradoop.examples.aggregation.functions;
+package org.gradoop.examples.grouping;

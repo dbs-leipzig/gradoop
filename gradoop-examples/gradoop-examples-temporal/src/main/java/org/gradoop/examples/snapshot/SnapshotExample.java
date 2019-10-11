@@ -44,7 +44,7 @@ public class SnapshotExample {
    *   <li>extract a snapshot of the temporal graph</li>
    *   <li>verifies the graph by removing dangling edges</li>
    * </ol>
-   * The result ing snapshot will be printed to console.
+   * The resulting snapshot will be printed to console.
    *
    * @param args Command line arguments (unused).
    *

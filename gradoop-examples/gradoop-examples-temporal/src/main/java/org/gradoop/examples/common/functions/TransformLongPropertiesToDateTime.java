@@ -13,26 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.examples.aggregation.functions;
+package org.gradoop.examples.common.functions;
 
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * A transformation function applicable on {@link TemporalGraphHead} instances that converts all properties of
- * type {@link Long} to a {@link LocalDateTime} value.
+ * A transformation function applicable on a {@link TemporalElement} that converts all properties matching
+ * the given list of keys from type {@link Long} to a {@link LocalDateTime} value.
+ *
+ * @param <TE> the type of the temporal element
  */
-public class TransformLongToDateTime implements TransformationFunction<TemporalGraphHead> {
+public class TransformLongPropertiesToDateTime<TE extends TemporalElement> implements TransformationFunction<TE> {
+  /**
+   * A list of property keys that will be converted.
+   */
+  private List<String> propertyNames;
+
+  /**
+   * Creates an instance of this temporal transformation function.
+   *
+   * @param property a set of property names which hold a {@link Long} value. Each value will be parsed
+   *                 to a {@link LocalDateTime} value.
+   */
+  public TransformLongPropertiesToDateTime(String... property) {
+    this.propertyNames = Arrays.asList(property);
+  }
 
   @Override
-  public TemporalGraphHead apply(TemporalGraphHead current, TemporalGraphHead transformed) {
+  public TE apply(TE current, TE transformed) {
     transformed.setLabel(current.getLabel());
     for (String propKey : current.getPropertyKeys()) {
-      if (current.getPropertyValue(propKey).isLong()) {
+      if (propertyNames.contains(propKey) && current.getPropertyValue(propKey).isLong()) {
         LocalDateTime parsedValue = Instant.ofEpochMilli(current.getPropertyValue(propKey).getLong())
           .atZone(ZoneId.systemDefault())
           .toLocalDateTime();
