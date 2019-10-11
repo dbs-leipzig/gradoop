@@ -23,9 +23,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -196,22 +195,15 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   //----------------------------------------------------------------------------
 
   @Override
-  public TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator) {
+  public <T> T callForValue(UnaryBaseGraphToValueOperator<TemporalGraph, T> operator) {
     return operator.execute(this);
   }
 
   @Override
-  public TemporalGraph callForGraph(BinaryBaseGraphToBaseGraphOperator<TemporalGraph> operator,
-    TemporalGraph otherGraph) {
+  public <T> T callForValue(BinaryBaseGraphToValueOperator<TemporalGraph, T> operator,
+                            TemporalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<TemporalGraph, TemporalGraphCollection> operator) {
-    return operator.execute(this);
-  }
-
 
   //----------------------------------------------------------------------------
   // Utilities

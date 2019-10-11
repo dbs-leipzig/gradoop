@@ -70,6 +70,8 @@ public class TemporalElementTest {
     props.set("k2", "v2");
     Long validFrom = 42L;
     Long validTo = 52L;
+    Long txFrom = 43L;
+    Long txTo = 53L;
 
     TemporalElement elementMock = mock(TemporalElement.class, withSettings()
       .useConstructor(id, label, props, null, null)
@@ -84,6 +86,10 @@ public class TemporalElementTest {
     assertEquals(validTo, elementMock.getValidTo());
     assertTrue(elementMock.getTxFrom() <= System.currentTimeMillis());
     assertEquals((Long) Long.MAX_VALUE, elementMock.getTxTo());
+    elementMock.setTxFrom(txFrom);
+    elementMock.setTxTo(txTo);
+    assertEquals(txFrom, elementMock.getTxFrom());
+    assertEquals(txTo, elementMock.getTxTo());
   }
 
   /**
