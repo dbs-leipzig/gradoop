@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.temporal.model.impl.operators.aggregation.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.api.functions.TimeDimension;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.api.TimeDimension;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment"> * Calculates the average duration of a time interval of a defined {@link TimeDimension} of all edges.</em>
@@ -41,7 +41,7 @@
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * @param aggregatePropertyKey The aggregate property key.</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * @param dimension            The time dimension to consider.</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/temporal/model/impl/operators/aggregation/functions/AverageEdgeDuration.html">AverageEdgeDuration</a>(String aggregatePropertyKey, <a href="../../../../../../../../org/gradoop/temporal/model/api/functions/TimeDimension.html">TimeDimension</a> dimension) {
+<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/temporal/model/impl/operators/aggregation/functions/AverageEdgeDuration.html">AverageEdgeDuration</a>(String aggregatePropertyKey, <a href="../../../../../../../../org/gradoop/temporal/model/api/TimeDimension.html">TimeDimension</a> dimension) {
 <a name="35" href="#35">35</a>      <strong class="jxr_keyword">super</strong>(aggregatePropertyKey, dimension);
 <a name="36" href="#36">36</a>    }
 <a name="37" href="#37">37</a>  }

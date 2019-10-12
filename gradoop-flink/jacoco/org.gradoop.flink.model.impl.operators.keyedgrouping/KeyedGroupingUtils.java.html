@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeyedGroupingUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping</a> &gt; <span class="el_source">KeyedGroupingUtils.java</span></div><h1>KeyedGroupingUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping;
+
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.UnlabeledGroupAggregatorWrapper;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.LabelSpecificKeyFunction;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+/**
+ * Utilities for the {@link KeyedGrouping} implementation.&lt;p&gt;
+ * This class provides functions used to convert arguments of the {@link Grouping} implementation to
+ * key functions and aggregate functions.
+ */
+public final class KeyedGroupingUtils {
+
+  /**
+   * No instances of this class are needed.
+   */
+  private KeyedGroupingUtils() {
+  }
+
+  /**
+   * Extract aggregate functions from a list of label groups.
+   *
+   * @param labelGroups A list of label groups.
+   * @return A list of aggregate functions defined in those label groups.
+   */
+  public static List&lt;AggregateFunction&gt; asAggregateFunctions(List&lt;LabelGroup&gt; labelGroups) {
+<span class="fc" id="L61">    LabelGroup defaultGroup = getDefaultGroupOrNull(labelGroups);</span>
+    List&lt;AggregateFunction&gt; functions;
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (defaultGroup == null) {</span>
+<span class="fc" id="L64">      functions = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L65">      AtomicInteger id = new AtomicInteger(0);</span>
+<span class="fc" id="L66">      Set&lt;String&gt; allLabels = labelGroups.stream().map(LabelGroup::getGroupingLabel)</span>
+<span class="fc" id="L67">        .collect(Collectors.toSet());</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      for (LabelGroup labelGroup : labelGroups) {</span>
+<span class="fc" id="L69">        final String currentLabel = labelGroup.getGroupingLabel();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (currentLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">          currentLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) {</span>
+<span class="fc" id="L72">          labelGroup.getAggregateFunctions().forEach(lga -&gt; functions.add(</span>
+<span class="fc" id="L73">            new UnlabeledGroupAggregatorWrapper(allLabels, lga, (short) id.getAndIncrement())));</span>
+        } else {
+<span class="fc" id="L75">          labelGroup.getAggregateFunctions().forEach(lga -&gt; functions.add(</span>
+<span class="fc" id="L76">            new LabelSpecificAggregatorWrapper(currentLabel, lga, (short) id.getAndIncrement())));</span>
+        }
+<span class="fc" id="L78">      }</span>
+<span class="fc" id="L79">    } else {</span>
+<span class="fc" id="L80">      functions = defaultGroup.getAggregateFunctions();</span>
+    }
+<span class="fc" id="L82">    return functions;</span>
+  }
+
+  /**
+   * Convert label groups to key functions.
+   *
+   * @param useLabels   Flag used to indicate whether labels of elements should be used as grouping keys.
+   * @param labelGroups The label groups to convert.
+   * @param &lt;T&gt; The element type for the key function.
+   * @return Key functions corresponding to those groups.
+   */
+  public static &lt;T extends Element&gt; List&lt;KeyFunction&lt;T, ?&gt;&gt; asKeyFunctions(
+    boolean useLabels, List&lt;LabelGroup&gt; labelGroups) {
+<span class="fc" id="L95">    LabelGroup defaultGroup = getDefaultGroupOrNull(labelGroups);</span>
+<span class="fc" id="L96">    List&lt;KeyFunction&lt;T, ?&gt;&gt; newKeys = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    if (defaultGroup == null) {</span>
+<span class="fc" id="L98">      newKeys.add(asKeyFunction(useLabels, labelGroups));</span>
+    } else {
+<span class="fc" id="L100">      defaultGroup.getPropertyKeys().forEach(k -&gt; newKeys.add(GroupingKeys.property(k)));</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">      if (useLabels) {</span>
+<span class="fc" id="L102">        newKeys.add(GroupingKeys.label());</span>
+      }
+    }
+<span class="fc" id="L105">    return newKeys;</span>
+  }
+
+  /**
+   * Create a label-specific key function from a list of label groups.
+   *
+   * @param useLabels   Should labels be used for grouping?
+   * @param labelGroups The label groups to convert.
+   * @param &lt;T&gt; The element type for the key function.
+   * @return The label-specific key function.
+   */
+  public static &lt;T extends Element&gt; LabelSpecificKeyFunction&lt;T&gt; asKeyFunction(
+    boolean useLabels, List&lt;LabelGroup&gt; labelGroups) {
+<span class="fc" id="L118">    Map&lt;String, List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt;&gt; keyFunctions = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    for (LabelGroup labelGroup : labelGroups) {</span>
+<span class="fc" id="L120">      final String groupingLabel = labelGroup.getGroupingLabel();</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">      if (keyFunctions.containsKey(groupingLabel)) {</span>
+<span class="nc" id="L122">        throw new UnsupportedOperationException(&quot;Duplicate grouping label: &quot; + groupingLabel);</span>
+      }
+<span class="fc" id="L124">      List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt; keysForLabel = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">      if ((groupingLabel.equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP) ||</span>
+<span class="fc bfc" id="L126" title="All 4 branches covered.">        groupingLabel.equals(Grouping.DEFAULT_EDGE_LABEL_GROUP)) &amp;&amp; useLabels) {</span>
+<span class="fc" id="L127">        keysForLabel.add(GroupingKeys.label());</span>
+      }
+<span class="fc" id="L129">      labelGroup.getPropertyKeys().forEach(k -&gt; keysForLabel.add(GroupingKeys.property(k)));</span>
+<span class="fc" id="L130">      keyFunctions.put(groupingLabel, keysForLabel);</span>
+<span class="fc" id="L131">    }</span>
+<span class="fc" id="L132">    Map&lt;String, String&gt; labelUpdateMap = labelGroups.stream()</span>
+<span class="fc" id="L133">      .collect(Collectors.toMap(LabelGroup::getGroupingLabel, LabelGroup::getGroupLabel));</span>
+<span class="fc" id="L134">    return new LabelSpecificKeyFunction&lt;&gt;(keyFunctions, labelUpdateMap);</span>
+  }
+
+  /**
+   * Create a new instance of the {@link KeyedGrouping} operator from a list of vertex and edge label groups.
+   * This factory method also accepts global aggregators which will be applied to each label group.
+   *
+   * @param useVertexLabels         Group by vertex label.
+   * @param useEdgeLabels           Group by edge label.
+   * @param vertexLabelGroups       The vertex label groups.
+   * @param edgeLabelGroups         The edge label groups.
+   * @param globalVertexAggregators A list of aggregate functions applicable for all vertex groups.
+   * @param globalEdgeAggregators   A list of aggregate functions applicable for all edge groups.
+   * @param &lt;G&gt;  The graph head type.
+   * @param &lt;V&gt;  The vertex type.
+   * @param &lt;E&gt;  The edge type.
+   * @param &lt;LG&gt; The graph type.
+   * @param &lt;GC&gt; The graph collection type.
+   * @return A new instance of the grouping operator.
+   */
+  public static &lt;
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+    GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; KeyedGrouping&lt;G, V, E, LG, GC&gt; createInstance(
+    boolean useVertexLabels, boolean useEdgeLabels,
+    List&lt;LabelGroup&gt; vertexLabelGroups, List&lt;LabelGroup&gt; edgeLabelGroups,
+    List&lt;AggregateFunction&gt; globalVertexAggregators, List&lt;AggregateFunction&gt; globalEdgeAggregators) {
+<span class="fc" id="L163">    List&lt;AggregateFunction&gt; vertexAggregators = asAggregateFunctions(vertexLabelGroups);</span>
+<span class="fc" id="L164">    vertexAggregators.addAll(globalVertexAggregators);</span>
+<span class="fc" id="L165">    List&lt;AggregateFunction&gt; edgeAggregators = asAggregateFunctions(edgeLabelGroups);</span>
+<span class="fc" id="L166">    edgeAggregators.addAll(globalEdgeAggregators);</span>
+<span class="fc" id="L167">    return new KeyedGrouping&lt;&gt;(</span>
+<span class="fc" id="L168">      asKeyFunctions(useVertexLabels, vertexLabelGroups), vertexAggregators,</span>
+<span class="fc" id="L169">      asKeyFunctions(useEdgeLabels, edgeLabelGroups), edgeAggregators);</span>
+  }
+
+  /**
+   * Get the default label group or return {@code null} if other label groups exist in the list.&lt;p&gt;
+   * This is used internally to check for label-specific grouping.
+   *
+   * @param labelGroups A list of label groups.
+   * @return The default label group, if it is the only label group and {@code null} otherwise
+   */
+  private static LabelGroup getDefaultGroupOrNull(List&lt;LabelGroup&gt; labelGroups) {
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (labelGroups.size() != 1) {</span>
+<span class="fc" id="L181">      return null;</span>
+    } else {
+<span class="fc" id="L183">      LabelGroup labelGroup = labelGroups.get(0);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      if (!(labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP) ||</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP))) {</span>
+<span class="nc" id="L186">        return null;</span>
+      }
+<span class="fc" id="L188">      return labelGroup;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

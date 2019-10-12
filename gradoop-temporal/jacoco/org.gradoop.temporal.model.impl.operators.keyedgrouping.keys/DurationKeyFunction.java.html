@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DurationKeyFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.keyedgrouping.keys</a> &gt; <span class="el_source">DurationKeyFunction.java</span></div><h1>DurationKeyFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.keyedgrouping.keys;
+
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.temporal.model.api.TimeDimension;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Objects;
+
+import static java.time.ZoneOffset.UTC;
+
+/**
+ * A key function extracting the duration of a temporal attribute.&lt;p&gt;
+ * This key function extracts a time interval from an element and calculates the duration of that element
+ * in a certain {@link TemporalUnit} (e.g. {@link ChronoUnit#SECONDS seconds}).
+ * Calculations will assume the time zone to be {@link java.time.ZoneOffset#UTC UTC}.&lt;p&gt;
+ * The final grouping key will be stored on the super element as a property with key
+ * {@code duration_INTERVAL_UNIT} where {@code INTERVAL} is the {@link TimeDimension} extracted and
+ * {@code UNIT} the {@link TemporalUnit} to be calculated.
+ *
+ * @param &lt;T&gt; The type of the temporal elements.
+ */
+public class DurationKeyFunction&lt;T extends TemporalElement&gt; implements KeyFunction&lt;T, Long&gt; {
+
+  /**
+   * A key function used to extract the interval from the element.
+   */
+  private final TimeIntervalKeyFunction&lt;T&gt; intervalExtractor;
+
+  /**
+   * The unit to get the duration as.
+   */
+  private final TemporalUnit timeUnit;
+
+  /**
+   * Should the duration be calculated from dates instead of {@link Instant}s? This will support
+   * units larger than {@link ChronoUnit#DAYS}.
+   */
+  private final boolean calculateAsDate;
+
+  /**
+   * Create a new instance of this grouping key function.
+   *
+   * @param timeDimension The time dimension to get the duration of.
+   * @param unit          The unit to get the duration as.
+   */
+<span class="fc" id="L69">  public DurationKeyFunction(TimeDimension timeDimension, TemporalUnit unit) {</span>
+<span class="fc" id="L70">    this.intervalExtractor = new TimeIntervalKeyFunction&lt;&gt;(timeDimension);</span>
+<span class="fc" id="L71">    this.timeUnit = Objects.requireNonNull(unit);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    if (unit instanceof ChronoUnit) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">      calculateAsDate = ((ChronoUnit) unit).compareTo(ChronoUnit.DAYS) &gt;= 0;</span>
+    } else {
+<span class="nc" id="L75">      calculateAsDate = false;</span>
+    }
+<span class="fc" id="L77">  }</span>
+
+  @Override
+  public Long getKey(T element) {
+<span class="fc" id="L81">    final Tuple2&lt;Long, Long&gt; interval = intervalExtractor.getKey(element);</span>
+<span class="fc" id="L82">    final Instant start = Instant.ofEpochMilli(interval.f0);</span>
+<span class="fc" id="L83">    final Instant end = Instant.ofEpochMilli(interval.f1);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (calculateAsDate) {</span>
+<span class="fc" id="L85">      return LocalDateTime.ofInstant(start, UTC).until(LocalDateTime.ofInstant(end, UTC), timeUnit);</span>
+    } else {
+<span class="fc" id="L87">      return start.until(end, timeUnit);</span>
+    }
+  }
+
+  @Override
+  public TypeInformation&lt;Long&gt; getType() {
+<span class="fc" id="L93">    return BasicTypeInfo.LONG_TYPE_INFO;</span>
+  }
+
+  @Override
+  public void addKeyToElement(T element, Object key) {
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (!(key instanceof Long)) {</span>
+<span class="nc" id="L99">      throw new IllegalArgumentException(&quot;Invalid type for key: &quot; + key.getClass().getSimpleName());</span>
+    }
+<span class="fc" id="L101">    element.setProperty(&quot;duration_&quot; + intervalExtractor + &quot;_&quot; + timeUnit, PropertyValue.create(key));</span>
+<span class="fc" id="L102">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

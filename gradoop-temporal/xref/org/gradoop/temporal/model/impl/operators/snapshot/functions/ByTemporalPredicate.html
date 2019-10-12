@@ -28,37 +28,46 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.api.functions.TemporalPredicate;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.pojo.TemporalElement;
-<a name="22" href="#22">22</a>  
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.util.Objects;
-<a name="24" href="#24">24</a>  
-<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * A filter function that accepts only elements matching a temporal predicate.</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; The temporal element type.</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ByTemporalPredicate&lt;T <strong class="jxr_keyword">extends</strong> TemporalElement&gt; implements CombinableFilter&lt;T&gt; {
-<a name="31" href="#31">31</a>  
-<a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Condition to be checked.</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="35" href="#35">35</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/temporal/model/api/functions/TemporalPredicate.html">TemporalPredicate</a> condition;
-<a name="36" href="#36">36</a>  
-<a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Creates a filter instance from a temporal predicate.</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * @param predicate The temporal predicate to check.</em>
-<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/temporal/model/impl/operators/snapshot/functions/ByTemporalPredicate.html">ByTemporalPredicate</a>(<a href="../../../../../../../../org/gradoop/temporal/model/api/functions/TemporalPredicate.html">TemporalPredicate</a> predicate) {
-<a name="43" href="#43">43</a>      condition = Objects.requireNonNull(predicate, <span class="jxr_string">"No predicate was given."</span>);
-<a name="44" href="#44">44</a>    }
-<a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>    @Override
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(T element) {
-<a name="48" href="#48">48</a>      Tuple2&lt;Long, Long&gt; validTime = element.getValidTime();
-<a name="49" href="#49">49</a>      <strong class="jxr_keyword">return</strong> condition.test(validTime.f0, validTime.f1);
-<a name="50" href="#50">50</a>    }
-<a name="51" href="#51">51</a>  }
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.api.TimeDimension;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.pojo.TemporalElement;
+<a name="23" href="#23">23</a>  
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> java.util.Objects;
+<a name="25" href="#25">25</a>  
+<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * A filter function that accepts only elements matching a temporal predicate.</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; The temporal element type.</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ByTemporalPredicate&lt;T <strong class="jxr_keyword">extends</strong> TemporalElement&gt; implements CombinableFilter&lt;T&gt; {
+<a name="32" href="#32">32</a>  
+<a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * Condition to be checked.</em>
+<a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/temporal/model/api/functions/TemporalPredicate.html">TemporalPredicate</a> condition;
+<a name="37" href="#37">37</a>  
+<a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * Specifies the time dimension that will be considered by the predicate.</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="41" href="#41">41</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../org/gradoop/temporal/model/api/TimeDimension.html">TimeDimension</a> dimension;
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>  
+<a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * Creates a filter instance from a temporal predicate and a time dimension.</em>
+<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * @param predicate The temporal predicate to check.</em>
+<a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * @param dimension The time dimension that will be considered by the predicate.</em>
+<a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/temporal/model/impl/operators/snapshot/functions/ByTemporalPredicate.html">ByTemporalPredicate</a>(<a href="../../../../../../../../org/gradoop/temporal/model/api/functions/TemporalPredicate.html">TemporalPredicate</a> predicate, <a href="../../../../../../../../org/gradoop/temporal/model/api/TimeDimension.html">TimeDimension</a> dimension) {
+<a name="51" href="#51">51</a>      <strong class="jxr_keyword">this</strong>.condition = Objects.requireNonNull(predicate, <span class="jxr_string">"No predicate given."</span>);
+<a name="52" href="#52">52</a>      <strong class="jxr_keyword">this</strong>.dimension = Objects.requireNonNull(dimension, <span class="jxr_string">"No time dimension given."</span>);
+<a name="53" href="#53">53</a>    }
+<a name="54" href="#54">54</a>  
+<a name="55" href="#55">55</a>    @Override
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(T element) {
+<a name="57" href="#57">57</a>      Tuple2&lt;Long, Long&gt; timeValues = element.getTimeByDimension(dimension);
+<a name="58" href="#58">58</a>      <strong class="jxr_keyword">return</strong> condition.test(timeValues.f0, timeValues.f1);
+<a name="59" href="#59">59</a>    }
+<a name="60" href="#60">60</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

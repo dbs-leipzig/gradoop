@@ -16,7 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 
 /**
  * Calculates the average duration of a time interval of a defined {@link TimeDimension} of all vertices.

@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.operators.snapshot.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
@@ -35,18 +36,26 @@ public class ByTemporalPredicate&lt;T extends TemporalElement&gt; implements Com
   private final TemporalPredicate condition;
 
   /**
-   * Creates a filter instance from a temporal predicate.
+   * Specifies the time dimension that will be considered by the predicate.
+   */
+  private TimeDimension dimension;
+
+
+  /**
+   * Creates a filter instance from a temporal predicate and a time dimension.
    *
    * @param predicate The temporal predicate to check.
+   * @param dimension The time dimension that will be considered by the predicate.
    */
-<span class="fc" id="L42">  public ByTemporalPredicate(TemporalPredicate predicate) {</span>
-<span class="fc" id="L43">    condition = Objects.requireNonNull(predicate, &quot;No predicate was given.&quot;);</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L50">  public ByTemporalPredicate(TemporalPredicate predicate, TimeDimension dimension) {</span>
+<span class="fc" id="L51">    this.condition = Objects.requireNonNull(predicate, &quot;No predicate given.&quot;);</span>
+<span class="fc" id="L52">    this.dimension = Objects.requireNonNull(dimension, &quot;No time dimension given.&quot;);</span>
+<span class="fc" id="L53">  }</span>
 
   @Override
   public boolean filter(T element) {
-<span class="fc" id="L48">    Tuple2&lt;Long, Long&gt; validTime = element.getValidTime();</span>
-<span class="fc" id="L49">    return condition.test(validTime.f0, validTime.f1);</span>
+<span class="fc" id="L57">    Tuple2&lt;Long, Long&gt; timeValues = element.getTimeByDimension(dimension);</span>
+<span class="fc" id="L58">    return condition.test(timeValues.f0, timeValues.f1);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

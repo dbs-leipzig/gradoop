@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeyedGrouping.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping</a> &gt; <span class="el_source">KeyedGrouping.java</span></div><h1>KeyedGrouping.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.functions.filters.Not;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperEdgeFromTuple;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperVertexFromTuple;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromEdges;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromVertices;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.GroupingConstants;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceEdgeTuples;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceVertexTuples;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdField;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
+/**
+ * Group a graph based on some key functions.&lt;p&gt;
+ * This operator is initialized with {@link List lists} of {@link KeyFunction key functions} and
+ * {@link AggregateFunction aggregate functions}. The output of this operator is the grouped graph
+ * (also called summarized graph or summary graph) which is calculated by reducing similar vertices and
+ * edges to single elements, called super-vertices and -edges respectively. Elements are considered similar
+ * if the values of the key functions are all equal.&lt;p&gt;
+ * The aggregate functions will summarize certain property values of similar elements and store the result
+ * on the super-elements.&lt;p&gt;
+ * This implementation will use tuples to represent elements during the execution of this operator.
+ * These tuples will contain IDs, the values of key functions and the aggregate values for each element
+ * and super-element.
+ *
+ * @param &lt;G&gt; The graph head type.
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ * @param &lt;LG&gt; The graph type.
+ * @param &lt;GC&gt; The graph collection type.
+ */
+public class KeyedGrouping&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+
+  /**
+   * The vertex grouping keys.
+   */
+  private final List&lt;KeyFunction&lt;V, ?&gt;&gt; vertexGroupingKeys;
+
+  /**
+   * The vertex aggregate functions.
+   */
+  private final List&lt;AggregateFunction&gt; vertexAggregateFunctions;
+
+  /**
+   * The edge grouping keys.
+   */
+  private final List&lt;KeyFunction&lt;E, ?&gt;&gt; edgeGroupingKeys;
+
+  /**
+   * The edge aggregate functions.
+   */
+  private final List&lt;AggregateFunction&gt; edgeAggregateFunctions;
+
+  /**
+   * Should a combine step be used before grouping? Note that this currently only affects edges.
+   */
+<span class="fc" id="L94">  private boolean useGroupCombine = true;</span>
+
+  /**
+   * Instantiate this grouping function.
+   *
+   * @param vertexGroupingKeys       The vertex grouping keys.
+   * @param vertexAggregateFunctions The vertex aggregate functions.
+   * @param edgeGroupingKeys         The edge grouping keys.
+   * @param edgeAggregateFunctions   The edge aggregate functions.
+   */
+  public KeyedGrouping(List&lt;KeyFunction&lt;V, ?&gt;&gt; vertexGroupingKeys,
+    List&lt;AggregateFunction&gt; vertexAggregateFunctions,
+    List&lt;KeyFunction&lt;E, ?&gt;&gt; edgeGroupingKeys,
+<span class="fc" id="L107">    List&lt;AggregateFunction&gt; edgeAggregateFunctions) {</span>
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {</span>
+      // Grouping with no keys is not supported, we therefore add a custom key function that returns a
+      // constant as a pseudo-key for every element.
+<span class="nc" id="L111">      this.vertexGroupingKeys = Collections.singletonList(GroupingKeys.nothing());</span>
+    } else {
+<span class="fc" id="L113">      this.vertexGroupingKeys = vertexGroupingKeys;</span>
+    }
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList() :</span>
+      vertexAggregateFunctions;
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">    this.edgeGroupingKeys = edgeGroupingKeys == null ? Collections.emptyList() :</span>
+      edgeGroupingKeys;
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    this.edgeAggregateFunctions = edgeAggregateFunctions == null ? Collections.emptyList() :</span>
+      edgeAggregateFunctions;
+<span class="fc" id="L121">  }</span>
+
+  @Override
+  public LG execute(LG graph) {
+    /* First we create tuple representations of each vertex.
+       Those tuples will then be grouped by the respective key fields (the fields containing the values
+       extracted by the key functions) and reduced to assign a super vertex and to calculate aggregates. */
+<span class="fc" id="L128">    DataSet&lt;Tuple&gt; verticesWithSuperVertex = graph.getVertices()</span>
+<span class="fc" id="L129">      .map(new BuildTuplesFromVertices&lt;&gt;(vertexGroupingKeys, vertexAggregateFunctions))</span>
+<span class="fc" id="L130">      .groupBy(getInternalVertexGroupingKeys())</span>
+<span class="fc" id="L131">      .reduceGroup(new ReduceVertexTuples&lt;&gt;(</span>
+<span class="fc" id="L132">        GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));</span>
+    /* Extract a mapping from vertex-ID to super-vertex-ID from the result of the vertex-reduce step. */
+<span class="fc" id="L134">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; idToSuperId = verticesWithSuperVertex</span>
+<span class="fc" id="L135">      .filter(new Not&lt;&gt;(new FilterSuperVertices&lt;&gt;()))</span>
+<span class="fc" id="L136">      .project(GroupingConstants.VERTEX_TUPLE_ID, GroupingConstants.VERTEX_TUPLE_SUPERID);</span>
+
+    /* Create tuple representations of each edge and update the source- and target-ids of those tuples with
+       with the mapping extracted in the previous step. Edges will then point from and to super-vertices. */
+<span class="fc" id="L140">    DataSet&lt;Tuple&gt; edgesWithUpdatedIds = graph.getEdges()</span>
+<span class="fc" id="L141">      .map(new BuildTuplesFromEdges&lt;&gt;(edgeGroupingKeys, edgeAggregateFunctions))</span>
+<span class="fc" id="L142">      .join(idToSuperId)</span>
+<span class="fc" id="L143">      .where(GroupingConstants.EDGE_TUPLE_SOURCEID)</span>
+<span class="fc" id="L144">      .equalTo(GroupingConstants.VERTEX_TUPLE_ID)</span>
+<span class="fc" id="L145">      .with(new UpdateIdField&lt;&gt;(GroupingConstants.EDGE_TUPLE_SOURCEID))</span>
+<span class="fc" id="L146">      .join(idToSuperId)</span>
+<span class="fc" id="L147">      .where(GroupingConstants.EDGE_TUPLE_TARGETID)</span>
+<span class="fc" id="L148">      .equalTo(GroupingConstants.VERTEX_TUPLE_ID)</span>
+<span class="fc" id="L149">      .with(new UpdateIdField&lt;&gt;(GroupingConstants.EDGE_TUPLE_TARGETID));</span>
+
+    /* Group the edge-tuples by the key fields and vertex IDs and reduce them to single elements. */
+<span class="fc" id="L152">    DataSet&lt;Tuple&gt; superEdgeTuples = edgesWithUpdatedIds</span>
+<span class="fc" id="L153">      .groupBy(getInternalEdgeGroupingKeys())</span>
+<span class="fc" id="L154">      .reduceGroup(new ReduceEdgeTuples&lt;&gt;(</span>
+<span class="fc" id="L155">        GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))</span>
+<span class="fc" id="L156">      .setCombinable(useGroupCombine);</span>
+
+    /* Rebuild super-vertices from vertex-tuples. Those new vertices contain the data extracted by the key
+       functions and aggregated by the aggregate functions. */
+<span class="fc" id="L160">    DataSet&lt;V&gt; superVertices = verticesWithSuperVertex</span>
+<span class="fc" id="L161">      .filter(new FilterSuperVertices&lt;&gt;())</span>
+<span class="fc" id="L162">      .map(new BuildSuperVertexFromTuple&lt;&gt;(vertexGroupingKeys, vertexAggregateFunctions,</span>
+<span class="fc" id="L163">        graph.getFactory().getVertexFactory()));</span>
+
+    /* Rebuild super-edges from edge-tuples. */
+<span class="fc" id="L166">    DataSet&lt;E&gt; superEdges = superEdgeTuples</span>
+<span class="fc" id="L167">      .map(new BuildSuperEdgeFromTuple&lt;&gt;(edgeGroupingKeys, edgeAggregateFunctions,</span>
+<span class="fc" id="L168">        graph.getFactory().getEdgeFactory()));</span>
+
+<span class="fc" id="L170">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
+  }
+
+  /**
+   * Get the internal grouping keys used for grouping the edge tuples.
+   *
+   * @return The grouping keys, as tuple indices.
+   */
+  private int[] getInternalEdgeGroupingKeys() {
+<span class="fc" id="L179">    return IntStream.range(0, GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size())</span>
+<span class="fc" id="L180">      .toArray();</span>
+  }
+
+  /**
+   * Get the internal grouping keys used for grouping the vertex tuples.
+   *
+   * @return The grouping keys, as tuple indices.
+   */
+  private int[] getInternalVertexGroupingKeys() {
+<span class="fc" id="L189">    return IntStream.range(GroupingConstants.VERTEX_TUPLE_RESERVED,</span>
+<span class="fc" id="L190">      GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();</span>
+  }
+
+  /**
+   * Enable or disable an optional combine step before the reduce step.
+   * Note that this currently only affects the edge reduce step.
+   * &lt;p&gt;
+   * The combine step is enabled by default.
+   *
+   * @param useGroupCombine {@code true}, if a combine step should be used.
+   * @return This operator.
+   */
+  public KeyedGrouping&lt;G, V, E, LG, GC&gt; setUseGroupCombine(boolean useGroupCombine) {
+<span class="nc" id="L203">    this.useGroupCombine = useGroupCombine;</span>
+<span class="nc" id="L204">    return this;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

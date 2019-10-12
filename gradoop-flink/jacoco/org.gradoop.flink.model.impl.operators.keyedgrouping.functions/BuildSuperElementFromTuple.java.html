@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildSuperElementFromTuple.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping.functions</a> &gt; <span class="el_source">BuildSuperElementFromTuple.java</span></div><h1>BuildSuperElementFromTuple.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateUtil;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Build the final super-elements from the internal tuple-based representation.
+ *
+ * @param &lt;T&gt; The input tuple type.
+ * @param &lt;E&gt; The final element type.
+ */
+abstract class BuildSuperElementFromTuple&lt;T extends Tuple, E extends Element&gt;
+  implements MapFunction&lt;T, E&gt;, ResultTypeQueryable&lt;E&gt; {
+
+  /**
+   * The data offset for tuples. Grouping keys and aggregate values are expected to start at this index.
+   */
+  private final int tupleDataOffset;
+
+  /**
+   * The grouping key functions.
+   */
+  private final List&lt;KeyFunction&lt;E, ?&gt;&gt; keyFunctions;
+
+  /**
+   * The aggregate functions for this element type.
+   */
+  private final List&lt;AggregateFunction&gt; aggregateFunctions;
+
+  /**
+   * Initialize this function.
+   *
+   * @param tupleDataOffset    The number of reserved fields in the tuple.
+   * @param groupingKeys       The grouping key functions.
+   * @param aggregateFunctions The aggregate functions.
+   */
+  BuildSuperElementFromTuple(int tupleDataOffset,
+    List&lt;KeyFunction&lt;E, ?&gt;&gt; groupingKeys,
+<span class="fc" id="L64">    List&lt;AggregateFunction&gt; aggregateFunctions) {</span>
+<span class="fc" id="L65">    this.tupleDataOffset = tupleDataOffset;</span>
+<span class="fc" id="L66">    this.keyFunctions = Objects.requireNonNull(groupingKeys);</span>
+<span class="fc" id="L67">    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);</span>
+<span class="fc" id="L68">  }</span>
+
+  /**
+   * Calculate the final aggregate values by calling post-processing functions and set them
+   * to the element. Also set grouping keys as properties on the element.
+   *
+   * @param element   The element to store the properties.
+   * @param tupleData The internal tuple-based representation of the element.
+   * @return The final element with all set properties.
+   */
+  E setAggregatePropertiesAndKeys(E element, T tupleData) {
+<span class="fc" id="L79">    element.setLabel(&quot;&quot;);</span>
+<span class="fc" id="L80">    element.setProperties(Properties.create());</span>
+    // Set grouping keys.
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    for (int i = 0; i &lt; keyFunctions.size(); i++) {</span>
+<span class="fc" id="L83">      final Object groupingKey = tupleData.getField(tupleDataOffset + i);</span>
+<span class="fc" id="L84">      keyFunctions.get(i).addKeyToElement(element, groupingKey);</span>
+    }
+    // Calculate aggregate values and set them.
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    for (int i = 0; i &lt; aggregateFunctions.size(); i++) {</span>
+<span class="fc" id="L88">      final AggregateFunction function = aggregateFunctions.get(i);</span>
+<span class="fc" id="L89">      final PropertyValue postAggregateValue = function.postAggregate(</span>
+<span class="fc" id="L90">        tupleData.getField(tupleDataOffset + keyFunctions.size() + i));</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      if (postAggregateValue != null) {</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue.isNull() ?</span>
+<span class="fc" id="L93">          AggregateUtil.getDefaultAggregate(function) : postAggregateValue);</span>
+      }
+    }
+<span class="fc" id="L96">    return element;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

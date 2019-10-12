@@ -24,7 +24,10 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -71,7 +74,7 @@ public interface BaseGraphOperators&lt;
    * @return projected base graph
    */
   default LG copy() {
-<span class="fc" id="L74">    return callForGraph(new Cloning&lt;&gt;());</span>
+<span class="fc" id="L77">    return callForGraph(new Cloning&lt;&gt;());</span>
   }
 
   /**
@@ -89,7 +92,7 @@ public interface BaseGraphOperators&lt;
    * @see Grouping
    */
   default LG groupBy(List&lt;String&gt; vertexGroupingKeys) {
-<span class="nc" id="L92">    return groupBy(vertexGroupingKeys, null);</span>
+<span class="nc" id="L95">    return groupBy(vertexGroupingKeys, null);</span>
   }
 
   /**
@@ -111,7 +114,7 @@ public interface BaseGraphOperators&lt;
    * @see Grouping
    */
   default LG groupBy(List&lt;String&gt; vertexGroupingKeys, List&lt;String&gt; edgeGroupingKeys) {
-<span class="nc" id="L114">    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);</span>
+<span class="nc" id="L117">    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);</span>
   }
 
   /**
@@ -142,24 +145,24 @@ public interface BaseGraphOperators&lt;
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
 
-<span class="fc" id="L145">    Objects.requireNonNull(vertexGroupingKeys, &quot;missing vertex grouping key(s)&quot;);</span>
-<span class="fc" id="L146">    Objects.requireNonNull(groupingStrategy, &quot;missing vertex grouping strategy&quot;);</span>
+<span class="fc" id="L148">    Objects.requireNonNull(vertexGroupingKeys, &quot;missing vertex grouping key(s)&quot;);</span>
+<span class="fc" id="L149">    Objects.requireNonNull(groupingStrategy, &quot;missing vertex grouping strategy&quot;);</span>
 
-<span class="fc" id="L148">    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();</span>
+<span class="fc" id="L151">    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();</span>
 
-<span class="fc" id="L150">    builder.addVertexGroupingKeys(vertexGroupingKeys);</span>
-<span class="fc" id="L151">    builder.setStrategy(groupingStrategy);</span>
+<span class="fc" id="L153">    builder.addVertexGroupingKeys(vertexGroupingKeys);</span>
+<span class="fc" id="L154">    builder.setStrategy(groupingStrategy);</span>
 
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">    if (edgeGroupingKeys != null) {</span>
-<span class="fc" id="L154">      builder.addEdgeGroupingKeys(edgeGroupingKeys);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    if (edgeGroupingKeys != null) {</span>
+<span class="fc" id="L157">      builder.addEdgeGroupingKeys(edgeGroupingKeys);</span>
     }
-<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    if (vertexAggregateFunctions != null) {</span>
-<span class="fc" id="L157">      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (vertexAggregateFunctions != null) {</span>
+<span class="fc" id="L160">      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);</span>
     }
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (edgeAggregateFunctions != null) {</span>
-<span class="fc" id="L160">      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    if (edgeAggregateFunctions != null) {</span>
+<span class="fc" id="L163">      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);</span>
     }
-<span class="fc" id="L162">    return callForGraph(builder.build());</span>
+<span class="fc" id="L165">    return callForGraph(builder.build());</span>
   }
 
   /**
@@ -175,7 +178,7 @@ public interface BaseGraphOperators&lt;
     TransformationFunction&lt;G&gt; graphHeadTransformationFunction,
     TransformationFunction&lt;V&gt; vertexTransformationFunction,
     TransformationFunction&lt;E&gt; edgeTransformationFunction) {
-<span class="fc" id="L178">    return callForGraph(new Transformation&lt;&gt;(</span>
+<span class="fc" id="L181">    return callForGraph(new Transformation&lt;&gt;(</span>
       graphHeadTransformationFunction,
       vertexTransformationFunction,
       edgeTransformationFunction));
@@ -189,7 +192,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformGraphHead(TransformationFunction&lt;G&gt; graphHeadTransformationFunction) {
-<span class="fc" id="L192">    return transform(graphHeadTransformationFunction, null, null);</span>
+<span class="fc" id="L195">    return transform(graphHeadTransformationFunction, null, null);</span>
   }
 
   /**
@@ -200,7 +203,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformVertices(TransformationFunction&lt;V&gt; vertexTransformationFunction) {
-<span class="fc" id="L203">    return transform(null, vertexTransformationFunction, null);</span>
+<span class="fc" id="L206">    return transform(null, vertexTransformationFunction, null);</span>
   }
 
   /**
@@ -211,7 +214,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformEdges(TransformationFunction&lt;E&gt; edgeTransformationFunction) {
-<span class="fc" id="L214">    return transform(null, null, edgeTransformationFunction);</span>
+<span class="fc" id="L217">    return transform(null, null, edgeTransformationFunction);</span>
   }
 
   /**
@@ -221,8 +224,8 @@ public interface BaseGraphOperators&lt;
    * @return vertex-induced subgraph
    */
   default LG vertexInducedSubgraph(FilterFunction&lt;V&gt; vertexFilterFunction) {
-<span class="fc" id="L224">    Objects.requireNonNull(vertexFilterFunction);</span>
-<span class="fc" id="L225">    return callForGraph(</span>
+<span class="fc" id="L227">    Objects.requireNonNull(vertexFilterFunction);</span>
+<span class="fc" id="L228">    return callForGraph(</span>
       new Subgraph&lt;&gt;(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
@@ -233,8 +236,8 @@ public interface BaseGraphOperators&lt;
    * @return edge-induced subgraph
    */
   default LG edgeInducedSubgraph(FilterFunction&lt;E&gt; edgeFilterFunction) {
-<span class="fc" id="L236">    Objects.requireNonNull(edgeFilterFunction);</span>
-<span class="fc" id="L237">    return callForGraph(new Subgraph&lt;&gt;(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));</span>
+<span class="fc" id="L239">    Objects.requireNonNull(edgeFilterFunction);</span>
+<span class="fc" id="L240">    return callForGraph(new Subgraph&lt;&gt;(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));</span>
   }
 
   /**
@@ -250,9 +253,9 @@ public interface BaseGraphOperators&lt;
    */
   default LG subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
                       FilterFunction&lt;E&gt; edgeFilterFunction) {
-<span class="fc" id="L253">    Objects.requireNonNull(vertexFilterFunction);</span>
-<span class="fc" id="L254">    Objects.requireNonNull(edgeFilterFunction);</span>
-<span class="fc" id="L255">    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);</span>
+<span class="fc" id="L256">    Objects.requireNonNull(vertexFilterFunction);</span>
+<span class="fc" id="L257">    Objects.requireNonNull(edgeFilterFunction);</span>
+<span class="fc" id="L258">    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);</span>
   }
 
   /**
@@ -269,7 +272,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
                       FilterFunction&lt;E&gt; edgeFilterFunction, Subgraph.Strategy strategy) {
-<span class="fc" id="L272">    return callForGraph(new Subgraph&lt;&gt;(vertexFilterFunction, edgeFilterFunction, strategy));</span>
+<span class="fc" id="L275">    return callForGraph(new Subgraph&lt;&gt;(vertexFilterFunction, edgeFilterFunction, strategy));</span>
   }
 
   /**
@@ -280,7 +283,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph with additional properties storing the aggregates
    */
   default LG aggregate(AggregateFunction... aggregateFunctions) {
-<span class="fc" id="L283">    return callForGraph(new Aggregation&lt;&gt;(aggregateFunctions));</span>
+<span class="fc" id="L286">    return callForGraph(new Aggregation&lt;&gt;(aggregateFunctions));</span>
   }
 
   /**
@@ -294,7 +297,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG reduceOnEdges(EdgeAggregateFunction function,
                            Neighborhood.EdgeDirection edgeDirection) {
-<span class="fc" id="L297">    return callForGraph(new ReduceEdgeNeighborhood&lt;&gt;(function, edgeDirection));</span>
+<span class="fc" id="L300">    return callForGraph(new ReduceEdgeNeighborhood&lt;&gt;(function, edgeDirection));</span>
   }
 
   /**
@@ -308,7 +311,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG reduceOnNeighbors(VertexAggregateFunction function,
                                Neighborhood.EdgeDirection edgeDirection) {
-<span class="fc" id="L311">    return callForGraph(new ReduceVertexNeighborhood&lt;&gt;(function, edgeDirection));</span>
+<span class="fc" id="L314">    return callForGraph(new ReduceVertexNeighborhood&lt;&gt;(function, edgeDirection));</span>
   }
 
   /**
@@ -320,7 +323,7 @@ public interface BaseGraphOperators&lt;
    * @return this graph with all dangling edges removed.
    */
   default LG verify() {
-<span class="fc" id="L323">    return callForGraph(new Verify&lt;&gt;());</span>
+<span class="fc" id="L326">    return callForGraph(new Verify&lt;&gt;());</span>
   }
 
   /**
@@ -332,7 +335,7 @@ public interface BaseGraphOperators&lt;
    * @return this graph with all dangling graph ids removed.
    */
   default LG verifyGraphContainment() {
-<span class="fc" id="L335">    return callForGraph(new VerifyGraphContainment&lt;&gt;());</span>
+<span class="fc" id="L338">    return callForGraph(new VerifyGraphContainment&lt;&gt;());</span>
   }
 
   //----------------------------------------------------------------------------
@@ -347,7 +350,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph containing all vertices and edges of the input graphs
    */
   default LG combine(LG otherGraph) {
-<span class="fc" id="L350">    return callForGraph(new Combination&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L353">    return callForGraph(new Combination&lt;&gt;(), otherGraph);</span>
   }
 
   /**
@@ -358,7 +361,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph that contains all vertices and edges that exist in both input graphs
    */
   default LG overlap(LG otherGraph) {
-<span class="fc" id="L361">    return callForGraph(new Overlap&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L364">    return callForGraph(new Overlap&lt;&gt;(), otherGraph);</span>
   }
 
   /**
@@ -370,12 +373,31 @@ public interface BaseGraphOperators&lt;
    * @return base that contains only vertices and edges that are not in the other graph
    */
   default LG exclude(LG otherGraph) {
-<span class="fc" id="L373">    return callForGraph(new Exclusion&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L376">    return callForGraph(new Exclusion&lt;&gt;(), otherGraph);</span>
   }
 
   //----------------------------------------------------------------------------
-  // Auxiliary Operators
+  // Call for Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Creates a value using the given unary graph to value operator.
+   *
+   * @param operator unary graph to value operator
+   * @param &lt;T&gt; return type
+   * @return result of given operator
+   */
+  &lt;T&gt; T callForValue(UnaryBaseGraphToValueOperator&lt;LG, T&gt; operator);
+
+  /**
+   * Calls the given binary graph to value operator using this graph and the input graph.
+   *
+   * @param operator   binary graph to value operator
+   * @param otherGraph second input graph for operator
+   * @param &lt;T&gt; return type
+   * @return result of given operator
+   */
+  &lt;T&gt; T callForValue(BinaryBaseGraphToValueOperator&lt;LG, T&gt; operator, LG otherGraph);
 
   /**
    * Creates a base graph using the given unary graph operator.
@@ -383,15 +405,28 @@ public interface BaseGraphOperators&lt;
    * @param operator unary graph to graph operator
    * @return result of given operator
    */
-  LG callForGraph(UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator);
+  default LG callForGraph(UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator) {
+<span class="fc" id="L409">    return callForValue(operator);</span>
+  }
 
   /**
-   * Creates a base graph from that graph and the input graph using the given binary operator.
+   * Creates a base graph from this graph and the input graph using the given binary operator.
    *
    * @param operator   binary graph to graph operator
    * @param otherGraph other graph
    * @return result of given operator
    */
-  LG callForGraph(BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator, LG otherGraph);
+  default LG callForGraph(BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator, LG otherGraph) {
+<span class="fc" id="L420">    return callForValue(operator, otherGraph);</span>
+  }
+  /**
+   * Creates a graph collection from this graph using the given unary graph operator.
+   *
+   * @param operator unary graph to collection operator
+   * @return result of given operator
+   */
+  default GC callForCollection(UnaryBaseGraphToBaseGraphCollectionOperator&lt;LG, GC&gt; operator) {
+<span class="fc" id="L429">    return callForValue(operator);</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

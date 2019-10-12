@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildSuperEdgeFromTuple.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping.functions</a> &gt; <span class="el_source">BuildSuperEdgeFromTuple.java</span></div><h1>BuildSuperEdgeFromTuple.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Build the final super-edge from the internal tuple-based representation.
+ *
+ * @param &lt;T&gt; The input tuple type.
+ * @param &lt;E&gt; The final edge type.
+ */
+public class BuildSuperEdgeFromTuple&lt;T extends Tuple, E extends Edge&gt;
+  extends BuildSuperElementFromTuple&lt;T, E&gt; {
+
+  /**
+   * The result edge type.
+   */
+  private final Class&lt;E&gt; edgeType;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final E reuse;
+
+  /**
+   * Initialize this function.
+   *
+   * @param groupingKeys       The grouping key functions.
+   * @param aggregateFunctions The aggregate functions.
+   * @param edgeFactory        A factory used to create new edges.
+   */
+  public BuildSuperEdgeFromTuple(List&lt;KeyFunction&lt;E, ?&gt;&gt; groupingKeys,
+    List&lt;AggregateFunction&gt; aggregateFunctions, EdgeFactory&lt;E&gt; edgeFactory) {
+<span class="fc" id="L57">    super(GroupingConstants.EDGE_TUPLE_RESERVED, groupingKeys, aggregateFunctions);</span>
+<span class="fc" id="L58">    reuse = Objects.requireNonNull(edgeFactory).createEdge(GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);</span>
+<span class="fc" id="L59">    edgeType = edgeFactory.getType();</span>
+<span class="fc" id="L60">  }</span>
+
+  @Override
+  public E map(T tuple) throws Exception {
+<span class="fc" id="L64">    E edge = setAggregatePropertiesAndKeys(reuse, tuple);</span>
+<span class="fc" id="L65">    edge.setId(GradoopId.get());</span>
+<span class="fc" id="L66">    edge.setSourceId(tuple.getField(GroupingConstants.EDGE_TUPLE_SOURCEID));</span>
+<span class="fc" id="L67">    edge.setTargetId(tuple.getField(GroupingConstants.EDGE_TUPLE_TARGETID));</span>
+<span class="fc" id="L68">    return edge;</span>
+  }
+
+  @Override
+  public TypeInformation&lt;E&gt; getProducedType() {
+<span class="fc" id="L73">    return TypeInformation.of(edgeType);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

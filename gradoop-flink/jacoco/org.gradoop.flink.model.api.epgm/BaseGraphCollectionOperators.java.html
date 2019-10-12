@@ -29,6 +29,7 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOpe
 import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -93,7 +94,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return collection containing requested base graphs
    */
   default GC getGraphs(final GradoopId... identifiers) {
-<span class="nc" id="L96">    return getGraphs(GradoopIdSet.fromExisting(identifiers));</span>
+<span class="nc" id="L97">    return getGraphs(GradoopIdSet.fromExisting(identifiers));</span>
   }
   /**
    * Extracts base graphs from collection using their identifiers.
@@ -114,7 +115,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return collection with base graphs that fulfil the predicate
    */
   default GC select(final FilterFunction&lt;G&gt; predicateFunction) {
-<span class="fc" id="L117">    return callForCollection(new Selection&lt;&gt;(predicateFunction));</span>
+<span class="fc" id="L118">    return callForCollection(new Selection&lt;&gt;(predicateFunction));</span>
   }
 
   /**
@@ -124,7 +125,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return subset of the graph collection
    */
   default GC limit(int n) {
-<span class="fc" id="L127">    return callForCollection(new Limit&lt;&gt;(n));</span>
+<span class="fc" id="L128">    return callForCollection(new Limit&lt;&gt;(n));</span>
   }
 
   /**
@@ -143,7 +144,7 @@ public interface BaseGraphCollectionOperators&lt;
    * graphs with a new property with name {@link AddMatchesToProperties#DEFAULT_KEY}
    */
   default GC query(String query, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
-<span class="fc" id="L146">    return callForCollection(new TransactionalPatternMatching&lt;&gt;(query, algorithm, returnEmbeddings));</span>
+<span class="fc" id="L147">    return callForCollection(new TransactionalPatternMatching&lt;&gt;(query, algorithm, returnEmbeddings));</span>
   }
 
   /**
@@ -155,7 +156,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling edges removed.
    */
   default GC verify() {
-<span class="fc" id="L158">    return callForCollection(new VerifyCollection&lt;&gt;());</span>
+<span class="fc" id="L159">    return callForCollection(new VerifyCollection&lt;&gt;());</span>
   }
 
   /**
@@ -167,7 +168,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling graph ids removed.
    */
   default GC verifyGraphsContainment() {
-<span class="fc" id="L170">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
+<span class="fc" id="L171">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
   }
 
   //----------------------------------------------------------------------------
@@ -182,7 +183,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return union of both collections
    */
   default GC union(GC otherCollection) {
-<span class="fc" id="L185">    return callForCollection(new Union&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L186">    return callForCollection(new Union&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -193,7 +194,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return intersection of both collections
    */
   default GC intersect(GC otherCollection) {
-<span class="fc" id="L196">    return callForCollection(new Intersection&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L197">    return callForCollection(new Intersection&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -207,7 +208,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return intersection of both collections
    */
   default GC intersectWithSmallResult(GC otherCollection) {
-<span class="fc" id="L210">    return callForCollection(new IntersectionBroadcast&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L211">    return callForCollection(new IntersectionBroadcast&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -218,7 +219,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return difference between that and the other collection
    */
   default GC difference(GC otherCollection) {
-<span class="fc" id="L221">    return callForCollection(new Difference&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L222">    return callForCollection(new Difference&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -232,7 +233,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return difference between that and the other collection
    */
   default GC differenceWithSmallResult(GC otherCollection) {
-<span class="fc" id="L235">    return callForCollection(new DifferenceBroadcast&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L236">    return callForCollection(new DifferenceBroadcast&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -242,7 +243,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return 1-element dataset containing true, if equal by graph ids
    */
   default DataSet&lt;Boolean&gt; equalsByGraphIds(GC otherCollection) {
-<span class="fc" id="L245">    return callForCollection(new CollectionEqualityByGraphIds&lt;&gt;(), otherCollection);</span>
+<span class="fc" id="L246">    return callForValue(new CollectionEqualityByGraphIds&lt;&gt;(), otherCollection);</span>
   }
 
   /**
@@ -252,7 +253,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return 1-element dataset containing true, if equal by element ids
    */
   default DataSet&lt;Boolean&gt; equalsByGraphElementIds(GC otherCollection) {
-<span class="fc" id="L255">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+<span class="fc" id="L256">    return callForValue(new CollectionEquality&lt;&gt;(</span>
       new GraphHeadToEmptyString&lt;&gt;(),
       new VertexToIdString&lt;&gt;(),
       new EdgeToIdString&lt;&gt;(), true), otherCollection);
@@ -270,7 +271,7 @@ public interface BaseGraphCollectionOperators&lt;
    * are equal or {@code false} if not
    */
   default DataSet&lt;Boolean&gt; equalsByGraphElementData(GC otherCollection) {
-<span class="fc" id="L273">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+<span class="fc" id="L274">    return callForValue(new CollectionEquality&lt;&gt;(</span>
       new GraphHeadToEmptyString&lt;&gt;(),
       new VertexToDataString&lt;&gt;(),
       new EdgeToDataString&lt;&gt;(), true), otherCollection);
@@ -288,78 +289,10 @@ public interface BaseGraphCollectionOperators&lt;
    * are equal or {@code false} if not
    */
   default DataSet&lt;Boolean&gt; equalsByGraphData(GC otherCollection) {
-<span class="fc" id="L291">    return callForCollection(new CollectionEquality&lt;&gt;(</span>
+<span class="fc" id="L292">    return callForValue(new CollectionEquality&lt;&gt;(</span>
       new GraphHeadToDataString&lt;&gt;(),
       new VertexToDataString&lt;&gt;(),
       new EdgeToDataString&lt;&gt;(), true), otherCollection);
-  }
-
-  //----------------------------------------------------------------------------
-  // Auxiliary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a graph collection using the given unary graph collection operator.
-   *
-   * @param operator unary graph collection to graph collection operator
-   * @return result of given operator
-   */
-  GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator);
-
-  /**
-   * Calls the given binary collection to value operator using that graph collection and the
-   * input graph collection.
-   *
-   * @param operator        binary collection to value operator
-   * @param otherCollection second input collection for operator
-   * @param &lt;T&gt; return type
-   * @return result of given operator
-   */
-  &lt;T&gt; T callForCollection(BinaryBaseGraphCollectionToValueOperator&lt;GC, T&gt; operator, GC otherCollection);
-
-  /**
-   * Calls the given binary collection to collection operator using that graph collection and the
-   * input graph collection.
-   *
-   * @param operator        binary collection to collection operator
-   * @param otherCollection second input collection for operator
-   * @return result of given operator
-   */
-  GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator,
-                       GC otherCollection);
-
-  /**
-   * Calls the given unary collection to graph operator for the collection.
-   *
-   * @param operator unary collection to graph operator
-   * @return result of given operator
-   */
-  LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator&lt;GC, LG&gt; operator);
-
-  /**
-   * Applies a given unary graph to graph operator (e.g., aggregate) on each
-   * base graph in the graph collection.
-   *
-   * @param operator applicable unary graph to graph operator
-   * @return collection with resulting logical graphs
-   */
-  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
-<span class="fc" id="L347">    return callForCollection(operator);</span>
-  }
-
-  /**
-   * Transforms a graph collection into a base graph by applying a
-   * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
-   *
-   * @param operator reducible binary graph to graph operator
-   * @return base graph returned by the operator
-   *
-   * @see Exclusion
-   * @see Overlap
-   * @see Combination
-   */
-  default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; operator) {
-<span class="fc" id="L362">    return callForGraph(operator);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -372,7 +305,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return distinct graph collection
    */
   default GC distinctById() {
-<span class="fc" id="L375">    return callForCollection(new DistinctById&lt;&gt;());</span>
+<span class="fc" id="L308">    return callForCollection(new DistinctById&lt;&gt;());</span>
   }
 
   /**
@@ -382,7 +315,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return distinct graph collection
    */
   default GC distinctByIsomorphism() {
-<span class="fc" id="L385">    return callForCollection(new DistinctByIsomorphism&lt;&gt;());</span>
+<span class="fc" id="L318">    return callForCollection(new DistinctByIsomorphism&lt;&gt;());</span>
   }
 
   /**
@@ -394,7 +327,91 @@ public interface BaseGraphCollectionOperators&lt;
    * @return grouped graph collection
    */
   default GC groupByIsomorphism(GraphHeadReduceFunction&lt;G&gt; reduceFunction) {
-<span class="fc" id="L397">    return callForCollection(new GroupByIsomorphism&lt;&gt;(reduceFunction));</span>
+<span class="fc" id="L330">    return callForCollection(new GroupByIsomorphism&lt;&gt;(reduceFunction));</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Call for Operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * Creates a value using the given unary collection to value operator.
+   *
+   * @param operator unary graph collection to value operator
+   * @param &lt;T&gt; return type
+   * @return result of given operator
+   */
+  &lt;T&gt; T callForValue(UnaryBaseGraphCollectionToValueOperator&lt;GC, T&gt; operator);
+
+  /**
+   * Calls the given binary collection to value operator using this graph collection and the
+   * input graph collection.
+   *
+   * @param operator        binary collection to value operator
+   * @param otherCollection second input collection for operator
+   * @param &lt;T&gt; return type
+   * @return result of given operator
+   */
+  &lt;T&gt; T callForValue(BinaryBaseGraphCollectionToValueOperator&lt;GC, T&gt; operator, GC otherCollection);
+
+  /**
+   * Calls the given unary collection to graph operator using this graph collection to get a graph of type
+   * {@link LG}.
+   *
+   * @param operator unary collection to graph operator
+   * @return result of given operator
+   */
+  default LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator&lt;GC, LG&gt; operator) {
+<span class="nc" id="L365">    return callForValue(operator);</span>
+  }
+
+  /**
+   * Creates a graph collection using the given unary graph collection operator.
+   *
+   * @param operator unary graph collection to graph collection operator
+   * @return result of given operator
+   */
+  default GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator) {
+<span class="fc" id="L375">    return callForValue(operator);</span>
+  }
+
+  /**
+   * Calls the given binary collection to collection operator using this graph collection and the
+   * input graph collection.
+   *
+   * @param operator        binary collection to collection operator
+   * @param otherCollection second input collection for operator
+   * @return result of given operator
+   */
+  default GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator,
+                               GC otherCollection) {
+<span class="fc" id="L388">    return callForValue(operator, otherCollection);</span>
+  }
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
+   * base graph in the graph collection.
+   *
+   * @param operator applicable unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
+<span class="fc" id="L399">    return callForValue(operator);</span>
+  }
+
+  /**
+   * Transforms a graph collection into a graph by applying a
+   * {@link ReducibleBinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
+   *
+   * @param operator reducible binary graph to graph operator
+   * @return base graph returned by the operator
+   *
+   * @see Exclusion
+   * @see Overlap
+   * @see Combination
+   */
+  default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; operator) {
+<span class="fc" id="L414">    return callForValue(operator);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

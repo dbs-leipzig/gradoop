@@ -16,7 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 
 /**
  * Aggregates the minimum value of a time value for temporal edges.

@@ -19,7 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
@@ -86,16 +86,15 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
 <span class="fc" id="L86">      timeInterval = element.getValidTime();</span>
 <span class="fc" id="L87">      break;</span>
     default:
-<span class="nc" id="L89">      throw new IllegalArgumentException(&quot;Temporal attribute &quot; + timeDimension +</span>
-        &quot; is not supported by this aggregate function.&quot;);
+<span class="nc" id="L89">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + timeDimension + &quot;].&quot;);</span>
     }
-<span class="pc bpc" id="L92" title="1 of 3 branches missed.">    switch (field) {</span>
+<span class="pc bpc" id="L91" title="1 of 3 branches missed.">    switch (field) {</span>
     case FROM:
-<span class="fc" id="L94">      return PropertyValue.create(timeInterval.f0);</span>
+<span class="fc" id="L93">      return PropertyValue.create(timeInterval.f0);</span>
     case TO:
-<span class="fc" id="L96">      return PropertyValue.create(timeInterval.f1);</span>
+<span class="fc" id="L95">      return PropertyValue.create(timeInterval.f1);</span>
     default:
-<span class="nc" id="L98">      throw new IllegalArgumentException(&quot;Field &quot; + field + &quot; is not supported for time intervals.&quot;);</span>
+<span class="nc" id="L97">      throw new IllegalArgumentException(&quot;Field [&quot; + field + &quot;] is not supported for time intervals.&quot;);</span>
     }
   }
 
@@ -110,12 +109,12 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    */
   PropertyValue applyAggregateWithDefaults(PropertyValue aggregate, PropertyValue increment,
     BiFunction&lt;PropertyValue, PropertyValue, PropertyValue&gt; comparison) {
-<span class="fc bfc" id="L113" title="All 4 branches covered.">    if (aggregate.isNull() || isDefaultTime(aggregate)) {</span>
-<span class="fc bfc" id="L114" title="All 2 branches covered.">      return isDefaultTime(increment) ? PropertyValue.NULL_VALUE : increment;</span>
-<span class="pc bpc" id="L115" title="1 of 4 branches missed.">    } else if (increment.isNull() || isDefaultTime(increment)) {</span>
-<span class="fc" id="L116">      return aggregate;</span>
+<span class="fc bfc" id="L112" title="All 4 branches covered.">    if (aggregate.isNull() || isDefaultTime(aggregate)) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      return isDefaultTime(increment) ? PropertyValue.NULL_VALUE : increment;</span>
+<span class="pc bpc" id="L114" title="2 of 4 branches missed.">    } else if (increment.isNull() || isDefaultTime(increment)) {</span>
+<span class="nc" id="L115">      return aggregate;</span>
     } else {
-<span class="fc" id="L118">      return comparison.apply(aggregate, increment);</span>
+<span class="fc" id="L117">      return comparison.apply(aggregate, increment);</span>
     }
   }
 
@@ -129,13 +128,13 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    * @return true, if the time semantic is valid time and the value equals a default temporal value.
    */
   private boolean isDefaultTime(PropertyValue value) {
-<span class="fc bfc" id="L132" title="All 2 branches covered.">    return timeDimension == TimeDimension.VALID_TIME &amp;&amp;</span>
-<span class="fc bfc" id="L133" title="All 4 branches covered.">      (value.equals(defaultFromValue) || value.equals(defaultToValue));</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    return timeDimension == TimeDimension.VALID_TIME &amp;&amp;</span>
+<span class="fc bfc" id="L132" title="All 4 branches covered.">      (value.equals(defaultFromValue) || value.equals(defaultToValue));</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L138">    return String.format(&quot;%s(%s.%s)&quot;, getClass().getSimpleName(), timeDimension, field);</span>
+<span class="nc" id="L137">    return String.format(&quot;%s(%s.%s)&quot;, getClass().getSimpleName(), timeDimension, field);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

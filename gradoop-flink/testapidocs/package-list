@@ -44,6 +44,8 @@ org.gradoop.flink.model.impl.operators.exclusion
 org.gradoop.flink.model.impl.operators.fusion
 org.gradoop.flink.model.impl.operators.grouping
 org.gradoop.flink.model.impl.operators.intersection
+org.gradoop.flink.model.impl.operators.keyedgrouping.functions
+org.gradoop.flink.model.impl.operators.keyedgrouping.keys
 org.gradoop.flink.model.impl.operators.limit
 org.gradoop.flink.model.impl.operators.matching
 org.gradoop.flink.model.impl.operators.matching.common.functions

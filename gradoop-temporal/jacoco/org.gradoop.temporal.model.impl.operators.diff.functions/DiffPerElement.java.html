@@ -20,6 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
@@ -27,13 +28,11 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import java.util.Objects;
 
 /**
- * Evaluates two temporal predicates per element of a data set and sets the
- * {@value Diff#PROPERTY_KEY} accordingly.
- * Values not matching any of the two predicates will be discarded.
+ * Evaluates two temporal predicates per element of a data set and sets the {@value Diff#PROPERTY_KEY}
+ * accordingly. Values not matching any of the two predicates will be discarded.
  *
  * @param &lt;E&gt; The element type.
  */
-@FunctionAnnotation.ReadFields(&quot;validTime&quot;)
 @FunctionAnnotation.NonForwardedFields(&quot;properties&quot;)
 public class DiffPerElement&lt;E extends TemporalElement&gt; implements FlatMapFunction&lt;E, E&gt; {
 
@@ -48,33 +47,52 @@ public class DiffPerElement&lt;E extends TemporalElement&gt; implements FlatMapF
   private final TemporalPredicate second;
 
   /**
+   * Specifies the time dimension that will be considered by the operator.
+   */
+  private TimeDimension dimension;
+
+  /**
    * Create an instance of this function, setting the two temporal predicates used to determine the snapshots.
    *
-   * @param first  The predicate used for the first snapshot.
-   * @param second The predicate used for the second snapshot.
+   * @param first     The predicate used for the first snapshot.
+   * @param second    The predicate used for the second snapshot.
+   * @param dimension The time dimension that will be used.
    */
-<span class="fc" id="L56">  public DiffPerElement(TemporalPredicate first, TemporalPredicate second) {</span>
-<span class="fc" id="L57">    this.first = Objects.requireNonNull(first);</span>
-<span class="fc" id="L58">    this.second = Objects.requireNonNull(second);</span>
-<span class="fc" id="L59">  }</span>
+<span class="fc" id="L61">  public DiffPerElement(TemporalPredicate first, TemporalPredicate second, TimeDimension dimension) {</span>
+<span class="fc" id="L62">    this.first = Objects.requireNonNull(first);</span>
+<span class="fc" id="L63">    this.second = Objects.requireNonNull(second);</span>
+<span class="fc" id="L64">    this.dimension = Objects.requireNonNull(dimension);</span>
+<span class="fc" id="L65">  }</span>
 
   @Override
   public void flatMap(E value, Collector&lt;E&gt; out) {
-<span class="fc" id="L63">    Tuple2&lt;Long, Long&gt; validTime = value.getValidTime();</span>
-<span class="fc" id="L64">    boolean inFirst = first.test(validTime.f0, validTime.f1);</span>
-<span class="fc" id="L65">    boolean inSecond = second.test(validTime.f0, validTime.f1);</span>
-    PropertyValue result;
-<span class="fc bfc" id="L67" title="All 4 branches covered.">    if (inFirst &amp;&amp; inSecond) {</span>
-<span class="fc" id="L68">      result = Diff.VALUE_EQUAL;</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">    } else if (inFirst) {</span>
-<span class="fc" id="L70">      result = Diff.VALUE_REMOVED;</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">    } else if (inSecond) {</span>
-<span class="fc" id="L72">      result = Diff.VALUE_ADDED;</span>
-    } else {
-<span class="fc" id="L74">      return;</span>
+    Tuple2&lt;Long, Long&gt; timeValues;
+
+<span class="pc bpc" id="L71" title="1 of 3 branches missed.">    switch (dimension) {</span>
+    case VALID_TIME:
+<span class="fc" id="L73">      timeValues = value.getValidTime();</span>
+<span class="fc" id="L74">      break;</span>
+    case TRANSACTION_TIME:
+<span class="fc" id="L76">      timeValues = value.getTransactionTime();</span>
+<span class="fc" id="L77">      break;</span>
+    default:
+<span class="nc" id="L79">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + dimension + &quot;].&quot;);</span>
     }
-<span class="fc" id="L76">    value.setProperty(Diff.PROPERTY_KEY, result);</span>
-<span class="fc" id="L77">    out.collect(value);</span>
-<span class="fc" id="L78">  }</span>
+
+<span class="fc" id="L82">    boolean inFirst = first.test(timeValues.f0, timeValues.f1);</span>
+<span class="fc" id="L83">    boolean inSecond = second.test(timeValues.f0, timeValues.f1);</span>
+    PropertyValue result;
+<span class="fc bfc" id="L85" title="All 4 branches covered.">    if (inFirst &amp;&amp; inSecond) {</span>
+<span class="fc" id="L86">      result = Diff.VALUE_EQUAL;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    } else if (inFirst) {</span>
+<span class="fc" id="L88">      result = Diff.VALUE_REMOVED;</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    } else if (inSecond) {</span>
+<span class="fc" id="L90">      result = Diff.VALUE_ADDED;</span>
+    } else {
+<span class="fc" id="L92">      return;</span>
+    }
+<span class="fc" id="L94">    value.setProperty(Diff.PROPERTY_KEY, result);</span>
+<span class="fc" id="L95">    out.collect(value);</span>
+<span class="fc" id="L96">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

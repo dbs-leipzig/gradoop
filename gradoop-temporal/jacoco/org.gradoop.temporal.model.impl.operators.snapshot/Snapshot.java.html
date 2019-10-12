@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.snapshot;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.snapshot.functions.ByTemporalPredicate;
@@ -27,7 +28,9 @@ import java.util.Objects;
 
 /**
  * Extracts a snapshot of a temporal graph using a given temporal predicate.
- * This will calculate the subgraph of a temporal graph induced by the predicate. The graph head is preserved.
+ * This will calculate the subgraph of a temporal graph induced by the predicate.
+ * &lt;p&gt;
+ * The graph head is preserved and will not be affected by the operator.
  * &lt;p&gt;
  * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
  * {@link TemporalGraph#verify()} operator to validate the graph.
@@ -40,26 +43,41 @@ public class Snapshot implements UnaryBaseGraphToBaseGraphOperator&lt;TemporalGr
   private final TemporalPredicate temporalPredicate;
 
   /**
+   * Specifies the time dimension that will be considered by the operator.
+   */
+  private TimeDimension dimension;
+
+  /**
    * Creates an instance of the snapshot operator with the given temporal predicate.
+   * The predicate is applied on the valid time dimension by default.
    *
    * @param predicate The temporal predicate.
    */
-<span class="fc" id="L47">  public Snapshot(TemporalPredicate predicate) {</span>
-<span class="fc" id="L48">    temporalPredicate = Objects.requireNonNull(predicate, &quot;No predicate was given.&quot;);</span>
-<span class="fc" id="L49">  }</span>
+  public Snapshot(TemporalPredicate predicate) {
+<span class="nc" id="L57">    this(predicate, TimeDimension.VALID_TIME);</span>
+<span class="nc" id="L58">  }</span>
+
+  /**
+   * Creates an instance of the snapshot operator with the given temporal predicate.
+   *
+   * @param predicate The temporal predicate.
+   * @param dimension The time dimension that will be considered by the operator.
+   */
+<span class="fc" id="L66">  public Snapshot(TemporalPredicate predicate, TimeDimension dimension) {</span>
+<span class="fc" id="L67">    this.temporalPredicate = Objects.requireNonNull(predicate, &quot;No predicate given.&quot;);</span>
+<span class="fc" id="L68">    this.dimension = Objects.requireNonNull(dimension, &quot;No time dimension given.&quot;);</span>
+<span class="fc" id="L69">  }</span>
 
   @Override
   public TemporalGraph execute(TemporalGraph superGraph) {
-<span class="fc" id="L53">    DataSet&lt;TemporalVertex&gt; vertices = superGraph.getVertices()</span>
+<span class="fc" id="L73">    DataSet&lt;TemporalVertex&gt; vertices = superGraph.getVertices()</span>
       // Filter vertices
-<span class="fc" id="L55">      .filter(new ByTemporalPredicate&lt;&gt;(temporalPredicate))</span>
-<span class="fc" id="L56">      .name(&quot;Snapshot vertices by [&quot; + temporalPredicate + &quot;]&quot;);</span>
-<span class="fc" id="L57">    DataSet&lt;TemporalEdge&gt; edges = superGraph.getEdges()</span>
+<span class="fc" id="L75">      .filter(new ByTemporalPredicate&lt;&gt;(temporalPredicate, dimension));</span>
+<span class="fc" id="L76">    DataSet&lt;TemporalEdge&gt; edges = superGraph.getEdges()</span>
       // Filter edges
-<span class="fc" id="L59">      .filter(new ByTemporalPredicate&lt;&gt;(temporalPredicate))</span>
-<span class="fc" id="L60">      .name(&quot;Snapshot edges by [&quot; + temporalPredicate + &quot;]&quot;);</span>
+<span class="fc" id="L78">      .filter(new ByTemporalPredicate&lt;&gt;(temporalPredicate, dimension));</span>
 
-<span class="fc" id="L62">    return superGraph.getFactory().fromDataSets(superGraph.getGraphHead(), vertices, edges);</span>
+<span class="fc" id="L80">    return superGraph.getFactory().fromDataSets(superGraph.getGraphHead(), vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

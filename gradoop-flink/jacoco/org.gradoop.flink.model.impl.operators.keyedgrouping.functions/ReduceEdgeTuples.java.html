@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReduceEdgeTuples.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping.functions</a> &gt; <span class="el_source">ReduceEdgeTuples.java</span></div><h1>ReduceEdgeTuples.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+
+import java.util.List;
+
+/**
+ * Reduce edge tuples, calculating aggregate values.
+ *
+ * @param &lt;T&gt; The tuple type.
+ */
+public class ReduceEdgeTuples&lt;T extends Tuple&gt; extends ReduceElementTuples&lt;T&gt;
+  implements GroupCombineFunction&lt;T, T&gt; {
+
+  /**
+   * Initialize this reduce function.
+   *
+   * @param tupleDataOffset    The data offset of the tuple. This will be
+   *                           {@value GroupingConstants#EDGE_TUPLE_RESERVED} {@code +} the
+   *                           number of the grouping keys.
+   * @param aggregateFunctions The vertex aggregate functions.
+   */
+  public ReduceEdgeTuples(int tupleDataOffset, List&lt;AggregateFunction&gt; aggregateFunctions) {
+<span class="fc" id="L42">    super(tupleDataOffset, aggregateFunctions);</span>
+<span class="fc" id="L43">  }</span>
+
+  @Override
+  public void combine(Iterable&lt;T&gt; values, Collector&lt;T&gt; out) throws Exception {
+<span class="fc" id="L47">    reduce(values, out);</span>
+<span class="fc" id="L48">  }</span>
+
+  @Override
+  public void reduce(Iterable&lt;T&gt; input, Collector&lt;T&gt; out) throws Exception {
+<span class="fc" id="L52">    T first = null;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (T inputTuple : input) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">      if (first == null) {</span>
+<span class="fc" id="L55">        first = inputTuple;</span>
+<span class="fc" id="L56">        continue;</span>
+      }
+<span class="fc" id="L58">      callAggregateFunctions(first, inputTuple);</span>
+<span class="fc" id="L59">    }</span>
+<span class="fc" id="L60">    out.collect(first);</span>
+<span class="fc" id="L61">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.operators.diff;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.diff.functions.DiffPerElement;
@@ -48,17 +49,17 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator&lt;TemporalGraph&
   /**
    * The property value used to indicate that an element was added in the second snapshot.
    */
-<span class="fc" id="L51">  public static final PropertyValue VALUE_ADDED = PropertyValue.create(1);</span>
+<span class="fc" id="L52">  public static final PropertyValue VALUE_ADDED = PropertyValue.create(1);</span>
 
   /**
    * The property value used to indicate that an element is equal in both snapshots.
    */
-<span class="fc" id="L56">  public static final PropertyValue VALUE_EQUAL = PropertyValue.create(0);</span>
+<span class="fc" id="L57">  public static final PropertyValue VALUE_EQUAL = PropertyValue.create(0);</span>
 
   /**
    * The property value used to indicate that an element was removed in the second snapshot.
    */
-<span class="fc" id="L61">  public static final PropertyValue VALUE_REMOVED = PropertyValue.create(-1);</span>
+<span class="fc" id="L62">  public static final PropertyValue VALUE_REMOVED = PropertyValue.create(-1);</span>
 
   /**
    * The predicate used to determine the first snapshot.
@@ -71,26 +72,41 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator&lt;TemporalGraph&
   private final TemporalPredicate secondPredicate;
 
   /**
+   * Specifies the time dimension that will be considered by the operator.
+   */
+  private TimeDimension dimension;
+
+  /**
    * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
+   * By default, valid times will be used by the predicate. To use transaction times, use
+   * {@link Diff#Diff(TemporalPredicate, TemporalPredicate, TimeDimension)} instead.
    *
    * @param firstPredicate  The predicate used for the first snapshot.
    * @param secondPredicate The predicate used for the second snapshot.
    */
-<span class="fc" id="L79">  public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate) {</span>
-<span class="fc" id="L80">    this.firstPredicate = Objects.requireNonNull(firstPredicate);</span>
-<span class="fc" id="L81">    this.secondPredicate = Objects.requireNonNull(secondPredicate);</span>
-<span class="fc" id="L82">  }</span>
+  public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate) {
+<span class="nc" id="L88">    this(firstPredicate, secondPredicate, TimeDimension.VALID_TIME);</span>
+<span class="nc" id="L89">  }</span>
+  /**
+   * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
+   *
+   * @param firstPredicate The predicate used for the first snapshot.
+   * @param secondPredicate The predicate used for the second snapshot.
+   * @param dimension The time dimension that will be used.
+   */
+<span class="fc" id="L97">  public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate, TimeDimension dimension) {</span>
+<span class="fc" id="L98">    this.firstPredicate = Objects.requireNonNull(firstPredicate, &quot;No first predicate given.&quot;);</span>
+<span class="fc" id="L99">    this.secondPredicate = Objects.requireNonNull(secondPredicate, &quot;No second predicate given.&quot;);</span>
+<span class="fc" id="L100">    this.dimension = Objects.requireNonNull(dimension, &quot;No time dimension given.&quot;);</span>
+<span class="fc" id="L101">  }</span>
 
   @Override
   public TemporalGraph execute(TemporalGraph graph) {
-<span class="fc" id="L86">    DataSet&lt;TemporalVertex&gt; transformedVertices = graph.getVertices()</span>
-<span class="fc" id="L87">      .flatMap(new DiffPerElement&lt;&gt;(firstPredicate, secondPredicate))</span>
-<span class="fc" id="L88">      .name(&quot;Diff vertices of [&quot; + firstPredicate + &quot;] and [&quot; + secondPredicate + &quot;]&quot;);</span>
-<span class="fc" id="L89">    DataSet&lt;TemporalEdge&gt; transformedEdges = graph.getEdges()</span>
-<span class="fc" id="L90">      .flatMap(new DiffPerElement&lt;&gt;(firstPredicate, secondPredicate))</span>
-<span class="fc" id="L91">      .name(&quot;Diff edges of [&quot; + firstPredicate + &quot;] and [&quot; + secondPredicate + &quot;]&quot;);</span>
-<span class="fc" id="L92">    return graph.getFactory()</span>
-<span class="fc" id="L93">      .fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);</span>
+<span class="fc" id="L105">    DataSet&lt;TemporalVertex&gt; transformedVertices = graph.getVertices()</span>
+<span class="fc" id="L106">      .flatMap(new DiffPerElement&lt;&gt;(firstPredicate, secondPredicate, dimension));</span>
+<span class="fc" id="L107">    DataSet&lt;TemporalEdge&gt; transformedEdges = graph.getEdges()</span>
+<span class="fc" id="L108">      .flatMap(new DiffPerElement&lt;&gt;(firstPredicate, secondPredicate, dimension));</span>
+<span class="fc" id="L109">    return graph.getFactory().fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

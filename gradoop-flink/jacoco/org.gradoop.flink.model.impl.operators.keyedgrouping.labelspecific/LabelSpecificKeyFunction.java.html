@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LabelSpecificKeyFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific</a> &gt; <span class="el_source">LabelSpecificKeyFunction.java</span></div><h1>LabelSpecificKeyFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
+
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.CompositeKeyFunctionWithDefaultValues;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * A grouping key function that extracts grouping keys only for specific labels.
+ *
+ * @param &lt;T&gt; The type of the elements to group.
+ */
+public class LabelSpecificKeyFunction&lt;T extends Element&gt; implements KeyFunction&lt;T, Tuple&gt; {
+
+  /**
+   * A label used to identify the default groups.
+   * If the label of an element is not a key in the map, the keys associated with label are used instead.
+   * &lt;p&gt;
+   * &lt;i&gt;Hint:&lt;/i&gt; For backwards compatibility either {@link Grouping#DEFAULT_VERTEX_LABEL_GROUP} or
+   * {@link Grouping#DEFAULT_EDGE_LABEL_GROUP} may be used instead.
+   */
+  public static final String DEFAULT_GROUP_LABEL = Grouping.DEFAULT_VERTEX_LABEL_GROUP;
+
+  /**
+   * A map assigning an internally used number to each label.
+   */
+  private final Map&lt;String, Integer&gt; labelToIndex;
+
+  /**
+   * A list of grouping key functions to be used for each label.
+   * The {@code 0}th element of this list is the key function used for the default label group.
+   */
+  private final List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt; keyFunctions;
+
+  /**
+   * An array of labels to be set on super elements.
+   */
+  private final String[] targetLabels;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple reuseTuple;
+
+  /**
+   * Create an instance of this key function.
+   *
+   * @param labelsWithKeys    A map assigning a list of key functions to each label.
+   * @param labelToSuperLabel A map assigning a label to be set on the super element for each label.
+   */
+  public LabelSpecificKeyFunction(Map&lt;String, List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt;&gt; labelsWithKeys,
+<span class="fc" id="L79">    Map&lt;String, String&gt; labelToSuperLabel) {</span>
+<span class="fc" id="L80">    final boolean hasDefaultVertexGroup = labelsWithKeys.containsKey(Grouping.DEFAULT_VERTEX_LABEL_GROUP);</span>
+<span class="fc" id="L81">    final boolean hasDefaultEdgeGroup = labelsWithKeys.containsKey(Grouping.DEFAULT_EDGE_LABEL_GROUP);</span>
+    final String defaultGroupLabel;
+<span class="fc bfc" id="L83" title="All 4 branches covered.">    if (hasDefaultEdgeGroup &amp;&amp; hasDefaultVertexGroup) {</span>
+<span class="fc" id="L84">      throw new IllegalArgumentException(&quot;The map contains both default label groups. Only one is expected.&quot;);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    } else if (hasDefaultVertexGroup) {</span>
+<span class="fc" id="L86">      defaultGroupLabel = Grouping.DEFAULT_VERTEX_LABEL_GROUP;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    } else if (hasDefaultEdgeGroup) {</span>
+<span class="fc" id="L88">      defaultGroupLabel = Grouping.DEFAULT_EDGE_LABEL_GROUP;</span>
+    } else {
+<span class="fc" id="L90">      throw new IllegalArgumentException(&quot;The map contains no default label groups. One is expected.&quot;);</span>
+    }
+<span class="fc" id="L92">    final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    if (totalLabels + 1 &gt; Tuple.MAX_ARITY) {</span>
+<span class="nc" id="L94">      throw new IllegalArgumentException(&quot;Too many labels. Tuple arity exceeded: &quot; + (totalLabels + 1) +</span>
+        &quot; (max.: &quot; + Tuple.MAX_ARITY + &quot;)&quot;);
+    }
+<span class="fc" id="L97">    int labelNr = 1;</span>
+<span class="fc" id="L98">    labelToIndex = new HashMap&lt;&gt;();</span>
+    // The list needs to be filled initially, the set(int,Object) function will fail otherwise.
+<span class="fc" id="L100">    keyFunctions = new ArrayList&lt;&gt;(Collections.nCopies(totalLabels, null));</span>
+<span class="fc" id="L101">    targetLabels = new String[totalLabels];</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    for (Map.Entry&lt;String, List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt;&gt; labelToKeys : labelsWithKeys.entrySet()) {</span>
+<span class="fc" id="L103">      final String key = labelToKeys.getKey();</span>
+<span class="fc" id="L104">      final List&lt;KeyFunctionWithDefaultValue&lt;T, ?&gt;&gt; keysForLabel = labelToKeys.getValue();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">      if (key.equals(defaultGroupLabel)) {</span>
+        // Ensure that the keys for the default group are always the 0th position.
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        keyFunctions.set(0, keysForLabel.size() == 1 ?</span>
+<span class="fc" id="L108">          keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues&lt;&gt;(keysForLabel));</span>
+<span class="fc" id="L109">        continue;</span>
+      }
+<span class="fc" id="L111">      labelToIndex.put(key, labelNr);</span>
+<span class="fc" id="L112">      targetLabels[labelNr] = key;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      keyFunctions.set(labelNr, keysForLabel.size() == 1 ?</span>
+<span class="fc" id="L114">        keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues&lt;&gt;(keysForLabel));</span>
+<span class="fc" id="L115">      labelNr++;</span>
+<span class="fc" id="L116">    }</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">    if (labelToSuperLabel != null) {</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">      for (Map.Entry&lt;String, String&gt; labelUpdateEntry : labelToSuperLabel.entrySet()) {</span>
+<span class="fc" id="L119">        Integer index = labelToIndex.get(labelUpdateEntry.getKey());</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (index == null) {</span>
+<span class="fc" id="L121">          continue;</span>
+        }
+<span class="fc" id="L123">        targetLabels[index] = labelUpdateEntry.getValue();</span>
+<span class="fc" id="L124">      }</span>
+    }
+<span class="fc" id="L126">    reuseTuple = Tuple.newInstance(1 + totalLabels);</span>
+<span class="fc" id="L127">  }</span>
+
+  @Override
+  public Tuple getKey(T element) {
+<span class="fc" id="L131">    Integer index = labelToIndex.get(element.getLabel());</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (int i = 0; i &lt; keyFunctions.size(); i++) {</span>
+<span class="fc" id="L133">      reuseTuple.setField(keyFunctions.get(i).getDefaultKey(), 1 + i);</span>
+    }
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    if (index == null) {</span>
+<span class="fc" id="L136">      index = 0;</span>
+    }
+    // The index is used to identify the key function, the 0th position in the tuple set to that index.
+<span class="fc" id="L139">    reuseTuple.setField(keyFunctions.get(index).getKey(element), 1 + index);</span>
+<span class="fc" id="L140">    reuseTuple.setField(index, 0);</span>
+<span class="fc" id="L141">    return reuseTuple;</span>
+  }
+
+  @Override
+  public void addKeyToElement(T element, Object key) {
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">    if (!(key instanceof Tuple)) {</span>
+<span class="nc" id="L147">      throw new IllegalArgumentException(&quot;Invalid type for key: &quot; + key.getClass().getSimpleName());</span>
+    }
+<span class="fc" id="L149">    Integer index = ((Tuple) key).getField(0);</span>
+<span class="fc" id="L150">    keyFunctions.get(index).addKeyToElement(element, ((Tuple) key).getField(1 + index));</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    if (index != 0) {</span>
+<span class="fc" id="L152">      element.setLabel(targetLabels[index]);</span>
+    }
+<span class="fc" id="L154">  }</span>
+
+  @Override
+  public TypeInformation&lt;Tuple&gt; getType() {
+<span class="fc" id="L158">    TypeInformation[] types = new TypeInformation[1 + keyFunctions.size()];</span>
+<span class="fc" id="L159">    types[0] = BasicTypeInfo.INT_TYPE_INFO;</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">    for (int index = 0; index &lt; keyFunctions.size(); index++) {</span>
+<span class="fc" id="L161">      types[1 + index] = keyFunctions.get(index).getType();</span>
+    }
+<span class="fc" id="L163">    return new TupleTypeInfo&lt;&gt;(types);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

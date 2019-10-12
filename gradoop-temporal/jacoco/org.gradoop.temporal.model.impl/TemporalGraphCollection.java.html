@@ -22,10 +22,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -89,26 +87,26 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    */
   TemporalGraphCollection(
     GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; layout,
-<span class="fc" id="L92">    TemporalGradoopConfig config) {</span>
-<span class="fc" id="L93">    this.layout = Preconditions.checkNotNull(layout);</span>
-<span class="fc" id="L94">    this.config = Preconditions.checkNotNull(config);</span>
-<span class="fc" id="L95">  }</span>
+<span class="fc" id="L90">    TemporalGradoopConfig config) {</span>
+<span class="fc" id="L91">    this.layout = Preconditions.checkNotNull(layout);</span>
+<span class="fc" id="L92">    this.config = Preconditions.checkNotNull(config);</span>
+<span class="fc" id="L93">  }</span>
 
   @Override
   public GradoopFlinkConfig getConfig() {
-<span class="fc" id="L99">    return this.config;</span>
+<span class="fc" id="L97">    return this.config;</span>
   }
 
   @Override
   public BaseGraphCollectionFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
     TemporalGraphCollection&gt; getFactory() {
-<span class="nc" id="L105">    return this.config.getTemporalGraphCollectionFactory();</span>
+<span class="nc" id="L103">    return this.config.getTemporalGraphCollectionFactory();</span>
   }
 
   @Override
   public BaseGraphFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
     TemporalGraphCollection&gt; getGraphFactory() {
-<span class="nc" id="L111">    return this.config.getTemporalGraphFactory();</span>
+<span class="nc" id="L109">    return this.config.getTemporalGraphFactory();</span>
   }
 
   /**
@@ -121,9 +119,9 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    * {@link Boolean#FALSE} otherwise.
    */
   public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="fc" id="L124">    return getGraphHeads().map(new True&lt;&gt;()).distinct()</span>
-<span class="fc" id="L125">      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())</span>
-<span class="fc" id="L126">      .map(new Not());</span>
+<span class="fc" id="L122">    return getGraphHeads().map(new True&lt;&gt;()).distinct()</span>
+<span class="fc" id="L123">      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())</span>
+<span class="fc" id="L124">      .map(new Not());</span>
   }
 
   /**
@@ -133,8 +131,8 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    * @throws IOException if the collection can't be written to the sink
    */
   public void writeTo(TemporalDataSink dataSink) throws IOException {
-<span class="fc" id="L136">    dataSink.write(this);</span>
-<span class="fc" id="L137">  }</span>
+<span class="fc" id="L134">    dataSink.write(this);</span>
+<span class="fc" id="L135">  }</span>
 
   /**
    * Writes the graph collection to the given data sink with an optional overwrite option.
@@ -144,57 +142,57 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    * @throws IOException if the collection can't be written to the sink
    */
   public void writeTo(TemporalDataSink dataSink, boolean overWrite) throws IOException {
-<span class="fc" id="L147">    dataSink.write(this, overWrite);</span>
-<span class="fc" id="L148">  }</span>
+<span class="fc" id="L145">    dataSink.write(this, overWrite);</span>
+<span class="fc" id="L146">  }</span>
 
   @Override
   public DataSet&lt;TemporalVertex&gt; getVertices() {
-<span class="fc" id="L152">    return this.layout.getVertices();</span>
+<span class="fc" id="L150">    return this.layout.getVertices();</span>
   }
 
   @Override
   public DataSet&lt;TemporalVertex&gt; getVerticesByLabel(String label) {
-<span class="fc" id="L157">    return this.layout.getVerticesByLabel(label);</span>
+<span class="fc" id="L155">    return this.layout.getVerticesByLabel(label);</span>
   }
 
   @Override
   public DataSet&lt;TemporalEdge&gt; getEdges() {
-<span class="fc" id="L162">    return this.layout.getEdges();</span>
+<span class="fc" id="L160">    return this.layout.getEdges();</span>
   }
 
   @Override
   public DataSet&lt;TemporalEdge&gt; getEdgesByLabel(String label) {
-<span class="fc" id="L167">    return this.layout.getEdgesByLabel(label);</span>
+<span class="fc" id="L165">    return this.layout.getEdgesByLabel(label);</span>
   }
 
   @Override
   public boolean isGVELayout() {
-<span class="nc" id="L172">    return this.layout.isGVELayout();</span>
+<span class="nc" id="L170">    return this.layout.isGVELayout();</span>
   }
 
   @Override
   public boolean isIndexedGVELayout() {
-<span class="nc" id="L177">    return this.layout.isIndexedGVELayout();</span>
+<span class="nc" id="L175">    return this.layout.isIndexedGVELayout();</span>
   }
 
   @Override
   public boolean isTransactionalLayout() {
-<span class="nc" id="L182">    return this.layout.isTransactionalLayout();</span>
+<span class="nc" id="L180">    return this.layout.isTransactionalLayout();</span>
   }
 
   @Override
   public DataSet&lt;TemporalGraphHead&gt; getGraphHeads() {
-<span class="fc" id="L187">    return this.layout.getGraphHeads();</span>
+<span class="fc" id="L185">    return this.layout.getGraphHeads();</span>
   }
 
   @Override
   public DataSet&lt;TemporalGraphHead&gt; getGraphHeadsByLabel(String label) {
-<span class="fc" id="L192">    return this.layout.getGraphHeadsByLabel(label);</span>
+<span class="fc" id="L190">    return this.layout.getGraphHeadsByLabel(label);</span>
   }
 
   @Override
   public DataSet&lt;GraphTransaction&gt; getGraphTransactions() {
-<span class="nc" id="L197">    return this.layout.getGraphTransactions();</span>
+<span class="nc" id="L195">    return this.layout.getGraphTransactions();</span>
   }
 
   //----------------------------------------------------------------------------
@@ -202,38 +200,23 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
   //----------------------------------------------------------------------------
 
   @Override
+  public &lt;T&gt; T callForValue(UnaryBaseGraphCollectionToValueOperator&lt;TemporalGraphCollection, T&gt; operator) {
+<span class="nc" id="L204">    return operator.execute(this);</span>
+  }
+
+  @Override
+  public &lt;T&gt; T callForValue(BinaryBaseGraphCollectionToValueOperator&lt;TemporalGraphCollection, T&gt; operator,
+                            TemporalGraphCollection otherCollection) {
+<span class="nc" id="L210">    return operator.execute(this, otherCollection);</span>
+  }
+
+  @Override
   public GraphCollection toGraphCollection() {
-<span class="fc" id="L206">    final GraphCollectionFactory collectionFactory = this.config.getGraphCollectionFactory();</span>
-<span class="fc" id="L207">    return collectionFactory.fromDataSets(</span>
-<span class="fc" id="L208">      getGraphHeads().map(new TemporalGraphHeadToGraphHead(collectionFactory.getGraphHeadFactory())),</span>
-<span class="fc" id="L209">      getVertices().map(new TemporalVertexToVertex(collectionFactory.getVertexFactory())),</span>
-<span class="fc" id="L210">      getEdges().map(new TemporalEdgeToEdge(collectionFactory.getEdgeFactory())));</span>
-  }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;TemporalGraphCollection&gt; operator) {
-<span class="nc" id="L216">    return operator.execute(this);</span>
-  }
-
-  @Override
-  public &lt;T&gt; T callForCollection(
-    BinaryBaseGraphCollectionToValueOperator&lt;TemporalGraphCollection, T&gt; operator,
-    TemporalGraphCollection otherCollection) {
-<span class="nc" id="L223">    return operator.execute(this, otherCollection);</span>
-  }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;TemporalGraphCollection&gt; operator,
-    TemporalGraphCollection otherCollection) {
-<span class="nc" id="L230">    return operator.execute(this, otherCollection);</span>
-  }
-
-  @Override
-  public TemporalGraph callForGraph(
-    UnaryBaseGraphCollectionToBaseGraphOperator&lt;TemporalGraphCollection, TemporalGraph&gt; operator) {
-<span class="nc" id="L236">    return operator.execute(this);</span>
+<span class="fc" id="L215">    final GraphCollectionFactory collectionFactory = this.config.getGraphCollectionFactory();</span>
+<span class="fc" id="L216">    return collectionFactory.fromDataSets(</span>
+<span class="fc" id="L217">      getGraphHeads().map(new TemporalGraphHeadToGraphHead(collectionFactory.getGraphHeadFactory())),</span>
+<span class="fc" id="L218">      getVertices().map(new TemporalVertexToVertex(collectionFactory.getVertexFactory())),</span>
+<span class="fc" id="L219">      getEdges().map(new TemporalEdgeToEdge(collectionFactory.getEdgeFactory())));</span>
   }
 
   /**
@@ -245,8 +228,8 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
   public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection) {
-<span class="fc" id="L248">    return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())</span>
-<span class="fc" id="L249">      .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);</span>
+<span class="fc" id="L231">    return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())</span>
+<span class="fc" id="L232">      .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);</span>
   }
 
   /**
@@ -255,7 +238,7 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
    * @throws Exception forwarded from dataset print
    */
   public void print() throws Exception {
-<span class="nc" id="L258">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L259">  }</span>
+<span class="nc" id="L241">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L242">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

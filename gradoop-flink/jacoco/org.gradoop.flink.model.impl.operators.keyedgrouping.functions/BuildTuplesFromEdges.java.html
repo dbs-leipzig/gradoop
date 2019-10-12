@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildTuplesFromEdges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.keyedgrouping.functions</a> &gt; <span class="el_source">BuildTuplesFromEdges.java</span></div><h1>BuildTuplesFromEdges.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
+
+import org.apache.flink.api.java.tuple.Tuple;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
+
+import java.util.List;
+
+/**
+ * Build a tuple-based representation of edges for grouping.
+ * Tuples will contain the source ID, the target ID, all grouping keys and all aggregate values.
+ *
+ * @param &lt;E&gt; The element type.
+ */
+public class BuildTuplesFromEdges&lt;E extends Edge&gt; extends BuildTuplesFromElements&lt;E&gt; {
+
+  /**
+   * Initialize this function, setting the grouping keys and aggregate functions.
+   *
+   * @param keys               The grouping keys.
+   * @param aggregateFunctions The aggregate functions used to determine the aggregate property
+   */
+  public BuildTuplesFromEdges(List&lt;KeyFunction&lt;E, ?&gt;&gt; keys, List&lt;AggregateFunction&gt; aggregateFunctions) {
+<span class="fc" id="L40">    super(GroupingConstants.EDGE_TUPLE_RESERVED, keys, aggregateFunctions);</span>
+<span class="fc" id="L41">  }</span>
+
+  @Override
+  public Tuple map(E element) throws Exception {
+<span class="fc" id="L45">    final Tuple result = super.map(element);</span>
+<span class="fc" id="L46">    result.setField(element.getSourceId(), GroupingConstants.EDGE_TUPLE_SOURCEID);</span>
+<span class="fc" id="L47">    result.setField(element.getTargetId(), GroupingConstants.EDGE_TUPLE_TARGETID);</span>
+<span class="fc" id="L48">    return result;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

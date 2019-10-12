@@ -120,6 +120,10 @@ org.gradoop.flink.model.impl.operators.grouping.functions
 org.gradoop.flink.model.impl.operators.grouping.tuples
 org.gradoop.flink.model.impl.operators.intersection
 org.gradoop.flink.model.impl.operators.intersection.functions
+org.gradoop.flink.model.impl.operators.keyedgrouping
+org.gradoop.flink.model.impl.operators.keyedgrouping.functions
+org.gradoop.flink.model.impl.operators.keyedgrouping.keys
+org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific
 org.gradoop.flink.model.impl.operators.limit
 org.gradoop.flink.model.impl.operators.matching
 org.gradoop.flink.model.impl.operators.matching.common
