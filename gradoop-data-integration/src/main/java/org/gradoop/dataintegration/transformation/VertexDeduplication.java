@@ -24,13 +24,13 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.dataintegration.transformation.functions.CreateMappingFromMarkedDuplicates;
 import org.gradoop.dataintegration.transformation.functions.GetPropertiesAsList;
 import org.gradoop.dataintegration.transformation.functions.MarkDuplicatesInGroup;
-import org.gradoop.dataintegration.transformation.functions.UpdateEdgeSource;
-import org.gradoop.dataintegration.transformation.functions.UpdateEdgeTarget;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeSourceUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeTargetUpdateJoin;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 
@@ -96,11 +96,11 @@ public class VertexDeduplication<
       .leftOuterJoin(vertexToDedupVertex)
       .where(new SourceId<>())
       .equalTo(0)
-      .with(new UpdateEdgeSource<>())
+      .with(new EdgeSourceUpdateJoin<>())
       .leftOuterJoin(vertexToDedupVertex)
       .where(new TargetId<>())
       .equalTo(0)
-      .with(new UpdateEdgeTarget<>());
+      .with(new EdgeTargetUpdateJoin<>());
 
     return graph.getFactory().fromDataSets(graph.getGraphHead(),
       otherVertices.union(deduplicatedVertices),

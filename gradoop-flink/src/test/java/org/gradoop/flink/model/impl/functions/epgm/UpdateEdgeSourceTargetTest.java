@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.transformation.functions;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
@@ -26,12 +26,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test for the {@link UpdateEdgeSource} and {@link UpdateEdgeTarget} functions.
+ * Test for the {@link EdgeSourceUpdateJoin} and {@link EdgeTargetUpdateJoin} functions.
  */
 public class UpdateEdgeSourceTargetTest extends GradoopFlinkTestBase {
 
   /**
-   * Test for {@link UpdateEdgeSource}.
+   * Test for {@link EdgeSourceUpdateJoin}.
    */
   @Test
   public void testUpdateSource() {
@@ -41,7 +41,7 @@ public class UpdateEdgeSourceTargetTest extends GradoopFlinkTestBase {
     GradoopId c = GradoopId.get();
     EPGMEdge edge = edgeFactory.createEdge(a, b);
     Tuple2<GradoopId, GradoopId> mapping = Tuple2.of(a, c);
-    UpdateEdgeSource<Edge> function = new UpdateEdgeSource<>();
+    EdgeSourceUpdateJoin<Edge> function = new EdgeSourceUpdateJoin<>();
     Edge updated = function.join(edge, mapping);
     assertEquals(c, updated.getSourceId());
     updated = function.join(edge, null);
@@ -49,7 +49,7 @@ public class UpdateEdgeSourceTargetTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test for {@link UpdateEdgeTarget}.
+   * Test for {@link EdgeTargetUpdateJoin}.
    */
   @Test
   public void testUpdateTarget() {
@@ -59,7 +59,7 @@ public class UpdateEdgeSourceTargetTest extends GradoopFlinkTestBase {
     GradoopId c = GradoopId.get();
     EPGMEdge edge = edgeFactory.createEdge(a, b);
     Tuple2<GradoopId, GradoopId> mapping = Tuple2.of(b, c);
-    UpdateEdgeTarget<Edge> function = new UpdateEdgeTarget<>();
+    EdgeTargetUpdateJoin<Edge> function = new EdgeTargetUpdateJoin<>();
     Edge updated = function.join(edge, mapping);
     assertEquals(c, updated.getTargetId());
     updated = function.join(edge, null);

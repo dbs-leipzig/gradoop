@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.transformation.functions;
+package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -22,18 +22,17 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * A join function updating the source id of an edge from a mapping in the form of a pair with fields:
- * <ol start="0">
- *   <li>the old source ID</li>
- *   <li>the new source ID</li>
- * </ol>
- * Note that this function can be used with an outer join, in that case the ID will not be updated.
+ * Joins edges with a Tuple2 that contains the id of the original edge
+ * source in its first field and the id of the new edge source vertex in its second.<p>
+ * The output is an edge with updated source id.<p>
+ * If the tuple is {@code null}, then the edge is not changed.
  *
- * @param <E> The edge type.
+ * @param <E> edge type
  */
 @FunctionAnnotation.NonForwardedFieldsFirst("sourceId")
 @FunctionAnnotation.ReadFieldsSecond("*")
-public class UpdateEdgeSource<E extends Edge> implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
+public class EdgeSourceUpdateJoin<E extends Edge>
+  implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 
   @Override
   public E join(E edge, Tuple2<GradoopId, GradoopId> mapping) {
