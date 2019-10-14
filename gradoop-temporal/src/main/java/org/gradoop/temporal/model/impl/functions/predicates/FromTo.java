@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the <b>FromTo</b> temporal predicate.
  * Given a time-interval, this predicate will match all intervals that were valid during that interval.
@@ -36,7 +40,7 @@ public class FromTo implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a FromTo instance with the given time stamps.
+   * Creates a <b>FromTo</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
@@ -44,6 +48,18 @@ public class FromTo implements TemporalPredicate {
   public FromTo(long from, long to) {
     queryFrom = from;
     queryTo = to;
+  }
+
+  /**
+   * Creates a <b>FromTo</b> instance with the given time-interval.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+  public FromTo(LocalDateTime from, LocalDateTime to) {
+    queryFrom = toEpochMilli(from);
+    queryTo = toEpochMilli(to);
   }
 
   @Override

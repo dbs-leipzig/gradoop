@@ -24,7 +24,10 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -374,8 +377,27 @@ public interface BaseGraphOperators<
   }
 
   //----------------------------------------------------------------------------
-  // Auxiliary Operators
+  // Call for Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Creates a value using the given unary graph to value operator.
+   *
+   * @param operator unary graph to value operator
+   * @param <T> return type
+   * @return result of given operator
+   */
+  <T> T callForValue(UnaryBaseGraphToValueOperator<LG, T> operator);
+
+  /**
+   * Calls the given binary graph to value operator using this graph and the input graph.
+   *
+   * @param operator   binary graph to value operator
+   * @param otherGraph second input graph for operator
+   * @param <T> return type
+   * @return result of given operator
+   */
+  <T> T callForValue(BinaryBaseGraphToValueOperator<LG, T> operator, LG otherGraph);
 
   /**
    * Creates a base graph using the given unary graph operator.
@@ -383,14 +405,27 @@ public interface BaseGraphOperators<
    * @param operator unary graph to graph operator
    * @return result of given operator
    */
-  LG callForGraph(UnaryBaseGraphToBaseGraphOperator<LG> operator);
+  default LG callForGraph(UnaryBaseGraphToBaseGraphOperator<LG> operator) {
+    return callForValue(operator);
+  }
 
   /**
-   * Creates a base graph from that graph and the input graph using the given binary operator.
+   * Creates a base graph from this graph and the input graph using the given binary operator.
    *
    * @param operator   binary graph to graph operator
    * @param otherGraph other graph
    * @return result of given operator
    */
-  LG callForGraph(BinaryBaseGraphToBaseGraphOperator<LG> operator, LG otherGraph);
+  default LG callForGraph(BinaryBaseGraphToBaseGraphOperator<LG> operator, LG otherGraph) {
+    return callForValue(operator, otherGraph);
+  }
+  /**
+   * Creates a graph collection from this graph using the given unary graph operator.
+   *
+   * @param operator unary graph to collection operator
+   * @return result of given operator
+   */
+  default GC callForCollection(UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> operator) {
+    return callForValue(operator);
+  }
 }

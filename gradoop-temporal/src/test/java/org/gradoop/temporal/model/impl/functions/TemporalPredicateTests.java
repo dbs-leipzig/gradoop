@@ -23,6 +23,9 @@ import org.gradoop.temporal.model.impl.functions.predicates.ContainedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
+import org.gradoop.temporal.model.impl.functions.predicates.Overlaps;
+import org.gradoop.temporal.model.impl.functions.predicates.Precedes;
+import org.gradoop.temporal.model.impl.functions.predicates.Succeeds;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
@@ -120,7 +123,7 @@ public class TemporalPredicateTests extends TemporalGradoopTestBase {
    */
   @Parameterized.Parameters(name = "{0} = {1}")
   public static Iterable<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
+    return Arrays.asList(new Object[][]{
       {new AsOf(1L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF)},
       {new AsOf(0L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_0_1,
         INTERVAL_MINUS1_1)},
@@ -138,7 +141,11 @@ public class TemporalPredicateTests extends TemporalGradoopTestBase {
         INTERVAL_MINUS1_0)},
       {new ValidDuring(-2L, 0L), Arrays.asList(INTERVAL_INF_0, INTERVAL_INF_INF)},
       {new ValidDuring(0L, 1L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_MINUS1_1,
-        INTERVAL_0_1)}
+        INTERVAL_0_1)},
+      {new Precedes(0L, 1L), Arrays.asList(INTERVAL_MINUS1_0, INTERVAL_INF_0)},
+      {new Overlaps(-1L, 1L), Arrays.asList(INTERVAL_INF_0, INTERVAL_MINUS1_0, INTERVAL_0_1, INTERVAL_0_INF,
+        INTERVAL_INF_INF, INTERVAL_MINUS1_1)},
+      {new Succeeds(-2L, 0L), Arrays.asList(INTERVAL_0_INF, INTERVAL_0_1)}
     });
   }
 }
