@@ -30,9 +30,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
@@ -177,17 +174,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   @Override
   public DataSet<TemporalEdge> getEdgesByLabel(String label) {
     return this.layout.getEdgesByLabel(label);
-  }
-
-  //----------------------------------------------------------------------------
-  // Unary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public TemporalGraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
-      true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
   }
 
   //----------------------------------------------------------------------------
