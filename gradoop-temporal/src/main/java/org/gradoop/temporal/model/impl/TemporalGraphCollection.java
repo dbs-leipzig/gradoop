@@ -26,9 +26,6 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOpe
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
@@ -107,21 +104,6 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   public BaseGraphFactory<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
     TemporalGraphCollection> getGraphFactory() {
     return this.config.getTemporalGraphFactory();
-  }
-
-  /**
-   * Returns a 1-element dataset containing a {@link Boolean} value which indicates if the graph collection
-   * is empty.
-   *
-   * The graph is considered empty if it contains no graphs.
-   *
-   * @return 1-element dataset containing {@link Boolean#TRUE} if the collection is empty and
-   * {@link Boolean#FALSE} otherwise.
-   */
-  public DataSet<Boolean> isEmpty() {
-    return getGraphHeads().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
-      .map(new Not());
   }
 
   /**

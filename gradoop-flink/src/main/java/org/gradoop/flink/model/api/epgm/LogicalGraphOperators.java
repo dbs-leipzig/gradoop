@@ -159,16 +159,6 @@ public interface LogicalGraphOperators
   LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs);
 
   /**
-   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
-   *
-   * A graph is considered empty, if it contains no vertices.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
-
-  /**
      * Writes the graph to given data sink.
      *
      * @param dataSink The data sink to which the graph should be written.
