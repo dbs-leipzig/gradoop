@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
+
 /**
  * Used to define the grouping strategy which is used for computing the summary graph.
  */
@@ -30,5 +32,11 @@ public enum GroupingStrategy {
    *
    * @see GroupingGroupCombine
    */
-  GROUP_COMBINE
+  GROUP_COMBINE,
+  /**
+   * The grouping implementation based on tuples and key functions.
+   *
+   * @see KeyedGrouping
+   */
+  GROUP_WITH_KEYFUNCTIONS
 }

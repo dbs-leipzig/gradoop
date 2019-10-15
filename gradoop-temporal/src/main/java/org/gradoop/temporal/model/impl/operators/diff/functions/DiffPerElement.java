@@ -20,6 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
@@ -27,13 +28,11 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import java.util.Objects;
 
 /**
- * Evaluates two temporal predicates per element of a data set and sets the
- * {@value Diff#PROPERTY_KEY} accordingly.
- * Values not matching any of the two predicates will be discarded.
+ * Evaluates two temporal predicates per element of a data set and sets the {@value Diff#PROPERTY_KEY}
+ * accordingly. Values not matching any of the two predicates will be discarded.
  *
  * @param <E> The element type.
  */
-@FunctionAnnotation.ReadFields("validTime")
 @FunctionAnnotation.NonForwardedFields("properties")
 public class DiffPerElement<E extends TemporalElement> implements FlatMapFunction<E, E> {
 
@@ -48,21 +47,40 @@ public class DiffPerElement<E extends TemporalElement> implements FlatMapFunctio
   private final TemporalPredicate second;
 
   /**
+   * Specifies the time dimension that will be considered by the operator.
+   */
+  private TimeDimension dimension;
+
+  /**
    * Create an instance of this function, setting the two temporal predicates used to determine the snapshots.
    *
-   * @param first  The predicate used for the first snapshot.
-   * @param second The predicate used for the second snapshot.
+   * @param first     The predicate used for the first snapshot.
+   * @param second    The predicate used for the second snapshot.
+   * @param dimension The time dimension that will be used.
    */
-  public DiffPerElement(TemporalPredicate first, TemporalPredicate second) {
+  public DiffPerElement(TemporalPredicate first, TemporalPredicate second, TimeDimension dimension) {
     this.first = Objects.requireNonNull(first);
     this.second = Objects.requireNonNull(second);
+    this.dimension = Objects.requireNonNull(dimension);
   }
 
   @Override
   public void flatMap(E value, Collector<E> out) {
-    Tuple2<Long, Long> validTime = value.getValidTime();
-    boolean inFirst = first.test(validTime.f0, validTime.f1);
-    boolean inSecond = second.test(validTime.f0, validTime.f1);
+    Tuple2<Long, Long> timeValues;
+
+    switch (dimension) {
+    case VALID_TIME:
+      timeValues = value.getValidTime();
+      break;
+    case TRANSACTION_TIME:
+      timeValues = value.getTransactionTime();
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
+    }
+
+    boolean inFirst = first.test(timeValues.f0, timeValues.f1);
+    boolean inSecond = second.test(timeValues.f0, timeValues.f1);
     PropertyValue result;
     if (inFirst && inSecond) {
       result = Diff.VALUE_EQUAL;

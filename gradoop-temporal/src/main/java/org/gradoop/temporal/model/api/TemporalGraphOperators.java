@@ -15,8 +15,7 @@
  */
 package org.gradoop.temporal.model.api;
 
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
@@ -31,27 +30,44 @@ import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
-
-import java.util.Objects;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
-public interface TemporalGraphOperators {
+public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraphHead, TemporalVertex,
+  TemporalEdge, TemporalGraph, TemporalGraphCollection> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
 
   /**
-   * Extracts a snapshot of this temporal graph using a given temporal predicate.
-   * This will calculate the subgraph induced by the predicate.
+   * Extracts a snapshot of this temporal graph using a given temporal predicate. The predicate is applied
+   * on the valid time dimension by default. To use the transaction time dimension, use
+   * {@link TemporalGraphOperators#snapshot(TemporalPredicate, TimeDimension)} instead.
+   * This operator will calculate the subgraph induced by the predicate.
    *
-   * @param predicate the temporal predicate to apply
+   * @param predicate the temporal predicate to apply on the valid times
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate) {
-    return callForGraph(new Snapshot(Objects.requireNonNull(predicate)));
+    return snapshot(predicate, TimeDimension.VALID_TIME);
+  }
+
+  /**
+   * Extracts a snapshot of this temporal graph using a given temporal predicate. The predicate is applied
+   * on the given time dimension.
+   * This operator will calculate the subgraph induced by the predicate.
+   *
+   * @param predicate the temporal predicate to apply
+   * @param dimension the dimension that is used
+   * @return the snapshot as a temporal graph
+   */
+  default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
+    return callForGraph(new Snapshot(predicate, dimension));
   }
 
   /**
@@ -154,8 +170,10 @@ public interface TemporalGraphOperators {
   /**
    * Compares two snapshots of this graph. Given two temporal predicates, this operation
    * will check if a graph element (vertex or edge) was added, removed or persists in the second
-   * snapshot compared to the first snapshot.
-   *
+   * snapshot compared to the first snapshot. The predicates are applied on the valid times. To use
+   * transaction time dimension, use
+   * {@link TemporalGraphOperators#diff(TemporalPredicate, TemporalPredicate, TimeDimension)}.
+   * <p>
    * This operation returns the union of both snapshots with the following changes:
    * A property with key {@value Diff#PROPERTY_KEY}
    * will be set on each graph element. Its value will be set to
@@ -172,11 +190,44 @@ public interface TemporalGraphOperators {
    *
    * @param firstSnapshot  The predicate used to determine the first snapshot.
    * @param secondSnapshot The predicate used to determine the second snapshot.
-   * @return A logical graph containing the union of vertex and edge sets of both snapshots,
+   * @return A temporal graph containing the union of vertex and edge sets of both snapshots,
    * defined by the given two predicate functions. A property with key
    * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
-  TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot);
+  default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot) {
+    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);
+  }
+
+  /**
+   * Compares two snapshots of this graph. Given two temporal predicates, this operation will check if a
+   * graph element (vertex or edge) was added, removed or persists in the second snapshot compared to the
+   * first snapshot. The predicates are applied on the specified time dimension.
+   * <p>
+   * This operation returns the union of both snapshots with the following changes:
+   * A property with key {@value Diff#PROPERTY_KEY} will be set on each graph element.
+   * Its value will be set to
+   * <ul>
+   *   <li>{@code 0}, if the element is present in both snapshots.</li>
+   *   <li>{@code 1}, if the element is present in the second, but not the first snapshot
+   *   (i.e. it was added since the first snapshot).</li>
+   *   <li>{@code -1}, if the element is present in the first, but not the second snapshot
+   *   (i.e. it was removed since the first snapshot).</li>
+   * </ul>
+   * Graph elements present in neither snapshot will be discarded.
+   * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
+   * {@code verify()} operator to validate the graph. The graph head is preserved.
+   *
+   * @param firstSnapshot The predicate used to determine the first snapshot.
+   * @param secondSnapshot The predicate used to determine the second snapshot.
+   * @param dimension The time dimension that will be considered by the predicates.
+   * @return A temporal graph containing the union of vertex and edge sets of both snapshots, defined by the
+   * given two predicate functions. A property with key {@link Diff#PROPERTY_KEY} is set on each graph
+   * element with a numerical value (-1, 0, 1) defined above.
+   */
+  default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
+    TimeDimension dimension) {
+    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));
+  }
 
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
@@ -257,27 +308,6 @@ public interface TemporalGraphOperators {
    * @return graph collection containing the output of the construct pattern
    */
   TemporalGraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
-
-  //----------------------------------------------------------------------------
-  // Auxiliary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a temporal graph using the given unary graph operator.
-   *
-   * @param operator unary graph to graph operator
-   * @return result of given operator
-   */
-  TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator);
-
-  /**
-   * Creates a graph collection from that graph using the given unary graph operator.
-   *
-   * @param operator unary graph to collection operator
-   * @return result of given operator
-   */
-  TemporalGraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<TemporalGraph, TemporalGraphCollection> operator);
 
   //----------------------------------------------------------------------------
   // Utilities

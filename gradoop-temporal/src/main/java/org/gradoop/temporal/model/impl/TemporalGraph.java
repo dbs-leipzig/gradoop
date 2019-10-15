@@ -23,10 +23,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -39,11 +37,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatte
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
-import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
-import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -193,11 +189,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   //----------------------------------------------------------------------------
 
   @Override
-  public TemporalGraph diff(TemporalPredicate firstSnapShot, TemporalPredicate secondSnapshot) {
-    return callForGraph(new Diff(firstSnapShot, secondSnapshot));
-  }
-
-  @Override
   public TemporalGraphCollection query(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
@@ -225,28 +216,15 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   //----------------------------------------------------------------------------
 
   @Override
+  public <T> T callForValue(UnaryBaseGraphToValueOperator<TemporalGraph, T> operator) {
+    return operator.execute(this);
+  }
+
+  @Override
   public <T> T callForValue(BinaryBaseGraphToValueOperator<TemporalGraph, T> operator,
                             TemporalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
-
-  @Override
-  public TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator) {
-    return operator.execute(this);
-  }
-
-  @Override
-  public TemporalGraph callForGraph(BinaryBaseGraphToBaseGraphOperator<TemporalGraph> operator,
-    TemporalGraph otherGraph) {
-    return operator.execute(this, otherGraph);
-  }
-
-  @Override
-  public TemporalGraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<TemporalGraph, TemporalGraphCollection> operator) {
-    return operator.execute(this);
-  }
-
 
   //----------------------------------------------------------------------------
   // Utilities

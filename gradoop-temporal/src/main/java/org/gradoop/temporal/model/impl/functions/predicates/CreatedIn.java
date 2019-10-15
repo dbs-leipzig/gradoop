@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the <b>CreatedIn</b> temporal predicate.
  * Given a certain time-interval, this predicate matches all intervals starting during that interval.
@@ -36,7 +40,7 @@ public class CreatedIn implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a CreatedIn instance with the given time stamps.
+   * Creates a <b>CreatedIn</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
@@ -44,6 +48,18 @@ public class CreatedIn implements TemporalPredicate {
   public CreatedIn(long from, long to) {
     queryFrom = from;
     queryTo = to;
+  }
+
+  /**
+   * Creates a <b>CreatedIn</b> instance with the given time-interval.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+  public CreatedIn(LocalDateTime from, LocalDateTime to) {
+    queryFrom = toEpochMilli(from);
+    queryTo = toEpochMilli(to);
   }
 
   @Override

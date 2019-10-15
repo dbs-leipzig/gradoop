@@ -29,11 +29,9 @@ import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -239,19 +237,13 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
 
   @Override
-  public <T> T callForValue(BinaryBaseGraphToValueOperator<LogicalGraph, T> operator,
-                            LogicalGraph otherGraph) {
-    return operator.execute(this, otherGraph);
-  }
-
-  @Override
-  public LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator) {
+  public <T> T callForValue(UnaryBaseGraphToValueOperator<LogicalGraph, T> operator) {
     return operator.execute(this);
   }
 
   @Override
-  public LogicalGraph callForGraph(BinaryBaseGraphToBaseGraphOperator<LogicalGraph> operator,
-                                   LogicalGraph otherGraph) {
+  public <T> T callForValue(BinaryBaseGraphToValueOperator<LogicalGraph, T> operator,
+                            LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -259,12 +251,6 @@ public class LogicalGraph implements
   public LogicalGraph callForGraph(GraphsToGraphOperator operator,
     LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
-  }
-
-  @Override
-  public GraphCollection callForCollection(
-    UnaryBaseGraphToBaseGraphCollectionOperator<LogicalGraph, GraphCollection> operator) {
-    return operator.execute(this);
   }
 
   @Override

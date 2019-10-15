@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.operators.diff;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.diff.functions.DiffPerElement;
@@ -71,25 +72,40 @@ public class Diff implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
   private final TemporalPredicate secondPredicate;
 
   /**
+   * Specifies the time dimension that will be considered by the operator.
+   */
+  private TimeDimension dimension;
+
+  /**
    * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
+   * By default, valid times will be used by the predicate. To use transaction times, use
+   * {@link Diff#Diff(TemporalPredicate, TemporalPredicate, TimeDimension)} instead.
    *
    * @param firstPredicate  The predicate used for the first snapshot.
    * @param secondPredicate The predicate used for the second snapshot.
    */
   public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate) {
-    this.firstPredicate = Objects.requireNonNull(firstPredicate);
-    this.secondPredicate = Objects.requireNonNull(secondPredicate);
+    this(firstPredicate, secondPredicate, TimeDimension.VALID_TIME);
+  }
+  /**
+   * Create an instance of the TPGM diff operator, setting the two predicates used to determine the snapshots.
+   *
+   * @param firstPredicate The predicate used for the first snapshot.
+   * @param secondPredicate The predicate used for the second snapshot.
+   * @param dimension The time dimension that will be used.
+   */
+  public Diff(TemporalPredicate firstPredicate, TemporalPredicate secondPredicate, TimeDimension dimension) {
+    this.firstPredicate = Objects.requireNonNull(firstPredicate, "No first predicate given.");
+    this.secondPredicate = Objects.requireNonNull(secondPredicate, "No second predicate given.");
+    this.dimension = Objects.requireNonNull(dimension, "No time dimension given.");
   }
 
   @Override
   public TemporalGraph execute(TemporalGraph graph) {
     DataSet<TemporalVertex> transformedVertices = graph.getVertices()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate))
-      .name("Diff vertices of [" + firstPredicate + "] and [" + secondPredicate + "]");
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
     DataSet<TemporalEdge> transformedEdges = graph.getEdges()
-      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate))
-      .name("Diff edges of [" + firstPredicate + "] and [" + secondPredicate + "]");
-    return graph.getFactory()
-      .fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);
+      .flatMap(new DiffPerElement<>(firstPredicate, secondPredicate, dimension));
+    return graph.getFactory().fromDataSets(graph.getGraphHead(), transformedVertices, transformedEdges);
   }
 }
