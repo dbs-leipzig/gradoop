@@ -17,6 +17,10 @@ package org.gradoop.temporal.model.impl.functions.predicates;
 
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
+import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
+
 /**
  * Implementation of the <b>Between</b> temporal predicate.
  * Given a certain time-interval, this predicate will match all intervals that start
@@ -37,7 +41,7 @@ public class Between implements TemporalPredicate {
   private final long queryTo;
 
   /**
-   * Creates a Between instance with the given time stamps.
+   * Creates a <b>Between</b> instance with the given time stamps.
    *
    * @param from The start of the query time-interval in Milliseconds since Unix Epoch.
    * @param to   The end of the query time-interval in Milliseconds since Unix Epoch.
@@ -45,6 +49,18 @@ public class Between implements TemporalPredicate {
   public Between(long from, long to) {
     queryFrom = from;
     queryTo = to;
+  }
+
+  /**
+   * Creates a <b>Between</b> instance with the given time stamps.
+   * The provided arguments will be converted to milliseconds since Unix Epoch for UTC time zone.
+   *
+   * @param from The beginning of the query time-interval.
+   * @param to The end of the query time-interval.
+   */
+  public Between(LocalDateTime from, LocalDateTime to) {
+    queryFrom = toEpochMilli(from);
+    queryTo = toEpochMilli(to);
   }
 
   @Override

@@ -18,6 +18,7 @@ package org.gradoop.temporal.model.impl.operators.snapshot.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.util.Objects;
@@ -35,17 +36,25 @@ public class ByTemporalPredicate<T extends TemporalElement> implements Combinabl
   private final TemporalPredicate condition;
 
   /**
-   * Creates a filter instance from a temporal predicate.
+   * Specifies the time dimension that will be considered by the predicate.
+   */
+  private TimeDimension dimension;
+
+
+  /**
+   * Creates a filter instance from a temporal predicate and a time dimension.
    *
    * @param predicate The temporal predicate to check.
+   * @param dimension The time dimension that will be considered by the predicate.
    */
-  public ByTemporalPredicate(TemporalPredicate predicate) {
-    condition = Objects.requireNonNull(predicate, "No predicate was given.");
+  public ByTemporalPredicate(TemporalPredicate predicate, TimeDimension dimension) {
+    this.condition = Objects.requireNonNull(predicate, "No predicate given.");
+    this.dimension = Objects.requireNonNull(dimension, "No time dimension given.");
   }
 
   @Override
   public boolean filter(T element) {
-    Tuple2<Long, Long> validTime = element.getValidTime();
-    return condition.test(validTime.f0, validTime.f1);
+    Tuple2<Long, Long> timeValues = element.getTimeByDimension(dimension);
+    return condition.test(timeValues.f0, timeValues.f1);
   }
 }

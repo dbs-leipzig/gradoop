@@ -20,6 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.operators.snapshot.functions.ByTemporalPredicate;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -96,7 +97,7 @@ public class ByTemporalPredicateTest extends TemporalGradoopTestBase {
     // Apply the filter to the input.
     List<TemporalVertex> result = getExecutionEnvironment()
       .fromCollection(inputTuples, TypeInformation.of(TemporalVertex.class))
-      .filter(new ByTemporalPredicate<>(testPredicate))
+      .filter(new ByTemporalPredicate<>(testPredicate, TimeDimension.VALID_TIME))
       .collect();
     // Sort the result and expected results to allow for comparison.
     Comparator<TemporalVertex> comparator = Comparator.comparing(TemporalVertex::getId);
@@ -134,7 +135,7 @@ public class ByTemporalPredicateTest extends TemporalGradoopTestBase {
     // Apply the filter to the input.
     List<TemporalEdge> result = getExecutionEnvironment()
       .fromCollection(inputTuples, TypeInformation.of(TemporalEdge.class))
-      .filter(new ByTemporalPredicate<>(testPredicate))
+      .filter(new ByTemporalPredicate<>(testPredicate, TimeDimension.VALID_TIME))
       .collect();
     // Sort the result and expected results to allow for comparison.
     Comparator<TemporalEdge> comparator = Comparator.comparing(TemporalEdge::getId);

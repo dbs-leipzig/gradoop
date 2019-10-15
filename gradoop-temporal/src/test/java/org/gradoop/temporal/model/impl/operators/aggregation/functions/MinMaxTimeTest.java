@@ -15,17 +15,10 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.Identifiable;
-import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.temporal.model.api.functions.TimeDimension;
+import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
-import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +28,10 @@ import java.util.Arrays;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.FROM;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.Field.TO;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.TRANSACTION_TIME;
-import static org.gradoop.temporal.model.api.functions.TimeDimension.VALID_TIME;
+import static org.gradoop.temporal.model.api.TimeDimension.Field.FROM;
+import static org.gradoop.temporal.model.api.TimeDimension.Field.TO;
+import static org.gradoop.temporal.model.api.TimeDimension.TRANSACTION_TIME;
+import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -46,19 +39,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Parameterized.class)
 public class MinMaxTimeTest extends TemporalGradoopTestBase {
-  /**
-   * Current timestamp in milliseconds.
-   */
-  private static final Long CURRENT_TIME = System.currentTimeMillis();
-  /**
-   * A factory used to create some test edges.
-   */
-  private EdgeFactory<TemporalEdge> edgeFactory = getEdgeFactory();
-
-  /**
-   * A factory used to create some test vertices.
-   */
-  private VertexFactory<TemporalVertex> vertexFactory = getVertexFactory();
 
   /**
    * The temporal attribute to aggregate.
@@ -199,82 +179,10 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   @Parameterized.Parameters(name = "{0}.{1}")
   public static Iterable<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-      {TRANSACTION_TIME, FROM, 4L, MIN_VALUE, 3L, MIN_VALUE, 4L, MIN_VALUE},
-      {TRANSACTION_TIME, TO, MAX_VALUE, -1L, MAX_VALUE, 1L, MAX_VALUE, -1L},
-      {VALID_TIME, FROM, 6L, -1L, 4L, 1L, 6L, -1L},
-      {VALID_TIME, TO, 7L, -1L, 4L, 1L, 7L, -1L}
+      {TRANSACTION_TIME, FROM, 6L,        0L, 3L,        MIN_VALUE, 6L,        MIN_VALUE},
+      {TRANSACTION_TIME, TO,   MAX_VALUE, 2L, MAX_VALUE, 7L,        MAX_VALUE, 2L},
+      {VALID_TIME,       FROM, 6L,        0L, 4L,        0L,        6L,        0L},
+      {VALID_TIME,       TO,   7L,        1L, 9L,        5L,        9L,        1L}
     });
-  }
-
-  /**
-   * Get a test graph with temporal attributes set.
-   *
-   * @return The test graph.
-   */
-  private TemporalGraph getTestGraphWithValues() {
-    TemporalVertex v1 = createVertex(MIN_VALUE, 1, MIN_VALUE, 1);
-    TemporalVertex v2 = createVertex(0, MAX_VALUE, 1, MAX_VALUE);
-    TemporalVertex v3 = createVertex(1, 2, 3, 4);
-    TemporalVertex v4 = createVertex(2, 2, 4, 4);
-    TemporalVertex v5 = createVertex(3, 3, 1, 2);
-    TemporalEdge e1 = createEdge(v1, v2, MIN_VALUE, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalEdge e2 = createEdge(v2, v3, -2, -1, 6, 7);
-    TemporalEdge e3 = createEdge(v4, v5, -2, 0, 1, 1);
-    TemporalEdge e4 = createEdge(v3, v5, 4, 5, -1, -1);
-    DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
-    DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4);
-    return getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
-  }
-
-  /**
-   * Get a test graph with all temporal attributes set to their default value.
-   *
-   * @return The test graph.
-   */
-  private TemporalGraph getTestGraphWithAllDefaults() {
-    TemporalVertex v1 = createVertex(CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalVertex v2 = createVertex(CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalVertex v3 = createVertex(CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalEdge e1 = createEdge(v1, v2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalEdge e2 = createEdge(v2, v3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    TemporalEdge e3 = createEdge(v3, v1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-    DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3);
-    DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3);
-    return getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
-  }
-
-  /**
-   * Create a temporal edge with temporal attributes set.
-   *
-   * @param source    The element used as a source for the edge.
-   * @param target    The element used as a target for the edge.
-   * @param txFrom    The start of the transaction time.
-   * @param txTo      The end of the transaction time.
-   * @param validFrom The start of the valid time.
-   * @param validTo   The end of the valid time.
-   * @return A temporal edge with those times set.
-   */
-  private TemporalEdge createEdge(Identifiable source, Identifiable target, long txFrom,
-    long txTo, long validFrom, long validTo) {
-    TemporalEdge edge = edgeFactory.createEdge(source.getId(), target.getId());
-    edge.setTransactionTime(Tuple2.of(txFrom, txTo));
-    edge.setValidTime(Tuple2.of(validFrom, validTo));
-    return edge;
-  }
-
-  /**
-   * Create a temporal vertex with temporal attributes set.
-   *
-   * @param txFrom    The start of the transaction time.
-   * @param txTo      The end of the transaction time.
-   * @param validFrom The start of the valid time.
-   * @param validTo   The end of the valid time.
-   * @return A temporal vertex with those times set.
-   */
-  private TemporalVertex createVertex(long txFrom, long txTo, long validFrom, long validTo) {
-    TemporalVertex vertex = vertexFactory.createVertex();
-    vertex.setTransactionTime(Tuple2.of(txFrom, txTo));
-    vertex.setValidTime(Tuple2.of(validFrom, validTo));
-    return vertex;
   }
 }
