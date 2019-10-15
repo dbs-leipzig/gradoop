@@ -170,7 +170,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_VALUE_BYTES,
       Bytes.toBytesBinary(key),
       compareOp,
-      PropertyValueUtils.Bytes.getRawBytesWithoutType(value));
+      PropertyValueUtils.BytesUtils.getRawBytesWithoutType(value));
 
     // Define that the entire row will be skipped if the column is not found
     valueFilter.setFilterIfMissing(true);
@@ -179,7 +179,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_TYPE_BYTES,
       Bytes.toBytesBinary(key),
       compareOp,
-      PropertyValueUtils.Bytes.getTypeByte(value));
+      PropertyValueUtils.BytesUtils.getTypeByte(value));
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);
@@ -265,7 +265,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_VALUE_BYTES,
       Bytes.toBytesBinary(key),
       compareOp,
-      new BinaryComparator(PropertyValueUtils.Bytes.getRawBytesWithoutType(min)));
+      new BinaryComparator(PropertyValueUtils.BytesUtils.getRawBytesWithoutType(min)));
 
     // Define that the entire row will be skipped if the column is not found
     valueFilter.setFilterIfMissing(true);
@@ -274,7 +274,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_TYPE_BYTES,
       Bytes.toBytesBinary(key),
       negate ? CompareFilter.CompareOp.NOT_EQUAL : CompareFilter.CompareOp.EQUAL,
-      PropertyValueUtils.Bytes.getTypeByte(min));
+      PropertyValueUtils.BytesUtils.getTypeByte(min));
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);
