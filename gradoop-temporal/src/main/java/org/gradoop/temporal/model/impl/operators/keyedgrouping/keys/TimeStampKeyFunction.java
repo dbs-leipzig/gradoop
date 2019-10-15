@@ -19,7 +19,7 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -42,11 +42,14 @@ import static java.time.ZoneOffset.UTC;
  * {@code time_INTERVAL_FIELD_CALCULATEDFIELD} where {@code INTERVAL} is the {@link TimeDimension},
  * {@code FIELD} the {@link TimeDimension.Field} and {@code CALCULATEDFIELD} the {@link TemporalField}
  * extracted from the element. When no {@link TemporalField} is given, the property will just be called
- * {@code time_INTERVAL_FIELD}.
+ * {@code time_INTERVAL_FIELD}.<p>
+ * When the extracted {@link TimeDimension.Field field} of the {@link TimeDimension} is set to a default
+ * value and a {@link TemporalField} was set, a default value ({@code -1}) will be returned instead.
+ * This this case no property will be set.
  *
  * @param <T> The type of the elements to group.
  */
-public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunction<T, Long> {
+public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunctionWithDefaultValue<T, Long> {
 
   /**
    * The time dimension of the temporal element to extract.
@@ -104,9 +107,15 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
     switch (timeDimensionField) {
     case FROM:
       fieldValue = interval.f0;
+      if (fieldValue.equals(TemporalElement.DEFAULT_TIME_FROM) && (fieldOfTimeStamp != null)) {
+        return getDefaultKey();
+      }
       break;
     case TO:
       fieldValue = interval.f1;
+      if (fieldValue.equals(TemporalElement.DEFAULT_TIME_TO) && (fieldOfTimeStamp != null)) {
+        return getDefaultKey();
+      }
       break;
     default:
       throw new UnsupportedOperationException("Field is not supported: " + timeDimensionField);
@@ -123,11 +132,29 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
     if (!(key instanceof Long)) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
-    element.setProperty(targetPropertyKey, PropertyValue.create(key));
+    // Do not set the key if field extraction in enabled and the key is -1
+    if (fieldOfTimeStamp == null || !getDefaultKey().equals(key)) {
+      element.setProperty(targetPropertyKey, PropertyValue.create(key));
+    }
   }
 
   @Override
   public TypeInformation<Long> getType() {
     return BasicTypeInfo.LONG_TYPE_INFO;
+  }
+
+  @Override
+  public Long getDefaultKey() {
+    if (fieldOfTimeStamp == null) {
+      switch (timeDimensionField) {
+      case FROM:
+        return TemporalElement.DEFAULT_TIME_FROM;
+      case TO:
+        return TemporalElement.DEFAULT_TIME_TO;
+      default:
+        throw new UnsupportedOperationException("Field not supported: " + timeDimensionField);
+      }
+    }
+    return -1L;
   }
 }
