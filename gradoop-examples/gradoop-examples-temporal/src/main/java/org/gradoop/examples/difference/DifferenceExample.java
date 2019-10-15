@@ -32,8 +32,9 @@ public class DifferenceExample {
   /**
    * Runs the program on the example data graph.
    *
-   * The example provides an overview of the usage of the {@code diff()} method with pre-defined
-   * predicate functions suitable for temporal analysis.
+   * The example provides an overview of the usage of the
+   * {@link org.gradoop.temporal.model.impl.operators.diff.Diff} method with pre-defined predicate
+   * functions suitable for temporal analysis.
    *
    * Documentation for all available predicate functions as well as a detailed description of the
    * diff method can be found in the projects wiki.
@@ -44,8 +45,8 @@ public class DifferenceExample {
    *   <li>verifies the graph by removing dangling edges</li>
    * </ol>
    * The result is a graph composed by the union of both snapshots where each element is annotated with an
-   * additional property {@link org.gradoop.temporal.model.impl.operators.diff.Diff#PROPERTY_KEY}. The value
-   * of that property indicates an addition (1), a deletion (-1) or a persistence (0) of the element.
+   * additional property. The value of that property indicates an addition (1), a deletion (-1) or a
+   * persistence (0) of the element.
    *
    * @param args Command line arguments (unused).
    *
@@ -78,5 +79,4 @@ public class DifferenceExample {
     // _diff: 0 (in both snapshots); _diff: 1 (only in second snapshot); _diff: -1 (only in first snapshot)
     annotatedDiffGraph.print();
   }
-
 }

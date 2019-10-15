@@ -216,5 +216,4 @@ public class TemporalCitiBikeGraph {
     }
     return transformed;
   }
-
 }

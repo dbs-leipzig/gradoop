@@ -98,7 +98,6 @@ public class TemporalGroupingExample {
       // since the aggregated values are 'long' values, we transform them into 'LocalDateTime' values
       .transformVertices(new TransformLongPropertiesToDateTime<>("firstStart", "lastStart"));
 
-
     // print the grouped and aggregated graph
     groupedGraph.print();
   }

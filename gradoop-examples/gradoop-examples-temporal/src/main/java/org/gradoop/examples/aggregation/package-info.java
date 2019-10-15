@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Examples related to the temporal aggregation operator
+ * Examples related to the temporal aggregation operator.
  */
 package org.gradoop.examples.aggregation;

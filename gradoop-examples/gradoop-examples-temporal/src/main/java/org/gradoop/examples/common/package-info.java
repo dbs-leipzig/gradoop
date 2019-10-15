@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Common classes for the temporal operator examples
+ * Common classes for the temporal operator examples.
  */
 package org.gradoop.examples.common;

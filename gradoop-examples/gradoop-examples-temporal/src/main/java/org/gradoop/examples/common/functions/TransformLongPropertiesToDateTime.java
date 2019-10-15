@@ -34,16 +34,16 @@ public class TransformLongPropertiesToDateTime<TE extends TemporalElement> imple
   /**
    * A list of property keys that will be converted.
    */
-  private List<String> propertyNames;
+  private final List<String> propertyNames;
 
   /**
    * Creates an instance of this temporal transformation function.
    *
-   * @param property a set of property names which hold a {@link Long} value. Each value will be parsed
+   * @param properties a set of property names which hold a {@link Long} value. Each value will be parsed
    *                 to a {@link LocalDateTime} value.
    */
-  public TransformLongPropertiesToDateTime(String... property) {
-    this.propertyNames = Arrays.asList(property);
+  public TransformLongPropertiesToDateTime(String... properties) {
+    this.propertyNames = Arrays.asList(properties);
   }
 
   @Override
@@ -52,7 +52,7 @@ public class TransformLongPropertiesToDateTime<TE extends TemporalElement> imple
     for (String propKey : current.getPropertyKeys()) {
       if (propertyNames.contains(propKey) && current.getPropertyValue(propKey).isLong()) {
         LocalDateTime parsedValue = Instant.ofEpochMilli(current.getPropertyValue(propKey).getLong())
-          .atZone(ZoneId.systemDefault())
+          .atZone(ZoneId.of("UTC"))
           .toLocalDateTime();
         transformed.setProperty(propKey, parsedValue);
       } else {

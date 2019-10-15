@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Examples related to the temporal difference operator
+ * Examples related to the temporal difference operator.
  */
 package org.gradoop.examples.difference;

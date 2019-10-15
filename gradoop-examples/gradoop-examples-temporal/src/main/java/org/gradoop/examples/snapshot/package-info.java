@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Examples related to the temporal snapshot operator
+ * Examples related to the temporal snapshot operator.
  */
 package org.gradoop.examples.snapshot;

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions related to the temporal operator examples
+ * Functions related to the temporal operator examples.
  */
 package org.gradoop.examples.common.functions;
