@@ -45,7 +45,7 @@ import static java.time.ZoneOffset.UTC;
  * {@code time_INTERVAL_FIELD}.<p>
  * When the extracted {@link TimeDimension.Field field} of the {@link TimeDimension} is set to a default
  * value and a {@link TemporalField} was set, a default value ({@code -1}) will be returned instead.
- * This this case no property will be set.
+ * In this case no property will be set.
  *
  * @param <T> The type of the elements to group.
  */
