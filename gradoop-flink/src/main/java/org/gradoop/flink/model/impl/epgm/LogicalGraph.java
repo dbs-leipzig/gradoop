@@ -32,16 +32,10 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -174,43 +168,6 @@ public class LogicalGraph implements
   }
 
   @Override
-  public GraphCollection query(String query) {
-    return query(query, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern) {
-    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  @Override
-  public GraphCollection query(String query, GraphStatistics graphStatistics) {
-    return query(query, true,
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true,
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-    GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching<>(query, constructionPattern, attachData,
-      vertexStrategy, edgeStrategy, graphStatistics));
-  }
-
-  @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
   }
@@ -296,16 +253,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
   // Utility methods
   //----------------------------------------------------------------------------
-
-  @Override
-  public DataSet<Boolean> isEmpty() {
-    return getVertices()
-      .map(new True<>())
-      .distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false))
-      .reduce(new Or())
-      .map(new Not());
-  }
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
