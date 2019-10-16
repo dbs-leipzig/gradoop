@@ -21,7 +21,7 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.properties.bytes.Bytes;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
