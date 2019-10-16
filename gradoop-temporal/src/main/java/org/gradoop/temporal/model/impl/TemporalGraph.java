@@ -27,12 +27,6 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
@@ -110,20 +104,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   }
 
   /**
-   * Returns a 1-element dataset containing a {@link Boolean} value which indicates if the graph is empty.
-   *
-   * A graph is considered empty, if it contains no vertices.
-   *
-   * @return  1-element dataset containing {@link Boolean#TRUE}, if the collection is
-   *          empty or {@link Boolean#FALSE} if not
-   */
-  public DataSet<Boolean> isEmpty() {
-    return getVertices().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
-      .map(new Not());
-  }
-
-  /**
    * Writes the graph to given data sink.
    *
    * @param dataSink The data sink to which the graph should be written.
@@ -177,17 +157,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   @Override
   public DataSet<TemporalEdge> getEdgesByLabel(String label) {
     return this.layout.getEdgesByLabel(label);
-  }
-
-  //----------------------------------------------------------------------------
-  // Unary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public TemporalGraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
-      true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
   }
 
   //----------------------------------------------------------------------------
