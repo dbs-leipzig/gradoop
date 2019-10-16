@@ -14,6 +14,7 @@
 
     <modules>
         <module>gradoop-examples-operators</module>
+        <module>gradoop-examples-temporal</module>
     </modules>
 
     <name>Gradoop Examples</name>

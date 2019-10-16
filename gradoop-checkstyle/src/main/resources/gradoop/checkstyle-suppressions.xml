@@ -23,6 +23,9 @@
   <suppress checks="LineLength"
             files="SocialNetworkGraph.java"
             lines="0-68"/>
+  <suppress checks="LineLength"
+            files="TemporalCitiBikeGraph.java"
+            lines="50-185"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"
