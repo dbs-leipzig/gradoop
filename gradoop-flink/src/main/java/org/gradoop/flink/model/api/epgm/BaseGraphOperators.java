@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -34,6 +35,9 @@ import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
@@ -65,6 +69,118 @@ public interface BaseGraphOperators<
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, GraphStatistics)} to provide statistics for the query planner.
+   *
+   * @param query Cypher query
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query) {
+    return query(query, new GraphStatistics(1, 1, 1, 1));
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, String, GraphStatistics)} to provide statistics for the query planner.
+   * <p>
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * <br>
+   * {@code graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query string
+   * @param constructionPattern Construction pattern
+   * @return graph collection containing the output of the construct pattern
+   */
+  default GC query(String query, String constructionPattern) {
+    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   *
+   * @param query           Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, GraphStatistics graphStatistics) {
+    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
+      graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * <br>
+   * {@code graph.query(
+   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   *  "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param graphStatistics     statistics about the data graph
+   * @return graph collection containing the output of the construct pattern
+   */
+  default GC query(String query, String constructionPattern, GraphStatistics graphStatistics) {
+    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
+      MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query           Cypher query
+   * @param attachData      attach original vertex and edge data to the result
+   * @param vertexStrategy  morphism setting for vertex mapping
+   * @param edgeStrategy    morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, boolean attachData, MatchStrategy vertexStrategy,
+                   MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param attachData          attach original vertex and edge data to the result
+   * @param vertexStrategy      morphism setting for vertex mapping
+   * @param edgeStrategy        morphism setting for edge mapping
+   * @param graphStatistics     statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, String constructionPattern, boolean attachData, MatchStrategy vertexStrategy,
+                   MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching<>(query, constructionPattern, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
 
   /**
    * Creates a copy of the base graph.
@@ -375,6 +491,20 @@ public interface BaseGraphOperators<
   default LG exclude(LG otherGraph) {
     return callForGraph(new Exclusion<>(), otherGraph);
   }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
+   *
+   * A graph is considered empty, if it contains no vertices.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet<Boolean> isEmpty();
 
   //----------------------------------------------------------------------------
   // Call for Operators

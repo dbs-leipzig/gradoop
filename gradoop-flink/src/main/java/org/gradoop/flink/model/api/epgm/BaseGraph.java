@@ -15,10 +15,14 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -58,4 +62,18 @@ public interface BaseGraph<
    * @return a factory that can be used to create a {@link GC} instance.
    */
   BaseGraphCollectionFactory<G, V, E, LG, GC> getCollectionFactory();
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  default DataSet<Boolean> isEmpty() {
+    return getVertices()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
+  }
 }
