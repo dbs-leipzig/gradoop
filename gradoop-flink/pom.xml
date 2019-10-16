@@ -133,11 +133,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-hbase_2.11</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>me.lemire.integercompression</groupId>
             <artifactId>JavaFastPFOR</artifactId>
         </dependency>
@@ -150,7 +145,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-shaded-hadoop2</artifactId>
-	</dependency>
+	    </dependency>
 
         <!-- CAPF -->
         <dependency>
@@ -169,21 +164,6 @@
         <dependency>
             <groupId>org.gradoop</groupId>
             <artifactId>gradoop-common</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- HBase -->
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-testing-util</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-server</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

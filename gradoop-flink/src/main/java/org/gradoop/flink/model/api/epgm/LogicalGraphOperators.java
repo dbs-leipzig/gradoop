@@ -26,8 +26,6 @@ import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 import java.io.IOException;
@@ -70,106 +68,6 @@ public interface LogicalGraphOperators
    * @throws Exception on failure
    */
   CAPFQueryResult cypher(String query) throws Exception;
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * <p>
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   *
-   * @param query Cypher query
-   * @return graph collection containing matching subgraphs
-   */
-  GraphCollection query(String query);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * <p>
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   * <p>
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * <p>
-   * {@code graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")}
-   * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper.
-   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query               Cypher query string
-   * @param constructionPattern Construction pattern
-   * @return graph collection containing the output of the construct pattern
-   */
-  GraphCollection query(String query, String constructionPattern);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * @param query           Cypher query
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  GraphCollection query(String query, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * <p>
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * <p>
-   * {@code graph.query(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")}
-   * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper.
-   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query               Cypher query
-   * @param constructionPattern Construction pattern
-   * @param graphStatistics     statistics about the data graph
-   * @return graph collection containing the output of the construct pattern
-   */
-  GraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query           Cypher query
-   * @param attachData      attach original vertex and edge data to the result
-   * @param vertexStrategy  morphism setting for vertex mapping
-   * @param edgeStrategy    morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-    MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query               Cypher query
-   * @param constructionPattern Construction pattern
-   * @param attachData          attach original vertex and edge data to the result
-   * @param vertexStrategy      morphism setting for vertex mapping
-   * @param edgeStrategy        morphism setting for edge mapping
-   * @param graphStatistics     statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-    GraphStatistics graphStatistics);
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their associated edges.
@@ -233,16 +131,6 @@ public interface LogicalGraphOperators
    * @return result of given operator
    */
   LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
-   *
-   * A graph is considered empty, if it contains no vertices.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
 
   /**
      * Writes the graph to given data sink.
