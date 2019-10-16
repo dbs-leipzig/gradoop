@@ -15,9 +15,12 @@
  */
 package org.gradoop.temporal.util;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
@@ -27,14 +30,21 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHeadFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -44,9 +54,43 @@ import static org.junit.Assert.assertTrue;
 public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
 
   /**
+   * The time format used for formatted date strings.
+   *
+   * @see SimpleDateFormat detailed description of date formats
+   */
+  public static final String DATE_FORMAT = "yyyy.MM.dd kk:mm:ss.SSS";
+
+  /**
+   * A formatter used to convert date strings to milliseconds.
+   *
+   * @see #DATE_FORMAT
+   */
+  private final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT, Locale.GERMANY);
+
+  /**
    * The config used for tests.
    */
   private TemporalGradoopConfig config;
+
+  /*
+   * Constants used as labels inside a test graph.
+   */
+  protected static final String V1 = "v1";
+  protected static final String V2 = "v2";
+  protected static final String V3 = "v3";
+  protected static final String V4 = "v4";
+  protected static final String V5 = "v5";
+
+  protected static final String E1 = "e1";
+  protected static final String E2 = "e2";
+  protected static final String E3 = "e3";
+  protected static final String E4 = "e4";
+  protected static final String E5 = "e5";
+
+  /**
+   * Current timestamp in milliseconds.
+   */
+  protected static final Long CURRENT_TIME = System.currentTimeMillis();
 
   @Override
   protected TemporalGradoopConfig getConfig() {
@@ -186,4 +230,96 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     return getLoaderFromStream(inputStream);
   }
 
+  /**
+   * Get a test graph with temporal attributes set.
+   *
+   * @return The test graph.
+   */
+  protected TemporalGraph getTestGraphWithValues() {
+    TemporalVertex v1 = createVertex(V1, MIN_VALUE, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalVertex v2 = createVertex(V2, 0, MAX_VALUE, 0, MAX_VALUE);
+    TemporalVertex v3 = createVertex(V3, 1, 8, 3, 9);
+    TemporalVertex v4 = createVertex(V4, 2, 7, 4, 5);
+    TemporalVertex v5 = createVertex(V5, 3, 8, 1, 9);
+    TemporalEdge e1 = createEdge(E1, v1, v2, 0, MAX_VALUE, 0, MAX_VALUE);
+    TemporalEdge e2 = createEdge(E2, v2, v3, 1, 2, 6, 7);
+    TemporalEdge e3 = createEdge(E3, v4, v5, 3, 4, 1, 1);
+    TemporalEdge e4 = createEdge(E4, v3, v5, 6, 7, 4, 6);
+    TemporalEdge e5 = createEdge(E5, v4, v4, 2, 6, 4, 5);
+    DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
+    DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4, e5);
+    return getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
+  }
+
+  /**
+   * Get a test graph with all temporal attributes set to their default value.
+   *
+   * @return The test graph.
+   */
+  protected TemporalGraph getTestGraphWithAllDefaults() {
+    TemporalVertex v1 = createVertex(V1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalVertex v2 = createVertex(V2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalVertex v3 = createVertex(V3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalEdge e1 = createEdge(E1, v1, v2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalEdge e2 = createEdge(E2, v2, v3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    TemporalEdge e3 = createEdge(E3, v3, v1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+    DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3);
+    DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3);
+    return getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
+  }
+
+  /**
+   * Create a temporal edge with temporal attributes set.
+   *
+   * @param label     The label of the edge.
+   * @param source    The element used as a source for the edge.
+   * @param target    The element used as a target for the edge.
+   * @param txFrom    The start of the transaction time.
+   * @param txTo      The end of the transaction time.
+   * @param validFrom The start of the valid time.
+   * @param validTo   The end of the valid time.
+   * @return A temporal edge with those times set.
+   */
+  private TemporalEdge createEdge(String label, Identifiable source, Identifiable target, long txFrom,
+    long txTo, long validFrom, long validTo) {
+    TemporalEdge edge = getConfig().getTemporalGraphFactory().getEdgeFactory()
+      .createEdge(source.getId(), target.getId());
+    edge.setLabel(label);
+    edge.setTransactionTime(Tuple2.of(txFrom, txTo));
+    edge.setValidTime(Tuple2.of(validFrom, validTo));
+    return edge;
+  }
+
+  /**
+   * Create a temporal vertex with temporal attributes set.
+   *
+   * @param label     The label of the vertex.
+   * @param txFrom    The start of the transaction time.
+   * @param txTo      The end of the transaction time.
+   * @param validFrom The start of the valid time.
+   * @param validTo   The end of the valid time.
+   * @return A temporal vertex with those times set.
+   */
+  private TemporalVertex createVertex(String label, long txFrom, long txTo, long validFrom, long validTo) {
+    TemporalVertex vertex = getConfig().getTemporalGraphFactory().getVertexFactory().createVertex();
+    vertex.setLabel(label);
+    vertex.setTransactionTime(Tuple2.of(txFrom, txTo));
+    vertex.setValidTime(Tuple2.of(validFrom, validTo));
+    return vertex;
+  }
+
+  /**
+   * Convert a formatted date/time string to the time format (milliseconds since unix epoch) used by Gradoop.
+   * The date string is expected to be formatted according to {@link #DATE_FORMAT}.
+   *
+   * @param dateTimeString The date string.
+   * @return The time in milliseconds since unix epoch.
+   */
+  protected long asMillis(String dateTimeString) {
+    try {
+      return dateFormatter.parse(dateTimeString).getTime();
+    } catch (ParseException pe) {
+      throw new IllegalArgumentException("Failed to parse date.", pe);
+    }
+  }
 }
