@@ -616,7 +616,7 @@ public class PropertyValueUtils {
   /**
    * Byte utilities.
    */
-  public static class Bytes {
+  public static class BytesUtils {
 
     /**
      * Get the raw byte representation of a {@link PropertyValue} instance without the type byte as prefix.
