@@ -75,7 +75,7 @@ class UnsafeAvailChecker {
           m.setAccessible(true);
           UNALIGNED = (Boolean) m.invoke(null);
         } catch (ReflectiveOperationException e) {
-          LOG.warn("java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types" +
+          LOG.warn("java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types " +
             "won't be used", e);
         }
       }
