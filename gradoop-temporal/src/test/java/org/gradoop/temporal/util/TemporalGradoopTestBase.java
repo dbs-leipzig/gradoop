@@ -180,7 +180,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   protected TemporalGraph toTemporalGraphWithDefaultExtractors(BaseGraph<?, ?, ?, ?, ?> graph) {
     // We have to use lambda expressions instead of method references here, otherwise a
     // ClassCastException will be thrown when those extractor functions are called.
-    // TODO: Find out why.
+    // TODO: Find out why. (#1399)
     return toTemporalGraph(graph,
       g -> TemporalGradoopTestUtils.extractTime(g),
       v -> TemporalGradoopTestUtils.extractTime(v),
@@ -195,6 +195,48 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    */
   protected TemporalGraphCollection toTemporalGraphCollection(BaseGraphCollection<?, ?, ?, ?, ?> collection) {
     return getConfig().getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(collection);
+  }
+
+  /**
+   * Convert a graph collection to a {@link TemporalGraphCollection} and set temporal attributes using
+   * {@link TimeIntervalExtractor} functions.
+   *
+   * @param collection             The graph collection.
+   * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.
+   * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.
+   * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @return A temporal graph with temporal attributes extracted from the original graph.
+   */
+  protected <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraphCollection
+  toTemporalGraphCollection(
+    BaseGraphCollection<G, V, E, ?, ?> collection,
+    TimeIntervalExtractor<G> graphHeadTimeExtractor,
+    TimeIntervalExtractor<V> vertexTimeExtractor,
+    TimeIntervalExtractor<E> edgeTimeExtractor) {
+    return getConfig().getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
+      collection.getGraphHeads(), graphHeadTimeExtractor, collection.getVertices(), vertexTimeExtractor,
+      collection.getEdges(), edgeTimeExtractor);
+  }
+
+  /**
+   * Convert a graph collection to a {@link TemporalGraphCollection} with time extraction functions.
+   * This will use {@link TemporalGradoopTestUtils#extractTime(Element)} to extract temporal attributes.
+   *
+   * @param collection The graph collection.
+   * @return The temporal graph with extracted temporal information.
+   */
+  protected TemporalGraphCollection toTemporalGraphCollectionWithDefaultExtractors(
+    BaseGraphCollection<?, ?, ?, ?, ?> collection) {
+    // We have to use lambda expressions instead of method references here, otherwise a
+    // ClassCastException will be thrown when those extractor functions are called.
+    // TODO: Find out why. (#1399)
+    return toTemporalGraphCollection(collection,
+      g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v),
+      e -> TemporalGradoopTestUtils.extractTime(e));
   }
 
   /**
@@ -281,7 +323,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    * @return A temporal edge with those times set.
    */
   private TemporalEdge createEdge(String label, Identifiable source, Identifiable target, long txFrom,
-    long txTo, long validFrom, long validTo) {
+                                  long txTo, long validFrom, long validTo) {
     TemporalEdge edge = getConfig().getTemporalGraphFactory().getEdgeFactory()
       .createEdge(source.getId(), target.getId());
     edge.setLabel(label);

@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tostring.functions;
+package org.gradoop.temporal.model.impl.operators.tostring;
 
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
+import org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElementToDataString;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 
 /**
- * represents a graph head by a data string (label and properties)
+ * Represents a temporal graph head by a data string (label, properties and valid time).
  *
- * @param <G> graph head type
+ * @param <G> temporal graph head type
  */
-public class GraphHeadToDataString<G extends GraphHead> extends ElementToDataString<G>
+public class TemporalGraphHeadToDataString<G extends TemporalGraphHead> extends TemporalElementToDataString<G>
   implements GraphHeadToString<G> {
 
   @Override
-  public GraphHeadString map(G graph) throws Exception {
-    return new GraphHeadString(graph.getId(), "|" + labelWithProperties(graph) + "|");
+  public GraphHeadString map(G graph) {
+    return new GraphHeadString(graph.getId(), "|" + labelWithProperties(graph) + time(graph) + "|");
   }
 }

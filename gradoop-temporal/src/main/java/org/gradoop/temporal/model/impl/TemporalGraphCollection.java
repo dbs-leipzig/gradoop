@@ -27,12 +27,17 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOper
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -175,6 +180,22 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
     return this.layout.getGraphTransactions();
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByGraphElementData(TemporalGraphCollection otherCollection) {
+    return callForValue(new CollectionEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByGraphData(TemporalGraphCollection otherCollection) {
+    return callForValue(new CollectionEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------
