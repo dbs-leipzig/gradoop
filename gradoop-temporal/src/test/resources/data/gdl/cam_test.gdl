@@ -1,0 +1,12 @@
+:Network{social:true}[
+(a:User{name:"Alice", __valFrom : 1543400000000L, __valTo : 1543900000000L})-[:knows{since:2013}]->(b:User{name:"Bob"})
+(a)-[:knows{since:2014, __valFrom : 1543800000000L}]->(b)
+(b)-[k:knows{since:2015, __valTo : 1543700000000L}]->(c:User{name:"Carol"})
+]
+:Network{social:false}[
+(a)-[:hates]->(b)
+(b)-[k]->(c)
+(a)-[:hates]->(c)
+(c)-[:loves]->(c)
+]
+

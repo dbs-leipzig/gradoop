@@ -32,6 +32,7 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
@@ -43,6 +44,12 @@ import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhoo
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
@@ -490,6 +497,47 @@ public interface BaseGraphOperators<
    */
   default LG exclude(LG otherGraph) {
     return callForGraph(new Exclusion<>(), otherGraph);
+  }
+
+  /**
+   * Checks, if another graph contains exactly the same vertices and edges (by id) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element ids
+   */
+  default DataSet<Boolean> equalsByElementIds(LG other) {
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new VertexToIdString<>(),
+      new EdgeToIdString<>(), true), other);
+  }
+
+  /**
+   * Checks, if another graph contains vertices and edges with the same
+   * attached data (i.e. label and properties) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element data
+   */
+  default DataSet<Boolean> equalsByElementData(LG other) {
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true), other);
+  }
+
+  /**
+   * Checks, if another graph has the same attached data and contains
+   * vertices and edges with the same attached data as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element data
+   */
+  default DataSet<Boolean> equalsByData(LG other) {
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToDataString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true), other);
   }
 
   //----------------------------------------------------------------------------

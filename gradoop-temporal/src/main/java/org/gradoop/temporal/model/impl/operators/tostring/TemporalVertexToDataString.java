@@ -13,30 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tostring.functions;
+package org.gradoop.temporal.model.impl.operators.tostring;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
+import org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElementToDataString;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
 
 /**
- * represents a vertex by a data string (label and properties)
+ * Represents a temporal vertex by a data string (label, properties and valid time).
  *
- * @param <V> vertex type
+ * @param <V> temporal vertex type
  */
-public class VertexToDataString<V extends Vertex>
-  extends ElementToDataString<V>
+public class TemporalVertexToDataString<V extends TemporalVertex> extends TemporalElementToDataString<V>
   implements VertexToString<V> {
 
   @Override
-  public void flatMap(V vertex, Collector<VertexString> collector) throws Exception {
+  public void flatMap(V vertex, Collector<VertexString> collector) {
     GradoopId vertexId = vertex.getId();
-    String vertexLabel = "(" + labelWithProperties(vertex) + ")";
+    String vertexLabel = "(" + labelWithProperties(vertex) + time(vertex) + ")";
 
     for (GradoopId graphId : vertex.getGraphIds()) {
       collector.collect(new VertexString(graphId, vertexId, vertexLabel));
     }
   }
 }
+

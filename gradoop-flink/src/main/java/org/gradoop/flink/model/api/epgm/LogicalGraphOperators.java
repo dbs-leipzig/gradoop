@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -76,32 +75,6 @@ public interface LogicalGraphOperators
    * @return logical graph with random nodes and their associated edges
    */
   LogicalGraph sample(SamplingAlgorithm algorithm);
-
-  /**
-   * Checks, if another logical graph contains exactly the same vertices and edges (by id) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByElementIds(LogicalGraph other);
-
-  /**
-   * Checks, if another logical graph contains vertices and edges with the same
-   * attached data (i.e. label and properties) as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
-   */
-  DataSet<Boolean> equalsByElementData(LogicalGraph other);
-
-  /**
-   * Checks, if another logical graph has the same attached data and contains
-   * vertices and edges with the same attached data as this graph.
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, iff equal by element data
-   */
-  DataSet<Boolean> equalsByData(LogicalGraph other);
 
   /**
    * Generates all combinations of the supplied vertex grouping keys according to the definition of
