@@ -113,16 +113,6 @@
                                     <include>com.google.guava:*</include>
                                     <!-- DIMSpan dependencies -->
                                     <include>me.lemire.integercompression:*</include>
-                                    <!-- capf example dependencies -->
-                                    <include>org.opencypher:*</include>
-                                    <include>org.apache.flink:flink-table_2.11</include>
-                                    <include>org.parboiled:parboiled-scala_2.11</include>
-                                    <include>com.lihaoyi:ujson_2.11</include>
-                                    <include>com.lihaoyi:upickle_2.11</include>
-                                    <include>org.typelevel:cats-kernel_2.11</include>
-                                    <include>org.typelevel:cats-core_2.11</include>
-                                    <include>org.atnos:eff_2.11</include>
-                                    <include>org.parboiled:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
