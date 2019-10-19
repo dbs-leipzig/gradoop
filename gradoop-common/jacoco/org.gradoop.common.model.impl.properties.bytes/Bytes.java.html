@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bytes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.bytes</a> &gt; <span class="el_source">Bytes.java</span></div><h1>Bytes.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.bytes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Comparator;
+
+/**
+ * Utility class that handles byte arrays, conversions to/from other types,
+ * comparisons, hash code generation, manufacturing keys for HashMaps or HashSets, etc.
+ *
+ * This implementation reuses much of the code of HBase's Bytes (org.apache.hadoop.hbase.util.Bytes).
+ * This can be found in org.apache.hbase:hbase-common
+ * Much of the code is copied directly or has only small changes.
+ */
+public class Bytes implements Comparable&lt;Bytes&gt; {
+
+  /**
+   * Size of boolean in bytes
+   */
+  public static final int SIZEOF_BOOLEAN = Byte.SIZE / Byte.SIZE;
+
+  /**
+   * Size of byte in bytes
+   */
+  public static final int SIZEOF_BYTE = SIZEOF_BOOLEAN;
+
+  /**
+   * Size of char in bytes
+   */
+  public static final int SIZEOF_CHAR = Character.SIZE / Byte.SIZE;
+
+  /**
+   * Size of double in bytes
+   */
+  public static final int SIZEOF_DOUBLE = Double.SIZE / Byte.SIZE;
+
+  /**
+   * Size of float in bytes
+   */
+  public static final int SIZEOF_FLOAT = Float.SIZE / Byte.SIZE;
+
+  /**
+   * Size of int in bytes
+   */
+  public static final int SIZEOF_INT = Integer.SIZE / Byte.SIZE;
+
+  /**
+   * Size of long in bytes
+   */
+  public static final int SIZEOF_LONG = Long.SIZE / Byte.SIZE;
+
+  /**
+   * Size of short in bytes
+   */
+  public static final int SIZEOF_SHORT = Short.SIZE / Byte.SIZE;
+
+  /**
+   * true, if unsafe is available
+   */
+<span class="fc" id="L84">  private static final boolean UNSAFE_UNALIGNED = UnsafeAvailChecker.unaligned();</span>
+
+  /**
+   * Logger
+   */
+<span class="fc" id="L89">  private static final Logger LOG = LoggerFactory.getLogger(Bytes.class);</span>
+
+  /**
+   * Byte array
+   */
+  private byte[] bytes;
+
+  /**
+   * offset
+   */
+  private int offset;
+
+  /**
+   * length
+   */
+  private int length;
+
+  /**
+   * Use comparing byte arrays, byte-by-byte
+   */
+<span class="nc" id="L109">  private final ByteArrayComparator bytesRawcomparator = new ByteArrayComparator();</span>
+
+  /**
+   * Create a zero-size sequence.
+   */
+  public Bytes() {
+<span class="nc" id="L115">    super();</span>
+<span class="nc" id="L116">  }</span>
+
+  /**
+   * Create a Bytes using the byte array as the initial value.
+   *
+   * @param bytes This array becomes the backing storage for the object.
+   */
+  public Bytes(byte[] bytes) {
+<span class="nc" id="L124">    this(bytes, 0, bytes.length);</span>
+<span class="nc" id="L125">  }</span>
+
+  /**
+   * Set the new Bytes to the contents of the passed
+   * {@code ibw}
+   *
+   * @param ibw the value to set this Bytes to.
+   */
+  public Bytes(final Bytes ibw) {
+<span class="nc" id="L134">    this(ibw.get(), ibw.getOffset(), ibw.getLength());</span>
+<span class="nc" id="L135">  }</span>
+
+  /**
+   * Set the value to a given byte range
+   *
+   * @param bytes the new byte range to set to
+   * @param offset the offset in newData to start at
+   * @param length the number of bytes in the range
+   */
+  public Bytes(final byte[] bytes, final int offset,
+<span class="nc" id="L145">               final int length) {</span>
+<span class="nc" id="L146">    this.bytes = bytes;</span>
+<span class="nc" id="L147">    this.offset = offset;</span>
+<span class="nc" id="L148">    this.length = length;</span>
+<span class="nc" id="L149">  }</span>
+
+  /**
+   * Get the data from the Bytes.
+   *
+   * @return The data is only valid between offset and offset+length.
+   */
+  public byte[] get() {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (this.bytes == null) {</span>
+<span class="nc" id="L158">      throw new IllegalStateException(&quot;Uninitialiized. Null constructor &quot; +</span>
+        &quot;called w/o accompaying readFields invocation&quot;);
+    }
+<span class="nc" id="L161">    return this.bytes;</span>
+  }
+
+  /**
+   * Set byte array with offset 0 and length of the byte array.
+   *
+   * @param b Use passed bytes as backing array for this instance.
+   */
+  public void set(final byte[] b) {
+<span class="nc" id="L170">    set(b, 0, b.length);</span>
+<span class="nc" id="L171">  }</span>
+
+  /**
+   * Set byte array, offset and length.
+   *
+   * @param b Use passed bytes as backing array for this instance.
+   * @param offset offset
+   * @param length length
+   */
+  public void set(final byte[] b, final int offset, final int length) {
+<span class="nc" id="L181">    this.bytes = b;</span>
+<span class="nc" id="L182">    this.offset = offset;</span>
+<span class="nc" id="L183">    this.length = length;</span>
+<span class="nc" id="L184">  }</span>
+
+  /**
+   * Get length
+   *
+   * @return the number of valid bytes in the buffer
+   */
+  public int getLength() {
+<span class="nc bnc" id="L192" title="All 2 branches missed.">    if (this.bytes == null) {</span>
+<span class="nc" id="L193">      throw new IllegalStateException(&quot;Uninitialiized. Null constructor &quot; +</span>
+        &quot;called w/o accompaying readFields invocation&quot;);
+    }
+<span class="nc" id="L196">    return this.length;</span>
+  }
+
+  /**
+   * Get offset
+   *
+   * @return offset
+   */
+  public int getOffset() {
+<span class="nc" id="L205">    return this.offset;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L210">    return hashCode(bytes, offset, length);</span>
+  }
+
+  /**
+   * Define the sort order of the Bytes.
+   *
+   * @param that The other bytes writable
+   * @return Positive if left is bigger than right, 0 if they are equal, and
+   *         negative if left is smaller than right.
+   */
+  @Override
+  public int compareTo(Bytes that) {
+<span class="nc" id="L222">    return bytesRawcomparator.compare(</span>
+      this.bytes, this.offset, this.length,
+      that.bytes, that.offset, that.length);
+  }
+
+  @Override
+  public boolean equals(Object that) {
+<span class="nc bnc" id="L229" title="All 2 branches missed.">    if (that == this) {</span>
+<span class="nc" id="L230">      return true;</span>
+    }
+<span class="nc bnc" id="L232" title="All 2 branches missed.">    if (that instanceof Bytes) {</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">      return compareTo((Bytes) that) == 0;</span>
+    }
+<span class="nc" id="L235">    return false;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L240">    return toString(bytes, offset, length);</span>
+  }
+
+  /**
+   * Byte array comparator class.
+   */
+  public static class ByteArrayComparator implements Comparator&lt;byte []&gt; {
+    /**
+     * Constructor
+     */
+    ByteArrayComparator() {
+<span class="nc" id="L251">      super();</span>
+<span class="nc" id="L252">    }</span>
+
+    @Override
+    public int compare(byte [] left, byte [] right) {
+<span class="nc" id="L256">      return compareTo(left, right);</span>
+    }
+
+    /**
+     * Compares two byte arrays with a specified offset and length.
+     *
+     * @param b1 left byte array
+     * @param s1 offset of left byte array
+     * @param l1 length of left byte array
+     * @param b2 right byte array
+     * @param s2 offset of right byte array
+     * @param l2 length of right byte array
+     * @return 0 if equal, &amp;lt; 0 if left is less than right, etc.
+     */
+    public int compare(byte [] b1, int s1, int l1, byte [] b2, int s2, int l2) {
+<span class="nc" id="L271">      return LexicographicalComparerHolder.BEST_COMPARER.</span>
+<span class="nc" id="L272">        compareTo(b1, s1, l1, b2, s2, l2);</span>
+    }
+  }
+
+  /**
+   * Put bytes at the specified byte array position.
+   *
+   * @param tgtBytes the byte array
+   * @param tgtOffset position in the array
+   * @param srcBytes array to write out
+   * @param srcOffset source offset
+   * @param srcLength source length
+   * @return incremented offset
+   */
+  public static int putBytes(byte[] tgtBytes, int tgtOffset, byte[] srcBytes,
+                             int srcOffset, int srcLength) {
+<span class="fc" id="L288">    System.arraycopy(srcBytes, srcOffset, tgtBytes, tgtOffset, srcLength);</span>
+<span class="fc" id="L289">    return tgtOffset + srcLength;</span>
+  }
+
+  /**
+   * Write a single byte out to the specified byte array position.
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param b byte to write out
+   * @return incremented offset
+   */
+  public static int putByte(byte[] bytes, int offset, byte b) {
+<span class="fc" id="L301">    bytes[offset] = b;</span>
+<span class="fc" id="L302">    return offset + 1;</span>
+  }
+
+  /**
+   * This method will convert utf8 encoded bytes into a string. If the given byte array is null,
+   * this method will return null.
+   *
+   * @param b Presumed UTF-8 encoded byte array.
+   * @return String made from &lt;code&gt;b&lt;/code&gt;
+   */
+  public static String toString(final byte [] b) {
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">    if (b == null) {</span>
+<span class="nc" id="L314">      return null;</span>
+    }
+<span class="fc" id="L316">    return toString(b, 0, b.length);</span>
+  }
+
+  /**
+   * Joins two byte arrays together using a separator.
+   *
+   * @param b1 The first byte array.
+   * @param sep The separator to use.
+   * @param b2 The second byte array.
+   * @return input byte arrays as string with a separator between
+   */
+  public static String toString(final byte [] b1,
+                                String sep,
+                                final byte [] b2) {
+<span class="nc" id="L330">    return toString(b1, 0, b1.length) + sep + toString(b2, 0, b2.length);</span>
+  }
+
+  /**
+   * This method will convert utf8 encoded bytes into a string. If the given byte array is null,
+   * this method will return null.
+   *
+   * @param b Presumed UTF-8 encoded byte array.
+   * @param off offset into array
+   * @return String made from &lt;code&gt;b&lt;/code&gt; or null
+   */
+  public static String toString(final byte[] b, int off) {
+<span class="nc bnc" id="L342" title="All 2 branches missed.">    if (b == null) {</span>
+<span class="nc" id="L343">      return null;</span>
+    }
+<span class="nc" id="L345">    int len = b.length - off;</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">    if (len &lt;= 0) {</span>
+<span class="nc" id="L347">      return &quot;&quot;;</span>
+    }
+<span class="nc" id="L349">    return new String(b, off, len, StandardCharsets.UTF_8);</span>
+  }
+
+  /**
+   * This method will convert utf8 encoded bytes into a string. If the given byte array is null,
+   * this method will return null.
+   *
+   * @param b Presumed UTF-8 encoded byte array.
+   * @param off offset into array
+   * @param len length of utf-8 sequence
+   * @return String made from &lt;code&gt;b&lt;/code&gt; or null
+   */
+  public static String toString(final byte [] b, int off, int len) {
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">    if (b == null) {</span>
+<span class="nc" id="L363">      return null;</span>
+    }
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">    if (len == 0) {</span>
+<span class="nc" id="L366">      return &quot;&quot;;</span>
+    }
+<span class="fc" id="L368">    return new String(b, off, len, StandardCharsets.UTF_8);</span>
+  }
+
+  /**
+   * Converts a string to a UTF-8 byte array.
+   *
+   * @param s string
+   * @return the byte array
+   */
+  public static byte[] toBytes(String s) {
+<span class="fc" id="L378">    return s.getBytes(StandardCharsets.UTF_8);</span>
+  }
+
+  /**
+   * Converts a byte array to a long value.
+   *
+   * @param bytes array
+   * @return the long value
+   */
+  public static long toLong(byte[] bytes) {
+<span class="fc" id="L388">    return toLong(bytes, 0, SIZEOF_LONG);</span>
+  }
+
+  /**
+   * Converts a byte array to a long value. Assumes there will be {@link #SIZEOF_LONG} bytes available.
+   *
+   * @param bytes bytes
+   * @param offset offset
+   * @return the long value
+   */
+  public static long toLong(byte[] bytes, int offset) {
+<span class="fc" id="L399">    return toLong(bytes, offset, SIZEOF_LONG);</span>
+  }
+
+  /**
+   * Converts a byte array to a long value.
+   *
+   * @param bytes array of bytes
+   * @param offset offset into array
+   * @param length length of data (must be {@link #SIZEOF_LONG})
+   * @return the long value
+   * @throws IllegalArgumentException if length is not {@link #SIZEOF_LONG} or
+   * if there's not enough room in the array at the offset indicated.
+   */
+  public static long toLong(byte[] bytes, int offset, final int length) {
+<span class="pc bpc" id="L413" title="2 of 4 branches missed.">    if (length != SIZEOF_LONG || offset + length &gt; bytes.length) {</span>
+<span class="nc" id="L414">      throw explainWrongLengthOrOffset(bytes, offset, length, SIZEOF_LONG);</span>
+    }
+<span class="pc bpc" id="L416" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L417">      return toLongUnsafe(bytes, offset);</span>
+    } else {
+<span class="nc" id="L419">      long l = 0;</span>
+<span class="nc bnc" id="L420" title="All 2 branches missed.">      for (int i = offset; i &lt; offset + length; i++) {</span>
+<span class="nc" id="L421">        l &lt;&lt;= 8;</span>
+<span class="nc" id="L422">        l ^= bytes[i] &amp; 0xFF;</span>
+      }
+<span class="nc" id="L424">      return l;</span>
+    }
+  }
+
+  /**
+   * Return Exception with fancy error message.
+   *
+   * @param bytes used byte array
+   * @param offset used offset
+   * @param length used length
+   * @param expectedLength expected length
+   * @return IllegalArgumentException with fancy error message
+   */
+  private static IllegalArgumentException explainWrongLengthOrOffset(final byte[] bytes,
+                                                                     final int offset,
+                                                                     final int length,
+                                                                     final int expectedLength) {
+    String reason;
+<span class="nc bnc" id="L442" title="All 2 branches missed.">    if (length != expectedLength) {</span>
+<span class="nc" id="L443">      reason = &quot;Wrong length: &quot; + length + &quot;, expected &quot; + expectedLength;</span>
+    } else {
+<span class="nc" id="L445">      reason = &quot;offset (&quot; + offset + &quot;) + length (&quot; + length + &quot;) exceed the capacity of the array: &quot; +</span>
+        bytes.length;
+    }
+<span class="nc" id="L448">    return new IllegalArgumentException(reason);</span>
+  }
+
+  /**
+   * Put a long value out to the specified byte array position.
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val long to write out
+   * @return incremented offset
+   * @throws IllegalArgumentException if the byte array given doesn't have
+   * enough room at the offset specified.
+   */
+  public static int putLong(byte[] bytes, int offset, long val) {
+<span class="pc bpc" id="L462" title="1 of 2 branches missed.">    if (bytes.length - offset &lt; SIZEOF_LONG) {</span>
+<span class="nc" id="L463">      throw new IllegalArgumentException(&quot;Not enough room to put a long at&quot; + &quot; offset &quot; + offset +</span>
+        &quot; in a &quot; + bytes.length + &quot; byte array&quot;);
+    }
+<span class="pc bpc" id="L466" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L467">      return putLongUnsafe(bytes, offset, val);</span>
+    } else {
+<span class="nc bnc" id="L469" title="All 2 branches missed.">      for (int i = offset + 7; i &gt; offset; i--) {</span>
+<span class="nc" id="L470">        bytes[i] = (byte) val;</span>
+<span class="nc" id="L471">        val &gt;&gt;&gt;= 8;</span>
+      }
+<span class="nc" id="L473">      bytes[offset] = (byte) val;</span>
+<span class="nc" id="L474">      return offset + SIZEOF_LONG;</span>
+    }
+  }
+
+  /**
+   * Put a long value out to the specified byte array position (Unsafe).
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val long to write out
+   * @return incremented offset
+   */
+  private static int putLongUnsafe(byte[] bytes, int offset, long val) {
+<span class="pc bpc" id="L487" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L488">      val = Long.reverseBytes(val);</span>
+    }
+<span class="fc" id="L490">    LexicographicalComparerHolder.UnsafeComparer.UNSAFE.putLong(bytes, (long) offset +</span>
+      LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET, val);
+<span class="fc" id="L492">    return offset + SIZEOF_LONG;</span>
+  }
+
+  /**
+   * Presumes float encoded as IEEE 754 floating-point &quot;single format&quot;
+   *
+   * @param bytes byte array
+   * @return Float made from passed byte array.
+   */
+  public static float toFloat(byte [] bytes) {
+<span class="fc" id="L502">    return toFloat(bytes, 0);</span>
+  }
+
+  /**
+   * Presumes float encoded as IEEE 754 floating-point &quot;single format&quot;
+   *
+   * @param bytes array to convert
+   * @param offset offset into array
+   * @return Float made from passed byte array.
+   */
+  public static float toFloat(byte [] bytes, int offset) {
+<span class="fc" id="L513">    return Float.intBitsToFloat(toInt(bytes, offset, SIZEOF_INT));</span>
+  }
+
+  /**
+   * Put a float value out to the specified byte position.
+   *
+   * @param bytes byte array
+   * @param offset offset to write to
+   * @param f float value
+   * @return New offset in &lt;code&gt;bytes&lt;/code&gt;
+   */
+  public static int putFloat(byte [] bytes, int offset, float f) {
+<span class="fc" id="L525">    return putInt(bytes, offset, Float.floatToRawIntBits(f));</span>
+  }
+
+  /**
+   * Converts a byte array to a double value.
+   *
+   * @param bytes byte array
+   * @return Return double made from passed bytes.
+   */
+  public static double toDouble(final byte [] bytes) {
+<span class="fc" id="L535">    return toDouble(bytes, 0);</span>
+  }
+
+  /**
+   * Converts a byte array to a double value.
+   *
+   * @param bytes byte array
+   * @param offset offset where double is
+   * @return Return double made from passed bytes.
+   */
+  public static double toDouble(final byte [] bytes, final int offset) {
+<span class="fc" id="L546">    return Double.longBitsToDouble(toLong(bytes, offset, SIZEOF_LONG));</span>
+  }
+
+  /**
+   * Put a double value out to the specified byte position.
+   *
+   * @param bytes byte array
+   * @param offset offset to write to
+   * @param d value
+   * @return New offset into array &lt;code&gt;bytes&lt;/code&gt;
+   */
+  public static int putDouble(byte [] bytes, int offset, double d) {
+<span class="fc" id="L558">    return putLong(bytes, offset, Double.doubleToLongBits(d));</span>
+  }
+
+  /**
+   * Converts a byte array to an int value
+   *
+   * @param bytes byte array
+   * @return the int value
+   */
+  public static int toInt(byte[] bytes) {
+<span class="fc" id="L568">    return toInt(bytes, 0, SIZEOF_INT);</span>
+  }
+
+  /**
+   * Converts a byte array to an int value
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @return the int value
+   */
+  public static int toInt(byte[] bytes, int offset) {
+<span class="fc" id="L579">    return toInt(bytes, offset, SIZEOF_INT);</span>
+  }
+
+  /**
+   * Converts a byte array to an int value
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @param length length of int (has to be {@link #SIZEOF_INT})
+   * @return the int value
+   * @throws IllegalArgumentException if length is not {@link #SIZEOF_INT} or
+   * if there's not enough room in the array at the offset indicated.
+   */
+  public static int toInt(byte[] bytes, int offset, final int length) {
+<span class="pc bpc" id="L593" title="2 of 4 branches missed.">    if (length != SIZEOF_INT || offset + length &gt; bytes.length) {</span>
+<span class="nc" id="L594">      throw explainWrongLengthOrOffset(bytes, offset, length, SIZEOF_INT);</span>
+    }
+<span class="pc bpc" id="L596" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L597">      return toIntUnsafe(bytes, offset);</span>
+    } else {
+<span class="nc" id="L599">      int n = 0;</span>
+<span class="nc bnc" id="L600" title="All 2 branches missed.">      for (int i = offset; i &lt; (offset + length); i++) {</span>
+<span class="nc" id="L601">        n &lt;&lt;= 8;</span>
+<span class="nc" id="L602">        n ^= bytes[i] &amp; 0xFF;</span>
+      }
+<span class="nc" id="L604">      return n;</span>
+    }
+  }
+
+  /**
+   * Converts a byte array to an int value (Unsafe version)
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @return the int value
+   */
+  public static int toIntUnsafe(byte[] bytes, int offset) {
+<span class="pc bpc" id="L616" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L617">      return Integer.reverseBytes(LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getInt(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+    } else {
+<span class="nc" id="L620">      return LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getInt(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+    }
+  }
+
+  /**
+   * Converts a byte array to an short value (Unsafe version)
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @return the short value
+   */
+  private static short toShortUnsafe(byte[] bytes, int offset) {
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L634">      return Short.reverseBytes(LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getShort(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+    } else {
+<span class="nc" id="L637">      return LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getShort(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+    }
+  }
+
+  /**
+   * Converts a byte array to an long value (Unsafe version)
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @return the long value
+   */
+  private static long toLongUnsafe(byte[] bytes, int offset) {
+<span class="pc bpc" id="L650" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L651">      return Long.reverseBytes(LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getLong(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+    } else {
+<span class="nc" id="L654">      return LexicographicalComparerHolder.UnsafeComparer.UNSAFE.getLong(bytes,</span>
+        (long) offset + LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+    }
+  }
+
+  /**
+   * Put an int value out to the specified byte array position.
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val int to write out
+   * @return incremented offset
+   * @throws IllegalArgumentException if the byte array given doesn't have enough room at the
+   * offset specified.
+   */
+  public static int putInt(byte[] bytes, int offset, int val) {
+<span class="pc bpc" id="L670" title="1 of 2 branches missed.">    if (bytes.length - offset &lt; SIZEOF_INT) {</span>
+<span class="nc" id="L671">      throw new IllegalArgumentException(&quot;Not enough room to put an int at&quot; + &quot; offset &quot; + offset +</span>
+        &quot; in a &quot; + bytes.length + &quot; byte array&quot;);
+    }
+<span class="pc bpc" id="L674" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L675">      return putIntUnsafe(bytes, offset, val);</span>
+    } else {
+<span class="nc bnc" id="L677" title="All 2 branches missed.">      for (int i = offset + 3; i &gt; offset; i--) {</span>
+<span class="nc" id="L678">        bytes[i] = (byte) val;</span>
+<span class="nc" id="L679">        val &gt;&gt;&gt;= 8;</span>
+      }
+<span class="nc" id="L681">      bytes[offset] = (byte) val;</span>
+<span class="nc" id="L682">      return offset + SIZEOF_INT;</span>
+    }
+  }
+
+  /**
+   * Put an int value out to the specified byte array position (Unsafe).
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val int to write out
+   * @return incremented offset
+   */
+  private static int putIntUnsafe(byte[] bytes, int offset, int val) {
+<span class="pc bpc" id="L695" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L696">      val = Integer.reverseBytes(val);</span>
+    }
+<span class="fc" id="L698">    LexicographicalComparerHolder.UnsafeComparer.UNSAFE.putInt(bytes, (long) offset +</span>
+      LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET, val);
+<span class="fc" id="L700">    return offset + SIZEOF_INT;</span>
+  }
+
+  /**
+   * Converts a byte array to a short value
+   *
+   * @param bytes byte array
+   * @return the short value
+   */
+  public static short toShort(byte[] bytes) {
+<span class="fc" id="L710">    return toShort(bytes, 0, SIZEOF_SHORT);</span>
+  }
+
+  /**
+   * Converts a byte array to a short value
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @return the short value
+   */
+  public static short toShort(byte[] bytes, int offset) {
+<span class="fc" id="L721">    return toShort(bytes, offset, SIZEOF_SHORT);</span>
+  }
+
+  /**
+   * Converts a byte array to a short value
+   *
+   * @param bytes byte array
+   * @param offset offset into array
+   * @param length length, has to be {@link #SIZEOF_SHORT}
+   * @return the short value
+   * @throws IllegalArgumentException if length is not {@link #SIZEOF_SHORT}
+   * or if there's not enough room in the array at the offset indicated.
+   */
+  public static short toShort(byte[] bytes, int offset, final int length) {
+<span class="pc bpc" id="L735" title="2 of 4 branches missed.">    if (length != SIZEOF_SHORT || offset + length &gt; bytes.length) {</span>
+<span class="nc" id="L736">      throw explainWrongLengthOrOffset(bytes, offset, length, SIZEOF_SHORT);</span>
+    }
+<span class="pc bpc" id="L738" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L739">      return toShortUnsafe(bytes, offset);</span>
+    } else {
+<span class="nc" id="L741">      short n = 0;</span>
+<span class="nc" id="L742">      n = (short) ((n ^ bytes[offset]) &amp; 0xFF);</span>
+<span class="nc" id="L743">      n = (short) (n &lt;&lt; 8);</span>
+<span class="nc" id="L744">      n = (short) ((n ^ bytes[offset + 1]) &amp; 0xFF);</span>
+<span class="nc" id="L745">      return n;</span>
+    }
+  }
+
+  /**
+   * Put a short value out to the specified byte array position.
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val short to write out
+   * @return incremented offset
+   * @throws IllegalArgumentException if the byte array given doesn't have enough room at the
+   * offset specified.
+   */
+  public static int putShort(byte[] bytes, int offset, short val) {
+<span class="pc bpc" id="L760" title="1 of 2 branches missed.">    if (bytes.length - offset &lt; SIZEOF_SHORT) {</span>
+<span class="nc" id="L761">      throw new IllegalArgumentException(&quot;Not enough room to put a short at&quot; + &quot; offset &quot; + offset +</span>
+        &quot; in a &quot; + bytes.length + &quot; byte array&quot;);
+    }
+<span class="pc bpc" id="L764" title="1 of 2 branches missed.">    if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L765">      return putShortUnsafe(bytes, offset, val);</span>
+    } else {
+<span class="nc" id="L767">      bytes[offset + 1] = (byte) val;</span>
+<span class="nc" id="L768">      val &gt;&gt;= 8;</span>
+<span class="nc" id="L769">      bytes[offset] = (byte) val;</span>
+<span class="nc" id="L770">      return offset + SIZEOF_SHORT;</span>
+    }
+  }
+
+  /**
+   * Put a short value out to the specified byte array position (Unsafe).
+   *
+   * @param bytes the byte array
+   * @param offset position in the array
+   * @param val short to write out
+   * @return incremented offset
+   */
+  private static int putShortUnsafe(byte[] bytes, int offset, short val) {
+<span class="pc bpc" id="L783" title="1 of 2 branches missed.">    if (LexicographicalComparerHolder.UnsafeComparer.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L784">      val = Short.reverseBytes(val);</span>
+    }
+<span class="fc" id="L786">    LexicographicalComparerHolder.UnsafeComparer.UNSAFE.putShort(bytes, (long) offset +</span>
+      LexicographicalComparerHolder.UnsafeComparer.BYTE_ARRAY_BASE_OFFSET, val);
+<span class="fc" id="L788">    return offset + SIZEOF_SHORT;</span>
+  }
+
+  /**
+   * Convert a BigDecimal value to a byte array
+   *
+   * @param val input value
+   * @return the byte array
+   */
+  public static byte[] toBytes(BigDecimal val) {
+<span class="fc" id="L798">    byte[] valueBytes = val.unscaledValue().toByteArray();</span>
+<span class="fc" id="L799">    byte[] result = new byte[valueBytes.length + SIZEOF_INT];</span>
+<span class="fc" id="L800">    int offset = putInt(result, 0, val.scale());</span>
+<span class="fc" id="L801">    putBytes(result, offset, valueBytes, 0, valueBytes.length);</span>
+<span class="fc" id="L802">    return result;</span>
+  }
+
+
+  /**
+   * Converts a byte array to a BigDecimal
+   *
+   * @param bytes bytes
+   * @return the char value
+   */
+  public static BigDecimal toBigDecimal(byte[] bytes) {
+<span class="fc" id="L813">    return toBigDecimal(bytes, 0, bytes.length);</span>
+  }
+
+  /**
+   * Converts a byte array to a BigDecimal value
+   *
+   * @param bytes bytes
+   * @param offset offset
+   * @param length length
+   * @return the char value
+   */
+  public static BigDecimal toBigDecimal(byte[] bytes, int offset, final int length) {
+<span class="pc bpc" id="L825" title="3 of 6 branches missed.">    if (bytes == null || length &lt; SIZEOF_INT + 1 ||</span>
+      (offset + length &gt; bytes.length)) {
+<span class="nc" id="L827">      return null;</span>
+    }
+
+<span class="fc" id="L830">    int scale = toInt(bytes, offset);</span>
+<span class="fc" id="L831">    byte[] tcBytes = new byte[length - SIZEOF_INT];</span>
+<span class="fc" id="L832">    System.arraycopy(bytes, offset + SIZEOF_INT, tcBytes, 0, length - SIZEOF_INT);</span>
+<span class="fc" id="L833">    return new BigDecimal(new BigInteger(tcBytes), scale);</span>
+  }
+
+  /**
+   * Compares two byte arrays
+   *
+   * @param left left operand
+   * @param right right operand
+   * @return 0 if equal, &amp;lt; 0 if left is less than right, etc.
+   */
+  public static int compareTo(final byte [] left, final byte [] right) {
+<span class="fc" id="L844">    return LexicographicalComparerHolder.BEST_COMPARER.</span>
+<span class="fc" id="L845">      compareTo(left, 0, left.length, right, 0, right.length);</span>
+  }
+
+  /**
+   * Lexicographically compare two arrays.
+   *
+   * @param buffer1 left operand
+   * @param buffer2 right operand
+   * @param offset1 Where to start comparing in the left buffer
+   * @param offset2 Where to start comparing in the right buffer
+   * @param length1 How much to compare from the left buffer
+   * @param length2 How much to compare from the right buffer
+   * @return 0 if equal, &amp;lt; 0 if left is less than right, etc.
+   */
+  public static int compareTo(byte[] buffer1, int offset1, int length1,
+                              byte[] buffer2, int offset2, int length2) {
+<span class="nc" id="L861">    return LexicographicalComparerHolder.BEST_COMPARER.</span>
+<span class="nc" id="L862">      compareTo(buffer1, offset1, length1, buffer2, offset2, length2);</span>
+  }
+
+  /**
+   * Comparer interface
+   *
+   * @param &lt;T&gt; type to compare
+   */
+  interface Comparer&lt;T&gt; {
+    /**
+     * Compares two buffers of type {@code T} with a given offset and length.
+     *
+     * @param buffer1 left operand
+     * @param offset1 offset of left operand
+     * @param length1 length of left operand
+     * @param buffer2 left operand
+     * @param offset2 offset of right operand
+     * @param length2 length of right operand
+     * @return 0 if equal, &lt; 0 if left is less than right, etc.
+     */
+    int compareTo(
+      T buffer1, int offset1, int length1, T buffer2, int offset2, int length2
+    );
+  }
+
+  /**
+   * Returns the pure java comparer
+   *
+   * @return java comparer
+   */
+  private static Comparer&lt;byte[]&gt; lexicographicalComparerJavaImpl() {
+<span class="nc" id="L893">    return LexicographicalComparerHolder.PureJavaComparer.INSTANCE;</span>
+  }
+
+  /**
+   * Provides a lexicographical comparer implementation; either a Java
+   * implementation or a faster implementation based on {@link Unsafe}.
+   * &lt;p&gt;
+   * Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't available.
+   */
+<span class="nc" id="L902">  static class LexicographicalComparerHolder {</span>
+    /**
+     * Class name of the unsafe comparer
+     */
+<span class="fc" id="L906">    static final String UNSAFE_COMPARER_NAME =</span>
+<span class="fc" id="L907">      LexicographicalComparerHolder.class.getName() + &quot;$UnsafeComparer&quot;;</span>
+
+    /**
+     * The best comparer
+     */
+<span class="fc" id="L912">    static final Comparer&lt;byte[]&gt; BEST_COMPARER = getBestComparer();</span>
+    /**
+     * Returns the Unsafe-using Comparer, or falls back to the pure-Java implementation if unable to do so.
+     *
+     * @return Unsafe comparer if available, else a pure java comparer
+     */
+    static Comparer&lt;byte[]&gt; getBestComparer() {
+      try {
+<span class="fc" id="L920">        Class&lt;?&gt; theClass = Class.forName(UNSAFE_COMPARER_NAME);</span>
+
+        // yes, UnsafeComparer does implement Comparer&lt;byte[]&gt;
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L924">        Comparer&lt;byte[]&gt; comparer =</span>
+<span class="fc" id="L925">          (Comparer&lt;byte[]&gt;) theClass.getEnumConstants()[0];</span>
+<span class="fc" id="L926">        return comparer;</span>
+<span class="nc" id="L927">      } catch (ClassNotFoundException t) {</span>
+<span class="nc" id="L928">        return lexicographicalComparerJavaImpl();</span>
+      }
+    }
+
+    /**
+     * Java comparer (without unsafe)
+     */
+<span class="nc" id="L935">    enum PureJavaComparer implements Comparer&lt;byte[]&gt; {</span>
+      /**
+       * Instance
+       */
+<span class="nc" id="L939">      INSTANCE;</span>
+
+      @Override
+      public int compareTo(byte[] buffer1, int offset1, int length1,
+                           byte[] buffer2, int offset2, int length2) {
+        // Short circuit equal case
+<span class="nc bnc" id="L945" title="All 6 branches missed.">        if (buffer1 == buffer2 &amp;&amp;</span>
+          offset1 == offset2 &amp;&amp;
+          length1 == length2) {
+<span class="nc" id="L948">          return 0;</span>
+        }
+        // Bring WritableComparator code local
+<span class="nc" id="L951">        int end1 = offset1 + length1;</span>
+<span class="nc" id="L952">        int end2 = offset2 + length2;</span>
+<span class="nc bnc" id="L953" title="All 4 branches missed.">        for (int i = offset1, j = offset2; i &lt; end1 &amp;&amp; j &lt; end2; i++, j++) {</span>
+<span class="nc" id="L954">          int a = buffer1[i] &amp; 0xff;</span>
+<span class="nc" id="L955">          int b = buffer2[j] &amp; 0xff;</span>
+<span class="nc bnc" id="L956" title="All 2 branches missed.">          if (a != b) {</span>
+<span class="nc" id="L957">            return a - b;</span>
+          }
+        }
+<span class="nc" id="L960">        return length1 - length2;</span>
+      }
+    }
+
+    /**
+     * Unsafe comparer
+     */
+<span class="fc" id="L967">    enum UnsafeComparer implements Comparer&lt;byte[]&gt; {</span>
+      /**
+       * Instance
+       */
+<span class="fc" id="L971">      INSTANCE;</span>
+
+      /**
+       * Unsafe
+       */
+      static final Unsafe UNSAFE;
+
+      /** The offset to the first element in a byte array. */
+      static final int BYTE_ARRAY_BASE_OFFSET;
+
+      static {
+<span class="pc bpc" id="L982" title="1 of 2 branches missed.">        if (UNSAFE_UNALIGNED) {</span>
+<span class="fc" id="L983">          UNSAFE = (Unsafe) AccessController.doPrivileged((PrivilegedAction&lt;Object&gt;) () -&gt; {</span>
+            try {
+<span class="fc" id="L985">              Field f = Unsafe.class.getDeclaredField(&quot;theUnsafe&quot;);</span>
+<span class="fc" id="L986">              f.setAccessible(true);</span>
+<span class="fc" id="L987">              return f.get(null);</span>
+<span class="nc" id="L988">            } catch (ReflectiveOperationException e) {</span>
+<span class="nc" id="L989">              LOG.warn(&quot;sun.misc.Unsafe is not accessible&quot;);</span>
+<span class="nc" id="L990">              return null;</span>
+            }
+          });
+        } else {
+          // It doesn't matter what we throw;
+          // it's swallowed in getBestComparer().
+<span class="nc" id="L996">          throw new Error();</span>
+        }
+
+<span class="fc" id="L999">        BYTE_ARRAY_BASE_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);</span>
+
+        // sanity check - this should never fail
+<span class="pc bpc" id="L1002" title="1 of 2 branches missed.">        if (UNSAFE.arrayIndexScale(byte[].class) != 1) {</span>
+<span class="nc" id="L1003">          throw new AssertionError();</span>
+        }
+      }
+
+      /**
+       * true, if byte order is little endian
+       */
+<span class="fc" id="L1010">      static final boolean LITTLE_ENDIAN = ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN);</span>
+
+      /**
+       * Lexicographically compare two arrays.
+       *
+       * @param buffer1 left operand
+       * @param buffer2 right operand
+       * @param offset1 Where to start comparing in the left buffer
+       * @param offset2 Where to start comparing in the right buffer
+       * @param length1 How much to compare from the left buffer
+       * @param length2 How much to compare from the right buffer
+       * @return 0 if equal, &lt; 0 if left is less than right, etc.
+       */
+      @Override
+      public int compareTo(byte[] buffer1, int offset1, int length1,
+                           byte[] buffer2, int offset2, int length2) {
+
+        // Short circuit equal case
+<span class="pc bpc" id="L1028" title="5 of 6 branches missed.">        if (buffer1 == buffer2 &amp;&amp;</span>
+          offset1 == offset2 &amp;&amp;
+          length1 == length2) {
+<span class="nc" id="L1031">          return 0;</span>
+        }
+<span class="fc" id="L1033">        final int stride = 8;</span>
+<span class="fc" id="L1034">        final int minLength = Math.min(length1, length2);</span>
+<span class="fc" id="L1035">        int strideLimit = minLength &amp; -stride;</span>
+<span class="fc" id="L1036">        final long offset1Adj = (long) offset1 + BYTE_ARRAY_BASE_OFFSET;</span>
+<span class="fc" id="L1037">        final long offset2Adj = (long) offset2 + BYTE_ARRAY_BASE_OFFSET;</span>
+        int i;
+
+        /*
+         * Compare 8 bytes at a time. Benchmarking on x86 shows a stride of 8 bytes is no slower
+         * than 4 bytes even on 32-bit. On the other hand, it is substantially faster on 64-bit.
+         */
+<span class="fc bfc" id="L1044" title="All 2 branches covered.">        for (i = 0; i &lt; strideLimit; i += stride) {</span>
+<span class="fc" id="L1045">          long lw = UNSAFE.getLong(buffer1, offset1Adj + (long) i);</span>
+<span class="fc" id="L1046">          long rw = UNSAFE.getLong(buffer2, offset2Adj + (long) i);</span>
+<span class="pc bpc" id="L1047" title="1 of 2 branches missed.">          if (lw != rw) {</span>
+<span class="nc bnc" id="L1048" title="All 2 branches missed.">            if (!LITTLE_ENDIAN) {</span>
+<span class="nc bnc" id="L1049" title="All 2 branches missed.">              return ((lw + Long.MIN_VALUE) &lt; (rw + Long.MIN_VALUE)) ? -1 : 1;</span>
+            }
+
+            /*
+             * We want to compare only the first index where left[index] != right[index]. This
+             * corresponds to the least significant nonzero byte in lw ^ rw, since lw and rw are
+             * little-endian. Long.numberOfTrailingZeros(diff) tells us the least significant
+             * nonzero bit, and zeroing out the first three bits of L.nTZ gives us the shift to get
+             * that least significant nonzero byte. This comparison logic is based on UnsignedBytes
+             * comparator from guava v21
+             */
+<span class="nc" id="L1060">            int n = Long.numberOfTrailingZeros(lw ^ rw) &amp; ~0x7;</span>
+<span class="nc" id="L1061">            return ((int) ((lw &gt;&gt;&gt; n) &amp; 0xFF)) - ((int) ((rw &gt;&gt;&gt; n) &amp; 0xFF));</span>
+          }
+        }
+
+        // The epilogue to cover the last (minLength % stride) elements.
+<span class="fc bfc" id="L1066" title="All 2 branches covered.">        for (; i &lt; minLength; i++) {</span>
+<span class="fc" id="L1067">          int a = buffer1[offset1 + i] &amp; 0xFF;</span>
+<span class="fc" id="L1068">          int b = buffer2[offset2 + i] &amp; 0xFF;</span>
+<span class="fc bfc" id="L1069" title="All 2 branches covered.">          if (a != b) {</span>
+<span class="fc" id="L1070">            return a - b;</span>
+          }
+        }
+<span class="fc" id="L1073">        return length1 - length2;</span>
+      }
+    }
+  }
+
+  /**
+   * Hashes a specified byte array with offset and length.
+   *
+   * @param bytes array to hash
+   * @param offset offset to start from
+   * @param length length to hash
+   * @return hash
+   */
+  public static int hashCode(byte[] bytes, int offset, int length) {
+<span class="nc" id="L1087">    int hash = 1;</span>
+<span class="nc bnc" id="L1088" title="All 2 branches missed.">    for (int i = offset; i &lt; offset + length; i++) {</span>
+<span class="nc" id="L1089">      hash = (31 * hash) + (int) bytes[i];</span>
+    }
+<span class="nc" id="L1091">    return hash;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

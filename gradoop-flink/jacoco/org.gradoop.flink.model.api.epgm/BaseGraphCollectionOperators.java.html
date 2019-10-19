@@ -300,12 +300,22 @@ public interface BaseGraphCollectionOperators&lt;
   //----------------------------------------------------------------------------
 
   /**
+   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the collection
+   * is empty.
+   *
+   * A collection is considered empty, if it contains no logical graphs.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is empty or {@code false} if not
+   */
+  DataSet&lt;Boolean&gt; isEmpty();
+
+  /**
    * Returns a distinct collection of base graphs. Graph equality is based on graph identifiers.
    *
    * @return distinct graph collection
    */
   default GC distinctById() {
-<span class="fc" id="L308">    return callForCollection(new DistinctById&lt;&gt;());</span>
+<span class="fc" id="L318">    return callForCollection(new DistinctById&lt;&gt;());</span>
   }
 
   /**
@@ -315,7 +325,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return distinct graph collection
    */
   default GC distinctByIsomorphism() {
-<span class="fc" id="L318">    return callForCollection(new DistinctByIsomorphism&lt;&gt;());</span>
+<span class="fc" id="L328">    return callForCollection(new DistinctByIsomorphism&lt;&gt;());</span>
   }
 
   /**
@@ -327,7 +337,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return grouped graph collection
    */
   default GC groupByIsomorphism(GraphHeadReduceFunction&lt;G&gt; reduceFunction) {
-<span class="fc" id="L330">    return callForCollection(new GroupByIsomorphism&lt;&gt;(reduceFunction));</span>
+<span class="fc" id="L340">    return callForCollection(new GroupByIsomorphism&lt;&gt;(reduceFunction));</span>
   }
 
   //----------------------------------------------------------------------------
@@ -362,7 +372,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return result of given operator
    */
   default LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator&lt;GC, LG&gt; operator) {
-<span class="nc" id="L365">    return callForValue(operator);</span>
+<span class="nc" id="L375">    return callForValue(operator);</span>
   }
 
   /**
@@ -372,7 +382,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return result of given operator
    */
   default GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator) {
-<span class="fc" id="L375">    return callForValue(operator);</span>
+<span class="fc" id="L385">    return callForValue(operator);</span>
   }
 
   /**
@@ -385,7 +395,7 @@ public interface BaseGraphCollectionOperators&lt;
    */
   default GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator,
                                GC otherCollection) {
-<span class="fc" id="L388">    return callForValue(operator, otherCollection);</span>
+<span class="fc" id="L398">    return callForValue(operator, otherCollection);</span>
   }
 
   /**
@@ -396,7 +406,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return collection with resulting logical graphs
    */
   default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
-<span class="fc" id="L399">    return callForValue(operator);</span>
+<span class="fc" id="L409">    return callForValue(operator);</span>
   }
 
   /**
@@ -411,7 +421,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @see Combination
    */
   default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator&lt;GC, LG&gt; operator) {
-<span class="fc" id="L414">    return callForValue(operator);</span>
+<span class="fc" id="L424">    return callForValue(operator);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

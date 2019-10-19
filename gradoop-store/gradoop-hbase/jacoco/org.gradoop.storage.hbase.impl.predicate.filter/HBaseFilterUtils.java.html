@@ -170,7 +170,7 @@ import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
       CF_PROPERTY_VALUE_BYTES,
 <span class="fc" id="L171">      Bytes.toBytesBinary(key),</span>
       compareOp,
-<span class="fc" id="L173">      PropertyValueUtils.Bytes.getRawBytesWithoutType(value));</span>
+<span class="fc" id="L173">      PropertyValueUtils.BytesUtils.getRawBytesWithoutType(value));</span>
 
     // Define that the entire row will be skipped if the column is not found
 <span class="fc" id="L176">    valueFilter.setFilterIfMissing(true);</span>
@@ -179,7 +179,7 @@ import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
       CF_PROPERTY_TYPE_BYTES,
 <span class="fc" id="L180">      Bytes.toBytesBinary(key),</span>
       compareOp,
-<span class="fc" id="L182">      PropertyValueUtils.Bytes.getTypeByte(value));</span>
+<span class="fc" id="L182">      PropertyValueUtils.BytesUtils.getTypeByte(value));</span>
 
     // Define that the entire row will be skipped if the column is not found
 <span class="fc" id="L185">    typeFilter.setFilterIfMissing(true);</span>
@@ -265,7 +265,7 @@ import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
       CF_PROPERTY_VALUE_BYTES,
 <span class="fc" id="L266">      Bytes.toBytesBinary(key),</span>
       compareOp,
-<span class="fc" id="L268">      new BinaryComparator(PropertyValueUtils.Bytes.getRawBytesWithoutType(min)));</span>
+<span class="fc" id="L268">      new BinaryComparator(PropertyValueUtils.BytesUtils.getRawBytesWithoutType(min)));</span>
 
     // Define that the entire row will be skipped if the column is not found
 <span class="fc" id="L271">    valueFilter.setFilterIfMissing(true);</span>
@@ -274,7 +274,7 @@ import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
       CF_PROPERTY_TYPE_BYTES,
 <span class="fc bfc" id="L275" title="All 2 branches covered.">      Bytes.toBytesBinary(key),</span>
       negate ? CompareFilter.CompareOp.NOT_EQUAL : CompareFilter.CompareOp.EQUAL,
-<span class="fc" id="L277">      PropertyValueUtils.Bytes.getTypeByte(min));</span>
+<span class="fc" id="L277">      PropertyValueUtils.BytesUtils.getTypeByte(min));</span>
 
     // Define that the entire row will be skipped if the column is not found
 <span class="fc" id="L280">    typeFilter.setFilterIfMissing(true);</span>

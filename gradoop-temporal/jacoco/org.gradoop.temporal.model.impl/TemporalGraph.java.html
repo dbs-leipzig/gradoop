@@ -27,17 +27,16 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -87,40 +86,26 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
    * @param config the temporal Gradoop config
    */
   TemporalGraph(LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; layout,
-<span class="fc" id="L90">    TemporalGradoopConfig config) {</span>
-<span class="fc" id="L91">    this.layout = Preconditions.checkNotNull(layout);</span>
-<span class="fc" id="L92">    this.config = Preconditions.checkNotNull(config);</span>
-<span class="fc" id="L93">  }</span>
+<span class="fc" id="L89">    TemporalGradoopConfig config) {</span>
+<span class="fc" id="L90">    this.layout = Preconditions.checkNotNull(layout);</span>
+<span class="fc" id="L91">    this.config = Preconditions.checkNotNull(config);</span>
+<span class="fc" id="L92">  }</span>
 
   @Override
   public TemporalGradoopConfig getConfig() {
-<span class="fc" id="L97">    return this.config;</span>
+<span class="fc" id="L96">    return this.config;</span>
   }
 
   @Override
   public BaseGraphFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection&gt; getFactory() {
-<span class="fc" id="L103">    return this.config.getTemporalGraphFactory();</span>
+<span class="fc" id="L102">    return this.config.getTemporalGraphFactory();</span>
   }
 
   @Override
   public BaseGraphCollectionFactory&lt;TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
       TemporalGraphCollection&gt; getCollectionFactory() {
-<span class="fc" id="L109">    return this.config.getTemporalGraphCollectionFactory();</span>
-  }
-
-  /**
-   * Returns a 1-element dataset containing a {@link Boolean} value which indicates if the graph is empty.
-   *
-   * A graph is considered empty, if it contains no vertices.
-   *
-   * @return  1-element dataset containing {@link Boolean#TRUE}, if the collection is
-   *          empty or {@link Boolean#FALSE} if not
-   */
-  public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="fc" id="L121">    return getVertices().map(new True&lt;&gt;()).distinct()</span>
-<span class="fc" id="L122">      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())</span>
-<span class="fc" id="L123">      .map(new Not());</span>
+<span class="fc" id="L108">    return this.config.getTemporalGraphCollectionFactory();</span>
   }
 
   /**
@@ -130,8 +115,8 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
    * @throws IOException if the graph can't be written to the sink
    */
   public void writeTo(TemporalDataSink dataSink) throws IOException {
-<span class="fc" id="L133">    dataSink.write(this);</span>
-<span class="fc" id="L134">  }</span>
+<span class="fc" id="L118">    dataSink.write(this);</span>
+<span class="fc" id="L119">  }</span>
 
   /**
    * Writes the graph to given data sink with an optional overwrite option.
@@ -141,42 +126,42 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
    * @throws IOException if the graph can't be written to the sink
    */
   public void writeTo(TemporalDataSink dataSink, boolean overWrite) throws IOException {
-<span class="fc" id="L144">    dataSink.write(this, overWrite);</span>
-<span class="fc" id="L145">  }</span>
+<span class="fc" id="L129">    dataSink.write(this, overWrite);</span>
+<span class="fc" id="L130">  }</span>
 
   @Override
   public boolean isGVELayout() {
-<span class="nc" id="L149">    return this.layout.isGVELayout();</span>
+<span class="nc" id="L134">    return this.layout.isGVELayout();</span>
   }
 
   @Override
   public boolean isIndexedGVELayout() {
-<span class="nc" id="L154">    return this.layout.isIndexedGVELayout();</span>
+<span class="nc" id="L139">    return this.layout.isIndexedGVELayout();</span>
   }
 
   @Override
   public DataSet&lt;TemporalGraphHead&gt; getGraphHead() {
-<span class="fc" id="L159">    return this.layout.getGraphHead();</span>
+<span class="fc" id="L144">    return this.layout.getGraphHead();</span>
   }
 
   @Override
   public DataSet&lt;TemporalVertex&gt; getVertices() {
-<span class="fc" id="L164">    return this.layout.getVertices();</span>
+<span class="fc" id="L149">    return this.layout.getVertices();</span>
   }
 
   @Override
   public DataSet&lt;TemporalVertex&gt; getVerticesByLabel(String label) {
-<span class="fc" id="L169">    return this.layout.getVerticesByLabel(label);</span>
+<span class="fc" id="L154">    return this.layout.getVerticesByLabel(label);</span>
   }
 
   @Override
   public DataSet&lt;TemporalEdge&gt; getEdges() {
-<span class="fc" id="L174">    return this.layout.getEdges();</span>
+<span class="fc" id="L159">    return this.layout.getEdges();</span>
   }
 
   @Override
   public DataSet&lt;TemporalEdge&gt; getEdgesByLabel(String label) {
-<span class="fc" id="L179">    return this.layout.getEdgesByLabel(label);</span>
+<span class="fc" id="L164">    return this.layout.getEdgesByLabel(label);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -184,10 +169,19 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
   //----------------------------------------------------------------------------
 
   @Override
-  public TemporalGraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-<span class="nc" id="L189">    return callForCollection(new CypherPatternMatching&lt;&gt;(query, constructionPattern,</span>
-      true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
+  public DataSet&lt;Boolean&gt; equalsByElementData(TemporalGraph other) {
+<span class="fc" id="L173">    return callForValue(new GraphEquality&lt;&gt;(</span>
+      new GraphHeadToEmptyString&lt;&gt;(),
+      new TemporalVertexToDataString&lt;&gt;(),
+      new TemporalEdgeToDataString&lt;&gt;(), true), other);
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; equalsByData(TemporalGraph other) {
+<span class="fc" id="L181">    return callForValue(new GraphEquality&lt;&gt;(</span>
+      new TemporalGraphHeadToDataString&lt;&gt;(),
+      new TemporalVertexToDataString&lt;&gt;(),
+      new TemporalEdgeToDataString&lt;&gt;(), true), other);
   }
 
   //----------------------------------------------------------------------------
@@ -196,13 +190,13 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
 
   @Override
   public &lt;T&gt; T callForValue(UnaryBaseGraphToValueOperator&lt;TemporalGraph, T&gt; operator) {
-<span class="fc" id="L199">    return operator.execute(this);</span>
+<span class="fc" id="L193">    return operator.execute(this);</span>
   }
 
   @Override
   public &lt;T&gt; T callForValue(BinaryBaseGraphToValueOperator&lt;TemporalGraph, T&gt; operator,
                             TemporalGraph otherGraph) {
-<span class="nc" id="L205">    return operator.execute(this, otherGraph);</span>
+<span class="fc" id="L199">    return operator.execute(this, otherGraph);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -211,11 +205,11 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
 
   @Override
   public LogicalGraph toLogicalGraph() {
-<span class="fc" id="L214">    final LogicalGraphFactory logicalGraphFactory = getConfig().getLogicalGraphFactory();</span>
-<span class="fc" id="L215">    return logicalGraphFactory.fromDataSets(</span>
-<span class="fc" id="L216">      getGraphHead().map(new TemporalGraphHeadToGraphHead(logicalGraphFactory.getGraphHeadFactory())),</span>
-<span class="fc" id="L217">      getVertices().map(new TemporalVertexToVertex(logicalGraphFactory.getVertexFactory())),</span>
-<span class="fc" id="L218">      getEdges().map(new TemporalEdgeToEdge(logicalGraphFactory.getEdgeFactory())));</span>
+<span class="fc" id="L208">    final LogicalGraphFactory logicalGraphFactory = getConfig().getLogicalGraphFactory();</span>
+<span class="fc" id="L209">    return logicalGraphFactory.fromDataSets(</span>
+<span class="fc" id="L210">      getGraphHead().map(new TemporalGraphHeadToGraphHead(logicalGraphFactory.getGraphHeadFactory())),</span>
+<span class="fc" id="L211">      getVertices().map(new TemporalVertexToVertex(logicalGraphFactory.getVertexFactory())),</span>
+<span class="fc" id="L212">      getEdges().map(new TemporalEdgeToEdge(logicalGraphFactory.getEdgeFactory())));</span>
   }
 
   /**
@@ -227,8 +221,8 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
    * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
   public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph) {
-<span class="fc" id="L230">    return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()</span>
-<span class="fc" id="L231">      .fromNonTemporalGraph(logicalGraph);</span>
+<span class="fc" id="L224">    return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()</span>
+<span class="fc" id="L225">      .fromNonTemporalGraph(logicalGraph);</span>
   }
 
   /**
@@ -237,7 +231,7 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
    * @throws Exception forwarded from dataset print
    */
   public void print() throws Exception {
-<span class="nc" id="L240">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L241">  }</span>
+<span class="nc" id="L234">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L235">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

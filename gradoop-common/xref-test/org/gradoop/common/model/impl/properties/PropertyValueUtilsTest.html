@@ -971,33 +971,33 @@
 <a name="961" href="#961">961</a>   }
 <a name="962" href="#962">962</a> 
 <a name="963" href="#963">963</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="964" href="#964">964</a> <em class="jxr_javadoccomment">   * Test class for {@link PropertyValueUtils.Bytes} class</em>
+<a name="964" href="#964">964</a> <em class="jxr_javadoccomment">   * Test class for {@link PropertyValueUtils.BytesUtils} class</em>
 <a name="965" href="#965">965</a> <em class="jxr_javadoccomment">   */</em>
 <a name="966" href="#966">966</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/common/model/impl/properties/PropertyValueUtilsTest.html">BytesTest</a> {
 <a name="967" href="#967">967</a> 
 <a name="968" href="#968">968</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="969" href="#969">969</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.Bytes#getRawBytesWithoutType(PropertyValue)}</em>
+<a name="969" href="#969">969</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.BytesUtils#getRawBytesWithoutType(PropertyValue)}</em>
 <a name="970" href="#970">970</a> <em class="jxr_javadoccomment">     */</em>
 <a name="971" href="#971">971</a>     @Test(dataProviderClass = PropertyValueTestProvider.<strong class="jxr_keyword">class</strong>, dataProvider = <span class="jxr_string">"propertyValueProvider"</span>)
 <a name="972" href="#972">972</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetRawBytesWithoutType(PropertyValue propertyValue) {
 <a name="973" href="#973">973</a>       assertArrayEquals(Arrays.copyOfRange(propertyValue.getRawBytes(), 1, propertyValue.getRawBytes().length),
-<a name="974" href="#974">974</a>         PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
+<a name="974" href="#974">974</a>         PropertyValueUtils.BytesUtils.getRawBytesWithoutType(propertyValue));
 <a name="975" href="#975">975</a>     }
 <a name="976" href="#976">976</a> 
 <a name="977" href="#977">977</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="978" href="#978">978</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.Bytes#getTypeByte(PropertyValue)}</em>
+<a name="978" href="#978">978</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.BytesUtils#getTypeByte(PropertyValue)}</em>
 <a name="979" href="#979">979</a> <em class="jxr_javadoccomment">     */</em>
 <a name="980" href="#980">980</a>     @Test(dataProviderClass = PropertyValueTestProvider.<strong class="jxr_keyword">class</strong>, dataProvider = <span class="jxr_string">"propertiesProvider"</span>)
 <a name="981" href="#981">981</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetTypeByte(PropertyValue propertyValue, byte type) {
-<a name="982" href="#982">982</a>       assertArrayEquals(<strong class="jxr_keyword">new</strong> byte[] {type}, PropertyValueUtils.Bytes.getTypeByte(propertyValue));
+<a name="982" href="#982">982</a>       assertArrayEquals(<strong class="jxr_keyword">new</strong> byte[] {type}, PropertyValueUtils.BytesUtils.getTypeByte(propertyValue));
 <a name="983" href="#983">983</a>     }
 <a name="984" href="#984">984</a> 
 <a name="985" href="#985">985</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="986" href="#986">986</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.Bytes#createFromTypeValueBytes(byte[], byte[])}}</em>
+<a name="986" href="#986">986</a> <em class="jxr_javadoccomment">     * Test static function {@link PropertyValueUtils.BytesUtils#createFromTypeValueBytes(byte[], byte[])}}</em>
 <a name="987" href="#987">987</a> <em class="jxr_javadoccomment">     */</em>
 <a name="988" href="#988">988</a>     @Test(dataProviderClass = PropertyValueTestProvider.<strong class="jxr_keyword">class</strong>, dataProvider = <span class="jxr_string">"propertiesProvider"</span>)
 <a name="989" href="#989">989</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCreateFromTypeValueBytes(PropertyValue propertyValue, byte type) {
-<a name="990" href="#990">990</a>       assertEquals(propertyValue, PropertyValueUtils.Bytes
+<a name="990" href="#990">990</a>       assertEquals(propertyValue, PropertyValueUtils.BytesUtils
 <a name="991" href="#991">991</a>         .createFromTypeValueBytes(<strong class="jxr_keyword">new</strong> byte[] {type},
 <a name="992" href="#992">992</a>           Arrays.copyOfRange(propertyValue.getRawBytes(),
 <a name="993" href="#993">993</a>             1, propertyValue.getRawBytes().length)));

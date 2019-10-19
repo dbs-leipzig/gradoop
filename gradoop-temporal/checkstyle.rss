@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 23,
+      <title>File: 25,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -44,6 +44,160 @@ under the License.
             </tr>
           </thead>
           <tbody>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.TemporalCanonicalAdjacencyMatrixBuilderTest.java">org/gradoop/temporal/model/impl/operators/tostring/TemporalCanonicalAdjacencyMatrixBuilderTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.keyedgrouping.TemporalGroupingTest.java">org/gradoop/temporal/model/impl/operators/keyedgrouping/TemporalGroupingTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.TemporalCSVSourceAndSinkTest.java">org/gradoop/temporal/io/impl/csv/TemporalCSVSourceAndSinkTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphTest.java">org/gradoop/temporal/model/impl/TemporalGraphTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.layout.TemporalGraphLayoutFactoryTest.java">org/gradoop/temporal/model/impl/layout/TemporalGraphLayoutFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphCollectionTest.java">org/gradoop/temporal/model/impl/TemporalGraphCollectionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AbstractTimeAggregateFunctionTest.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AbstractTimeAggregateFunctionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.api.functions.TemporalAggregateFunctionTest.java">org/gradoop/temporal/model/api/functions/TemporalAggregateFunctionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.diff.functions.DiffPerElementTest.java">org/gradoop/temporal/model/impl/operators/diff/functions/DiffPerElementTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.equality.TemporalEqualityTest.java">org/gradoop/temporal/model/impl/operators/equality/TemporalEqualityTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AverageDurationTest.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AverageDurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.util.TemporalGradoopTestBase.java">org/gradoop/temporal/util/TemporalGradoopTestBase.java</a>
@@ -75,20 +229,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.util.TimeFormatConversionTest.java">org/gradoop/temporal/util/TimeFormatConversionTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.keyedgrouping.TemporalGroupingTest.java">org/gradoop/temporal/model/impl/operators/keyedgrouping/TemporalGroupingTest.java</a>
                 </td>
                 <td>
                   0
@@ -144,20 +284,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.TemporalCSVSourceAndSinkTest.java">org/gradoop/temporal/io/impl/csv/TemporalCSVSourceAndSinkTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.snapshot.ByTemporalPredicateTest.java">org/gradoop/temporal/model/impl/operators/snapshot/ByTemporalPredicateTest.java</a>
                 </td>
                 <td>
@@ -172,49 +298,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphTest.java">org/gradoop/temporal/model/impl/TemporalGraphTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.layout.TemporalGraphLayoutFactoryTest.java">org/gradoop/temporal/model/impl/layout/TemporalGraphLayoutFactoryTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.diff.DiffTest.java">org/gradoop/temporal/model/impl/operators/diff/DiffTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphCollectionTest.java">org/gradoop/temporal/model/impl/TemporalGraphCollectionTest.java</a>
                 </td>
                 <td>
                   0
@@ -284,20 +368,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AbstractTimeAggregateFunctionTest.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AbstractTimeAggregateFunctionTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.functions.TemporalPredicateTests.java">org/gradoop/temporal/model/impl/functions/TemporalPredicateTests.java</a>
                 </td>
                 <td>
@@ -312,49 +382,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.api.functions.TemporalAggregateFunctionTest.java">org/gradoop/temporal/model/api/functions/TemporalAggregateFunctionTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.diff.functions.DiffPerElementTest.java">org/gradoop/temporal/model/impl/operators/diff/functions/DiffPerElementTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.pojo.TemporalGraphHeadTest.java">org/gradoop/temporal/model/impl/pojo/TemporalGraphHeadTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AverageDurationTest.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AverageDurationTest.java</a>
                 </td>
                 <td>
                   0

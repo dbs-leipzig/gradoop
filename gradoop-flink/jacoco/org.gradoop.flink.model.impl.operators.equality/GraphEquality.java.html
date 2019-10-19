@@ -16,13 +16,13 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
@@ -30,15 +30,26 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class GraphEquality
-  implements BinaryBaseGraphToValueOperator&lt;LogicalGraph, DataSet&lt;Boolean&gt;&gt; {
+public class GraphEquality&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements BinaryBaseGraphToValueOperator&lt;LG, DataSet&lt;Boolean&gt;&gt; {
 
   /**
    * collection equality operator, wrapped by graph equality
    * (graph are considered to be a 1-graph collection)
    */
-  private final CollectionEquality collectionEquality;
+  private final CollectionEquality&lt;G, V, E, LG, GC&gt; collectionEquality;
   /**
    * sets mode for directed or undirected graphs
    */
@@ -51,21 +62,20 @@ public class GraphEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
-    VertexToString&lt;EPGMVertex&gt; vertexToString, EdgeToString&lt;EPGMEdge&gt; edgeToString,
-<span class="fc" id="L56">    boolean directed) {</span>
-<span class="fc" id="L57">    this.directed = directed;</span>
+  public GraphEquality(GraphHeadToString&lt;G&gt; graphHeadToString,
+    VertexToString&lt;V&gt; vertexToString, EdgeToString&lt;E&gt; edgeToString,
+<span class="fc" id="L67">    boolean directed) {</span>
+<span class="fc" id="L68">    this.directed = directed;</span>
 
-<span class="fc" id="L59">    this.collectionEquality =</span>
-      new CollectionEquality(graphHeadToString, vertexToString, edgeToString, this.directed);
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L70">    this.collectionEquality =</span>
+      new CollectionEquality&lt;&gt;(graphHeadToString, vertexToString, edgeToString, this.directed);
+<span class="fc" id="L72">  }</span>
 
   @Override
-  public DataSet&lt;Boolean&gt; execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    BaseGraphCollectionFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;
-<span class="fc" id="L66">      collectionFactory = firstGraph.getCollectionFactory();</span>
-<span class="fc" id="L67">    return collectionEquality</span>
-<span class="fc" id="L68">      .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));</span>
+  public DataSet&lt;Boolean&gt; execute(LG firstGraph, LG secondGraph) {
+<span class="fc" id="L76">    BaseGraphCollectionFactory&lt;G, V, E, LG, GC&gt; collectionFactory = firstGraph.getCollectionFactory();</span>
+<span class="fc" id="L77">    return collectionEquality</span>
+<span class="fc" id="L78">      .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

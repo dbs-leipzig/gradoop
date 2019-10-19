@@ -108,8 +108,8 @@
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>    @Override
 <a name="100" href="#100">100</a>   <strong class="jxr_keyword">public</strong> Put writeProperty(<strong class="jxr_keyword">final</strong> Put put, Property property) {
-<a name="101" href="#101">101</a>     byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());
-<a name="102" href="#102">102</a>     byte[] bytesWithoutType = PropertyValueUtils.Bytes.getRawBytesWithoutType(property.getValue());
+<a name="101" href="#101">101</a>     byte[] type = PropertyValueUtils.BytesUtils.getTypeByte(property.getValue());
+<a name="102" href="#102">102</a>     byte[] bytesWithoutType = PropertyValueUtils.BytesUtils.getRawBytesWithoutType(property.getValue());
 <a name="103" href="#103">103</a>     put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);
 <a name="104" href="#104">104</a>     put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);
 <a name="105" href="#105">105</a>     <strong class="jxr_keyword">return</strong> put;
@@ -142,7 +142,7 @@
 <a name="132" href="#132">132</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;byte[], byte[]&gt; propertyColumn : typeFamilyMap.entrySet()) {
 <a name="133" href="#133">133</a>       properties.set(
 <a name="134" href="#134">134</a>         Bytes.toString(propertyColumn.getKey()),
-<a name="135" href="#135">135</a>         PropertyValueUtils.Bytes.createFromTypeValueBytes(
+<a name="135" href="#135">135</a>         PropertyValueUtils.BytesUtils.createFromTypeValueBytes(
 <a name="136" href="#136">136</a>           propertyColumn.getValue(),
 <a name="137" href="#137">137</a>           valueFamilyMap.get(propertyColumn.getKey())));
 <a name="138" href="#138">138</a>     }

@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
@@ -40,7 +39,6 @@ import static java.util.stream.Collectors.joining;
  * The reference is stored via the elements ID. Additionally the embedding ca store an ordered
  * list of PropertyValues.
  */
-@SuppressWarnings(&quot;SE_NO_SERIALVERSIONID&quot;)
 public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
 
   /**
@@ -57,6 +55,11 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * Indicates that an entry is an id list
    */
   public static final transient byte ID_LIST_FLAG = 0x01;
+
+  /**
+   * Default class version for serialization.
+   */
+  private static final long serialVersionUID = 1;
 
   /**
    * Holds the idData of all id-able entries (IDListFlag, ID)
@@ -77,8 +80,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * Creates am empty Embedding
    */
   public Embedding() {
-<span class="fc" id="L80">    this(new byte[0], new byte[0], new byte[0]);</span>
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L83">    this(new byte[0], new byte[0], new byte[0]);</span>
+<span class="fc" id="L84">  }</span>
 
   /**
    * Creates an Embedding with the given data
@@ -86,12 +89,11 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param propertyData Properties stored in internal byte array format
    * @param idListData IdLists stored in internal byte array format
    */
-  @SuppressWarnings(&quot;EI_EXPOSE_REP2&quot;)
-<span class="fc" id="L90">  public Embedding(byte[] idData, byte[] propertyData, byte[] idListData) {</span>
-<span class="fc" id="L91">    this.idData = idData;</span>
-<span class="fc" id="L92">    this.propertyData = propertyData;</span>
-<span class="fc" id="L93">    this.idListData = idListData;</span>
-<span class="fc" id="L94">  }</span>
+<span class="fc" id="L92">  public Embedding(byte[] idData, byte[] propertyData, byte[] idListData) {</span>
+<span class="fc" id="L93">    this.idData = idData;</span>
+<span class="fc" id="L94">    this.propertyData = propertyData;</span>
+<span class="fc" id="L95">    this.idListData = idListData;</span>
+<span class="fc" id="L96">  }</span>
 
   // ---------------------------------------------------------------------------------------------
   //  ID handling
@@ -102,8 +104,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param id the Id that will be appended
    */
   public void add(GradoopId id) {
-<span class="fc" id="L105">    add(id, false);</span>
-<span class="fc" id="L106">  }</span>
+<span class="fc" id="L107">    add(id, false);</span>
+<span class="fc" id="L108">  }</span>
 
 
   /**
@@ -112,26 +114,26 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param ids list of ids
    */
   public void addAll(GradoopId... ids) {
-<span class="fc" id="L115">    byte[] newIds = new byte[idData.length + ids.length * ID_ENTRY_SIZE];</span>
+<span class="fc" id="L117">    byte[] newIds = new byte[idData.length + ids.length * ID_ENTRY_SIZE];</span>
 
-<span class="fc" id="L117">    System.arraycopy(idData, 0, newIds, 0, idData.length);</span>
+<span class="fc" id="L119">    System.arraycopy(idData, 0, newIds, 0, idData.length);</span>
 
-<span class="fc" id="L119">    int offset = idData.length;</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">    for (GradoopId id : ids) {</span>
-<span class="fc" id="L121">      newIds[offset] = ID_ENTRY_FLAG;</span>
-<span class="fc" id="L122">      System.arraycopy(id.toByteArray(), 0, newIds, offset + 1, GradoopId.ID_SIZE);</span>
-<span class="fc" id="L123">      offset += ID_ENTRY_SIZE;</span>
+<span class="fc" id="L121">    int offset = idData.length;</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    for (GradoopId id : ids) {</span>
+<span class="fc" id="L123">      newIds[offset] = ID_ENTRY_FLAG;</span>
+<span class="fc" id="L124">      System.arraycopy(id.toByteArray(), 0, newIds, offset + 1, GradoopId.ID_SIZE);</span>
+<span class="fc" id="L125">      offset += ID_ENTRY_SIZE;</span>
     }
 
-<span class="fc" id="L126">    idData = newIds;</span>
-<span class="fc" id="L127">  }</span>
+<span class="fc" id="L128">    idData = newIds;</span>
+<span class="fc" id="L129">  }</span>
   /**
    * Returns the Id of the entry stored at the specified position
    * @param column the position the entry is stored at
    * @return ID of the entry
    */
   public GradoopId getId(int column) {
-<span class="fc" id="L134">    return GradoopId.fromByteArray(getRawId(column));</span>
+<span class="fc" id="L136">    return GradoopId.fromByteArray(getRawId(column));</span>
   }
 
   /**
@@ -140,13 +142,13 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return the entries ID
    */
   public byte[] getRawId(int column) {
-<span class="fc" id="L143">    byte[] rawEntry = getRawIdEntry(column);</span>
+<span class="fc" id="L145">    byte[] rawEntry = getRawIdEntry(column);</span>
 
-<span class="fc bfc" id="L145" title="All 2 branches covered.">    if (rawEntry[0] == ID_LIST_FLAG) {</span>
-<span class="fc" id="L146">      throw new UnsupportedOperationException(&quot;Can't return ID for ID List&quot;);</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">    if (rawEntry[0] == ID_LIST_FLAG) {</span>
+<span class="fc" id="L148">      throw new UnsupportedOperationException(&quot;Can't return ID for ID List&quot;);</span>
     }
 
-<span class="fc" id="L149">    return ArrayUtils.subarray(rawEntry, 1, ID_ENTRY_SIZE);</span>
+<span class="fc" id="L151">    return ArrayUtils.subarray(rawEntry, 1, ID_ENTRY_SIZE);</span>
   }
 
   /**
@@ -155,8 +157,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Internal representation of the entry
    */
   public byte[] getRawIdEntry(int column) {
-<span class="fc" id="L158">    int offset = getIdOffset(column);</span>
-<span class="fc" id="L159">    return ArrayUtils.subarray(idData, offset, offset + ID_ENTRY_SIZE);</span>
+<span class="fc" id="L160">    int offset = getIdOffset(column);</span>
+<span class="fc" id="L161">    return ArrayUtils.subarray(idData, offset, offset + ID_ENTRY_SIZE);</span>
   }
 
   /**
@@ -165,8 +167,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return The ID or ID-List stored at the specified position
    */
   public List&lt;GradoopId&gt; getIdAsList(int column) {
-<span class="fc" id="L168">    int offset = getIdOffset(column);</span>
-<span class="fc bfc" id="L169" title="All 2 branches covered.">    return idData[offset] == ID_LIST_FLAG ? getIdList(column) : Lists.newArrayList(getId(column));</span>
+<span class="fc" id="L170">    int offset = getIdOffset(column);</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">    return idData[offset] == ID_LIST_FLAG ? getIdList(column) : Lists.newArrayList(getId(column));</span>
   }
 
   /**
@@ -176,18 +178,18 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    */
   public List&lt;GradoopId&gt; getIdsAsList(List&lt;Integer&gt; columns) {
     int offset;
-<span class="fc" id="L179">    List&lt;GradoopId&gt; ids = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L181">    List&lt;GradoopId&gt; ids = new ArrayList&lt;&gt;();</span>
 
-<span class="fc bfc" id="L181" title="All 2 branches covered.">    for (Integer column : columns) {</span>
-<span class="fc" id="L182">      offset = getIdOffset(column);</span>
-<span class="fc bfc" id="L183" title="All 2 branches covered.">      if (idData[offset] == ID_LIST_FLAG) {</span>
-<span class="fc" id="L184">        ids.addAll(getIdList(column));</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    for (Integer column : columns) {</span>
+<span class="fc" id="L184">      offset = getIdOffset(column);</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">      if (idData[offset] == ID_LIST_FLAG) {</span>
+<span class="fc" id="L186">        ids.addAll(getIdList(column));</span>
       } else {
-<span class="fc" id="L186">        ids.add(getId(column));</span>
+<span class="fc" id="L188">        ids.add(getId(column));</span>
       }
-<span class="fc" id="L188">    }</span>
+<span class="fc" id="L190">    }</span>
 
-<span class="fc" id="L190">    return ids;</span>
+<span class="fc" id="L192">    return ids;</span>
   }
 
   /**
@@ -197,13 +199,13 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param isIdList indicates if the id represents a GraphElement or points to a path entry
    */
   private void add(GradoopId id, boolean isIdList) {
-<span class="fc" id="L200">    byte[] newIds = new byte[idData.length + 1 + GradoopId.ID_SIZE];</span>
-<span class="fc" id="L201">    System.arraycopy(idData, 0, newIds, 0, idData.length);</span>
-<span class="fc bfc" id="L202" title="All 2 branches covered.">    newIds[idData.length] = isIdList ? ID_LIST_FLAG : ID_ENTRY_FLAG;</span>
-<span class="fc" id="L203">    System.arraycopy(id.toByteArray(), 0, newIds, idData.length + 1, GradoopId.ID_SIZE);</span>
+<span class="fc" id="L202">    byte[] newIds = new byte[idData.length + 1 + GradoopId.ID_SIZE];</span>
+<span class="fc" id="L203">    System.arraycopy(idData, 0, newIds, 0, idData.length);</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    newIds[idData.length] = isIdList ? ID_LIST_FLAG : ID_ENTRY_FLAG;</span>
+<span class="fc" id="L205">    System.arraycopy(id.toByteArray(), 0, newIds, idData.length + 1, GradoopId.ID_SIZE);</span>
 
-<span class="fc" id="L205">    idData = newIds;</span>
-<span class="fc" id="L206">  }</span>
+<span class="fc" id="L207">    idData = newIds;</span>
+<span class="fc" id="L208">  }</span>
 
   /**
    * Returns the offset in the IdData array of the given entry
@@ -211,8 +213,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Offset in the IdData array of the given entry
    */
   private int getIdOffset(int column) {
-<span class="fc" id="L214">    checkColumn(column);</span>
-<span class="fc" id="L215">    return column * ID_ENTRY_SIZE;</span>
+<span class="fc" id="L216">    checkColumn(column);</span>
+<span class="fc" id="L217">    return column * ID_ENTRY_SIZE;</span>
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -226,9 +228,9 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param properties list of property values
    */
   public void add(GradoopId id, PropertyValue... properties) {
-<span class="fc" id="L229">    add(id);</span>
-<span class="fc" id="L230">    addPropertyValues(properties);</span>
-<span class="fc" id="L231">  }</span>
+<span class="fc" id="L231">    add(id);</span>
+<span class="fc" id="L232">    addPropertyValues(properties);</span>
+<span class="fc" id="L233">  }</span>
 
   /**
    * Adds the list of properties to the embedding
@@ -236,23 +238,23 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param properties new properties
    */
   public void addPropertyValues(PropertyValue... properties) {
-<span class="fc" id="L239">    int newPropertiesSize = propertyData.length;</span>
-<span class="fc bfc" id="L240" title="All 2 branches covered.">    for (PropertyValue property : properties) {</span>
-<span class="fc" id="L241">      newPropertiesSize += property.getByteSize() + Integer.BYTES;</span>
+<span class="fc" id="L241">    int newPropertiesSize = propertyData.length;</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    for (PropertyValue property : properties) {</span>
+<span class="fc" id="L243">      newPropertiesSize += property.getByteSize() + Integer.BYTES;</span>
     }
 
-<span class="fc" id="L244">    byte[] newPropertyData = new byte[newPropertiesSize];</span>
+<span class="fc" id="L246">    byte[] newPropertyData = new byte[newPropertiesSize];</span>
 
-<span class="fc" id="L246">    System.arraycopy(propertyData, 0, newPropertyData, 0, propertyData.length);</span>
+<span class="fc" id="L248">    System.arraycopy(propertyData, 0, newPropertyData, 0, propertyData.length);</span>
 
-<span class="fc" id="L248">    int offset = propertyData.length;</span>
-<span class="fc bfc" id="L249" title="All 2 branches covered.">    for (PropertyValue property : properties) {</span>
-<span class="fc" id="L250">      writeProperty(property, newPropertyData, offset);</span>
-<span class="fc" id="L251">      offset += property.getByteSize() + Integer.BYTES;</span>
+<span class="fc" id="L250">    int offset = propertyData.length;</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">    for (PropertyValue property : properties) {</span>
+<span class="fc" id="L252">      writeProperty(property, newPropertyData, offset);</span>
+<span class="fc" id="L253">      offset += property.getByteSize() + Integer.BYTES;</span>
     }
 
-<span class="fc" id="L254">    this.propertyData = newPropertyData;</span>
-<span class="fc" id="L255">  }</span>
+<span class="fc" id="L256">    this.propertyData = newPropertyData;</span>
+<span class="fc" id="L257">  }</span>
 
 
   /**
@@ -261,16 +263,16 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return the property stored at the specified index
    */
   public PropertyValue getProperty(int column) {
-<span class="fc" id="L264">    int offset = getPropertyOffset(column);</span>
+<span class="fc" id="L266">    int offset = getPropertyOffset(column);</span>
 
-<span class="fc" id="L266">    int entryLength = Ints.fromByteArray(</span>
-<span class="fc" id="L267">      ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES)</span>
+<span class="fc" id="L268">    int entryLength = Ints.fromByteArray(</span>
+<span class="fc" id="L269">      ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES)</span>
     );
 
-<span class="fc" id="L270">    offset += Integer.BYTES;</span>
+<span class="fc" id="L272">    offset += Integer.BYTES;</span>
 
-<span class="fc" id="L272">    return PropertyValue.fromRawBytes(</span>
-<span class="fc" id="L273">      ArrayUtils.subarray(propertyData, offset, offset + entryLength)</span>
+<span class="fc" id="L274">    return PropertyValue.fromRawBytes(</span>
+<span class="fc" id="L275">      ArrayUtils.subarray(propertyData, offset, offset + entryLength)</span>
     );
   }
 
@@ -280,13 +282,13 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Internal representation of the property stored at the specified column
    */
   public byte[] getRawProperty(int column) {
-<span class="fc" id="L283">    int offset = getPropertyOffset(column);</span>
+<span class="fc" id="L285">    int offset = getPropertyOffset(column);</span>
 
-<span class="fc" id="L285">    int entryLength = Ints.fromByteArray(</span>
-<span class="fc" id="L286">      ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES)</span>
+<span class="fc" id="L287">    int entryLength = Ints.fromByteArray(</span>
+<span class="fc" id="L288">      ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES)</span>
     );
 
-<span class="fc" id="L289">    return ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES + entryLength);</span>
+<span class="fc" id="L291">    return ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES + entryLength);</span>
   }
 
   /**
@@ -294,23 +296,23 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return List of all property values stored in the embedding
    */
   public List&lt;PropertyValue&gt; getProperties() {
-<span class="fc" id="L297">    List&lt;PropertyValue&gt; properties = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L298">    int offset = 0;</span>
+<span class="fc" id="L299">    List&lt;PropertyValue&gt; properties = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L300">    int offset = 0;</span>
     int entrySize;
-<span class="fc bfc" id="L300" title="All 2 branches covered.">    while (offset &lt; propertyData.length) {</span>
-<span class="fc" id="L301">      entrySize =</span>
-<span class="fc" id="L302">        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">    while (offset &lt; propertyData.length) {</span>
+<span class="fc" id="L303">      entrySize =</span>
+<span class="fc" id="L304">        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));</span>
 
-<span class="fc" id="L304">      offset += Integer.BYTES;</span>
+<span class="fc" id="L306">      offset += Integer.BYTES;</span>
 
-<span class="fc" id="L306">      properties.add(PropertyValue.fromRawBytes(</span>
-<span class="fc" id="L307">        ArrayUtils.subarray(propertyData, offset, offset + entrySize)</span>
+<span class="fc" id="L308">      properties.add(PropertyValue.fromRawBytes(</span>
+<span class="fc" id="L309">        ArrayUtils.subarray(propertyData, offset, offset + entrySize)</span>
       ));
 
-<span class="fc" id="L310">      offset += entrySize;</span>
+<span class="fc" id="L312">      offset += entrySize;</span>
     }
 
-<span class="fc" id="L313">    return properties;</span>
+<span class="fc" id="L315">    return properties;</span>
   }
 
   /**
@@ -319,23 +321,23 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Offset of the property in the propertyData array
    */
   private int getPropertyOffset(int column) {
-<span class="fc" id="L322">    int i = 0;</span>
-<span class="fc" id="L323">    int offset = 0;</span>
+<span class="fc" id="L324">    int i = 0;</span>
+<span class="fc" id="L325">    int offset = 0;</span>
     int entryLength;
 
-<span class="pc bpc" id="L326" title="1 of 4 branches missed.">    while (i &lt; column &amp;&amp; offset &lt; propertyData.length) {</span>
-<span class="fc" id="L327">      entryLength =</span>
-<span class="fc" id="L328">        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));</span>
+<span class="pc bpc" id="L328" title="1 of 4 branches missed.">    while (i &lt; column &amp;&amp; offset &lt; propertyData.length) {</span>
+<span class="fc" id="L329">      entryLength =</span>
+<span class="fc" id="L330">        Ints.fromByteArray(ArrayUtils.subarray(propertyData, offset, offset + Integer.BYTES));</span>
 
-<span class="fc" id="L330">      offset += entryLength + Integer.BYTES;</span>
-<span class="fc" id="L331">      i++;</span>
+<span class="fc" id="L332">      offset += entryLength + Integer.BYTES;</span>
+<span class="fc" id="L333">      i++;</span>
     }
 
-<span class="fc bfc" id="L334" title="All 2 branches covered.">    if (offset &gt;= propertyData.length) {</span>
-<span class="fc" id="L335">      throw new IndexOutOfBoundsException(&quot;Cant find Property. &quot; + (i - 1) + &quot; &lt; &quot; + column);</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">    if (offset &gt;= propertyData.length) {</span>
+<span class="fc" id="L337">      throw new IndexOutOfBoundsException(&quot;Cant find Property. &quot; + (i - 1) + &quot; &lt; &quot; + column);</span>
     }
 
-<span class="fc" id="L338">    return offset;</span>
+<span class="fc" id="L340">    return offset;</span>
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -347,25 +349,25 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param ids the path that will be added to the embedding
    */
   public void add(GradoopId... ids) {
-<span class="fc" id="L350">    GradoopId pointer = GradoopId.get();</span>
-<span class="fc" id="L351">    add(pointer, true);</span>
+<span class="fc" id="L352">    GradoopId pointer = GradoopId.get();</span>
+<span class="fc" id="L353">    add(pointer, true);</span>
 
-<span class="fc" id="L353">    byte[] newIdLists = new byte[idListData.length +</span>
+<span class="fc" id="L355">    byte[] newIdLists = new byte[idListData.length +</span>
       GradoopId.ID_SIZE + Integer.BYTES +
       ids.length * GradoopId.ID_SIZE];
 
-<span class="fc" id="L357">    System.arraycopy(idListData, 0, newIdLists, 0, idListData.length);</span>
-<span class="fc" id="L358">    writeId(pointer, newIdLists, idListData.length);</span>
-<span class="fc" id="L359">    writeInt(ids.length, newIdLists, idListData.length + GradoopId.ID_SIZE);</span>
+<span class="fc" id="L359">    System.arraycopy(idListData, 0, newIdLists, 0, idListData.length);</span>
+<span class="fc" id="L360">    writeId(pointer, newIdLists, idListData.length);</span>
+<span class="fc" id="L361">    writeInt(ids.length, newIdLists, idListData.length + GradoopId.ID_SIZE);</span>
 
-<span class="fc" id="L361">    int offset = idListData.length + GradoopId.ID_SIZE + Integer.BYTES;</span>
-<span class="fc bfc" id="L362" title="All 2 branches covered.">    for (GradoopId id: ids) {</span>
-<span class="fc" id="L363">      writeId(id, newIdLists, offset);</span>
-<span class="fc" id="L364">      offset += GradoopId.ID_SIZE;</span>
+<span class="fc" id="L363">    int offset = idListData.length + GradoopId.ID_SIZE + Integer.BYTES;</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">    for (GradoopId id: ids) {</span>
+<span class="fc" id="L365">      writeId(id, newIdLists, offset);</span>
+<span class="fc" id="L366">      offset += GradoopId.ID_SIZE;</span>
     }
 
-<span class="fc" id="L367">    idListData = newIdLists;</span>
-<span class="fc" id="L368">  }</span>
+<span class="fc" id="L369">    idListData = newIdLists;</span>
+<span class="fc" id="L370">  }</span>
 
   /**
    * Returns the ID-List stored at the specified column
@@ -373,23 +375,23 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return ID-List stored at the specified column
    */
   public List&lt;GradoopId&gt; getIdList(int column) {
-<span class="fc" id="L376">    int offset = getIdListOffset(column);</span>
+<span class="fc" id="L378">    int offset = getIdListOffset(column);</span>
 
-<span class="fc" id="L378">    int listSize =</span>
-<span class="fc" id="L379">      Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));</span>
+<span class="fc" id="L380">    int listSize =</span>
+<span class="fc" id="L381">      Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));</span>
 
-<span class="fc" id="L381">    offset += Integer.BYTES;</span>
+<span class="fc" id="L383">    offset += Integer.BYTES;</span>
 
-<span class="fc" id="L383">    List&lt;GradoopId&gt; idList = new ArrayList&lt;&gt;(listSize);</span>
+<span class="fc" id="L385">    List&lt;GradoopId&gt; idList = new ArrayList&lt;&gt;(listSize);</span>
 
-<span class="fc bfc" id="L385" title="All 2 branches covered.">    for (int i = 0; i &lt; listSize; i++) {</span>
-<span class="fc" id="L386">      idList.add(GradoopId.fromByteArray(</span>
-<span class="fc" id="L387">        ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE)</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">    for (int i = 0; i &lt; listSize; i++) {</span>
+<span class="fc" id="L388">      idList.add(GradoopId.fromByteArray(</span>
+<span class="fc" id="L389">        ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE)</span>
       ));
-<span class="fc" id="L389">      offset += GradoopId.ID_SIZE;</span>
+<span class="fc" id="L391">      offset += GradoopId.ID_SIZE;</span>
     }
 
-<span class="fc" id="L392">    return idList;</span>
+<span class="fc" id="L394">    return idList;</span>
   }
 
   /**
@@ -398,36 +400,36 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Offset of the ID-List in the idListData array
    */
   private int getIdListOffset(int column) {
-<span class="fc" id="L401">    int pointerOffset = getIdOffset(column);</span>
+<span class="fc" id="L403">    int pointerOffset = getIdOffset(column);</span>
 
-<span class="fc bfc" id="L403" title="All 2 branches covered.">    if (idData[pointerOffset++] != ID_LIST_FLAG) {</span>
-<span class="fc" id="L404">      throw new UnsupportedOperationException(&quot;Entry is not an IDList&quot;);</span>
+<span class="fc bfc" id="L405" title="All 2 branches covered.">    if (idData[pointerOffset++] != ID_LIST_FLAG) {</span>
+<span class="fc" id="L406">      throw new UnsupportedOperationException(&quot;Entry is not an IDList&quot;);</span>
     }
 
-<span class="fc" id="L407">    byte[] pointer = ArrayUtils.subarray(idData, pointerOffset, pointerOffset + GradoopId.ID_SIZE);</span>
+<span class="fc" id="L409">    byte[] pointer = ArrayUtils.subarray(idData, pointerOffset, pointerOffset + GradoopId.ID_SIZE);</span>
 
-<span class="fc" id="L409">    int offset = 0;</span>
+<span class="fc" id="L411">    int offset = 0;</span>
     byte[] comparePointer;
     int listSize;
-<span class="fc" id="L412">    boolean found = false;</span>
+<span class="fc" id="L414">    boolean found = false;</span>
 
-<span class="pc bpc" id="L414" title="1 of 4 branches missed.">    while (!found &amp;&amp; offset &lt; idListData.length) {</span>
-<span class="fc" id="L415">      comparePointer = ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE);</span>
-<span class="fc" id="L416">      offset += GradoopId.ID_SIZE;</span>
-<span class="fc" id="L417">      found = Arrays.equals(pointer, comparePointer);</span>
+<span class="pc bpc" id="L416" title="1 of 4 branches missed.">    while (!found &amp;&amp; offset &lt; idListData.length) {</span>
+<span class="fc" id="L417">      comparePointer = ArrayUtils.subarray(idListData, offset, offset + GradoopId.ID_SIZE);</span>
+<span class="fc" id="L418">      offset += GradoopId.ID_SIZE;</span>
+<span class="fc" id="L419">      found = Arrays.equals(pointer, comparePointer);</span>
 
-<span class="fc bfc" id="L419" title="All 2 branches covered.">      if (!found) {</span>
-<span class="fc" id="L420">        listSize =</span>
-<span class="fc" id="L421">          Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));</span>
-<span class="fc" id="L422">        offset += GradoopId.ID_SIZE * listSize + Integer.BYTES;</span>
+<span class="fc bfc" id="L421" title="All 2 branches covered.">      if (!found) {</span>
+<span class="fc" id="L422">        listSize =</span>
+<span class="fc" id="L423">          Ints.fromByteArray(ArrayUtils.subarray(idListData, offset, offset + Integer.BYTES));</span>
+<span class="fc" id="L424">        offset += GradoopId.ID_SIZE * listSize + Integer.BYTES;</span>
       }
     }
 
-<span class="pc bpc" id="L426" title="1 of 2 branches missed.">    if (!found) {</span>
-<span class="nc" id="L427">      throw new RuntimeException(&quot;Could not find IdList entry&quot;);</span>
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">    if (!found) {</span>
+<span class="nc" id="L429">      throw new RuntimeException(&quot;Could not find IdList entry&quot;);</span>
     }
 
-<span class="fc" id="L430">    return offset;</span>
+<span class="fc" id="L432">    return offset;</span>
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -439,19 +441,17 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return the number of entries in the embedding
    */
   public int size() {
-<span class="fc" id="L442">    return idData.length / ID_ENTRY_SIZE;</span>
+<span class="fc" id="L444">    return idData.length / ID_ENTRY_SIZE;</span>
   }
 
   /**
    * Returns the internal representation of the stored ids
    * @return Internal representation of the list of ids
    */
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public byte[] getIdData() {
-<span class="fc" id="L451">    return this.idData;</span>
+<span class="fc" id="L452">    return this.idData;</span>
   }
 
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public void setIdData(byte[] idData) {
 <span class="fc" id="L456">    this.idData = idData;</span>
 <span class="fc" id="L457">  }</span>
@@ -460,29 +460,25 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * Returns the internal representation of the stored properties
    * @return Internal representation of the stored properties
    */
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public byte[] getPropertyData() {
-<span class="fc" id="L465">    return this.propertyData;</span>
+<span class="fc" id="L464">    return this.propertyData;</span>
   }
 
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public void setPropertyData(byte[] propertyData) {
-<span class="fc" id="L470">    this.propertyData = propertyData;</span>
-<span class="fc" id="L471">  }</span>
+<span class="fc" id="L468">    this.propertyData = propertyData;</span>
+<span class="fc" id="L469">  }</span>
 
   /**
    * Returns the internal representation of the stored IdLists
    * @return Internal representation of the stored IdLists
    */
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public byte[] getIdListData() {
-<span class="fc" id="L479">    return idListData;</span>
+<span class="fc" id="L476">    return idListData;</span>
   }
 
-  @SuppressWarnings(&quot;EI_EXPOSE_REP&quot;)
   public void setIdListData(byte[] idListData) {
-<span class="fc" id="L484">    this.idListData = idListData;</span>
-<span class="fc" id="L485">  }</span>
+<span class="fc" id="L480">    this.idListData = idListData;</span>
+<span class="fc" id="L481">  }</span>
 
 
   // ---------------------------------------------------------------------------------------------
@@ -495,12 +491,12 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return Embedding with the projected property list
    */
   public Embedding project(List&lt;Integer&gt; propertyWhiteList) {
-<span class="fc" id="L498">    byte[] newPropertyData = new byte[0];</span>
-<span class="fc bfc" id="L499" title="All 2 branches covered.">    for (int index : propertyWhiteList) {</span>
-<span class="fc" id="L500">      newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));</span>
-<span class="fc" id="L501">    }</span>
+<span class="fc" id="L494">    byte[] newPropertyData = new byte[0];</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">    for (int index : propertyWhiteList) {</span>
+<span class="fc" id="L496">      newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));</span>
+<span class="fc" id="L497">    }</span>
 
-<span class="fc" id="L503">    return new Embedding(idData, newPropertyData, idListData);</span>
+<span class="fc" id="L499">    return new Embedding(idData, newPropertyData, idListData);</span>
   }
 
   /**
@@ -509,17 +505,17 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @return  A new Embedding with reversed entry order
    */
   public Embedding reverse() {
-<span class="fc" id="L512">    byte[] newIdData = new byte[idData.length];</span>
+<span class="fc" id="L508">    byte[] newIdData = new byte[idData.length];</span>
 
-<span class="fc bfc" id="L514" title="All 2 branches covered.">    for (int i = size() - 1; i &gt;= 0; i--) {</span>
-<span class="fc" id="L515">      System.arraycopy(</span>
-<span class="fc" id="L516">        getRawIdEntry(i), 0,</span>
-<span class="fc" id="L517">        newIdData,  (size() - 1 - i) * ID_ENTRY_SIZE,</span>
+<span class="fc bfc" id="L510" title="All 2 branches covered.">    for (int i = size() - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L511">      System.arraycopy(</span>
+<span class="fc" id="L512">        getRawIdEntry(i), 0,</span>
+<span class="fc" id="L513">        newIdData,  (size() - 1 - i) * ID_ENTRY_SIZE,</span>
         ID_ENTRY_SIZE
       );
     }
 
-<span class="fc" id="L522">    return new Embedding(newIdData, propertyData, idListData);</span>
+<span class="fc" id="L518">    return new Embedding(newIdData, propertyData, idListData);</span>
   }
 
 
@@ -528,13 +524,13 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param column index of the entry
    */
   private void checkColumn(int column) {
-<span class="pc bpc" id="L531" title="1 of 2 branches missed.">    if (column &lt; 0) {</span>
-<span class="nc" id="L532">      throw new IndexOutOfBoundsException(&quot;Negative columns are not allowed&quot;);</span>
+<span class="pc bpc" id="L527" title="1 of 2 branches missed.">    if (column &lt; 0) {</span>
+<span class="nc" id="L528">      throw new IndexOutOfBoundsException(&quot;Negative columns are not allowed&quot;);</span>
     }
-<span class="fc bfc" id="L534" title="All 2 branches covered.">    if (column &gt;= size()) {</span>
-<span class="fc" id="L535">      throw new IndexOutOfBoundsException(column + &quot; &gt;= &quot; + size());</span>
+<span class="fc bfc" id="L530" title="All 2 branches covered.">    if (column &gt;= size()) {</span>
+<span class="fc" id="L531">      throw new IndexOutOfBoundsException(column + &quot; &gt;= &quot; + size());</span>
     }
-<span class="fc" id="L537">  }</span>
+<span class="fc" id="L533">  }</span>
 
   /**
    * Writes the byte representation of an Integer into the target byte array starting at the
@@ -544,8 +540,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param offset offset the value will be written to
    */
   private void writeInt(int value, byte[] target, int offset) {
-<span class="fc" id="L547">    System.arraycopy(Ints.toByteArray(value), 0, target, offset, Integer.BYTES);</span>
-<span class="fc" id="L548">  }</span>
+<span class="fc" id="L543">    System.arraycopy(Ints.toByteArray(value), 0, target, offset, Integer.BYTES);</span>
+<span class="fc" id="L544">  }</span>
 
   /**
    * Writes the byte representation of a GradoopId into the target byte array
@@ -555,8 +551,8 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param offset offset the value will be written to
    */
   private void writeId(GradoopId value, byte[] target, int offset) {
-<span class="fc" id="L558">    System.arraycopy(value.toByteArray(), 0, target, offset, GradoopId.ID_SIZE);</span>
-<span class="fc" id="L559">  }</span>
+<span class="fc" id="L554">    System.arraycopy(value.toByteArray(), 0, target, offset, GradoopId.ID_SIZE);</span>
+<span class="fc" id="L555">  }</span>
 
   /**
    * Writes the byte representation of a property into the target byte array
@@ -566,10 +562,10 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
    * @param offset offset the value will be written to
    */
   private void writeProperty(PropertyValue value, byte[] target, int offset) {
-<span class="fc" id="L569">    writeInt(value.getByteSize(), target, offset);</span>
-<span class="fc" id="L570">    offset += Integer.BYTES;</span>
-<span class="fc" id="L571">    System.arraycopy(value.getRawBytes(), 0, target, offset, value.getByteSize());</span>
-<span class="fc" id="L572">  }</span>
+<span class="fc" id="L565">    writeInt(value.getByteSize(), target, offset);</span>
+<span class="fc" id="L566">    offset += Integer.BYTES;</span>
+<span class="fc" id="L567">    System.arraycopy(value.getRawBytes(), 0, target, offset, value.getByteSize());</span>
+<span class="fc" id="L568">  }</span>
 
   // ---------------------------------------------------------------------------------------------
   //  Serialisation
@@ -577,140 +573,140 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
 
   @Override
   public int getBinaryLength() {
-<span class="nc" id="L580">    return -1;</span>
+<span class="nc" id="L576">    return -1;</span>
   }
 
   @Override
   public void copyTo(Embedding target) {
-<span class="fc" id="L585">    target.idData = new byte[idData.length];</span>
-<span class="fc" id="L586">    target.propertyData = new byte[propertyData.length];</span>
-<span class="fc" id="L587">    target.idListData = new byte[idListData.length];</span>
+<span class="fc" id="L581">    target.idData = new byte[idData.length];</span>
+<span class="fc" id="L582">    target.propertyData = new byte[propertyData.length];</span>
+<span class="fc" id="L583">    target.idListData = new byte[idListData.length];</span>
 
-<span class="fc" id="L589">    System.arraycopy(this.idData, 0, target.idData, 0, this.idData.length);</span>
-<span class="fc" id="L590">    System.arraycopy(this.propertyData, 0, target.propertyData, 0, this.propertyData.length);</span>
-<span class="fc" id="L591">    System.arraycopy(this.idListData, 0, target.idListData, 0, this.idListData.length);</span>
-<span class="fc" id="L592">  }</span>
+<span class="fc" id="L585">    System.arraycopy(this.idData, 0, target.idData, 0, this.idData.length);</span>
+<span class="fc" id="L586">    System.arraycopy(this.propertyData, 0, target.propertyData, 0, this.propertyData.length);</span>
+<span class="fc" id="L587">    System.arraycopy(this.idListData, 0, target.idListData, 0, this.idListData.length);</span>
+<span class="fc" id="L588">  }</span>
 
   @Override
   public Embedding copy() {
-<span class="fc" id="L596">    Embedding res = new Embedding();</span>
-<span class="fc" id="L597">    copyTo(res);</span>
+<span class="fc" id="L592">    Embedding res = new Embedding();</span>
+<span class="fc" id="L593">    copyTo(res);</span>
 
-<span class="fc" id="L599">    return res;</span>
+<span class="fc" id="L595">    return res;</span>
   }
 
   @Override
   public void copy(DataInputView source, DataOutputView target) throws IOException {
-<span class="nc" id="L604">    int sizeBuffer = source.readInt();</span>
+<span class="nc" id="L600">    int sizeBuffer = source.readInt();</span>
+<span class="nc" id="L601">    target.writeInt(sizeBuffer);</span>
+<span class="nc" id="L602">    target.write(source, sizeBuffer);</span>
+
+<span class="nc" id="L604">    sizeBuffer = source.readInt();</span>
 <span class="nc" id="L605">    target.writeInt(sizeBuffer);</span>
 <span class="nc" id="L606">    target.write(source, sizeBuffer);</span>
 
 <span class="nc" id="L608">    sizeBuffer = source.readInt();</span>
 <span class="nc" id="L609">    target.writeInt(sizeBuffer);</span>
 <span class="nc" id="L610">    target.write(source, sizeBuffer);</span>
-
-<span class="nc" id="L612">    sizeBuffer = source.readInt();</span>
-<span class="nc" id="L613">    target.writeInt(sizeBuffer);</span>
-<span class="nc" id="L614">    target.write(source, sizeBuffer);</span>
-<span class="nc" id="L615">  }</span>
+<span class="nc" id="L611">  }</span>
 
   @Override
   public void write(DataOutputView out) throws IOException {
-<span class="fc" id="L619">    out.writeInt(idData.length);</span>
-<span class="fc" id="L620">    out.write(idData);</span>
+<span class="fc" id="L615">    out.writeInt(idData.length);</span>
+<span class="fc" id="L616">    out.write(idData);</span>
 
-<span class="fc" id="L622">    out.writeInt(propertyData.length);</span>
-<span class="fc" id="L623">    out.write(propertyData);</span>
+<span class="fc" id="L618">    out.writeInt(propertyData.length);</span>
+<span class="fc" id="L619">    out.write(propertyData);</span>
 
-<span class="fc" id="L625">    out.writeInt(idListData.length);</span>
-<span class="fc" id="L626">    out.write(idListData);</span>
-<span class="fc" id="L627">  }</span>
+<span class="fc" id="L621">    out.writeInt(idListData.length);</span>
+<span class="fc" id="L622">    out.write(idListData);</span>
+<span class="fc" id="L623">  }</span>
 
   @Override
   public void read(DataInputView in) throws IOException {
 
-<span class="fc" id="L632">    int sizeBuffer = in.readInt();</span>
-<span class="fc" id="L633">    byte[] ids = new byte[sizeBuffer];</span>
-<span class="fc bfc" id="L634" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
-<span class="pc bpc" id="L635" title="1 of 2 branches missed.">      if (in.read(ids) != sizeBuffer) {</span>
-<span class="nc" id="L636">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
+<span class="fc" id="L628">    int sizeBuffer = in.readInt();</span>
+<span class="fc" id="L629">    byte[] ids = new byte[sizeBuffer];</span>
+<span class="fc bfc" id="L630" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
+<span class="pc bpc" id="L631" title="1 of 2 branches missed.">      if (in.read(ids) != sizeBuffer) {</span>
+<span class="nc" id="L632">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
       }
     }
 
-<span class="fc" id="L640">    sizeBuffer = in.readInt();</span>
-<span class="fc" id="L641">    byte[] newPropertyData =  new byte[sizeBuffer];</span>
-<span class="fc bfc" id="L642" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
-<span class="pc bpc" id="L643" title="1 of 2 branches missed.">      if (in.read(newPropertyData) != sizeBuffer) {</span>
-<span class="nc" id="L644">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
+<span class="fc" id="L636">    sizeBuffer = in.readInt();</span>
+<span class="fc" id="L637">    byte[] newPropertyData =  new byte[sizeBuffer];</span>
+<span class="fc bfc" id="L638" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
+<span class="pc bpc" id="L639" title="1 of 2 branches missed.">      if (in.read(newPropertyData) != sizeBuffer) {</span>
+<span class="nc" id="L640">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
       }
     }
 
-<span class="fc" id="L648">    sizeBuffer = in.readInt();</span>
-<span class="fc" id="L649">    byte[] idLists = new byte[sizeBuffer];</span>
-<span class="fc bfc" id="L650" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
-<span class="pc bpc" id="L651" title="1 of 2 branches missed.">      if (in.read(idLists) != sizeBuffer) {</span>
-<span class="nc" id="L652">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
+<span class="fc" id="L644">    sizeBuffer = in.readInt();</span>
+<span class="fc" id="L645">    byte[] idLists = new byte[sizeBuffer];</span>
+<span class="fc bfc" id="L646" title="All 2 branches covered.">    if (sizeBuffer &gt; 0) {</span>
+<span class="pc bpc" id="L647" title="1 of 2 branches missed.">      if (in.read(idLists) != sizeBuffer) {</span>
+<span class="nc" id="L648">        throw new RuntimeException(&quot;Deserialisation of Embedding failed&quot;);</span>
       }
     }
 
-<span class="fc" id="L656">    this.idData = ids;</span>
-<span class="fc" id="L657">    this.propertyData = newPropertyData;</span>
-<span class="fc" id="L658">    this.idListData = idLists;</span>
-<span class="fc" id="L659">  }</span>
+<span class="fc" id="L652">    this.idData = ids;</span>
+<span class="fc" id="L653">    this.propertyData = newPropertyData;</span>
+<span class="fc" id="L654">    this.idListData = idLists;</span>
+<span class="fc" id="L655">  }</span>
 
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L663" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L664">      return true;</span>
+<span class="fc bfc" id="L659" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L660">      return true;</span>
     }
-<span class="pc bpc" id="L666" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L667">      return false;</span>
+<span class="pc bpc" id="L662" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L663">      return false;</span>
     }
 
-<span class="fc" id="L670">    Embedding that = (Embedding) o;</span>
+<span class="fc" id="L666">    Embedding that = (Embedding) o;</span>
 
-<span class="pc bpc" id="L672" title="1 of 2 branches missed.">    if (!Arrays.equals(idData, that.idData)) {</span>
-<span class="nc" id="L673">      return false;</span>
+<span class="pc bpc" id="L668" title="1 of 2 branches missed.">    if (!Arrays.equals(idData, that.idData)) {</span>
+<span class="nc" id="L669">      return false;</span>
     }
-<span class="pc bpc" id="L675" title="1 of 2 branches missed.">    if (!Arrays.equals(propertyData, that.propertyData)) {</span>
-<span class="nc" id="L676">      return false;</span>
+<span class="pc bpc" id="L671" title="1 of 2 branches missed.">    if (!Arrays.equals(propertyData, that.propertyData)) {</span>
+<span class="nc" id="L672">      return false;</span>
     }
-<span class="fc" id="L678">    return Arrays.equals(idListData, that.idListData);</span>
+<span class="fc" id="L674">    return Arrays.equals(idListData, that.idListData);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc" id="L683">    int result = Arrays.hashCode(idData);</span>
-<span class="nc" id="L684">    result = 31 * result + Arrays.hashCode(propertyData);</span>
-<span class="nc" id="L685">    result = 31 * result + Arrays.hashCode(idListData);</span>
-<span class="nc" id="L686">    return result;</span>
+<span class="nc" id="L679">    int result = Arrays.hashCode(idData);</span>
+<span class="nc" id="L680">    result = 31 * result + Arrays.hashCode(propertyData);</span>
+<span class="nc" id="L681">    result = 31 * result + Arrays.hashCode(idListData);</span>
+<span class="nc" id="L682">    return result;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L691">    List&lt;List&lt;GradoopId&gt;&gt; idCollection = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L692" title="All 2 branches covered.">    for (int i = 0; i &lt; size(); i++) {</span>
-<span class="fc" id="L693">      idCollection.add(getIdAsList(i));</span>
+<span class="fc" id="L687">    List&lt;List&lt;GradoopId&gt;&gt; idCollection = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L688" title="All 2 branches covered.">    for (int i = 0; i &lt; size(); i++) {</span>
+<span class="fc" id="L689">      idCollection.add(getIdAsList(i));</span>
     }
 
-<span class="fc" id="L696">    String idString = idCollection</span>
-<span class="fc" id="L697">      .stream()</span>
-<span class="fc" id="L698">      .map(entry -&gt; {</span>
-<span class="fc bfc" id="L699" title="All 2 branches covered.">        if (entry.size() == 1) {</span>
-<span class="fc" id="L700">          return entry.get(0).toString();</span>
+<span class="fc" id="L692">    String idString = idCollection</span>
+<span class="fc" id="L693">      .stream()</span>
+<span class="fc" id="L694">      .map(entry -&gt; {</span>
+<span class="fc bfc" id="L695" title="All 2 branches covered.">        if (entry.size() == 1) {</span>
+<span class="fc" id="L696">          return entry.get(0).toString();</span>
         } else {
-<span class="fc" id="L702">          return entry.stream().map(GradoopId::toString).collect(joining(&quot;, &quot;, &quot;[&quot;, &quot;]&quot;));</span>
+<span class="fc" id="L698">          return entry.stream().map(GradoopId::toString).collect(joining(&quot;, &quot;, &quot;[&quot;, &quot;]&quot;));</span>
         }
       })
-<span class="fc" id="L705">      .collect(joining(&quot;, &quot;));</span>
+<span class="fc" id="L701">      .collect(joining(&quot;, &quot;));</span>
 
-<span class="fc" id="L707">    String propertyString = getProperties()</span>
-<span class="fc" id="L708">      .stream()</span>
-<span class="fc" id="L709">      .map(PropertyValue::toString)</span>
-<span class="fc" id="L710">      .collect(joining(&quot;, &quot;));</span>
+<span class="fc" id="L703">    String propertyString = getProperties()</span>
+<span class="fc" id="L704">      .stream()</span>
+<span class="fc" id="L705">      .map(PropertyValue::toString)</span>
+<span class="fc" id="L706">      .collect(joining(&quot;, &quot;));</span>
 
 
-<span class="fc" id="L713">    return &quot;Embedding{ &quot; +</span>
+<span class="fc" id="L709">    return &quot;Embedding{ &quot; +</span>
       &quot;entries: {&quot; + idString + &quot;},  &quot; +
       &quot;properties: {&quot; + propertyString + &quot;} &quot; +
       &quot;}&quot;;

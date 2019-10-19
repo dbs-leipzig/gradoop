@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnsafeAvailChecker.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.bytes</a> &gt; <span class="el_source">UnsafeAvailChecker.java</span></div><h1>UnsafeAvailChecker.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.bytes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+/**
+ * This implementation reuses much of the code of HBase's UnsafeAvailChecker
+ * (org.apache.hadoop.hbase.util.UnsafeAvailChecker).
+ * This can be found in org.apache.hbase:hbase-common
+ * Much of the code is copied directly or has only small changes.
+ */
+class UnsafeAvailChecker {
+
+  /**
+   * Unsafe class name
+   */
+  private static final String CLASS_NAME = &quot;sun.misc.Unsafe&quot;;
+
+  /**
+   * true, when Unsafe available and system has unaligned access capability
+   */
+<span class="fc" id="L42">  private static boolean UNALIGNED = false;</span>
+
+  /**
+   * Logger
+   */
+<span class="fc" id="L47">  private static final Logger LOG = LoggerFactory.getLogger(UnsafeAvailChecker.class);</span>
+
+  static {
+<span class="fc" id="L50">    boolean avail = AccessController.doPrivileged(new PrivilegedAction&lt;Boolean&gt;() {</span>
+      @Override
+      public Boolean run() {
+        try {
+<span class="fc" id="L54">          Class&lt;?&gt; clazz = Class.forName(CLASS_NAME);</span>
+<span class="fc" id="L55">          Field f = clazz.getDeclaredField(&quot;theUnsafe&quot;);</span>
+<span class="fc" id="L56">          f.setAccessible(true);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">          return f.get(null) != null;</span>
+<span class="nc" id="L58">        } catch (ReflectiveOperationException e) {</span>
+<span class="nc" id="L59">          LOG.warn(&quot;sun.misc.Unsafe is not available/accessible&quot;);</span>
+<span class="nc" id="L60">          return false;</span>
+        }
+      }
+    });
+    // When Unsafe itself is not available/accessible consider unaligned as false.
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (avail) {</span>
+<span class="fc" id="L66">      String arch = System.getProperty(&quot;os.arch&quot;);</span>
+<span class="pc bpc" id="L67" title="2 of 4 branches missed.">      if (&quot;ppc64&quot;.equals(arch) || &quot;ppc64le&quot;.equals(arch)) {</span>
+        // java.nio.Bits.unaligned() wrongly returns false on ppc (JDK-8165231),
+<span class="nc" id="L69">        UNALIGNED = true;</span>
+      } else {
+        try {
+          // Using java.nio.Bits#unaligned() to check for unaligned-access capability
+<span class="fc" id="L73">          Class&lt;?&gt; clazz = Class.forName(&quot;java.nio.Bits&quot;);</span>
+<span class="fc" id="L74">          Method m = clazz.getDeclaredMethod(&quot;unaligned&quot;);</span>
+<span class="fc" id="L75">          m.setAccessible(true);</span>
+<span class="fc" id="L76">          UNALIGNED = (Boolean) m.invoke(null);</span>
+<span class="nc" id="L77">        } catch (ReflectiveOperationException e) {</span>
+<span class="nc" id="L78">          LOG.warn(&quot;java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types&quot; +</span>
+            &quot;won't be used&quot;, e);
+<span class="fc" id="L80">        }</span>
+      }
+    }
+<span class="fc" id="L83">  }</span>
+
+  /**
+   * Private constructor to avoid instantiation
+   */
+  private UnsafeAvailChecker() {
+  }
+
+  /**
+   * True when running JVM is having sun's Unsafe package available in it and underlying
+   * system having unaligned-access capability.
+   *
+   * @return true, if unaligned
+   */
+  static boolean unaligned() {
+<span class="fc" id="L98">    return UNALIGNED;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

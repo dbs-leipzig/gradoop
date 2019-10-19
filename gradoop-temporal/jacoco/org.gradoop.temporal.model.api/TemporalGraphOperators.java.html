@@ -17,7 +17,6 @@ package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -54,7 +53,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate) {
-<span class="fc" id="L57">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L56">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -67,7 +66,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-<span class="fc" id="L70">    return callForGraph(new Snapshot(predicate, dimension));</span>
+<span class="fc" id="L69">    return callForGraph(new Snapshot(predicate, dimension));</span>
   }
 
   /**
@@ -80,7 +79,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see AsOf
    */
   default TemporalGraph asOf(long timestamp) {
-<span class="fc" id="L83">    return snapshot(new AsOf(timestamp));</span>
+<span class="fc" id="L82">    return snapshot(new AsOf(timestamp));</span>
   }
 
   /**
@@ -94,7 +93,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see FromTo
    */
   default TemporalGraph fromTo(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L97">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L96">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -108,7 +107,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see Between
    */
   default TemporalGraph between(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L111">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L110">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -122,7 +121,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ContainedIn
    */
   default TemporalGraph containedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L125">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L124">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -136,7 +135,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ValidDuring
    */
   default TemporalGraph validDuring(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L139">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L138">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -150,7 +149,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see CreatedIn
    */
   default TemporalGraph createdIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L153">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L152">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -164,7 +163,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see DeletedIn
    */
   default TemporalGraph deletedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L167">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L166">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -195,7 +194,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot) {
-<span class="fc" id="L198">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L197">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -226,88 +225,8 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
     TimeDimension dimension) {
-<span class="fc" id="L229">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
+<span class="fc" id="L228">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
   }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   *
-   * @param query Cypher query
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query) {
-<span class="nc" id="L245">    return query(query, new GraphStatistics(1, 1, 1, 1));</span>
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * &lt;p&gt;
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   * &lt;p&gt;
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * &lt;br&gt;
-   * {@code graph.query(
-   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
-   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
-   * }
-   * &lt;p&gt;
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query Cypher query string
-   * @param constructionPattern Construction pattern
-   * @return graph collection containing the output of the construct pattern
-   */
-  default TemporalGraphCollection query(String query, String constructionPattern) {
-<span class="nc" id="L273">    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));</span>
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * @param query Cypher query
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query, GraphStatistics graphStatistics) {
-<span class="nc" id="L286">    return query(query, null, graphStatistics);</span>
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * &lt;p&gt;
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * &lt;br&gt;
-   * {@code graph.query(
-   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
-   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)
-   * }
-   * &lt;p&gt;
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type {@code CO_AUTHOR} between the two entities.
-   *
-   * @param query Cypher query
-   * @param constructionPattern Construction pattern
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing the output of the construct pattern
-   */
-  TemporalGraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
 
   //----------------------------------------------------------------------------
   // Utilities

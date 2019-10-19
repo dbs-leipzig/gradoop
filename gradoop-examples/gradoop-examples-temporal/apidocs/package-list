@@ -1,0 +1,6 @@
+org.gradoop.examples.aggregation
+org.gradoop.examples.common
+org.gradoop.examples.common.functions
+org.gradoop.examples.difference
+org.gradoop.examples.grouping
+org.gradoop.examples.snapshot

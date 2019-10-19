@@ -23,6 +23,9 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
@@ -73,30 +76,44 @@ public interface BaseGraphCollection&lt;
   @Override
   default LG getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
-<span class="fc" id="L76">    DataSet&lt;G&gt; graphHead = getGraphHeads()</span>
-<span class="fc" id="L77">      .filter(new BySameId&lt;&gt;(graphID));</span>
-<span class="fc" id="L78">    DataSet&lt;V&gt; vertices = getVertices()</span>
-<span class="fc" id="L79">      .filter(new InGraph&lt;&gt;(graphID));</span>
-<span class="fc" id="L80">    DataSet&lt;E&gt; edges = getEdges()</span>
-<span class="fc" id="L81">      .filter(new InGraph&lt;&gt;(graphID));</span>
+<span class="fc" id="L79">    DataSet&lt;G&gt; graphHead = getGraphHeads()</span>
+<span class="fc" id="L80">      .filter(new BySameId&lt;&gt;(graphID));</span>
+<span class="fc" id="L81">    DataSet&lt;V&gt; vertices = getVertices()</span>
+<span class="fc" id="L82">      .filter(new InGraph&lt;&gt;(graphID));</span>
+<span class="fc" id="L83">    DataSet&lt;E&gt; edges = getEdges()</span>
+<span class="fc" id="L84">      .filter(new InGraph&lt;&gt;(graphID));</span>
 
-<span class="fc" id="L83">    return getGraphFactory().fromDataSets(graphHead, vertices, edges);</span>
+<span class="fc" id="L86">    return getGraphFactory().fromDataSets(graphHead, vertices, edges);</span>
   }
 
   @Override
   default GC getGraphs(final GradoopIdSet identifiers) {
-<span class="fc" id="L88">    DataSet&lt;G&gt; newGraphHeads = this.getGraphHeads()</span>
-<span class="fc" id="L89">      .filter((FilterFunction&lt;G&gt;) graphHead -&gt; identifiers.contains(graphHead.getId()));</span>
+<span class="fc" id="L91">    DataSet&lt;G&gt; newGraphHeads = this.getGraphHeads()</span>
+<span class="fc" id="L92">      .filter((FilterFunction&lt;G&gt;) graphHead -&gt; identifiers.contains(graphHead.getId()));</span>
 
     // build new vertex set
-<span class="fc" id="L92">    DataSet&lt;V&gt; vertices = getVertices()</span>
-<span class="fc" id="L93">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+<span class="fc" id="L95">    DataSet&lt;V&gt; vertices = getVertices()</span>
+<span class="fc" id="L96">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
 
     // build new edge set
-<span class="fc" id="L96">    DataSet&lt;E&gt; edges = getEdges()</span>
-<span class="fc" id="L97">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+<span class="fc" id="L99">    DataSet&lt;E&gt; edges = getEdges()</span>
+<span class="fc" id="L100">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
 
-<span class="fc" id="L99">    return getFactory().fromDataSets(newGraphHeads, vertices, edges);</span>
+<span class="fc" id="L102">    return getFactory().fromDataSets(newGraphHeads, vertices, edges);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  default DataSet&lt;Boolean&gt; isEmpty() {
+<span class="fc" id="L111">    return getGraphHeads()</span>
+<span class="fc" id="L112">      .map(new True&lt;&gt;())</span>
+<span class="fc" id="L113">      .distinct()</span>
+<span class="fc" id="L114">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
+<span class="fc" id="L115">      .reduce(new Or())</span>
+<span class="fc" id="L116">      .map(new Not());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

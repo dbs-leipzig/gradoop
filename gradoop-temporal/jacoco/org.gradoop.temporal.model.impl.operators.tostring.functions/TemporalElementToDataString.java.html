@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalElementToDataString.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.tostring.functions</a> &gt; <span class="el_source">TemporalElementToDataString.java</span></div><h1>TemporalElementToDataString.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.tostring.functions;
+
+import org.gradoop.flink.model.impl.operators.tostring.functions.ElementToDataString;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+/**
+ * Superclass of data-bases string representations of temporal elements,
+ * i.e. such including label, properties and valid time.
+ *
+ * @param &lt;EL&gt; temporal element type
+ */
+<span class="fc" id="L27">public class TemporalElementToDataString&lt;EL extends TemporalElement&gt; extends ElementToDataString&lt;EL&gt; {</span>
+
+  /**
+   * Represents the time fields of the input element as a comma separated string.
+   * Default times result in an empty string for this field.
+   *
+   * @param element temporal element
+   * @return valid time and transaction time as of element as string
+   */
+  protected String time(EL element) {
+<span class="fc" id="L37">    StringBuilder builder = new StringBuilder();</span>
+<span class="fc" id="L38">    builder.append('(');</span>
+
+<span class="fc" id="L40">    Long time = element.getValidFrom();</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">    if (!time.equals(TemporalElement.DEFAULT_TIME_FROM)) {</span>
+<span class="fc" id="L42">      builder.append(time);</span>
+    }
+<span class="fc" id="L44">    builder.append(',');</span>
+<span class="fc" id="L45">    time = element.getValidTo();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (!time.equals(TemporalElement.DEFAULT_TIME_TO)) {</span>
+<span class="fc" id="L47">      builder.append(time);</span>
+    }
+
+<span class="fc" id="L50">    builder.append(')');</span>
+<span class="fc" id="L51">    return builder.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

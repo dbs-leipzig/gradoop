@@ -190,7 +190,7 @@
 <a name="180" href="#180">180</a>   <strong class="jxr_keyword">protected</strong> TemporalGraph toTemporalGraphWithDefaultExtractors(BaseGraph&lt;?, ?, ?, ?, ?&gt; graph) {
 <a name="181" href="#181">181</a>     <em class="jxr_comment">// We have to use lambda expressions instead of method references here, otherwise a</em>
 <a name="182" href="#182">182</a>     <em class="jxr_comment">// ClassCastException will be thrown when those extractor functions are called.</em>
-<a name="183" href="#183">183</a>     <em class="jxr_comment">// TODO: Find out why.</em>
+<a name="183" href="#183">183</a>     <em class="jxr_comment">// TODO: Find out why. (#1399)</em>
 <a name="184" href="#184">184</a>     <strong class="jxr_keyword">return</strong> toTemporalGraph(graph,
 <a name="185" href="#185">185</a>       g -&gt; TemporalGradoopTestUtils.extractTime(g),
 <a name="186" href="#186">186</a>       v -&gt; TemporalGradoopTestUtils.extractTime(v),
@@ -208,131 +208,173 @@
 <a name="198" href="#198">198</a>   }
 <a name="199" href="#199">199</a> 
 <a name="200" href="#200">200</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   * Check if the temporal graph element has default time values for valid and transaction time.</em>
-<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   *</em>
-<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   * @param element the temporal graph element to check</em>
-<a name="204" href="#204">204</a> <em class="jxr_javadoccomment">   */</em>
-<a name="205" href="#205">205</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkDefaultTemporalElement(TemporalElement element) {
-<a name="206" href="#206">206</a>     assertEquals(TemporalElement.DEFAULT_TIME_FROM, element.getValidFrom());
-<a name="207" href="#207">207</a>     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getValidTo());
-<a name="208" href="#208">208</a>     checkDefaultTxTimes(element);
-<a name="209" href="#209">209</a>   }
-<a name="210" href="#210">210</a> 
-<a name="211" href="#211">211</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   * Check if the temporal graph element has default time values for transaction time.</em>
-<a name="213" href="#213">213</a> <em class="jxr_javadoccomment">   *</em>
-<a name="214" href="#214">214</a> <em class="jxr_javadoccomment">   * @param element the temporal graph element to check</em>
-<a name="215" href="#215">215</a> <em class="jxr_javadoccomment">   */</em>
-<a name="216" href="#216">216</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkDefaultTxTimes(TemporalElement element) {
-<a name="217" href="#217">217</a>     assertTrue(element.getTxFrom() &lt; System.currentTimeMillis());
-<a name="218" href="#218">218</a>     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getTxTo());
-<a name="219" href="#219">219</a>   }
-<a name="220" href="#220">220</a> 
-<a name="221" href="#221">221</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   * Creates a social network graph with temporal attributes used for tests.</em>
-<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   *</em>
-<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @return The graph loader containing the network graph.</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @throws IOException When loading the graph resource fails.</em>
-<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   */</em>
-<a name="227" href="#227">227</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getTemporalSocialNetworkLoader() <strong class="jxr_keyword">throws</strong> IOException {
-<a name="228" href="#228">228</a>     InputStream inputStream = getClass()
-<a name="229" href="#229">229</a>       .getResourceAsStream(TemporalGradoopTestUtils.SOCIAL_NETWORK_TEMPORAL_GDL_FILE);
-<a name="230" href="#230">230</a>     <strong class="jxr_keyword">return</strong> getLoaderFromStream(inputStream);
-<a name="231" href="#231">231</a>   }
-<a name="232" href="#232">232</a> 
-<a name="233" href="#233">233</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="234" href="#234">234</a> <em class="jxr_javadoccomment">   * Get a test graph with temporal attributes set.</em>
-<a name="235" href="#235">235</a> <em class="jxr_javadoccomment">   *</em>
-<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * @return The test graph.</em>
-<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   */</em>
-<a name="238" href="#238">238</a>   <strong class="jxr_keyword">protected</strong> TemporalGraph getTestGraphWithValues() {
-<a name="239" href="#239">239</a>     TemporalVertex v1 = createVertex(V1, MIN_VALUE, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="240" href="#240">240</a>     TemporalVertex v2 = createVertex(V2, 0, MAX_VALUE, 0, MAX_VALUE);
-<a name="241" href="#241">241</a>     TemporalVertex v3 = createVertex(V3, 1, 8, 3, 9);
-<a name="242" href="#242">242</a>     TemporalVertex v4 = createVertex(V4, 2, 7, 4, 5);
-<a name="243" href="#243">243</a>     TemporalVertex v5 = createVertex(V5, 3, 8, 1, 9);
-<a name="244" href="#244">244</a>     TemporalEdge e1 = createEdge(E1, v1, v2, 0, MAX_VALUE, 0, MAX_VALUE);
-<a name="245" href="#245">245</a>     TemporalEdge e2 = createEdge(E2, v2, v3, 1, 2, 6, 7);
-<a name="246" href="#246">246</a>     TemporalEdge e3 = createEdge(E3, v4, v5, 3, 4, 1, 1);
-<a name="247" href="#247">247</a>     TemporalEdge e4 = createEdge(E4, v3, v5, 6, 7, 4, 6);
-<a name="248" href="#248">248</a>     TemporalEdge e5 = createEdge(E5, v4, v4, 2, 6, 4, 5);
-<a name="249" href="#249">249</a>     DataSet&lt;TemporalVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
-<a name="250" href="#250">250</a>     DataSet&lt;TemporalEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4, e5);
-<a name="251" href="#251">251</a>     <strong class="jxr_keyword">return</strong> getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
-<a name="252" href="#252">252</a>   }
-<a name="253" href="#253">253</a> 
-<a name="254" href="#254">254</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   * Get a test graph with all temporal attributes set to their default value.</em>
-<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   *</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   * @return The test graph.</em>
-<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   */</em>
-<a name="259" href="#259">259</a>   <strong class="jxr_keyword">protected</strong> TemporalGraph getTestGraphWithAllDefaults() {
-<a name="260" href="#260">260</a>     TemporalVertex v1 = createVertex(V1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="261" href="#261">261</a>     TemporalVertex v2 = createVertex(V2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="262" href="#262">262</a>     TemporalVertex v3 = createVertex(V3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="263" href="#263">263</a>     TemporalEdge e1 = createEdge(E1, v1, v2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="264" href="#264">264</a>     TemporalEdge e2 = createEdge(E2, v2, v3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="265" href="#265">265</a>     TemporalEdge e3 = createEdge(E3, v3, v1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
-<a name="266" href="#266">266</a>     DataSet&lt;TemporalVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2, v3);
-<a name="267" href="#267">267</a>     DataSet&lt;TemporalEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2, e3);
-<a name="268" href="#268">268</a>     <strong class="jxr_keyword">return</strong> getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
-<a name="269" href="#269">269</a>   }
-<a name="270" href="#270">270</a> 
-<a name="271" href="#271">271</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="272" href="#272">272</a> <em class="jxr_javadoccomment">   * Create a temporal edge with temporal attributes set.</em>
-<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">   *</em>
-<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">   * @param label     The label of the edge.</em>
-<a name="275" href="#275">275</a> <em class="jxr_javadoccomment">   * @param source    The element used as a source for the edge.</em>
-<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   * @param target    The element used as a target for the edge.</em>
-<a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   * @param txFrom    The start of the transaction time.</em>
-<a name="278" href="#278">278</a> <em class="jxr_javadoccomment">   * @param txTo      The end of the transaction time.</em>
-<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   * @param validFrom The start of the valid time.</em>
-<a name="280" href="#280">280</a> <em class="jxr_javadoccomment">   * @param validTo   The end of the valid time.</em>
-<a name="281" href="#281">281</a> <em class="jxr_javadoccomment">   * @return A temporal edge with those times set.</em>
-<a name="282" href="#282">282</a> <em class="jxr_javadoccomment">   */</em>
-<a name="283" href="#283">283</a>   <strong class="jxr_keyword">private</strong> TemporalEdge createEdge(String label, Identifiable source, Identifiable target, <strong class="jxr_keyword">long</strong> txFrom,
-<a name="284" href="#284">284</a>     <strong class="jxr_keyword">long</strong> txTo, <strong class="jxr_keyword">long</strong> validFrom, <strong class="jxr_keyword">long</strong> validTo) {
-<a name="285" href="#285">285</a>     TemporalEdge edge = getConfig().getTemporalGraphFactory().getEdgeFactory()
-<a name="286" href="#286">286</a>       .createEdge(source.getId(), target.getId());
-<a name="287" href="#287">287</a>     edge.setLabel(label);
-<a name="288" href="#288">288</a>     edge.setTransactionTime(Tuple2.of(txFrom, txTo));
-<a name="289" href="#289">289</a>     edge.setValidTime(Tuple2.of(validFrom, validTo));
-<a name="290" href="#290">290</a>     <strong class="jxr_keyword">return</strong> edge;
-<a name="291" href="#291">291</a>   }
-<a name="292" href="#292">292</a> 
-<a name="293" href="#293">293</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">   * Create a temporal vertex with temporal attributes set.</em>
-<a name="295" href="#295">295</a> <em class="jxr_javadoccomment">   *</em>
-<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   * @param label     The label of the vertex.</em>
-<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * @param txFrom    The start of the transaction time.</em>
-<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   * @param txTo      The end of the transaction time.</em>
-<a name="299" href="#299">299</a> <em class="jxr_javadoccomment">   * @param validFrom The start of the valid time.</em>
-<a name="300" href="#300">300</a> <em class="jxr_javadoccomment">   * @param validTo   The end of the valid time.</em>
-<a name="301" href="#301">301</a> <em class="jxr_javadoccomment">   * @return A temporal vertex with those times set.</em>
-<a name="302" href="#302">302</a> <em class="jxr_javadoccomment">   */</em>
-<a name="303" href="#303">303</a>   <strong class="jxr_keyword">private</strong> TemporalVertex createVertex(String label, <strong class="jxr_keyword">long</strong> txFrom, <strong class="jxr_keyword">long</strong> txTo, <strong class="jxr_keyword">long</strong> validFrom, <strong class="jxr_keyword">long</strong> validTo) {
-<a name="304" href="#304">304</a>     TemporalVertex vertex = getConfig().getTemporalGraphFactory().getVertexFactory().createVertex();
-<a name="305" href="#305">305</a>     vertex.setLabel(label);
-<a name="306" href="#306">306</a>     vertex.setTransactionTime(Tuple2.of(txFrom, txTo));
-<a name="307" href="#307">307</a>     vertex.setValidTime(Tuple2.of(validFrom, validTo));
-<a name="308" href="#308">308</a>     <strong class="jxr_keyword">return</strong> vertex;
-<a name="309" href="#309">309</a>   }
-<a name="310" href="#310">310</a> 
-<a name="311" href="#311">311</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="312" href="#312">312</a> <em class="jxr_javadoccomment">   * Convert a formatted date/time string to the time format (milliseconds since unix epoch) used by Gradoop.</em>
-<a name="313" href="#313">313</a> <em class="jxr_javadoccomment">   * The date string is expected to be formatted according to {@link #DATE_FORMAT}.</em>
-<a name="314" href="#314">314</a> <em class="jxr_javadoccomment">   *</em>
-<a name="315" href="#315">315</a> <em class="jxr_javadoccomment">   * @param dateTimeString The date string.</em>
-<a name="316" href="#316">316</a> <em class="jxr_javadoccomment">   * @return The time in milliseconds since unix epoch.</em>
-<a name="317" href="#317">317</a> <em class="jxr_javadoccomment">   */</em>
-<a name="318" href="#318">318</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">long</strong> asMillis(String dateTimeString) {
-<a name="319" href="#319">319</a>     <strong class="jxr_keyword">try</strong> {
-<a name="320" href="#320">320</a>       <strong class="jxr_keyword">return</strong> dateFormatter.parse(dateTimeString).getTime();
-<a name="321" href="#321">321</a>     } <strong class="jxr_keyword">catch</strong> (ParseException pe) {
-<a name="322" href="#322">322</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Failed to parse date."</span>, pe);
-<a name="323" href="#323">323</a>     }
-<a name="324" href="#324">324</a>   }
-<a name="325" href="#325">325</a> }
+<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   * Convert a graph collection to a {@link TemporalGraphCollection} and set temporal attributes using</em>
+<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   * {@link TimeIntervalExtractor} functions.</em>
+<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   *</em>
+<a name="204" href="#204">204</a> <em class="jxr_javadoccomment">   * @param collection             The graph collection.</em>
+<a name="205" href="#205">205</a> <em class="jxr_javadoccomment">   * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.</em>
+<a name="206" href="#206">206</a> <em class="jxr_javadoccomment">   * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.</em>
+<a name="207" href="#207">207</a> <em class="jxr_javadoccomment">   * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.</em>
+<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   * @param &lt;G&gt; The graph head type.</em>
+<a name="209" href="#209">209</a> <em class="jxr_javadoccomment">   * @param &lt;V&gt; The vertex type.</em>
+<a name="210" href="#210">210</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; The edge type.</em>
+<a name="211" href="#211">211</a> <em class="jxr_javadoccomment">   * @return A temporal graph with temporal attributes extracted from the original graph.</em>
+<a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   */</em>
+<a name="213" href="#213">213</a>   <strong class="jxr_keyword">protected</strong> &lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt; TemporalGraphCollection
+<a name="214" href="#214">214</a>   toTemporalGraphCollection(
+<a name="215" href="#215">215</a>     BaseGraphCollection&lt;G, V, E, ?, ?&gt; collection,
+<a name="216" href="#216">216</a>     TimeIntervalExtractor&lt;G&gt; graphHeadTimeExtractor,
+<a name="217" href="#217">217</a>     TimeIntervalExtractor&lt;V&gt; vertexTimeExtractor,
+<a name="218" href="#218">218</a>     TimeIntervalExtractor&lt;E&gt; edgeTimeExtractor) {
+<a name="219" href="#219">219</a>     <strong class="jxr_keyword">return</strong> getConfig().getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
+<a name="220" href="#220">220</a>       collection.getGraphHeads(), graphHeadTimeExtractor, collection.getVertices(), vertexTimeExtractor,
+<a name="221" href="#221">221</a>       collection.getEdges(), edgeTimeExtractor);
+<a name="222" href="#222">222</a>   }
+<a name="223" href="#223">223</a> 
+<a name="224" href="#224">224</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * Convert a graph collection to a {@link TemporalGraphCollection} with time extraction functions.</em>
+<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   * This will use {@link TemporalGradoopTestUtils#extractTime(Element)} to extract temporal attributes.</em>
+<a name="227" href="#227">227</a> <em class="jxr_javadoccomment">   *</em>
+<a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   * @param collection The graph collection.</em>
+<a name="229" href="#229">229</a> <em class="jxr_javadoccomment">   * @return The temporal graph with extracted temporal information.</em>
+<a name="230" href="#230">230</a> <em class="jxr_javadoccomment">   */</em>
+<a name="231" href="#231">231</a>   <strong class="jxr_keyword">protected</strong> TemporalGraphCollection toTemporalGraphCollectionWithDefaultExtractors(
+<a name="232" href="#232">232</a>     BaseGraphCollection&lt;?, ?, ?, ?, ?&gt; collection) {
+<a name="233" href="#233">233</a>     <em class="jxr_comment">// We have to use lambda expressions instead of method references here, otherwise a</em>
+<a name="234" href="#234">234</a>     <em class="jxr_comment">// ClassCastException will be thrown when those extractor functions are called.</em>
+<a name="235" href="#235">235</a>     <em class="jxr_comment">// TODO: Find out why. (#1399)</em>
+<a name="236" href="#236">236</a>     <strong class="jxr_keyword">return</strong> toTemporalGraphCollection(collection,
+<a name="237" href="#237">237</a>       g -&gt; TemporalGradoopTestUtils.extractTime(g),
+<a name="238" href="#238">238</a>       v -&gt; TemporalGradoopTestUtils.extractTime(v),
+<a name="239" href="#239">239</a>       e -&gt; TemporalGradoopTestUtils.extractTime(e));
+<a name="240" href="#240">240</a>   }
+<a name="241" href="#241">241</a> 
+<a name="242" href="#242">242</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="243" href="#243">243</a> <em class="jxr_javadoccomment">   * Check if the temporal graph element has default time values for valid and transaction time.</em>
+<a name="244" href="#244">244</a> <em class="jxr_javadoccomment">   *</em>
+<a name="245" href="#245">245</a> <em class="jxr_javadoccomment">   * @param element the temporal graph element to check</em>
+<a name="246" href="#246">246</a> <em class="jxr_javadoccomment">   */</em>
+<a name="247" href="#247">247</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkDefaultTemporalElement(TemporalElement element) {
+<a name="248" href="#248">248</a>     assertEquals(TemporalElement.DEFAULT_TIME_FROM, element.getValidFrom());
+<a name="249" href="#249">249</a>     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getValidTo());
+<a name="250" href="#250">250</a>     checkDefaultTxTimes(element);
+<a name="251" href="#251">251</a>   }
+<a name="252" href="#252">252</a> 
+<a name="253" href="#253">253</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   * Check if the temporal graph element has default time values for transaction time.</em>
+<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   *</em>
+<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   * @param element the temporal graph element to check</em>
+<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   */</em>
+<a name="258" href="#258">258</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkDefaultTxTimes(TemporalElement element) {
+<a name="259" href="#259">259</a>     assertTrue(element.getTxFrom() &lt; System.currentTimeMillis());
+<a name="260" href="#260">260</a>     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getTxTo());
+<a name="261" href="#261">261</a>   }
+<a name="262" href="#262">262</a> 
+<a name="263" href="#263">263</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   * Creates a social network graph with temporal attributes used for tests.</em>
+<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   *</em>
+<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * @return The graph loader containing the network graph.</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   * @throws IOException When loading the graph resource fails.</em>
+<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   */</em>
+<a name="269" href="#269">269</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getTemporalSocialNetworkLoader() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="270" href="#270">270</a>     InputStream inputStream = getClass()
+<a name="271" href="#271">271</a>       .getResourceAsStream(TemporalGradoopTestUtils.SOCIAL_NETWORK_TEMPORAL_GDL_FILE);
+<a name="272" href="#272">272</a>     <strong class="jxr_keyword">return</strong> getLoaderFromStream(inputStream);
+<a name="273" href="#273">273</a>   }
+<a name="274" href="#274">274</a> 
+<a name="275" href="#275">275</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   * Get a test graph with temporal attributes set.</em>
+<a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   *</em>
+<a name="278" href="#278">278</a> <em class="jxr_javadoccomment">   * @return The test graph.</em>
+<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   */</em>
+<a name="280" href="#280">280</a>   <strong class="jxr_keyword">protected</strong> TemporalGraph getTestGraphWithValues() {
+<a name="281" href="#281">281</a>     TemporalVertex v1 = createVertex(V1, MIN_VALUE, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="282" href="#282">282</a>     TemporalVertex v2 = createVertex(V2, 0, MAX_VALUE, 0, MAX_VALUE);
+<a name="283" href="#283">283</a>     TemporalVertex v3 = createVertex(V3, 1, 8, 3, 9);
+<a name="284" href="#284">284</a>     TemporalVertex v4 = createVertex(V4, 2, 7, 4, 5);
+<a name="285" href="#285">285</a>     TemporalVertex v5 = createVertex(V5, 3, 8, 1, 9);
+<a name="286" href="#286">286</a>     TemporalEdge e1 = createEdge(E1, v1, v2, 0, MAX_VALUE, 0, MAX_VALUE);
+<a name="287" href="#287">287</a>     TemporalEdge e2 = createEdge(E2, v2, v3, 1, 2, 6, 7);
+<a name="288" href="#288">288</a>     TemporalEdge e3 = createEdge(E3, v4, v5, 3, 4, 1, 1);
+<a name="289" href="#289">289</a>     TemporalEdge e4 = createEdge(E4, v3, v5, 6, 7, 4, 6);
+<a name="290" href="#290">290</a>     TemporalEdge e5 = createEdge(E5, v4, v4, 2, 6, 4, 5);
+<a name="291" href="#291">291</a>     DataSet&lt;TemporalVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
+<a name="292" href="#292">292</a>     DataSet&lt;TemporalEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4, e5);
+<a name="293" href="#293">293</a>     <strong class="jxr_keyword">return</strong> getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
+<a name="294" href="#294">294</a>   }
+<a name="295" href="#295">295</a> 
+<a name="296" href="#296">296</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * Get a test graph with all temporal attributes set to their default value.</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   *</em>
+<a name="299" href="#299">299</a> <em class="jxr_javadoccomment">   * @return The test graph.</em>
+<a name="300" href="#300">300</a> <em class="jxr_javadoccomment">   */</em>
+<a name="301" href="#301">301</a>   <strong class="jxr_keyword">protected</strong> TemporalGraph getTestGraphWithAllDefaults() {
+<a name="302" href="#302">302</a>     TemporalVertex v1 = createVertex(V1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="303" href="#303">303</a>     TemporalVertex v2 = createVertex(V2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="304" href="#304">304</a>     TemporalVertex v3 = createVertex(V3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="305" href="#305">305</a>     TemporalEdge e1 = createEdge(E1, v1, v2, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="306" href="#306">306</a>     TemporalEdge e2 = createEdge(E2, v2, v3, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="307" href="#307">307</a>     TemporalEdge e3 = createEdge(E3, v3, v1, CURRENT_TIME, MAX_VALUE, MIN_VALUE, MAX_VALUE);
+<a name="308" href="#308">308</a>     DataSet&lt;TemporalVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2, v3);
+<a name="309" href="#309">309</a>     DataSet&lt;TemporalEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2, e3);
+<a name="310" href="#310">310</a>     <strong class="jxr_keyword">return</strong> getConfig().getTemporalGraphFactory().fromDataSets(vertices, edges);
+<a name="311" href="#311">311</a>   }
+<a name="312" href="#312">312</a> 
+<a name="313" href="#313">313</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="314" href="#314">314</a> <em class="jxr_javadoccomment">   * Create a temporal edge with temporal attributes set.</em>
+<a name="315" href="#315">315</a> <em class="jxr_javadoccomment">   *</em>
+<a name="316" href="#316">316</a> <em class="jxr_javadoccomment">   * @param label     The label of the edge.</em>
+<a name="317" href="#317">317</a> <em class="jxr_javadoccomment">   * @param source    The element used as a source for the edge.</em>
+<a name="318" href="#318">318</a> <em class="jxr_javadoccomment">   * @param target    The element used as a target for the edge.</em>
+<a name="319" href="#319">319</a> <em class="jxr_javadoccomment">   * @param txFrom    The start of the transaction time.</em>
+<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">   * @param txTo      The end of the transaction time.</em>
+<a name="321" href="#321">321</a> <em class="jxr_javadoccomment">   * @param validFrom The start of the valid time.</em>
+<a name="322" href="#322">322</a> <em class="jxr_javadoccomment">   * @param validTo   The end of the valid time.</em>
+<a name="323" href="#323">323</a> <em class="jxr_javadoccomment">   * @return A temporal edge with those times set.</em>
+<a name="324" href="#324">324</a> <em class="jxr_javadoccomment">   */</em>
+<a name="325" href="#325">325</a>   <strong class="jxr_keyword">private</strong> TemporalEdge createEdge(String label, Identifiable source, Identifiable target, <strong class="jxr_keyword">long</strong> txFrom,
+<a name="326" href="#326">326</a>                                   <strong class="jxr_keyword">long</strong> txTo, <strong class="jxr_keyword">long</strong> validFrom, <strong class="jxr_keyword">long</strong> validTo) {
+<a name="327" href="#327">327</a>     TemporalEdge edge = getConfig().getTemporalGraphFactory().getEdgeFactory()
+<a name="328" href="#328">328</a>       .createEdge(source.getId(), target.getId());
+<a name="329" href="#329">329</a>     edge.setLabel(label);
+<a name="330" href="#330">330</a>     edge.setTransactionTime(Tuple2.of(txFrom, txTo));
+<a name="331" href="#331">331</a>     edge.setValidTime(Tuple2.of(validFrom, validTo));
+<a name="332" href="#332">332</a>     <strong class="jxr_keyword">return</strong> edge;
+<a name="333" href="#333">333</a>   }
+<a name="334" href="#334">334</a> 
+<a name="335" href="#335">335</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="336" href="#336">336</a> <em class="jxr_javadoccomment">   * Create a temporal vertex with temporal attributes set.</em>
+<a name="337" href="#337">337</a> <em class="jxr_javadoccomment">   *</em>
+<a name="338" href="#338">338</a> <em class="jxr_javadoccomment">   * @param label     The label of the vertex.</em>
+<a name="339" href="#339">339</a> <em class="jxr_javadoccomment">   * @param txFrom    The start of the transaction time.</em>
+<a name="340" href="#340">340</a> <em class="jxr_javadoccomment">   * @param txTo      The end of the transaction time.</em>
+<a name="341" href="#341">341</a> <em class="jxr_javadoccomment">   * @param validFrom The start of the valid time.</em>
+<a name="342" href="#342">342</a> <em class="jxr_javadoccomment">   * @param validTo   The end of the valid time.</em>
+<a name="343" href="#343">343</a> <em class="jxr_javadoccomment">   * @return A temporal vertex with those times set.</em>
+<a name="344" href="#344">344</a> <em class="jxr_javadoccomment">   */</em>
+<a name="345" href="#345">345</a>   <strong class="jxr_keyword">private</strong> TemporalVertex createVertex(String label, <strong class="jxr_keyword">long</strong> txFrom, <strong class="jxr_keyword">long</strong> txTo, <strong class="jxr_keyword">long</strong> validFrom, <strong class="jxr_keyword">long</strong> validTo) {
+<a name="346" href="#346">346</a>     TemporalVertex vertex = getConfig().getTemporalGraphFactory().getVertexFactory().createVertex();
+<a name="347" href="#347">347</a>     vertex.setLabel(label);
+<a name="348" href="#348">348</a>     vertex.setTransactionTime(Tuple2.of(txFrom, txTo));
+<a name="349" href="#349">349</a>     vertex.setValidTime(Tuple2.of(validFrom, validTo));
+<a name="350" href="#350">350</a>     <strong class="jxr_keyword">return</strong> vertex;
+<a name="351" href="#351">351</a>   }
+<a name="352" href="#352">352</a> 
+<a name="353" href="#353">353</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="354" href="#354">354</a> <em class="jxr_javadoccomment">   * Convert a formatted date/time string to the time format (milliseconds since unix epoch) used by Gradoop.</em>
+<a name="355" href="#355">355</a> <em class="jxr_javadoccomment">   * The date string is expected to be formatted according to {@link #DATE_FORMAT}.</em>
+<a name="356" href="#356">356</a> <em class="jxr_javadoccomment">   *</em>
+<a name="357" href="#357">357</a> <em class="jxr_javadoccomment">   * @param dateTimeString The date string.</em>
+<a name="358" href="#358">358</a> <em class="jxr_javadoccomment">   * @return The time in milliseconds since unix epoch.</em>
+<a name="359" href="#359">359</a> <em class="jxr_javadoccomment">   */</em>
+<a name="360" href="#360">360</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">long</strong> asMillis(String dateTimeString) {
+<a name="361" href="#361">361</a>     <strong class="jxr_keyword">try</strong> {
+<a name="362" href="#362">362</a>       <strong class="jxr_keyword">return</strong> dateFormatter.parse(dateTimeString).getTime();
+<a name="363" href="#363">363</a>     } <strong class="jxr_keyword">catch</strong> (ParseException pe) {
+<a name="364" href="#364">364</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Failed to parse date."</span>, pe);
+<a name="365" href="#365">365</a>     }
+<a name="366" href="#366">366</a>   }
+<a name="367" href="#367">367</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

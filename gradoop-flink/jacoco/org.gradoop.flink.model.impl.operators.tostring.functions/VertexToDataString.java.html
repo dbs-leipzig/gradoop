@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
   @Override
   public void flatMap(V vertex, Collector&lt;VertexString&gt; collector) throws Exception {
 <span class="fc" id="L35">    GradoopId vertexId = vertex.getId();</span>
-<span class="fc" id="L36">    String vertexLabel = &quot;(&quot; + label(vertex) + &quot;)&quot;;</span>
+<span class="fc" id="L36">    String vertexLabel = &quot;(&quot; + labelWithProperties(vertex) + &quot;)&quot;;</span>
 
 <span class="fc bfc" id="L38" title="All 2 branches covered.">    for (GradoopId graphId : vertex.getGraphIds()) {</span>
 <span class="fc" id="L39">      collector.collect(new VertexString(graphId, vertexId, vertexLabel));</span>

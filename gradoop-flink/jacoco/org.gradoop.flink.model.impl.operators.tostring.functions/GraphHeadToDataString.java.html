@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
   @Override
   public GraphHeadString map(G graph) throws Exception {
-<span class="fc" id="L32">    return new GraphHeadString(graph.getId(), &quot;|&quot; + label(graph) + &quot;|&quot;);</span>
+<span class="fc" id="L32">    return new GraphHeadString(graph.getId(), &quot;|&quot; + labelWithProperties(graph) + &quot;|&quot;);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

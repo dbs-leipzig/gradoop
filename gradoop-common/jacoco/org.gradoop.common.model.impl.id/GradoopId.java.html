@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.model.impl.id;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
@@ -54,7 +53,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   /**
    * Represents a null id.
    */
-<span class="fc" id="L57">  public static final GradoopId NULL_VALUE =</span>
+<span class="fc" id="L56">  public static final GradoopId NULL_VALUE =</span>
     new GradoopId(0, 0, (short) 0, 0);
 
   /**
@@ -70,7 +69,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   /**
    * Integer containing a counter that is increased whenever a new id is created
    */
-<span class="fc" id="L73">  private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());</span>
+<span class="fc" id="L72">  private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());</span>
 
   /**
    * Bit mask used to extract the lowest three bytes of four
@@ -85,7 +84,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   /**
    * Required for {@link GradoopId#toString()}
    */
-<span class="fc" id="L88">  private static final char[] HEX_CHARS = new char[] {</span>
+<span class="fc" id="L87">  private static final char[] HEX_CHARS = new char[] {</span>
     '0', '1', '2', '3', '4', '5', '6', '7',
     '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -95,25 +94,25 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   private byte[] bytes;
 
   static {
-<span class="fc" id="L98">    MACHINE_IDENTIFIER = createMachineIdentifier();</span>
-<span class="fc" id="L99">    PROCESS_IDENTIFIER = createProcessIdentifier();</span>
-<span class="fc" id="L100">  }</span>
+<span class="fc" id="L97">    MACHINE_IDENTIFIER = createMachineIdentifier();</span>
+<span class="fc" id="L98">    PROCESS_IDENTIFIER = createProcessIdentifier();</span>
+<span class="fc" id="L99">  }</span>
 
   /**
    * Required default constructor for instantiation by serialization logic.
    */
-<span class="nc" id="L105">  public GradoopId() {</span>
-<span class="nc" id="L106">    bytes = new byte[ID_SIZE];</span>
-<span class="nc" id="L107">  }</span>
+<span class="nc" id="L104">  public GradoopId() {</span>
+<span class="nc" id="L105">    bytes = new byte[ID_SIZE];</span>
+<span class="nc" id="L106">  }</span>
 
   /**
    * Creates a GradoopId from a given byte representation
    *
    * @param bytes the GradoopId represented by the byte array
    */
-<span class="fc" id="L114">  private GradoopId(byte[] bytes) {</span>
-<span class="fc" id="L115">    this.bytes = bytes;</span>
-<span class="fc" id="L116">  }</span>
+<span class="fc" id="L113">  private GradoopId(byte[] bytes) {</span>
+<span class="fc" id="L114">    this.bytes = bytes;</span>
+<span class="fc" id="L115">  }</span>
 
   /**
    * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
@@ -129,8 +128,8 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    */
   public GradoopId(final int timestamp, final int machineIdentifier,
     final short processIdentifier, final int counter) {
-<span class="fc" id="L132">    this(timestamp, machineIdentifier, processIdentifier, counter, true);</span>
-<span class="fc" id="L133">  }</span>
+<span class="fc" id="L131">    this(timestamp, machineIdentifier, processIdentifier, counter, true);</span>
+<span class="fc" id="L132">  }</span>
 
 
   /**
@@ -146,36 +145,36 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    *                          16777215
    */
   private GradoopId(final int timestamp, final int machineIdentifier, final short processIdentifier,
-<span class="fc" id="L149">    final int counter, final boolean checkCounter) {</span>
-<span class="pc bpc" id="L150" title="1 of 2 branches missed.">    if ((machineIdentifier &amp; HIGH_ORDER_ONE_BYTE) != 0) {</span>
-<span class="nc" id="L151">      throw new IllegalArgumentException(&quot;The machine identifier must be between 0&quot; +</span>
+<span class="fc" id="L148">    final int counter, final boolean checkCounter) {</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if ((machineIdentifier &amp; HIGH_ORDER_ONE_BYTE) != 0) {</span>
+<span class="nc" id="L150">      throw new IllegalArgumentException(&quot;The machine identifier must be between 0&quot; +</span>
         &quot; and 16777215 (it must fit in three bytes).&quot;);
     }
-<span class="pc bpc" id="L154" title="1 of 4 branches missed.">    if (checkCounter &amp;&amp; ((counter &amp; HIGH_ORDER_ONE_BYTE) != 0)) {</span>
-<span class="nc" id="L155">      throw new IllegalArgumentException(&quot;The counter must be between 0&quot; +</span>
+<span class="pc bpc" id="L153" title="1 of 4 branches missed.">    if (checkCounter &amp;&amp; ((counter &amp; HIGH_ORDER_ONE_BYTE) != 0)) {</span>
+<span class="nc" id="L154">      throw new IllegalArgumentException(&quot;The counter must be between 0&quot; +</span>
         &quot; and 16777215 (it must fit in three bytes).&quot;);
     }
 
-<span class="fc" id="L159">    ByteBuffer buffer = ByteBuffer.allocate(12);</span>
+<span class="fc" id="L158">    ByteBuffer buffer = ByteBuffer.allocate(12);</span>
 
-<span class="fc" id="L161">    buffer.put((byte) (timestamp &gt;&gt; 24));</span>
-<span class="fc" id="L162">    buffer.put((byte) (timestamp &gt;&gt; 16));</span>
-<span class="fc" id="L163">    buffer.put((byte) (timestamp &gt;&gt; 8));</span>
-<span class="fc" id="L164">    buffer.put((byte) timestamp);</span>
+<span class="fc" id="L160">    buffer.put((byte) (timestamp &gt;&gt; 24));</span>
+<span class="fc" id="L161">    buffer.put((byte) (timestamp &gt;&gt; 16));</span>
+<span class="fc" id="L162">    buffer.put((byte) (timestamp &gt;&gt; 8));</span>
+<span class="fc" id="L163">    buffer.put((byte) timestamp);</span>
 
-<span class="fc" id="L166">    buffer.put((byte) (machineIdentifier &gt;&gt; 16));</span>
-<span class="fc" id="L167">    buffer.put((byte) (machineIdentifier &gt;&gt; 8));</span>
-<span class="fc" id="L168">    buffer.put((byte) machineIdentifier);</span>
+<span class="fc" id="L165">    buffer.put((byte) (machineIdentifier &gt;&gt; 16));</span>
+<span class="fc" id="L166">    buffer.put((byte) (machineIdentifier &gt;&gt; 8));</span>
+<span class="fc" id="L167">    buffer.put((byte) machineIdentifier);</span>
 
-<span class="fc" id="L170">    buffer.put((byte) (processIdentifier &gt;&gt; 8));</span>
-<span class="fc" id="L171">    buffer.put((byte) processIdentifier);</span>
+<span class="fc" id="L169">    buffer.put((byte) (processIdentifier &gt;&gt; 8));</span>
+<span class="fc" id="L170">    buffer.put((byte) processIdentifier);</span>
 
-<span class="fc" id="L173">    buffer.put((byte) (counter &gt;&gt; 16));</span>
-<span class="fc" id="L174">    buffer.put((byte) (counter &gt;&gt; 8));</span>
-<span class="fc" id="L175">    buffer.put((byte) counter);</span>
+<span class="fc" id="L172">    buffer.put((byte) (counter &gt;&gt; 16));</span>
+<span class="fc" id="L173">    buffer.put((byte) (counter &gt;&gt; 8));</span>
+<span class="fc" id="L174">    buffer.put((byte) counter);</span>
 
-<span class="fc" id="L177">    this.bytes = buffer.array();</span>
-<span class="fc" id="L178">  }</span>
+<span class="fc" id="L176">    this.bytes = buffer.array();</span>
+<span class="fc" id="L177">  }</span>
 
   /**
    * Creates the machine identifier from the network interface.
@@ -187,29 +186,29 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   private static int createMachineIdentifier() {
     int machinePiece;
     try {
-<span class="fc" id="L190">      StringBuilder sb = new StringBuilder();</span>
-<span class="fc" id="L191">      Enumeration&lt;NetworkInterface&gt; e = NetworkInterface.getNetworkInterfaces();</span>
-<span class="fc bfc" id="L192" title="All 2 branches covered.">      while (e.hasMoreElements()) {</span>
-<span class="fc" id="L193">        NetworkInterface ni = e.nextElement();</span>
-<span class="fc" id="L194">        sb.append(ni.toString());</span>
-<span class="fc" id="L195">        byte[] mac = ni.getHardwareAddress();</span>
-<span class="fc bfc" id="L196" title="All 2 branches covered.">        if (mac != null) {</span>
-<span class="fc" id="L197">          ByteBuffer bb = ByteBuffer.wrap(mac);</span>
+<span class="fc" id="L189">      StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L190">      Enumeration&lt;NetworkInterface&gt; e = NetworkInterface.getNetworkInterfaces();</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">      while (e.hasMoreElements()) {</span>
+<span class="fc" id="L192">        NetworkInterface ni = e.nextElement();</span>
+<span class="fc" id="L193">        sb.append(ni.toString());</span>
+<span class="fc" id="L194">        byte[] mac = ni.getHardwareAddress();</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (mac != null) {</span>
+<span class="fc" id="L196">          ByteBuffer bb = ByteBuffer.wrap(mac);</span>
           try {
+<span class="fc" id="L198">            sb.append(bb.getChar());</span>
 <span class="fc" id="L199">            sb.append(bb.getChar());</span>
 <span class="fc" id="L200">            sb.append(bb.getChar());</span>
-<span class="fc" id="L201">            sb.append(bb.getChar());</span>
-<span class="nc" id="L202">          } catch (BufferUnderflowException shortHardwareAddressException) {</span>
+<span class="nc" id="L201">          } catch (BufferUnderflowException shortHardwareAddressException) {</span>
             // mac with less than 6 bytes. continue
-<span class="fc" id="L204">          }</span>
+<span class="fc" id="L203">          }</span>
         }
-<span class="fc" id="L206">      }</span>
-<span class="fc" id="L207">      machinePiece = sb.toString().hashCode();</span>
-<span class="nc" id="L208">    } catch (SocketException t) {</span>
-<span class="nc" id="L209">      machinePiece = new SecureRandom().nextInt();</span>
-<span class="fc" id="L210">    }</span>
-<span class="fc" id="L211">    machinePiece = machinePiece &amp; LOW_ORDER_THREE_BYTES;</span>
-<span class="fc" id="L212">    return machinePiece;</span>
+<span class="fc" id="L205">      }</span>
+<span class="fc" id="L206">      machinePiece = sb.toString().hashCode();</span>
+<span class="nc" id="L207">    } catch (SocketException t) {</span>
+<span class="nc" id="L208">      machinePiece = new SecureRandom().nextInt();</span>
+<span class="fc" id="L209">    }</span>
+<span class="fc" id="L210">    machinePiece = machinePiece &amp; LOW_ORDER_THREE_BYTES;</span>
+<span class="fc" id="L211">    return machinePiece;</span>
   }
 
   /**
@@ -222,15 +221,15 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    */
   private static short createProcessIdentifier() {
     short processId;
-<span class="fc" id="L225">    String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();</span>
-<span class="pc bpc" id="L226" title="1 of 2 branches missed.">    if (processName.contains(&quot;@&quot;)) {</span>
-<span class="fc" id="L227">      processId = (short) Integer.parseInt(processName.substring(0, processName.indexOf('@')));</span>
+<span class="fc" id="L224">    String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">    if (processName.contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L226">      processId = (short) Integer.parseInt(processName.substring(0, processName.indexOf('@')));</span>
     } else {
       processId = (short) java.lang.management.ManagementFactory
-<span class="nc" id="L230">        .getRuntimeMXBean().getName().hashCode();</span>
+<span class="nc" id="L229">        .getRuntimeMXBean().getName().hashCode();</span>
     }
 
-<span class="fc" id="L233">    return processId;</span>
+<span class="fc" id="L232">    return processId;</span>
   }
 
   /**
@@ -239,8 +238,8 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return new GradoopId
    */
   public static GradoopId get() {
-<span class="fc" id="L242">    return new GradoopId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER,</span>
-<span class="fc" id="L243">      PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);</span>
+<span class="fc" id="L241">    return new GradoopId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER,</span>
+<span class="fc" id="L242">      PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);</span>
   }
 
   /**
@@ -250,7 +249,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return int representing the seconds between unix epoch and the given time
    */
   private static int dateToTimestampSeconds(final Date time) {
-<span class="fc" id="L253">    return (int) (time.getTime() / 1000);</span>
+<span class="fc" id="L252">    return (int) (time.getTime() / 1000);</span>
   }
 
   /**
@@ -262,16 +261,16 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return GradoopId
    */
   public static GradoopId fromString(String string) {
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (!GradoopId.isValid(string)) {</span>
-<span class="nc" id="L266">      throw new IllegalArgumentException(</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">    if (!GradoopId.isValid(string)) {</span>
+<span class="nc" id="L265">      throw new IllegalArgumentException(</span>
         &quot;invalid hexadecimal representation of a GradoopId: [&quot; + string + &quot;]&quot;);
     }
 
-<span class="fc" id="L270">    byte[] b = new byte[12];</span>
-<span class="fc bfc" id="L271" title="All 2 branches covered.">    for (int i = 0; i &lt; b.length; i++) {</span>
-<span class="fc" id="L272">      b[i] = (byte) Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16);</span>
+<span class="fc" id="L269">    byte[] b = new byte[12];</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">    for (int i = 0; i &lt; b.length; i++) {</span>
+<span class="fc" id="L271">      b[i] = (byte) Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16);</span>
     }
-<span class="fc" id="L274">    return new GradoopId(b);</span>
+<span class="fc" id="L273">    return new GradoopId(b);</span>
   }
 
   /**
@@ -284,31 +283,31 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @throws IllegalArgumentException if hexString is null
    */
   public static boolean isValid(final String hexString) {
-<span class="pc bpc" id="L287" title="1 of 2 branches missed.">    if (hexString == null) {</span>
-<span class="nc" id="L288">      throw new IllegalArgumentException();</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">    if (hexString == null) {</span>
+<span class="nc" id="L287">      throw new IllegalArgumentException();</span>
     }
 
-<span class="fc" id="L291">    int len = hexString.length();</span>
-<span class="fc bfc" id="L292" title="All 2 branches covered.">    if (len != 24) {</span>
-<span class="fc" id="L293">      return false;</span>
+<span class="fc" id="L290">    int len = hexString.length();</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    if (len != 24) {</span>
+<span class="fc" id="L292">      return false;</span>
     }
 
-<span class="fc bfc" id="L296" title="All 2 branches covered.">    for (int i = 0; i &lt; len; i++) {</span>
-<span class="fc" id="L297">      char c = hexString.charAt(i);</span>
-<span class="pc bpc" id="L298" title="1 of 4 branches missed.">      if (c &gt;= '0' &amp;&amp; c &lt;= '9') {</span>
-<span class="fc" id="L299">        continue;</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">    for (int i = 0; i &lt; len; i++) {</span>
+<span class="fc" id="L296">      char c = hexString.charAt(i);</span>
+<span class="pc bpc" id="L297" title="1 of 4 branches missed.">      if (c &gt;= '0' &amp;&amp; c &lt;= '9') {</span>
+<span class="fc" id="L298">        continue;</span>
       }
-<span class="pc bpc" id="L301" title="1 of 4 branches missed.">      if (c &gt;= 'a' &amp;&amp; c &lt;= 'f') {</span>
-<span class="fc" id="L302">        continue;</span>
+<span class="pc bpc" id="L300" title="1 of 4 branches missed.">      if (c &gt;= 'a' &amp;&amp; c &lt;= 'f') {</span>
+<span class="fc" id="L301">        continue;</span>
       }
-<span class="pc bpc" id="L304" title="1 of 4 branches missed.">      if (c &gt;= 'A' &amp;&amp; c &lt;= 'F') {</span>
-<span class="fc" id="L305">        continue;</span>
+<span class="pc bpc" id="L303" title="1 of 4 branches missed.">      if (c &gt;= 'A' &amp;&amp; c &lt;= 'F') {</span>
+<span class="fc" id="L304">        continue;</span>
       }
 
-<span class="fc" id="L308">      return false;</span>
+<span class="fc" id="L307">      return false;</span>
     }
 
-<span class="fc" id="L311">    return true;</span>
+<span class="fc" id="L310">    return true;</span>
   }
 
   /**
@@ -318,7 +317,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return Gradoop ID
    */
   public static GradoopId fromByteArray(byte[] bytes) {
-<span class="fc" id="L321">    return new GradoopId(bytes);</span>
+<span class="fc" id="L320">    return new GradoopId(bytes);</span>
   }
 
   /**
@@ -326,9 +325,8 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    *
    * @return Byte representation
    */
-  @SuppressWarnings(value = &quot;EI_EXPOSE_REP&quot;, justification = &quot;never mutated&quot;)
   public byte[] toByteArray() {
-<span class="fc" id="L331">    return bytes;</span>
+<span class="fc" id="L329">    return bytes;</span>
   }
 
   /**
@@ -339,21 +337,21 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    */
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L342" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L343">      return true;</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L341">      return true;</span>
     }
-<span class="fc bfc" id="L345" title="All 4 branches covered.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="fc" id="L346">      return false;</span>
+<span class="fc bfc" id="L343" title="All 4 branches covered.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="fc" id="L344">      return false;</span>
     }
 
-<span class="fc" id="L349">    byte[] firstBytes = this.bytes;</span>
-<span class="fc" id="L350">    byte[] secondBytes = ((GradoopId) o).bytes;</span>
-<span class="fc bfc" id="L351" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
-<span class="fc bfc" id="L352" title="All 2 branches covered.">      if (firstBytes[i] != secondBytes[i]) {</span>
-<span class="fc" id="L353">        return false;</span>
+<span class="fc" id="L347">    byte[] firstBytes = this.bytes;</span>
+<span class="fc" id="L348">    byte[] secondBytes = ((GradoopId) o).bytes;</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">      if (firstBytes[i] != secondBytes[i]) {</span>
+<span class="fc" id="L351">        return false;</span>
       }
     }
-<span class="fc" id="L356">    return true;</span>
+<span class="fc" id="L354">    return true;</span>
   }
 
   /**
@@ -365,11 +363,11 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L368">    int result = getTimeStamp();</span>
-<span class="fc" id="L369">    result = 31 * result + getMachineIdentifier();</span>
-<span class="fc" id="L370">    result = 31 * result + (int) getProcessIdentifier();</span>
-<span class="fc" id="L371">    result = 31 * result + getCounter();</span>
-<span class="fc" id="L372">    return result;</span>
+<span class="fc" id="L366">    int result = getTimeStamp();</span>
+<span class="fc" id="L367">    result = 31 * result + getMachineIdentifier();</span>
+<span class="fc" id="L368">    result = 31 * result + (int) getProcessIdentifier();</span>
+<span class="fc" id="L369">    result = 31 * result + getCounter();</span>
+<span class="fc" id="L370">    return result;</span>
   }
 
   /**
@@ -382,12 +380,12 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
   @Override
   public int compareTo(GradoopId other) {
 
-<span class="fc bfc" id="L385" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
-<span class="fc bfc" id="L386" title="All 2 branches covered.">      if (this.bytes[i] != other.bytes[i]) {</span>
-<span class="fc bfc" id="L387" title="All 2 branches covered.">        return ((this.bytes[i] &amp; 0xff) &lt; (other.bytes[i] &amp; 0xff)) ? -1 : 1;</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">      if (this.bytes[i] != other.bytes[i]) {</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">        return ((this.bytes[i] &amp; 0xff) &lt; (other.bytes[i] &amp; 0xff)) ? -1 : 1;</span>
       }
     }
-<span class="fc" id="L390">    return 0;</span>
+<span class="fc" id="L388">    return 0;</span>
   }
 
   /**
@@ -399,13 +397,13 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    */
   @Override
   public String toString() {
-<span class="fc" id="L402">    char[] chars = new char[24];</span>
-<span class="fc" id="L403">    int i = 0;</span>
-<span class="fc bfc" id="L404" title="All 2 branches covered.">    for (byte b : bytes) {</span>
-<span class="fc" id="L405">      chars[i++] = HEX_CHARS[b &gt;&gt; 4 &amp; 0xF];</span>
-<span class="fc" id="L406">      chars[i++] = HEX_CHARS[b &amp; 0xF];</span>
+<span class="fc" id="L400">    char[] chars = new char[24];</span>
+<span class="fc" id="L401">    int i = 0;</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">    for (byte b : bytes) {</span>
+<span class="fc" id="L403">      chars[i++] = HEX_CHARS[b &gt;&gt; 4 &amp; 0xF];</span>
+<span class="fc" id="L404">      chars[i++] = HEX_CHARS[b &amp; 0xF];</span>
     }
-<span class="fc" id="L408">    return String.valueOf(chars);</span>
+<span class="fc" id="L406">    return String.valueOf(chars);</span>
   }
 
   //------------------------------------------------------------------------------------------------
@@ -414,23 +412,23 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
 
   @Override
   public int getMaxNormalizedKeyLen() {
-<span class="nc" id="L417">    return ID_SIZE;</span>
+<span class="nc" id="L415">    return ID_SIZE;</span>
   }
 
   @Override
   public void copyNormalizedKey(MemorySegment target, int offset, int len) {
-<span class="nc" id="L422">    target.put(offset, bytes, 0, len);</span>
-<span class="nc" id="L423">  }</span>
+<span class="nc" id="L420">    target.put(offset, bytes, 0, len);</span>
+<span class="nc" id="L421">  }</span>
 
   @Override
   public void write(DataOutputView out) throws IOException {
-<span class="nc" id="L427">    out.write(bytes);</span>
-<span class="nc" id="L428">  }</span>
+<span class="nc" id="L425">    out.write(bytes);</span>
+<span class="nc" id="L426">  }</span>
 
   @Override
   public void read(DataInputView in) throws IOException {
-<span class="nc" id="L432">    in.readFully(bytes);</span>
-<span class="nc" id="L433">  }</span>
+<span class="nc" id="L430">    in.readFully(bytes);</span>
+<span class="nc" id="L431">  }</span>
 
   //------------------------------------------------------------------------------------------------
   // methods inherited from CopyableValue
@@ -438,23 +436,23 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
 
   @Override
   public int getBinaryLength() {
-<span class="nc" id="L441">    return ID_SIZE;</span>
+<span class="nc" id="L439">    return ID_SIZE;</span>
   }
 
   @Override
   public void copyTo(GradoopId target) {
-<span class="nc" id="L446">    target.bytes = this.bytes;</span>
-<span class="nc" id="L447">  }</span>
+<span class="nc" id="L444">    target.bytes = this.bytes;</span>
+<span class="nc" id="L445">  }</span>
 
   @Override
   public GradoopId copy() {
-<span class="nc" id="L451">    return new GradoopId(this.bytes);</span>
+<span class="nc" id="L449">    return new GradoopId(this.bytes);</span>
   }
 
   @Override
   public void copy(DataInputView source, DataOutputView target) throws IOException {
-<span class="nc" id="L456">    target.write(source, ID_SIZE);</span>
-<span class="nc" id="L457">  }</span>
+<span class="nc" id="L454">    target.write(source, ID_SIZE);</span>
+<span class="nc" id="L455">  }</span>
 
   //------------------------------------------------------------------------------------------------
   // private little helpers
@@ -466,7 +464,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return the timestamp
    */
   private int getTimeStamp() {
-<span class="fc" id="L469">    return makeInt(bytes[0], bytes[1], bytes[2], bytes[3]);</span>
+<span class="fc" id="L467">    return makeInt(bytes[0], bytes[1], bytes[2], bytes[3]);</span>
   }
 
   /**
@@ -475,7 +473,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return the machine identifier
    */
   private int getMachineIdentifier() {
-<span class="fc" id="L478">    return makeInt((byte) 0, bytes[4], bytes[5], bytes[6]);</span>
+<span class="fc" id="L476">    return makeInt((byte) 0, bytes[4], bytes[5], bytes[6]);</span>
   }
 
   /**
@@ -484,7 +482,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return the process identifier
    */
   private short getProcessIdentifier() {
-<span class="fc" id="L487">    return (short) makeInt((byte) 0, (byte) 0, bytes[7], bytes[8]);</span>
+<span class="fc" id="L485">    return (short) makeInt((byte) 0, (byte) 0, bytes[7], bytes[8]);</span>
   }
 
   /**
@@ -493,7 +491,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return the counter
    */
   private int getCounter() {
-<span class="fc" id="L496">    return makeInt((byte) 0, bytes[9], bytes[10], bytes[11]);</span>
+<span class="fc" id="L494">    return makeInt((byte) 0, bytes[9], bytes[10], bytes[11]);</span>
   }
 
 
@@ -510,8 +508,8 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return smaller GradoopId or first if equal
    */
   public static GradoopId min(GradoopId first, GradoopId second) {
-<span class="fc" id="L513">    int comparison = first.compareTo(second);</span>
-<span class="pc bpc" id="L514" title="2 of 4 branches missed.">    return comparison == 0 ? first : (comparison &lt; 0 ? first : second);</span>
+<span class="fc" id="L511">    int comparison = first.compareTo(second);</span>
+<span class="pc bpc" id="L512" title="2 of 4 branches missed.">    return comparison == 0 ? first : (comparison &lt; 0 ? first : second);</span>
   }
 
   /**
@@ -524,7 +522,7 @@ public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValu
    * @return int value
    */
   private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {
-<span class="fc" id="L527">    return (b3 &lt;&lt; 24) | ((b2 &amp; 0xff) &lt;&lt; 16) | ((b1 &amp; 0xff) &lt;&lt; 8) | ((b0 &amp; 0xff));</span>
+<span class="fc" id="L525">    return (b3 &lt;&lt; 24) | ((b2 &amp; 0xff) &lt;&lt; 16) | ((b1 &amp; 0xff) &lt;&lt; 8) | ((b0 &amp; 0xff));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

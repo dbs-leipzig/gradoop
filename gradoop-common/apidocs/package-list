@@ -7,5 +7,6 @@ org.gradoop.common.model.impl.id
 org.gradoop.common.model.impl.metadata
 org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
+org.gradoop.common.model.impl.properties.bytes
 org.gradoop.common.model.impl.properties.strategies
 org.gradoop.common.util

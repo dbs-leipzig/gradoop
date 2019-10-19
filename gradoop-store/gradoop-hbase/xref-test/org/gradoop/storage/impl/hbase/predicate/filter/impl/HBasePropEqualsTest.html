@@ -65,7 +65,7 @@
 <a name="55" href="#55">55</a>        Bytes.toBytesBinary(CF_PROPERTY_VALUE),
 <a name="56" href="#56">56</a>        Bytes.toBytesBinary(propertyKey),
 <a name="57" href="#57">57</a>        CompareFilter.CompareOp.EQUAL,
-<a name="58" href="#58">58</a>        PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
+<a name="58" href="#58">58</a>        PropertyValueUtils.BytesUtils.getRawBytesWithoutType(propertyValue));
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="61" href="#61">61</a>      valueFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
@@ -74,7 +74,7 @@
 <a name="64" href="#64">64</a>        Bytes.toBytesBinary(CF_PROPERTY_TYPE),
 <a name="65" href="#65">65</a>        Bytes.toBytesBinary(propertyKey),
 <a name="66" href="#66">66</a>        CompareFilter.CompareOp.EQUAL,
-<a name="67" href="#67">67</a>        PropertyValueUtils.Bytes.getTypeByte(propertyValue));
+<a name="67" href="#67">67</a>        PropertyValueUtils.BytesUtils.getTypeByte(propertyValue));
 <a name="68" href="#68">68</a>  
 <a name="69" href="#69">69</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="70" href="#70">70</a>      typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);

@@ -180,7 +180,7 @@
 <a name="170" href="#170">170</a>       CF_PROPERTY_VALUE_BYTES,
 <a name="171" href="#171">171</a>       Bytes.toBytesBinary(key),
 <a name="172" href="#172">172</a>       compareOp,
-<a name="173" href="#173">173</a>       PropertyValueUtils.Bytes.getRawBytesWithoutType(value));
+<a name="173" href="#173">173</a>       PropertyValueUtils.BytesUtils.getRawBytesWithoutType(value));
 <a name="174" href="#174">174</a> 
 <a name="175" href="#175">175</a>     <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="176" href="#176">176</a>     valueFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
@@ -189,7 +189,7 @@
 <a name="179" href="#179">179</a>       CF_PROPERTY_TYPE_BYTES,
 <a name="180" href="#180">180</a>       Bytes.toBytesBinary(key),
 <a name="181" href="#181">181</a>       compareOp,
-<a name="182" href="#182">182</a>       PropertyValueUtils.Bytes.getTypeByte(value));
+<a name="182" href="#182">182</a>       PropertyValueUtils.BytesUtils.getTypeByte(value));
 <a name="183" href="#183">183</a> 
 <a name="184" href="#184">184</a>     <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="185" href="#185">185</a>     typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
@@ -275,7 +275,7 @@
 <a name="265" href="#265">265</a>       CF_PROPERTY_VALUE_BYTES,
 <a name="266" href="#266">266</a>       Bytes.toBytesBinary(key),
 <a name="267" href="#267">267</a>       compareOp,
-<a name="268" href="#268">268</a>       <strong class="jxr_keyword">new</strong> BinaryComparator(PropertyValueUtils.Bytes.getRawBytesWithoutType(min)));
+<a name="268" href="#268">268</a>       <strong class="jxr_keyword">new</strong> BinaryComparator(PropertyValueUtils.BytesUtils.getRawBytesWithoutType(min)));
 <a name="269" href="#269">269</a> 
 <a name="270" href="#270">270</a>     <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="271" href="#271">271</a>     valueFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);
@@ -284,7 +284,7 @@
 <a name="274" href="#274">274</a>       CF_PROPERTY_TYPE_BYTES,
 <a name="275" href="#275">275</a>       Bytes.toBytesBinary(key),
 <a name="276" href="#276">276</a>       negate ? CompareFilter.CompareOp.NOT_EQUAL : CompareFilter.CompareOp.EQUAL,
-<a name="277" href="#277">277</a>       PropertyValueUtils.Bytes.getTypeByte(min));
+<a name="277" href="#277">277</a>       PropertyValueUtils.BytesUtils.getTypeByte(min));
 <a name="278" href="#278">278</a> 
 <a name="279" href="#279">279</a>     <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="280" href="#280">280</a>     typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);

@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -31,14 +32,24 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
@@ -67,6 +78,118 @@ public interface BaseGraphOperators&lt;
   //----------------------------------------------------------------------------
 
   /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * &lt;p&gt;
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, GraphStatistics)} to provide statistics for the query planner.
+   *
+   * @param query Cypher query
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query) {
+<span class="nc" id="L92">    return query(query, new GraphStatistics(1, 1, 1, 1));</span>
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * &lt;p&gt;
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, String, GraphStatistics)} to provide statistics for the query planner.
+   * &lt;p&gt;
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * &lt;br&gt;
+   * {@code graph.query(
+   *  &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   *  &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)}
+   * &lt;p&gt;
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query string
+   * @param constructionPattern Construction pattern
+   * @return graph collection containing the output of the construct pattern
+   */
+  default GC query(String query, String constructionPattern) {
+<span class="fc" id="L118">    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));</span>
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   *
+   * @param query           Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, GraphStatistics graphStatistics) {
+<span class="nc" id="L131">    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,</span>
+      graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * &lt;p&gt;
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * &lt;br&gt;
+   * {@code graph.query(
+   *  &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   *  &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)}
+   * &lt;p&gt;
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param graphStatistics     statistics about the data graph
+   * @return graph collection containing the output of the construct pattern
+   */
+  default GC query(String query, String constructionPattern, GraphStatistics graphStatistics) {
+<span class="fc" id="L156">    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,</span>
+      MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query           Cypher query
+   * @param attachData      attach original vertex and edge data to the result
+   * @param vertexStrategy  morphism setting for vertex mapping
+   * @param edgeStrategy    morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, boolean attachData, MatchStrategy vertexStrategy,
+                   MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+<span class="nc" id="L172">    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);</span>
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param attachData          attach original vertex and edge data to the result
+   * @param vertexStrategy      morphism setting for vertex mapping
+   * @param edgeStrategy        morphism setting for edge mapping
+   * @param graphStatistics     statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default GC query(String query, String constructionPattern, boolean attachData, MatchStrategy vertexStrategy,
+                   MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+<span class="fc" id="L188">    return callForCollection(new CypherPatternMatching&lt;&gt;(query, constructionPattern, attachData,</span>
+      vertexStrategy, edgeStrategy, graphStatistics));
+  }
+
+  /**
    * Creates a copy of the base graph.
    * &lt;p&gt;
    * Note that this method creates new graph head, vertex and edge instances.
@@ -74,7 +197,7 @@ public interface BaseGraphOperators&lt;
    * @return projected base graph
    */
   default LG copy() {
-<span class="fc" id="L77">    return callForGraph(new Cloning&lt;&gt;());</span>
+<span class="fc" id="L200">    return callForGraph(new Cloning&lt;&gt;());</span>
   }
 
   /**
@@ -92,7 +215,7 @@ public interface BaseGraphOperators&lt;
    * @see Grouping
    */
   default LG groupBy(List&lt;String&gt; vertexGroupingKeys) {
-<span class="nc" id="L95">    return groupBy(vertexGroupingKeys, null);</span>
+<span class="nc" id="L218">    return groupBy(vertexGroupingKeys, null);</span>
   }
 
   /**
@@ -114,7 +237,7 @@ public interface BaseGraphOperators&lt;
    * @see Grouping
    */
   default LG groupBy(List&lt;String&gt; vertexGroupingKeys, List&lt;String&gt; edgeGroupingKeys) {
-<span class="nc" id="L117">    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);</span>
+<span class="nc" id="L240">    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);</span>
   }
 
   /**
@@ -145,24 +268,24 @@ public interface BaseGraphOperators&lt;
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
 
-<span class="fc" id="L148">    Objects.requireNonNull(vertexGroupingKeys, &quot;missing vertex grouping key(s)&quot;);</span>
-<span class="fc" id="L149">    Objects.requireNonNull(groupingStrategy, &quot;missing vertex grouping strategy&quot;);</span>
+<span class="fc" id="L271">    Objects.requireNonNull(vertexGroupingKeys, &quot;missing vertex grouping key(s)&quot;);</span>
+<span class="fc" id="L272">    Objects.requireNonNull(groupingStrategy, &quot;missing vertex grouping strategy&quot;);</span>
 
-<span class="fc" id="L151">    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();</span>
+<span class="fc" id="L274">    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();</span>
 
-<span class="fc" id="L153">    builder.addVertexGroupingKeys(vertexGroupingKeys);</span>
-<span class="fc" id="L154">    builder.setStrategy(groupingStrategy);</span>
+<span class="fc" id="L276">    builder.addVertexGroupingKeys(vertexGroupingKeys);</span>
+<span class="fc" id="L277">    builder.setStrategy(groupingStrategy);</span>
 
-<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    if (edgeGroupingKeys != null) {</span>
-<span class="fc" id="L157">      builder.addEdgeGroupingKeys(edgeGroupingKeys);</span>
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">    if (edgeGroupingKeys != null) {</span>
+<span class="fc" id="L280">      builder.addEdgeGroupingKeys(edgeGroupingKeys);</span>
     }
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (vertexAggregateFunctions != null) {</span>
-<span class="fc" id="L160">      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">    if (vertexAggregateFunctions != null) {</span>
+<span class="fc" id="L283">      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);</span>
     }
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    if (edgeAggregateFunctions != null) {</span>
-<span class="fc" id="L163">      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">    if (edgeAggregateFunctions != null) {</span>
+<span class="fc" id="L286">      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);</span>
     }
-<span class="fc" id="L165">    return callForGraph(builder.build());</span>
+<span class="fc" id="L288">    return callForGraph(builder.build());</span>
   }
 
   /**
@@ -178,7 +301,7 @@ public interface BaseGraphOperators&lt;
     TransformationFunction&lt;G&gt; graphHeadTransformationFunction,
     TransformationFunction&lt;V&gt; vertexTransformationFunction,
     TransformationFunction&lt;E&gt; edgeTransformationFunction) {
-<span class="fc" id="L181">    return callForGraph(new Transformation&lt;&gt;(</span>
+<span class="fc" id="L304">    return callForGraph(new Transformation&lt;&gt;(</span>
       graphHeadTransformationFunction,
       vertexTransformationFunction,
       edgeTransformationFunction));
@@ -192,7 +315,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformGraphHead(TransformationFunction&lt;G&gt; graphHeadTransformationFunction) {
-<span class="fc" id="L195">    return transform(graphHeadTransformationFunction, null, null);</span>
+<span class="fc" id="L318">    return transform(graphHeadTransformationFunction, null, null);</span>
   }
 
   /**
@@ -203,7 +326,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformVertices(TransformationFunction&lt;V&gt; vertexTransformationFunction) {
-<span class="fc" id="L206">    return transform(null, vertexTransformationFunction, null);</span>
+<span class="fc" id="L329">    return transform(null, vertexTransformationFunction, null);</span>
   }
 
   /**
@@ -214,7 +337,7 @@ public interface BaseGraphOperators&lt;
    * @return transformed base graph
    */
   default LG transformEdges(TransformationFunction&lt;E&gt; edgeTransformationFunction) {
-<span class="fc" id="L217">    return transform(null, null, edgeTransformationFunction);</span>
+<span class="fc" id="L340">    return transform(null, null, edgeTransformationFunction);</span>
   }
 
   /**
@@ -224,8 +347,8 @@ public interface BaseGraphOperators&lt;
    * @return vertex-induced subgraph
    */
   default LG vertexInducedSubgraph(FilterFunction&lt;V&gt; vertexFilterFunction) {
-<span class="fc" id="L227">    Objects.requireNonNull(vertexFilterFunction);</span>
-<span class="fc" id="L228">    return callForGraph(</span>
+<span class="fc" id="L350">    Objects.requireNonNull(vertexFilterFunction);</span>
+<span class="fc" id="L351">    return callForGraph(</span>
       new Subgraph&lt;&gt;(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
@@ -236,8 +359,8 @@ public interface BaseGraphOperators&lt;
    * @return edge-induced subgraph
    */
   default LG edgeInducedSubgraph(FilterFunction&lt;E&gt; edgeFilterFunction) {
-<span class="fc" id="L239">    Objects.requireNonNull(edgeFilterFunction);</span>
-<span class="fc" id="L240">    return callForGraph(new Subgraph&lt;&gt;(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));</span>
+<span class="fc" id="L362">    Objects.requireNonNull(edgeFilterFunction);</span>
+<span class="fc" id="L363">    return callForGraph(new Subgraph&lt;&gt;(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));</span>
   }
 
   /**
@@ -253,9 +376,9 @@ public interface BaseGraphOperators&lt;
    */
   default LG subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
                       FilterFunction&lt;E&gt; edgeFilterFunction) {
-<span class="fc" id="L256">    Objects.requireNonNull(vertexFilterFunction);</span>
-<span class="fc" id="L257">    Objects.requireNonNull(edgeFilterFunction);</span>
-<span class="fc" id="L258">    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);</span>
+<span class="fc" id="L379">    Objects.requireNonNull(vertexFilterFunction);</span>
+<span class="fc" id="L380">    Objects.requireNonNull(edgeFilterFunction);</span>
+<span class="fc" id="L381">    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);</span>
   }
 
   /**
@@ -272,7 +395,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
                       FilterFunction&lt;E&gt; edgeFilterFunction, Subgraph.Strategy strategy) {
-<span class="fc" id="L275">    return callForGraph(new Subgraph&lt;&gt;(vertexFilterFunction, edgeFilterFunction, strategy));</span>
+<span class="fc" id="L398">    return callForGraph(new Subgraph&lt;&gt;(vertexFilterFunction, edgeFilterFunction, strategy));</span>
   }
 
   /**
@@ -283,7 +406,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph with additional properties storing the aggregates
    */
   default LG aggregate(AggregateFunction... aggregateFunctions) {
-<span class="fc" id="L286">    return callForGraph(new Aggregation&lt;&gt;(aggregateFunctions));</span>
+<span class="fc" id="L409">    return callForGraph(new Aggregation&lt;&gt;(aggregateFunctions));</span>
   }
 
   /**
@@ -297,7 +420,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG reduceOnEdges(EdgeAggregateFunction function,
                            Neighborhood.EdgeDirection edgeDirection) {
-<span class="fc" id="L300">    return callForGraph(new ReduceEdgeNeighborhood&lt;&gt;(function, edgeDirection));</span>
+<span class="fc" id="L423">    return callForGraph(new ReduceEdgeNeighborhood&lt;&gt;(function, edgeDirection));</span>
   }
 
   /**
@@ -311,7 +434,7 @@ public interface BaseGraphOperators&lt;
    */
   default LG reduceOnNeighbors(VertexAggregateFunction function,
                                Neighborhood.EdgeDirection edgeDirection) {
-<span class="fc" id="L314">    return callForGraph(new ReduceVertexNeighborhood&lt;&gt;(function, edgeDirection));</span>
+<span class="fc" id="L437">    return callForGraph(new ReduceVertexNeighborhood&lt;&gt;(function, edgeDirection));</span>
   }
 
   /**
@@ -323,7 +446,7 @@ public interface BaseGraphOperators&lt;
    * @return this graph with all dangling edges removed.
    */
   default LG verify() {
-<span class="fc" id="L326">    return callForGraph(new Verify&lt;&gt;());</span>
+<span class="fc" id="L449">    return callForGraph(new Verify&lt;&gt;());</span>
   }
 
   /**
@@ -335,7 +458,7 @@ public interface BaseGraphOperators&lt;
    * @return this graph with all dangling graph ids removed.
    */
   default LG verifyGraphContainment() {
-<span class="fc" id="L338">    return callForGraph(new VerifyGraphContainment&lt;&gt;());</span>
+<span class="fc" id="L461">    return callForGraph(new VerifyGraphContainment&lt;&gt;());</span>
   }
 
   //----------------------------------------------------------------------------
@@ -350,7 +473,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph containing all vertices and edges of the input graphs
    */
   default LG combine(LG otherGraph) {
-<span class="fc" id="L353">    return callForGraph(new Combination&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L476">    return callForGraph(new Combination&lt;&gt;(), otherGraph);</span>
   }
 
   /**
@@ -361,7 +484,7 @@ public interface BaseGraphOperators&lt;
    * @return base graph that contains all vertices and edges that exist in both input graphs
    */
   default LG overlap(LG otherGraph) {
-<span class="fc" id="L364">    return callForGraph(new Overlap&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L487">    return callForGraph(new Overlap&lt;&gt;(), otherGraph);</span>
   }
 
   /**
@@ -373,8 +496,63 @@ public interface BaseGraphOperators&lt;
    * @return base that contains only vertices and edges that are not in the other graph
    */
   default LG exclude(LG otherGraph) {
-<span class="fc" id="L376">    return callForGraph(new Exclusion&lt;&gt;(), otherGraph);</span>
+<span class="fc" id="L499">    return callForGraph(new Exclusion&lt;&gt;(), otherGraph);</span>
   }
+
+  /**
+   * Checks, if another graph contains exactly the same vertices and edges (by id) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element ids
+   */
+  default DataSet&lt;Boolean&gt; equalsByElementIds(LG other) {
+<span class="fc" id="L509">    return callForValue(new GraphEquality&lt;&gt;(</span>
+      new GraphHeadToEmptyString&lt;&gt;(),
+      new VertexToIdString&lt;&gt;(),
+      new EdgeToIdString&lt;&gt;(), true), other);
+  }
+
+  /**
+   * Checks, if another graph contains vertices and edges with the same
+   * attached data (i.e. label and properties) as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element data
+   */
+  default DataSet&lt;Boolean&gt; equalsByElementData(LG other) {
+<span class="fc" id="L523">    return callForValue(new GraphEquality&lt;&gt;(</span>
+      new GraphHeadToEmptyString&lt;&gt;(),
+      new VertexToDataString&lt;&gt;(),
+      new EdgeToDataString&lt;&gt;(), true), other);
+  }
+
+  /**
+   * Checks, if another graph has the same attached data and contains
+   * vertices and edges with the same attached data as this graph.
+   *
+   * @param other other graph
+   * @return 1-element dataset containing true, iff equal by element data
+   */
+  default DataSet&lt;Boolean&gt; equalsByData(LG other) {
+<span class="fc" id="L537">    return callForValue(new GraphEquality&lt;&gt;(</span>
+      new GraphHeadToDataString&lt;&gt;(),
+      new VertexToDataString&lt;&gt;(),
+      new EdgeToDataString&lt;&gt;(), true), other);
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which indicates if the graph is empty.
+   *
+   * A graph is considered empty, if it contains no vertices.
+   *
+   * @return  1-element dataset containing {@code true}, if the collection is
+   *          empty or {@code false} if not
+   */
+  DataSet&lt;Boolean&gt; isEmpty();
 
   //----------------------------------------------------------------------------
   // Call for Operators
@@ -406,7 +584,7 @@ public interface BaseGraphOperators&lt;
    * @return result of given operator
    */
   default LG callForGraph(UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator) {
-<span class="fc" id="L409">    return callForValue(operator);</span>
+<span class="fc" id="L587">    return callForValue(operator);</span>
   }
 
   /**
@@ -417,7 +595,7 @@ public interface BaseGraphOperators&lt;
    * @return result of given operator
    */
   default LG callForGraph(BinaryBaseGraphToBaseGraphOperator&lt;LG&gt; operator, LG otherGraph) {
-<span class="fc" id="L420">    return callForValue(operator, otherGraph);</span>
+<span class="fc" id="L598">    return callForValue(operator, otherGraph);</span>
   }
   /**
    * Creates a graph collection from this graph using the given unary graph operator.
@@ -426,7 +604,7 @@ public interface BaseGraphOperators&lt;
    * @return result of given operator
    */
   default GC callForCollection(UnaryBaseGraphToBaseGraphCollectionOperator&lt;LG, GC&gt; operator) {
-<span class="fc" id="L429">    return callForValue(operator);</span>
+<span class="fc" id="L607">    return callForValue(operator);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

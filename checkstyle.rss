@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 1783,
+      <title>File: 1804,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -89,6 +89,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.difference.Difference.java">org/gradoop/flink/model/impl/operators/difference/Difference.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.grouping.TemporalGroupingExample.java">org/gradoop/examples/grouping/TemporalGroupingExample.java</a>
                 </td>
                 <td>
                   0
@@ -1572,6 +1586,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.difference.DifferenceExample.java">org/gradoop/examples/difference/DifferenceExample.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.functions.AddGraphElementToNewGraph.java">org/gradoop/flink/model/impl/operators/matching/common/functions/AddGraphElementToNewGraph.java</a>
                 </td>
                 <td>
@@ -1713,6 +1741,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.io.impl.csv.CSVDataSource.java">org/gradoop/flink/io/impl/csv/CSVDataSource.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.snapshot.package-info.java">org/gradoop/examples/snapshot/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -2538,6 +2580,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.difference.package-info.java">org/gradoop/examples/difference/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.io.impl.graph.functions.UpdateEdge.java">org/gradoop/flink/io/impl/graph/functions/UpdateEdge.java</a>
                 </td>
                 <td>
@@ -3015,6 +3071,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.pojo.PojoSerializationTest.java">org/gradoop/flink/model/impl/pojo/PojoSerializationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.common.TemporalCitiBikeGraph.java">org/gradoop/examples/common/TemporalCitiBikeGraph.java</a>
                 </td>
                 <td>
                   0
@@ -3575,6 +3645,34 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.functions.filters.Or.java">org/gradoop/flink/model/impl/functions/filters/Or.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString.java">org/gradoop/temporal/model/impl/operators/tostring/TemporalGraphHeadToDataString.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.functions.epgm.RemoveProperties.java">org/gradoop/flink/model/impl/functions/epgm/RemoveProperties.java</a>
                 </td>
                 <td>
                   0
@@ -8166,6 +8264,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.common.functions.TransformLongPropertiesToDateTime.java">org/gradoop/examples/common/functions/TransformLongPropertiesToDateTime.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.tuples.IdWithIdSet.java">org/gradoop/flink/model/impl/tuples/IdWithIdSet.java</a>
                 </td>
                 <td>
@@ -9847,6 +9959,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.debug.PrintEmbedding.java">org/gradoop/flink/model/impl/operators/matching/common/debug/PrintEmbedding.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.package-info.java">org/gradoop/temporal/model/impl/operators/tostring/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -11638,6 +11764,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString.java">org/gradoop/temporal/model/impl/operators/tostring/TemporalVertexToDataString.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.io.impl.tlf.TLFBase.java">org/gradoop/flink/io/impl/tlf/TLFBase.java</a>
                 </td>
                 <td>
@@ -12101,6 +12241,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.snapshot.SnapshotApiTest.java">org/gradoop/temporal/model/impl/operators/snapshot/SnapshotApiTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.TemporalCanonicalAdjacencyMatrixBuilderTest.java">org/gradoop/temporal/model/impl/operators/tostring/TemporalCanonicalAdjacencyMatrixBuilderTest.java</a>
                 </td>
                 <td>
                   0
@@ -13038,6 +13192,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString.java">org/gradoop/temporal/model/impl/operators/tostring/TemporalEdgeToDataString.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AverageDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AverageDuration.java</a>
                 </td>
                 <td>
@@ -13081,6 +13249,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.distinction.functions.package-info.java">org/gradoop/flink/model/impl/operators/distinction/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.common.model.impl.properties.bytes.UnsafeAvailChecker.java">org/gradoop/common/model/impl/properties/bytes/UnsafeAvailChecker.java</a>
                 </td>
                 <td>
                   0
@@ -13403,6 +13585,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems.java">org/gradoop/flink/model/impl/operators/grouping/functions/ReduceVertexGroupItems.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElementToDataString.java">org/gradoop/temporal/model/impl/operators/tostring/functions/TemporalElementToDataString.java</a>
                 </td>
                 <td>
                   0
@@ -13767,6 +13963,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryFrequentAndInteresting.java">org/gradoop/flink/algorithms/fsm/transactional/tle/functions/CategoryFrequentAndInteresting.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.snapshot.SnapshotExample.java">org/gradoop/examples/snapshot/SnapshotExample.java</a>
                 </td>
                 <td>
                   0
@@ -15908,20 +16118,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReaderTest.java">org/gradoop/flink/model/impl/operators/matching/common/statistics/GraphStatisticsHDFSReaderTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertex.java">org/gradoop/flink/algorithms/gelly/functions/VertexToGellyVertex.java</a>
                 </td>
                 <td>
@@ -16623,6 +16819,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetIdWithGraphIds.java">org/gradoop/flink/model/impl/operators/subgraph/functions/EdgeToSourceAndTargetIdWithGraphIds.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.tostring.functions.package-info.java">org/gradoop/temporal/model/impl/operators/tostring/functions/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -20864,6 +21074,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.common.model.impl.properties.bytes.Bytes.java">org/gradoop/common/model/impl/properties/bytes/Bytes.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.java">org/gradoop/flink/algorithms/btgs/BusinessTransactionGraphs.java</a>
                 </td>
                 <td>
@@ -23006,6 +23230,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.common.model.impl.properties.bytes.package-info.java">org/gradoop/common/model/impl/properties/bytes/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.btgs.functions.package-info.java">org/gradoop/flink/algorithms/btgs/functions/package-info.java</a>
                 </td>
                 <td>
@@ -23119,6 +23357,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism.java">org/gradoop/flink/model/impl/operators/distinction/GroupByIsomorphism.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.equality.TemporalEqualityTest.java">org/gradoop/temporal/model/impl/operators/equality/TemporalEqualityTest.java</a>
                 </td>
                 <td>
                   0
@@ -23413,6 +23665,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.api.package-info.java">org/gradoop/temporal/model/api/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.functions.epgm.RemovePropertiesTest.java">org/gradoop/flink/model/impl/functions/epgm/RemovePropertiesTest.java</a>
                 </td>
                 <td>
                   0
@@ -23847,6 +24113,34 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MinEdgeTime.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MinEdgeTime.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.aggregation.TemporalAggregationExample.java">org/gradoop/examples/aggregation/TemporalAggregationExample.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.examples.common.functions.package-info.java">org/gradoop/examples/common/functions/package-info.java</a>
                 </td>
                 <td>
                   0

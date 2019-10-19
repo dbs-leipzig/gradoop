@@ -7,6 +7,7 @@ org.gradoop.common.model.impl.id
 org.gradoop.common.model.impl.metadata
 org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
+org.gradoop.common.model.impl.properties.bytes
 org.gradoop.common.model.impl.properties.strategies
 org.gradoop.common.util
 org.gradoop.dataintegration.importer
@@ -23,13 +24,16 @@ org.gradoop.dataintegration.transformation.impl.functions
 org.gradoop.examples.aggregation
 org.gradoop.examples.aggregation.functions
 org.gradoop.examples.common
+org.gradoop.examples.common.functions
 org.gradoop.examples.communities
+org.gradoop.examples.difference
 org.gradoop.examples.frequentpattern
 org.gradoop.examples.frequentpattern.data
 org.gradoop.examples.grouping
 org.gradoop.examples.patternmatch
 org.gradoop.examples.quickstart
 org.gradoop.examples.quickstart.data
+org.gradoop.examples.snapshot
 org.gradoop.flink.algorithms
 org.gradoop.flink.algorithms.btgs
 org.gradoop.flink.algorithms.btgs.functions
@@ -298,5 +302,7 @@ org.gradoop.temporal.model.impl.operators.keyedgrouping
 org.gradoop.temporal.model.impl.operators.keyedgrouping.keys
 org.gradoop.temporal.model.impl.operators.snapshot
 org.gradoop.temporal.model.impl.operators.snapshot.functions
+org.gradoop.temporal.model.impl.operators.tostring
+org.gradoop.temporal.model.impl.operators.tostring.functions
 org.gradoop.temporal.model.impl.pojo
 org.gradoop.temporal.util

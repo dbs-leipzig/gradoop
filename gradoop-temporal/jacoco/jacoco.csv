@@ -5,7 +5,7 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHeadFactory,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement.new Object() {...},2,17,0,0,0,1,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphElement,1,65,2,4,0,17,2,9,0,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHead,0,11,0,0,0,4,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdgeFactory,50,77,0,0,6,13,6,8,6,8
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdgeFactory,41,86,0,0,5,14,5,9,5,9
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdge,0,32,0,0,0,12,0,6,0,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement,14,227,2,15,1,48,2,24,0,17
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff.functions,DiffPerElement.new Object() {...},2,17,0,0,0,1,0,1,0,1
@@ -13,14 +13,15 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff.functions,DiffPe
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphLayoutFactory,38,110,2,2,7,26,6,5,4,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalBaseLayoutFactory,20,110,2,4,3,24,2,14,0,13
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphCollectionLayoutFactory,5,67,0,0,1,17,1,8,1,8
-Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGVELayout,11,48,0,0,4,12,4,8,4,8
-Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,29,85,0,0,3,11,3,11,3,11
+Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGVELayout,9,50,0,0,3,13,3,9,3,9
+Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,0,85,0,0,0,11,0,11,0,11
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension.Field,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping,TemporalGroupingKeys,0,23,0,0,0,4,0,4,0,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring.functions,TemporalElementToDataString,0,44,0,4,0,12,0,4,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollectionFactory,52,187,0,4,9,32,7,13,7,11
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,36,118,0,0,10,25,9,13,9,13
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,29,125,0,0,6,27,5,15,5,15
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,15,147,0,0,5,29,4,19,4,19
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,11,138,0,0,4,27,3,17,3,17
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphFactory,63,133,0,0,8,20,7,10,7,10
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSource,0,49,0,0,0,12,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSink,16,111,4,4,3,27,4,6,1,5
@@ -56,6 +57,9 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinTime,0,12,0,0,0,3,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageEdgeDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff,Diff,6,69,0,0,2,13,1,3,1,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalGraphHeadToDataString,0,25,0,0,0,2,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalEdgeToDataString,0,48,0,2,0,8,0,3,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalVertexToDataString,0,44,0,2,0,7,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction.new Object() {...},4,33,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction,62,69,7,5,8,17,7,5,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,17,90,2,6,2,16,2,6,0,4

@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 
 <span class="fc" id="L36">    GradoopId sourceId = edge.getSourceId();</span>
 <span class="fc" id="L37">    GradoopId targetId = edge.getTargetId();</span>
-<span class="fc" id="L38">    String edgeLabel = &quot;[&quot; + label(edge) + &quot;]&quot;;</span>
+<span class="fc" id="L38">    String edgeLabel = &quot;[&quot; + labelWithProperties(edge) + &quot;]&quot;;</span>
 
 <span class="fc bfc" id="L40" title="All 2 branches covered.">    for (GradoopId graphId : edge.getGraphIds()) {</span>
 <span class="fc" id="L41">      collector.collect(new EdgeString(graphId, sourceId, targetId, edgeLabel));</span>

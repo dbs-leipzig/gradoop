@@ -32,26 +32,13 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -91,12 +78,12 @@ public class LogicalGraph implements
    * @param config the Gradoop Flink configuration
    */
   LogicalGraph(LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; layout,
-<span class="fc" id="L94">    GradoopFlinkConfig config) {</span>
-<span class="fc" id="L95">    Objects.requireNonNull(layout);</span>
-<span class="fc" id="L96">    Objects.requireNonNull(config);</span>
-<span class="fc" id="L97">    this.layout = layout;</span>
-<span class="fc" id="L98">    this.config = config;</span>
-<span class="fc" id="L99">  }</span>
+<span class="fc" id="L81">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L82">    Objects.requireNonNull(layout);</span>
+<span class="fc" id="L83">    Objects.requireNonNull(config);</span>
+<span class="fc" id="L84">    this.layout = layout;</span>
+<span class="fc" id="L85">    this.config = config;</span>
+<span class="fc" id="L86">  }</span>
 
   //----------------------------------------------------------------------------
   // Data methods
@@ -104,54 +91,54 @@ public class LogicalGraph implements
 
   @Override
   public GradoopFlinkConfig getConfig() {
-<span class="fc" id="L107">    return config;</span>
+<span class="fc" id="L94">    return config;</span>
   }
 
   @Override
   public BaseGraphFactory&lt;
     EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getFactory() {
-<span class="fc" id="L113">    return config.getLogicalGraphFactory();</span>
+<span class="fc" id="L100">    return config.getLogicalGraphFactory();</span>
   }
 
   @Override
   public BaseGraphCollectionFactory&lt;
     EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getCollectionFactory() {
-<span class="fc" id="L119">    return config.getGraphCollectionFactory();</span>
+<span class="fc" id="L106">    return config.getGraphCollectionFactory();</span>
   }
 
   @Override
   public boolean isGVELayout() {
-<span class="nc" id="L124">    return layout.isGVELayout();</span>
+<span class="nc" id="L111">    return layout.isGVELayout();</span>
   }
 
   @Override
   public boolean isIndexedGVELayout() {
-<span class="nc" id="L129">    return layout.isIndexedGVELayout();</span>
+<span class="nc" id="L116">    return layout.isIndexedGVELayout();</span>
   }
 
   @Override
   public DataSet&lt;EPGMGraphHead&gt; getGraphHead() {
-<span class="fc" id="L134">    return layout.getGraphHead();</span>
+<span class="fc" id="L121">    return layout.getGraphHead();</span>
   }
 
   @Override
   public DataSet&lt;EPGMVertex&gt; getVertices() {
-<span class="fc" id="L139">    return layout.getVertices();</span>
+<span class="fc" id="L126">    return layout.getVertices();</span>
   }
 
   @Override
   public DataSet&lt;EPGMVertex&gt; getVerticesByLabel(String label) {
-<span class="fc" id="L144">    return layout.getVerticesByLabel(label);</span>
+<span class="fc" id="L131">    return layout.getVerticesByLabel(label);</span>
   }
 
   @Override
   public DataSet&lt;EPGMEdge&gt; getEdges() {
-<span class="fc" id="L149">    return layout.getEdges();</span>
+<span class="fc" id="L136">    return layout.getEdges();</span>
   }
 
   @Override
   public DataSet&lt;EPGMEdge&gt; getEdgesByLabel(String label) {
-<span class="fc" id="L154">    return layout.getEdgesByLabel(label);</span>
+<span class="fc" id="L141">    return layout.getEdgesByLabel(label);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -160,70 +147,33 @@ public class LogicalGraph implements
 
   @Override
   public CAPFQueryResult cypher(String query) throws Exception {
-<span class="nc" id="L163">    CAPFQuery capfQuery = new CAPFQuery(</span>
-<span class="nc" id="L164">      query, this.config.getExecutionEnvironment()</span>
+<span class="nc" id="L150">    CAPFQuery capfQuery = new CAPFQuery(</span>
+<span class="nc" id="L151">      query, this.config.getExecutionEnvironment()</span>
     );
-<span class="nc" id="L166">    return capfQuery.execute(this);</span>
+<span class="nc" id="L153">    return capfQuery.execute(this);</span>
   }
 
   @Override
   public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
-<span class="fc" id="L171">    CAPFQuery capfQuery = new CAPFQuery(</span>
-<span class="fc" id="L172">      query, metaData, this.config.getExecutionEnvironment());</span>
-<span class="fc" id="L173">    return capfQuery.execute(this);</span>
-  }
-
-  @Override
-  public GraphCollection query(String query) {
-<span class="nc" id="L178">    return query(query, new GraphStatistics(1, 1, 1, 1));</span>
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern) {
-<span class="fc" id="L183">    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));</span>
-  }
-
-  @Override
-  public GraphCollection query(String query, GraphStatistics graphStatistics) {
-<span class="nc" id="L188">    return query(query, true,</span>
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-<span class="fc" id="L195">    return query(query, constructionPattern, true,</span>
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-<span class="nc" id="L202">    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);</span>
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-    GraphStatistics graphStatistics) {
-<span class="fc" id="L209">    return callForCollection(new CypherPatternMatching&lt;&gt;(query, constructionPattern, attachData,</span>
-      vertexStrategy, edgeStrategy, graphStatistics));
+<span class="fc" id="L158">    CAPFQuery capfQuery = new CAPFQuery(</span>
+<span class="fc" id="L159">      query, metaData, this.config.getExecutionEnvironment());</span>
+<span class="fc" id="L160">    return capfQuery.execute(this);</span>
   }
 
   @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {
-<span class="nc" id="L215">    return callForGraph(algorithm);</span>
+<span class="nc" id="L165">    return callForGraph(algorithm);</span>
   }
 
   @Override
   public GraphCollection groupVerticesByRollUp(
     List&lt;String&gt; vertexGroupingKeys, List&lt;AggregateFunction&gt; vertexAggregateFunctions,
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions) {
-<span class="pc bpc" id="L222" title="2 of 4 branches missed.">    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {</span>
-<span class="nc" id="L223">      throw new IllegalArgumentException(&quot;Missing vertex grouping key(s).&quot;);</span>
+<span class="pc bpc" id="L172" title="2 of 4 branches missed.">    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {</span>
+<span class="nc" id="L173">      throw new IllegalArgumentException(&quot;Missing vertex grouping key(s).&quot;);</span>
     }
 
-<span class="fc" id="L226">    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
+<span class="fc" id="L176">    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
       edgeGroupingKeys, edgeAggregateFunctions));
   }
 
@@ -231,40 +181,12 @@ public class LogicalGraph implements
   public GraphCollection groupEdgesByRollUp(
     List&lt;String&gt; vertexGroupingKeys, List&lt;AggregateFunction&gt; vertexAggregateFunctions,
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions) {
-<span class="pc bpc" id="L234" title="2 of 4 branches missed.">    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {</span>
-<span class="nc" id="L235">      throw new IllegalArgumentException(&quot;Missing edge grouping key(s).&quot;);</span>
+<span class="pc bpc" id="L184" title="2 of 4 branches missed.">    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {</span>
+<span class="nc" id="L185">      throw new IllegalArgumentException(&quot;Missing edge grouping key(s).&quot;);</span>
     }
 
-<span class="fc" id="L238">    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
+<span class="fc" id="L188">    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
       edgeGroupingKeys, edgeAggregateFunctions));
-  }
-
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public DataSet&lt;Boolean&gt; equalsByElementIds(LogicalGraph other) {
-<span class="fc" id="L248">    return new GraphEquality(</span>
-      new GraphHeadToEmptyString(),
-      new VertexToIdString(),
-<span class="fc" id="L251">      new EdgeToIdString(), true).execute(this, other);</span>
-  }
-
-  @Override
-  public DataSet&lt;Boolean&gt; equalsByElementData(LogicalGraph other) {
-<span class="fc" id="L256">    return new GraphEquality(</span>
-      new GraphHeadToEmptyString(),
-      new VertexToDataString(),
-<span class="fc" id="L259">      new EdgeToDataString(), true).execute(this, other);</span>
-  }
-
-  @Override
-  public DataSet&lt;Boolean&gt; equalsByData(LogicalGraph other) {
-<span class="fc" id="L264">    return new GraphEquality(</span>
-      new GraphHeadToDataString(),
-      new VertexToDataString(),
-<span class="fc" id="L267">      new EdgeToDataString(), true).execute(this, other);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -273,24 +195,24 @@ public class LogicalGraph implements
 
   @Override
   public &lt;T&gt; T callForValue(UnaryBaseGraphToValueOperator&lt;LogicalGraph, T&gt; operator) {
-<span class="fc" id="L276">    return operator.execute(this);</span>
+<span class="fc" id="L198">    return operator.execute(this);</span>
   }
 
   @Override
   public &lt;T&gt; T callForValue(BinaryBaseGraphToValueOperator&lt;LogicalGraph, T&gt; operator,
                             LogicalGraph otherGraph) {
-<span class="fc" id="L282">    return operator.execute(this, otherGraph);</span>
+<span class="fc" id="L204">    return operator.execute(this, otherGraph);</span>
   }
 
   @Override
   public LogicalGraph callForGraph(GraphsToGraphOperator operator,
     LogicalGraph... otherGraphs) {
-<span class="nc" id="L288">    return operator.execute(this, otherGraphs);</span>
+<span class="nc" id="L210">    return operator.execute(this, otherGraphs);</span>
   }
 
   @Override
   public GraphCollection splitBy(String propertyKey) {
-<span class="fc" id="L293">    return callForCollection(new Split(new PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));</span>
+<span class="fc" id="L215">    return callForCollection(new Split(new PropertyGetter&lt;&gt;(Lists.newArrayList(propertyKey))));</span>
   }
 
   //----------------------------------------------------------------------------
@@ -298,24 +220,14 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
 
   @Override
-  public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="nc" id="L302">    return getVertices()</span>
-<span class="nc" id="L303">      .map(new True&lt;&gt;())</span>
-<span class="nc" id="L304">      .distinct()</span>
-<span class="nc" id="L305">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
-<span class="nc" id="L306">      .reduce(new Or())</span>
-<span class="nc" id="L307">      .map(new Not());</span>
-  }
-
-  @Override
   public void writeTo(DataSink dataSink) throws IOException {
-<span class="nc" id="L312">    dataSink.write(this);</span>
-<span class="nc" id="L313">  }</span>
+<span class="nc" id="L224">    dataSink.write(this);</span>
+<span class="nc" id="L225">  }</span>
 
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-<span class="nc" id="L317">    dataSink.write(this, overWrite);</span>
-<span class="nc" id="L318">  }</span>
+<span class="nc" id="L229">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L230">  }</span>
 
   /**
    * Prints the GDL formatted graph to the standard output.
@@ -323,7 +235,7 @@ public class LogicalGraph implements
    * @throws Exception forwarded from dataset print
    */
   public void print() throws Exception {
-<span class="nc" id="L326">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L327">  }</span>
+<span class="nc" id="L238">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L239">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
