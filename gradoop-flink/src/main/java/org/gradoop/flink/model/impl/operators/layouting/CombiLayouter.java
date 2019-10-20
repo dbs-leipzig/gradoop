@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.layouting;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
- * A layouter that combines the CentroidFRLayouter and the FRLayouter
+ * A layouter that combines the {@link CentroidFRLayouter } and the {@link FRLayouter}.
  */
 public class CombiLayouter implements LayoutingAlgorithm {
   /**
@@ -49,11 +49,11 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * Create a new CombiLayouter.
    *
-   * @param iterations Number of iterations to perform
+   * @param iterations  Number of iterations to perform
    * @param numVertices Approximate number of vertices in the input-graph
-   * @param quality Ratio of iterations between the two base algorithms. The higher the value,
-   *                the more iterations of the FRLayouter are performed. A value of 0.1 is often
-   *                good enough.
+   * @param quality     Ratio of iterations between the two base algorithms. The higher the value,
+   *                    the more iterations of the FRLayouter are performed. A value of 0.1 is often
+   *                    good enough.
    */
   public CombiLayouter(int iterations, int numVertices, double quality) {
 
@@ -68,14 +68,15 @@ public class CombiLayouter implements LayoutingAlgorithm {
       centroidFRLayouter.k(centroidFRLayouter.getK() * K_FACTOR);
     }
     if (l2iterations > 0) {
-      fRLayouter = new FRLayouter(l2iterations, numVertices).useExistingLayout(
-        centroidFRLayouter != null)
-        .startAtIteration(l1iterations);
+      fRLayouter =
+        new FRLayouter(l2iterations, numVertices).useExistingLayout(centroidFRLayouter != null)
+          .startAtIteration(l1iterations);
     }
   }
 
   /**
    * Set the FRLayouter parameter k for both algorithms, overwriting the default value
+   *
    * @param k The new value
    * @return this layouter
    */
@@ -127,6 +128,7 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * Use the existing layout as starting point instead of creating a random one.
    * If used, EVERY vertex in the input-graph MUST have an X and Y property!
+   *
    * @param useExisting whether to re-use the existing layout or not
    * @return this layouter
    */

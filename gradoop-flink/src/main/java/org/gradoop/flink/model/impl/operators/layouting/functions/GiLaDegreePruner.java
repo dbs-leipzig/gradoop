@@ -167,8 +167,9 @@ public class GiLaDegreePruner {
     return edges.flatMap(new FlatMapFunction<EPGMEdge, EPGMEdge>() {
       @Override
       public void flatMap(EPGMEdge e, Collector<EPGMEdge> collector) throws Exception {
-        EPGMEdge edgeCopy = new EPGMEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
-          new Properties(), e.getGraphIds());
+        EPGMEdge edgeCopy =
+          new EPGMEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
+            new Properties(), e.getGraphIds());
         collector.collect(e);
         collector.collect(edgeCopy);
       }
@@ -182,7 +183,8 @@ public class GiLaDegreePruner {
    * @param edges    The non-pruned edges
    * @return The non-pruned vertices, but some now have a property MIN_EDGE_LEN
    */
-  private DataSet<EPGMVertex> annotateShortestEdge(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+  private DataSet<EPGMVertex> annotateShortestEdge(DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
     return vertices.join(edges).where("id").equalTo("sourceId").join(vertices)
       .where("f1" + ".targetId").equalTo("id")
       .with(new FlatJoinFunction<Tuple2<EPGMVertex, EPGMEdge>, EPGMVertex, EPGMVertex>() {
@@ -220,7 +222,8 @@ public class GiLaDegreePruner {
     return edges.leftOuterJoin(toRemove).where(field).equalTo(0)
       .with(new FlatJoinFunction<EPGMEdge, Tuple2<GradoopId, Integer>, EPGMEdge>() {
         @Override
-        public void join(EPGMEdge edge, Tuple2<GradoopId, Integer> remove, Collector<EPGMEdge> collector) {
+        public void join(EPGMEdge edge, Tuple2<GradoopId, Integer> remove,
+          Collector<EPGMEdge> collector) {
           if ((remove == null) == keep) {
             collector.collect(edge);
           }

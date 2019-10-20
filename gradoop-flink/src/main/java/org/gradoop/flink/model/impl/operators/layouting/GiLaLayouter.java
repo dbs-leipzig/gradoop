@@ -175,19 +175,17 @@ public class GiLaLayouter extends
     // and reversing all edges.
 
 
-    DataSet<EPGMEdge> edges = graph.getEdges().flatMap(
-      new FlatMapFunction<EPGMEdge, EPGMEdge>() {
+    DataSet<EPGMEdge> edges = graph.getEdges().flatMap(new FlatMapFunction<EPGMEdge, EPGMEdge>() {
 
-        @Override
-        public void flatMap(EPGMEdge e,
-          Collector<EPGMEdge> collector) throws Exception {
-          EPGMEdge edgeCopy =
-            new EPGMEdge(GradoopId.get(), e.getLabel(),
-              e.getTargetId(), e.getSourceId(), new Properties(), null);
-          collector.collect(e);
-          collector.collect(edgeCopy);
-        }
-      });
+      @Override
+      public void flatMap(EPGMEdge e, Collector<EPGMEdge> collector) throws Exception {
+        EPGMEdge edgeCopy =
+          new EPGMEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
+            new Properties(), null);
+        collector.collect(e);
+        collector.collect(edgeCopy);
+      }
+    });
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), edges);
 
@@ -207,11 +205,10 @@ public class GiLaLayouter extends
 
 
     DataSet<EPGMVertex> layoutedVertices =
-      result.join(currentGraph.getVertices()).where(0).equalTo("id").with(
-        new JoinFunction<Vertex<GradoopId, VertexValue>, EPGMVertex, EPGMVertex>() {
+      result.join(currentGraph.getVertices()).where(0).equalTo("id")
+        .with(new JoinFunction<Vertex<GradoopId, VertexValue>, EPGMVertex, EPGMVertex>() {
           @Override
-          public EPGMVertex join(
-            Vertex<GradoopId, VertexValue> gellyVertex,
+          public EPGMVertex join(Vertex<GradoopId, VertexValue> gellyVertex,
             EPGMVertex vertex) throws Exception {
             gellyVertex.getValue().getPosition().setVertexPosition(vertex);
             return vertex;
@@ -270,7 +267,7 @@ public class GiLaLayouter extends
      * @param optimumDistance k of FRLayouter
      * @param kNeighborhood   kNeighborhood for repulsion-calculations
      * @param numVertices     Number of vertices in the graph
-     * @param maxIterations  Number of iterations to perform
+     * @param maxIterations   Number of iterations to perform
      */
     public MsgFunc(int width, int height, double optimumDistance, int kNeighborhood,
       int numVertices, int maxIterations) {

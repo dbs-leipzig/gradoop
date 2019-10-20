@@ -21,7 +21,6 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**

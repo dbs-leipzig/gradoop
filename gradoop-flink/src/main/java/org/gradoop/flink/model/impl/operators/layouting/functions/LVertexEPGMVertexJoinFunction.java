@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.layouting;
+package org.gradoop.flink.model.impl.operators.layouting.functions;
 
-public class CentroidFRLayouterTest extends LayoutingAlgorithmTest {
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+
+/**
+ * Joins LVeritces and EPGMVertices. Assigns the position of the LVertex to the resulting
+ * EPGMVertex.
+ */
+public class LVertexEPGMVertexJoinFunction implements
+  JoinFunction<LVertex, EPGMVertex, EPGMVertex> {
 
   @Override
-  public LayoutingAlgorithm getLayouter(int w, int h) {
-    return new CentroidFRLayouter(5, 10);
+  public EPGMVertex join(LVertex lVertex, EPGMVertex vertex) throws Exception {
+    lVertex.getPosition().setVertexPosition(vertex);
+    return vertex;
   }
-
 }

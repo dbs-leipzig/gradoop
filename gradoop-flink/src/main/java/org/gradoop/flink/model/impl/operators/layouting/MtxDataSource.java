@@ -37,17 +37,24 @@ import java.io.IOException;
  */
 public class MtxDataSource implements DataSource {
 
-  /** Path to the input-file */
+  /**
+   * Path to the input-file
+   */
   private String path;
-  /** Gradoop config */
+  /**
+   * Gradoop config
+   */
   private GradoopFlinkConfig cfg;
-  /** if true, skip the pre-processing (remove multi-edges, self-edges etc.) */
+  /**
+   * if true, skip the pre-processing (remove multi-edges, self-edges etc.)
+   */
   private boolean skipPreprocessing;
 
   /**
    * Create new MTX-Datasource
+   *
    * @param path Pathh to the input-file
-   * @param cfg Gradoop-config to use
+   * @param cfg  Gradoop-config to use
    */
   public MtxDataSource(String path, GradoopFlinkConfig cfg) {
     this(path, cfg, false);
@@ -55,11 +62,15 @@ public class MtxDataSource implements DataSource {
 
   /**
    * Create new MTX-Datasource
-   * @param path Pathh to the input-file
-   * @param cfg Gradoop-config to use
+   *
+   * @param path              Pathh to the input-file
+   * @param cfg               Gradoop-config to use
    * @param skipPreprocessing if true, skip the pre-processing (remove multi-edges, self-edges etc.)
    */
   public MtxDataSource(String path, GradoopFlinkConfig cfg, boolean skipPreprocessing) {
+    if (path == null || cfg == null) {
+      throw new IllegalArgumentException("Stguments can not be null");
+    }
     this.path = path;
     this.cfg = cfg;
     this.skipPreprocessing = skipPreprocessing;
@@ -68,7 +79,8 @@ public class MtxDataSource implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     DataSet<EPGMVertex> vertices = cfg.getExecutionEnvironment().readTextFile(path)
-      .flatMap(new MtxVertexToVertex(cfg.getLogicalGraphFactory().getVertexFactory())).distinct(new Id<>());
+      .flatMap(new MtxVertexToVertex(cfg.getLogicalGraphFactory().getVertexFactory()))
+      .distinct(new Id<>());
 
     DataSet<EPGMEdge> edges = cfg.getExecutionEnvironment().readTextFile(path)
       .flatMap(new MtxEdgeToEdge(cfg.getLogicalGraphFactory().getEdgeFactory()));
@@ -95,6 +107,7 @@ public class MtxDataSource implements DataSource {
 
   /**
    * Returns true if the given line is a comment
+   *
    * @param line The line to check
    * @return true if comment
    */
@@ -104,6 +117,7 @@ public class MtxDataSource implements DataSource {
 
   /**
    * Get the character that should be used to split the given line
+   *
    * @param text The line to check
    * @return A string containing either a space or tab character
    */
@@ -113,6 +127,7 @@ public class MtxDataSource implements DataSource {
 
   /**
    * Generate a GradoopId from an mtx-id
+   *
    * @param text The numerical id of the vertex from the mtx file
    * @return A GradooopId for the vertex
    */
@@ -126,11 +141,14 @@ public class MtxDataSource implements DataSource {
    * Maps mtx-edges to gradoop edges
    */
   private static class MtxEdgeToEdge implements FlatMapFunction<String, EPGMEdge> {
-    /** The EPGMEdgeFactory<Edge> to use for creating Edges */
+    /**
+     * The EPGMEdgeFactory<Edge> to use for creating Edges
+     */
     private EdgeFactory<EPGMEdge> edgeFactory;
 
     /**
      * Create new EdgeMapper
+     *
      * @param edgeFactory The EPGMEdgeFactory<Edge> to use for creating Edges
      */
     MtxEdgeToEdge(EdgeFactory<EPGMEdge> edgeFactory) {
@@ -151,11 +169,14 @@ public class MtxDataSource implements DataSource {
    * Maps mtx-vertices to vertices
    */
   private static class MtxVertexToVertex implements FlatMapFunction<String, EPGMVertex> {
-    /** The EPGMVertexFactory<Vertex> to use for creating vertices */
+    /**
+     * The EPGMVertexFactory<Vertex> to use for creating vertices
+     */
     private VertexFactory<EPGMVertex> vertexFactory;
 
     /**
      * Create new VertexMapper
+     *
      * @param vertexFactory The EPGMVertexFactory<Vertex> to use for creating vertices
      */
     MtxVertexToVertex(VertexFactory<EPGMVertex> vertexFactory) {

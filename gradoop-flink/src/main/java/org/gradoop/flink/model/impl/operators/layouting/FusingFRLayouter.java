@@ -15,19 +15,17 @@
  */
 package org.gradoop.flink.model.impl.operators.layouting;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.layouting.functions.DefaultVertexCompareFunction;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRForceApplicator;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LGraphToEPGMMapper;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexFlattener;
 import org.gradoop.flink.model.impl.operators.layouting.functions.VertexCompareFunction;
 import org.gradoop.flink.model.impl.operators.layouting.functions.VertexFusor;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
@@ -35,11 +33,7 @@ import org.gradoop.flink.model.impl.operators.layouting.util.GraphElement;
 import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
 import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
-import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 /**
  * A special variant of the FRLayouter that combines similar vertices during the layouting,
@@ -212,22 +206,9 @@ public class FusingFRLayouter extends FRLayouter {
    * @return The final graph, containing all vertices and edges from the original graph.
    */
   protected LogicalGraph buildPostLayoutGraph(LogicalGraph input, LGraph graph) {
-    final double kf = getK();
-    DataSet<LVertex> vertices =
-      graph.getVertices().flatMap((FlatMapFunction<LVertex, LVertex>) (superv, collector) -> {
-        double jitterRadius = Math.sqrt(superv.getCount() * kf);
-        for (GradoopId id : superv.getSubVertices()) {
-          LVertex v = new LVertex();
-          v.setId(id);
-          v.setPosition(jitterPosition(superv.getPosition(), jitterRadius));
-          collector.collect(v);
-        }
-        superv.setSubVertices(null);
-        collector.collect(superv);
-      }).returns(new TypeHint<LVertex>() {
-      });
+    DataSet<LVertex> vertices = graph.getVertices().flatMap(new LVertexFlattener(true, getK()));
 
-    DataSet<LEdge> edges = input.getEdges().map(e -> new LEdge(e));
+    DataSet<LEdge> edges = input.getEdges().map(LEdge::new);
     graph.setEdges(edges);
 
 
@@ -245,10 +226,8 @@ public class FusingFRLayouter extends FRLayouter {
 
 
     DataSet<EPGMVertex> gradoopVertices =
-      vertices.join(input.getVertices()).where(LVertex.ID).equalTo("id").with((lv, v) -> {
-        lv.getPosition().setVertexPosition(v);
-        return v;
-      });
+      vertices.join(input.getVertices()).where(LVertex.ID).equalTo("id")
+        .with(new LVertexEPGMVertexJoinFunction());
 
     return input.getFactory().fromDataSets(gradoopVertices, input.getEdges());
   }
@@ -261,22 +240,7 @@ public class FusingFRLayouter extends FRLayouter {
    * @return The layouted graph in the Gradoop-format
    */
   protected LogicalGraph buildSimplifiedGraph(LogicalGraph input, LGraph layouted) {
-    DataSet<EPGMVertex> vertices = layouted.getVertices().map((lv) -> {
-      EPGMVertex v = new EPGMVertex(lv.getId(), "vertex", Properties.create(), null);
-      lv.getPosition().setVertexPosition(v);
-      v.setProperty(VERTEX_SIZE_PROPERTY, lv.getCount());
-      v.setProperty(SUB_ELEMENTS_PROPERTY, getSubelementListValue(lv.getSubVertices()));
-      return v;
-    });
-
-    DataSet<EPGMEdge> edges = layouted.getEdges().map((le) -> {
-      EPGMEdge e =
-        new EPGMEdge(le.getId(), "edge", le.getSourceId(), le.getTargetId(), Properties.create(), null);
-      e.setProperty(VERTEX_SIZE_PROPERTY, le.getCount());
-      e.setProperty(SUB_ELEMENTS_PROPERTY, getSubelementListValue(le.getSubEdges()));
-      return e;
-    });
-    return input.getFactory().fromDataSets(vertices, edges);
+    return new LGraphToEPGMMapper().buildSimplifiedGraph(input, layouted);
   }
 
   /**
@@ -290,52 +254,11 @@ public class FusingFRLayouter extends FRLayouter {
    */
   protected LogicalGraph buildExtractedGraph(LogicalGraph input, LGraph layouted,
     final boolean jitter) {
-    final double kf = getK();
-    DataSet<EPGMVertex> vertices =
-      layouted.getVertices().flatMap((FlatMapFunction<LVertex, LVertex>) (superv, collector) -> {
-        double jitterRadius = 0;
-        if (jitter) {
-          jitterRadius = Math.sqrt(superv.getCount() * kf);
-        }
-        for (GradoopId id : superv.getSubVertices()) {
-          LVertex v = new LVertex();
-          v.setId(id);
-          Vector position = superv.getPosition();
-          if (jitter) {
-            position = jitterPosition(position, jitterRadius);
-          }
-          v.setPosition(position);
-          collector.collect(v);
-        }
-        superv.setSubVertices(null);
-        collector.collect(superv);
-      }).returns(TypeInformation.of(LVertex.class)).join(input.getVertices()).where(LVertex.ID)
-        .equalTo(new Id<>()).with((lv, v) -> {
-        lv.getPosition().setVertexPosition(v);
-        return v;
-      });
-    return input.getFactory().fromDataSets(vertices, input.getEdges());
-  }
 
-  /**
-   * Add random jitter to position
-   *
-   * @param center Position
-   * @param jitter Maximum distance
-   * @return Randomly modified position
-   */
-  protected static Vector jitterPosition(Vector center, double jitter) {
-    ThreadLocalRandom rng = ThreadLocalRandom.current();
-    Vector offset = new Vector();
-    while (true) {
-      double x = (rng.nextDouble(1) * jitter) - (jitter / 2.0);
-      double y = (rng.nextDouble(1) * jitter) - (jitter / 2.0);
-      offset.set(x, y);
-      if (offset.magnitude() <= jitter) {
-        break;
-      }
-    }
-    return offset.mAdd(center);
+    DataSet<EPGMVertex> vertices =
+      layouted.getVertices().flatMap(new LVertexFlattener(jitter, getK())).join(input.getVertices())
+        .where(LVertex.ID).equalTo(new Id<>()).with(new LVertexEPGMVertexJoinFunction());
+    return input.getFactory().fromDataSets(vertices, input.getEdges());
   }
 
   @Override
@@ -344,17 +267,6 @@ public class FusingFRLayouter extends FRLayouter {
     return vertices.join(forces).where(LVertex.ID).equalTo(Force.ID).with(applicator);
   }
 
-  /**
-   * Helper function to convert the List of sub-elements into a comma seperated string
-   * Gradoop (especially the CSVDataSink) seems to have trouble with lists of PropertyValues, so
-   * this is the easies workaround
-   *
-   * @param ids List of GradoopIds
-   * @return A comma seperated string of ids
-   */
-  protected static String getSubelementListValue(List<GradoopId> ids) {
-    return ids.stream().map(GradoopId::toString).collect(Collectors.joining(","));
-  }
 
   @Override
   public String toString() {

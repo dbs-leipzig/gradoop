@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.FRCellIdMapper
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRCellIdSelector;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRForceApplicator;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
 import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
 import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
@@ -139,6 +140,7 @@ public class FRLayouter implements LayoutingAlgorithm {
   /**
    * Use the existing layout as starting point instead of creating a random one.
    * If used, EVERY vertex in the input-graph MUST have an X and Y property!
+   *
    * @param uel whether to re-use the existing layout or not
    * @return this (for method chaining)
    */
@@ -204,13 +206,7 @@ public class FRLayouter implements LayoutingAlgorithm {
     vertices = loop.closeWith(graph.getVertices());
 
     gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID).equalTo("id")
-      .with(new JoinFunction<LVertex, EPGMVertex, EPGMVertex>() {
-        @Override
-        public EPGMVertex join(LVertex lVertex, EPGMVertex vertex) throws Exception {
-          lVertex.getPosition().setVertexPosition(vertex);
-          return vertex;
-        }
-      });
+      .with(new LVertexEPGMVertexJoinFunction());
 
     return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);
   }
@@ -226,7 +222,7 @@ public class FRLayouter implements LayoutingAlgorithm {
       return g;
     }
     return new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,
-        getHeight() - (getHeight() / 10)).execute(g);
+      getHeight() - (getHeight() / 10)).execute(g);
   }
 
   /**
@@ -317,14 +313,13 @@ public class FRLayouter implements LayoutingAlgorithm {
       .where("f0." + LEdge.TARGET_ID).equalTo(LVertex.ID).with(
         (first, second) -> new Tuple3<LVertex, LVertex, Integer>(first.f1, second,
           first.f0.getCount())).returns(new TypeHint<Tuple3<LVertex, LVertex, Integer>>() {
-          }).flatMap(new FRAttractionFunction(getK()));
+            }).flatMap(new FRAttractionFunction(getK()));
   }
 
   @Override
   public String toString() {
     return "FRLayouter{" + "iterations=" + iterations + ", k=" + getK() + ", with=" + getWidth() +
-          ", height=" + getHeight() + ", maxRepulsionDistance=" + getMaxRepulsionDistance() +
-          ", numberOfVertices=" + numberOfVertices +
-          ", useExistingLayout=" + useExistingLayout + '}';
+      ", height=" + getHeight() + ", maxRepulsionDistance=" + getMaxRepulsionDistance() +
+      ", numberOfVertices=" + numberOfVertices + ", useExistingLayout=" + useExistingLayout + '}';
   }
 }
