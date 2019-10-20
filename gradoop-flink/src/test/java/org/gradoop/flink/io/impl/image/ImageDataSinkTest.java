@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.layouting.util;
+package org.gradoop.flink.io.impl.image;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -29,7 +29,7 @@ import org.junit.Test;
 import java.io.File;
 
 
-public class PlotterTest extends GradoopFlinkTestBase {
+public class ImageDataSinkTest extends GradoopFlinkTestBase {
 
 
   private String getTestPath() {
@@ -46,7 +46,7 @@ public class PlotterTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testPlotter() throws Exception {
+  public void testImageSink() throws Exception {
     ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig cfg = getConfig();
 
@@ -56,7 +56,9 @@ public class PlotterTest extends GradoopFlinkTestBase {
     RandomLayouter rl = new RandomLayouter(0, 500, 0, 500);
     LogicalGraph g = rl.execute(loader.getLogicalGraph());
 
-    Plotter p = new Plotter(getTestPath(), 500, 500, 1000, 1000).vertexLabel("name");
+    ImageDataSink p =
+      new ImageDataSink(getTestPath(), 500, 500, 1000, 1000)
+        .vertexLabel("name").zoom(true, 100);
     g.writeTo(p);
 
     env.execute();

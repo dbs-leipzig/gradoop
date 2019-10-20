@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.layouting.util;
+package org.gradoop.flink.io.impl.image;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -49,7 +49,7 @@ import java.util.List;
  * DataSink to write a layouted graph to an image
  */
 
-public class Plotter implements DataSink, Serializable {
+public class ImageDataSink implements DataSink, Serializable {
 
   /**
    * ImageIO-format used for intermediate image-encodings
@@ -69,11 +69,11 @@ public class Plotter implements DataSink, Serializable {
    */
   protected int layoutHeight;
   /**
-   * Requested width of output-image (px)
+   * Width of output-image (px)
    */
   protected int imageWidth;
   /**
-   * Requested height of output-image (px)
+   * Height of output-image (px)
    */
   protected int imageHeight;
 
@@ -121,7 +121,10 @@ public class Plotter implements DataSink, Serializable {
    * If true, scale the layout to fill the complete drawing-space.
    */
   protected boolean zoom = false;
-
+  /**
+   * Size of a order in pixels, that should be left free when using zoom.
+   */
+  protected int zoomBorder = 0;
   /**
    * Create new plotter.
    *
@@ -131,7 +134,7 @@ public class Plotter implements DataSink, Serializable {
    * @param imageWidth   Wanted width of the output image
    * @param imageHeight  Wanted height of the output image
    */
-  public Plotter(String path, int layoutWidth, int layoutHeight, int imageWidth, int imageHeight) {
+  public ImageDataSink(String path, int layoutWidth, int layoutHeight, int imageWidth, int imageHeight) {
     this.path = path;
     this.layoutWidth = layoutWidth;
     this.layoutHeight = layoutHeight;
@@ -149,7 +152,7 @@ public class Plotter implements DataSink, Serializable {
    * @param imageWidth  Wanted width of the output image
    * @param imageHeight Wanted height of the output image
    */
-  public Plotter(String path, LayoutingAlgorithm algo, int imageWidth, int imageHeight) {
+  public ImageDataSink(String path, LayoutingAlgorithm algo, int imageWidth, int imageHeight) {
     this(path, algo.getWidth(), algo.getHeight(), imageWidth, imageHeight);
   }
 
@@ -159,7 +162,7 @@ public class Plotter implements DataSink, Serializable {
    * @param vertexSize the new value
    * @return this (for method-chaining)
    */
-  public Plotter vertexSize(int vertexSize) {
+  public ImageDataSink vertexSize(int vertexSize) {
     this.vertexSize = vertexSize;
     return this;
   }
@@ -170,7 +173,7 @@ public class Plotter implements DataSink, Serializable {
    * @param vertexColor the new value
    * @return this (for method-chaining)
    */
-  public Plotter vertexColor(Color vertexColor) {
+  public ImageDataSink vertexColor(Color vertexColor) {
     this.vertexColor = vertexColor;
     return this;
   }
@@ -181,7 +184,7 @@ public class Plotter implements DataSink, Serializable {
    * @param edgeColor the new value
    * @return this (for method-chaining)
    */
-  public Plotter edgeColor(Color edgeColor) {
+  public ImageDataSink edgeColor(Color edgeColor) {
     this.edgeColor = edgeColor;
     return this;
   }
@@ -192,7 +195,7 @@ public class Plotter implements DataSink, Serializable {
    * @param ignoreVertices the new value
    * @return this (for method-chaining)
    */
-  public Plotter ignoreVertices(boolean ignoreVertices) {
+  public ImageDataSink ignoreVertices(boolean ignoreVertices) {
     this.ignoreVertices = ignoreVertices;
     return this;
   }
@@ -203,7 +206,7 @@ public class Plotter implements DataSink, Serializable {
    * @param vertexLabel the new value
    * @return this (for method-chaining)
    */
-  public Plotter vertexLabel(String vertexLabel) {
+  public ImageDataSink vertexLabel(String vertexLabel) {
     this.vertexLabel = vertexLabel;
     return this;
   }
@@ -214,7 +217,7 @@ public class Plotter implements DataSink, Serializable {
    * @param vertexLabelSize the new value
    * @return this (for method-chaining)
    */
-  public Plotter vertexLabelSize(int vertexLabelSize) {
+  public ImageDataSink vertexLabelSize(int vertexLabelSize) {
     this.vertexLabelSize = vertexLabelSize;
     return this;
   }
@@ -225,7 +228,7 @@ public class Plotter implements DataSink, Serializable {
    * @param backgroundColor the new value
    * @return this (for method-chaining)
    */
-  public Plotter backgroundColor(Color backgroundColor) {
+  public ImageDataSink backgroundColor(Color backgroundColor) {
     this.backgroundColor = backgroundColor;
     return this;
   }
@@ -236,7 +239,7 @@ public class Plotter implements DataSink, Serializable {
    * @param edgeSize the new value
    * @return this (for method-chaining)
    */
-  public Plotter edgeSize(float edgeSize) {
+  public ImageDataSink edgeSize(float edgeSize) {
     this.edgeSize = edgeSize;
     return this;
   }
@@ -247,7 +250,7 @@ public class Plotter implements DataSink, Serializable {
    * @param dynamicVertexSize the new value
    * @return this (for method-chaining)
    */
-  public Plotter dynamicVertexSize(boolean dynamicVertexSize) {
+  public ImageDataSink dynamicVertexSize(boolean dynamicVertexSize) {
     this.dynamicVertexSize = dynamicVertexSize;
     return this;
   }
@@ -258,7 +261,7 @@ public class Plotter implements DataSink, Serializable {
    * @param dynamicEdgeSize the new value
    * @return this (for method-chaining)
    */
-  public Plotter dynamicEdgeSize(boolean dynamicEdgeSize) {
+  public ImageDataSink dynamicEdgeSize(boolean dynamicEdgeSize) {
     this.dynamicEdgeSize = dynamicEdgeSize;
     return this;
   }
@@ -269,8 +272,22 @@ public class Plotter implements DataSink, Serializable {
    * @param zoom the new value
    * @return this (for method-chaining)
    */
-  public Plotter zoom(boolean zoom) {
+  public ImageDataSink zoom(boolean zoom) {
     this.zoom = zoom;
+    return this;
+  }
+
+  /**
+   * If true, scale the graph to completely fill the layout-area
+   *
+   * @param zoom the new value
+   * @param border Size of a border in px, that is to be left free when placing zoomed vertices. Can
+   *              be used to prevent vertices being cut off at the edges.
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink zoom(boolean zoom, int border) {
+    this.zoom = zoom;
+    this.zoomBorder = border;
     return this;
   }
 
@@ -310,8 +327,9 @@ public class Plotter implements DataSink, Serializable {
   protected DataSet<EPGMVertex> scaleLayout(DataSet<EPGMVertex> inp) {
 
     if (zoom) {
-      final int imageWidthF = imageWidth;
-      final int imageHeightF = imageHeight;
+      final int imageWidthF = imageWidth - 2 * zoomBorder;
+      final int imageHeightF = imageHeight - 2 * zoomBorder;
+      final int zoomBorderF = zoomBorder;
 
       DataSet<Tuple4<Integer, Integer, Integer, Integer>> minMaxCoords = inp.map((v) -> {
         int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
@@ -345,8 +363,8 @@ public class Plotter implements DataSink, Serializable {
         public EPGMVertex map(EPGMVertex v) {
           int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
           int y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();
-          x = (int) ((x - offsetX) * zoomFactor);
-          y = (int) ((y - offsetY) * zoomFactor);
+          x = (int) ((x - offsetX) * zoomFactor) + zoomBorderF;
+          y = (int) ((y - offsetY) * zoomFactor) + zoomBorderF;
           v.setProperty(LayoutingAlgorithm.X_COORDINATE_PROPERTY, x);
           v.setProperty(LayoutingAlgorithm.Y_COORDINATE_PROPERTY, y);
           return v;
@@ -440,7 +458,7 @@ public class Plotter implements DataSink, Serializable {
         }
       }).withBroadcastSet(vertexImage, "vertexImage");
     }
-    image = image.map(imgg::addBackgound);
+    image = image.map(imgg::addBackground);
 
     image.output(pof).setParallelism(1);
   }
@@ -460,14 +478,14 @@ public class Plotter implements DataSink, Serializable {
     /**
      * Contains all necessary parameters
      */
-    private Plotter plotter;
+    private ImageDataSink plotter;
 
     /**
-     * Create new image-generatir
+     * Create new ImageGenerator
      *
      * @param p Contains all necessary parameters (cannot use non-static class du to flink-madness)
      */
-    public ImageGenerator(Plotter p) {
+    public ImageGenerator(ImageDataSink p) {
       this.plotter = p;
     }
 
@@ -573,12 +591,12 @@ public class Plotter implements DataSink, Serializable {
     }
 
     /**
-     * Draw a black background behind the image
+     * Draw a background behind the image.
      *
      * @param arr Input image
      * @return Input-image + black background
      */
-    public byte[] addBackgound(byte[] arr) {
+    public byte[] addBackground(byte[] arr) {
       BufferedImage bufferedImage = arrToImg(arr);
       BufferedImage out =
         new BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
@@ -631,7 +649,7 @@ public class Plotter implements DataSink, Serializable {
     @Override
     public void writeRecord(byte[] img) throws IOException {
       String outputFormat = getFileExtension(path);
-      if (outputFormat != INTERMEDIATE_ENCODING) {
+      if (!outputFormat.equals(INTERMEDIATE_ENCODING)) {
         BufferedImage bimg = arrToImg(img);
         ImageIO.write(bimg, outputFormat, this.stream);
       } else {

@@ -20,7 +20,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Interface for all Layouters. A LayoutAlgorithm layouts a graph (assignes a position in 2D-space
- * to each vertex in a graph).
+ * to each vertex in a graph). Layouted graphs can be converted to
+ * images using {@link org.gradoop.flink.io.impl.image.ImageDataSink}.
  */
 public interface LayoutingAlgorithm extends UnaryGraphToGraphOperator {
 
@@ -29,21 +30,10 @@ public interface LayoutingAlgorithm extends UnaryGraphToGraphOperator {
    */
   String X_COORDINATE_PROPERTY = "X";
 
-
   /**
    * The name of the property where the Y-Coordinate of a vertex is stored
    */
   String Y_COORDINATE_PROPERTY = "Y";
-
-  /**
-   * The name of the property where the layout-width is stored in the graph-head
-   */
-  String LAYOUT_WIDTH = "WIDTH";
-
-  /**
-   * The name of the property where the layout-height is stored in the graph-head
-   */
-  String LAYOUT_HEIGHT = "HEIGHT";
 
   /**
    * Layouts the given graph. After layouting all vertices will have two new properties:
