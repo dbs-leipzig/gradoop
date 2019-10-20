@@ -226,7 +226,7 @@ public class FusingFRLayouter extends FRLayouter {
 
 
     DataSet<EPGMVertex> gradoopVertices =
-      vertices.join(input.getVertices()).where(LVertex.ID).equalTo("id")
+      vertices.join(input.getVertices()).where(LVertex.ID_POSITION).equalTo("id")
         .with(new LVertexEPGMVertexJoinFunction());
 
     return input.getFactory().fromDataSets(gradoopVertices, input.getEdges());
@@ -257,14 +257,14 @@ public class FusingFRLayouter extends FRLayouter {
 
     DataSet<EPGMVertex> vertices =
       layouted.getVertices().flatMap(new LVertexFlattener(jitter, getK())).join(input.getVertices())
-        .where(LVertex.ID).equalTo(new Id<>()).with(new LVertexEPGMVertexJoinFunction());
+        .where(LVertex.ID_POSITION).equalTo(new Id<>()).with(new LVertexEPGMVertexJoinFunction());
     return input.getFactory().fromDataSets(vertices, input.getEdges());
   }
 
   @Override
   protected DataSet<LVertex> applyForces(DataSet<LVertex> vertices, DataSet<Force> forces,
     int iterations) {
-    return vertices.join(forces).where(LVertex.ID).equalTo(Force.ID).with(applicator);
+    return vertices.join(forces).where(LVertex.ID_POSITION).equalTo(Force.ID_POSITION).with(applicator);
   }
 
 

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Leightweight/Layouting-Vertex. Has all properties of a Vertex that are important for
+ * Lightweight/Layouting-Vertex. Has all properties of an {@link EPGMVertex} that are important for
  * the layouting. This way we do not need to drag around a full Vertex through every operation.
  */
 public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>, Vector> implements
@@ -32,7 +32,7 @@ public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>,
   /**
    * Position of the ID-property in the tuple
    */
-  public static final int ID = 0;
+  public static final int ID_POSITION = 0;
 
   /**
    * Create new LVertex
@@ -61,7 +61,7 @@ public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>,
    * @param id          Id of the original vertex
    * @param position    Position of the original vertex
    * @param cellid      Id of grid-cell this vertex should be assigned to
-   * @param subVertices List of suvvertex ids to include in this vertex
+   * @param subVertices List of sub-vertex ids to include in this vertex
    */
   public LVertex(GradoopId id, Vector position, int cellid, List<GradoopId> subVertices) {
     super(id, position, cellid, subVertices, new Vector());
@@ -160,7 +160,7 @@ public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>,
   }
 
   /**
-   * Get list of sub-vertiex ids
+   * Get list of sub-vertex ids
    * @return The List
    */
   public List<GradoopId> getSubVertices() {
@@ -168,8 +168,8 @@ public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>,
   }
 
   /**
-   * Set list of sub-vertiex ids
-   * @param v The new list of subvertex ids
+   * Set list of sub-vertex ids
+   * @param v The new list of sub-vertex ids
    */
   public void setSubVertices(List<GradoopId> v) {
     f3 = v;

@@ -82,7 +82,7 @@ public class CentroidUpdater extends RichMapFunction<LVertex, Force> {
   public DataSet<Centroid> updateCentroids(DataSet<Centroid> centroids, DataSet<LVertex> vertices) {
     centroids = centroids.flatMap(this::removeOrSplitCentroids);
     return vertices.map(this)
-      .withBroadcastSet(centroids, CentroidFRLayouter.CENTROID_BROADCAST_NAME).groupBy(Force.ID)
+      .withBroadcastSet(centroids, CentroidFRLayouter.CENTROID_BROADCAST_NAME).groupBy(Force.ID_POSITION)
       .reduceGroup(this::calculateNewCentroidPosition);
   }
 

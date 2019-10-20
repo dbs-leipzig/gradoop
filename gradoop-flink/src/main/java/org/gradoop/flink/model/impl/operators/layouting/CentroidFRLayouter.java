@@ -113,7 +113,7 @@ public class CentroidFRLayouter extends FRLayouter {
 
     vertices = graphElements.filter(x -> x instanceof LVertex).map(x -> (LVertex) x);
 
-    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID).equalTo(new Id<>())
+    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID_POSITION).equalTo(new Id<>())
       .with(new LVertexEPGMVertexJoinFunction());
 
     return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);

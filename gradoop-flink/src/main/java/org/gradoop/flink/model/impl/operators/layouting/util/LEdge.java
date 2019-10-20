@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Lightweight verison of Edge. Contains only data necessary for layouting.
+ * Lightweight version of {@link EPGMEdge}. Contains only data necessary for layouting.
  */
 public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopId>> implements
   GraphElement {
@@ -31,15 +31,15 @@ public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopI
   /**
    * Position of the ID-property in the tuple
    */
-  public static final int ID = 0;
+  public static final int ID_POSITION = 0;
   /**
    * Position of the sourceId-property in the tuple
    */
-  public static final int SOURCE_ID = 1;
+  public static final int SOURCE_ID_POSITION = 1;
   /**
    * Position of the targetId-property in the tuple
    */
-  public static final int TARGET_ID = 2;
+  public static final int TARGET_ID_POSITION = 2;
 
   /**
    * Create LEdge from raw data
@@ -47,7 +47,7 @@ public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopI
    * @param id       Edge-id
    * @param sourceId id of source vertex
    * @param targetId id of target vertex
-   * @param subEdges IDs of subedges contained in this edge
+   * @param subEdges IDs of sub-edges contained in this edge
    */
   public LEdge(GradoopId id, GradoopId sourceId, GradoopId targetId, List<GradoopId> subEdges) {
     this.f0 = id;
@@ -57,7 +57,7 @@ public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopI
   }
 
   /**
-   * Construct LEdge from rgular edge
+   * Construct LEdge from regular edge
    *
    * @param e The original edge to copy values from
    */

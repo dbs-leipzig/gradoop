@@ -91,6 +91,9 @@ public class FRLayouter implements LayoutingAlgorithm {
    *                    parammeters
    */
   public FRLayouter(int iterations, int vertexCount) {
+    if (iterations <= 0 || vertexCount <= 0) {
+      throw new IllegalArgumentException("Iterations and vertexcount must both be greater than 0.");
+    }
     this.iterations = iterations;
     this.numberOfVertices = vertexCount;
   }
@@ -104,6 +107,9 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @return this (for method-chaining)
    */
   public FRLayouter k(double k) {
+    if (k <= 0) {
+      throw new IllegalArgumentException("K must be greater than 0.");
+    }
     this.k = k;
     return this;
   }
@@ -117,6 +123,9 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @return this (for method-chaining)
    */
   public FRLayouter area(int width, int height) {
+    if (width <= 0 || height <= 0) {
+      throw new IllegalArgumentException("Width and height must both be greater than 0.");
+    }
     this.width = width;
     this.height = height;
     return this;
@@ -125,14 +134,17 @@ public class FRLayouter implements LayoutingAlgorithm {
   /**
    * Override default maxRepulsionDistance of the FR-Algorithm. Vertices with larger distance
    * are ignored in repulsion-force calculation
-   * Default-Value is relative to current k. If k is overriden, this is changed
-   * accordingly automatically
+   * Default-Value is relative to current k. If k is overridden, this is changed
+   * accordingly automatically.
    * Default: 2k
    *
    * @param maxRepulsionDistance new value
    * @return this (for method-chaining)
    */
   public FRLayouter maxRepulsionDistance(int maxRepulsionDistance) {
+    if (maxRepulsionDistance <= 0) {
+      throw new IllegalArgumentException("MaxRepulsionDistance must be greater than 0.");
+    }
     this.maxRepulsionDistance = maxRepulsionDistance;
     return this;
   }
@@ -156,6 +168,9 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @return this (for method-chaining)
    */
   public FRLayouter startAtIteration(int startAtIteration) {
+    if (startAtIteration <= 0) {
+      throw new IllegalArgumentException("Start-Iteration must be greater than 0.");
+    }
     this.startAtIteration = startAtIteration;
     return this;
   }
@@ -205,14 +220,15 @@ public class FRLayouter implements LayoutingAlgorithm {
     layout(graph);
     vertices = loop.closeWith(graph.getVertices());
 
-    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID).equalTo("id")
+    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID_POSITION).equalTo("id")
       .with(new LVertexEPGMVertexJoinFunction());
 
     return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);
   }
 
   /**
-   * Creates a random layout as the starting-point for the algorithm
+   * Creates a layout as the starting-point for the algorithm. If useExistingLayout is false, the
+   * created layout is random, else it is the already existing layout of the graph.
    *
    * @param g The graph to layout
    * @return The randomly layouted input graph
@@ -235,7 +251,7 @@ public class FRLayouter implements LayoutingAlgorithm {
     DataSet<Force> attractions = attractionForces(g.getVertices(), g.getEdges());
 
     DataSet<Force> forces =
-      repulsions.union(attractions).groupBy(Force.ID).reduce((first, second) -> {
+      repulsions.union(attractions).groupBy(Force.ID_POSITION).reduce((first, second) -> {
         first.setValue(first.getValue().add(second.getValue()));
         return first;
       });
@@ -249,9 +265,9 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @param vertices   Vertices to move
    * @param forces     Forces to apply. At most one per vertex. The id indicates which vertex
    *                   the force should be applied to
-   * @param iterations Number of iterations that are/will be performed (NOT the number of the
-   *                   current Iteration). Is to compute the simulated annealing shedule.
-   * @return The input vertices with x and y coordinated chaned according to the given force and
+   * @param iterations Number of iterations that will be performed (NOT the number of the
+   *                   current iteration). It is used to compute the simulated annealing shedule.
+   * @return The input vertices with x and y coordinated changed according to the given force and
    * current iteration number.
    */
   protected DataSet<LVertex> applyForces(DataSet<LVertex> vertices, DataSet<Force> forces,
@@ -259,12 +275,12 @@ public class FRLayouter implements LayoutingAlgorithm {
     FRForceApplicator applicator =
       new FRForceApplicator(getWidth(), getHeight(), getK(), iterations);
     applicator.setPreviousIterations(startAtIteration);
-    return vertices.join(forces).where(LVertex.ID).equalTo(Force.ID).with(applicator);
+    return vertices.join(forces).where(LVertex.ID_POSITION).equalTo(Force.ID_POSITION).with(applicator);
   }
 
 
   /**
-   * Calculates the repusive forces between the given vertices.
+   * Calculates the repulsive forces between the given vertices.
    *
    * @param vertices A dataset of vertices
    * @return Dataset of applied forces. May (and will) contain multiple forces for each vertex.
@@ -309,8 +325,8 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @return A mapping from VertexId to x and y forces
    */
   protected DataSet<Force> attractionForces(DataSet<LVertex> vertices, DataSet<LEdge> edges) {
-    return edges.join(vertices).where(LEdge.SOURCE_ID).equalTo(LVertex.ID).join(vertices)
-      .where("f0." + LEdge.TARGET_ID).equalTo(LVertex.ID).with(
+    return edges.join(vertices).where(LEdge.SOURCE_ID_POSITION).equalTo(LVertex.ID_POSITION).join(vertices)
+      .where("f0." + LEdge.TARGET_ID_POSITION).equalTo(LVertex.ID_POSITION).with(
         (first, second) -> new Tuple3<LVertex, LVertex, Integer>(first.f1, second,
           first.f0.getCount())).returns(new TypeHint<Tuple3<LVertex, LVertex, Integer>>() {
             }).flatMap(new FRAttractionFunction(getK()));

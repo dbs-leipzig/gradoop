@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.layouting.util;
 import org.apache.flink.api.java.DataSet;
 
 /**
- * Leightweight/Layouting-Graph. This way we do not need to drag around
- * a full Vertex through every operation.
+ * Lightweight/Layouting-Graph. This way we do not need to drag around
+ * a full {@link org.gradoop.flink.model.impl.epgm.LogicalGraph} through every operation.
  */
 public class LGraph {
   /**

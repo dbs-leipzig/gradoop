@@ -80,7 +80,7 @@ public class VertexFusor {
 
     edges = fixEdgeReferences(edges, fusions);
 
-    edges = edges.groupBy(LEdge.SOURCE_ID, LEdge.TARGET_ID).reduce((a, b) -> {
+    edges = edges.groupBy(LEdge.SOURCE_ID_POSITION, LEdge.TARGET_ID_POSITION).reduce((a, b) -> {
       a.addSubEdge(b.getId());
       a.addSubEdges(b.getSubEdges());
       return a;
@@ -114,8 +114,8 @@ public class VertexFusor {
    */
   protected DataSet<Tuple2<LVertex, LVertex>> generateFusionCandidates(
     DataSet<Tuple2<LVertex, Boolean>> classifiedVertices, DataSet<LEdge> edges) {
-    return edges.join(classifiedVertices).where(LEdge.SOURCE_ID).equalTo("0." + LVertex.ID)
-      .join(classifiedVertices).where("0." + LEdge.TARGET_ID).equalTo("0." + LVertex.ID)
+    return edges.join(classifiedVertices).where(LEdge.SOURCE_ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
+      .join(classifiedVertices).where("0." + LEdge.TARGET_ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
       .with(new CandidateGenerator(compareFunction, threshold)).groupBy("0.0")
       .reduce((a, b) -> (a.f2 > b.f2) ? a : b).map(c -> new Tuple2<>(c.f0, c.f1))
       .returns(new TypeHint<Tuple2<LVertex, LVertex>>() {
@@ -134,7 +134,7 @@ public class VertexFusor {
   protected DataSet<LVertex> findRemainingVertices(DataSet<Tuple2<LVertex, LVertex>> fusions,
     DataSet<LVertex> vertices, DataSet<LVertex> superVertices) {
     DataSet<LVertex> remainingVertices =
-      vertices.leftOuterJoin(superVertices).where(LVertex.ID).equalTo(LVertex.ID)
+      vertices.leftOuterJoin(superVertices).where(LVertex.ID_POSITION).equalTo(LVertex.ID_POSITION)
         .with(new FlatJoinFunction<LVertex, LVertex, LVertex>() {
           @Override
           public void join(LVertex lVertex, LVertex lVertex2, Collector<LVertex> collector) {
@@ -145,7 +145,7 @@ public class VertexFusor {
         });
 
     remainingVertices =
-      remainingVertices.leftOuterJoin(fusions).where(LVertex.ID).equalTo("0." + LVertex.ID)
+      remainingVertices.leftOuterJoin(fusions).where(LVertex.ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
         .with(new FlatJoinFunction<LVertex, Tuple2<LVertex, LVertex>, LVertex>() {
           @Override
           public void join(LVertex lVertex, Tuple2<LVertex, LVertex> lVertexLVertexDoubleTuple3,
@@ -168,7 +168,7 @@ public class VertexFusor {
    */
   protected DataSet<LEdge> fixEdgeReferences(DataSet<LEdge> edges,
     DataSet<Tuple2<LVertex, LVertex>> fusions) {
-    edges = edges.leftOuterJoin(fusions).where(LEdge.SOURCE_ID).equalTo("0." + LVertex.ID)
+    edges = edges.leftOuterJoin(fusions).where(LEdge.SOURCE_ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
       .with(new JoinFunction<LEdge, Tuple2<LVertex, LVertex>, LEdge>() {
         @Override
         public LEdge join(LEdge lEdge, Tuple2<LVertex, LVertex> lVertexLVertexDoubleTuple3) {
@@ -179,7 +179,7 @@ public class VertexFusor {
         }
       });
 
-    edges = edges.leftOuterJoin(fusions).where(LEdge.TARGET_ID).equalTo("0." + LVertex.ID)
+    edges = edges.leftOuterJoin(fusions).where(LEdge.TARGET_ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
       .with(new JoinFunction<LEdge, Tuple2<LVertex, LVertex>, LEdge>() {
         @Override
         public LEdge join(LEdge lEdge, Tuple2<LVertex, LVertex> lVertexLVertexDoubleTuple3) {

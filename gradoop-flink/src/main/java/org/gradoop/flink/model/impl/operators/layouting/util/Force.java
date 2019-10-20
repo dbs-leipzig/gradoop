@@ -26,7 +26,7 @@ public class Force extends Tuple2<GradoopId, Vector> {
   /**
    * Position of the ID-property in the tuple
    */
-  public static final int ID = 0;
+  public static final int ID_POSITION = 0;
 
 
   /**
