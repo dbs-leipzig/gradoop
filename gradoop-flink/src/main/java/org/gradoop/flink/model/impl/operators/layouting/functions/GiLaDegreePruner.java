@@ -96,17 +96,17 @@ public class GiLaDegreePruner {
   /**
    * Reinsert previously pruned Vertices into the graph. Place them near their neighbors.
    *
-   * @param g The pruned AND LAYOUTED! graph
+   * @param graph The pruned AND LAYOUTED! graph
    * @return g with vertices of degree 1 reinserted
    */
-  public LogicalGraph reinsert(LogicalGraph g) {
-    DataSet<EPGMVertex> vertices = g.getVertices();
-    DataSet<EPGMEdge> edges = g.getEdges();
+  public LogicalGraph reinsert(LogicalGraph graph) {
+    DataSet<EPGMVertex> vertices = graph.getVertices();
+    DataSet<EPGMEdge> edges = graph.getEdges();
 
     vertices = annotateShortestEdge(vertices, edges);
     prunedVertices = positionPrunedVertices(vertices);
 
-    return g.getFactory().fromDataSets(vertices.union(prunedVertices), originalEdges);
+    return graph.getFactory().fromDataSets(vertices.union(prunedVertices), originalEdges);
   }
 
   /**

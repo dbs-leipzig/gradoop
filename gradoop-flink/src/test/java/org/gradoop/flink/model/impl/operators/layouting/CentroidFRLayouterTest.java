@@ -56,7 +56,10 @@ public class CentroidFRLayouterTest extends LayoutingAlgorithmTest {
 
     FRRepulsionFunction rf = new FRRepulsionFunction(10);
     CentroidFRLayouter.RepulsionForceMapper calc =
-      new CentroidFRLayouter.RepulsionForceMapper(rf, centroids, center);
+      new CentroidFRLayouter.RepulsionForceMapper(rf);
+    // manually set centroids and center, as we do not call open() like Flink would
+    calc.centroids = centroids;
+    calc.center = center;
 
     LVertex vertex = new LVertex(GradoopId.get(), new Vector(1, 1));
 
@@ -77,7 +80,8 @@ public class CentroidFRLayouterTest extends LayoutingAlgorithmTest {
     centroids.add(new CentroidFRLayouter.Centroid(new Vector(3, 3), 0));
     centroids.add(new CentroidFRLayouter.Centroid(new Vector(7, 7), 0));
     CentroidFRLayouter.CentroidUpdater upd =
-      new CentroidFRLayouter.CentroidUpdater(1000, centroids);
+      new CentroidFRLayouter.CentroidUpdater(1000);
+      upd.centroids = centroids;
 
     //test map() (map vertex to closest centroid)
     LVertex vertex = new LVertex(GradoopId.get(), new Vector(4, 4));

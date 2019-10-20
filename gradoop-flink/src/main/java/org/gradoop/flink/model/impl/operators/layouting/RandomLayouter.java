@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * LayoutingAlgorithm that positions all vertices randomly
@@ -47,7 +48,7 @@ public class RandomLayouter implements LayoutingAlgorithm, MapFunction<EPGMVerte
   /**
    * Rng to use for coordinate-generation
    */
-  private Random rng;
+  private ThreadLocalRandom rng;
 
   /**
    * Create a new RandomLayouter
@@ -68,7 +69,7 @@ public class RandomLayouter implements LayoutingAlgorithm, MapFunction<EPGMVerte
   @Override
   public LogicalGraph execute(LogicalGraph g) {
     if (rng == null) {
-      rng = new Random();
+      rng = ThreadLocalRandom.current();
     }
     DataSet<EPGMVertex> placed = g.getVertices().map(this);
     return g.getFactory().fromDataSets(placed, g.getEdges());

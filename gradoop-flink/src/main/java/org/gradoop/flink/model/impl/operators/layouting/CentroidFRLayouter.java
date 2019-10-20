@@ -28,6 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
 import org.gradoop.flink.model.impl.operators.layouting.util.GraphElement;
@@ -36,11 +37,14 @@ import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 
+
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * Layout a graph using approximate repulsive forces calculated using centroids.
+ * Layout a graph using approximate repulsive forces calculated using centroids as described
+ * <a href="https://www.researchgate.net/publication/281348264_Distributed_Graph_Layout_with_Spark">
+ *   here</a>
  * Very fast, even for large inputs.
  */
 public class CentroidFRLayouter extends FRLayouter {
@@ -48,30 +52,31 @@ public class CentroidFRLayouter extends FRLayouter {
   /**
    * Fraction of all vertices a centroid should minimally have
    */
-  protected static final double MIN_MASS_FACTOR = 0.0025d;
+  private static final double MIN_MASS_FACTOR = 0.0025d;
   /**
    * Fraction of all vertices a centroid should maximally have
    */
-  protected static final double MAX_MASS_FACTOR = 0.05d;
+  private static final double MAX_MASS_FACTOR = 0.05d;
   /**
    * Name for the Centroid BroadcastSet
    */
-  protected static final String CENTROID_BROADCAST_NAME = "centroids";
+  private static final String CENTROID_BROADCAST_NAME = "centroids";
   /**
    * Name for the Center BroadcastSet
    */
-  protected static final String CENTER_BROADCAST_NAME = "center";
+  private static final String CENTER_BROADCAST_NAME = "center";
   /**
    * DataSet containing the current centroids
    */
-  protected DataSet<Centroid> centroids;
+  private DataSet<Centroid> centroids;
   /**
    * DataSet containing the current graph-center
    */
-  protected DataSet<Vector> center;
+  private DataSet<Vector> center;
 
   /**
    * Create new CentroidFRLayouter
+   *
    * @param iterations Number of iterations to perform
    * @param vertexCount Approximate number of vertices in the input-graph
    */
@@ -87,8 +92,8 @@ public class CentroidFRLayouter extends FRLayouter {
     DataSet<EPGMVertex> gradoopVertices = g.getVertices();
     DataSet<EPGMEdge> gradoopEdges = g.getEdges();
 
-    DataSet<LVertex> vertices = gradoopVertices.map((v) -> new LVertex(v));
-    DataSet<LEdge> edges = gradoopEdges.map((e) -> new LEdge(e));
+    DataSet<LVertex> vertices = gradoopVertices.map(LVertex::new);
+    DataSet<LEdge> edges = gradoopEdges.map(LEdge::new);
 
     centroids = chooseInitialCentroids(vertices);
 
@@ -115,7 +120,7 @@ public class CentroidFRLayouter extends FRLayouter {
 
     vertices = graphElements.filter(x -> x instanceof LVertex).map(x -> (LVertex) x);
 
-    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID).equalTo("id")
+    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID).equalTo(new Id<>())
       .with(new JoinFunction<LVertex, EPGMVertex, EPGMVertex>() {
         @Override
         public EPGMVertex join(LVertex lVertex, EPGMVertex vertex) throws Exception {
@@ -131,8 +136,7 @@ public class CentroidFRLayouter extends FRLayouter {
   original FR */
   @Override
   protected DataSet<Force> repulsionForces(DataSet<LVertex> vertices) {
-    FRRepulsionFunction rf = new FRRepulsionFunction(getK());
-    return vertices.map(new RepulsionForceMapper(rf))
+    return vertices.map(new RepulsionForceMapper( new FRRepulsionFunction(getK())))
       .withBroadcastSet(centroids, CENTROID_BROADCAST_NAME)
       .withBroadcastSet(center, CENTER_BROADCAST_NAME);
   }
@@ -165,12 +169,14 @@ public class CentroidFRLayouter extends FRLayouter {
   protected DataSet<Centroid> calculateNewCentroids(DataSet<Centroid> centroids,
     DataSet<LVertex> vertices) {
 
-    CentroidUpdater upd = new CentroidUpdater(numberOfVertices);
+    CentroidUpdater updater = new CentroidUpdater(numberOfVertices);
 
-    centroids = centroids.flatMap(upd::removeOrSplitCentroids);
+    centroids = centroids.flatMap(updater::removeOrSplitCentroids);
 
-    return vertices.map(upd).withBroadcastSet(centroids, CENTROID_BROADCAST_NAME).groupBy(Force.ID)
-      .reduceGroup(upd::calculateNewCentroidPosition);
+    return vertices.map(updater)
+      .withBroadcastSet(centroids, CENTROID_BROADCAST_NAME)
+      .groupBy(Force.ID)
+      .reduceGroup(updater::calculateNewCentroidPosition);
   }
 
   /**
@@ -189,7 +195,7 @@ public class CentroidFRLayouter extends FRLayouter {
    * @param vertices Input vertices
    * @return average position
    */
-  protected static DataSet<Vector> averagePosition(DataSet<LVertex> vertices) {
+  static DataSet<Vector> averagePosition(DataSet<LVertex> vertices) {
     // combine local partition to make following reduce more efficient
     return vertices.combineGroup(new GroupCombineFunction<LVertex, Tuple2<Vector, Integer>>() {
       @Override
@@ -227,7 +233,15 @@ public class CentroidFRLayouter extends FRLayouter {
     /**
      * For object-reuse
      */
-    protected LVertex centroidVertex = new LVertex();
+    private LVertex centroidVertex = new LVertex();
+    /**
+     * For object-reuse
+     */
+    private Vector forceSumVect = new Vector();
+    /**
+     * For object-reuse
+     */
+    private Force  sumForce = new Force();
     /**
      * The function to use for the calculation of the repulsion-force
      */
@@ -242,20 +256,6 @@ public class CentroidFRLayouter extends FRLayouter {
       this.rf = rf;
     }
 
-    /**
-     * Constructor FOR TESTING! Provide centroids and center manually.
-     *
-     * @param rf        Repulsion function
-     * @param centroids Centroids to use
-     * @param center    Center of graph
-     */
-    public RepulsionForceMapper(FRRepulsionFunction rf, List<Centroid> centroids,
-      List<Vector> center) {
-      this.rf = rf;
-      this.centroids = centroids;
-      this.center = center;
-      centroidVertex.setId(GradoopId.get());
-    }
 
     @Override
     public void open(Configuration parameters) throws Exception {
@@ -267,15 +267,16 @@ public class CentroidFRLayouter extends FRLayouter {
 
     @Override
     public Force map(LVertex vertex) {
-      Vector forceSum = new Vector();
+      forceSumVect.reset();
       for (Centroid c : centroids) {
         centroidVertex.setId(c.getId());
         centroidVertex.setPosition(c.getPosition().copy());
-        forceSum.mAdd(rf.join(vertex, centroidVertex).getValue());
+        forceSumVect.mAdd(rf.join(vertex, centroidVertex).getValue());
       }
       centroidVertex.setPosition(center.get(0));
-      forceSum.mAdd(rf.join(vertex, centroidVertex).getValue());
-      return new Force(vertex.getId(), forceSum);
+      forceSumVect.mAdd(rf.join(vertex, centroidVertex).getValue());
+      sumForce.set(vertex.getId(), forceSumVect);
+      return sumForce;
     }
   }
 
@@ -287,7 +288,7 @@ public class CentroidFRLayouter extends FRLayouter {
     /**
      * Number of vertices in the graph
      */
-    protected int vertexCount;
+    private int vertexCount;
     /**
      * List of current centroids. Usually populated using broadcastVariables, but can be
      * populated manually for testing. Used for getClosestCentroidForVertex()
@@ -303,16 +304,6 @@ public class CentroidFRLayouter extends FRLayouter {
       this.vertexCount = vertexCount;
     }
 
-    /**
-     * Constructor FOR TESTING! Provide centroids manually (without broadcastVariable)
-     *
-     * @param vertexCount Number of vertices in the graph
-     * @param centroids   List of current centroids
-     */
-    public CentroidUpdater(int vertexCount, List<Centroid> centroids) {
-      this.vertexCount = vertexCount;
-      this.centroids = centroids;
-    }
 
     @Override
     public void open(Configuration parameters) throws Exception {
@@ -359,9 +350,13 @@ public class CentroidFRLayouter extends FRLayouter {
      */
     public Force map(LVertex vertex) {
 
+      if (centroids == null){
+        throw new IllegalStateException("DataSet of centroids MUST be broadcasted to this class");
+      }
+
       if (centroids.size() == 0) {
         throw new IllegalStateException(
-          "There are no centroids (left). This should " + "NEVER happen. Layouting failed...");
+          "There are no centroids (left). This should NEVER happen. Layouting failed...");
       }
 
       Force best = new Force();
@@ -374,23 +369,30 @@ public class CentroidFRLayouter extends FRLayouter {
         }
       }
       if (best.getId() == null) {
-        throw new IllegalStateException("Ooops. This should never have happened...");
+        throw new IllegalStateException("There is no closest centroid. This means there " +
+          "is a bug in this implementation, probably a NaN occured " +
+          "during distance calculation.");
       }
       return best;
     }
 
     /**
      * Expects the group of vertex-positions for a centroid. Calculates the new position of the
-     * centroid as average ov the vertex-positions
+     * centroid as average of the vertex-positions.
      *
-     * @param iterable  Force-objects (id=centroidid, value=the position of the vertex)
+     * forceObjects does not really contain "forces", but it has the fields needed herre (id and
+     * vector). The id of the force object represents the id of the centroid of which the new
+     * position is calculated and the
+     * force-vector is the position of a vertex belonging to the centroid.
+     *
+     * @param forceObjects  List of vertex positions, wrapped in Force-objects.
      * @param collector The newly created centoid
      */
-    public void calculateNewCentroidPosition(Iterable<Force> iterable,
+    public void calculateNewCentroidPosition(Iterable<Force> forceObjects,
       Collector<Centroid> collector) {
       int count = 0;
       Vector posSum = new Vector();
-      for (Force f : iterable) {
+      for (Force f : forceObjects) {
         count++;
         posSum.mAdd(f.getValue());
       }

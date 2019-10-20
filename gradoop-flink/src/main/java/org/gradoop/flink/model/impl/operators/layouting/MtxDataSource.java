@@ -26,13 +26,14 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
 /**
- * An importer for the matrix-marked format (.mtx)
- * https://math.nist.gov/MatrixMarket/formats.html
+ * An importer for the
+ * <a href="https://math.nist.gov/MatrixMarket/formats.html">matrix-marked format</a> (.mtx)
  */
 public class MtxDataSource implements DataSource {
 
@@ -67,10 +68,10 @@ public class MtxDataSource implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     DataSet<EPGMVertex> vertices = cfg.getExecutionEnvironment().readTextFile(path)
-      .flatMap(new VertexMapper(cfg.getLogicalGraphFactory().getVertexFactory())).distinct("id");
+      .flatMap(new MtxVertexToVertex(cfg.getLogicalGraphFactory().getVertexFactory())).distinct(new Id<>());
 
     DataSet<EPGMEdge> edges = cfg.getExecutionEnvironment().readTextFile(path)
-      .flatMap(new EdgeMapper(cfg.getLogicalGraphFactory().getEdgeFactory()));
+      .flatMap(new MtxEdgeToEdge(cfg.getLogicalGraphFactory().getEdgeFactory()));
 
     if (!skipPreprocessing) {
       edges = edges.filter((e) -> !e.getSourceId().equals(e.getTargetId()));
@@ -124,7 +125,7 @@ public class MtxDataSource implements DataSource {
   /**
    * Maps mtx-edges to gradoop edges
    */
-  private static class EdgeMapper implements FlatMapFunction<String, EPGMEdge> {
+  private static class MtxEdgeToEdge implements FlatMapFunction<String, EPGMEdge> {
     /** The EPGMEdgeFactory<Edge> to use for creating Edges */
     private EdgeFactory<EPGMEdge> edgeFactory;
 
@@ -132,7 +133,7 @@ public class MtxDataSource implements DataSource {
      * Create new EdgeMapper
      * @param edgeFactory The EPGMEdgeFactory<Edge> to use for creating Edges
      */
-    EdgeMapper(EdgeFactory<EPGMEdge> edgeFactory) {
+    MtxEdgeToEdge(EdgeFactory<EPGMEdge> edgeFactory) {
       this.edgeFactory = edgeFactory;
     }
 
@@ -149,7 +150,7 @@ public class MtxDataSource implements DataSource {
   /**
    * Maps mtx-vertices to vertices
    */
-  private static class VertexMapper implements FlatMapFunction<String, EPGMVertex> {
+  private static class MtxVertexToVertex implements FlatMapFunction<String, EPGMVertex> {
     /** The EPGMVertexFactory<Vertex> to use for creating vertices */
     private VertexFactory<EPGMVertex> vertexFactory;
 
@@ -157,7 +158,7 @@ public class MtxDataSource implements DataSource {
      * Create new VertexMapper
      * @param vertexFactory The EPGMVertexFactory<Vertex> to use for creating vertices
      */
-    VertexMapper(VertexFactory<EPGMVertex> vertexFactory) {
+    MtxVertexToVertex(VertexFactory<EPGMVertex> vertexFactory) {
       this.vertexFactory = vertexFactory;
     }
 

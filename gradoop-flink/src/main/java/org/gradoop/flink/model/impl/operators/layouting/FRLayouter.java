@@ -79,7 +79,7 @@ public class FRLayouter implements LayoutingAlgorithm {
   /**
    * Perform the layouting as if this number of iterations had already passed
    */
-  protected int startAtIteration = 0;
+  private int startAtIteration = 0;
 
 
   /**
@@ -225,16 +225,14 @@ public class FRLayouter implements LayoutingAlgorithm {
     if (useExistingLayout) {
       return g;
     }
-    RandomLayouter rl =
-      new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,
-        getHeight() - (getHeight() / 10));
-    return rl.execute(g);
+    return new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,
+        getHeight() - (getHeight() / 10)).execute(g);
   }
 
   /**
    * Perform the actual layouting (calculate and apply forces)
    *
-   * @param g The Graph to layout. Is modified by the method.
+   * @param g The Graph to layout. It is modified by this method.
    */
   protected void layout(LGraph g) {
     DataSet<Force> repulsions = repulsionForces(g.getVertices());

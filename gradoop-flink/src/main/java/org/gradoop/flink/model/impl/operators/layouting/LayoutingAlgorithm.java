@@ -19,7 +19,8 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
- * Base-class for all Layouters
+ * Interface for all Layouters. A LayoutAlgorithm layouts a graph (assignes a position in 2D-space
+ * to each vertex in a graph).
  */
 public interface LayoutingAlgorithm extends UnaryGraphToGraphOperator {
 
@@ -46,13 +47,13 @@ public interface LayoutingAlgorithm extends UnaryGraphToGraphOperator {
 
   /**
    * Layouts the given graph. After layouting all vertices will have two new properties:
-   * X: the assigned x-coordinate
-   * Y: the assigned y-coordinate
+   * X: the assigned x-coordinate <br>
+   * Y: the assigned y-coordinate <br>
    *
-   * @param g The graph to layout
+   * @param inputGraph The graph to layout
    * @return The input-graph, but every vertex now has X and Y coordinates as properties
    */
-  LogicalGraph execute(LogicalGraph g);
+  LogicalGraph execute(LogicalGraph inputGraph);
 
   /**
    * The width of the layout-area for this layouter

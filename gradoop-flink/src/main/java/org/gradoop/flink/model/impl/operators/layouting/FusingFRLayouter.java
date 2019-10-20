@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.layouting;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -24,6 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.layouting.functions.DefaultVertexCompareFunction;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRForceApplicator;
 import org.gradoop.flink.model.impl.operators.layouting.functions.VertexCompareFunction;
@@ -36,6 +38,8 @@ import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * A special variant of the FRLayouter that combines similar vertices during the layouting,
@@ -77,12 +81,11 @@ public class FusingFRLayouter extends FRLayouter {
   public static final String VERTEX_SIZE_PROPERTY = "SIZE";
   /**
    * The name of the property where the ids of the sub-vertices (or sub-edges) of a
-   * supervertex/superedge
-   * are stored.
+   * supervertex/superedge are stored.
    */
   public static final String SUB_ELEMENTS_PROPERTY = "SUBELEMENTS";
   /**
-   * Iterations used for the after-fusing layouting. (If OutputFormat.POSTLAYOUT is used.)
+   * Iterations used for the after-fusing layouting. (If {@link OutputFormat#POSTLAYOUT} is used.)
    */
   private static final int POST_ITERATIONS = 10;
   /**
@@ -105,21 +108,24 @@ public class FusingFRLayouter extends FRLayouter {
   /**
    * Create new FusingFRLayouter
    *
-   * @param iterations  Number of iterations to perform
-   * @param vertexCount Number of vertices in the input-graph (used to compute default-values)
-   * @param threshold   nly vertices with a similarity of at least threshold are combined. Lower
-   *                    values will lead to a more simplified output-graph. Valid values are >= 0
-   *                    and <= 1
-   * @param of          Chosen OutputFormat. See {@link OutputFormat}
+   * @param iterations   Number of iterations to perform
+   * @param vertexCount  Number of vertices in the input-graph (used to compute default-values)
+   * @param threshold    Only vertices with a similarity of at least threshold are combined. Lower
+   *                     values will lead to a more simplified output-graph. Valid values are {@code
+   *                     >= 0 }
+   *                     and {@code <= 1 }.
+   * @param outputFormat Chosen OutputFormat. See {@link OutputFormat}
    */
-  public FusingFRLayouter(int iterations, int vertexCount, double threshold, OutputFormat of) {
+  public FusingFRLayouter(int iterations, int vertexCount, double threshold,
+    OutputFormat outputFormat) {
     super(iterations, vertexCount);
-    this.threshold = threshold;
-    this.outputFormat = of;
 
     if (threshold < 0 || threshold > 1) {
       throw new IllegalArgumentException("Threshold must be between 0 and 1");
     }
+
+    this.threshold = threshold;
+    this.outputFormat = outputFormat;
   }
 
   /**
@@ -127,7 +133,7 @@ public class FusingFRLayouter extends FRLayouter {
    * DefaultVertexCompareFunction will be used.
    *
    * @param compareFunction the new value
-   * @return this (for method-chaining)
+   * @return this layouter
    */
   public FusingFRLayouter compareFunction(VertexCompareFunction compareFunction) {
     this.compareFunction = compareFunction;
@@ -171,8 +177,7 @@ public class FusingFRLayouter extends FRLayouter {
     layout(graph);
 
     // Use the VertexFusor to create a simplified version of the graph
-    VertexFusor vf = new VertexFusor(getCompareFunction(), threshold);
-    graph = vf.execute(graph);
+    graph = new VertexFusor(getCompareFunction(), threshold).execute(graph);
 
     // again, combine vertices and edges into a single dataset to perform iterations
     graphElements = graph.getGraphElements();
@@ -192,7 +197,7 @@ public class FusingFRLayouter extends FRLayouter {
     case POSTLAYOUT:
       return buildPostLayoutGraph(g, graph);
     default:
-      return null;
+      throw new IllegalArgumentException("Unsupported output-format");
     }
 
   }
@@ -249,7 +254,7 @@ public class FusingFRLayouter extends FRLayouter {
   }
 
   /**
-   * Simply translate the internal representations into GRadoop-types
+   * Simply translate the internal representations back to {@link LogicalGraph}.
    *
    * @param input    Original input graph
    * @param layouted Result of the layouting
@@ -257,7 +262,7 @@ public class FusingFRLayouter extends FRLayouter {
    */
   protected LogicalGraph buildSimplifiedGraph(LogicalGraph input, LGraph layouted) {
     DataSet<EPGMVertex> vertices = layouted.getVertices().map((lv) -> {
-      EPGMVertex v = new EPGMVertex(lv.getId(), "vertex", new Properties(), null);
+      EPGMVertex v = new EPGMVertex(lv.getId(), "vertex", Properties.create(), null);
       lv.getPosition().setVertexPosition(v);
       v.setProperty(VERTEX_SIZE_PROPERTY, lv.getCount());
       v.setProperty(SUB_ELEMENTS_PROPERTY, getSubelementListValue(lv.getSubVertices()));
@@ -266,7 +271,7 @@ public class FusingFRLayouter extends FRLayouter {
 
     DataSet<EPGMEdge> edges = layouted.getEdges().map((le) -> {
       EPGMEdge e =
-        new EPGMEdge(le.getId(), "edge", le.getSourceId(), le.getTargetId(), new Properties(), null);
+        new EPGMEdge(le.getId(), "edge", le.getSourceId(), le.getTargetId(), Properties.create(), null);
       e.setProperty(VERTEX_SIZE_PROPERTY, le.getCount());
       e.setProperty(SUB_ELEMENTS_PROPERTY, getSubelementListValue(le.getSubEdges()));
       return e;
@@ -304,8 +309,8 @@ public class FusingFRLayouter extends FRLayouter {
         }
         superv.setSubVertices(null);
         collector.collect(superv);
-      }).returns(new TypeHint<LVertex>() {
-      }).join(input.getVertices()).where(LVertex.ID).equalTo("id").with((lv, v) -> {
+      }).returns(TypeInformation.of(LVertex.class)).join(input.getVertices()).where(LVertex.ID)
+        .equalTo(new Id<>()).with((lv, v) -> {
         lv.getPosition().setVertexPosition(v);
         return v;
       });
@@ -320,10 +325,11 @@ public class FusingFRLayouter extends FRLayouter {
    * @return Randomly modified position
    */
   protected static Vector jitterPosition(Vector center, double jitter) {
+    ThreadLocalRandom rng = ThreadLocalRandom.current();
     Vector offset = new Vector();
     while (true) {
-      double x = (Math.random() * jitter) - (jitter / 2.0);
-      double y = (Math.random() * jitter) - (jitter / 2.0);
+      double x = (rng.nextDouble(1) * jitter) - (jitter / 2.0);
+      double y = (rng.nextDouble(1) * jitter) - (jitter / 2.0);
       offset.set(x, y);
       if (offset.magnitude() <= jitter) {
         break;
@@ -347,15 +353,7 @@ public class FusingFRLayouter extends FRLayouter {
    * @return A comma seperated string of ids
    */
   protected static String getSubelementListValue(List<GradoopId> ids) {
-    StringBuilder sb = new StringBuilder();
-    for (GradoopId id : ids) {
-      sb.append(id.toString());
-      sb.append(",");
-    }
-    if (sb.length() > 0) {
-      sb.deleteCharAt(sb.length() - 1);
-    }
-    return sb.toString();
+    return ids.stream().map(GradoopId::toString).collect(Collectors.joining(","));
   }
 
   @Override

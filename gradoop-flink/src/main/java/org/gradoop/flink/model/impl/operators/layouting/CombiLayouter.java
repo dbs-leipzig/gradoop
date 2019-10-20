@@ -40,14 +40,15 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * The CentroidFRLayouter that is being used
    */
-  private CentroidFRLayouter layouter1;
+  private CentroidFRLayouter centroidFRLayouter;
   /**
    * The FRLayouter that is being used
    */
-  private FRLayouter layouter2;
+  private FRLayouter fRLayouter;
 
   /**
-   * Create a new CombiLayouter
+   * Create a new CombiLayouter.
+   *
    * @param iterations Number of iterations to perform
    * @param numVertices Approximate number of vertices in the input-graph
    * @param quality Ratio of iterations between the two base algorithms. The higher the value,
@@ -63,11 +64,12 @@ public class CombiLayouter implements LayoutingAlgorithm {
     int l2iterations = (int) Math.ceil(iterations * quality);
 
     if (l1iterations > 0) {
-      layouter1 = new CentroidFRLayouter(l1iterations, numVertices);
-      layouter1.k(layouter1.getK() * K_FACTOR);
+      centroidFRLayouter = new CentroidFRLayouter(l1iterations, numVertices);
+      centroidFRLayouter.k(centroidFRLayouter.getK() * K_FACTOR);
     }
     if (l2iterations > 0) {
-      layouter2 = new FRLayouter(l2iterations, numVertices).useExistingLayout(layouter1 != null)
+      fRLayouter = new FRLayouter(l2iterations, numVertices).useExistingLayout(
+        centroidFRLayouter != null)
         .startAtIteration(l1iterations);
     }
   }
@@ -75,31 +77,31 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * Set the FRLayouter parameter k for both algorithms, overwriting the default value
    * @param k The new value
-   * @return this (for method chaining)
+   * @return this layouter
    */
   public CombiLayouter k(double k) {
-    if (layouter1 != null) {
-      layouter1.k(k * K_FACTOR);
+    if (centroidFRLayouter != null) {
+      centroidFRLayouter.k(k * K_FACTOR);
     }
-    if (layouter2 != null) {
-      layouter2.k(k);
+    if (fRLayouter != null) {
+      fRLayouter.k(k);
     }
     return this;
   }
 
   /**
    * Override default layout-space size
-   * Default:  width = height = Math.sqrt(Math.pow(k, 2) * numberOfVertices) * 0.5
+   * Default:  {@code width = height = Math.sqrt(Math.pow(k, 2) * numberOfVertices) * 0.5}
    *
    * @param width  new width
    * @param height new height
-   * @return this (for method-chaining)
+   * @return this layouter
    */
   public CombiLayouter area(int width, int height) {
-    if (layouter1 != null) {
-      layouter1.area(width, height);
-      if (layouter2 != null) {
-        layouter2.area(width, height);
+    if (centroidFRLayouter != null) {
+      centroidFRLayouter.area(width, height);
+      if (fRLayouter != null) {
+        fRLayouter.area(width, height);
       }
     }
     return this;
@@ -108,16 +110,16 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * Override default maxRepulsionDistance of the FR-Algorithm. Vertices with larger distance
    * are ignored in repulsion-force calculation
-   * Default-Value is relative to current k. If k is overriden, this is changed
+   * Default-Value is relative to current {@code k}. If {@code k} is overriden, this is changed
    * accordingly automatically
    * Default: 2k
    *
    * @param maxRepulsionDistance new value
-   * @return this (for method-chaining)
+   * @return this layouter
    */
   public CombiLayouter maxRepulsionDistance(int maxRepulsionDistance) {
-    if (layouter2 != null) {
-      layouter2.maxRepulsionDistance(maxRepulsionDistance);
+    if (fRLayouter != null) {
+      fRLayouter.maxRepulsionDistance(maxRepulsionDistance);
     }
     return this;
   }
@@ -125,28 +127,30 @@ public class CombiLayouter implements LayoutingAlgorithm {
   /**
    * Use the existing layout as starting point instead of creating a random one.
    * If used, EVERY vertex in the input-graph MUST have an X and Y property!
-   * @param uel whether to re-use the existing layout or not
-   * @return this (for method chaining)
+   * @param useExisting whether to re-use the existing layout or not
+   * @return this layouter
    */
-  public CombiLayouter useExistingLayout(boolean uel) {
-    if (layouter1 != null) {
-      layouter1.useExistingLayout(uel);
+  public CombiLayouter useExistingLayout(boolean useExisting) {
+    if (centroidFRLayouter != null) {
+      centroidFRLayouter.useExistingLayout(useExisting);
     } else {
-      layouter2.useExistingLayout(uel);
+      fRLayouter.useExistingLayout(useExisting);
     }
     return this;
   }
 
   /**
-   * Gets k
+   * Gets k. K is the distance in which the attracting and repulsive forces between two connected
+   * vertices are equally strong. The value of k influences the scale of the final graph-layout.
+   * (A small k leads to vertices being closer together)
    *
    * @return value of k
    */
   public double getK() {
-    if (layouter2 != null) {
-      return layouter2.getK();
+    if (fRLayouter != null) {
+      return fRLayouter.getK();
     } else {
-      return layouter1.getK() / K_FACTOR;
+      return centroidFRLayouter.getK() / K_FACTOR;
     }
   }
 
@@ -156,38 +160,38 @@ public class CombiLayouter implements LayoutingAlgorithm {
    * @return value of maxRepulsionDistance
    */
   public int getMaxRepulsionDistance() {
-    if (layouter2 == null) {
+    if (fRLayouter == null) {
       return -1;
     }
-    return layouter2.getMaxRepulsionDistance();
+    return fRLayouter.getMaxRepulsionDistance();
   }
 
   @Override
   public LogicalGraph execute(LogicalGraph g) {
-    if (layouter1 != null) {
-      g = layouter1.execute(g);
+    if (centroidFRLayouter != null) {
+      g = centroidFRLayouter.execute(g);
     }
-    if (layouter2 != null) {
-      g = layouter2.execute(g);
+    if (fRLayouter != null) {
+      g = fRLayouter.execute(g);
     }
     return g;
   }
 
   @Override
   public int getWidth() {
-    if (layouter2 != null) {
-      return layouter2.getWidth();
+    if (fRLayouter != null) {
+      return fRLayouter.getWidth();
     } else {
-      return layouter1.getWidth();
+      return centroidFRLayouter.getWidth();
     }
   }
 
   @Override
   public int getHeight() {
-    if (layouter2 != null) {
-      return layouter2.getHeight();
+    if (fRLayouter != null) {
+      return fRLayouter.getHeight();
     } else {
-      return layouter1.getHeight();
+      return centroidFRLayouter.getHeight();
     }
   }
 

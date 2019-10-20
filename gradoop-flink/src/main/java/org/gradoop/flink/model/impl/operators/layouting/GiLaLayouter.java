@@ -48,8 +48,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Implementation of the GiLa-Layouting-Algorithm.
- * Good for sparsely-connected graphs. Really slow for dense graphs.
+ * Implementation of the <a href="https://www.researchgate
+ * .net/publication/303840520_A_Distributed_Force
+ * -Directed_Algorithm_on_Giraph_Design_and_Experiments">GiLa-Layouting-Algorithm</a>.
  */
 public class GiLaLayouter extends
   GradoopGellyAlgorithm<GiLaLayouter.VertexValue, NullValue> implements LayoutingAlgorithm {
@@ -163,10 +164,8 @@ public class GiLaLayouter extends
         iterations);
 
     // random start-layout
-    RandomLayouter rl =
-      new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,
-        getHeight() - (getHeight() / 10));
-    graph = rl.execute(graph);
+    graph = new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,
+      getHeight() - (getHeight() / 10)).execute(graph);
 
     // remove vertices of degree 1
     GiLaDegreePruner pruner = new GiLaDegreePruner();
@@ -385,6 +384,12 @@ public class GiLaLayouter extends
 
   /**
    * Represents a message transmitted between vertices. Just wraps Tuple4 for better readability.
+   * Tuple-Index: Value <br>
+   * 0: Initial Sender of the message <br>
+   * 1: Position of the sender <br>
+   * 2: TimeToLive of this message <br>
+   * 3: Id of the last vertex that retransmitted this message <br>
+   * 4: The weight of the vertex <br>
    */
   protected static class Message extends Tuple5<GradoopId, Vector, Integer, GradoopId, Integer> {
 
@@ -498,11 +503,7 @@ public class GiLaLayouter extends
       f4 = w;
     }
 
-    /**
-     * Create a copy of this message.
-     *
-     * @return A shallow copy of this message
-     */
+    @Override
     public Message copy() {
       return new Message(f0, f1, f2, f3, f4);
     }
@@ -510,11 +511,16 @@ public class GiLaLayouter extends
 
   /**
    * Represents the stored values for each vertex.
+   * Tuple-Index: Value <br>
+   * 0: Position of the vertex <br>
+   * 1: Current aggregated forces acting on this vertex <br>
+   * 2: List with sender-ids of recieved messages <br>
+   * 3: Amount of one-degree neighbors that were pruned from this vertex <br>
    */
   protected static class VertexValue extends Tuple4<Vector, Vector, HashSet<GradoopId>, Integer> {
 
     /**
-     * Construct ne vertex-value
+     * Construct a new instance ot this value type.
      *
      * @param v The gradoop-vertex to extract the position from
      */
