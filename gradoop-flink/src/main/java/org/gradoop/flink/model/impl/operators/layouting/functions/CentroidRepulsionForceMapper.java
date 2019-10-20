@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.layouting.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.layouting.CentroidFRLayouter;
+import org.gradoop.flink.model.impl.operators.layouting.util.Centroid;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 import org.gradoop.flink.model.impl.operators.layouting.util.Vector;

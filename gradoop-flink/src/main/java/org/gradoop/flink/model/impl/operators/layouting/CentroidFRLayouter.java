@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.layouting.functions.AverageVertexPositionsFunction;
-import org.gradoop.flink.model.impl.operators.layouting.functions.Centroid;
+import org.gradoop.flink.model.impl.operators.layouting.util.Centroid;
 import org.gradoop.flink.model.impl.operators.layouting.functions.CentroidRepulsionForceMapper;
 import org.gradoop.flink.model.impl.operators.layouting.functions.CentroidUpdater;
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;

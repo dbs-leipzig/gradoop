@@ -48,9 +48,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Implementation of the <a href="https://www.researchgate
- * .net/publication/303840520_A_Distributed_Force
- * -Directed_Algorithm_on_Giraph_Design_and_Experiments">GiLa-Layouting-Algorithm</a>.
+ * Implementation of the GiLa-Algorithm.
+ * https://www.researchgate.net/publication/
+ * 303840520_A_Distributed_Force-Directed_Algorithm_on_Giraph_Design_and_Experiments
  */
 public class GiLaLayouter extends
   GradoopGellyAlgorithm<GiLaLayouter.VertexValue, NullValue> implements LayoutingAlgorithm {

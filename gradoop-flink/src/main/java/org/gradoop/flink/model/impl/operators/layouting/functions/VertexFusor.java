@@ -93,7 +93,7 @@ public class VertexFusor {
    * Splits the vertices randomly into donor and acceptor-vertices (~50/50).
    *
    * @param vertices vertices to classify
-   * @return Tuple2<LVertex, Boolean>. If the boolean is true, the vertex is an acceptor
+   * @return {@code Tuple2<LVertex, Boolean>}. If the boolean is true, the vertex is an acceptor
    */
   protected DataSet<Tuple2<LVertex, Boolean>> chooseDonorsAndAcceptors(DataSet<LVertex> vertices) {
     final Random rng = new Random();
@@ -108,7 +108,8 @@ public class VertexFusor {
    *
    * @param classifiedVertices The vertices (split into donors and acceptors)
    * @param edges              The edges
-   * @return Tuple2<LVertex, LVertex> for each merge. f0 is the donor and f1 the acceptor for the
+   * @return {@code Tuple2<LVertex, LVertex>} for each merge. f0 is the donor and f1 the acceptor
+   * for the
    * merge.
    */
   protected DataSet<Tuple2<LVertex, LVertex>> generateFusionCandidates(
@@ -266,12 +267,11 @@ public class VertexFusor {
      *
      * @param iterable  The vertices to combine. f0 contains donor-vertices and f1 contains
      *                  (always the same) acceptor vertex.
-     * @param collector
-     * @throws Exception
+     * @param collector Collector for the resuls
      */
     @Override
     public void reduce(Iterable<Tuple2<LVertex, LVertex>> iterable,
-      Collector<LVertex> collector) throws Exception {
+      Collector<LVertex> collector) {
       int count = 0;
       Vector positionSum = new Vector();
       LVertex self = null;

@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.layouting.functions;
+package org.gradoop.flink.model.impl.operators.layouting.util;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.layouting.util.GraphElement;
-import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 
 import java.io.Serializable;
 

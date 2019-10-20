@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 public class SamplingFRLayouter extends FRLayouter {
 
   /**
-   * probability to choose a given vertex for repulsion calculations. >0 <1
+   * probability to choose a given vertex for repulsion calculations. {@code >0 <1 }
    */
   protected double samplingRate;
 
@@ -42,7 +42,7 @@ public class SamplingFRLayouter extends FRLayouter {
    *
    * @param iterations   Number of iterations to perform
    * @param vertexCount  (Estimated) number of vertices in the graph. Needed to calculate default
-   * @param samplingRate Factor >0 <1 to simplify repulsion-computation. Lower values are
+   * @param samplingRate Factor {@code >0 <1 } to simplify repulsion-computation. Lower values are
    *                     faster but less precise
    */
   public SamplingFRLayouter(int iterations, int vertexCount, double samplingRate) {

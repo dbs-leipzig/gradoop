@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.layouting.functions;
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.layouting.CentroidFRLayouter;
+import org.gradoop.flink.model.impl.operators.layouting.util.Centroid;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
