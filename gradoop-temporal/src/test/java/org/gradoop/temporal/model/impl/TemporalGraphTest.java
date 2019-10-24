@@ -101,7 +101,8 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   @Test
   public void testGetVerticesByLabel() throws Exception {
     List<TemporalVertex> temporalVertices = new ArrayList<>();
-    testGraph.getVerticesByLabel("Person").output(new LocalCollectionOutputFormat<>(temporalVertices));
+    testGraph.getVerticesByLabel("Person")
+      .output(new LocalCollectionOutputFormat<>(temporalVertices));
     getExecutionEnvironment().execute();
     assertEquals(6, temporalVertices.size());
     temporalVertices.forEach(v -> assertEquals("Person", v.getLabel()));

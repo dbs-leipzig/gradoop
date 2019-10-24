@@ -63,10 +63,10 @@ import java.io.IOException;
  *   <li>{@code transactionTime}: {@code (tx-from [ms], tx-to [ms])}</li>
  *   <li>{@code validTime}: {@code (val-from [ms], val-to [ms])}</li>
  * </ul>
- * <p>
+ *
  * Furthermore, a temporal graph provides operations that are performed on the underlying data.
  * These operations result in either another temporal graph or in a {@link TemporalGraphCollection}.
- * <p>
+ *
  * Analogous to a logical graph, a temporal graph is wrapping a layout which defines, how the graph
  * is represented in Apache Flink.<br>
  * Note that the {@link TemporalGraph} also implements that interface and just forwards the calls to
@@ -74,9 +74,8 @@ import java.io.IOException;
  *
  * @see TemporalGraphOperators
  */
-public class TemporalGraph implements
-  BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>,
-  TemporalGraphOperators {
+public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge,
+  TemporalGraph, TemporalGraphCollection>, TemporalGraphOperators {
 
   /**
    * Layout for that temporal graph.
@@ -106,13 +105,13 @@ public class TemporalGraph implements
 
   @Override
   public BaseGraphFactory<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
-    TemporalGraphCollection> getFactory() {
+      TemporalGraphCollection> getFactory() {
     return this.config.getTemporalGraphFactory();
   }
 
   @Override
   public BaseGraphCollectionFactory<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
-    TemporalGraphCollection> getCollectionFactory() {
+      TemporalGraphCollection> getCollectionFactory() {
     return this.config.getTemporalGraphCollectionFactory();
   }
 
@@ -129,7 +128,7 @@ public class TemporalGraph implements
   /**
    * Writes the graph to given data sink with an optional overwrite option.
    *
-   * @param dataSink  The data sink to which the graph should be written.
+   * @param dataSink The data sink to which the graph should be written.
    * @param overWrite determines whether existing files are overwritten
    * @throws IOException if the graph can't be written to the sink
    */
@@ -178,16 +177,18 @@ public class TemporalGraph implements
 
   @Override
   public DataSet<Boolean> equalsByElementData(TemporalGraph other) {
-    return callForValue(
-      new GraphEquality<>(new GraphHeadToEmptyString<>(), new TemporalVertexToDataString<>(),
-        new TemporalEdgeToDataString<>(), true), other);
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
   }
 
   @Override
   public DataSet<Boolean> equalsByData(TemporalGraph other) {
-    return callForValue(
-      new GraphEquality<>(new TemporalGraphHeadToDataString<>(), new TemporalVertexToDataString<>(),
-        new TemporalEdgeToDataString<>(), true), other);
+    return callForValue(new GraphEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
   }
 
   //----------------------------------------------------------------------------
@@ -201,7 +202,7 @@ public class TemporalGraph implements
 
   @Override
   public <T> T callForValue(BinaryBaseGraphToValueOperator<TemporalGraph, T> operator,
-    TemporalGraph otherGraph) {
+                            TemporalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -262,7 +263,7 @@ public class TemporalGraph implements
       new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
         edgeTimeExtractor));
 
-    return new TemporalGraphFactory(temporalGradoopConfig)
+    return temporalGradoopConfig.getTemporalGraphFactory()
       .fromDataSets(temporalGraphHeadDataSet, temporalVertexDataSet, temporalEdgeDataSet);
   }
 

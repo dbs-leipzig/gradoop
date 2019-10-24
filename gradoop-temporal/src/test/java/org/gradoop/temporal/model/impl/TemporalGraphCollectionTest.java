@@ -108,7 +108,9 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource.getTemporalGraphCollection().toGraphCollection()
+    collectAndAssertTrue(dataSource
+      .getTemporalGraphCollection()
+      .toGraphCollection()
       .equalsByGraphElementData(testTemporalCollection.toGraphCollection()));
   }
 
@@ -127,7 +129,9 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource.getTemporalGraphCollection().toGraphCollection()
+    collectAndAssertTrue(dataSource
+      .getTemporalGraphCollection()
+      .toGraphCollection()
       .equalsByGraphElementData(testTemporalCollection.toGraphCollection()));
   }
 
@@ -175,7 +179,8 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
   @Test
   public void testGetEdgesByLabel() throws Exception {
     List<TemporalEdge> temporalEdges = Lists.newArrayList();
-    testTemporalCollection.getEdgesByLabel("knows").output(new LocalCollectionOutputFormat<>(temporalEdges));
+    testTemporalCollection.getEdgesByLabel("knows")
+      .output(new LocalCollectionOutputFormat<>(temporalEdges));
     getExecutionEnvironment().execute();
     assertEquals(8, temporalEdges.size());
     temporalEdges.forEach(e -> assertEquals("knows", e.getLabel()));

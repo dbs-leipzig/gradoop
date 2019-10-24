@@ -73,10 +73,10 @@ import java.io.IOException;
  *
  * @see TemporalGraphCollectionOperators
  */
-public class TemporalGraphCollection implements
-  BaseGraphCollection<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
-    TemporalGraphCollection>,
-  GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>, TemporalGraphCollectionOperators {
+public class TemporalGraphCollection implements BaseGraphCollection<
+    TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>,
+  GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>,
+  TemporalGraphCollectionOperators {
 
   /**
    * Layout for this temporal graph collection.
@@ -94,7 +94,8 @@ public class TemporalGraphCollection implements
    * @param layout the temporal graph layout representing the temporal graph
    * @param config Temporal Gradoop config
    */
-  TemporalGraphCollection(GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout,
+  TemporalGraphCollection(
+    GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout,
     TemporalGradoopConfig config) {
     this.layout = Preconditions.checkNotNull(layout);
     this.config = Preconditions.checkNotNull(config);
@@ -130,7 +131,7 @@ public class TemporalGraphCollection implements
   /**
    * Writes the graph collection to the given data sink with an optional overwrite option.
    *
-   * @param dataSink  The data sink to which the graph collection should be written.
+   * @param dataSink The data sink to which the graph collection should be written.
    * @param overWrite determines whether existing files are overwritten
    * @throws IOException if the collection can't be written to the sink
    */
@@ -190,16 +191,18 @@ public class TemporalGraphCollection implements
 
   @Override
   public DataSet<Boolean> equalsByGraphElementData(TemporalGraphCollection otherCollection) {
-    return callForValue(
-      new CollectionEquality<>(new GraphHeadToEmptyString<>(), new TemporalVertexToDataString<>(),
-        new TemporalEdgeToDataString<>(), true), otherCollection);
+    return callForValue(new CollectionEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   @Override
   public DataSet<Boolean> equalsByGraphData(TemporalGraphCollection otherCollection) {
-    return callForValue(
-      new CollectionEquality<>(new TemporalGraphHeadToDataString<>(), new TemporalVertexToDataString<>(),
-        new TemporalEdgeToDataString<>(), true), otherCollection);
+    return callForValue(new CollectionEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------
@@ -213,7 +216,7 @@ public class TemporalGraphCollection implements
 
   @Override
   public <T> T callForValue(BinaryBaseGraphCollectionToValueOperator<TemporalGraphCollection, T> operator,
-    TemporalGraphCollection otherCollection) {
+                            TemporalGraphCollection otherCollection) {
     return operator.execute(this, otherCollection);
   }
 
@@ -271,7 +274,7 @@ public class TemporalGraphCollection implements
       new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
         edgeTimeExtractor));
 
-    return new TemporalGraphCollectionFactory(temporalGradoopConfig)
+    return temporalGradoopConfig.getTemporalGraphCollectionFactory()
       .fromDataSets(temporalGraphHeadsDataSet, temporalVertexDataSet, temporalEdgeDataSet);
   }
 
