@@ -18,6 +18,9 @@ package org.gradoop.temporal.model.impl;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -31,9 +34,13 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -56,10 +63,10 @@ import java.io.IOException;
  *   <li>{@code transactionTime}: {@code (tx-from [ms], tx-to [ms])}</li>
  *   <li>{@code validTime}: {@code (val-from [ms], val-to [ms])}</li>
  * </ul>
- *
+ * <p>
  * Furthermore, a temporal graph provides operations that are performed on the underlying data.
  * These operations result in either another temporal graph or in a {@link TemporalGraphCollection}.
- *
+ * <p>
  * Analogous to a logical graph, a temporal graph is wrapping a layout which defines, how the graph
  * is represented in Apache Flink.<br>
  * Note that the {@link TemporalGraph} also implements that interface and just forwards the calls to
@@ -67,8 +74,9 @@ import java.io.IOException;
  *
  * @see TemporalGraphOperators
  */
-public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge,
-  TemporalGraph, TemporalGraphCollection>, TemporalGraphOperators {
+public class TemporalGraph implements
+  BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>,
+  TemporalGraphOperators {
 
   /**
    * Layout for that temporal graph.
@@ -98,13 +106,13 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
 
   @Override
   public BaseGraphFactory<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
-      TemporalGraphCollection> getFactory() {
+    TemporalGraphCollection> getFactory() {
     return this.config.getTemporalGraphFactory();
   }
 
   @Override
   public BaseGraphCollectionFactory<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
-      TemporalGraphCollection> getCollectionFactory() {
+    TemporalGraphCollection> getCollectionFactory() {
     return this.config.getTemporalGraphCollectionFactory();
   }
 
@@ -121,7 +129,7 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   /**
    * Writes the graph to given data sink with an optional overwrite option.
    *
-   * @param dataSink The data sink to which the graph should be written.
+   * @param dataSink  The data sink to which the graph should be written.
    * @param overWrite determines whether existing files are overwritten
    * @throws IOException if the graph can't be written to the sink
    */
@@ -170,18 +178,16 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
 
   @Override
   public DataSet<Boolean> equalsByElementData(TemporalGraph other) {
-    return callForValue(new GraphEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new TemporalVertexToDataString<>(),
-      new TemporalEdgeToDataString<>(), true), other);
+    return callForValue(
+      new GraphEquality<>(new GraphHeadToEmptyString<>(), new TemporalVertexToDataString<>(),
+        new TemporalEdgeToDataString<>(), true), other);
   }
 
   @Override
   public DataSet<Boolean> equalsByData(TemporalGraph other) {
-    return callForValue(new GraphEquality<>(
-      new TemporalGraphHeadToDataString<>(),
-      new TemporalVertexToDataString<>(),
-      new TemporalEdgeToDataString<>(), true), other);
+    return callForValue(
+      new GraphEquality<>(new TemporalGraphHeadToDataString<>(), new TemporalVertexToDataString<>(),
+        new TemporalEdgeToDataString<>(), true), other);
   }
 
   //----------------------------------------------------------------------------
@@ -195,7 +201,7 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
 
   @Override
   public <T> T callForValue(BinaryBaseGraphToValueOperator<TemporalGraph, T> operator,
-                            TemporalGraph otherGraph) {
+    TemporalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
@@ -223,6 +229,41 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()
       .fromNonTemporalGraph(logicalGraph);
+  }
+
+  /**
+   * Function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with valid times
+   * depending on
+   * the 3 given {@link TimeIntervalExtractor}
+   *
+   * @param logicalGraph        the existing logical Graph
+   * @param graphTimeExtractor  mapFunction to generate valid times for graphHead
+   * @param vertexTimeExtractor mapFunction to generate valid times for vertices
+   * @param edgeTimeExtractor   mapFunction to generate valid times for edges
+   * @return a temporal graph with new valid time values
+   */
+  public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph,
+    TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
+    TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
+    TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
+
+    TemporalGradoopConfig temporalGradoopConfig =
+      TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig());
+
+    DataSet<TemporalGraphHead> temporalGraphHeadDataSet = logicalGraph.getGraphHead().map(
+      new GraphHeadToTemporalGraphHead<>(
+        temporalGradoopConfig.getTemporalGraphFactory().getGraphHeadFactory(), graphTimeExtractor));
+
+    DataSet<TemporalVertex> temporalVertexDataSet = logicalGraph.getVertices().map(
+      new VertexToTemporalVertex<>(temporalGradoopConfig.getTemporalGraphFactory().getVertexFactory(),
+        vertexTimeExtractor));
+
+    DataSet<TemporalEdge> temporalEdgeDataSet = logicalGraph.getEdges().map(
+      new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
+        edgeTimeExtractor));
+
+    return new TemporalGraphFactory(temporalGradoopConfig)
+      .fromDataSets(temporalGraphHeadDataSet, temporalVertexDataSet, temporalEdgeDataSet);
   }
 
   /**

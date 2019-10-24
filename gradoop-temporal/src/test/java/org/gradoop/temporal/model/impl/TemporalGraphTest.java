@@ -20,10 +20,15 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.temporal.io.api.TemporalDataSource;
+import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.gradoop.temporal.util.TemporalGradoopTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -96,8 +101,7 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   @Test
   public void testGetVerticesByLabel() throws Exception {
     List<TemporalVertex> temporalVertices = new ArrayList<>();
-    testGraph.getVerticesByLabel("Person")
-      .output(new LocalCollectionOutputFormat<>(temporalVertices));
+    testGraph.getVerticesByLabel("Person").output(new LocalCollectionOutputFormat<>(temporalVertices));
     getExecutionEnvironment().execute();
     assertEquals(6, temporalVertices.size());
     temporalVertices.forEach(v -> assertEquals("Person", v.getLabel()));
@@ -192,5 +196,26 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
     loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
     loadedVertices.forEach(this::checkDefaultTemporalElement);
     loadedEdges.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the
+   * {@link TemporalGraph#fromLogicalGraph(LogicalGraph, TimeIntervalExtractor, TimeIntervalExtractor, TimeIntervalExtractor)}  } method.
+   */
+  @Test
+  public void testFromLogicalGraphWithTimeIntervalExtractors() throws Exception {
+
+    String path = TemporalGraphTest.class.getResource("/datacsv/").getFile();
+    TemporalDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
+    TemporalGraphCollection temporalGraphCollection = csvDataSource.getTemporalGraphCollection();
+    TemporalGraph expected = temporalGraphCollection.reduce(new ReduceCombination<>());
+    LogicalGraph logicalGraph =
+      getTemporalSocialNetworkLoader().getGraphCollection().reduce(new ReduceCombination<>());
+
+    TemporalGraph check = TemporalGraph
+      .fromLogicalGraph(logicalGraph, g -> TemporalGradoopTestUtils.extractTime(g),
+        v -> TemporalGradoopTestUtils.extractTime(v), e -> TemporalGradoopTestUtils.extractTime(e));
+
+    collectAndAssertTrue(check.equalsByElementData(expected));
   }
 }

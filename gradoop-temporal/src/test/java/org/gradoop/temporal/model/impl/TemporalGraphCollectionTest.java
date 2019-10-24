@@ -21,14 +21,17 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.io.api.TemporalDataSource;
 import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSink;
 import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.gradoop.temporal.util.TemporalGradoopTestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,9 +108,7 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource
-      .getTemporalGraphCollection()
-      .toGraphCollection()
+    collectAndAssertTrue(dataSource.getTemporalGraphCollection().toGraphCollection()
       .equalsByGraphElementData(testTemporalCollection.toGraphCollection()));
   }
 
@@ -126,9 +127,7 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource
-      .getTemporalGraphCollection()
-      .toGraphCollection()
+    collectAndAssertTrue(dataSource.getTemporalGraphCollection().toGraphCollection()
       .equalsByGraphElementData(testTemporalCollection.toGraphCollection()));
   }
 
@@ -176,8 +175,7 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
   @Test
   public void testGetEdgesByLabel() throws Exception {
     List<TemporalEdge> temporalEdges = Lists.newArrayList();
-    testTemporalCollection.getEdgesByLabel("knows")
-      .output(new LocalCollectionOutputFormat<>(temporalEdges));
+    testTemporalCollection.getEdgesByLabel("knows").output(new LocalCollectionOutputFormat<>(temporalEdges));
     getExecutionEnvironment().execute();
     assertEquals(8, temporalEdges.size());
     temporalEdges.forEach(e -> assertEquals("knows", e.getLabel()));
@@ -261,5 +259,24 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
     loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
     loadedVertices.forEach(this::checkDefaultTemporalElement);
     loadedEdges.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the
+   * {@link TemporalGraph#fromLogicalGraph(LogicalGraph, TimeIntervalExtractor, TimeIntervalExtractor, TimeIntervalExtractor)} method.
+   */
+  @Test
+  public void testFromGraphCollectionWithTimeExtractors() throws Exception {
+
+    String path = TemporalGraphTest.class.getResource("/datacsv/").getFile();
+    TemporalCSVDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
+    TemporalGraphCollection expected = csvDataSource.getTemporalGraphCollection();
+    GraphCollection graphCollection = getTemporalSocialNetworkLoader().getGraphCollection();
+
+    TemporalGraphCollection check = TemporalGraphCollection
+      .fromGraphCollection(graphCollection, g -> TemporalGradoopTestUtils.extractTime(g),
+        v -> TemporalGradoopTestUtils.extractTime(v), e -> TemporalGradoopTestUtils.extractTime(e));
+
+    collectAndAssertTrue(check.equalsByGraphElementData(expected));
   }
 }

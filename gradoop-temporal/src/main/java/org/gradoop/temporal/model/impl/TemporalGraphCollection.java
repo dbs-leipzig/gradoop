@@ -17,6 +17,9 @@ package org.gradoop.temporal.model.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -32,9 +35,13 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
+import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
+import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -66,10 +73,10 @@ import java.io.IOException;
  *
  * @see TemporalGraphCollectionOperators
  */
-public class TemporalGraphCollection implements BaseGraphCollection<
-    TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>,
-  GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>,
-  TemporalGraphCollectionOperators {
+public class TemporalGraphCollection implements
+  BaseGraphCollection<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph,
+    TemporalGraphCollection>,
+  GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>, TemporalGraphCollectionOperators {
 
   /**
    * Layout for this temporal graph collection.
@@ -87,8 +94,7 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * @param layout the temporal graph layout representing the temporal graph
    * @param config Temporal Gradoop config
    */
-  TemporalGraphCollection(
-    GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout,
+  TemporalGraphCollection(GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout,
     TemporalGradoopConfig config) {
     this.layout = Preconditions.checkNotNull(layout);
     this.config = Preconditions.checkNotNull(config);
@@ -124,7 +130,7 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   /**
    * Writes the graph collection to the given data sink with an optional overwrite option.
    *
-   * @param dataSink The data sink to which the graph collection should be written.
+   * @param dataSink  The data sink to which the graph collection should be written.
    * @param overWrite determines whether existing files are overwritten
    * @throws IOException if the collection can't be written to the sink
    */
@@ -184,18 +190,16 @@ public class TemporalGraphCollection implements BaseGraphCollection<
 
   @Override
   public DataSet<Boolean> equalsByGraphElementData(TemporalGraphCollection otherCollection) {
-    return callForValue(new CollectionEquality<>(
-      new GraphHeadToEmptyString<>(),
-      new TemporalVertexToDataString<>(),
-      new TemporalEdgeToDataString<>(), true), otherCollection);
+    return callForValue(
+      new CollectionEquality<>(new GraphHeadToEmptyString<>(), new TemporalVertexToDataString<>(),
+        new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   @Override
   public DataSet<Boolean> equalsByGraphData(TemporalGraphCollection otherCollection) {
-    return callForValue(new CollectionEquality<>(
-      new TemporalGraphHeadToDataString<>(),
-      new TemporalVertexToDataString<>(),
-      new TemporalEdgeToDataString<>(), true), otherCollection);
+    return callForValue(
+      new CollectionEquality<>(new TemporalGraphHeadToDataString<>(), new TemporalVertexToDataString<>(),
+        new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------
@@ -209,7 +213,7 @@ public class TemporalGraphCollection implements BaseGraphCollection<
 
   @Override
   public <T> T callForValue(BinaryBaseGraphCollectionToValueOperator<TemporalGraphCollection, T> operator,
-                            TemporalGraphCollection otherCollection) {
+    TemporalGraphCollection otherCollection) {
     return operator.execute(this, otherCollection);
   }
 
@@ -227,12 +231,48 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * {@link GraphCollection} with default values for the temporal attributes.
    *
    * @param graphCollection the existing graph collection instance
-   * @return a temporal graph colection with default temporal values
+   * @return a temporal graph collection with default temporal values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
   public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())
       .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);
+  }
+
+  /**
+   * Convenience API function to create a {@link TemporalGraphCollection} from an existing
+   * {@link GraphCollection} with valid times depending on the 3 given {@link TimeIntervalExtractor} functions
+   *
+   * @param graphCollection     the existing graph collection instance
+   * @param graphTimeExtractor  the time extractor function for the Graph Heads in the
+   *                            graph collection instance
+   * @param vertexTimeExtractor the time extractor function for the vertices in the graph collection instance
+   * @param edgeTimeExtractor   the time extractor function for the edges in the graph collection instance
+   * @return a temporal graph collection with new valid time values
+   * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
+   */
+  public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection,
+    TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
+    TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
+    TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
+
+    TemporalGradoopConfig temporalGradoopConfig =
+      TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig());
+
+    DataSet<TemporalGraphHead> temporalGraphHeadsDataSet = graphCollection.getGraphHeads().map(
+      new GraphHeadToTemporalGraphHead<>(
+        temporalGradoopConfig.getTemporalGraphFactory().getGraphHeadFactory(), graphTimeExtractor));
+
+    DataSet<TemporalVertex> temporalVertexDataSet = graphCollection.getVertices().map(
+      new VertexToTemporalVertex<>(temporalGradoopConfig.getTemporalGraphFactory().getVertexFactory(),
+        vertexTimeExtractor));
+
+    DataSet<TemporalEdge> temporalEdgeDataSet = graphCollection.getEdges().map(
+      new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
+        edgeTimeExtractor));
+
+    return new TemporalGraphCollectionFactory(temporalGradoopConfig)
+      .fromDataSets(temporalGraphHeadsDataSet, temporalVertexDataSet, temporalEdgeDataSet);
   }
 
   /**
