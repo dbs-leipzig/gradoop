@@ -1,0 +1,53 @@
+// temporal attributes [ms] are represented by properties '__valFrom' and '__valTo'
+
+// 1543400000000L -> 2018-11-28T10:13:20+00:00
+// 1543500000000L -> 2018-11-29T14:00:00+00:00
+// 1543600000000L -> 2018-11-30T17:46:40+00:00
+// 1543700000000L -> 2018-12-01T21:33:20+00:00
+// 1543800000000L -> 2018-12-03T01:20:00+00:00
+// 1543900000000L -> 2018-12-04T05:06:40+00:00
+
+// all vertices
+(databases:Tag {name : "Databases"})
+(graphs:Tag {name : "Graphs"})
+(hadoop:Tag {name : "Hadoop"})
+(gdbs:Forum {title : "Graph Databases"})
+(gps:Forum {title : "Graph Processing"})
+(alice:Person {name : "Alice", gender : "f", city : "Leipzig", age : 20, __valFrom : 1543400000000L })
+(bob:Person {name : "Bob", gender : "m", city : "Leipzig", age : 30, __valFrom : 1543500000000L})
+(carol:Person {name : "Carol", gender : "f", city : "Dresden", age : 30, __valFrom : 1543600000000L})
+(dave:Person {name : "Dave", gender : "m", city : "Dresden", age : 40, __valFrom : 1543700000000L})
+(eve:Person {name : "Eve", gender : "f", city : "Dresden", speaks : "English", age : 35, __valFrom : 1543800000000L})
+(frank:Person {name : "Frank", gender : "m", city : "Berlin", locIP : "127.0.0.1", age : 35, __valFrom : 1543900000000L})
+
+// edges outside logical graphs
+(eve)-[ehid:hasInterest {__valFrom : 1543800000000L, __valTo : 1543900000000L}]->(databases)
+(alice)-[:hasInterest {__valFrom : 1543500000000L, __valTo : 1543700000000L}]->(databases)
+(frank)-[:hasInterest {__valFrom : 1543900000000L}]->(hadoop)
+(dave)-[:hasInterest {__valFrom : 1543700000000L, __valTo : 1543900000000L}]->(hadoop)
+(gdbs)-[ghma:hasModerator {__valFrom : 1543500000000L, __valTo : 1543600000000L}]->(alice)
+(gdbs)-[:hasMember {__valFrom : 1543500000000L, __valTo : 1543700000000L}]->(alice)
+(gdbs)-[:hasMember {__valFrom : 1543500000000L, __valTo : 1543800000000L}]->(bob)
+
+(databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag {__valFrom : 1543500000000L, __valTo : 1543700000000L}]->(hadoop)
+
+// logical graphs
+g0:Community {interest : "Databases", vertexCount : 3} [
+    (eve)-[eka:knows {since : 2013 , __valFrom : 1543800000000L}]->(alice)-[akb:knows {since : 2014 ,__valFrom : 1543600000000L}]->(bob)
+    (eve)-[ekb:knows {since : 2015 , __valFrom : 1543900000000L}]->(bob)-[bka:knows {since : 2014 , __valFrom : 1543600000000L}]->(alice)
+]
+g1:Community {interest : "Hadoop", vertexCount : 3} [
+    (frank)-[fkc:knows {since : 2015 , __valFrom : 1543900000000L}]->(carol)-[ckd:knows {since : 2014 , __valFrom : 1543700000000L}]->(dave)
+    (frank)-[fkd:knows {since : 2015 , __valFrom : 1543900000000L}]->(dave)-[dkc:knows {since : 2014 , __valFrom : 1543700000000L}]->(carol)
+]
+g2:Community {interest : "Graphs", vertexCount : 4} [
+    (alice)-[akb]->(bob)-[bkc:knows {since : 2013 , __valFrom : 1543800000000L}]->(carol)-[ckd]->(dave)
+    (alice)<-[bka]-(bob)<-[ckb:knows {since : 2013 , __valFrom : 1543800000000L}]-(carol)<-[dkc]-(dave)
+]
+g3:Forum [
+    (gps)-[ghmd:hasModerator {since : 2013 , __valFrom : 1543700000000L, __valTo : 1543800000000L}]->(dave)
+    (gps)-[:hasMember { __valFrom : 1543600000000L, __valTo : 1543800000000L}]->(dave)
+    (gps)-[:hasMember]->(carol)-[ckd]->(dave)
+]
+
+

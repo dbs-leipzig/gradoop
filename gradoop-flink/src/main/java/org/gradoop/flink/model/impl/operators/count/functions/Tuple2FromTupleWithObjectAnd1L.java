@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * (object) -> (object, 1L)
+ * {@code (object) -> (object, 1L)}
  *
  * @param <T> type of object
  */

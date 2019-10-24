@@ -15,31 +15,24 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.io.IOException;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
-public interface GraphCollectionOperators {
+public interface GraphCollectionOperators
+  extends BaseGraphCollectionOperators<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
 
   //----------------------------------------------------------------------------
   // Auxiliary operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the collection is empty.
-   *
-   * A collection is considered empty, if it contains no logical graphs.
-   *
-   * @return  1-element dataset containing {@code true}, if the collection is
-   *          empty or {@code false} if not
-   */
-  DataSet<Boolean> isEmpty();
 
   /**
      * Writes the graph collection to the given data sink.

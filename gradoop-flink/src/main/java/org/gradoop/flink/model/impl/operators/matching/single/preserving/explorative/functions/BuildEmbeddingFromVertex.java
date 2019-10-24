@@ -23,10 +23,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 
 /**
  * Initializes an {@link EmbeddingWithTiePoint} from the given vertex.
- *
- * Forwarded fields:
- *
- * f0: vertex id -> tie point
+ * <p>
+ * Forwarded fields:<br>
+ * f0: {@code vertex id -> tie point}
  *
  * @param <K> key type
  */

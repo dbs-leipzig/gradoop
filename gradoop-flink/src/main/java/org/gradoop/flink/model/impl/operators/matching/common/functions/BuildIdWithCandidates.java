@@ -28,18 +28,16 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
 
 /**
  * Converts an EPGM vertex to a {@link IdWithCandidates} tuple.
- *
- * vertex -> (vertexId, vertexCandidates)
- *
- * Forwarded Fields:
- *
- * id->f0: vertex id
+ * <p>
+ * {@code vertex -> (vertexId, vertexCandidates)}
+ * <p>
+ * Forwarded Fields:<br>
+ * {@code id->f0: vertex id}
  *
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class BuildIdWithCandidates<V extends Vertex>
-  extends AbstractBuilder<V, IdWithCandidates<GradoopId>> {
+public class BuildIdWithCandidates<V extends Vertex> extends AbstractBuilder<V, IdWithCandidates<GradoopId>> {
   /**
    * serial version uid
    */

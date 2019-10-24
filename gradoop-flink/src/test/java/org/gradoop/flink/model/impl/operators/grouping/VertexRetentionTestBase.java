@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
@@ -41,13 +42,13 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
    */
   @Test
   public void testRetainVerticesFlag() {
-    Grouping grouping = new Grouping.GroupingBuilder()
+    UnaryBaseGraphToBaseGraphOperator<?> grouping = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
       .useVertexLabel(true)
       .retainVerticesWithoutGroup()
       .build();
 
-    assertTrue(grouping.isRetainingVerticesWithoutGroup());
+    assertTrue(((Grouping) grouping).isRetainingVerticesWithoutGroup());
   }
 
   /**

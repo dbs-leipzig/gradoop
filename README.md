@@ -1,5 +1,5 @@
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Maven Central](https://img.shields.io/badge/Maven_Central-0.5.0-blue.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cgradoop)
+[![Maven Central](https://img.shields.io/badge/Maven_Central-0.5.1-blue.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cgradoop)
 [![Build Status](https://travis-ci.org/dbs-leipzig/gradoop.svg?branch=master)](https://travis-ci.org/dbs-leipzig/gradoop)
 [![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/dbs-leipzig/gradoop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/dbs-leipzig/gradoop/context:java)
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/dbs-leipzig/gradoop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/dbs-leipzig/gradoop/alerts)
@@ -24,6 +24,10 @@ help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
+* [Graph Sampling with Distributed In-Memory Dataflow Systems, arXiv, October 2019](https://arxiv.org/pdf/1910.04493.pdf)
+* [Evolution Analysis of Large Graphs with Gradoop, ECML PKDD LEG Workshop, September 2019](https://dbs.uni-leipzig.de/file/LEGECML-PKDD_2019_paper_9.pdf)
+* [Gradoop @Gridka Keynote Distributed Graph Analytics, August 2019](https://indico.scc.kit.edu/event/460/contributions/5772/attachments/2873/4171/gradoop_gridka19.pdf)
+* [Temporal Graph Analysis using Gradoop, BTW 2019-Workshopband, March 2019](https://dl.gi.de/bitstream/handle/20.500.12116/21797/C2-1.pdf)
 * [Declarative and distributed graph analytics with GRADOOP, VLDB Demo, August 2018](http://www.vldb.org/pvldb/vol11/p2006-junghanns.pdf)
 * [Cypher-based Graph Pattern Matching in Apache Flink, FlinkForward, September 2017](https://youtu.be/dZ8_v_P1j98)
 * [Cypher-based Graph Pattern Matching in GRADOOP, SIGMOD GRADES Workshop, May 2017](https://dbs.uni-leipzig.de/file/GRADES17_Cypher_in_Gradoop.pdf)
@@ -68,11 +72,11 @@ Stable:
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.1</version>
 </dependency>
 ```
 
-Latest nightly build (additional repository is required):
+Latest weekly build (additional repository is required):
 ```xml
 <repositories>
     <repository>
@@ -94,16 +98,18 @@ Latest nightly build (additional repository is required):
 ```
 In any case you also need Apache Flink (version 1.7.2):
 ```xml
-<dependency>
-    <groupId>org.apache.flink</groupId>
-    <artifactId>flink-java</artifactId>
-    <version>1.7.2</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.flink</groupId>
-    <artifactId>flink-clients_2.11</artifactId>
-    <version>1.7.2</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-java</artifactId>
+        <version>1.7.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-clients_2.11</artifactId>
+        <version>1.7.2</version>
+    </dependency>
+</dependencies>
 ```
 
 ### Build gradoop from source
@@ -149,6 +155,11 @@ using DataSet transformations. The module also contains implementations of
 general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
 
+### gradoop-temporal
+
+This module contains a reference implementation of the Temporal Property Graph Model (TPGM) and
+it's operators used to perform graph analysis with respect to the additional time dimension in real-world graphs.
+
 ### gradoop-examples
 
 Contains example pipelines showing use cases for Gradoop. 
@@ -160,7 +171,18 @@ Contains example pipelines showing use cases for Gradoop.
 ### gradoop-checkstyle
 
 Used to maintain the code style for the whole project.
-    
+
+## Related Repositories
+
+### [Gradoop Benchmarks](https://github.com/dbs-leipzig/gradoop-benchmarks)
+
+This repository contains sets of Gradoop operator benchmarks designed to run on a cluster to measure
+scalability and speedup of the operators.
+
+### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
+
+Demo application to show the functionalities of the grouping and query operator in an interactive web UI.
+
 ### Version History
 
 See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at the Wiki pages. 

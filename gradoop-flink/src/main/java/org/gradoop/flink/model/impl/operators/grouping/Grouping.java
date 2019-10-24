@@ -39,6 +39,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGroupingUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -742,26 +743,29 @@ public abstract class Grouping<
       V extends Vertex,
       E extends Edge,
       LG extends BaseGraph<G, V, E, LG, GC>,
-      GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
+      GC extends BaseGraphCollection<G, V, E, LG, GC>> UnaryBaseGraphToBaseGraphOperator<LG> build() {
 
       if (strategy == null) {
         throw new IllegalStateException("A GroupingStrategy has to be set.");
       }
 
       // adding the global aggregators to the associated label groups
-      for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
-        for (AggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
-          vertexLabelGroup.addAggregateFunction(aggregateFunction);
+      if (strategy != GroupingStrategy.GROUP_WITH_KEYFUNCTIONS) {
+        // global aggregate functions can be handled separately for KeyedGrouping
+        for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
+          for (AggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
+            vertexLabelGroup.addAggregateFunction(aggregateFunction);
+          }
+        }
+
+        for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
+          for (AggregateFunction aggregateFunction : globalEdgeAggregateFunctions) {
+            edgeLabelGroup.addAggregateFunction(aggregateFunction);
+          }
         }
       }
 
-      for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
-        for (AggregateFunction aggregateFunction : globalEdgeAggregateFunctions) {
-          edgeLabelGroup.addAggregateFunction(aggregateFunction);
-        }
-      }
-
-      Grouping<G, V, E, LG, GC> groupingOperator;
+      UnaryBaseGraphToBaseGraphOperator<LG> groupingOperator;
 
       switch (strategy) {
       case GROUP_REDUCE:
@@ -773,6 +777,15 @@ public abstract class Grouping<
         groupingOperator = new GroupingGroupCombine<>(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
           retainVerticesWithoutGroup);
+        break;
+      case GROUP_WITH_KEYFUNCTIONS:
+        if (retainVerticesWithoutGroup) {
+          throw new UnsupportedOperationException("Retaining vertices without group is not yet supported" +
+            " with this strategy.");
+        }
+        groupingOperator = KeyedGroupingUtils.createInstance(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          globalVertexAggregateFunctions, globalEdgeAggregateFunctions);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

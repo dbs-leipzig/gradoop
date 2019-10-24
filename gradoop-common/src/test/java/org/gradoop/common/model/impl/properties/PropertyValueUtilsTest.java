@@ -961,33 +961,33 @@ public class PropertyValueUtilsTest {
   }
 
   /**
-   * Test class for {@link PropertyValueUtils.Bytes} class
+   * Test class for {@link PropertyValueUtils.BytesUtils} class
    */
   public static class BytesTest {
 
     /**
-     * Test static function {@link PropertyValueUtils.Bytes#getRawBytesWithoutType(PropertyValue)}
+     * Test static function {@link PropertyValueUtils.BytesUtils#getRawBytesWithoutType(PropertyValue)}
      */
     @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertyValueProvider")
     public void testGetRawBytesWithoutType(PropertyValue propertyValue) {
       assertArrayEquals(Arrays.copyOfRange(propertyValue.getRawBytes(), 1, propertyValue.getRawBytes().length),
-        PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
+        PropertyValueUtils.BytesUtils.getRawBytesWithoutType(propertyValue));
     }
 
     /**
-     * Test static function {@link PropertyValueUtils.Bytes#getTypeByte(PropertyValue)}
+     * Test static function {@link PropertyValueUtils.BytesUtils#getTypeByte(PropertyValue)}
      */
     @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
     public void testGetTypeByte(PropertyValue propertyValue, byte type) {
-      assertArrayEquals(new byte[] {type}, PropertyValueUtils.Bytes.getTypeByte(propertyValue));
+      assertArrayEquals(new byte[] {type}, PropertyValueUtils.BytesUtils.getTypeByte(propertyValue));
     }
 
     /**
-     * Test static function {@link PropertyValueUtils.Bytes#createFromTypeValueBytes(byte[], byte[])}}
+     * Test static function {@link PropertyValueUtils.BytesUtils#createFromTypeValueBytes(byte[], byte[])}}
      */
     @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
     public void testCreateFromTypeValueBytes(PropertyValue propertyValue, byte type) {
-      assertEquals(propertyValue, PropertyValueUtils.Bytes
+      assertEquals(propertyValue, PropertyValueUtils.BytesUtils
         .createFromTypeValueBytes(new byte[] {type},
           Arrays.copyOfRange(propertyValue.getRawBytes(),
             1, propertyValue.getRawBytes().length)));

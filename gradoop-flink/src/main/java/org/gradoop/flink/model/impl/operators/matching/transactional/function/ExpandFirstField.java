@@ -23,12 +23,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Returns one Tuple2<GradoopId, T> per id contained in the first field.
+ * Returns one {@code Tuple2<GradoopId, T>} per id contained in the first field.
+ *
  * @param <T> any type
  */
 @FunctionAnnotation.ForwardedFields("f1")
-public class ExpandFirstField<T>
-  implements FlatMapFunction<Tuple2<GradoopIdSet, T>, Tuple2<GradoopId, T>> {
+public class ExpandFirstField<T> implements FlatMapFunction<Tuple2<GradoopIdSet, T>, Tuple2<GradoopId, T>> {
 
   /**
    * Reduce instantiation

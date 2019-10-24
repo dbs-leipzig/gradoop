@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (object, count) -> WithCount(object, count)
+ * {@code (object, count) -> WithCount(object, count)}
  *
  * @param <T> object type
  */

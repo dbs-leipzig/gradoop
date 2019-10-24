@@ -22,7 +22,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbedding
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * (graph, pattern->embeddings) => (pattern, 1),..
+ * {@code (graph, pattern->embeddings) => (pattern, 1),..}
  */
 public class ReportSupportedPatterns
   implements FlatMapFunction<GraphWithPatternEmbeddingsMap, WithCount<int[]>> {

@@ -291,7 +291,7 @@ public class PropertyValueUtils {
      * @param aValue first value
      * @param bValue second value
      *
-     * @return 0 if a is equal to b, < 0 if a is less than b and > 0 if a is greater than b
+     * @return 0 if a equal to b, {@code < 0} if {@code a < b} and {@code > 0} if {@code a > b}
      */
     public static int compare(PropertyValue aValue, PropertyValue bValue) {
 
@@ -616,7 +616,7 @@ public class PropertyValueUtils {
   /**
    * Byte utilities.
    */
-  public static class Bytes {
+  public static class BytesUtils {
 
     /**
      * Get the raw byte representation of a {@link PropertyValue} instance without the type byte as prefix.

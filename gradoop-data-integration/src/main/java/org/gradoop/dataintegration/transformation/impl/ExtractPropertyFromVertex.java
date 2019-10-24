@@ -30,6 +30,8 @@ import org.gradoop.dataintegration.transformation.impl.functions.ExtractProperty
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 
 import java.util.List;
@@ -152,8 +154,11 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
           newPropertyName));
     }
 
+
     DataSet<EPGMVertex> vertices = newVerticesAndOriginIds
       .map(new Value0Of2<>())
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(logicalGraph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID)
       .union(logicalGraph.getVertices());
 
     // the newly created vertices should be linked to the original vertices
@@ -162,6 +167,8 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
       edges = newVerticesAndOriginIds
         .flatMap(new CreateNewEdges(logicalGraph.getFactory().getEdgeFactory(), edgeDirection,
           edgeLabel))
+        .map(new AddToGraphBroadcast<>())
+        .withBroadcastSet(logicalGraph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID)
         .union(edges);
     }
 

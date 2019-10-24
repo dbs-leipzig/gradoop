@@ -33,7 +33,7 @@ public class VertexToDataString<V extends Vertex>
   @Override
   public void flatMap(V vertex, Collector<VertexString> collector) throws Exception {
     GradoopId vertexId = vertex.getId();
-    String vertexLabel = "(" + label(vertex) + ")";
+    String vertexLabel = "(" + labelWithProperties(vertex) + ")";
 
     for (GradoopId graphId : vertex.getGraphIds()) {
       collector.collect(new VertexString(graphId, vertexId, vertexLabel));
