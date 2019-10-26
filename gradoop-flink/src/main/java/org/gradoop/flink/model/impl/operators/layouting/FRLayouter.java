@@ -168,8 +168,8 @@ public class FRLayouter implements LayoutingAlgorithm {
    * @return this (for method-chaining)
    */
   public FRLayouter startAtIteration(int startAtIteration) {
-    if (startAtIteration <= 0) {
-      throw new IllegalArgumentException("Start-Iteration must be greater than 0.");
+    if (startAtIteration < 0) {
+      throw new IllegalArgumentException("Start-Iteration must be greater than or equal to 0.");
     }
     this.startAtIteration = startAtIteration;
     return this;

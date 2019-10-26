@@ -60,17 +60,17 @@ public class CombiLayouter implements LayoutingAlgorithm {
     this.iterations = iterations;
     this.numberOfVertices = numVertices;
     this.quality = quality;
-    int l1iterations = (int) Math.floor(iterations * (1 - quality));
-    int l2iterations = (int) Math.ceil(iterations * quality);
+    int centroidIterations = (int) Math.floor(iterations * (1 - quality));
+    int frIterations = (int) Math.ceil(iterations * quality);
 
-    if (l1iterations > 0) {
-      centroidFRLayouter = new CentroidFRLayouter(l1iterations, numVertices);
+    if (centroidIterations > 0) {
+      centroidFRLayouter = new CentroidFRLayouter(centroidIterations, numVertices);
       centroidFRLayouter.k(centroidFRLayouter.getK() * K_FACTOR);
     }
-    if (l2iterations > 0) {
+    if (frIterations > 0) {
       fRLayouter =
-        new FRLayouter(l2iterations, numVertices).useExistingLayout(centroidFRLayouter != null)
-          .startAtIteration(l1iterations);
+        new FRLayouter(frIterations, numVertices).useExistingLayout(centroidFRLayouter != null)
+          .startAtIteration(centroidIterations);
     }
   }
 

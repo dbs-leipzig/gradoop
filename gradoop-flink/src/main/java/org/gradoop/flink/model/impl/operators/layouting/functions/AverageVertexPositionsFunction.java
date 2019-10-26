@@ -29,7 +29,7 @@ public class AverageVertexPositionsFunction {
    * Calculates the average positions of the vertices.
    *
    * @param vertices A Dataset of vertices
-   * @return A DataSet contsaining a single Vector-Element representing the average position
+   * @return A DataSet containing a single Vector-Element representing the average position
    */
   public DataSet<Vector> averagePosition(DataSet<LVertex> vertices) {
     return vertices.map(AverageVertexPositionsFunction::mapToTuple)

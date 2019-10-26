@@ -275,7 +275,6 @@ public class GiLaLayouter extends
 
       this.repulsion = new FRRepulsionFunction(optimumDistance);
       this.attraction = new FRAttractionFunction(optimumDistance);
-      //this.applicator = new GiLaForceApplicator(width,height,optimumDistance,numVertices);
       this.applicator = new FRForceApplicator(width, height, optimumDistance, maxIterations);
     }
 

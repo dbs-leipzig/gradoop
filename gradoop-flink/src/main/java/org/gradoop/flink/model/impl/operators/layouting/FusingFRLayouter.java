@@ -63,7 +63,8 @@ public class FusingFRLayouter extends FRLayouter {
      */
     RAWEXTRACTED,
     /**
-     * Like EXTRACTED, but performs some more layouting-iterations after the extraction.
+     * Like EXTRACTED, but performs some more layouting-iterations after the extraction. At least 11
+     * iterations are needed to used POSTLAYOUT.
      */
     POSTLAYOUT
   }
@@ -116,6 +117,11 @@ public class FusingFRLayouter extends FRLayouter {
 
     if (threshold < 0 || threshold > 1) {
       throw new IllegalArgumentException("Threshold must be between 0 and 1");
+    }
+
+    if (outputFormat == OutputFormat.POSTLAYOUT && iterations <= POST_ITERATIONS) {
+      throw new IllegalArgumentException("When using OutputFormat.POSTLAYOUT, at least 11 " +
+        "iterations are needed");
     }
 
     this.threshold = threshold;

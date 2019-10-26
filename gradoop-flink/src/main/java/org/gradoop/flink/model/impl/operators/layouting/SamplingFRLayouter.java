@@ -25,6 +25,8 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFun
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * FRLayouter that only considers a random sample of vertices for one side of the
  * repulsion-calculation. Depending on the sampleRate this algorithm is faster then the default
@@ -42,11 +44,17 @@ public class SamplingFRLayouter extends FRLayouter {
    *
    * @param iterations   Number of iterations to perform
    * @param vertexCount  (Estimated) number of vertices in the graph. Needed to calculate default
-   * @param samplingRate Factor {@code >0 <1 } to simplify repulsion-computation. Lower values are
+   * @param samplingRate Factor {@code >0 <=1 } to simplify repulsion-computation. Lower values are
    *                     faster but less precise
    */
   public SamplingFRLayouter(int iterations, int vertexCount, double samplingRate) {
     super(iterations, vertexCount);
+
+    if (samplingRate <= 0 || samplingRate > 1) {
+      throw new IllegalArgumentException("Sampling rate must be greater than 0 and less than or " +
+        "equal to 1.");
+    }
+
     this.samplingRate = samplingRate;
   }
 
@@ -63,7 +71,7 @@ public class SamplingFRLayouter extends FRLayouter {
     DataSet<LVertex> sampledVertices = vertices.filter(new FilterFunction<LVertex>() {
       @Override
       public boolean filter(LVertex lVertex) {
-        return Math.random() < samplingRateF;
+        return ThreadLocalRandom.current().nextDouble(1) < samplingRateF;
       }
     });
 

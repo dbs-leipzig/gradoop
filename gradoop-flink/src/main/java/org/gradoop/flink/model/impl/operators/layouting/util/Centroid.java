@@ -32,7 +32,7 @@ public class Centroid extends Tuple3<GradoopId, Vector, Integer> implements Grap
 
 
   /**
-   * Create a new Centroid. Id is choosen automatically.
+   * Create a new Centroid. Id is chosen automatically.
    *
    * @param position Position of the centroid
    * @param count    Number of vertices associated to the centroid
