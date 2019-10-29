@@ -132,7 +132,7 @@ public class TimeStampKeyFunction<T extends TemporalElement> implements KeyFunct
     if (!(key instanceof Long)) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
     }
-    // Do not set the key if field extraction in enabled and the key is -1
+    // Do not set the key if field extraction is enabled and the key is -1
     if (fieldOfTimeStamp == null || !getDefaultKey().equals(key)) {
       element.setProperty(targetPropertyKey, PropertyValue.create(key));
     }
