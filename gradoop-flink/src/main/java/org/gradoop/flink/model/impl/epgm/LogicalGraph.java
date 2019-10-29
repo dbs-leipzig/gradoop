@@ -35,17 +35,10 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -194,34 +187,6 @@ public class LogicalGraph implements
 
     return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
       edgeGroupingKeys, edgeAggregateFunctions));
-  }
-
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToIdString(),
-      new EdgeToIdString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByData(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToDataString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------

@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.tostring.functions;
+package org.gradoop.temporal.model.impl.operators.tostring;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
+import org.gradoop.temporal.model.impl.operators.tostring.functions.TemporalElementToDataString;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
 /**
- * represents an edge by a data string (label and properties)
+ * Represents an temporal edge by a data string (label, properties and valid time).
  *
- * @param <E> edge type
+ * @param <E> temporal edge type
  */
-public class EdgeToDataString<E extends Edge> extends ElementToDataString<E> implements
-  EdgeToString<E> {
+public class TemporalEdgeToDataString<E extends TemporalEdge> extends TemporalElementToDataString<E>
+  implements EdgeToString<E> {
 
   @Override
-  public void flatMap(E edge, Collector<EdgeString> collector)
-      throws Exception {
+  public void flatMap(E edge, Collector<EdgeString> collector) {
 
     GradoopId sourceId = edge.getSourceId();
     GradoopId targetId = edge.getTargetId();
-    String edgeLabel = "[" + labelWithProperties(edge) + "]";
+    String edgeLabel = "[" + labelWithProperties(edge) + time(edge) + "]";
 
     for (GradoopId graphId : edge.getGraphIds()) {
       collector.collect(new EdgeString(graphId, sourceId, targetId, edgeLabel));
