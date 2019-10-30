@@ -15,7 +15,7 @@
 ## How Has This Been Tested?
 <!--- Please describe in detail how you tested your changes. -->
 
-## Types of changes
+## Types of Changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
@@ -29,3 +29,4 @@
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.
 - [ ] I ran a spell checker.
+
