@@ -82,6 +82,8 @@ public class KeyedGroupingExample {
 
     // define the key functions to use
     Map<String, List<KeyFunctionWithDefaultValue<EPGMVertex, ?>>> labelSpecificKeys = new HashMap<>();
+    // note that you may use any java.util.List type, we are using singletonList here since we only use
+    // one key function at a time
     labelSpecificKeys.put("Person", singletonList(new AgeRoundedTo10<>()));
     labelSpecificKeys.put("Forum", singletonList(property("title")));
     labelSpecificKeys.put(LabelSpecificKeyFunction.DEFAULT_GROUP_LABEL, singletonList(label()));
