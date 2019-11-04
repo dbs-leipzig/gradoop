@@ -33,7 +33,7 @@ import java.io.IOException;
 
 /**
  * An importer for the
- * <a href="https://math.nist.gov/MatrixMarket/formats.html">matrix-marked format</a> (.mtx)
+ * <a href="https://math.nist.gov/MatrixMarket/formats.html">matrix market format</a> (.mtx)
  */
 public class MtxDataSource implements DataSource {
 
@@ -53,8 +53,8 @@ public class MtxDataSource implements DataSource {
   /**
    * Create new MTX-Datasource
    *
-   * @param path Pathh to the input-file
-   * @param cfg  Gradoop-config to use
+   * @param path Path to the input-file
+   * @param cfg  {@link GradoopFlinkConfig} to use
    */
   public MtxDataSource(String path, GradoopFlinkConfig cfg) {
     this(path, cfg, false);
@@ -63,13 +63,13 @@ public class MtxDataSource implements DataSource {
   /**
    * Create new MTX-Datasource
    *
-   * @param path              Pathh to the input-file
-   * @param cfg               Gradoop-config to use
+   * @param path              Path to the input-file
+   * @param cfg               {@link GradoopFlinkConfig} to use
    * @param skipPreprocessing if true, skip the pre-processing (remove multi-edges, self-edges etc.)
    */
   public MtxDataSource(String path, GradoopFlinkConfig cfg, boolean skipPreprocessing) {
     if (path == null || cfg == null) {
-      throw new IllegalArgumentException("Stguments can not be null");
+      throw new IllegalArgumentException("Arguments can not be null");
     }
     this.path = path;
     this.cfg = cfg;
@@ -112,7 +112,7 @@ public class MtxDataSource implements DataSource {
    * @return true if comment
    */
   private static boolean isComment(String line) {
-    return line.startsWith("#") || line.startsWith("%");
+    return line.startsWith("%");
   }
 
   /**
@@ -126,10 +126,10 @@ public class MtxDataSource implements DataSource {
   }
 
   /**
-   * Generate a GradoopId from an mtx-id
+   * Generate a {@link GradoopId} from an mtx-id
    *
    * @param text The numerical id of the vertex from the mtx file
-   * @return A GradooopId for the vertex
+   * @return A {@link GradoopId} for the vertex
    */
   private static GradoopId generateId(String text) {
     String hex =
@@ -138,18 +138,18 @@ public class MtxDataSource implements DataSource {
   }
 
   /**
-   * Maps mtx-edges to gradoop edges
+   * Maps mtx-edges to {@link EPGMEdge}
    */
   private static class MtxEdgeToEdge implements FlatMapFunction<String, EPGMEdge> {
     /**
-     * The EPGMEdgeFactory<Edge> to use for creating Edges
+     * The EPGMEdgeFactory<Edge> to use for creating edges
      */
     private EdgeFactory<EPGMEdge> edgeFactory;
 
     /**
      * Create new EdgeMapper
      *
-     * @param edgeFactory The EPGMEdgeFactory<Edge> to use for creating Edges
+     * @param edgeFactory The {@link EdgeFactory} to use for creating Edges
      */
     MtxEdgeToEdge(EdgeFactory<EPGMEdge> edgeFactory) {
       this.edgeFactory = edgeFactory;
@@ -160,13 +160,13 @@ public class MtxDataSource implements DataSource {
       if (!isComment(line)) {
         String[] splitted = line.split(getSplitCharacter(line));
         collector.collect(edgeFactory
-          .initEdge(GradoopId.get(), "edge", generateId(splitted[0]), generateId(splitted[1])));
+          .initEdge(GradoopId.get(), generateId(splitted[0]), generateId(splitted[1])));
       }
     }
   }
 
   /**
-   * Maps mtx-vertices to vertices
+   * Maps mtx-vertices to {@link EPGMVertex}
    */
   private static class MtxVertexToVertex implements FlatMapFunction<String, EPGMVertex> {
     /**
@@ -177,7 +177,7 @@ public class MtxDataSource implements DataSource {
     /**
      * Create new VertexMapper
      *
-     * @param vertexFactory The EPGMVertexFactory<Vertex> to use for creating vertices
+     * @param vertexFactory The {@link VertexFactory} to use for creating vertices
      */
     MtxVertexToVertex(VertexFactory<EPGMVertex> vertexFactory) {
       this.vertexFactory = vertexFactory;
@@ -187,8 +187,8 @@ public class MtxDataSource implements DataSource {
     public void flatMap(String line, Collector<EPGMVertex> collector) {
       if (!isComment(line)) {
         String[] splitted = line.split(getSplitCharacter(line));
-        collector.collect(vertexFactory.initVertex(generateId(splitted[0]), "vertex"));
-        collector.collect(vertexFactory.initVertex(generateId(splitted[1]), "vertex"));
+        collector.collect(vertexFactory.initVertex(generateId(splitted[0])));
+        collector.collect(vertexFactory.initVertex(generateId(splitted[1])));
       }
     }
   }
