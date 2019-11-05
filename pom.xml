@@ -129,14 +129,6 @@
         <url>https://travis-ci.org/dbs-leipzig/gradoop/</url>
     </ciManagement>
 
-    <repositories>
-        <repository>
-            <id>dbleipzig</id>
-            <name>DB Leipzig Archiva</name>
-            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <site>
             <id>site_gradoop</id>
@@ -661,7 +653,6 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -674,7 +665,6 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients_2.11</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -733,29 +723,6 @@
                 <version>${dep.kryo.version}</version>
             </dependency>
 
-            <!-- CAPF -->
-            <dependency>
-                <groupId>org.opencypher</groupId>
-                <artifactId>flink-cypher</artifactId>
-                <version>${dep.okapi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-nop</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-all</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.opencypher</groupId>
-                <artifactId>spark-cypher</artifactId>
-                <version>${dep.okapi.version}</version>
-            </dependency>
-
             <!-- Others -->
             <dependency>
                 <groupId>com.github.s1ck</groupId>
@@ -779,7 +746,6 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>

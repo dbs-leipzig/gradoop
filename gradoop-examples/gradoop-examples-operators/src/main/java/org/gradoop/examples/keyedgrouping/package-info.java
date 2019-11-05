@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to the input and output of Flink tables.
+ * A runnable example for the {@code KeyedGrouping} operator.
  */
-package org.gradoop.flink.io.impl.table;
+package org.gradoop.examples.keyedgrouping;

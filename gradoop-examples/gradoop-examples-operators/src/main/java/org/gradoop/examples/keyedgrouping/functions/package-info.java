@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains implementations for the handling of results returned by CAPF
+ * Custom (key-) functions used by this {@code KeyedGrouping} example.
  */
-package org.gradoop.flink.model.impl.operators.cypher.capf.result;
+package org.gradoop.examples.keyedgrouping.functions;
