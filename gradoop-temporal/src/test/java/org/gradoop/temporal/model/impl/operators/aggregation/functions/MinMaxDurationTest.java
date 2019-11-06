@@ -37,9 +37,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test class for the following classes: {@link MaxDuration}, {@link MinDuration}
  * and the subclasses:
- *
- *  {@link MaxVertexDuration}, {@link MaxEdgeDuration},
- *  {@link MinVertexDuration}, {@link MinEdgeDuration}
+ * <ul>
+ *   <li>{@link MaxVertexDuration}</li>
+ *   <li>{@link MaxEdgeDuration}</li>
+ *   <li>{@link MinVertexDuration}</li>
+ *   <li>{@link MaxEdgeDuration}</li>
+ * </ul>
  *
  */
 public class MinMaxDurationTest extends TemporalGradoopTestBase {

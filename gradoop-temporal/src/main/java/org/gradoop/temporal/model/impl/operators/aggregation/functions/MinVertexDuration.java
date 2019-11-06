@@ -19,12 +19,12 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.temporal.model.api.TimeDimension;
 
 /**
- * Calculates the minimum duration of all given vertices and the defined {@link TimeDimension}
+ * Calculates the minimum duration of all given vertices and the defined {@link TimeDimension}.
  */
 public class MinVertexDuration extends MinDuration implements VertexAggregateFunction {
 
   /**
-   * Creates a new instance of a base aggregate function.
+   * Creates a new instance of this base aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
    * @param dimension the given TimeDimension

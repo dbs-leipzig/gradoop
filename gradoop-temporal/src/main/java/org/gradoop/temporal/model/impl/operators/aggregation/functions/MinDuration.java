@@ -15,14 +15,14 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.Min;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+import java.util.Objects;
 
 /**
  * Calculate the minimum duration of a time dimension of one given {@link TimeDimension} of temporal elements.
@@ -30,7 +30,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
  * Time intervals with either the start or end time set to the respective default value are evaluated as
  * Long Max.
  */
-public class MinDuration extends BaseAggregateFunction implements Min, TemporalAggregateFunction {
+public class MinDuration extends AbstractDurationAggregateFunction implements Min, TemporalAggregateFunction {
 
   /**
    * Selects which time dimension is considered by this aggregate function.
@@ -45,7 +45,7 @@ public class MinDuration extends BaseAggregateFunction implements Min, TemporalA
    */
   public MinDuration(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey);
-    this.dimension = dimension;
+    this.dimension = Objects.requireNonNull(dimension);
   }
 
   /**
@@ -58,27 +58,11 @@ public class MinDuration extends BaseAggregateFunction implements Min, TemporalA
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    Tuple2<Long, Long> timeInterval;
-    switch (dimension) {
-    case TRANSACTION_TIME:
-      timeInterval = element.getTransactionTime();
-      break;
-    case VALID_TIME:
-      timeInterval = element.getValidTime();
-      break;
-    default:
-      throw new IllegalArgumentException("Temporal attribute " + dimension + " is not supported.");
-    }
-    if (timeInterval.f0 == null || timeInterval.f1 == null ||
-      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||
-      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_TO) ||
-      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_FROM) ||
-      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_TO)) {
+    PropertyValue duration = super.getDuration(element, dimension);
+    if (duration.getLong() == -1L) {
       return PropertyValue.create(TemporalElement.DEFAULT_TIME_TO);
-
-    } else {
-      return PropertyValue.create(timeInterval.f1 - timeInterval.f0);
     }
+    return duration;
   }
 
   /**
