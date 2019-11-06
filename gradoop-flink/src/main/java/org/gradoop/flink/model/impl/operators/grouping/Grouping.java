@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.apache.flink.table.runtime.MinusCoGroupFunction;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -29,6 +28,7 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.filters.Not;
+import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
@@ -340,10 +340,10 @@ public abstract class Grouping<
    */
   DataSet<E> subtractEdges(DataSet<E> edges, DataSet<E> edgesToSubtract) {
     return edges
-      .coGroup(edgesToSubtract)
+      .leftOuterJoin(edgesToSubtract)
       .where("sourceId", "targetId")
       .equalTo("sourceId", "targetId")
-      .with(new MinusCoGroupFunction<>(true));
+      .with(new LeftWhenRightIsNull<>());
   }
 
   /**
