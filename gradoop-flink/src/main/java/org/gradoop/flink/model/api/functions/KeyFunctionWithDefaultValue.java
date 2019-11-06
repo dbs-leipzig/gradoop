@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.api.functions;
 
+import java.util.Objects;
+
 /**
  * A (grouping) key function with a default value. The value will be used in some cases where the key can
  * not be determined or when this key function is not applicable for an element.<p>
@@ -23,7 +25,7 @@ package org.gradoop.flink.model.api.functions;
  * @param <E> The type of the object from which the grouping key is extracted.
  * @param <K> The type of the extracted key.
  */
-public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K> {
+public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K>, DefaultKeyCheckable {
 
   /**
    * Get the default key value for all elements.
@@ -31,4 +33,18 @@ public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K> {
    * @return The default key.
    */
   K getDefaultKey();
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The default implementation of this method compares the key to the default key provided by this class
+   * using {@link Objects#deepEquals(Object, Object)}.
+   *
+   * @param key The key to check.
+   * @return {@code true}, if the key is a default key for this key-function.
+   */
+  @Override
+  default boolean isDefaultKey(Object key) {
+    return Objects.deepEquals(getDefaultKey(), key);
+  }
 }

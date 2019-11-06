@@ -52,4 +52,22 @@ public class CompositeKeyFunctionWithDefaultValues<T> extends CompositeKeyFuncti
   public Tuple getDefaultKey() {
     return defaultValue;
   }
+
+  @Override
+  public boolean isDefaultKey(Object key) {
+    if (!(key instanceof Tuple)) {
+      return false;
+    }
+    final Tuple tupleKey = (Tuple) key;
+    if (tupleKey.getArity() != defaultValue.getArity()) {
+      return false;
+    }
+    for (int index = 0; index < tupleKey.getArity(); index++) {
+      if (!((KeyFunctionWithDefaultValue) componentFunctions.get(index)).isDefaultKey(
+        tupleKey.getField(index))) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

@@ -34,7 +34,7 @@ public class CompositeKeyFunction<T> implements KeyFunction<T, Tuple> {
   /**
    * A list of grouping key functions combined in this key function.
    */
-  private final List<? extends KeyFunction<T, ?>> componentFunctions;
+  protected final List<? extends KeyFunction<T, ?>> componentFunctions;
 
   /**
    * Reduce object instantiations.

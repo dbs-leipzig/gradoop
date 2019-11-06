@@ -22,6 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple0;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -44,6 +45,7 @@ import static org.gradoop.flink.model.impl.operators.keyedgrouping.GroupingKeys.
 import static org.gradoop.flink.model.impl.operators.keyedgrouping.GroupingKeys.property;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -235,6 +237,27 @@ public class LabelSpecificKeyFunctionTest extends GradoopFlinkTestBase {
     assertEquals(PropertyValue.create("valueForC"), testVertex.getPropertyValue("forC"));
     assertEquals("newLabel", testVertex.getLabel());
     assertEquals(valueForDefault, testVertex.getPropertyValue("forDefault"));
+  }
+
+  /**
+   * Test if the {@link LabelSpecificKeyFunction#isDefaultKey(Object)} method works as expected.
+   */
+  @Test
+  public void testIsDefaultKey() {
+    // The default values are set initially, check them for each label
+    final EPGMVertex vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
+    for (String label : Arrays.asList("a", "b", "c", "")) {
+      vertex.setLabel(label);
+      assertTrue("Default key check fail for label: " + label,
+        testFunction.isDefaultKey(testFunction.getKey(vertex)));
+    }
+    // Changing the values on the vertex should only affect the result when the key function corresponding
+    // to the value is used. We check this by setting the property for label "c" to a non-default value.
+    vertex.setProperty("forC", PropertyValue.create(GradoopTestUtils.BIG_DECIMAL_VAL_7));
+    vertex.setLabel("a");
+    assertTrue(testFunction.isDefaultKey(testFunction.getKey(vertex)));
+    vertex.setLabel("c");
+    assertFalse(testFunction.isDefaultKey(testFunction.getKey(vertex)));
   }
 
   /**

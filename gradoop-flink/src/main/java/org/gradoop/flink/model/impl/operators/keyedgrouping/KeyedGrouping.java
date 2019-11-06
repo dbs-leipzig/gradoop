@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -25,6 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.filters.Not;
@@ -37,6 +39,7 @@ import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.GroupingCo
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceEdgeTuples;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceVertexTuples;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdField;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.WithAllKeysSetToDefault;
 
 import java.util.Collections;
 import java.util.List;
@@ -94,6 +97,11 @@ public class KeyedGrouping<
   private boolean useGroupCombine = true;
 
   /**
+   * Should vertices with all default keys be kept as is?
+   */
+  private boolean retainUngroupedVertices = false;
+
+  /**
    * Instantiate this grouping function.
    *
    * @param vertexGroupingKeys       The vertex grouping keys.
@@ -123,9 +131,17 @@ public class KeyedGrouping<
   @Override
   public LG execute(LG graph) {
     /* First we create tuple representations of each vertex.
-       Those tuples will then be grouped by the respective key fields (the fields containing the values
+       If retention of ungrouped vertices is enabled, we filter out vertices with unset keys prior to this
+       step. Those tuples will then be grouped by the respective key fields (the fields containing the values
        extracted by the key functions) and reduced to assign a super vertex and to calculate aggregates. */
-    DataSet<Tuple> verticesWithSuperVertex = graph.getVertices()
+    DataSet<V> vertices = graph.getVertices();
+    DataSet<V> ungrouped = vertices;
+    if (retainUngroupedVertices) {
+      final FilterFunction<V> retentionSelector = new WithAllKeysSetToDefault<>(vertexGroupingKeys);
+      ungrouped = ungrouped.filter(new Not<>(retentionSelector));
+      vertices = vertices.filter(retentionSelector);
+    }
+    DataSet<Tuple> verticesWithSuperVertex = vertices
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
@@ -139,11 +155,11 @@ public class KeyedGrouping<
        with the mapping extracted in the previous step. Edges will then point from and to super-vertices. */
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
       .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
-      .join(idToSuperId)
+      .leftOuterJoin(idToSuperId)
       .where(GroupingConstants.EDGE_TUPLE_SOURCEID)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
       .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_SOURCEID))
-      .join(idToSuperId)
+      .leftOuterJoin(idToSuperId)
       .where(GroupingConstants.EDGE_TUPLE_TARGETID)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
       .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_TARGETID));
@@ -167,6 +183,10 @@ public class KeyedGrouping<
       .map(new BuildSuperEdgeFromTuple<>(edgeGroupingKeys, edgeAggregateFunctions,
         graph.getFactory().getEdgeFactory()));
 
+    if (retainUngroupedVertices) {
+      /* We have to add the previously filtered vertices back. */
+      superVertices = superVertices.union(ungrouped);
+    }
     return graph.getFactory().fromDataSets(superVertices, superEdges);
   }
 
@@ -201,6 +221,25 @@ public class KeyedGrouping<
    */
   public KeyedGrouping<G, V, E, LG, GC> setUseGroupCombine(boolean useGroupCombine) {
     this.useGroupCombine = useGroupCombine;
+    return this;
+  }
+
+  /**
+   * Enable or disable vertex retention.
+   * <p>
+   * Enabling this features requires that all vertex keys implement {@link DefaultKeyCheckable}.
+   * <p>
+   * This is disabled per default.
+   *
+   * @param retainVertices Should vertices be retained?
+   * @return This operator.
+   * @throws IllegalArgumentException When any vertex key function is not supported for this feature.
+   */
+  public KeyedGrouping<G, V, E, LG, GC> setRetainUngroupedVertices(boolean retainVertices) {
+    if (retainVertices) {
+      WithAllKeysSetToDefault.checkKeySupport(vertexGroupingKeys);
+    }
+    this.retainUngroupedVertices = retainVertices;
     return this;
   }
 }

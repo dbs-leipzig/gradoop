@@ -20,6 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -37,7 +38,8 @@ import java.util.Objects;
  *
  * @param <T> The type of the elements to group.
  */
-public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<T, Tuple> {
+public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<T, Tuple>,
+  DefaultKeyCheckable {
 
   /**
    * A label used to identify the default groups.
@@ -161,5 +163,18 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
       types[1 + index] = keyFunctions.get(index).getType();
     }
     return new TupleTypeInfo<>(types);
+  }
+
+  @Override
+  public boolean isDefaultKey(Object key) {
+    if (!(key instanceof Tuple)) {
+      return false;
+    }
+    Tuple keyTuple = (Tuple) key;
+    if (keyTuple.getArity() != (1 + keyFunctions.size())) {
+      return false;
+    }
+    Integer index = keyTuple.getField(0);
+    return keyFunctions.get(index).isDefaultKey(keyTuple.getField(1 + index));
   }
 }
