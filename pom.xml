@@ -34,6 +34,7 @@
         <module>gradoop-checkstyle</module>
         <module>gradoop-store</module>
         <module>gradoop-data-integration</module>
+        <module>gradoop-archetype</module>
     </modules>
 
     <developers>
