@@ -55,7 +55,7 @@ public class HBasePropEqualsTest {
       Bytes.toBytesBinary(CF_PROPERTY_VALUE),
       Bytes.toBytesBinary(propertyKey),
       CompareFilter.CompareOp.EQUAL,
-      PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
+      PropertyValueUtils.BytesUtils.getRawBytesWithoutType(propertyValue));
 
     // Define that the entire row will be skipped if the column is not found
     valueFilter.setFilterIfMissing(true);
@@ -64,7 +64,7 @@ public class HBasePropEqualsTest {
       Bytes.toBytesBinary(CF_PROPERTY_TYPE),
       Bytes.toBytesBinary(propertyKey),
       CompareFilter.CompareOp.EQUAL,
-      PropertyValueUtils.Bytes.getTypeByte(propertyValue));
+      PropertyValueUtils.BytesUtils.getTypeByte(propertyValue));
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);

@@ -16,13 +16,13 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
@@ -30,15 +30,26 @@ import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 /**
  * Operator to determine if two graph are equal according to given string
  * representations of graph heads, vertices and edges.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class GraphEquality
-  implements BinaryBaseGraphToValueOperator<LogicalGraph, DataSet<Boolean>> {
+public class GraphEquality<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphToValueOperator<LG, DataSet<Boolean>> {
 
   /**
    * collection equality operator, wrapped by graph equality
    * (graph are considered to be a 1-graph collection)
    */
-  private final CollectionEquality collectionEquality;
+  private final CollectionEquality<G, V, E, LG, GC> collectionEquality;
   /**
    * sets mode for directed or undirected graphs
    */
@@ -51,19 +62,18 @@ public class GraphEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
-    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString,
+  public GraphEquality(GraphHeadToString<G> graphHeadToString,
+    VertexToString<V> vertexToString, EdgeToString<E> edgeToString,
     boolean directed) {
     this.directed = directed;
 
     this.collectionEquality =
-      new CollectionEquality(graphHeadToString, vertexToString, edgeToString, this.directed);
+      new CollectionEquality<>(graphHeadToString, vertexToString, edgeToString, this.directed);
   }
 
   @Override
-  public DataSet<Boolean> execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-      collectionFactory = firstGraph.getCollectionFactory();
+  public DataSet<Boolean> execute(LG firstGraph, LG secondGraph) {
+    BaseGraphCollectionFactory<G, V, E, LG, GC> collectionFactory = firstGraph.getCollectionFactory();
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }

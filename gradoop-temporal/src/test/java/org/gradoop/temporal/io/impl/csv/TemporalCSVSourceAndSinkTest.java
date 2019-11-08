@@ -70,10 +70,7 @@ public class TemporalCSVSourceAndSinkTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource
-      .getTemporalGraph()
-      .toLogicalGraph()
-      .equalsByElementData(testGraph.toLogicalGraph()));
+    collectAndAssertTrue(dataSource.getTemporalGraph().equalsByData(testGraph));
   }
 
   /**
@@ -94,9 +91,6 @@ public class TemporalCSVSourceAndSinkTest extends TemporalGradoopTestBase {
 
     TemporalDataSource dataSource = new TemporalCSVDataSource(tempFolderPath, getConfig());
 
-    collectAndAssertTrue(dataSource
-      .getTemporalGraph()
-      .toLogicalGraph()
-      .equalsByElementData(testGraph.toLogicalGraph()));
+    collectAndAssertTrue(dataSource.getTemporalGraph().equalsByData(testGraph));
   }
 }

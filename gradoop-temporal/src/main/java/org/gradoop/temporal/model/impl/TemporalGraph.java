@@ -27,17 +27,16 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
+import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -110,20 +109,6 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   }
 
   /**
-   * Returns a 1-element dataset containing a {@link Boolean} value which indicates if the graph is empty.
-   *
-   * A graph is considered empty, if it contains no vertices.
-   *
-   * @return  1-element dataset containing {@link Boolean#TRUE}, if the collection is
-   *          empty or {@link Boolean#FALSE} if not
-   */
-  public DataSet<Boolean> isEmpty() {
-    return getVertices().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
-      .map(new Not());
-  }
-
-  /**
    * Writes the graph to given data sink.
    *
    * @param dataSink The data sink to which the graph should be written.
@@ -184,10 +169,19 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   //----------------------------------------------------------------------------
 
   @Override
-  public TemporalGraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching<>(query, constructionPattern,
-      true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics));
+  public DataSet<Boolean> equalsByElementData(TemporalGraph other) {
+    return callForValue(new GraphEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByData(TemporalGraph other) {
+    return callForValue(new GraphEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), other);
   }
 
   //----------------------------------------------------------------------------

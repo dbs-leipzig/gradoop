@@ -35,7 +35,7 @@ public class EdgeToDataString<E extends Edge> extends ElementToDataString<E> imp
 
     GradoopId sourceId = edge.getSourceId();
     GradoopId targetId = edge.getTargetId();
-    String edgeLabel = "[" + label(edge) + "]";
+    String edgeLabel = "[" + labelWithProperties(edge) + "]";
 
     for (GradoopId graphId : edge.getGraphIds()) {
       collector.collect(new EdgeString(graphId, sourceId, targetId, edgeLabel));

@@ -15,8 +15,6 @@
  */
 package org.gradoop.storage.accumulo.impl.io.inputformats;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
@@ -29,6 +27,8 @@ import org.gradoop.storage.accumulo.impl.predicate.query.AccumuloQueryHolder;
 import org.gradoop.storage.accumulo.impl.constants.AccumuloTables;
 import org.gradoop.storage.accumulo.impl.handler.AccumuloVertexHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -60,7 +60,7 @@ public class VertexInputFormat extends BaseInputFormat<EPGMVertex> {
    * @param predicate accumulo query predicate
    */
   public VertexInputFormat(
-    @NonNull Properties properties,
+    @Nonnull Properties properties,
     @Nullable AccumuloQueryHolder<EPGMVertex> predicate
   ) {
     super(properties, predicate);

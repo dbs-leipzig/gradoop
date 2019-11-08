@@ -15,7 +15,6 @@
  */
 package org.gradoop.storage.common.api;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -56,7 +55,7 @@ public interface EPGMGraphOutput {
    * @return all graphs
    * @throws IOException unexpected IO error (timeout, conn disconnected)
    */
-  @NonNull
+  @Nonnull
   default ClosableIterator<EPGMGraphHead> getGraphSpace() throws IOException {
     return getGraphSpace(DEFAULT_CACHE_SIZE);
   }

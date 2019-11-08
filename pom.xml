@@ -129,14 +129,6 @@
         <url>https://travis-ci.org/dbs-leipzig/gradoop/</url>
     </ciManagement>
 
-    <repositories>
-        <repository>
-            <id>dbleipzig</id>
-            <name>DB Leipzig Archiva</name>
-            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <site>
             <id>site_gradoop</id>
@@ -164,8 +156,10 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
+        <dep.commons-lang.version>2.6</dep.commons-lang.version>
         <dep.flink.version>1.7.2</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
+        <dep.guava.version>11.0.2</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.12</dep.junit.version>
@@ -421,6 +415,7 @@
                     <version>${plugin.maven-spotbugs.version}</version>
                     <configuration>
                         <xmlOutput>true</xmlOutput>
+                        <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                     </configuration>
                     <executions>
                         <execution>
@@ -647,12 +642,17 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-temporal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -665,7 +665,6 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients_2.11</artifactId>
                 <version>${dep.flink.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -724,29 +723,6 @@
                 <version>${dep.kryo.version}</version>
             </dependency>
 
-            <!-- CAPF -->
-            <dependency>
-                <groupId>org.opencypher</groupId>
-                <artifactId>flink-cypher</artifactId>
-                <version>${dep.okapi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-nop</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-all</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.opencypher</groupId>
-                <artifactId>spark-cypher</artifactId>
-                <version>${dep.okapi.version}</version>
-            </dependency>
-
             <!-- Others -->
             <dependency>
                 <groupId>com.github.s1ck</groupId>
@@ -770,13 +746,24 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
                 <version>${dep.commons-cli.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${dep.commons-lang.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${dep.guava.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

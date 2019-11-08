@@ -15,13 +15,13 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.properties.bytes.Bytes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import static org.apache.hadoop.hbase.util.Bytes.SIZEOF_INT;
+import static org.gradoop.common.model.impl.properties.bytes.Bytes.SIZEOF_INT;
 
 /**
  * Serializer for Java 8 {@code LocalDate, LocalTime, LocalDateTime}.

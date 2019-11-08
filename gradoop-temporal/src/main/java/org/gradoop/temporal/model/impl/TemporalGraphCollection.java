@@ -26,16 +26,18 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOpe
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
+import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -110,21 +112,6 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   }
 
   /**
-   * Returns a 1-element dataset containing a {@link Boolean} value which indicates if the graph collection
-   * is empty.
-   *
-   * The graph is considered empty if it contains no graphs.
-   *
-   * @return 1-element dataset containing {@link Boolean#TRUE} if the collection is empty and
-   * {@link Boolean#FALSE} otherwise.
-   */
-  public DataSet<Boolean> isEmpty() {
-    return getGraphHeads().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
-      .map(new Not());
-  }
-
-  /**
    * Writes the graph collection to the given data sink.
    *
    * @param dataSink The data sink to which the graph collection should be written.
@@ -193,6 +180,22 @@ public class TemporalGraphCollection implements BaseGraphCollection<
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
     return this.layout.getGraphTransactions();
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByGraphElementData(TemporalGraphCollection otherCollection) {
+    return callForValue(new CollectionEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
+  }
+
+  @Override
+  public DataSet<Boolean> equalsByGraphData(TemporalGraphCollection otherCollection) {
+    return callForValue(new CollectionEquality<>(
+      new TemporalGraphHeadToDataString<>(),
+      new TemporalVertexToDataString<>(),
+      new TemporalEdgeToDataString<>(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------

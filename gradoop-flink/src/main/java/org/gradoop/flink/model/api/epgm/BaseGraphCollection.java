@@ -23,6 +23,9 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
@@ -97,5 +100,19 @@ public interface BaseGraphCollection<
       .filter(new InAnyGraph<>(identifiers));
 
     return getFactory().fromDataSets(newGraphHeads, vertices, edges);
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  default DataSet<Boolean> isEmpty() {
+    return getGraphHeads()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
   }
 }

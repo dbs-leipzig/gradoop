@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.model.impl.id;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
@@ -326,7 +325,6 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    *
    * @return Byte representation
    */
-  @SuppressWarnings(value = "EI_EXPOSE_REP", justification = "never mutated")
   public byte[] toByteArray() {
     return bytes;
   }
