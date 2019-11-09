@@ -28,7 +28,7 @@ public class RegionSplitter {
   /**
    * Singleton instance
    */
-<span class="fc" id="L31">  private static RegionSplitter INSTANCE = null;</span>
+<span class="nc" id="L31">  private static RegionSplitter INSTANCE = null;</span>
 
   /**
    * Number of regions, default {@link RegionSplitter#DEFAULT_REGIONS}
@@ -49,9 +49,9 @@ public class RegionSplitter {
    * Creates an instance of this singleton with setting the number of regions to the default
    * value {@link RegionSplitter#DEFAULT_REGIONS}.
    */
-<span class="fc" id="L52">  private RegionSplitter() {</span>
-<span class="fc" id="L53">    this.numberOfRegions = DEFAULT_REGIONS;</span>
-<span class="fc" id="L54">  }</span>
+<span class="nc" id="L52">  private RegionSplitter() {</span>
+<span class="nc" id="L53">    this.numberOfRegions = DEFAULT_REGIONS;</span>
+<span class="nc" id="L54">  }</span>
 
   /**
    * Static function to return the instance of this RegionSplitter.
@@ -59,10 +59,10 @@ public class RegionSplitter {
    * @return the instance of this singleton
    */
   public static RegionSplitter getInstance() {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (INSTANCE == null) {</span>
-<span class="fc" id="L63">      INSTANCE = new RegionSplitter();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">    if (INSTANCE == null) {</span>
+<span class="nc" id="L63">      INSTANCE = new RegionSplitter();</span>
     }
-<span class="fc" id="L65">    return INSTANCE;</span>
+<span class="nc" id="L65">    return INSTANCE;</span>
   }
 
   /**
@@ -71,10 +71,10 @@ public class RegionSplitter {
    * @return the start key of the row key range
    */
   public byte[] getStartKey() {
-<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (startKey == null) {</span>
-<span class="fc" id="L75">      startKey = new byte[13];</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">    if (startKey == null) {</span>
+<span class="nc" id="L75">      startKey = new byte[13];</span>
     }
-<span class="fc" id="L77">    return startKey.clone();</span>
+<span class="nc" id="L77">    return startKey.clone();</span>
   }
 
   /**
@@ -84,16 +84,16 @@ public class RegionSplitter {
    * @return the start key of the row key range
    */
   public byte[] getEndKey() {
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (endKey == null) {</span>
-<span class="fc" id="L88">      endKey = new byte[13];</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    if (endKey == null) {</span>
+<span class="nc" id="L88">      endKey = new byte[13];</span>
 
-<span class="fc" id="L90">      endKey[0] = (byte) numberOfRegions;</span>
+<span class="nc" id="L90">      endKey[0] = (byte) numberOfRegions;</span>
 
-<span class="fc bfc" id="L92" title="All 2 branches covered.">      for (int i = 1; i &lt; 13; i++) {</span>
-<span class="fc" id="L93">        endKey[i] = Byte.MAX_VALUE;</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">      for (int i = 1; i &lt; 13; i++) {</span>
+<span class="nc" id="L93">        endKey[i] = Byte.MAX_VALUE;</span>
       }
     }
-<span class="fc" id="L96">    return endKey.clone();</span>
+<span class="nc" id="L96">    return endKey.clone();</span>
   }
 
   /**
@@ -102,7 +102,7 @@ public class RegionSplitter {
    * @return the number of regions
    */
   public int getNumberOfRegions() {
-<span class="fc" id="L105">    return numberOfRegions;</span>
+<span class="nc" id="L105">    return numberOfRegions;</span>
   }
 
   /**
@@ -111,10 +111,10 @@ public class RegionSplitter {
    * @param numberOfRegions the number of regions to use
    */
   public void setNumberOfRegions(int numberOfRegions) {
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    if (numberOfRegions &lt;= 0) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">    if (numberOfRegions &lt;= 0) {</span>
 <span class="nc" id="L115">      throw new IllegalArgumentException(&quot;The number of regions has to be a positive integer.&quot;);</span>
     }
-<span class="fc" id="L117">    this.numberOfRegions = numberOfRegions;</span>
-<span class="fc" id="L118">  }</span>
+<span class="nc" id="L117">    this.numberOfRegions = numberOfRegions;</span>
+<span class="nc" id="L118">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

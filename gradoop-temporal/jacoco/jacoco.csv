@@ -64,7 +64,7 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,Ti
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction,62,69,7,5,8,17,7,5,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,17,90,2,6,2,16,2,6,0,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,44,98,4,8,5,22,4,7,0,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,53,144,4,25,4,32,4,17,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot,Snapshot,5,46,0,0,2,9,1,2,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot.functions,ByTemporalPredicate,0,32,0,0,0,6,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVVertex,16,23,0,0,4,11,4,6,4,6

@@ -38,9 +38,9 @@ public final class Not&lt;T extends Element&gt; implements HBaseElementFilter&lt
    *
    * @param predicate predicate
    */
-<span class="fc" id="L41">  private Not(HBaseElementFilter&lt;T&gt; predicate) {</span>
-<span class="fc" id="L42">    this.predicate = predicate;</span>
-<span class="fc" id="L43">  }</span>
+<span class="nc" id="L41">  private Not(HBaseElementFilter&lt;T&gt; predicate) {</span>
+<span class="nc" id="L42">    this.predicate = predicate;</span>
+<span class="nc" id="L43">  }</span>
 
   /**
    * Create a negative formula
@@ -50,14 +50,14 @@ public final class Not&lt;T extends Element&gt; implements HBaseElementFilter&lt
    * @return negated filter instance
    */
   public static &lt;T extends Element&gt; Not&lt;T&gt; of(HBaseElementFilter&lt;T&gt; predicate) {
-<span class="fc" id="L53">    return new Not&lt;&gt;(predicate);</span>
+<span class="nc" id="L53">    return new Not&lt;&gt;(predicate);</span>
   }
 
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
     // Toggle negation to prevent double negation while fetching filter instance
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    return predicate.toHBaseFilter(!negate);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">    return predicate.toHBaseFilter(!negate);</span>
   }
 
   @Override

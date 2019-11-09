@@ -69,11 +69,11 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   /**
    * Byte array representation of the source vertex column identifier.
    */
-<span class="fc" id="L72">  private static final byte[] COL_SOURCE_BYTES = Bytes.toBytes(HBaseConstants.COL_SOURCE);</span>
+<span class="nc" id="L72">  private static final byte[] COL_SOURCE_BYTES = Bytes.toBytes(HBaseConstants.COL_SOURCE);</span>
   /**
    * Byte array representation of the target vertex column identifier.
    */
-<span class="fc" id="L76">  private static final byte[] COL_TARGET_BYTES = Bytes.toBytes(HBaseConstants.COL_TARGET);</span>
+<span class="nc" id="L76">  private static final byte[] COL_TARGET_BYTES = Bytes.toBytes(HBaseConstants.COL_TARGET);</span>
 
   /**
    * Creates edge data objects from the rows.
@@ -90,72 +90,72 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    *
    * @param edgeFactory edge data factory
    */
-<span class="fc" id="L93">  public HBaseEdgeHandler(EdgeFactory&lt;EPGMEdge&gt; edgeFactory) {</span>
-<span class="fc" id="L94">    this.edgeFactory = edgeFactory;</span>
-<span class="fc" id="L95">  }</span>
+<span class="nc" id="L93">  public HBaseEdgeHandler(EdgeFactory&lt;EPGMEdge&gt; edgeFactory) {</span>
+<span class="nc" id="L94">    this.edgeFactory = edgeFactory;</span>
+<span class="nc" id="L95">  }</span>
 
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
-<span class="fc" id="L100">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));</span>
-<span class="fc" id="L101">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));</span>
-<span class="fc" id="L102">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));</span>
-<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (isPreSplitRegions()) {</span>
-<span class="fc" id="L104">      admin.createTable(</span>
+<span class="nc" id="L100">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));</span>
+<span class="nc" id="L101">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));</span>
+<span class="nc" id="L102">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">    if (isPreSplitRegions()) {</span>
+<span class="nc" id="L104">      admin.createTable(</span>
         tableDescriptor,
-<span class="fc" id="L106">        RegionSplitter.getInstance().getStartKey(),</span>
-<span class="fc" id="L107">        RegionSplitter.getInstance().getEndKey(),</span>
-<span class="fc" id="L108">        RegionSplitter.getInstance().getNumberOfRegions());</span>
+<span class="nc" id="L106">        RegionSplitter.getInstance().getStartKey(),</span>
+<span class="nc" id="L107">        RegionSplitter.getInstance().getEndKey(),</span>
+<span class="nc" id="L108">        RegionSplitter.getInstance().getNumberOfRegions());</span>
     } else {
-<span class="fc" id="L110">      admin.createTable(tableDescriptor);</span>
+<span class="nc" id="L110">      admin.createTable(tableDescriptor);</span>
     }
-<span class="fc" id="L112">  }</span>
+<span class="nc" id="L112">  }</span>
 
   @Override
   public Put writeSource(final Put put, final GradoopId sourceId) {
-<span class="fc" id="L116">    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());</span>
+<span class="nc" id="L116">    return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());</span>
   }
 
   @Override
   public GradoopId readSourceId(Result res) {
-<span class="fc" id="L121">    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));</span>
+<span class="nc" id="L121">    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));</span>
   }
 
   @Override
   public Put writeTarget(Put put, GradoopId targetId) {
-<span class="fc" id="L126">    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());</span>
+<span class="nc" id="L126">    return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());</span>
   }
 
   @Override
   public GradoopId readTargetId(Result res) {
-<span class="fc" id="L131">    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));</span>
+<span class="nc" id="L131">    return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));</span>
   }
 
   @Override
   public Put writeEdge(Put put, Edge edgeData) {
-<span class="fc" id="L136">    writeLabel(put, edgeData);</span>
-<span class="fc" id="L137">    writeSource(put, edgeData.getSourceId());</span>
-<span class="fc" id="L138">    writeTarget(put, edgeData.getTargetId());</span>
-<span class="fc" id="L139">    writeProperties(put, edgeData);</span>
-<span class="fc" id="L140">    writeGraphIds(put, edgeData);</span>
-<span class="fc" id="L141">    return put;</span>
+<span class="nc" id="L136">    writeLabel(put, edgeData);</span>
+<span class="nc" id="L137">    writeSource(put, edgeData.getSourceId());</span>
+<span class="nc" id="L138">    writeTarget(put, edgeData.getTargetId());</span>
+<span class="nc" id="L139">    writeProperties(put, edgeData);</span>
+<span class="nc" id="L140">    writeGraphIds(put, edgeData);</span>
+<span class="nc" id="L141">    return put;</span>
   }
 
   @Override
   public EPGMEdge readEdge(Result res) {
-<span class="fc" id="L146">    return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),</span>
-<span class="fc" id="L147">        readProperties(res), readGraphIds(res));</span>
+<span class="nc" id="L146">    return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),</span>
+<span class="nc" id="L147">        readProperties(res), readGraphIds(res));</span>
   }
 
   @Override
   public EdgeHandler applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query) {
-<span class="fc" id="L152">    this.edgeQuery = query;</span>
-<span class="fc" id="L153">    return this;</span>
+<span class="nc" id="L152">    this.edgeQuery = query;</span>
+<span class="nc" id="L153">    return this;</span>
   }
 
   @Override
   public ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; getQuery() {
-<span class="fc" id="L158">    return this.edgeQuery;</span>
+<span class="nc" id="L158">    return this.edgeQuery;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

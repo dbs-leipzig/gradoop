@@ -37,13 +37,13 @@ public class HBaseLabelIn&lt;T extends Element&gt; extends LabelIn&lt;HBaseEleme
    * @param labels label
    */
   public HBaseLabelIn(String... labels) {
-<span class="fc" id="L40">    super(labels);</span>
-<span class="fc" id="L41">  }</span>
+<span class="nc" id="L40">    super(labels);</span>
+<span class="nc" id="L41">  }</span>
 
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
-<span class="fc" id="L46">    return HBaseFilterUtils.getLabelInFilter(getLabels(), negate);</span>
+<span class="nc" id="L46">    return HBaseFilterUtils.getLabelInFilter(getLabels(), negate);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

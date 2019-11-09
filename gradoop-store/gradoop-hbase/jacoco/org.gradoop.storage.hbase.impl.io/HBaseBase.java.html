@@ -44,21 +44,21 @@ abstract class HBaseBase {
   HBaseBase(
     @Nonnull HBaseEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig flinkConfig
-<span class="fc" id="L47">  ) {</span>
-<span class="fc" id="L48">    this.epgmStore = epgmStore;</span>
-<span class="fc" id="L49">    this.flinkConfig = flinkConfig;</span>
-<span class="fc" id="L50">  }</span>
+<span class="nc" id="L47">  ) {</span>
+<span class="nc" id="L48">    this.epgmStore = epgmStore;</span>
+<span class="nc" id="L49">    this.flinkConfig = flinkConfig;</span>
+<span class="nc" id="L50">  }</span>
 
   HBaseEPGMStore getStore() {
-<span class="fc" id="L53">    return epgmStore;</span>
+<span class="nc" id="L53">    return epgmStore;</span>
   }
 
   GradoopHBaseConfig getHBaseConfig() {
-<span class="fc" id="L57">    return epgmStore.getConfig();</span>
+<span class="nc" id="L57">    return epgmStore.getConfig();</span>
   }
 
   GradoopFlinkConfig getFlinkConfig() {
-<span class="fc" id="L61">    return flinkConfig;</span>
+<span class="nc" id="L61">    return flinkConfig;</span>
   }
 
 }

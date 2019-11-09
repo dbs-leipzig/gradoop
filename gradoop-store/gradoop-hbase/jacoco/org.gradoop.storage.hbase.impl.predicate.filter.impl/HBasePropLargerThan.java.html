@@ -39,13 +39,13 @@ public class HBasePropLargerThan&lt;T extends Element&gt;
    * @param include include min value
    */
   public HBasePropLargerThan(@Nonnull String key, @Nonnull Object min, boolean include) {
-<span class="fc" id="L42">    super(key, min, include);</span>
-<span class="fc" id="L43">  }</span>
+<span class="nc" id="L42">    super(key, min, include);</span>
+<span class="nc" id="L43">  }</span>
 
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
-<span class="fc" id="L48">    return HBaseFilterUtils.getPropLargerThanFilter(getKey(), getMin(), isInclude(), negate);</span>
+<span class="nc" id="L48">    return HBaseFilterUtils.getPropLargerThanFilter(getKey(), getMin(), isInclude(), negate);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

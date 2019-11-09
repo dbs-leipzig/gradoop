@@ -75,7 +75,7 @@ class UnsafeAvailChecker {
 <span class="fc" id="L75">          m.setAccessible(true);</span>
 <span class="fc" id="L76">          UNALIGNED = (Boolean) m.invoke(null);</span>
 <span class="nc" id="L77">        } catch (ReflectiveOperationException e) {</span>
-<span class="nc" id="L78">          LOG.warn(&quot;java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types&quot; +</span>
+<span class="nc" id="L78">          LOG.warn(&quot;java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types &quot; +</span>
             &quot;won't be used&quot;, e);
 <span class="fc" id="L80">        }</span>
       }

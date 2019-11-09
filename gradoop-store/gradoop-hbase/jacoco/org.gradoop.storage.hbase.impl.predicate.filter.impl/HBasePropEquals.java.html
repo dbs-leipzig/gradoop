@@ -38,13 +38,13 @@ public class HBasePropEquals&lt;T extends Element&gt; extends PropEquals&lt;HBas
    * @param value property value
    */
   public HBasePropEquals(@Nonnull String key, @Nonnull Object value) {
-<span class="fc" id="L41">    super(key, value);</span>
-<span class="fc" id="L42">  }</span>
+<span class="nc" id="L41">    super(key, value);</span>
+<span class="nc" id="L42">  }</span>
 
   @Override
   @Nonnull
   public Filter toHBaseFilter(boolean negate) {
-<span class="fc" id="L47">    return HBaseFilterUtils.getPropEqualsFilter(getKey(), getValue(), negate);</span>
+<span class="nc" id="L47">    return HBaseFilterUtils.getPropEqualsFilter(getKey(), getValue(), negate);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

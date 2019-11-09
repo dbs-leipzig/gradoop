@@ -8,6 +8,7 @@ org.gradoop.temporal.model.impl.operators.diff
 org.gradoop.temporal.model.impl.operators.diff.functions
 org.gradoop.temporal.model.impl.operators.equality
 org.gradoop.temporal.model.impl.operators.keyedgrouping
+org.gradoop.temporal.model.impl.operators.keyedgrouping.keys
 org.gradoop.temporal.model.impl.operators.snapshot
 org.gradoop.temporal.model.impl.operators.tostring
 org.gradoop.temporal.model.impl.pojo

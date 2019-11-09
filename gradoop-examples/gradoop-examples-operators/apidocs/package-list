@@ -5,6 +5,8 @@ org.gradoop.examples.communities
 org.gradoop.examples.frequentpattern
 org.gradoop.examples.frequentpattern.data
 org.gradoop.examples.grouping
+org.gradoop.examples.keyedgrouping
+org.gradoop.examples.keyedgrouping.functions
 org.gradoop.examples.patternmatch
 org.gradoop.examples.quickstart
 org.gradoop.examples.quickstart.data

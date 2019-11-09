@@ -35,8 +35,6 @@ org.gradoop.flink.model.impl.operators.aggregation.functions.average
 org.gradoop.flink.model.impl.operators.base
 org.gradoop.flink.model.impl.operators.cloning
 org.gradoop.flink.model.impl.operators.combination
-org.gradoop.flink.model.impl.operators.cypher.capf
-org.gradoop.flink.model.impl.operators.cypher.capf.query
 org.gradoop.flink.model.impl.operators.difference
 org.gradoop.flink.model.impl.operators.distinction
 org.gradoop.flink.model.impl.operators.equality
