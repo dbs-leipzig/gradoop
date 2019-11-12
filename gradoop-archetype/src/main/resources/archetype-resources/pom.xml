@@ -120,7 +120,7 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <!-- The main class for Flink execution. -->
-                                        <program-class>${package}.AggregationExample</program-class>
+                                        <program-class>${package}.GradoopApplication</program-class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
