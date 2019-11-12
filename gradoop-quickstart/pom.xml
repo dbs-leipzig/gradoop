@@ -8,7 +8,7 @@
     <version>0.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>gradoop-archetype</artifactId>
+  <artifactId>gradoop-quickstart</artifactId>
   <packaging>maven-archetype</packaging>
 
   <name>Gradoop Maven Archetype</name>
