@@ -27,7 +27,7 @@ public class MinVertexDuration extends MinDuration implements VertexAggregateFun
    * Creates a new instance of this base aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
-   * @param dimension the given TimeDimension
+   * @param dimension the time dimension to consider
    */
   public MinVertexDuration(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey, dimension);

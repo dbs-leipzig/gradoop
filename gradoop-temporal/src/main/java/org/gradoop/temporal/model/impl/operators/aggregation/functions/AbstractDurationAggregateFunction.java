@@ -21,32 +21,37 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
+import java.util.Objects;
+
 /**
- * Abstract class for the DurationAggregate Functions
- *
+ * Abstract base class for functions aggregating the duration of temporal elements for a certain {@link TimeDimension}.
  */
 public abstract class AbstractDurationAggregateFunction extends BaseAggregateFunction {
 
+  /**
+   * Selects which time dimension is considered by this aggregate function.
+   */
+  protected final TimeDimension dimension;
 
   /**
-   * Creates a new instance of a base aggregate function.
+   * Creates a new instance of this base aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
+   * @param dimension the given TimeDimension
    */
-  public AbstractDurationAggregateFunction(String aggregatePropertyKey) {
+  public AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey);
+    this.dimension = Objects.requireNonNull(dimension);
   }
 
   /**
-   * Returns the duration of an element depending on the given TimeDimension
-   * If at least one part of the interval is either null or a Default Time, the
-   * method returns -1
+   * Returns the duration of an element based on the given {@link TimeDimension}.
+   * If start or end of the interval are `null` or set to a default value, {@code -1} is returned.
    *
    * @param element the given TemporalElement
-   * @param dimension the given TimeDimension
    * @return a correct duration or -1
    */
-  public static PropertyValue getDuration(TemporalElement element, TimeDimension dimension) {
+  protected PropertyValue getDuration(TemporalElement element) {
     Tuple2<Long, Long> timeInterval;
     switch (dimension) {
     case TRANSACTION_TIME:

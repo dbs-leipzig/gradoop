@@ -22,10 +22,8 @@ import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
-import java.util.Objects;
-
 /**
- * Calculate the minimum duration of a time dimension of one given {@link TimeDimension} of temporal elements.
+ * Calculates the maximum duration of a {@link TimeDimension} of temporal elements.
  *
  * Time intervals with either the start or end time set to the respective default value are evaluated as
  * Long Max.
@@ -33,19 +31,13 @@ import java.util.Objects;
 public class MinDuration extends AbstractDurationAggregateFunction implements Min, TemporalAggregateFunction {
 
   /**
-   * Selects which time dimension is considered by this aggregate function.
-   */
-  private final TimeDimension dimension;
-
-  /**
-   * Creates a new instance of a base aggregate function.
+   * Creates a new instance of this base aggregate function.
    *
    * @param aggregatePropertyKey the given aggregate property key
-   * @param dimension the given TimeDimension
+   * @param dimension the time dimension to consider
    */
   public MinDuration(String aggregatePropertyKey, TimeDimension dimension) {
-    super(aggregatePropertyKey);
-    this.dimension = Objects.requireNonNull(dimension);
+    super(aggregatePropertyKey, dimension);
   }
 
   /**
@@ -58,7 +50,7 @@ public class MinDuration extends AbstractDurationAggregateFunction implements Mi
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    PropertyValue duration = super.getDuration(element, dimension);
+    PropertyValue duration = getDuration(element);
     if (duration.getLong() == -1L) {
       return PropertyValue.create(TemporalElement.DEFAULT_TIME_TO);
     }

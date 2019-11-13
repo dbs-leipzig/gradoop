@@ -44,10 +44,10 @@ public class AverageDuration extends AbstractDurationAggregateFunction implement
    * Create an instance of the {@link AverageDuration} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param dimension            The time dimension to consider.
+   * @param dimension the time dimension to consider
    */
   public AverageDuration(String aggregatePropertyKey, TimeDimension dimension) {
-    super(aggregatePropertyKey);
+    super(aggregatePropertyKey, dimension);
     this.dimension = Objects.requireNonNull(dimension);
   }
 
@@ -62,7 +62,7 @@ public class AverageDuration extends AbstractDurationAggregateFunction implement
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    PropertyValue duration = super.getDuration(element, dimension);
+    PropertyValue duration = getDuration(element);
     if (duration.getLong() == -1L) {
       return Average.IGNORED_VALUE;
     }

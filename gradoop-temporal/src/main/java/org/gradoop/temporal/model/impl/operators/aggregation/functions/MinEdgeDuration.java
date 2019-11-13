@@ -25,10 +25,10 @@ import org.gradoop.temporal.model.api.TimeDimension;
 public class MinEdgeDuration extends MinDuration implements EdgeAggregateFunction {
 
   /**
-   * Creates a new instance of this base aggregate function.
+   * Creates a new instance of this aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
-   * @param dimension the given TimeDimension
+   * @param dimension the time dimension to consider
    */
   public MinEdgeDuration(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey, dimension);
