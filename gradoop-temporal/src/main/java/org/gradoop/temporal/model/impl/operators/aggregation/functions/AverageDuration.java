@@ -28,7 +28,8 @@ import java.util.Objects;
  * Calculate the average duration of a time dimension of one given {@link TimeDimension} of temporal elements.
  * Time intervals with either the start or end time set to the respective default value will be ignored.
  */
-public class AverageDuration extends AbstractDurationAggregateFunction implements Average, TemporalAggregateFunction {
+public class AverageDuration extends AbstractDurationAggregateFunction
+  implements Average, TemporalAggregateFunction {
 
   /**
    * A property value containing the number {@code 1}, as a {@link Long}.

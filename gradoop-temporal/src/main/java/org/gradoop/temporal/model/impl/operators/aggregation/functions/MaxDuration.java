@@ -38,12 +38,34 @@ public class MaxDuration extends AbstractDurationAggregateFunction implements Ma
     super(aggregatePropertyKey, dimension);
   }
 
+  /**
+   * Calculates the duration of a given element depending on the given {@link TimeDimension}.
+   *  Returns 0 if either the start or end time of the duration are default values.
+   *
+   * @param element the temporal element
+   * @return the duration of the time interval
+   */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
     PropertyValue duration = getDuration(element);
     if (duration.getLong() == -1L) {
-      return PropertyValue.create(0L);
+      return PropertyValue.create(TemporalElement.DEFAULT_TIME_FROM);
     }
     return duration;
+  }
+
+  /**
+   * Method to check whether all aggregated durations had been default values.
+   *
+   * @param result the result of the MaxDuration Aggregation
+   *
+   * @return null, if the maximum duration is {@link TemporalElement#DEFAULT_TIME_FROM}
+   */
+  @Override
+  public PropertyValue postAggregate(PropertyValue result) {
+    if (result.getLong() == TemporalElement.DEFAULT_TIME_FROM) {
+      return PropertyValue.create(null);
+    }
+    return result;
   }
 }

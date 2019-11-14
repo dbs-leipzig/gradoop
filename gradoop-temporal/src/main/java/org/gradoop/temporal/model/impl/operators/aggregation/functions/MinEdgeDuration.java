@@ -20,7 +20,6 @@ import org.gradoop.temporal.model.api.TimeDimension;
 
 /**
  * Calculates the minimum duration of all given edges and the defined {@link TimeDimension}.
- *
  */
 public class MinEdgeDuration extends MinDuration implements EdgeAggregateFunction {
 

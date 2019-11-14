@@ -39,7 +39,7 @@ public abstract class AbstractDurationAggregateFunction extends BaseAggregateFun
    * @param aggregatePropertyKey aggregate property key
    * @param dimension the given TimeDimension
    */
-  public AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension) {
+  AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension) {
     super(aggregatePropertyKey);
     this.dimension = Objects.requireNonNull(dimension);
   }
@@ -49,9 +49,9 @@ public abstract class AbstractDurationAggregateFunction extends BaseAggregateFun
    * If start or end of the interval are `null` or set to a default value, {@code -1} is returned.
    *
    * @param element the given TemporalElement
-   * @return a correct duration or -1
+   * @return a {@link PropertyValue} object holding the duration as long value [ms] or {@value -1} in case of a null or default value
    */
-  protected PropertyValue getDuration(TemporalElement element) {
+  PropertyValue getDuration(TemporalElement element) {
     Tuple2<Long, Long> timeInterval;
     switch (dimension) {
     case TRANSACTION_TIME:
@@ -61,7 +61,7 @@ public abstract class AbstractDurationAggregateFunction extends BaseAggregateFun
       timeInterval = element.getValidTime();
       break;
     default:
-      throw new IllegalArgumentException("Temporal attribute " + dimension + " is not supported.");
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
     }
     if (timeInterval.f0 == null || timeInterval.f1 == null ||
       timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||

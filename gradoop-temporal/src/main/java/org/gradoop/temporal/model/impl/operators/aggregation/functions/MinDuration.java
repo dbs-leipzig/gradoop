@@ -23,10 +23,10 @@ import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 /**
- * Calculates the maximum duration of a {@link TimeDimension} of temporal elements.
+ * Calculates the minimum duration of a {@link TimeDimension} of temporal elements.
  *
  * Time intervals with either the start or end time set to the respective default value are evaluated as
- * Long Max.
+ * {@link Long#MAX_VALUE}.
  */
 public class MinDuration extends AbstractDurationAggregateFunction implements Min, TemporalAggregateFunction {
 
@@ -41,9 +41,8 @@ public class MinDuration extends AbstractDurationAggregateFunction implements Mi
   }
 
   /**
-   * Calculates the duration of a given element depending on the TimeDimension of the MaxDuration function.
-   *  Returns Long_Max if either the start or end time of the duration are equal to
-   *  DEFAULT_TIME_FROM / DEFAULT_TIME_TO or null
+   * Calculates the duration of a given element depending on the given {@link TimeDimension}.
+   *  Returns {@link Long#MAX_VALUE} if either the start or end time of the duration are default values.
    *
    * @param element the temporal element
    * @return the duration of the time interval
@@ -68,5 +67,20 @@ public class MinDuration extends AbstractDurationAggregateFunction implements Mi
   @Override
   public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Numeric.min(aggregate, increment);
+  }
+
+  /**
+   * Method to check whether all aggregated durations had been default values.
+   *
+   * @param result the result of the MinDuration Aggregation
+   *
+   * @return null, if the minimum duration is {@link TemporalElement#DEFAULT_TIME_TO}
+   */
+  @Override
+  public PropertyValue postAggregate(PropertyValue result) {
+    if (result.getLong() == TemporalElement.DEFAULT_TIME_TO) {
+      return PropertyValue.create(null);
+    }
+    return result;
   }
 }
