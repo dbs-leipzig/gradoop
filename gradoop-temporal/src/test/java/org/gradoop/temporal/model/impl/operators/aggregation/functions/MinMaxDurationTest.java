@@ -201,7 +201,8 @@ public class MinMaxDurationTest extends TemporalGradoopTestBase {
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4, e5);
     TemporalGraph temporalResult = graphFactory.fromDataSets(vertices, edges)
-      .aggregate(new MinDuration("minDurTx", TRANSACTION_TIME),
+      .aggregate(
+        new MinDuration("minDurTx", TRANSACTION_TIME),
         new MinDuration("minDurValid", VALID_TIME),
         new MinVertexDuration("minVertexDurTx", TRANSACTION_TIME),
         new MinVertexDuration("minVertexDurValid", VALID_TIME),
@@ -233,7 +234,8 @@ public class MinMaxDurationTest extends TemporalGradoopTestBase {
   public void testDurationWithDefaultValues() throws Exception {
     LogicalGraph logicalGraph  = getSocialNetworkLoader().getLogicalGraph();
     TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(logicalGraph);
-    temporalGraph = temporalGraph.aggregate(new MinDuration("minDur", VALID_TIME),
+    temporalGraph = temporalGraph.aggregate(
+      new MinDuration("minDur", VALID_TIME),
       new MaxDuration("maxDur", VALID_TIME));
     LogicalGraph result = temporalGraph.toLogicalGraph();
     List<EPGMGraphHead> graphHead = new ArrayList<>();
