@@ -31,10 +31,9 @@ import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.testng.AssertJUnit;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,37 +41,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Test for the snapshot operator for temporal graphs.
  */
-@RunWith(Parameterized.class)
 public class SnapshotTest extends TemporalGradoopTestBase {
-
-  /**
-   * The temporal predicate to test.
-   */
-  @Parameterized.Parameter
-  public TemporalPredicate predicate;
-
-  /**
-   * The temporal dimension to test.
-   */
-  @Parameterized.Parameter(1)
-  public TimeDimension dimension;
-
-  /**
-   * The variable name of the input graph.
-   */
-  @Parameterized.Parameter(2)
-  public String[] expectedVertices;
-
-  /**
-   * The expected result graph for the ascii graph loader.
-   */
-  @Parameterized.Parameter(3)
-  public String[] expectedEdges;
 
   /**
    * Run the test. Calls the snapshot operator using a predicate and compares results with the expected
@@ -80,8 +54,9 @@ public class SnapshotTest extends TemporalGradoopTestBase {
    *
    * @throws Exception when the Execution in Flink fails.
    */
-  @Test
-  public void runTest() throws Exception {
+  @Test(dataProvider = "parameters")
+  public void runTest(TemporalPredicate predicate, TimeDimension dimension, String[] expectedVertices,
+                      String[] expectedEdges) throws Exception {
     TemporalGraph inputGraph = getTestGraphWithValues();
 
     Collection<TemporalVertex> resultVertices = new HashSet<>();
@@ -102,8 +77,8 @@ public class SnapshotTest extends TemporalGradoopTestBase {
     assertEquals(expectedVertices.length, resultVertices.size());
     assertEquals(expectedEdges.length, resultEdges.size());
 
-    Arrays.stream(expectedVertices).map(resultVertexLabels::contains).forEach(Assert::assertTrue);
-    Arrays.stream(expectedEdges).map(resultEdgeLabels::contains).forEach(Assert::assertTrue);
+    Arrays.stream(expectedVertices).map(resultVertexLabels::contains).forEach(AssertJUnit::assertTrue);
+    Arrays.stream(expectedEdges).map(resultEdgeLabels::contains).forEach(AssertJUnit::assertTrue);
   }
 
   /**
@@ -112,11 +87,10 @@ public class SnapshotTest extends TemporalGradoopTestBase {
    * @return An array containing arrays in the form of {@code {predicate, dimension, inputGraph,
    * extraGraphData}}.
    */
-  @Parameterized.Parameters(name = "{0} ({1})")
-  public static Iterable<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
-      {new All(), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V4, V5},
-        new String[] {E1, E2, E3, E4, E5}},
+  @DataProvider
+  public static Object[][] parameters() {
+    return new Object[][] {
+      {new All(), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V4, V5}, new String[] {E1, E2, E3, E4, E5}},
       {new AsOf(3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
       {new Between(2L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
       {new ContainedIn(0L, 5L), TimeDimension.VALID_TIME, new String[] {V4}, new String[] {E3, E5}},
@@ -124,23 +98,19 @@ public class SnapshotTest extends TemporalGradoopTestBase {
       {new DeletedIn(6L, 10L), TimeDimension.VALID_TIME, new String[] {V3, V5}, new String[] {E2, E4}},
       {new FromTo(1L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V5}, new String[] {E1}},
       {new ValidDuring(3L, 8L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
-
       {new All(), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
         new String[] {E1, E2, E3, E4, E5}},
       {new AsOf(3L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
         new String[] {E1, E3, E5}},
       {new Between(4L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
         new String[] {E1, E4, E5}},
-      {new ContainedIn(2L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V4, V5},
-        new String[] {E3, E4, E5}},
+      {new ContainedIn(2L, 8L), TimeDimension.TRANSACTION_TIME, new String[] {V4, V5}, new String[] {E3, E4, E5}},
       {new CreatedIn(0L, 5L), TimeDimension.TRANSACTION_TIME, new String[] {V2, V3, V4, V5},
         new String[] {E1, E2, E3, E5}},
-      {new DeletedIn(5L, 10L), TimeDimension.TRANSACTION_TIME, new String[] {V3, V4, V5},
-        new String[] {E4, E5}},
+      {new DeletedIn(5L, 10L), TimeDimension.TRANSACTION_TIME, new String[] {V3, V4, V5}, new String[] {E4, E5}},
       {new FromTo(2L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3, V4, V5},
         new String[] {E1, E3, E5}},
-      {new ValidDuring(1L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3},
-        new String[] {E1}}
-    });
+      {new ValidDuring(1L, 6L), TimeDimension.TRANSACTION_TIME, new String[] {V1, V2, V3}, new String[] {E1}}
+    };
   }
 }
