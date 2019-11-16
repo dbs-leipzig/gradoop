@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWith
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -81,58 +82,93 @@ public class GroupingGroupCombine&lt;
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List&lt;LabelGroup&gt; vertexLabelGroups,
-    List&lt;LabelGroup&gt; edgeLabelGroups) {
-<span class="fc" id="L94">    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);</span>
-<span class="fc" id="L95">  }</span>
+    List&lt;LabelGroup&gt; edgeLabelGroups,
+    boolean retainVerticesWithoutGroup) {
+<span class="fc" id="L98">    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,</span>
+      retainVerticesWithoutGroup);
+<span class="fc" id="L100">  }</span>
 
   @Override
   protected LG groupInternal(LG graph) {
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    DataSet&lt;V&gt; vertices = isRetainingVerticesWithoutGroup() ?</span>
+<span class="fc" id="L106">      graph.getVertices()</span>
+<span class="fc" id="L107">        .filter(new LabelGroupFilter&lt;&gt;(getVertexLabelGroups(), useVertexLabels())) :</span>
+<span class="fc" id="L108">      graph.getVertices();</span>
+
     // map vertex to vertex group item
-<span class="fc" id="L100">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
-<span class="fc" id="L101">      .flatMap(new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
+<span class="fc" id="L111">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = vertices.flatMap(</span>
+<span class="fc" id="L112">      new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
 
     // group vertices by label / properties / both
-<span class="fc" id="L104">    DataSet&lt;VertexGroupItem&gt; combinedVertexGroupItems = groupVertices(verticesForGrouping)</span>
+<span class="fc" id="L115">    DataSet&lt;VertexGroupItem&gt; combinedVertexGroupItems = groupVertices(verticesForGrouping)</span>
       // apply aggregate function per combined partition
-<span class="fc" id="L106">      .combineGroup(new CombineVertexGroupItems(useVertexLabels()));</span>
+<span class="fc" id="L117">      .combineGroup(new CombineVertexGroupItems(useVertexLabels()));</span>
 
     // filter super vertex tuples (1..n per partition/group)
     // group  super vertex tuples
     // create super vertex tuple (1 per group) + previous super vertex ids
-<span class="fc" id="L111">    DataSet&lt;Tuple2&lt;VertexGroupItem, IdWithIdSet&gt;&gt; superVertexTuples =</span>
-<span class="fc" id="L112">      groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))</span>
-<span class="fc" id="L113">        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels()));</span>
+<span class="fc" id="L122">    DataSet&lt;Tuple2&lt;VertexGroupItem, IdWithIdSet&gt;&gt; superVertexTuples =</span>
+<span class="fc" id="L123">      groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))</span>
+<span class="fc" id="L124">        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels()));</span>
 
     // build super vertices from super vertex tuples
-<span class="fc" id="L116">    DataSet&lt;V&gt; superVertices = superVertexTuples</span>
-<span class="fc" id="L117">      .map(new Value0Of2&lt;&gt;())</span>
-<span class="fc" id="L118">      .map(new BuildSuperVertex&lt;&gt;(</span>
-<span class="fc" id="L119">        useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
+<span class="fc" id="L127">    DataSet&lt;V&gt; superVertices = superVertexTuples</span>
+<span class="fc" id="L128">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L129">      .map(new BuildSuperVertex&lt;&gt;(</span>
+<span class="fc" id="L130">        useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
 
     // extract mapping
-<span class="fc" id="L122">    DataSet&lt;IdWithIdSet&gt; mapping = superVertexTuples</span>
-<span class="fc" id="L123">      .map(new Value1Of2&lt;&gt;());</span>
+<span class="fc" id="L133">    DataSet&lt;IdWithIdSet&gt; mapping = superVertexTuples</span>
+<span class="fc" id="L134">      .map(new Value1Of2&lt;&gt;());</span>
 
     // filter non-candidates from combiner output
     // update their vertex representative according to the mapping
-<span class="fc" id="L127">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = combinedVertexGroupItems</span>
-<span class="fc" id="L128">      .filter(new FilterRegularVertices())</span>
-<span class="fc" id="L129">      .map(new BuildVertexWithSuperVertexBC())</span>
-<span class="fc" id="L130">      .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);</span>
+<span class="fc" id="L138">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = combinedVertexGroupItems</span>
+<span class="fc" id="L139">      .filter(new FilterRegularVertices())</span>
+<span class="fc" id="L140">      .map(new BuildVertexWithSuperVertexBC())</span>
+<span class="fc" id="L141">      .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);</span>
 
-    // build super edges
-<span class="fc" id="L133">    DataSet&lt;E&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
+<span class="fc" id="L143">    DataSet&lt;E&gt; edgesToGroup = graph.getEdges();</span>
 
-<span class="fc" id="L135">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">    if (isRetainingVerticesWithoutGroup()) {</span>
+<span class="fc" id="L146">      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);</span>
+
+      // To add support for grouped edges between retained vertices and supervertices,
+      // vertices are their group representatives themselves
+<span class="fc" id="L150">      vertexToRepresentativeMap =</span>
+<span class="fc" id="L151">        updateVertexRepresentatives(vertexToRepresentativeMap,</span>
+<span class="fc" id="L152">          retainedVerticesSubgraph.getVertices());</span>
+
+      // don't execute grouping on edges between retained vertices
+      // but execute on edges between retained vertices and grouped vertices
+      //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
+<span class="fc" id="L157">      edgesToGroup = subtractEdges(graph.getEdges(), retainedVerticesSubgraph.getEdges());</span>
+    }
+
+<span class="fc" id="L160">    DataSet&lt;E&gt; superEdges =</span>
+<span class="fc" id="L161">      buildSuperEdges(graph.getFactory().getEdgeFactory(), edgesToGroup, vertexToRepresentativeMap);</span>
+
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    if (isRetainingVerticesWithoutGroup()) {</span>
+<span class="fc" id="L164">      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);</span>
+<span class="fc" id="L165">      superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());</span>
+<span class="fc" id="L166">      superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());</span>
+    }
+
+<span class="fc" id="L169">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
+
   }
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

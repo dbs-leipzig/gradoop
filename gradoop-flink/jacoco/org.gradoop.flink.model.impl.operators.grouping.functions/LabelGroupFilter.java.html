@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LabelGroupFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping.functions</a> &gt; <span class="el_source">LabelGroupFilter.java</span></div><h1>LabelGroupFilter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping.functions;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Function to check whether a vertex is a member of a {@link LabelGroup}.
+ *
+ * @param &lt;V&gt; The vertex type.
+ */
+public class LabelGroupFilter&lt;V extends Vertex&gt; implements FilterFunction&lt;V&gt; {
+
+  /**
+   * LabelGroups to check.
+   */
+  private final List&lt;LabelGroup&gt; labelGroups;
+
+  /**
+   * A flag to identify if grouping by vertex label is enabled.
+   */
+  private final boolean groupingByLabels;
+
+  /**
+   * A filter function to retain vertices that are in a label group which means, the vertex has a
+   * label or property that matches a grouping key from the config.
+   *
+   * @param labelGroups the label groups used by grouping
+   * @param groupingByLabels a flag that indicates if the grouping by all labels is enabled
+   */
+<span class="fc" id="L51">  public LabelGroupFilter(List&lt;LabelGroup&gt; labelGroups, boolean groupingByLabels) {</span>
+<span class="fc" id="L52">    this.labelGroups = Objects.requireNonNull(labelGroups);</span>
+<span class="fc" id="L53">    this.groupingByLabels = groupingByLabels;</span>
+<span class="fc" id="L54">  }</span>
+
+  /**
+   * Check whether a vertex exhibits all properties of a {@link LabelGroup}.
+   *
+   * @param group  labelGroup to check
+   * @param vertex vertex to check
+   * @return true, if a vertex exhibits all properties or if grouped by properties (propertyKeys)
+   * are empty.
+   */
+  private boolean hasVertexAllPropertiesOfGroup(LabelGroup group, V vertex) {
+<span class="fc" id="L65">    return group.getPropertyKeys().parallelStream().allMatch(vertex::hasProperty);</span>
+  }
+
+  @Override
+  public boolean filter(V vertex) throws Exception {
+<span class="fc" id="L70">    boolean vertexIsInALabelGroup = false;</span>
+    LabelGroup labelGroup;
+
+<span class="fc" id="L73">    final Iterator&lt;LabelGroup&gt; labelGroupIterator = labelGroups.iterator();</span>
+
+    // Iterate over all label labelGroups until vertex matches a label group
+<span class="fc bfc" id="L76" title="All 4 branches covered.">    while (labelGroupIterator.hasNext() &amp;&amp; !vertexIsInALabelGroup) {</span>
+<span class="fc" id="L77">      labelGroup = labelGroupIterator.next();</span>
+
+      // Default case (parameter group is not label specific)
+<span class="fc bfc" id="L80" title="All 2 branches covered.">      if (labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {</span>
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (groupingByLabels) {</span>
+
+          // if the vertex's label is empty,
+          // a) and the group by properties are empty =&gt; vertex is not member of the group
+          // b) and group by properties are not empty =&gt; vertex can be member of the group
+<span class="fc bfc" id="L87" title="All 2 branches covered.">          if (!vertex.getLabel().isEmpty()) {</span>
+<span class="fc" id="L88">            vertexIsInALabelGroup = hasVertexAllPropertiesOfGroup(labelGroup, vertex);</span>
+          }
+        }
+        // if we not group by labels, we need to check if the vertex has all properties grouped by
+        // if there is no grouped by property, no vertex should be part of the group
+<span class="fc bfc" id="L93" title="All 4 branches covered.">        vertexIsInALabelGroup = vertexIsInALabelGroup || !labelGroup.getPropertyKeys().isEmpty() &amp;&amp;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">          hasVertexAllPropertiesOfGroup(labelGroup, vertex);</span>
+
+      } else {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        vertexIsInALabelGroup = vertex.getLabel().equals(labelGroup.getGroupingLabel()) &amp;&amp;</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">          hasVertexAllPropertiesOfGroup(labelGroup, vertex);</span>
+      }
+    }
+<span class="fc" id="L101">    return vertexIsInALabelGroup;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

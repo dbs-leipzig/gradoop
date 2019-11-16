@@ -1,0 +1,1065 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<title>VertexRetentionTestBase xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../../stylesheet.css" />
+</head>
+<body>
+<pre>
+
+<a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2019 Leipzig University (Database Research Group)</em>
+<a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.grouping;
+<a name="17" href="#17">17</a>  
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.epgm.BaseGraph;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="29" href="#29">29</a>  
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> java.util.Collections;
+<a name="32" href="#32">32</a>  
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="34" href="#34">34</a>  
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/grouping/VertexRetentionTestBase.html">VertexRetentionTestBase</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
+<a name="36" href="#36">36</a>  
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> GroupingStrategy getStrategy();
+<a name="38" href="#38">38</a>  
+<a name="39" href="#39">39</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * Tests function {@link Grouping.GroupingBuilder#retainVerticesWithoutGroup()}.</em>
+<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * Tests whether enabling the flag works.</em>
+<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="43" href="#43">43</a>    @Test
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetainVerticesFlag() {
+<a name="45" href="#45">45</a>      UnaryBaseGraphToBaseGraphOperator&lt;?&gt; grouping = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="46" href="#46">46</a>        .setStrategy(getStrategy())
+<a name="47" href="#47">47</a>        .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="48" href="#48">48</a>        .retainVerticesWithoutGroup()
+<a name="49" href="#49">49</a>        .build();
+<a name="50" href="#50">50</a>  
+<a name="51" href="#51">51</a>      assertTrue(((Grouping) grouping).isRetainingVerticesWithoutGroup());
+<a name="52" href="#52">52</a>    }
+<a name="53" href="#53">53</a>  
+<a name="54" href="#54">54</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * Tests correct retention of a vertex with no properties.</em>
+<a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="60" href="#60">60</a>    @Test
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionNoProperties() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="62" href="#62">62</a>      String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="63" href="#63">63</a>        <span class="jxr_string">"(v0 {})"</span> +
+<a name="64" href="#64">64</a>        <span class="jxr_string">"]"</span>;
+<a name="65" href="#65">65</a>  
+<a name="66" href="#66">66</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="67" href="#67">67</a>  
+<a name="68" href="#68">68</a>      loader.appendToDatabaseFromString(
+<a name="69" href="#69">69</a>        <span class="jxr_string">"expected["</span> +
+<a name="70" href="#70">70</a>          <span class="jxr_string">"(v00 {})"</span> +
+<a name="71" href="#71">71</a>          <span class="jxr_string">"]"</span>);
+<a name="72" href="#72">72</a>  
+<a name="73" href="#73">73</a>      <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="74" href="#74">74</a>  
+<a name="75" href="#75">75</a>      LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="76" href="#76">76</a>        .setStrategy(getStrategy())
+<a name="77" href="#77">77</a>        .retainVerticesWithoutGroup()
+<a name="78" href="#78">78</a>        .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="79" href="#79">79</a>        .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="80" href="#80">80</a>        .execute(input);
+<a name="81" href="#81">81</a>  
+<a name="82" href="#82">82</a>      collectAndAssertTrue(
+<a name="83" href="#83">83</a>        output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="84" href="#84">84</a>    }
+<a name="85" href="#85">85</a>  
+<a name="86" href="#86">86</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * Tests correct retention of a vertex with a single property.</em>
+<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="92" href="#92">92</a>    @Test
+<a name="93" href="#93">93</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionSingleProperty() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="94" href="#94">94</a>      String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="95" href="#95">95</a>        <span class="jxr_string">"(v0 {a: 3})"</span> +
+<a name="96" href="#96">96</a>        <span class="jxr_string">"]"</span>;
+<a name="97" href="#97">97</a>  
+<a name="98" href="#98">98</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="99" href="#99">99</a>  
+<a name="100" href="#100">100</a>     loader.appendToDatabaseFromString(
+<a name="101" href="#101">101</a>       <span class="jxr_string">"expected["</span> +
+<a name="102" href="#102">102</a>         <span class="jxr_string">"(v00 {a: 3})"</span> +
+<a name="103" href="#103">103</a>         <span class="jxr_string">"]"</span>);
+<a name="104" href="#104">104</a> 
+<a name="105" href="#105">105</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="108" href="#108">108</a>       .setStrategy(getStrategy())
+<a name="109" href="#109">109</a>       .retainVerticesWithoutGroup()
+<a name="110" href="#110">110</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="111" href="#111">111</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="112" href="#112">112</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="113" href="#113">113</a>       .execute(input);
+<a name="114" href="#114">114</a> 
+<a name="115" href="#115">115</a>     collectAndAssertTrue(
+<a name="116" href="#116">116</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="117" href="#117">117</a>   }
+<a name="118" href="#118">118</a> 
+<a name="119" href="#119">119</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   * Tests correct retention of a vertex with multiple properties.</em>
+<a name="122" href="#122">122</a> <em class="jxr_javadoccomment">   *</em>
+<a name="123" href="#123">123</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="124" href="#124">124</a> <em class="jxr_javadoccomment">   */</em>
+<a name="125" href="#125">125</a>   @Test
+<a name="126" href="#126">126</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionMultipleProperties() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="127" href="#127">127</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="128" href="#128">128</a>       <span class="jxr_string">"(v0 {a: 3, b:'c'})"</span> +
+<a name="129" href="#129">129</a>       <span class="jxr_string">"]"</span>;
+<a name="130" href="#130">130</a> 
+<a name="131" href="#131">131</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="132" href="#132">132</a> 
+<a name="133" href="#133">133</a>     loader.appendToDatabaseFromString(
+<a name="134" href="#134">134</a>       <span class="jxr_string">"expected["</span> +
+<a name="135" href="#135">135</a>         <span class="jxr_string">"(v00 {a: 3, b:'c'})"</span> +
+<a name="136" href="#136">136</a>         <span class="jxr_string">"]"</span>);
+<a name="137" href="#137">137</a> 
+<a name="138" href="#138">138</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="139" href="#139">139</a> 
+<a name="140" href="#140">140</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="141" href="#141">141</a>       .setStrategy(getStrategy())
+<a name="142" href="#142">142</a>       .retainVerticesWithoutGroup()
+<a name="143" href="#143">143</a>       .addVertexGroupingKey(<span class="jxr_string">"c"</span>)
+<a name="144" href="#144">144</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="145" href="#145">145</a>       .execute(input);
+<a name="146" href="#146">146</a> 
+<a name="147" href="#147">147</a>     collectAndAssertTrue(
+<a name="148" href="#148">148</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="149" href="#149">149</a>   }
+<a name="150" href="#150">150</a> 
+<a name="151" href="#151">151</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * Tests correct retention of an edge from a vertex to be retained to a grouped vertex.</em>
+<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   *</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   */</em>
+<a name="157" href="#157">157</a>   @Test
+<a name="158" href="#158">158</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionSingleEdgeFromRetainedToGrouped() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="159" href="#159">159</a> 
+<a name="160" href="#160">160</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="161" href="#161">161</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="162" href="#162">162</a>       <span class="jxr_string">"(v1 {b : 2})"</span> + <em class="jxr_comment">// group</em>
+<a name="163" href="#163">163</a>       <span class="jxr_string">"(v0)--&gt;(v1)"</span> +
+<a name="164" href="#164">164</a>       <span class="jxr_string">"]"</span>;
+<a name="165" href="#165">165</a> 
+<a name="166" href="#166">166</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="167" href="#167">167</a> 
+<a name="168" href="#168">168</a>     loader.appendToDatabaseFromString(
+<a name="169" href="#169">169</a>       <span class="jxr_string">"expected["</span> +
+<a name="170" href="#170">170</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="171" href="#171">171</a>         <span class="jxr_string">"(v01 {b : 2, count: 1L})"</span> +
+<a name="172" href="#172">172</a>         <span class="jxr_string">"(v00)-[{count : 1L}]-&gt;(v01)"</span> +
+<a name="173" href="#173">173</a>         <span class="jxr_string">"]"</span>);
+<a name="174" href="#174">174</a> 
+<a name="175" href="#175">175</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="176" href="#176">176</a> 
+<a name="177" href="#177">177</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="178" href="#178">178</a>       .setStrategy(getStrategy())
+<a name="179" href="#179">179</a>       .retainVerticesWithoutGroup()
+<a name="180" href="#180">180</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="181" href="#181">181</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="182" href="#182">182</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="183" href="#183">183</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="184" href="#184">184</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="185" href="#185">185</a>       .execute(input);
+<a name="186" href="#186">186</a> 
+<a name="187" href="#187">187</a>     collectAndAssertTrue(
+<a name="188" href="#188">188</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="189" href="#189">189</a>   }
+<a name="190" href="#190">190</a> 
+<a name="191" href="#191">191</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="193" href="#193">193</a> <em class="jxr_javadoccomment">   * Tests correct retention of edges of a vertex to be retained to grouped vertices.</em>
+<a name="194" href="#194">194</a> <em class="jxr_javadoccomment">   *</em>
+<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   */</em>
+<a name="197" href="#197">197</a>   @Test
+<a name="198" href="#198">198</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionMultipleEdgesFromRetainedToGrouped() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="199" href="#199">199</a> 
+<a name="200" href="#200">200</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="201" href="#201">201</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="202" href="#202">202</a>       <span class="jxr_string">"(v1 {b : 2})"</span> + <em class="jxr_comment">// group</em>
+<a name="203" href="#203">203</a>       <span class="jxr_string">"(v2 {b : 4})"</span> + <em class="jxr_comment">// group</em>
+<a name="204" href="#204">204</a>       <span class="jxr_string">"(v0)--&gt;(v1)"</span> +
+<a name="205" href="#205">205</a>       <span class="jxr_string">"(v0)--&gt;(v2)"</span> +
+<a name="206" href="#206">206</a>       <span class="jxr_string">"]"</span>;
+<a name="207" href="#207">207</a> 
+<a name="208" href="#208">208</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="209" href="#209">209</a> 
+<a name="210" href="#210">210</a>     loader.appendToDatabaseFromString(
+<a name="211" href="#211">211</a>       <span class="jxr_string">"expected["</span> +
+<a name="212" href="#212">212</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="213" href="#213">213</a>         <span class="jxr_string">"(v01 {b : 2, count : 1L})"</span> +
+<a name="214" href="#214">214</a>         <span class="jxr_string">"(v02 {b : 4, count : 1L})"</span> +
+<a name="215" href="#215">215</a>         <span class="jxr_string">"(v00)-[{count : 1L}]-&gt;(v01)"</span> +
+<a name="216" href="#216">216</a>         <span class="jxr_string">"(v00)-[{count : 1L}]-&gt;(v02)"</span> +
+<a name="217" href="#217">217</a>         <span class="jxr_string">"]"</span>);
+<a name="218" href="#218">218</a> 
+<a name="219" href="#219">219</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="220" href="#220">220</a> 
+<a name="221" href="#221">221</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="222" href="#222">222</a>       .setStrategy(getStrategy())
+<a name="223" href="#223">223</a>       .retainVerticesWithoutGroup()
+<a name="224" href="#224">224</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="225" href="#225">225</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="226" href="#226">226</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="227" href="#227">227</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="228" href="#228">228</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="229" href="#229">229</a>       .execute(input);
+<a name="230" href="#230">230</a> 
+<a name="231" href="#231">231</a>     collectAndAssertTrue(
+<a name="232" href="#232">232</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="233" href="#233">233</a>   }
+<a name="234" href="#234">234</a> 
+<a name="235" href="#235">235</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * Tests correct retention of an edge from a vertex to be grouped to a retained vertex.</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   *</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   */</em>
+<a name="241" href="#241">241</a>   @Test
+<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionSingleEdgeFromGroupedToRetained() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="243" href="#243">243</a> 
+<a name="244" href="#244">244</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="245" href="#245">245</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="246" href="#246">246</a>       <span class="jxr_string">"(v1 {b : 2})"</span> + <em class="jxr_comment">// group</em>
+<a name="247" href="#247">247</a>       <span class="jxr_string">"(v1)--&gt;(v0)"</span> +
+<a name="248" href="#248">248</a>       <span class="jxr_string">"]"</span>;
+<a name="249" href="#249">249</a> 
+<a name="250" href="#250">250</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="251" href="#251">251</a> 
+<a name="252" href="#252">252</a>     loader.appendToDatabaseFromString(
+<a name="253" href="#253">253</a>       <span class="jxr_string">"expected["</span> +
+<a name="254" href="#254">254</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="255" href="#255">255</a>         <span class="jxr_string">"(v01 {b : 2, count: 1L})"</span> +
+<a name="256" href="#256">256</a>         <span class="jxr_string">"(v01)-[{count : 1L}]-&gt;(v00)"</span> +
+<a name="257" href="#257">257</a>         <span class="jxr_string">"]"</span>);
+<a name="258" href="#258">258</a> 
+<a name="259" href="#259">259</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="260" href="#260">260</a> 
+<a name="261" href="#261">261</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="262" href="#262">262</a>       .setStrategy(getStrategy())
+<a name="263" href="#263">263</a>       .retainVerticesWithoutGroup()
+<a name="264" href="#264">264</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="265" href="#265">265</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="266" href="#266">266</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="267" href="#267">267</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="268" href="#268">268</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="269" href="#269">269</a>       .execute(input);
+<a name="270" href="#270">270</a> 
+<a name="271" href="#271">271</a>     collectAndAssertTrue(
+<a name="272" href="#272">272</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="273" href="#273">273</a>   }
+<a name="274" href="#274">274</a> 
+<a name="275" href="#275">275</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="277" href="#277">277</a> <em class="jxr_javadoccomment">   * Tests correct retention of edges from vertices to be grouped to a retained vertex.</em>
+<a name="278" href="#278">278</a> <em class="jxr_javadoccomment">   *</em>
+<a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="280" href="#280">280</a> <em class="jxr_javadoccomment">   */</em>
+<a name="281" href="#281">281</a>   @Test
+<a name="282" href="#282">282</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionMultipleEdgesFromGroupedToRetained() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="283" href="#283">283</a> 
+<a name="284" href="#284">284</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="285" href="#285">285</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="286" href="#286">286</a>       <span class="jxr_string">"(v1 {b : 2})"</span> + <em class="jxr_comment">// group</em>
+<a name="287" href="#287">287</a>       <span class="jxr_string">"(v2 {b : 3})"</span> + <em class="jxr_comment">// group</em>
+<a name="288" href="#288">288</a>       <span class="jxr_string">"(v1)--&gt;(v0)"</span> +
+<a name="289" href="#289">289</a>       <span class="jxr_string">"(v2)--&gt;(v0)"</span> +
+<a name="290" href="#290">290</a>       <span class="jxr_string">"]"</span>;
+<a name="291" href="#291">291</a> 
+<a name="292" href="#292">292</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="293" href="#293">293</a> 
+<a name="294" href="#294">294</a>     loader.appendToDatabaseFromString(
+<a name="295" href="#295">295</a>       <span class="jxr_string">"expected["</span> +
+<a name="296" href="#296">296</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="297" href="#297">297</a>         <span class="jxr_string">"(v01 {b : 2, count: 1L})"</span> +
+<a name="298" href="#298">298</a>         <span class="jxr_string">"(v02 {b : 3, count: 1L})"</span> +
+<a name="299" href="#299">299</a>         <span class="jxr_string">"(v01)-[{count : 1L}]-&gt;(v00)"</span> +
+<a name="300" href="#300">300</a>         <span class="jxr_string">"(v02)-[{count : 1L}]-&gt;(v00)"</span> +
+<a name="301" href="#301">301</a>         <span class="jxr_string">"]"</span>);
+<a name="302" href="#302">302</a> 
+<a name="303" href="#303">303</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="304" href="#304">304</a> 
+<a name="305" href="#305">305</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="306" href="#306">306</a>       .setStrategy(getStrategy())
+<a name="307" href="#307">307</a>       .retainVerticesWithoutGroup()
+<a name="308" href="#308">308</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="309" href="#309">309</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="310" href="#310">310</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="311" href="#311">311</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="312" href="#312">312</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="313" href="#313">313</a>       .execute(input);
+<a name="314" href="#314">314</a> 
+<a name="315" href="#315">315</a>     collectAndAssertTrue(
+<a name="316" href="#316">316</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="317" href="#317">317</a>   }
+<a name="318" href="#318">318</a> 
+<a name="319" href="#319">319</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="321" href="#321">321</a> <em class="jxr_javadoccomment">   * Tests correct retention of an edge from a vertex to itself.</em>
+<a name="322" href="#322">322</a> <em class="jxr_javadoccomment">   *</em>
+<a name="323" href="#323">323</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="324" href="#324">324</a> <em class="jxr_javadoccomment">   */</em>
+<a name="325" href="#325">325</a>   @Test
+<a name="326" href="#326">326</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionIdentityEdge() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="327" href="#327">327</a> 
+<a name="328" href="#328">328</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="329" href="#329">329</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="330" href="#330">330</a>       <span class="jxr_string">"(v0)-[{b : 1L}]-&gt;(v0)"</span> +
+<a name="331" href="#331">331</a>       <span class="jxr_string">"]"</span>;
+<a name="332" href="#332">332</a> 
+<a name="333" href="#333">333</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="334" href="#334">334</a> 
+<a name="335" href="#335">335</a>     loader.appendToDatabaseFromString(
+<a name="336" href="#336">336</a>       <span class="jxr_string">"expected["</span> +
+<a name="337" href="#337">337</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="338" href="#338">338</a>         <span class="jxr_string">"(v00)-[{b : 1L}]-&gt;(v00)"</span> +
+<a name="339" href="#339">339</a>         <span class="jxr_string">"]"</span>);
+<a name="340" href="#340">340</a> 
+<a name="341" href="#341">341</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="342" href="#342">342</a> 
+<a name="343" href="#343">343</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="344" href="#344">344</a>       .setStrategy(getStrategy())
+<a name="345" href="#345">345</a>       .retainVerticesWithoutGroup()
+<a name="346" href="#346">346</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="347" href="#347">347</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="348" href="#348">348</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="349" href="#349">349</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="350" href="#350">350</a>       .execute(input);
+<a name="351" href="#351">351</a> 
+<a name="352" href="#352">352</a>     collectAndAssertTrue(
+<a name="353" href="#353">353</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="354" href="#354">354</a>   }
+<a name="355" href="#355">355</a> 
+<a name="356" href="#356">356</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="357" href="#357">357</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="358" href="#358">358</a> <em class="jxr_javadoccomment">   * Tests correct retention of edges between retained vertices.</em>
+<a name="359" href="#359">359</a> <em class="jxr_javadoccomment">   *</em>
+<a name="360" href="#360">360</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="361" href="#361">361</a> <em class="jxr_javadoccomment">   */</em>
+<a name="362" href="#362">362</a>   @Test
+<a name="363" href="#363">363</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionSingleEdgeRetainedToRetained() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="364" href="#364">364</a> 
+<a name="365" href="#365">365</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="366" href="#366">366</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="367" href="#367">367</a>       <span class="jxr_string">"(v1 {c : 2})"</span> + <em class="jxr_comment">// retain</em>
+<a name="368" href="#368">368</a>       <span class="jxr_string">"(v1)-[:foo {e : 1}]-&gt;(v0)"</span> +
+<a name="369" href="#369">369</a>       <span class="jxr_string">"]"</span>;
+<a name="370" href="#370">370</a> 
+<a name="371" href="#371">371</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="372" href="#372">372</a> 
+<a name="373" href="#373">373</a>     loader.appendToDatabaseFromString(
+<a name="374" href="#374">374</a>       <span class="jxr_string">"expected["</span> +
+<a name="375" href="#375">375</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="376" href="#376">376</a>         <span class="jxr_string">"(v01 {c : 2})"</span> +
+<a name="377" href="#377">377</a>         <span class="jxr_string">"(v01)-[:foo {e : 1}]-&gt;(v00)"</span> +
+<a name="378" href="#378">378</a>         <span class="jxr_string">"]"</span>);
+<a name="379" href="#379">379</a> 
+<a name="380" href="#380">380</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="381" href="#381">381</a> 
+<a name="382" href="#382">382</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="383" href="#383">383</a>       .setStrategy(getStrategy())
+<a name="384" href="#384">384</a>       .retainVerticesWithoutGroup()
+<a name="385" href="#385">385</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="386" href="#386">386</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="387" href="#387">387</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="388" href="#388">388</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="389" href="#389">389</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="390" href="#390">390</a>       .execute(input);
+<a name="391" href="#391">391</a> 
+<a name="392" href="#392">392</a>     collectAndAssertTrue(
+<a name="393" href="#393">393</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="394" href="#394">394</a>   }
+<a name="395" href="#395">395</a> 
+<a name="396" href="#396">396</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="397" href="#397">397</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="398" href="#398">398</a> <em class="jxr_javadoccomment">   * Tests correct retention of edges between retained vertices.</em>
+<a name="399" href="#399">399</a> <em class="jxr_javadoccomment">   *</em>
+<a name="400" href="#400">400</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="401" href="#401">401</a> <em class="jxr_javadoccomment">   */</em>
+<a name="402" href="#402">402</a>   @Test
+<a name="403" href="#403">403</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testRetentionMultipleEdgesRetainedToRetained() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="404" href="#404">404</a> 
+<a name="405" href="#405">405</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="406" href="#406">406</a>       <span class="jxr_string">"(v0 {a : 1})"</span> + <em class="jxr_comment">// retain</em>
+<a name="407" href="#407">407</a>       <span class="jxr_string">"(v1 {c : 2})"</span> + <em class="jxr_comment">// retain</em>
+<a name="408" href="#408">408</a>       <span class="jxr_string">"(v2 {d : 3})"</span> + <em class="jxr_comment">// retain</em>
+<a name="409" href="#409">409</a>       <span class="jxr_string">"(v1)-[:foo {e : 1, f : 2}]-&gt;(v0)"</span> +
+<a name="410" href="#410">410</a>       <span class="jxr_string">"(v2)--&gt;(v0)"</span> +
+<a name="411" href="#411">411</a>       <span class="jxr_string">"]"</span>;
+<a name="412" href="#412">412</a> 
+<a name="413" href="#413">413</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="414" href="#414">414</a> 
+<a name="415" href="#415">415</a>     loader.appendToDatabaseFromString(
+<a name="416" href="#416">416</a>       <span class="jxr_string">"expected["</span> +
+<a name="417" href="#417">417</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="418" href="#418">418</a>         <span class="jxr_string">"(v01 {c : 2})"</span> +
+<a name="419" href="#419">419</a>         <span class="jxr_string">"(v02 {d : 3})"</span> +
+<a name="420" href="#420">420</a>         <span class="jxr_string">"(v01)-[:foo {e : 1, f : 2}]-&gt;(v00)"</span> +
+<a name="421" href="#421">421</a>         <span class="jxr_string">"(v02)--&gt;(v00)"</span> +
+<a name="422" href="#422">422</a>         <span class="jxr_string">"]"</span>);
+<a name="423" href="#423">423</a> 
+<a name="424" href="#424">424</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="425" href="#425">425</a> 
+<a name="426" href="#426">426</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="427" href="#427">427</a>       .setStrategy(getStrategy())
+<a name="428" href="#428">428</a>       .retainVerticesWithoutGroup()
+<a name="429" href="#429">429</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="430" href="#430">430</a>       .addVertexGroupingKey(<span class="jxr_string">"b"</span>)
+<a name="431" href="#431">431</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="432" href="#432">432</a>       .addEdgeAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="433" href="#433">433</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="434" href="#434">434</a>       .execute(input);
+<a name="435" href="#435">435</a> 
+<a name="436" href="#436">436</a>     collectAndAssertTrue(
+<a name="437" href="#437">437</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="438" href="#438">438</a>   }
+<a name="439" href="#439">439</a> 
+<a name="440" href="#440">440</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="441" href="#441">441</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="442" href="#442">442</a> <em class="jxr_javadoccomment">   * Tests a graph without vertices.</em>
+<a name="443" href="#443">443</a> <em class="jxr_javadoccomment">   *</em>
+<a name="444" href="#444">444</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="445" href="#445">445</a> <em class="jxr_javadoccomment">   */</em>
+<a name="446" href="#446">446</a>   @Test
+<a name="447" href="#447">447</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphNoVertices() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="448" href="#448">448</a> 
+<a name="449" href="#449">449</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="450" href="#450">450</a>       <span class="jxr_string">"]"</span>;
+<a name="451" href="#451">451</a> 
+<a name="452" href="#452">452</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="453" href="#453">453</a> 
+<a name="454" href="#454">454</a>     loader.appendToDatabaseFromString(
+<a name="455" href="#455">455</a>       <span class="jxr_string">"expected["</span> +
+<a name="456" href="#456">456</a>         <span class="jxr_string">"]"</span>);
+<a name="457" href="#457">457</a> 
+<a name="458" href="#458">458</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="459" href="#459">459</a> 
+<a name="460" href="#460">460</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="461" href="#461">461</a>       .setStrategy(getStrategy())
+<a name="462" href="#462">462</a>       .retainVerticesWithoutGroup()
+<a name="463" href="#463">463</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="464" href="#464">464</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="465" href="#465">465</a>       .execute(input);
+<a name="466" href="#466">466</a> 
+<a name="467" href="#467">467</a>     collectAndAssertTrue(
+<a name="468" href="#468">468</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="469" href="#469">469</a>   }
+<a name="470" href="#470">470</a> 
+<a name="471" href="#471">471</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="472" href="#472">472</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="473" href="#473">473</a> <em class="jxr_javadoccomment">   * Tests a graph that contains to vertices to be retained 1:1.</em>
+<a name="474" href="#474">474</a> <em class="jxr_javadoccomment">   *</em>
+<a name="475" href="#475">475</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="476" href="#476">476</a> <em class="jxr_javadoccomment">   */</em>
+<a name="477" href="#477">477</a>   @Test
+<a name="478" href="#478">478</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphOnlyVerticesToGroup() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="479" href="#479">479</a> 
+<a name="480" href="#480">480</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="481" href="#481">481</a>       <span class="jxr_string">"(v0:Blue {})"</span> +
+<a name="482" href="#482">482</a>       <span class="jxr_string">"(v1:Blue {})"</span> +
+<a name="483" href="#483">483</a>       <span class="jxr_string">"(v2:Red {})"</span> +
+<a name="484" href="#484">484</a>       <span class="jxr_string">"(v0)--&gt;(v1)"</span> +
+<a name="485" href="#485">485</a>       <span class="jxr_string">"(v1)--&gt;(v2)"</span> +
+<a name="486" href="#486">486</a>       <span class="jxr_string">"]"</span>;
+<a name="487" href="#487">487</a> 
+<a name="488" href="#488">488</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="489" href="#489">489</a> 
+<a name="490" href="#490">490</a>     loader.appendToDatabaseFromString(
+<a name="491" href="#491">491</a>       <span class="jxr_string">"expected["</span> +
+<a name="492" href="#492">492</a>         <span class="jxr_string">"(v00:Blue {count : 2L})"</span> +
+<a name="493" href="#493">493</a>         <span class="jxr_string">"(v02:Red {count: 1L})"</span> +
+<a name="494" href="#494">494</a>         <span class="jxr_string">"(v00)--&gt;(v00)"</span> +
+<a name="495" href="#495">495</a>         <span class="jxr_string">"(v00)--&gt;(v02)"</span> +
+<a name="496" href="#496">496</a>         <span class="jxr_string">"]"</span>);
+<a name="497" href="#497">497</a> 
+<a name="498" href="#498">498</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="499" href="#499">499</a> 
+<a name="500" href="#500">500</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="501" href="#501">501</a>       .setStrategy(getStrategy())
+<a name="502" href="#502">502</a>       .retainVerticesWithoutGroup()
+<a name="503" href="#503">503</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="504" href="#504">504</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="505" href="#505">505</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="506" href="#506">506</a>       .execute(input);
+<a name="507" href="#507">507</a> 
+<a name="508" href="#508">508</a>     collectAndAssertTrue(
+<a name="509" href="#509">509</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="510" href="#510">510</a>   }
+<a name="511" href="#511">511</a> 
+<a name="512" href="#512">512</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="513" href="#513">513</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * Tests a graph that contains only vertices to be retained 1:1.</em>
+<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   *</em>
+<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="517" href="#517">517</a> <em class="jxr_javadoccomment">   */</em>
+<a name="518" href="#518">518</a>   @Test
+<a name="519" href="#519">519</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphOnlyVerticesToRetain() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="520" href="#520">520</a> 
+<a name="521" href="#521">521</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="522" href="#522">522</a>       <span class="jxr_string">"(v0 {a : 1})"</span> +
+<a name="523" href="#523">523</a>       <span class="jxr_string">"(v1 {b : 2})"</span> +
+<a name="524" href="#524">524</a>       <span class="jxr_string">"(v2 {})"</span> +
+<a name="525" href="#525">525</a>       <span class="jxr_string">"(v0)--&gt;(v1)"</span> +
+<a name="526" href="#526">526</a>       <span class="jxr_string">"(v1)--&gt;(v2)"</span> +
+<a name="527" href="#527">527</a>       <span class="jxr_string">"]"</span>;
+<a name="528" href="#528">528</a> 
+<a name="529" href="#529">529</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="530" href="#530">530</a> 
+<a name="531" href="#531">531</a>     loader.appendToDatabaseFromString(
+<a name="532" href="#532">532</a>       <span class="jxr_string">"expected["</span> +
+<a name="533" href="#533">533</a>         <span class="jxr_string">"(v00 {a : 1})"</span> +
+<a name="534" href="#534">534</a>         <span class="jxr_string">"(v01 {b : 2})"</span> +
+<a name="535" href="#535">535</a>         <span class="jxr_string">"(v02 {})"</span> +
+<a name="536" href="#536">536</a>         <span class="jxr_string">"(v00)--&gt;(v01)"</span> +
+<a name="537" href="#537">537</a>         <span class="jxr_string">"(v01)--&gt;(v02)"</span> +
+<a name="538" href="#538">538</a>         <span class="jxr_string">"]"</span>);
+<a name="539" href="#539">539</a> 
+<a name="540" href="#540">540</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="541" href="#541">541</a> 
+<a name="542" href="#542">542</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="543" href="#543">543</a>       .setStrategy(getStrategy())
+<a name="544" href="#544">544</a>       .retainVerticesWithoutGroup()
+<a name="545" href="#545">545</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="546" href="#546">546</a>       .addVertexGroupingKey(<span class="jxr_string">"c"</span>)
+<a name="547" href="#547">547</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="548" href="#548">548</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="549" href="#549">549</a>       .execute(input);
+<a name="550" href="#550">550</a> 
+<a name="551" href="#551">551</a>     collectAndAssertTrue(
+<a name="552" href="#552">552</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="553" href="#553">553</a>   }
+<a name="554" href="#554">554</a> 
+<a name="555" href="#555">555</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="556" href="#556">556</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="557" href="#557">557</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="558" href="#558">558</a> <em class="jxr_javadoccomment">   * Groups a graph by label.</em>
+<a name="559" href="#559">559</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="560" href="#560">560</a> <em class="jxr_javadoccomment">   * - vertices without a label: retain</em>
+<a name="561" href="#561">561</a> <em class="jxr_javadoccomment">   * - vertices with a matching label: group</em>
+<a name="562" href="#562">562</a> <em class="jxr_javadoccomment">   *</em>
+<a name="563" href="#563">563</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="564" href="#564">564</a> <em class="jxr_javadoccomment">   */</em>
+<a name="565" href="#565">565</a>   @Test
+<a name="566" href="#566">566</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByLabel() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="567" href="#567">567</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="568" href="#568">568</a>       <span class="jxr_string">"(v0 {})"</span> +
+<a name="569" href="#569">569</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="570" href="#570">570</a>       <span class="jxr_string">"(v2 {a : 1, b : 2})"</span> +
+<a name="571" href="#571">571</a>       <span class="jxr_string">"(v3:B {})"</span> +
+<a name="572" href="#572">572</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="573" href="#573">573</a>       <span class="jxr_string">"(v5:B {a : 1, b : 2})"</span> +
+<a name="574" href="#574">574</a>       <span class="jxr_string">"]"</span>;
+<a name="575" href="#575">575</a> 
+<a name="576" href="#576">576</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="577" href="#577">577</a> 
+<a name="578" href="#578">578</a>     loader.appendToDatabaseFromString(
+<a name="579" href="#579">579</a>       <span class="jxr_string">"expected["</span> +
+<a name="580" href="#580">580</a>         <span class="jxr_string">"(v00 {})"</span> +
+<a name="581" href="#581">581</a>         <span class="jxr_string">"(v01 {a : 1})"</span> +
+<a name="582" href="#582">582</a>         <span class="jxr_string">"(v02 {a : 1, b : 2})"</span> +
+<a name="583" href="#583">583</a>         <span class="jxr_string">"(v03:B {count : 3L})"</span> +
+<a name="584" href="#584">584</a>         <span class="jxr_string">"]"</span>);
+<a name="585" href="#585">585</a> 
+<a name="586" href="#586">586</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="587" href="#587">587</a> 
+<a name="588" href="#588">588</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="589" href="#589">589</a>       .setStrategy(getStrategy())
+<a name="590" href="#590">590</a>       .retainVerticesWithoutGroup()
+<a name="591" href="#591">591</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="592" href="#592">592</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="593" href="#593">593</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="594" href="#594">594</a>       .execute(input);
+<a name="595" href="#595">595</a> 
+<a name="596" href="#596">596</a>     collectAndAssertTrue(
+<a name="597" href="#597">597</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="598" href="#598">598</a>   }
+<a name="599" href="#599">599</a> 
+<a name="600" href="#600">600</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="601" href="#601">601</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="602" href="#602">602</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="603" href="#603">603</a> <em class="jxr_javadoccomment">   * Groups a graph by label and property a.</em>
+<a name="604" href="#604">604</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="605" href="#605">605</a> <em class="jxr_javadoccomment">   * - a vertex without a label and no property: retain</em>
+<a name="606" href="#606">606</a> <em class="jxr_javadoccomment">   * - a vertex without a label and another property: retain</em>
+<a name="607" href="#607">607</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a matching property: group</em>
+<a name="608" href="#608">608</a> <em class="jxr_javadoccomment">   * - a vertex with a label and no property: retain</em>
+<a name="609" href="#609">609</a> <em class="jxr_javadoccomment">   * - a vertex with a label and another property: retain</em>
+<a name="610" href="#610">610</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a matching property: group</em>
+<a name="611" href="#611">611</a> <em class="jxr_javadoccomment">   *</em>
+<a name="612" href="#612">612</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="613" href="#613">613</a> <em class="jxr_javadoccomment">   */</em>
+<a name="614" href="#614">614</a>   @Test
+<a name="615" href="#615">615</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByLabelAndProperty() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="616" href="#616">616</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="617" href="#617">617</a>       <span class="jxr_string">"(v0 {})"</span> +
+<a name="618" href="#618">618</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="619" href="#619">619</a>       <span class="jxr_string">"(v2 {b : 2})"</span> +
+<a name="620" href="#620">620</a>       <span class="jxr_string">"(v3:B {})"</span> +
+<a name="621" href="#621">621</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="622" href="#622">622</a>       <span class="jxr_string">"(v5:B {b : 2})"</span> +
+<a name="623" href="#623">623</a>       <span class="jxr_string">"]"</span>;
+<a name="624" href="#624">624</a> 
+<a name="625" href="#625">625</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="626" href="#626">626</a> 
+<a name="627" href="#627">627</a>     loader.appendToDatabaseFromString(
+<a name="628" href="#628">628</a>       <span class="jxr_string">"expected["</span> +
+<a name="629" href="#629">629</a>         <span class="jxr_string">"(v00 {})"</span> +
+<a name="630" href="#630">630</a>         <span class="jxr_string">"(v01 {a : 1, count : 1L})"</span> +
+<a name="631" href="#631">631</a>         <span class="jxr_string">"(v02 {b : 2})"</span> +
+<a name="632" href="#632">632</a>         <span class="jxr_string">"(v03:B {})"</span> +
+<a name="633" href="#633">633</a>         <span class="jxr_string">"(v04:B {a : 1, count : 1L})"</span> +
+<a name="634" href="#634">634</a>         <span class="jxr_string">"(v05:B {b : 2})"</span> +
+<a name="635" href="#635">635</a>         <span class="jxr_string">"]"</span>);
+<a name="636" href="#636">636</a> 
+<a name="637" href="#637">637</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="638" href="#638">638</a> 
+<a name="639" href="#639">639</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="640" href="#640">640</a>       .setStrategy(getStrategy())
+<a name="641" href="#641">641</a>       .retainVerticesWithoutGroup()
+<a name="642" href="#642">642</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="643" href="#643">643</a>       .addVertexGroupingKey(<span class="jxr_string">"a"</span>)
+<a name="644" href="#644">644</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="645" href="#645">645</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="646" href="#646">646</a>       .execute(input);
+<a name="647" href="#647">647</a> 
+<a name="648" href="#648">648</a>     collectAndAssertTrue(
+<a name="649" href="#649">649</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="650" href="#650">650</a>   }
+<a name="651" href="#651">651</a> 
+<a name="652" href="#652">652</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="653" href="#653">653</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="654" href="#654">654</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="655" href="#655">655</a> <em class="jxr_javadoccomment">   * Groups a graph by label and properties a, b.</em>
+<a name="656" href="#656">656</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="657" href="#657">657</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a: retain</em>
+<a name="658" href="#658">658</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a, b: group</em>
+<a name="659" href="#659">659</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a: retain</em>
+<a name="660" href="#660">660</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a, b: group</em>
+<a name="661" href="#661">661</a> <em class="jxr_javadoccomment">   *</em>
+<a name="662" href="#662">662</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="663" href="#663">663</a> <em class="jxr_javadoccomment">   */</em>
+<a name="664" href="#664">664</a>   @Test
+<a name="665" href="#665">665</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByLabelAndProperties() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="666" href="#666">666</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="667" href="#667">667</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="668" href="#668">668</a>       <span class="jxr_string">"(v2 {a : 1, b : 2})"</span> +
+<a name="669" href="#669">669</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="670" href="#670">670</a>       <span class="jxr_string">"(v5:B {a : 1, b : 2})"</span> +
+<a name="671" href="#671">671</a>       <span class="jxr_string">"]"</span>;
+<a name="672" href="#672">672</a> 
+<a name="673" href="#673">673</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="674" href="#674">674</a> 
+<a name="675" href="#675">675</a>     loader.appendToDatabaseFromString(
+<a name="676" href="#676">676</a>       <span class="jxr_string">"expected["</span> +
+<a name="677" href="#677">677</a>         <span class="jxr_string">"(v01 {a : 1})"</span> +
+<a name="678" href="#678">678</a>         <span class="jxr_string">"(v02 {a : 1, b : 2, count : 1L})"</span> +
+<a name="679" href="#679">679</a>         <span class="jxr_string">"(v04:B {a : 1})"</span> +
+<a name="680" href="#680">680</a>         <span class="jxr_string">"(v05:B {a : 1, b : 2, count : 1L})"</span> +
+<a name="681" href="#681">681</a>         <span class="jxr_string">"]"</span>);
+<a name="682" href="#682">682</a> 
+<a name="683" href="#683">683</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="684" href="#684">684</a> 
+<a name="685" href="#685">685</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="686" href="#686">686</a>       .setStrategy(getStrategy())
+<a name="687" href="#687">687</a>       .retainVerticesWithoutGroup()
+<a name="688" href="#688">688</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="689" href="#689">689</a>       .addVertexGroupingKeys(Arrays.asList(<span class="jxr_string">"a"</span>, <span class="jxr_string">"b"</span>))
+<a name="690" href="#690">690</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="691" href="#691">691</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="692" href="#692">692</a>       .execute(input);
+<a name="693" href="#693">693</a> 
+<a name="694" href="#694">694</a>     collectAndAssertTrue(
+<a name="695" href="#695">695</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="696" href="#696">696</a>   }
+<a name="697" href="#697">697</a> 
+<a name="698" href="#698">698</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="699" href="#699">699</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="700" href="#700">700</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="701" href="#701">701</a> <em class="jxr_javadoccomment">   * Groups a graph by property a.</em>
+<a name="702" href="#702">702</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="703" href="#703">703</a> <em class="jxr_javadoccomment">   * - a vertex without a label and no property: retain</em>
+<a name="704" href="#704">704</a> <em class="jxr_javadoccomment">   * - a vertex without a label and another property: retain</em>
+<a name="705" href="#705">705</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a: group</em>
+<a name="706" href="#706">706</a> <em class="jxr_javadoccomment">   * - a vertex with a label and no property: retain</em>
+<a name="707" href="#707">707</a> <em class="jxr_javadoccomment">   * - a vertex with a label and another property: retain</em>
+<a name="708" href="#708">708</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a: group</em>
+<a name="709" href="#709">709</a> <em class="jxr_javadoccomment">   *</em>
+<a name="710" href="#710">710</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="711" href="#711">711</a> <em class="jxr_javadoccomment">   */</em>
+<a name="712" href="#712">712</a>   @Test
+<a name="713" href="#713">713</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByProperty() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="714" href="#714">714</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="715" href="#715">715</a>       <span class="jxr_string">"(v0 {})"</span> +
+<a name="716" href="#716">716</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="717" href="#717">717</a>       <span class="jxr_string">"(v2 {b : 2})"</span> +
+<a name="718" href="#718">718</a>       <span class="jxr_string">"(v3:B {})"</span> +
+<a name="719" href="#719">719</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="720" href="#720">720</a>       <span class="jxr_string">"(v5:B {b : 2})"</span> +
+<a name="721" href="#721">721</a>       <span class="jxr_string">"]"</span>;
+<a name="722" href="#722">722</a> 
+<a name="723" href="#723">723</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="724" href="#724">724</a> 
+<a name="725" href="#725">725</a>     loader.appendToDatabaseFromString(
+<a name="726" href="#726">726</a>       <span class="jxr_string">"expected["</span> +
+<a name="727" href="#727">727</a>         <span class="jxr_string">"(v00 {})"</span> +
+<a name="728" href="#728">728</a>         <span class="jxr_string">"(v0104 {a : 1, count : 2L})"</span> +
+<a name="729" href="#729">729</a>         <span class="jxr_string">"(v02 {b : 2})"</span> +
+<a name="730" href="#730">730</a>         <span class="jxr_string">"(v03:B {})"</span> +
+<a name="731" href="#731">731</a>         <span class="jxr_string">"(v05:B {b : 2})"</span> +
+<a name="732" href="#732">732</a>         <span class="jxr_string">"]"</span>);
+<a name="733" href="#733">733</a> 
+<a name="734" href="#734">734</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="735" href="#735">735</a> 
+<a name="736" href="#736">736</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="737" href="#737">737</a>       .setStrategy(getStrategy())
+<a name="738" href="#738">738</a>       .retainVerticesWithoutGroup()
+<a name="739" href="#739">739</a>       .useVertexLabel(false)
+<a name="740" href="#740">740</a>       .addVertexGroupingKey(<span class="jxr_string">"a"</span>)
+<a name="741" href="#741">741</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="742" href="#742">742</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="743" href="#743">743</a>       .execute(input);
+<a name="744" href="#744">744</a> 
+<a name="745" href="#745">745</a>     collectAndAssertTrue(
+<a name="746" href="#746">746</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="747" href="#747">747</a>   }
+<a name="748" href="#748">748</a> 
+<a name="749" href="#749">749</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="750" href="#750">750</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="751" href="#751">751</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="752" href="#752">752</a> <em class="jxr_javadoccomment">   * Groups a graph by properties a, b.</em>
+<a name="753" href="#753">753</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="754" href="#754">754</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a: retain</em>
+<a name="755" href="#755">755</a> <em class="jxr_javadoccomment">   * - a vertex without a label and a, b: group</em>
+<a name="756" href="#756">756</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a: retain</em>
+<a name="757" href="#757">757</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a, b: group</em>
+<a name="758" href="#758">758</a> <em class="jxr_javadoccomment">   *</em>
+<a name="759" href="#759">759</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="760" href="#760">760</a> <em class="jxr_javadoccomment">   */</em>
+<a name="761" href="#761">761</a>   @Test
+<a name="762" href="#762">762</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByProperties() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="763" href="#763">763</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="764" href="#764">764</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="765" href="#765">765</a>       <span class="jxr_string">"(v2 {a : 1, b : 2})"</span> +
+<a name="766" href="#766">766</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="767" href="#767">767</a>       <span class="jxr_string">"(v5:B {a : 1, b : 2})"</span> +
+<a name="768" href="#768">768</a>       <span class="jxr_string">"]"</span>;
+<a name="769" href="#769">769</a> 
+<a name="770" href="#770">770</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="771" href="#771">771</a> 
+<a name="772" href="#772">772</a>     loader.appendToDatabaseFromString(
+<a name="773" href="#773">773</a>       <span class="jxr_string">"expected["</span> +
+<a name="774" href="#774">774</a>         <span class="jxr_string">"(v01 {a : 1})"</span> +
+<a name="775" href="#775">775</a>         <span class="jxr_string">"(v0205 {a : 1, b : 2, count : 2L})"</span> +
+<a name="776" href="#776">776</a>         <span class="jxr_string">"(v04:B {a : 1})"</span> +
+<a name="777" href="#777">777</a>         <span class="jxr_string">"]"</span>);
+<a name="778" href="#778">778</a> 
+<a name="779" href="#779">779</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="780" href="#780">780</a> 
+<a name="781" href="#781">781</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="782" href="#782">782</a>       .setStrategy(getStrategy())
+<a name="783" href="#783">783</a>       .retainVerticesWithoutGroup()
+<a name="784" href="#784">784</a>       .useVertexLabel(false)
+<a name="785" href="#785">785</a>       .addVertexGroupingKeys(Arrays.asList(<span class="jxr_string">"a"</span>, <span class="jxr_string">"b"</span>))
+<a name="786" href="#786">786</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="787" href="#787">787</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="788" href="#788">788</a>       .execute(input);
+<a name="789" href="#789">789</a> 
+<a name="790" href="#790">790</a>     collectAndAssertTrue(
+<a name="791" href="#791">791</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="792" href="#792">792</a>   }
+<a name="793" href="#793">793</a> 
+<a name="794" href="#794">794</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="795" href="#795">795</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="796" href="#796">796</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="797" href="#797">797</a> <em class="jxr_javadoccomment">   * Groups a graph by nothing, so every vertex needs to be retained.</em>
+<a name="798" href="#798">798</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="799" href="#799">799</a> <em class="jxr_javadoccomment">   * - a vertex without a label and without properties</em>
+<a name="800" href="#800">800</a> <em class="jxr_javadoccomment">   * - a vertex without a label but a property</em>
+<a name="801" href="#801">801</a> <em class="jxr_javadoccomment">   * - a vertex with a label and no property</em>
+<a name="802" href="#802">802</a> <em class="jxr_javadoccomment">   * - a vertex with a label and a property</em>
+<a name="803" href="#803">803</a> <em class="jxr_javadoccomment">   *</em>
+<a name="804" href="#804">804</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="805" href="#805">805</a> <em class="jxr_javadoccomment">   */</em>
+<a name="806" href="#806">806</a>   @Test
+<a name="807" href="#807">807</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGroupByNothing() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="808" href="#808">808</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="809" href="#809">809</a>       <span class="jxr_string">"(v1 {})"</span> +
+<a name="810" href="#810">810</a>       <span class="jxr_string">"(v2 {a : 1})"</span> +
+<a name="811" href="#811">811</a>       <span class="jxr_string">"(v3:B {})"</span> +
+<a name="812" href="#812">812</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="813" href="#813">813</a>       <span class="jxr_string">"]"</span>;
+<a name="814" href="#814">814</a> 
+<a name="815" href="#815">815</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="816" href="#816">816</a> 
+<a name="817" href="#817">817</a>     loader.appendToDatabaseFromString(
+<a name="818" href="#818">818</a>       <span class="jxr_string">"expected["</span> +
+<a name="819" href="#819">819</a>         <span class="jxr_string">"(v01 {})"</span> +
+<a name="820" href="#820">820</a>         <span class="jxr_string">"(v02 {a : 1})"</span> +
+<a name="821" href="#821">821</a>         <span class="jxr_string">"(v03:B {})"</span> +
+<a name="822" href="#822">822</a>         <span class="jxr_string">"(v04:B {a : 1})"</span> +
+<a name="823" href="#823">823</a>         <span class="jxr_string">"]"</span>);
+<a name="824" href="#824">824</a> 
+<a name="825" href="#825">825</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="826" href="#826">826</a> 
+<a name="827" href="#827">827</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="828" href="#828">828</a>       .setStrategy(getStrategy())
+<a name="829" href="#829">829</a>       .retainVerticesWithoutGroup()
+<a name="830" href="#830">830</a>       .useVertexLabel(false)
+<a name="831" href="#831">831</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count())
+<a name="832" href="#832">832</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="833" href="#833">833</a>       .execute(input);
+<a name="834" href="#834">834</a> 
+<a name="835" href="#835">835</a>     collectAndAssertTrue(
+<a name="836" href="#836">836</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="837" href="#837">837</a>   }
+<a name="838" href="#838">838</a> 
+<a name="839" href="#839">839</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="840" href="#840">840</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="841" href="#841">841</a> <em class="jxr_javadoccomment">   * When using label specific grouping and no vertex will be retain 1:1.</em>
+<a name="842" href="#842">842</a> <em class="jxr_javadoccomment">   *</em>
+<a name="843" href="#843">843</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="844" href="#844">844</a> <em class="jxr_javadoccomment">   */</em>
+<a name="845" href="#845">845</a>   @Test
+<a name="846" href="#846">846</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testLabelSpecificGroupingNoVerticesMatch() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="847" href="#847">847</a> 
+<a name="848" href="#848">848</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="849" href="#849">849</a>       <span class="jxr_string">"(v0:A {a: 1, foo: true})"</span> +
+<a name="850" href="#850">850</a>       <span class="jxr_string">"(v1:B {b: 2, foo: true})"</span> +
+<a name="851" href="#851">851</a>       <span class="jxr_string">"(v2:C {c : 3})"</span> +
+<a name="852" href="#852">852</a>       <span class="jxr_string">"(v3:D {d: 4})"</span> +
+<a name="853" href="#853">853</a>       <span class="jxr_string">"(v0)--&gt;(v2)"</span> +
+<a name="854" href="#854">854</a>       <span class="jxr_string">"(v1)--&gt;(v2)"</span> +
+<a name="855" href="#855">855</a>       <span class="jxr_string">"(v2)--&gt;(v3)"</span> +
+<a name="856" href="#856">856</a>       <span class="jxr_string">"]"</span>;
+<a name="857" href="#857">857</a> 
+<a name="858" href="#858">858</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="859" href="#859">859</a> 
+<a name="860" href="#860">860</a>     loader.appendToDatabaseFromString(
+<a name="861" href="#861">861</a>       <span class="jxr_string">"expected["</span> +
+<a name="862" href="#862">862</a>         <span class="jxr_string">"(v00:SuperA {a: 1})"</span> +
+<a name="863" href="#863">863</a>         <span class="jxr_string">"(v01:SuperB {b: 2})"</span> +
+<a name="864" href="#864">864</a>         <span class="jxr_string">"(v02:C {})"</span> +
+<a name="865" href="#865">865</a>         <span class="jxr_string">"(v03:D {})"</span> +
+<a name="866" href="#866">866</a>         <span class="jxr_string">"(v00)--&gt;(v02)"</span> +
+<a name="867" href="#867">867</a>         <span class="jxr_string">"(v01)--&gt;(v02)"</span> +
+<a name="868" href="#868">868</a>         <span class="jxr_string">"(v02)--&gt;(v03)"</span> +
+<a name="869" href="#869">869</a>         <span class="jxr_string">"]"</span>);
+<a name="870" href="#870">870</a> 
+<a name="871" href="#871">871</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="872" href="#872">872</a> 
+<a name="873" href="#873">873</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="874" href="#874">874</a>       .setStrategy(getStrategy())
+<a name="875" href="#875">875</a>       .retainVerticesWithoutGroup()
+<a name="876" href="#876">876</a>       .useVertexLabel(<strong class="jxr_keyword">true</strong>)
+<a name="877" href="#877">877</a>       .addVertexLabelGroup(<span class="jxr_string">"A"</span>, <span class="jxr_string">"SuperA"</span>, Collections.singletonList(<span class="jxr_string">"a"</span>))
+<a name="878" href="#878">878</a>       .addVertexLabelGroup(<span class="jxr_string">"B"</span>, <span class="jxr_string">"SuperB"</span>, Collections.singletonList(<span class="jxr_string">"b"</span>))
+<a name="879" href="#879">879</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="880" href="#880">880</a>       .execute(input);
+<a name="881" href="#881">881</a> 
+<a name="882" href="#882">882</a>     collectAndAssertTrue(
+<a name="883" href="#883">883</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="884" href="#884">884</a> 
+<a name="885" href="#885">885</a>   }
+<a name="886" href="#886">886</a> 
+<a name="887" href="#887">887</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="888" href="#888">888</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="889" href="#889">889</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="890" href="#890">890</a> <em class="jxr_javadoccomment">   * Groups a graph by label A and two properties a, b.</em>
+<a name="891" href="#891">891</a> <em class="jxr_javadoccomment">   * The graph contains:</em>
+<a name="892" href="#892">892</a> <em class="jxr_javadoccomment">   * - a vertex without a label and no properties: retain</em>
+<a name="893" href="#893">893</a> <em class="jxr_javadoccomment">   * - a vertex without a label and one matching property: retain</em>
+<a name="894" href="#894">894</a> <em class="jxr_javadoccomment">   * - a vertex without a label but matching properties: retain</em>
+<a name="895" href="#895">895</a> <em class="jxr_javadoccomment">   * - a vertex with a non matching label, no properties: retain</em>
+<a name="896" href="#896">896</a> <em class="jxr_javadoccomment">   * - a vertex with a non matching label, and one matching property: retain</em>
+<a name="897" href="#897">897</a> <em class="jxr_javadoccomment">   * - a vertex with a non matching label, and two matching properties: retain</em>
+<a name="898" href="#898">898</a> <em class="jxr_javadoccomment">   * - a vertex with a matching label, no properties: retain</em>
+<a name="899" href="#899">899</a> <em class="jxr_javadoccomment">   * - a vertex with a matching label, one matching property: retain</em>
+<a name="900" href="#900">900</a> <em class="jxr_javadoccomment">   * - two vertices with matching labels, two matching properties: group</em>
+<a name="901" href="#901">901</a> <em class="jxr_javadoccomment">   *</em>
+<a name="902" href="#902">902</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="903" href="#903">903</a> <em class="jxr_javadoccomment">   */</em>
+<a name="904" href="#904">904</a>   @Test
+<a name="905" href="#905">905</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testLabelSpecificGrouping() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="906" href="#906">906</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="907" href="#907">907</a>       <span class="jxr_string">"(v0 {})"</span> +
+<a name="908" href="#908">908</a>       <span class="jxr_string">"(v1 {a : 1})"</span> +
+<a name="909" href="#909">909</a>       <span class="jxr_string">"(v2 {a : 1, b : 2})"</span> +
+<a name="910" href="#910">910</a>       <span class="jxr_string">"(v3:B {})"</span> +
+<a name="911" href="#911">911</a>       <span class="jxr_string">"(v4:B {a : 1})"</span> +
+<a name="912" href="#912">912</a>       <span class="jxr_string">"(v5:B {a : 1, b : 2})"</span> +
+<a name="913" href="#913">913</a>       <span class="jxr_string">"(v6:A {})"</span> +
+<a name="914" href="#914">914</a>       <span class="jxr_string">"(v7:A {a : 1})"</span> +
+<a name="915" href="#915">915</a>       <span class="jxr_string">"(v8:A {a : 1, b : 2})"</span> +
+<a name="916" href="#916">916</a>       <span class="jxr_string">"]"</span>;
+<a name="917" href="#917">917</a> 
+<a name="918" href="#918">918</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="919" href="#919">919</a> 
+<a name="920" href="#920">920</a>     loader.appendToDatabaseFromString(
+<a name="921" href="#921">921</a>       <span class="jxr_string">"expected["</span> +
+<a name="922" href="#922">922</a>         <span class="jxr_string">"(v00 {})"</span> +
+<a name="923" href="#923">923</a>         <span class="jxr_string">"(v01 {a : 1})"</span> +
+<a name="924" href="#924">924</a>         <span class="jxr_string">"(v02 {a : 1, b : 2})"</span> +
+<a name="925" href="#925">925</a>         <span class="jxr_string">"(v03:B {})"</span> +
+<a name="926" href="#926">926</a>         <span class="jxr_string">"(v04:B {a : 1})"</span> +
+<a name="927" href="#927">927</a>         <span class="jxr_string">"(v05:B {a : 1, b : 2})"</span> +
+<a name="928" href="#928">928</a>         <span class="jxr_string">"(v06:A {})"</span> +
+<a name="929" href="#929">929</a>         <span class="jxr_string">"(v07:A {a : 1})"</span> +
+<a name="930" href="#930">930</a>         <span class="jxr_string">"(v08:A {a : 1, b : 2, count: 1L})"</span> +
+<a name="931" href="#931">931</a>         <span class="jxr_string">"]"</span>);
+<a name="932" href="#932">932</a> 
+<a name="933" href="#933">933</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="934" href="#934">934</a> 
+<a name="935" href="#935">935</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="936" href="#936">936</a>       .setStrategy(getStrategy())
+<a name="937" href="#937">937</a>       .retainVerticesWithoutGroup()
+<a name="938" href="#938">938</a>       .useVertexLabel(false)
+<a name="939" href="#939">939</a>       .addVertexLabelGroup(<span class="jxr_string">"A"</span>, <span class="jxr_string">"A"</span>, Arrays.asList(<span class="jxr_string">"a"</span>, <span class="jxr_string">"b"</span>),
+<a name="940" href="#940">940</a>         Collections.singletonList(<strong class="jxr_keyword">new</strong> Count()))
+<a name="941" href="#941">941</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="942" href="#942">942</a>       .execute(input);
+<a name="943" href="#943">943</a> 
+<a name="944" href="#944">944</a>     collectAndAssertTrue(
+<a name="945" href="#945">945</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="946" href="#946">946</a>   }
+<a name="947" href="#947">947</a> 
+<a name="948" href="#948">948</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="949" href="#949">949</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="950" href="#950">950</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="951" href="#951">951</a> <em class="jxr_javadoccomment">   * Uses label specific grouping and global grouping by a property.</em>
+<a name="952" href="#952">952</a> <em class="jxr_javadoccomment">   * Vertices without the grouped by property and non-matching labels will be retained.</em>
+<a name="953" href="#953">953</a> <em class="jxr_javadoccomment">   *</em>
+<a name="954" href="#954">954</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="955" href="#955">955</a> <em class="jxr_javadoccomment">   */</em>
+<a name="956" href="#956">956</a>   @Test
+<a name="957" href="#957">957</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testLabelSpecificGroupingAndGlobalPropertyGrouping() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="958" href="#958">958</a> 
+<a name="959" href="#959">959</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="960" href="#960">960</a>       <span class="jxr_string">"(v0:A {a: 1, foo: true})"</span> +
+<a name="961" href="#961">961</a>       <span class="jxr_string">"(v1:B {b: 2, foo: true})"</span> +
+<a name="962" href="#962">962</a>       <span class="jxr_string">"(v2:A {c : 3})"</span> + <em class="jxr_comment">// A and D are not member of a group =&gt; retain</em>
+<a name="963" href="#963">963</a>       <span class="jxr_string">"(v3:D {d: 4})"</span> +
+<a name="964" href="#964">964</a>       <span class="jxr_string">"(v4 {d: 4})"</span> +
+<a name="965" href="#965">965</a>       <span class="jxr_string">"(v0)--&gt;(v2)"</span> +
+<a name="966" href="#966">966</a>       <span class="jxr_string">"(v1)--&gt;(v2)"</span> +
+<a name="967" href="#967">967</a>       <span class="jxr_string">"(v2)--&gt;(v3)"</span> +
+<a name="968" href="#968">968</a>       <span class="jxr_string">"(v4)--&gt;(v0)"</span> +
+<a name="969" href="#969">969</a>       <span class="jxr_string">"]"</span>;
+<a name="970" href="#970">970</a> 
+<a name="971" href="#971">971</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="972" href="#972">972</a> 
+<a name="973" href="#973">973</a>     loader.appendToDatabaseFromString(
+<a name="974" href="#974">974</a>       <span class="jxr_string">"expected["</span> +
+<a name="975" href="#975">975</a>         <span class="jxr_string">"(v00:SuperA {a: 1})"</span> +
+<a name="976" href="#976">976</a>         <span class="jxr_string">"(v01:SuperB {b: 2})"</span> +
+<a name="977" href="#977">977</a>         <span class="jxr_string">"(v02:A {c : 3})"</span> +
+<a name="978" href="#978">978</a>         <span class="jxr_string">"(v03:D {d : 4})"</span> +
+<a name="979" href="#979">979</a>         <span class="jxr_string">"(v04 {d : 4})"</span> +
+<a name="980" href="#980">980</a>         <span class="jxr_string">"(v00)--&gt;(v02)"</span> +
+<a name="981" href="#981">981</a>         <span class="jxr_string">"(v01)--&gt;(v02)"</span> +
+<a name="982" href="#982">982</a>         <span class="jxr_string">"(v02)--&gt;(v03)"</span> +
+<a name="983" href="#983">983</a>         <span class="jxr_string">"(v04)--&gt;(v00)"</span> +
+<a name="984" href="#984">984</a>         <span class="jxr_string">"]"</span>);
+<a name="985" href="#985">985</a> 
+<a name="986" href="#986">986</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="987" href="#987">987</a> 
+<a name="988" href="#988">988</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="989" href="#989">989</a>       .setStrategy(getStrategy())
+<a name="990" href="#990">990</a>       .retainVerticesWithoutGroup()
+<a name="991" href="#991">991</a>       .useVertexLabel(false)
+<a name="992" href="#992">992</a>       .addVertexGroupingKey(<span class="jxr_string">"f"</span>)
+<a name="993" href="#993">993</a>       .addVertexLabelGroup(<span class="jxr_string">"A"</span>, <span class="jxr_string">"SuperA"</span>, Collections.singletonList(<span class="jxr_string">"a"</span>))
+<a name="994" href="#994">994</a>       .addVertexLabelGroup(<span class="jxr_string">"B"</span>, <span class="jxr_string">"SuperB"</span>, Collections.singletonList(<span class="jxr_string">"b"</span>))
+<a name="995" href="#995">995</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="996" href="#996">996</a>       .execute(input);
+<a name="997" href="#997">997</a> 
+<a name="998" href="#998">998</a>     collectAndAssertTrue(
+<a name="999" href="#999">999</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="1000" href="#1000">1000</a>   }
+<a name="1001" href="#1001">1001</a> 
+<a name="1002" href="#1002">1002</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="1003" href="#1003">1003</a> <em class="jxr_javadoccomment">   * Tests function {@link Grouping#groupInternal(BaseGraph)}.</em>
+<a name="1004" href="#1004">1004</a> <em class="jxr_javadoccomment">   * &lt;p&gt;</em>
+<a name="1005" href="#1005">1005</a> <em class="jxr_javadoccomment">   * Uses label specific grouping and no global grouping.</em>
+<a name="1006" href="#1006">1006</a> <em class="jxr_javadoccomment">   * Multiple Vertices are not members of specific labelGroups and will not be grouped.</em>
+<a name="1007" href="#1007">1007</a> <em class="jxr_javadoccomment">   *</em>
+<a name="1008" href="#1008">1008</a> <em class="jxr_javadoccomment">   * @throws Exception if collecting result values fails</em>
+<a name="1009" href="#1009">1009</a> <em class="jxr_javadoccomment">   */</em>
+<a name="1010" href="#1010">1010</a>   @Test
+<a name="1011" href="#1011">1011</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testLabelSpecificGroupingNoGlobalPropertyGrouping() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="1012" href="#1012">1012</a> 
+<a name="1013" href="#1013">1013</a>     String asciiInput = <span class="jxr_string">"input["</span> +
+<a name="1014" href="#1014">1014</a>       <span class="jxr_string">"(v0:A {a: 1, foo: true})"</span> +
+<a name="1015" href="#1015">1015</a>       <span class="jxr_string">"(v1:B {b: 2, foo: true})"</span> +
+<a name="1016" href="#1016">1016</a>       <span class="jxr_string">"(v2:C {c : 3})"</span> +
+<a name="1017" href="#1017">1017</a>       <span class="jxr_string">"(v3 {d : 4})"</span> +
+<a name="1018" href="#1018">1018</a>       <span class="jxr_string">"(v0)--&gt;(v2)"</span> +
+<a name="1019" href="#1019">1019</a>       <span class="jxr_string">"(v1)--&gt;(v2)"</span> +
+<a name="1020" href="#1020">1020</a>       <span class="jxr_string">"(v2)--&gt;(v3)"</span> +
+<a name="1021" href="#1021">1021</a>       <span class="jxr_string">"(v0)--&gt;(v3)"</span> +
+<a name="1022" href="#1022">1022</a>       <span class="jxr_string">"]"</span>;
+<a name="1023" href="#1023">1023</a> 
+<a name="1024" href="#1024">1024</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+<a name="1025" href="#1025">1025</a> 
+<a name="1026" href="#1026">1026</a>     loader.appendToDatabaseFromString(
+<a name="1027" href="#1027">1027</a>       <span class="jxr_string">"expected["</span> +
+<a name="1028" href="#1028">1028</a>         <span class="jxr_string">"(v00:SuperA {a: 1})"</span> +
+<a name="1029" href="#1029">1029</a>         <span class="jxr_string">"(v01:SuperB {b: 2})"</span> +
+<a name="1030" href="#1030">1030</a>         <span class="jxr_string">"(v02:C {c : 3})"</span> +
+<a name="1031" href="#1031">1031</a>         <span class="jxr_string">"(v03 {d : 4})"</span> +
+<a name="1032" href="#1032">1032</a>         <span class="jxr_string">"(v00)--&gt;(v02)"</span> +
+<a name="1033" href="#1033">1033</a>         <span class="jxr_string">"(v01)--&gt;(v02)"</span> +
+<a name="1034" href="#1034">1034</a>         <span class="jxr_string">"(v02)--&gt;(v03)"</span> +
+<a name="1035" href="#1035">1035</a>         <span class="jxr_string">"(v00)--&gt;(v03)"</span> +
+<a name="1036" href="#1036">1036</a>         <span class="jxr_string">"]"</span>);
+<a name="1037" href="#1037">1037</a> 
+<a name="1038" href="#1038">1038</a>     <strong class="jxr_keyword">final</strong> LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="1039" href="#1039">1039</a> 
+<a name="1040" href="#1040">1040</a>     LogicalGraph output = <strong class="jxr_keyword">new</strong> Grouping.GroupingBuilder()
+<a name="1041" href="#1041">1041</a>       .setStrategy(getStrategy())
+<a name="1042" href="#1042">1042</a>       .retainVerticesWithoutGroup()
+<a name="1043" href="#1043">1043</a>       .useVertexLabel(false)
+<a name="1044" href="#1044">1044</a>       .addVertexLabelGroup(<span class="jxr_string">"A"</span>, <span class="jxr_string">"SuperA"</span>, Collections.singletonList(<span class="jxr_string">"a"</span>))
+<a name="1045" href="#1045">1045</a>       .addVertexLabelGroup(<span class="jxr_string">"B"</span>, <span class="jxr_string">"SuperB"</span>, Collections.singletonList(<span class="jxr_string">"b"</span>))
+<a name="1046" href="#1046">1046</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
+<a name="1047" href="#1047">1047</a>       .execute(input);
+<a name="1048" href="#1048">1048</a> 
+<a name="1049" href="#1049">1049</a>     collectAndAssertTrue(
+<a name="1050" href="#1050">1050</a>       output.equalsByElementData(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
+<a name="1051" href="#1051">1051</a>   }
+<a name="1052" href="#1052">1052</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>

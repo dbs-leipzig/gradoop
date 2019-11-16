@@ -30,8 +30,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeSourceUpdateJoin;
-import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeSourceUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeTargetUpdateJoin;
 import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 

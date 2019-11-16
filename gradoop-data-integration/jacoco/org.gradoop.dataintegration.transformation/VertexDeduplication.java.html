@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VertexDeduplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation</a> &gt; <span class="el_source">VertexDeduplication.java</span></div><h1>VertexDeduplication.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.dataintegration.transformation.functions.CreateMappingFromMarkedDuplicates;
+import org.gradoop.dataintegration.transformation.functions.GetPropertiesAsList;
+import org.gradoop.dataintegration.transformation.functions.MarkDuplicatesInGroup;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeSourceUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeTargetUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Deduplicates vertices based on some attribute.&lt;p&gt;
+ * Given a label and a list of property keys, this operator will find all vertices of that label and condense
+ * duplicates to one vertex. Two (or more) vertices are considered duplicates if all property values,
+ * respective to the list of given keys, are equal.&lt;p&gt;
+ * Other attributes of the vertices are ignored, the new (condensed) vertex will have the attributes of some
+ * (random) vertex of its duplicates.
+ * &lt;p&gt;
+ * This will create no new elements and retain the graph head.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
+ */
+public class VertexDeduplication&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+
+  /**
+   * The label of vertices to deduplicate.
+   */
+  private final String label;
+
+  /**
+   * The list of property keys used to determine equal vertices.
+   */
+  private final List&lt;String&gt; propertyKeys;
+
+  /**
+   * Creates a new instance of this vertex deduplication operator.
+   *
+   * @param label        The label of vertices to deduplicate.
+   * @param propertyKeys The properties used to check if two (or more) vertices of that label are duplicates.
+   */
+<span class="fc" id="L80">  public VertexDeduplication(String label, List&lt;String&gt; propertyKeys) {</span>
+<span class="fc" id="L81">    this.label = Objects.requireNonNull(label);</span>
+<span class="fc" id="L82">    this.propertyKeys = Objects.requireNonNull(propertyKeys);</span>
+<span class="fc" id="L83">  }</span>
+
+  @Override
+  public LG execute(LG graph) {
+<span class="fc" id="L87">    DataSet&lt;V&gt; annotatedVertices = graph.getVerticesByLabel(label)</span>
+<span class="fc" id="L88">      .groupBy(new GetPropertiesAsList&lt;&gt;(propertyKeys))</span>
+<span class="fc" id="L89">      .reduceGroup(new MarkDuplicatesInGroup&lt;&gt;());</span>
+<span class="fc" id="L90">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexToDedupVertex = annotatedVertices</span>
+<span class="fc" id="L91">      .flatMap(new CreateMappingFromMarkedDuplicates&lt;&gt;());</span>
+<span class="fc" id="L92">    DataSet&lt;V&gt; deduplicatedVertices = annotatedVertices</span>
+<span class="fc" id="L93">      .filter(new ByProperty&lt;V&gt;(MarkDuplicatesInGroup.PROPERTY_KEY).negate());</span>
+<span class="fc" id="L94">    DataSet&lt;V&gt; otherVertices = graph.getVertices().filter(new ByLabel&lt;V&gt;(label).negate());</span>
+<span class="fc" id="L95">    DataSet&lt;E&gt; updatesEdges = graph.getEdges()</span>
+<span class="fc" id="L96">      .leftOuterJoin(vertexToDedupVertex)</span>
+<span class="fc" id="L97">      .where(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L98">      .equalTo(0)</span>
+<span class="fc" id="L99">      .with(new EdgeSourceUpdateJoin&lt;&gt;())</span>
+<span class="fc" id="L100">      .leftOuterJoin(vertexToDedupVertex)</span>
+<span class="fc" id="L101">      .where(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L102">      .equalTo(0)</span>
+<span class="fc" id="L103">      .with(new EdgeTargetUpdateJoin&lt;&gt;());</span>
+
+<span class="fc" id="L105">    return graph.getFactory().fromDataSets(graph.getGraphHead(),</span>
+<span class="fc" id="L106">      otherVertices.union(deduplicatedVertices),</span>
+      updatesEdges);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

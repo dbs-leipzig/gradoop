@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GetPropertiesAsList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">GetPropertiesAsList.java</span></div><h1>GetPropertiesAsList.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueList;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * A map and key function used to extract property values of certain keys as a {@link PropertyValueList}.&lt;p&gt;
+ * This will take a list of property keys and return a list of property values for each element. The order
+ * will be the same for both keys and values.&lt;p&gt;
+ * Unset properties will be returned as {@link PropertyValue#NULL_VALUE}.
+ *
+ * @param &lt;E&gt; The type of elements to extract properties from.
+ */
+public class GetPropertiesAsList&lt;E extends Attributed&gt; implements MapFunction&lt;E, PropertyValueList&gt;,
+  KeySelector&lt;E, PropertyValueList&gt; {
+
+  /**
+   * The keys of the property values to extract.
+   */
+  private final List&lt;String&gt; propertyKeys;
+
+  /**
+   * Create a new instance of this key function.
+   *
+   * @param propertyKeys The keys of the properties to extract.
+   */
+<span class="fc" id="L50">  public GetPropertiesAsList(List&lt;String&gt; propertyKeys) {</span>
+<span class="fc" id="L51">    this.propertyKeys = Objects.requireNonNull(propertyKeys);</span>
+<span class="fc" id="L52">  }</span>
+
+  @Override
+  public PropertyValueList map(E element) throws IOException {
+<span class="fc" id="L56">    List&lt;PropertyValue&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    for (String key : propertyKeys) {</span>
+<span class="fc" id="L58">      final PropertyValue value = element.getPropertyValue(key);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">      values.add(value == null ? PropertyValue.NULL_VALUE : value);</span>
+<span class="fc" id="L60">    }</span>
+<span class="fc" id="L61">    return PropertyValueList.fromPropertyValues(values);</span>
+  }
+
+  @Override
+  public PropertyValueList getKey(E element) throws IOException {
+<span class="fc" id="L66">    return map(element);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
