@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWith
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -81,24 +82,34 @@ public class GroupingGroupCombine<
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
-    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
+    List<LabelGroup> edgeLabelGroups,
+    boolean retainVerticesWithoutGroup) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
+      retainVerticesWithoutGroup);
   }
 
   @Override
   protected LG groupInternal(LG graph) {
+
+    DataSet<V> vertices = isRetainingVerticesWithoutGroup() ?
+      graph.getVertices()
+        .filter(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels())) :
+      graph.getVertices();
+
     // map vertex to vertex group item
-    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .flatMap(new BuildVertexGroupItem<>(useVertexLabels(), getVertexLabelGroups()));
+    DataSet<VertexGroupItem> verticesForGrouping = vertices.flatMap(
+      new BuildVertexGroupItem<>(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
@@ -129,9 +140,34 @@ public class GroupingGroupCombine<
       .map(new BuildVertexWithSuperVertexBC())
       .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
-    // build super edges
-    DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> edgesToGroup = graph.getEdges();
+
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
+
+      // To add support for grouped edges between retained vertices and supervertices,
+      // vertices are their group representatives themselves
+      vertexToRepresentativeMap =
+        updateVertexRepresentatives(vertexToRepresentativeMap,
+          retainedVerticesSubgraph.getVertices());
+
+      // don't execute grouping on edges between retained vertices
+      // but execute on edges between retained vertices and grouped vertices
+      //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
+      edgesToGroup = subtractEdges(graph.getEdges(), retainedVerticesSubgraph.getEdges());
+    }
+
+    DataSet<E> superEdges =
+      buildSuperEdges(graph.getFactory().getEdgeFactory(), edgesToGroup, vertexToRepresentativeMap);
+
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
+      superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());
+      superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());
+    }
 
     return graph.getFactory().fromDataSets(superVertices, superEdges);
+
   }
+
 }
