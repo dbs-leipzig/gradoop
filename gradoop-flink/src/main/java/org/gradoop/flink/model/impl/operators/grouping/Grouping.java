@@ -371,7 +371,7 @@ public abstract class Grouping<
      */
     private GroupingStrategy strategy;
     /**
-     * True, iff vertex labels shall be considered.
+     * True, if vertex labels shall be considered.
      */
     private boolean useVertexLabel;
 
