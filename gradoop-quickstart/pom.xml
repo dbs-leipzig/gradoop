@@ -66,7 +66,27 @@
           <artifactId>maven-archetype-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${plugin.maven-resource.version}</version>
+          <configuration>
+            <!-- We have to make sure that template variables are not filtered by the resource plugin. -->
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+            <delimiters>
+              <delimiter>@</delimiter>
+            </delimiters>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
+
+    <resources>
+      <!-- Manually filter resource files to fill in all versions. -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 </project>
