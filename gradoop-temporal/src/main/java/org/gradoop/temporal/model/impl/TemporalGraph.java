@@ -18,9 +18,9 @@ package org.gradoop.temporal.model.impl;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
@@ -221,29 +221,38 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
    * default values for the temporal attributes.
    *
    * @param logicalGraph the existing logical graph instance
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The type of the graph.
    * @return a temporal graph with default temporal values
    * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
-  public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph) {
+  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, ?>>
+  TemporalGraph fromGraph(LG logicalGraph) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()
       .fromNonTemporalGraph(logicalGraph);
   }
 
   /**
    * Function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with valid times
-   * depending on
-   * the three given {@link TimeIntervalExtractor} instances
+   * depending on the three given {@link TimeIntervalExtractor} instances
    *
    * @param logicalGraph        the existing logical Graph
    * @param graphTimeExtractor  mapFunction to generate valid times for graphHead
    * @param vertexTimeExtractor mapFunction to generate valid times for vertices
    * @param edgeTimeExtractor   mapFunction to generate valid times for edges
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The type of the graph.
    * @return a temporal graph with new valid time values
    */
-  public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph,
-      TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
-      TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
-      TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
+  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, ?>>
+  TemporalGraph fromGraph(LG logicalGraph,
+      TimeIntervalExtractor<G> graphTimeExtractor,
+      TimeIntervalExtractor<V> vertexTimeExtractor,
+      TimeIntervalExtractor<E> edgeTimeExtractor) {
     TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.fromGradoopFlinkConfig(
       logicalGraph.getConfig());
     return temporalGradoopConfig.getTemporalGraphFactory().fromNonTemporalDataSets(

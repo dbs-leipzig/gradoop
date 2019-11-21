@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.temporal.io.api.TemporalDataSource;
 import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
-import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -160,13 +159,13 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the {@link TemporalGraph#fromLogicalGraph(LogicalGraph)} method.
+   * Test the {@link TemporalGraph#fromGraph} method.
    *
    * @throws Exception if loading the graph fails
    */
   @Test
   public void testFromLogicalGraph() throws Exception {
-    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(testLogicalGraph);
+    TemporalGraph temporalGraph = TemporalGraph.fromGraph(testLogicalGraph);
 
     Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
     Collection<TemporalVertex> loadedVertices = new ArrayList<>();
@@ -202,8 +201,7 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the
-   * {@link TemporalGraph#fromLogicalGraph(LogicalGraph, TimeIntervalExtractor, TimeIntervalExtractor, TimeIntervalExtractor)}  } method.
+   * Test the {@link TemporalGraph#fromGraph} method with TimeInterval Extractors as parameters
    *
    * @throws Exception if loading the graph from the csv data source fails
    */
@@ -218,7 +216,7 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
       getTemporalSocialNetworkLoader().getGraphCollection().reduce(new ReduceCombination<>());
 
     TemporalGraph check = TemporalGraph
-      .fromLogicalGraph(logicalGraph, g -> TemporalGradoopTestUtils.extractTime(g),
+      .fromGraph(logicalGraph, g -> TemporalGradoopTestUtils.extractTime(g),
         v -> TemporalGradoopTestUtils.extractTime(v), e -> TemporalGradoopTestUtils.extractTime(e));
 
     collectAndAssertTrue(check.equalsByElementData(expected));

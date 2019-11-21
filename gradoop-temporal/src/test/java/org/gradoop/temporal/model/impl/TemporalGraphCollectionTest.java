@@ -20,13 +20,12 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.io.api.TemporalDataSource;
 import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSink;
 import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
-import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -227,7 +226,7 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the {@link TemporalGraphCollection#fromGraphCollection(GraphCollection)} method.
+   * Test the {@link TemporalGraphCollection#fromGraphCollection(BaseGraphCollection)} method.
    */
   @Test
   public void testFromGraphCollection() throws Exception {
@@ -268,7 +267,8 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
 
   /**
    * Test the
-   * {@link TemporalGraph#fromLogicalGraph(LogicalGraph, TimeIntervalExtractor, TimeIntervalExtractor, TimeIntervalExtractor)} method.
+   * {@link TemporalGraphCollection#fromGraphCollection} method with TimeInterval
+   * extractors as parameters
    *
    * @throws Exception if loading the graph from the csv data source fails
    */
