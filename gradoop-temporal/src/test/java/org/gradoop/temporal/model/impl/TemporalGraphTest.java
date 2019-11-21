@@ -164,7 +164,7 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
    * @throws Exception if loading the graph fails
    */
   @Test
-  public void testFromLogicalGraph() throws Exception {
+  public void testFromGraph() throws Exception {
     TemporalGraph temporalGraph = TemporalGraph.fromGraph(testLogicalGraph);
 
     Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
@@ -206,7 +206,7 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
    * @throws Exception if loading the graph from the csv data source fails
    */
   @Test
-  public void testFromLogicalGraphWithTimeIntervalExtractors() throws Exception {
+  public void testFromGraphWithTimeIntervalExtractors() throws Exception {
 
     String path = getFilePath("/data/csv/socialnetwork/");
     TemporalDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
