@@ -35,12 +35,9 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
-import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
-import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
-import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -235,7 +232,7 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   /**
    * Function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with valid times
    * depending on
-   * the 3 given {@link TimeIntervalExtractor}
+   * the three given {@link TimeIntervalExtractor} instances
    *
    * @param logicalGraph        the existing logical Graph
    * @param graphTimeExtractor  mapFunction to generate valid times for graphHead
@@ -244,27 +241,14 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
    * @return a temporal graph with new valid time values
    */
   public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph,
-    TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
-    TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
-    TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
-
-    TemporalGradoopConfig temporalGradoopConfig =
-      TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig());
-
-    DataSet<TemporalGraphHead> temporalGraphHeadDataSet = logicalGraph.getGraphHead().map(
-      new GraphHeadToTemporalGraphHead<>(
-        temporalGradoopConfig.getTemporalGraphFactory().getGraphHeadFactory(), graphTimeExtractor));
-
-    DataSet<TemporalVertex> temporalVertexDataSet = logicalGraph.getVertices().map(
-      new VertexToTemporalVertex<>(temporalGradoopConfig.getTemporalGraphFactory().getVertexFactory(),
-        vertexTimeExtractor));
-
-    DataSet<TemporalEdge> temporalEdgeDataSet = logicalGraph.getEdges().map(
-      new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
-        edgeTimeExtractor));
-
-    return temporalGradoopConfig.getTemporalGraphFactory()
-      .fromDataSets(temporalGraphHeadDataSet, temporalVertexDataSet, temporalEdgeDataSet);
+      TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
+      TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
+      TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
+    TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.fromGradoopFlinkConfig(
+      logicalGraph.getConfig());
+    return temporalGradoopConfig.getTemporalGraphFactory().fromNonTemporalDataSets(
+      logicalGraph.getGraphHead(), graphTimeExtractor, logicalGraph.getVertices(), vertexTimeExtractor,
+      logicalGraph.getEdges(), edgeTimeExtractor);
   }
 
   /**

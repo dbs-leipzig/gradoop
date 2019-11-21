@@ -269,11 +269,13 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
   /**
    * Test the
    * {@link TemporalGraph#fromLogicalGraph(LogicalGraph, TimeIntervalExtractor, TimeIntervalExtractor, TimeIntervalExtractor)} method.
+   *
+   * @throws Exception if loading the graph from the csv data source fails
    */
   @Test
   public void testFromGraphCollectionWithTimeExtractors() throws Exception {
 
-    String path = TemporalGraphTest.class.getResource("/datacsv/").getFile();
+    String path = getFilePath("/data/csv/socialnetwork/");
     TemporalCSVDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
     TemporalGraphCollection expected = csvDataSource.getTemporalGraphCollection();
     GraphCollection graphCollection = getTemporalSocialNetworkLoader().getGraphCollection();

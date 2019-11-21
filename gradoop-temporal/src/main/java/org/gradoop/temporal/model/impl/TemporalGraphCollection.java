@@ -36,12 +36,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphCollectionOperators;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
-import org.gradoop.temporal.model.impl.functions.tpgm.GraphHeadToTemporalGraphHead;
-import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
-import org.gradoop.temporal.model.impl.functions.tpgm.VertexToTemporalVertex;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -244,38 +241,28 @@ public class TemporalGraphCollection implements BaseGraphCollection<
 
   /**
    * Convenience API function to create a {@link TemporalGraphCollection} from an existing
-   * {@link GraphCollection} with valid times depending on the 3 given {@link TimeIntervalExtractor} functions
+   * {@link GraphCollection} with valid times depending on the three given
+   * {@link TimeIntervalExtractor} functions
    *
    * @param graphCollection     the existing graph collection instance
    * @param graphTimeExtractor  the time extractor function for the Graph Heads in the
    *                            graph collection instance
-   * @param vertexTimeExtractor the time extractor function for the vertices in the graph collection instance
-   * @param edgeTimeExtractor   the time extractor function for the edges in the graph collection instance
+   * @param vertexTimeExtractor the time extractor function for the vertices in the graph
+   *                            collection instance
+   * @param edgeTimeExtractor   the time extractor function for the edges in the graph
+   *                            collection instance
    * @return a temporal graph collection with new valid time values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
   public static TemporalGraphCollection fromGraphCollection(GraphCollection graphCollection,
-    TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
-    TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
-    TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
-
-    TemporalGradoopConfig temporalGradoopConfig =
-      TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig());
-
-    DataSet<TemporalGraphHead> temporalGraphHeadsDataSet = graphCollection.getGraphHeads().map(
-      new GraphHeadToTemporalGraphHead<>(
-        temporalGradoopConfig.getTemporalGraphFactory().getGraphHeadFactory(), graphTimeExtractor));
-
-    DataSet<TemporalVertex> temporalVertexDataSet = graphCollection.getVertices().map(
-      new VertexToTemporalVertex<>(temporalGradoopConfig.getTemporalGraphFactory().getVertexFactory(),
-        vertexTimeExtractor));
-
-    DataSet<TemporalEdge> temporalEdgeDataSet = graphCollection.getEdges().map(
-      new EdgeToTemporalEdge<>(temporalGradoopConfig.getTemporalGraphFactory().getEdgeFactory(),
-        edgeTimeExtractor));
-
-    return temporalGradoopConfig.getTemporalGraphCollectionFactory()
-      .fromDataSets(temporalGraphHeadsDataSet, temporalVertexDataSet, temporalEdgeDataSet);
+      TimeIntervalExtractor<EPGMGraphHead> graphTimeExtractor,
+      TimeIntervalExtractor<EPGMVertex> vertexTimeExtractor,
+      TimeIntervalExtractor<EPGMEdge> edgeTimeExtractor) {
+    TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.
+      fromGradoopFlinkConfig(graphCollection.getConfig());
+    return temporalGradoopConfig.getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
+      graphCollection.getGraphHeads(), graphTimeExtractor, graphCollection.getVertices(), vertexTimeExtractor,
+      graphCollection.getEdges(), edgeTimeExtractor);
   }
 
   /**
