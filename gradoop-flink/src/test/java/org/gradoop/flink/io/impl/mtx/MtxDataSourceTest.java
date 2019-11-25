@@ -30,10 +30,10 @@ public class MtxDataSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testMtxDataSource() throws Exception {
 
-    final long vertexcount = 4960;
-    final long edgecount = 9462;
+    final long vertexcount = 5;
+    final long edgecount = 5;
 
-    String filePath = getFilePath("/data/mtx/add32.mtx");
+    String filePath = getFilePath("/data/mtx/testdata.mtx");
     DataSource ds = new MtxDataSource(filePath, getConfig());
     LogicalGraph graph = ds.getLogicalGraph();
 
