@@ -23,6 +23,7 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -217,47 +218,51 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   }
 
   /**
-   * Convenience API function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with
+   * Convenience API function to create a {@link TemporalGraph} from an existing {@link BaseGraph} with
    * default values for the temporal attributes.
    *
-   * @param logicalGraph the existing logical graph instance
+   * @param baseGraph the existing graph instance
    * @param <G> The graph head type.
    * @param <V> The vertex type.
    * @param <E> The edge type.
    * @param <LG> The type of the graph.
+   * @param <GC> The type of the Graph collection
    * @return a temporal graph with default temporal values
    * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, ?>>
-  TemporalGraph fromGraph(LG logicalGraph) {
-    return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()
-      .fromNonTemporalGraph(logicalGraph);
+  public static <G extends GraphHead, V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  TemporalGraph fromGraph(LG baseGraph) {
+    return TemporalGradoopConfig.fromGradoopFlinkConfig(baseGraph.getConfig()).getTemporalGraphFactory()
+      .fromNonTemporalGraph(baseGraph);
   }
 
   /**
-   * Function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with valid times
+   * Function to create a {@link TemporalGraph} from an existing {@link BaseGraph} with valid times
    * depending on the three given {@link TimeIntervalExtractor} instances
    *
-   * @param logicalGraph        the existing logical Graph
-   * @param graphTimeExtractor  mapFunction to generate valid times for graphHead
+   * @param baseGraph the existing Graph
+   * @param graphTimeExtractor mapFunction to generate valid times for graphHead
    * @param vertexTimeExtractor mapFunction to generate valid times for vertices
-   * @param edgeTimeExtractor   mapFunction to generate valid times for edges
+   * @param edgeTimeExtractor mapFunction to generate valid times for edges
    * @param <G> The graph head type.
    * @param <V> The vertex type.
    * @param <E> The edge type.
    * @param <LG> The type of the graph.
+   * @param <GC> The type of the Graph collection
    * @return a temporal graph with new valid time values
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, ?>>
-  TemporalGraph fromGraph(LG logicalGraph,
+  public static <G extends GraphHead, V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  TemporalGraph fromGraph(LG baseGraph,
       TimeIntervalExtractor<G> graphTimeExtractor,
       TimeIntervalExtractor<V> vertexTimeExtractor,
       TimeIntervalExtractor<E> edgeTimeExtractor) {
     TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.fromGradoopFlinkConfig(
-      logicalGraph.getConfig());
+      baseGraph.getConfig());
     return temporalGradoopConfig.getTemporalGraphFactory().fromNonTemporalDataSets(
-      logicalGraph.getGraphHead(), graphTimeExtractor, logicalGraph.getVertices(), vertexTimeExtractor,
-      logicalGraph.getEdges(), edgeTimeExtractor);
+      baseGraph.getGraphHead(), graphTimeExtractor, baseGraph.getVertices(), vertexTimeExtractor,
+      baseGraph.getEdges(), edgeTimeExtractor);
   }
 
   /**

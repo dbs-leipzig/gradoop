@@ -229,9 +229,9 @@ public class TemporalGraphCollection implements BaseGraphCollection<
 
   /**
    * Convenience API function to create a {@link TemporalGraphCollection} from an existing
-   * {@link GraphCollection} with default values for the temporal attributes.
+   * {@link BaseGraphCollection} with default values for the temporal attributes.
    *
-   * @param graphCollection the existing graph collection instance
+   * @param baseGraphCollection the existing BaseGraphCollection instance
    * @param <G> The graph head type.
    * @param <V> The vertex type.
    * @param <E> The edge type.
@@ -240,19 +240,20 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * @return a temporal graph collection with default temporal values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraphCollection fromGraphCollection(
-      GC graphCollection) {
-    return TemporalGradoopConfig.fromGradoopFlinkConfig(graphCollection.getConfig())
-      .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(graphCollection);
+  public static <G extends GraphHead, V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  TemporalGraphCollection fromGraphCollection(
+      GC baseGraphCollection) {
+    return TemporalGradoopConfig.fromGradoopFlinkConfig(baseGraphCollection.getConfig())
+      .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(baseGraphCollection);
   }
 
   /**
    * Convenience API function to create a {@link TemporalGraphCollection} from an existing
-   * {@link GraphCollection} with valid times depending on the three given
+   * {@link BaseGraphCollection} with valid times depending on the three given
    * {@link TimeIntervalExtractor} functions
    *
-   * @param graphCollection     the existing graph collection instance
+   * @param baseGraphCollection the existing BaseGraphCollection instance
    * @param graphTimeExtractor  the time extractor function for the Graph Heads in the
    *                            graph collection instance
    * @param vertexTimeExtractor the time extractor function for the vertices in the graph
@@ -267,17 +268,18 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * @return a temporal graph collection with new valid time values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraphCollection fromGraphCollection(
-      GC graphCollection,
+  public static <G extends GraphHead, V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  TemporalGraphCollection fromGraphCollection(GC baseGraphCollection,
       TimeIntervalExtractor<G> graphTimeExtractor,
       TimeIntervalExtractor<V> vertexTimeExtractor,
       TimeIntervalExtractor<E> edgeTimeExtractor) {
     TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.
-      fromGradoopFlinkConfig(graphCollection.getConfig());
+      fromGradoopFlinkConfig(baseGraphCollection.getConfig());
     return temporalGradoopConfig.getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
-      graphCollection.getGraphHeads(), graphTimeExtractor, graphCollection.getVertices(), vertexTimeExtractor,
-      graphCollection.getEdges(), edgeTimeExtractor);
+      baseGraphCollection.getGraphHeads(), graphTimeExtractor, baseGraphCollection.getVertices(),
+      vertexTimeExtractor,
+      baseGraphCollection.getEdges(), edgeTimeExtractor);
   }
 
   /**
