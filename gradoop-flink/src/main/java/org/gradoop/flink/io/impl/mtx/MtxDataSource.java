@@ -79,11 +79,14 @@ public class MtxDataSource implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     DataSet<EPGMVertex> vertices = cfg.getExecutionEnvironment().readTextFile(path)
+      .setParallelism(1)
       .flatMap(new MtxVertexToVertex(cfg.getLogicalGraphFactory().getVertexFactory()))
+      .setParallelism(1)
       .distinct(new Id<>());
 
-    DataSet<EPGMEdge> edges = cfg.getExecutionEnvironment().readTextFile(path)
-      .flatMap(new MtxEdgeToEdge(cfg.getLogicalGraphFactory().getEdgeFactory()));
+    DataSet<EPGMEdge> edges = cfg.getExecutionEnvironment().readTextFile(path).setParallelism(1)
+      .flatMap(new MtxEdgeToEdge(cfg.getLogicalGraphFactory().getEdgeFactory()))
+      .setParallelism(1);
 
     if (!skipPreprocessing) {
       edges = edges.filter((e) -> !e.getSourceId().equals(e.getTargetId()));
@@ -145,6 +148,11 @@ public class MtxDataSource implements DataSource {
      * The EPGMEdgeFactory<Edge> to use for creating edges
      */
     private EdgeFactory<EPGMEdge> edgeFactory;
+    /**
+     * Is set to true once the first non-comment line is skipped.
+     * This line contains the amount of vertices and edges and no 'real' data.
+     */
+    private boolean firstSkipped = false;
 
     /**
      * Create new EdgeMapper
@@ -158,6 +166,10 @@ public class MtxDataSource implements DataSource {
     @Override
     public void flatMap(String line, Collector<EPGMEdge> collector) {
       if (!isComment(line)) {
+        if (!firstSkipped) {
+          firstSkipped = true;
+          return;
+        }
         String[] splitted = line.split(getSplitCharacter(line));
         collector.collect(edgeFactory
           .initEdge(GradoopId.get(), generateId(splitted[0]), generateId(splitted[1])));
@@ -173,7 +185,11 @@ public class MtxDataSource implements DataSource {
      * The EPGMVertexFactory<Vertex> to use for creating vertices
      */
     private VertexFactory<EPGMVertex> vertexFactory;
-
+    /**
+     * Is set to true once the first non-comment line is skipped.
+     * This line contains the amount of vertices and edges and no 'real' data.
+     */
+    private boolean firstSkipped = false;
     /**
      * Create new VertexMapper
      *
@@ -186,6 +202,10 @@ public class MtxDataSource implements DataSource {
     @Override
     public void flatMap(String line, Collector<EPGMVertex> collector) {
       if (!isComment(line)) {
+        if (!firstSkipped) {
+          firstSkipped = true;
+          return;
+        }
         String[] splitted = line.split(getSplitCharacter(line));
         collector.collect(vertexFactory.initVertex(generateId(splitted[0])));
         collector.collect(vertexFactory.initVertex(generateId(splitted[1])));
