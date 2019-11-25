@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 1792,
+      <title>File: 1800,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -1992,6 +1992,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.AbstractDurationAggregateFunction.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/AbstractDurationAggregateFunction.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.dataintegration.transformation.api.package-info.java">org/gradoop/dataintegration/transformation/api/package-info.java</a>
                 </td>
                 <td>
@@ -3827,6 +3841,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.functions.graphcontainment.PairVertexWithGraphs.java">org/gradoop/flink/model/impl/functions/graphcontainment/PairVertexWithGraphs.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxEdgeDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MaxEdgeDuration.java</a>
                 </td>
                 <td>
                   0
@@ -11904,6 +11932,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MinMaxDurationTest.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MinMaxDurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.layout.TemporalGraphCollectionLayoutFactory.java">org/gradoop/temporal/model/impl/layout/TemporalGraphCollectionLayoutFactory.java</a>
                 </td>
                 <td>
@@ -16636,6 +16678,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MinEdgeDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MinEdgeDuration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges.java">org/gradoop/dataintegration/transformation/functions/CreateVertexFromEdges.java</a>
                 </td>
                 <td>
@@ -18121,6 +18177,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectTriple.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/functions/FilterAndProjectTriple.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MinVertexDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MinVertexDuration.java</a>
                 </td>
                 <td>
                   0
@@ -19815,6 +19885,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency.java">org/gradoop/flink/algorithms/fsm/transactional/tle/functions/MinFrequency.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MinDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MinDuration.java</a>
                 </td>
                 <td>
                   0
@@ -22992,6 +23076,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxVertexDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MaxVertexDuration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants.java">org/gradoop/flink/algorithms/fsm/transactional/common/TFSMConstants.java</a>
                 </td>
                 <td>
@@ -23217,6 +23315,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.sampling.statistics.ConnectedComponentsDistributionTest.java">org/gradoop/flink/model/impl/operators/sampling/statistics/ConnectedComponentsDistributionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxDuration.java">org/gradoop/temporal/model/impl/operators/aggregation/functions/MaxDuration.java</a>
                 </td>
                 <td>
                   0

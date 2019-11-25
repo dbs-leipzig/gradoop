@@ -107,11 +107,11 @@ import java.util.Comparator;
 <span class="fc" id="L107">        } else {</span>
 
           // compare backtracking
-<span class="fc bfc" id="L110" title="All 2 branches covered.">          boolean thisIsBackwards = thisToTime &lt;= thisFromTime;</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">          boolean thisIsBackwards = thisToTime &lt;= thisFromTime;</span>
 <span class="fc bfc" id="L111" title="All 2 branches covered.">          boolean thatIsBackwards = thatToTime &lt;= thatFromTime;</span>
 
-<span class="pc bpc" id="L113" title="1 of 4 branches missed.">          if (thisIsBackwards &amp;&amp; !thatIsBackwards) {</span>
-<span class="fc" id="L114">            comparison = -1;</span>
+<span class="pc bpc" id="L113" title="3 of 4 branches missed.">          if (thisIsBackwards &amp;&amp; !thatIsBackwards) {</span>
+<span class="nc" id="L114">            comparison = -1;</span>
 <span class="pc bpc" id="L115" title="1 of 4 branches missed.">          } else if (thatIsBackwards &amp;&amp; !thisIsBackwards) {</span>
 <span class="fc" id="L116">            comparison = 1;</span>
           } else {

@@ -15,9 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Average;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.api.TimeDimension;
@@ -30,12 +28,13 @@ import java.util.Objects;
  * Calculate the average duration of a time dimension of one given {@link TimeDimension} of temporal elements.
  * Time intervals with either the start or end time set to the respective default value will be ignored.
  */
-public class AverageDuration extends BaseAggregateFunction implements Average, TemporalAggregateFunction {
+public class AverageDuration extends AbstractDurationAggregateFunction
+  implements Average, TemporalAggregateFunction {
 
   /**
    * A property value containing the number {@code 1}, as a {@link Long}.
    */
-<span class="fc" id="L38">  private static final PropertyValue ONE = PropertyValue.create(1L);</span>
+<span class="fc" id="L37">  private static final PropertyValue ONE = PropertyValue.create(1L);</span>
 
   /**
    * Selects which time dimension is considered by this aggregate function.
@@ -46,12 +45,12 @@ public class AverageDuration extends BaseAggregateFunction implements Average, T
    * Create an instance of the {@link AverageDuration} aggregate function.
    *
    * @param aggregatePropertyKey The aggregate property key.
-   * @param dimension            The time dimension to consider.
+   * @param dimension the time dimension to consider
    */
   public AverageDuration(String aggregatePropertyKey, TimeDimension dimension) {
-<span class="fc" id="L52">    super(aggregatePropertyKey);</span>
-<span class="fc" id="L53">    this.dimension = Objects.requireNonNull(dimension);</span>
-<span class="fc" id="L54">  }</span>
+<span class="fc" id="L51">    super(aggregatePropertyKey, dimension);</span>
+<span class="fc" id="L52">    this.dimension = Objects.requireNonNull(dimension);</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Get the duration of a time dimension as the aggregate value from a temporal element.
@@ -64,32 +63,16 @@ public class AverageDuration extends BaseAggregateFunction implements Average, T
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    Tuple2&lt;Long, Long&gt; timeInterval;
-<span class="pc bpc" id="L68" title="1 of 3 branches missed.">    switch (dimension) {</span>
-    case TRANSACTION_TIME:
-<span class="fc" id="L70">      timeInterval = element.getTransactionTime();</span>
-<span class="fc" id="L71">      break;</span>
-    case VALID_TIME:
-<span class="fc" id="L73">      timeInterval = element.getValidTime();</span>
-<span class="fc" id="L74">      break;</span>
-    default:
-<span class="nc" id="L76">      throw new IllegalArgumentException(&quot;Temporal attribute &quot; + dimension + &quot; is not supported.&quot;);</span>
+<span class="fc" id="L66">    PropertyValue duration = getDuration(element);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (duration.getLong() == -1L) {</span>
+<span class="fc" id="L68">      return Average.IGNORED_VALUE;</span>
     }
-<span class="pc bpc" id="L78" title="2 of 4 branches missed.">    if (timeInterval.f0 == null || timeInterval.f1 == null ||</span>
-<span class="fc bfc" id="L79" title="All 2 branches covered.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_TO) ||</span>
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
-<span class="fc bfc" id="L82" title="All 2 branches covered.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_TO)) {</span>
-<span class="fc" id="L83">      return Average.IGNORED_VALUE;</span>
-    } else {
-<span class="fc" id="L85">      return PropertyValue</span>
-<span class="fc" id="L86">        .create(Arrays.asList(PropertyValue.create(timeInterval.f1 - timeInterval.f0), ONE));</span>
-    }
+<span class="fc" id="L70">    return PropertyValue.create(Arrays.asList(duration, ONE));</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L92">    return String.format(&quot;%s(%s)&quot;, getClass().getSimpleName(), dimension);</span>
+<span class="nc" id="L75">    return String.format(&quot;%s(%s)&quot;, getClass().getSimpleName(), dimension);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
