@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Gradoop HBase Unit Tests">
+    <test name="Unit Test">
+        <groups>
+            <run>
+                <include name="unit"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.gradoop.storage.impl.hbase.*"/>
+        </packages>
+    </test>
+</suite>

@@ -75,7 +75,7 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if setting up HBase test cluster fails
    */
-  @BeforeSuite
+  @BeforeSuite(groups = {"integration"})
   public static void setUpHBase() throws Exception {
     if (utility == null) {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
@@ -88,7 +88,7 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if closing HBase test cluster fails
    */
-  @AfterSuite
+  @AfterSuite(groups = {"integration"})
   public static void tearDownHBase() throws Exception {
     if (utility != null) {
       utility.shutdownMiniCluster();

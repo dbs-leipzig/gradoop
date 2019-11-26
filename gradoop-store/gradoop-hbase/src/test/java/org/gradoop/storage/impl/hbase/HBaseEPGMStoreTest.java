@@ -55,7 +55,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test
+  @Test(groups = {"integration"})
   public void writeCloseOpenReadTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -86,7 +86,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test
+  @Test(groups = {"integration"})
   public void writeCloseOpenReadTestWithPrefix() throws IOException {
     String prefix = "test.";
     HBaseEPGMStore graphStore = createEmptyEPGMStore(prefix);
@@ -118,7 +118,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test
+  @Test(groups = {"integration"})
   public void writeFlushReadTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
     graphStore.setAutoFlush(false);
@@ -150,7 +150,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException if read to or write from store fails
    */
-  @Test
+  @Test(groups = "integration")
   public void iteratorTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -203,7 +203,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(expectedExceptions = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class, groups = {"integration"})
   public void wrongPropertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -229,7 +229,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test
+  @Test(groups = {"integration"})
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -328,7 +328,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the truncate tables functionality.
    */
-  @Test
+  @Test(groups = {"integration"})
   public void truncateTablesTest() throws IOException {
     HBaseEPGMStore store = createEmptyEPGMStore("truncateTest");
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader = getMinimalFullFeaturedGraphLoader();

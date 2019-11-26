@@ -43,7 +43,7 @@ public class HBasePropEqualsTest {
   /**
    * Test the toHBaseFilter function
    */
-  @Test(dataProvider = "property values")
+  @Test(dataProvider = "property values", groups = {"unit"})
   public void testToHBaseFilter(String propertyKey, Object value) {
     PropertyValue propertyValue = PropertyValue.create(value);
 

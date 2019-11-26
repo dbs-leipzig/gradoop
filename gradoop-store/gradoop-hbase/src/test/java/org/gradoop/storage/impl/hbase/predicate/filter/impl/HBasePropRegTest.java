@@ -34,11 +34,12 @@ import static org.testng.Assert.assertEquals;
 /**
  * Test class for {@link HBasePropReg}
  */
+@Test(groups = "unit")
 public class HBasePropRegTest {
   /**
    * Test the toHBaseFilter function
    */
-  @Test
+  @Test(groups = {"unit"})
   public void testToHBaseFilter() {
     String key = "key";
     Pattern pattern = Pattern.compile("^FooBar.*$");

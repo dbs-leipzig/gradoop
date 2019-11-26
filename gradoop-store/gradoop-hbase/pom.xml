@@ -70,7 +70,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>gradoop-hbase-testng.xml</suiteXmlFile>
+                        <suiteXmlFile>gradoop-hbase-unit-testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <properties>
                         <property>

@@ -60,7 +60,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @BeforeClass
+  @BeforeClass(groups = {"integration"})
   public static void setUp() throws IOException {
     epgmStores = new HBaseEPGMStore[3];
 
@@ -83,7 +83,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @AfterClass
+  @AfterClass(groups = {"integration"})
   public static void tearDown() throws IOException {
     for (HBaseEPGMStore store : epgmStores) {
       if (store != null) {
@@ -106,7 +106,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test, whether the store uses the correct region splitting.
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testConfig(int storeIndex) {
     switch (storeIndex) {
     case 1:
@@ -128,7 +128,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetGraphSpaceWithIdPredicate(int storeIndex) throws IOException {
     // Fetch all graph heads from gdl file
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
@@ -153,7 +153,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = "integration")
   public void testGetGraphSpaceWithoutIdPredicate(int storeIndex) throws IOException {
     // Fetch all graph heads from gdl file
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
@@ -172,7 +172,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetVertexSpaceWithIdPredicate(int storeIndex) throws IOException {
     // Fetch all vertices from gdl file
     List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices());
@@ -198,7 +198,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetVertexSpaceWithoutIdPredicate(int storeIndex) throws IOException {
     // Fetch all vertices from gdl file
     List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices());
@@ -217,7 +217,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetEdgeSpaceWithIdPredicate(int storeIndex) throws IOException {
     // Fetch all edges from gdl file
     List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges());
@@ -242,7 +242,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetEdgeSpaceWithoutIdPredicate(int storeIndex) throws IOException {
     // Fetch all edges from gdl file
     List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges());
@@ -262,7 +262,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetElementSpaceWithLabelInPredicate(int storeIndex) throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
@@ -311,7 +311,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetElementSpaceWithLabelRegPredicate(int storeIndex) throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
@@ -359,7 +359,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = "integration")
   public void testGetElementSpaceWithPropEqualsPredicate(int storeIndex) throws IOException {
     // Create the expected graph elements
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
@@ -415,7 +415,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetElementSpaceWithPropLargerThanPredicate(int storeIndex) throws IOException {
     // Create the expected graph elements
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
@@ -475,7 +475,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetElementSpaceWithPropRegPredicate(int storeIndex) throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
@@ -533,7 +533,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
+  @Test(dataProvider = "store index", groups = {"integration"})
   public void testGetElementSpaceWithChainedPredicates(int storeIndex) throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = getSocialGraphHeads()
