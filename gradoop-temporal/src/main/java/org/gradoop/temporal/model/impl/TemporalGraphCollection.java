@@ -276,11 +276,11 @@ public class TemporalGraphCollection implements BaseGraphCollection<
     TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.
       fromGradoopFlinkConfig(baseGraphCollection.getConfig());
     return temporalGradoopConfig.getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
-      baseGraphCollection.getGraphHeads(), 
-      graphTimeExtractor, 
+      baseGraphCollection.getGraphHeads(),
+      graphTimeExtractor,
       baseGraphCollection.getVertices(),
       vertexTimeExtractor,
-      baseGraphCollection.getEdges(), 
+      baseGraphCollection.getEdges(),
       edgeTimeExtractor);
   }
 
