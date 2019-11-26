@@ -26,8 +26,10 @@ import org.gradoop.storage.accumulo.impl.predicate.filter.api.AccumuloElementFil
 import org.gradoop.storage.accumulo.impl.predicate.filter.calculate.Or;
 import org.gradoop.storage.accumulo.utils.AccumuloFilters;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
  * Accumulo graph store predicate test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "basic_predicate_01";

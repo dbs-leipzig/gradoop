@@ -29,8 +29,10 @@ import org.gradoop.storage.accumulo.impl.AccumuloEPGMStore;
 import org.gradoop.storage.accumulo.impl.io.AccumuloDataSink;
 import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
 import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.io.InputStream;
@@ -43,6 +45,7 @@ import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollection
  * accumulo data read write test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class IOBasicTest extends GradoopFlinkTestBase {
 
   private static final String TEST_01 = "io_basic_01";

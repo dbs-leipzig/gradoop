@@ -22,8 +22,10 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.accumulo.utils.AccumuloFilters;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
  * accumulo graph store predicate test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class StorePropPredicateTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "prop_predicate_01";

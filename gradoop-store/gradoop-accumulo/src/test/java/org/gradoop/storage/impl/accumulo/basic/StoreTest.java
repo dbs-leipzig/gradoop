@@ -37,8 +37,10 @@ import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
 import org.gradoop.storage.accumulo.impl.AccumuloEPGMStore;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.AccumuloTestSuite;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
@@ -89,6 +91,7 @@ import static org.junit.Assert.*;
  * Accumulo graph store test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class StoreTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "basic_01";

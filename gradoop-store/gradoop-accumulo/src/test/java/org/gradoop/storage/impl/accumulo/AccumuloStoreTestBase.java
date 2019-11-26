@@ -38,10 +38,7 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
    * @param context loader context
    * @throws Throwable if error
    */
-  protected void doTest(
-    String namespace,
-    SocialTestContext context
-  ) throws Throwable {
+  protected void doTest(String namespace, SocialTestContext context) throws Throwable {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(namespace);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 

@@ -21,8 +21,10 @@ import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
 import org.gradoop.storage.accumulo.utils.AccumuloFilters;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class IOGraphPredicateTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "io_graph_predicate_01";

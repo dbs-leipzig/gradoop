@@ -21,8 +21,10 @@ import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
 import org.gradoop.storage.accumulo.impl.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.storage.accumulo.utils.AccumuloFilters;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class IOVertexPredicateTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "io_vertex_predicate_01";

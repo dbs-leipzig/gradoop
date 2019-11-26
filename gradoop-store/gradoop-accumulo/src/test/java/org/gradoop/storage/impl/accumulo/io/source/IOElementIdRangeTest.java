@@ -23,9 +23,11 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.accumulo.impl.io.AccumuloDataSource;
+import org.gradoop.storage.impl.accumulo.IntegrationTests;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(IntegrationTests.class)
 public class IOElementIdRangeTest extends AccumuloStoreTestBase {
 
   private static final String TEST01 = "io_element_id_range_01";
