@@ -132,6 +132,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @param elementFactory A supplier used to create the test elements.
    * @param <E> The temporal element type to test the map function on.
+   * @param dimension The {@link TimeDimension} to compute the diff for.
    * @throws Exception When the flat map operation throws an exception.
    */
   private <E extends TemporalElement> void runTestForElement(Supplier<E> elementFactory, TimeDimension dimension)
@@ -175,6 +176,7 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @param elementFactory A supplier used to create the test elements.
    * @param <E> The temporal element type to test the map function on.
+   * @param dimension The {@link TimeDimension} to base the computation on.
    * @throws Exception when the execution in Flink fails.
    */
   private <E extends TemporalElement> void runTestOnDataSet(Supplier<E> elementFactory, TimeDimension dimension)
@@ -232,6 +234,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     }
   }
 
+  /**
+   * Returns all supported {@link TimeDimension}s as parameters.
+   *
+   * @return {@link TimeDimension}
+   */
   @DataProvider
   public static Object[][] timeDimensions() {
     return new Object[][]{

@@ -52,6 +52,11 @@ public class SnapshotTest extends TemporalGradoopTestBase {
    * Run the test. Calls the snapshot operator using a predicate and compares results with the expected
    * result graph.
    *
+   * @param predicate The {@link TemporalPredicate} to create the {@link Snapshot} operator with.
+   * @param dimension The {@link TimeDimension} to create the {@link Snapshot} operator with.
+   * @param expectedVertices An array of strings specifying the expected vertices.
+   * @param expectedEdges An array of string specifying the expected edges.
+   *
    * @throws Exception when the Execution in Flink fails.
    */
   @Test(dataProvider = "parameters")

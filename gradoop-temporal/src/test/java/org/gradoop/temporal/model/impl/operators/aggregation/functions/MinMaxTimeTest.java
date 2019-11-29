@@ -137,6 +137,16 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
     assertEquals(defaultValue, head.getPropertyValue(keyMin));
   }
 
+  /**
+   * Returns test parameters to test aggregate functions with defaults.
+   *
+   *<ol>
+   *   <li>The {@link TimeDimension} attribute to aggregate.</li>
+   *   <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
+   *</ol>
+   *
+   * @return Test parameters
+   */
   @DataProvider
   public static Object[][] defaultParameters() {
     return new Object[][] {
