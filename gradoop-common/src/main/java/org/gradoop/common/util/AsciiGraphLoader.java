@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.antlr.v4.runtime.BailErrorStrategy;
 import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
@@ -140,7 +139,6 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .setErrorStrategy(new BailErrorStrategy())
       .buildFromString(asciiGraph),
       elementFactoryProvider);
   }
@@ -166,7 +164,6 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .setErrorStrategy(new BailErrorStrategy())
       .buildFromFile(fileName),
       elementFactoryProvider);
   }
@@ -192,7 +189,6 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .setErrorStrategy(new BailErrorStrategy())
       .buildFromStream(inputStream),
       elementFactoryProvider);
   }

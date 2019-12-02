@@ -17,8 +17,6 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -103,7 +101,6 @@ public class QueryHandler {
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .setErrorStrategy(new BailErrorStrategy())
       .buildFromString(gdlString);
     edgeCache = gdlHandler.getEdgeCache(true, true);
     vertexCache = gdlHandler.getVertexCache(true, true);
