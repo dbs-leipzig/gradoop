@@ -29,6 +29,6 @@ public class GraphHeadToDataString<G extends GraphHead> extends ElementToDataStr
 
   @Override
   public GraphHeadString map(G graph) throws Exception {
-    return new GraphHeadString(graph.getId(), "|" + label(graph) + "|");
+    return new GraphHeadString(graph.getId(), "|" + labelWithProperties(graph) + "|");
   }
 }

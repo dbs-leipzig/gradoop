@@ -17,7 +17,6 @@ package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -228,86 +227,6 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
     TimeDimension dimension) {
     return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));
   }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   *
-   * @param query Cypher query
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query) {
-    return query(query, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * <p>
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link TemporalGraphOperators#query(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   * <p>
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * <br>
-   * {@code graph.query(
-   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   * "(a)-[:CO_AUTHOR]->(b)")
-   * }
-   * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query Cypher query string
-   * @param constructionPattern Construction pattern
-   * @return graph collection containing the output of the construct pattern
-   */
-  default TemporalGraphCollection query(String query, String constructionPattern) {
-    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * @param query Cypher query
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query, GraphStatistics graphStatistics) {
-    return query(query, null, graphStatistics);
-  }
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   * <p>
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following example:
-   * <br>
-   * {@code graph.query(
-   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   * "(a)-[:CO_AUTHOR]->(b)")
-   * }
-   * <p>
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type {@code CO_AUTHOR} between the two entities.
-   *
-   * @param query Cypher query
-   * @param constructionPattern Construction pattern
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing the output of the construct pattern
-   */
-  TemporalGraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
 
   //----------------------------------------------------------------------------
   // Utilities

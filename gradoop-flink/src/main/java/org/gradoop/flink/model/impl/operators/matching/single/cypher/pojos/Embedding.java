@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
@@ -40,7 +39,6 @@ import static java.util.stream.Collectors.joining;
  * The reference is stored via the elements ID. Additionally the embedding ca store an ordered
  * list of PropertyValues.
  */
-@SuppressWarnings("SE_NO_SERIALVERSIONID")
 public class Embedding implements Value, CopyableValue<Embedding> {
 
   /**
@@ -57,6 +55,11 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * Indicates that an entry is an id list
    */
   public static final transient byte ID_LIST_FLAG = 0x01;
+
+  /**
+   * Default class version for serialization.
+   */
+  private static final long serialVersionUID = 1;
 
   /**
    * Holds the idData of all id-able entries (IDListFlag, ID)
@@ -86,7 +89,6 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * @param propertyData Properties stored in internal byte array format
    * @param idListData IdLists stored in internal byte array format
    */
-  @SuppressWarnings("EI_EXPOSE_REP2")
   public Embedding(byte[] idData, byte[] propertyData, byte[] idListData) {
     this.idData = idData;
     this.propertyData = propertyData;
@@ -446,12 +448,10 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * Returns the internal representation of the stored ids
    * @return Internal representation of the list of ids
    */
-  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getIdData() {
     return this.idData;
   }
 
-  @SuppressWarnings("EI_EXPOSE_REP")
   public void setIdData(byte[] idData) {
     this.idData = idData;
   }
@@ -460,12 +460,10 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * Returns the internal representation of the stored properties
    * @return Internal representation of the stored properties
    */
-  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getPropertyData() {
     return this.propertyData;
   }
 
-  @SuppressWarnings("EI_EXPOSE_REP")
   public void setPropertyData(byte[] propertyData) {
     this.propertyData = propertyData;
   }
@@ -474,12 +472,10 @@ public class Embedding implements Value, CopyableValue<Embedding> {
    * Returns the internal representation of the stored IdLists
    * @return Internal representation of the stored IdLists
    */
-  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getIdListData() {
     return idListData;
   }
 
-  @SuppressWarnings("EI_EXPOSE_REP")
   public void setIdListData(byte[] idListData) {
     this.idListData = idListData;
   }

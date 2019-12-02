@@ -37,7 +37,7 @@ public abstract class ElementToDataString<EL extends Element> {
    * @param el graph head, vertex or edge
    * @return string representation
    */
-  protected String label(EL el) {
+  protected String labelWithProperties(EL el) {
 
     String label = el.getLabel();
 

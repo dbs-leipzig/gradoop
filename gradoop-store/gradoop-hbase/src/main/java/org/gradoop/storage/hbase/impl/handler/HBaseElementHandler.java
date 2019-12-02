@@ -98,8 +98,8 @@ public abstract class HBaseElementHandler implements ElementHandler {
 
   @Override
   public Put writeProperty(final Put put, Property property) {
-    byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());
-    byte[] bytesWithoutType = PropertyValueUtils.Bytes.getRawBytesWithoutType(property.getValue());
+    byte[] type = PropertyValueUtils.BytesUtils.getTypeByte(property.getValue());
+    byte[] bytesWithoutType = PropertyValueUtils.BytesUtils.getRawBytesWithoutType(property.getValue());
     put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);
     put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);
     return put;
@@ -132,7 +132,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
     for (Map.Entry<byte[], byte[]> propertyColumn : typeFamilyMap.entrySet()) {
       properties.set(
         Bytes.toString(propertyColumn.getKey()),
-        PropertyValueUtils.Bytes.createFromTypeValueBytes(
+        PropertyValueUtils.BytesUtils.createFromTypeValueBytes(
           propertyColumn.getValue(),
           valueFamilyMap.get(propertyColumn.getKey())));
     }

@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.epgm;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -32,26 +31,11 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
-import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
-import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -159,58 +143,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
 
   @Override
-  public CAPFQueryResult cypher(String query) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, this.config.getExecutionEnvironment()
-    );
-    return capfQuery.execute(this);
-  }
-
-  @Override
-  public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, metaData, this.config.getExecutionEnvironment());
-    return capfQuery.execute(this);
-  }
-
-  @Override
-  public GraphCollection query(String query) {
-    return query(query, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern) {
-    return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  @Override
-  public GraphCollection query(String query, GraphStatistics graphStatistics) {
-    return query(query, true,
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true,
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
-  }
-
-  @Override
-  public GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-    GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching<>(query, constructionPattern, attachData,
-      vertexStrategy, edgeStrategy, graphStatistics));
-  }
-
-  @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
   }
@@ -237,34 +169,6 @@ public class LogicalGraph implements
 
     return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
       edgeGroupingKeys, edgeAggregateFunctions));
-  }
-
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToIdString(),
-      new EdgeToIdString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByData(LogicalGraph other) {
-    return new GraphEquality(
-      new GraphHeadToDataString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
   }
 
   //----------------------------------------------------------------------------
@@ -296,16 +200,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
   // Utility methods
   //----------------------------------------------------------------------------
-
-  @Override
-  public DataSet<Boolean> isEmpty() {
-    return getVertices()
-      .map(new True<>())
-      .distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false))
-      .reduce(new Or())
-      .map(new Not());
-  }
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
