@@ -70,7 +70,7 @@ public class GellyCommunitiesExample {
     });
 
     // apply label propagation to compute communities
-    graph = graph.callForGraph(new GellyLabelPropagation(5, communityKey));
+    graph = graph.callForGraph(new GellyLabelPropagation<>(5, communityKey));
 
     // print results
     graph.print();

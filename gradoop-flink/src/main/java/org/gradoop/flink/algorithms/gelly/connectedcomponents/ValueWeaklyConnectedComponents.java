@@ -23,14 +23,16 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.library.ConnectedComponents;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLongSourceIds;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLongTargetIds;
+import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.MapVertexIdComponentId;
 import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyEdgeWithLongValue;
 import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyVertexWithLongValue;
-import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.MapVertexIdComponentId;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 
@@ -39,9 +41,20 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
  * {@link org.apache.flink.graph.library.ConnectedComponents}.
  *
  * Returns a mapping of {@code VertexId -> ComponentId}
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class ValueWeaklyConnectedComponents
-  extends BaseGellyAlgorithm<Long, Long, NullValue, DataSet<Tuple2<Long, Long>>> {
+public class ValueWeaklyConnectedComponents<
+  G extends GraphHead,
+  V extends org.gradoop.common.model.api.entities.Vertex,
+  E extends org.gradoop.common.model.api.entities.Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  extends BaseGellyAlgorithm<G, V, E, LG, GC, Long, Long, NullValue, DataSet<Tuple2<Long, Long>>> {
 
   /**
    * Max number of gelly iteration.
@@ -64,19 +77,19 @@ public class ValueWeaklyConnectedComponents
    * @return Gelly Graph.
    */
   @Override
-  public Graph<Long, Long, NullValue> transformToGelly(LogicalGraph graph) {
+  public Graph<Long, Long, NullValue> transformToGelly(LG graph) {
 
     DataSet<Tuple2<Long, GradoopId>> uniqueVertexID =
       DataSetUtils.zipWithUniqueId(graph.getVertices().map(new Id<>()));
 
     DataSet<Vertex<Long, Long>> vertices = uniqueVertexID
-        .map(new LongTupleToGellyVertexWithLongValue());
+      .map(new LongTupleToGellyVertexWithLongValue());
 
     DataSet<Edge<Long, NullValue>> edges =
       uniqueVertexID
       .join(graph.getEdges())
       .where(1).equalTo(new SourceId<>())
-      .with(new CreateLongSourceIds())
+      .with(new CreateLongSourceIds<>())
       .join(uniqueVertexID)
       .where(3).equalTo(1)
       .with(new CreateLongTargetIds())
@@ -88,15 +101,15 @@ public class ValueWeaklyConnectedComponents
   /**
    * Executes gelly algorithm and post process the result.
    *
-   * @param graph The Gelly graph.
+   * @param gellyGraph The Gelly graph.
    * @return List of VertexId and ComponentId.
    * @throws Exception in case of failure.
    */
   @Override
-  public DataSet<Tuple2<Long, Long>> executeInGelly(Graph<Long, Long, NullValue> graph)
+  public DataSet<Tuple2<Long, Long>> executeInGelly(Graph<Long, Long, NullValue> gellyGraph)
     throws Exception {
 
     return new ConnectedComponents<Long, Long, NullValue>(maxIteration)
-      .run(graph).map(new MapVertexIdComponentId());
+      .run(gellyGraph).map(new MapVertexIdComponentId());
   }
 }

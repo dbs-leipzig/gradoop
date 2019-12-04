@@ -79,7 +79,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testFullyConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("clique");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);
@@ -96,7 +96,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testNonConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("nonConnected");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);
@@ -114,7 +114,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testHalfConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("halfConnected");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);

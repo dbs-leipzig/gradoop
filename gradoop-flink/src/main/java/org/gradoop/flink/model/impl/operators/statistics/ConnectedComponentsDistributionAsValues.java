@@ -17,18 +17,31 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.ValueWeaklyConnectedComponents;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 
 /**
  * Computes the weakly connected components of a graph structure. Uses the gradoop wrapper
  * {@link ValueWeaklyConnectedComponents} of Flinks ConnectedComponents.
  * <p>
  * Returns a mapping of {@code VertexId -> ComponentId}
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class ConnectedComponentsDistributionAsValues
-  implements UnaryGraphToValueOperator<DataSet<Tuple2<Long, Long>>> {
+public class ConnectedComponentsDistributionAsValues<
+  G extends GraphHead,
+  V extends org.gradoop.common.model.api.entities.Vertex,
+  E extends org.gradoop.common.model.api.entities.Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToValueOperator<LG, DataSet<Tuple2<Long, Long>>> {
 
   /**
    * Max iterations.
@@ -45,7 +58,7 @@ public class ConnectedComponentsDistributionAsValues
   }
 
   @Override
-  public DataSet<Tuple2<Long, Long>> execute(LogicalGraph graph) {
-    return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);
+  public DataSet<Tuple2<Long, Long>> execute(LG graph) {
+    return new ValueWeaklyConnectedComponents<G, V, E, LG, GC>(maxIteration).execute(graph);
   }
 }

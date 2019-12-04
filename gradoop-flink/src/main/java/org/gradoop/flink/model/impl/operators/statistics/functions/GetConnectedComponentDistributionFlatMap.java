@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.statistics.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.ArrayList;
@@ -31,9 +31,11 @@ import java.util.stream.Collectors;
 /**
  * Collects the aggregated component ids from vertices and edges. Extracts the distribution for
  * vertices and edges over this components.
+ *
+ * @param <G> Graph head type
  */
-public class GetConnectedComponentDistributionFlatMap implements
-  FlatMapFunction<EPGMGraphHead, Tuple3<String, Long, Long>> {
+public class GetConnectedComponentDistributionFlatMap<G extends GraphHead>
+  implements FlatMapFunction<G, Tuple3<String, Long, Long>> {
 
   /**
    * Property key to store the component id.
@@ -57,7 +59,7 @@ public class GetConnectedComponentDistributionFlatMap implements
   }
 
   @Override
-  public void flatMap(EPGMGraphHead graphHead, Collector<Tuple3<String, Long, Long>> out) {
+  public void flatMap(G graphHead, Collector<Tuple3<String, Long, Long>> out) {
     List<String> vertexWcc = graphHead.getPropertyValue(
       new AggregateListOfWccVertices(propertyKey).getAggregatePropertyKey()).getList()
       .stream().map(PropertyValue::getString)

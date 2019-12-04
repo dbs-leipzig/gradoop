@@ -15,15 +15,15 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.graph.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Convert a Gradoop {@link Vertex} to a Gelly EPGMVertex.
+ * Convert a Gradoop {@link Vertex} to a Gelly Vertex.
  *
- * @param <VV> Value type of the output gelly vertex.
+ * @param <V> Gradoop input Vertex type
+ * @param <VV> Value type of the output Gelly vertex.
  */
-public interface VertexToGellyVertex<VV>
-  extends ElementToGellyVertex<EPGMVertex, GradoopId, VV> {
+public interface VertexToGellyVertex<V extends Vertex, VV>
+  extends ElementToGellyVertex<V, GradoopId, VV> {
 }

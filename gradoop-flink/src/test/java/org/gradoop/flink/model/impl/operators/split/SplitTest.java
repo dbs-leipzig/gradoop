@@ -65,7 +65,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result =
-      input.callForCollection(new Split(SplitTest::getSplitValues));
+      input.callForCollection(new Split<>(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -102,7 +102,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(SplitTest::getSplitValues));
+      .callForCollection(new Split<>(SplitTest::getSplitValues));
 
     GraphCollection expectation = loader.getGraphCollectionByVariables(
       "graph1", "graph2", "graph3");
@@ -137,7 +137,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(SplitTest::getSplitValues));
+      .callForCollection(new Split<>(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));

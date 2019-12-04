@@ -25,7 +25,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A self contained quickstart example on how to use a composition of gradoop operators.
- * */
+ */
 public class QuickstartExample {
 
   /**
@@ -86,7 +86,8 @@ public class QuickstartExample {
     workGraph.print();
 
     // execute WCC
-    GraphCollection workspaces = new WeaklyConnectedComponentsAsCollection(5).execute(workGraph);
+    GraphCollection workspaces = workGraph
+      .callForCollection(new WeaklyConnectedComponentsAsCollection<>(5));
 
     System.out.println("CONNECTED_COMPONENTS_GRAPH");
     workspaces.print();

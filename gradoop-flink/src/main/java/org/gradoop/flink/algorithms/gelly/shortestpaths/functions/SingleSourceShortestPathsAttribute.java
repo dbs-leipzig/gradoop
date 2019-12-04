@@ -16,14 +16,16 @@
 package org.gradoop.flink.algorithms.gelly.shortestpaths.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Stores the minimum distance as a property in vertex.
+ *
+ * @param <V> Gradoop Vertex type
  */
-public class SingleSourceShortestPathsAttribute
-  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, Double>, EPGMVertex, EPGMVertex> {
+public class SingleSourceShortestPathsAttribute<V extends Vertex>
+  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, Double>, V, V> {
 
   /**
    * Property to store the minimum distance in.
@@ -40,8 +42,7 @@ public class SingleSourceShortestPathsAttribute
   }
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex<GradoopId, Double> gellyVertex,
-    EPGMVertex gradoopVertex) {
+  public V join(org.apache.flink.graph.Vertex<GradoopId, Double> gellyVertex, V gradoopVertex) {
     gradoopVertex.setProperty(shortestPathProperty, gellyVertex.getValue());
     return gradoopVertex;
   }

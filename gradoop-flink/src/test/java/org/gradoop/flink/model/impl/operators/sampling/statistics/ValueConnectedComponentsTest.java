@@ -84,8 +84,8 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
     LogicalGraph graph = loader.getLogicalGraphByVariable("g");
 
     // execute Gelly ConnectedComponents.
-    DataSet<Tuple2<Long, Long>> cComponents =
-      new ConnectedComponentsDistributionAsValues(Integer.MAX_VALUE).execute(graph);
+    DataSet<Tuple2<Long, Long>> cComponents = graph.callForValue(
+      new ConnectedComponentsDistributionAsValues<>(Integer.MAX_VALUE));
 
     List<Tuple2<Long, Long>> vertexComponentList = new ArrayList<>();
     cComponents.output(new LocalCollectionOutputFormat<>(vertexComponentList));

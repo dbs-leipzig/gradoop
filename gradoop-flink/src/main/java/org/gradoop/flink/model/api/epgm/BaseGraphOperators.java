@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.Edge;
@@ -29,6 +30,7 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -43,6 +45,7 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
@@ -553,6 +556,18 @@ public interface BaseGraphOperators<
    *          empty or {@code false} if not
    */
   DataSet<Boolean> isEmpty();
+
+  /**
+   * Splits the graph into multiple logical graphs using the property value which is assigned to the given
+   * property key. Vertices and edges that do not have this property will be removed from the resulting
+   * collection.
+   *
+   * @param propertyKey split property key
+   * @return graph collection
+   */
+  default GC splitBy(String propertyKey) {
+    return callForCollection(new Split<>(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
+  }
 
   //----------------------------------------------------------------------------
   // Call for Operators

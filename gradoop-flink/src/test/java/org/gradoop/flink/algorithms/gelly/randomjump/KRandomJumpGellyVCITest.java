@@ -69,8 +69,8 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void baseTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
-      0.5).execute(socialGraph);
+    LogicalGraph result = socialGraph.callForGraph(
+      new KRandomJumpGellyVCI<>(1, 1000, 0.15, 0.5));
 
     commonValidation(socialGraph, result);
 
@@ -86,8 +86,8 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void base3StartVerticesTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(3, 1000, 0.15,
-      0.5).execute(socialGraph);
+    LogicalGraph result = socialGraph.callForGraph(
+      new KRandomJumpGellyVCI<>(3, 1000, 0.15, 0.5));
 
     commonValidation(socialGraph, result);
 
@@ -103,8 +103,8 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void visitAllTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
-      1.0).execute(socialGraph);
+    LogicalGraph result = socialGraph.callForGraph(
+      new KRandomJumpGellyVCI<>(1, 1000, 0.15, 1.0));
 
     commonValidation(socialGraph, result);
 
@@ -118,8 +118,8 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void visitAll3StartVerticesTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(3, 1000, 0.15,
-      1.0).execute(socialGraph);
+    LogicalGraph result = socialGraph.callForGraph(
+      new KRandomJumpGellyVCI<>(3, 1000, 0.15, 1.0));
 
     commonValidation(socialGraph, result);
 
@@ -133,8 +133,8 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void visitAllJumpsOnlyTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
-      1.0).execute(customGraph);
+    LogicalGraph result = customGraph.callForGraph(
+      new KRandomJumpGellyVCI<>(1, 1000, 0.15, 1.0));
 
     commonValidation(customGraph, result);
 

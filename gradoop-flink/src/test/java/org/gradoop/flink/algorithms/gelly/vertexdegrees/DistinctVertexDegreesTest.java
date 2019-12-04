@@ -51,8 +51,8 @@ public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    LogicalGraph outputGraph =
-      input.callForGraph(new DistinctVertexDegrees("degree", "inDegree", "outDegree", false));
+    LogicalGraph outputGraph = input.callForGraph(new DistinctVertexDegrees<>(
+      "degree", "inDegree", "outDegree", false));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 
     collectAndAssertTrue(outputGraph.equalsByData(expect));

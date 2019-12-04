@@ -15,16 +15,17 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.graph.Edge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link Double} as edge value.
+ *
+ * @param <E> Gradoop Edge type
  */
-public class EdgeToGellyEdgeWithDouble implements EdgeToGellyEdge<Double> {
+public class EdgeToGellyEdgeWithDouble<E extends Edge> implements EdgeToGellyEdge<E, Double> {
 
   /**
    * Property key to get the value for.
@@ -47,7 +48,7 @@ public class EdgeToGellyEdgeWithDouble implements EdgeToGellyEdge<Double> {
   }
 
   @Override
-  public Edge<GradoopId, Double> map(EPGMEdge epgmEdge)
+  public org.apache.flink.graph.Edge<GradoopId, Double> map(E epgmEdge)
     throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());

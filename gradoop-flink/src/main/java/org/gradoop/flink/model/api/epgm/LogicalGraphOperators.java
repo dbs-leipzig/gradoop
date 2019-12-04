@@ -83,16 +83,6 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
 
   /**
-   * Splits the graph into multiple logical graphs using the property value
-   * which is assigned to the given property key. Vertices and edges that do
-   * not have this property will be removed from the resulting collection.
-   *
-   * @param propertyKey split property key
-   * @return graph collection
-   */
-  GraphCollection splitBy(String propertyKey);
-
-  /**
    * Creates a logical graph from that graph and other graphs using the given operator.
    *
    * @param operator    multi graph to graph operator

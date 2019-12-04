@@ -18,15 +18,17 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Retrieves the source- and target-id from an edge, if this edge was visited, determined by the
  * boolean property.
+ *
+ * @param <E> Gradoop Edge type
  */
 @FunctionAnnotation.ReadFields("properties")
-public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction<EPGMEdge, GradoopId> {
+public class GetVisitedSourceTargetIdsFlatMap<E extends Edge> implements FlatMapFunction<E, GradoopId> {
 
   /**
    * Key for the boolean property value to determine, if the edge was visited.
@@ -43,7 +45,7 @@ public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction<EPGMEdg
   }
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector<GradoopId> out) throws Exception {
+  public void flatMap(E edge, Collector<GradoopId> out) throws Exception {
     if (edge.getPropertyValue(propertyKey).getBoolean()) {
       out.collect(edge.getSourceId());
       out.collect(edge.getTargetId());

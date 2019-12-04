@@ -16,15 +16,15 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Retains all vertices which do not have the given degree.
  * If a vertex does not have the degree property, it will be filtered.
  *
- * @param <V> EPGM vertex type with property for degree ("deg")
+ * @param <V> Vertex type with property for degree ("deg")
  */
-public class VertexWithDegreeFilter<V extends EPGMVertex> implements FilterFunction<V> {
+public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<V> {
   /**
    * Given degree to be filtered
    */

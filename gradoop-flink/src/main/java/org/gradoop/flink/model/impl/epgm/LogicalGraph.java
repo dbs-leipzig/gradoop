@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.epgm;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -31,11 +30,9 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
-import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -190,11 +187,6 @@ public class LogicalGraph implements
   public LogicalGraph callForGraph(GraphsToGraphOperator operator,
     LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
-  }
-
-  @Override
-  public GraphCollection splitBy(String propertyKey) {
-    return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
   }
 
   //----------------------------------------------------------------------------

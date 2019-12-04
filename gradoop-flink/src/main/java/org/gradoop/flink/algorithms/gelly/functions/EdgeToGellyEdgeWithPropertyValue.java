@@ -16,17 +16,19 @@
 package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link PropertyValue} as edge value.
+ *
+ * @param <E>  Gradoop Edge type
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
 @FunctionAnnotation.ReadFields("properties")
-public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge<PropertyValue> {
+public class EdgeToGellyEdgeWithPropertyValue<E extends Edge> implements EdgeToGellyEdge<E, PropertyValue> {
   /**
    * Property key to get the value for.
    */
@@ -35,8 +37,7 @@ public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge<Propert
   /**
    * Reduce object instantiations.
    */
-  private final org.apache.flink.graph.Edge<GradoopId, PropertyValue>
-    reuseEdge;
+  private final org.apache.flink.graph.Edge<GradoopId, PropertyValue> reuseEdge;
 
   /**
    * Constructor.
@@ -49,7 +50,7 @@ public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge<Propert
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, PropertyValue> map(EPGMEdge epgmEdge) {
+  public org.apache.flink.graph.Edge<GradoopId, PropertyValue> map(E epgmEdge) {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
     reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey));
