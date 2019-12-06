@@ -47,7 +47,7 @@ import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO
 import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ZOOKEEPER_HOSTS;
 
 /**
- * gradoop accumulo test suit
+ * gradoop accumulo test suite
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
