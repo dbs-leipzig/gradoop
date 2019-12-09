@@ -230,9 +230,12 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
    * @return a temporal graph with default temporal values
    * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
-  TemporalGraph fromGraph(LG baseGraph) {
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraph fromGraph(LG baseGraph) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(baseGraph.getConfig()).getTemporalGraphFactory()
       .fromNonTemporalGraph(baseGraph);
   }
@@ -252,9 +255,11 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
    * @param <GC> The type of the Graph collection
    * @return a temporal graph with new valid time values
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
-  TemporalGraph fromGraph(LG baseGraph,
+  public static <
+    G extends GraphHead,
+    V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraph fromGraph(LG baseGraph,
       TimeIntervalExtractor<G> graphTimeExtractor,
       TimeIntervalExtractor<V> vertexTimeExtractor,
       TimeIntervalExtractor<E> edgeTimeExtractor) {

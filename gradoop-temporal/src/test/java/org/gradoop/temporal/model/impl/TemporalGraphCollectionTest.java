@@ -280,9 +280,10 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
     TemporalGraphCollection expected = csvDataSource.getTemporalGraphCollection();
     GraphCollection graphCollection = getTemporalSocialNetworkLoader().getGraphCollection();
 
-    TemporalGraphCollection check = TemporalGraphCollection
-      .fromGraphCollection(graphCollection, g -> TemporalGradoopTestUtils.extractTime(g),
-        v -> TemporalGradoopTestUtils.extractTime(v), e -> TemporalGradoopTestUtils.extractTime(e));
+    TemporalGraphCollection check = TemporalGraphCollection.fromGraphCollection(graphCollection,
+        g -> TemporalGradoopTestUtils.extractTime(g),
+        v -> TemporalGradoopTestUtils.extractTime(v),
+        e -> TemporalGradoopTestUtils.extractTime(e));
 
     collectAndAssertTrue(check.equalsByGraphElementData(expected));
   }

@@ -240,8 +240,12 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * @return a temporal graph collection with default temporal values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
   TemporalGraphCollection fromGraphCollection(GC baseGraphCollection) {
     return TemporalGradoopConfig.fromGradoopFlinkConfig(baseGraphCollection.getConfig())
       .getTemporalGraphCollectionFactory().fromNonTemporalGraphCollection(baseGraphCollection);
@@ -267,8 +271,12 @@ public class TemporalGraphCollection implements BaseGraphCollection<
    * @return a temporal graph collection with assigned valid time values
    * @see TemporalGraphCollectionFactory#fromNonTemporalGraphCollection(BaseGraphCollection)
    */
-  public static <G extends GraphHead, V extends Vertex, E extends Edge,
-    LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
   TemporalGraphCollection fromGraphCollection(GC baseGraphCollection,
       TimeIntervalExtractor<G> graphTimeExtractor,
       TimeIntervalExtractor<V> vertexTimeExtractor,
@@ -276,12 +284,8 @@ public class TemporalGraphCollection implements BaseGraphCollection<
     TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.
       fromGradoopFlinkConfig(baseGraphCollection.getConfig());
     return temporalGradoopConfig.getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
-      baseGraphCollection.getGraphHeads(),
-      graphTimeExtractor,
-      baseGraphCollection.getVertices(),
-      vertexTimeExtractor,
-      baseGraphCollection.getEdges(),
-      edgeTimeExtractor);
+      baseGraphCollection.getGraphHeads(), graphTimeExtractor, baseGraphCollection.getVertices(),
+      vertexTimeExtractor, baseGraphCollection.getEdges(), edgeTimeExtractor);
   }
 
   /**
