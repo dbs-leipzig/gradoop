@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Gradoop HBase Unit Tests">
-    <test name="Unit Test">
+<suite name="Gradoop HBase Integration Tests">
+    <test name="Integration Test">
         <groups>
             <run>
                 <include name="integration"/>

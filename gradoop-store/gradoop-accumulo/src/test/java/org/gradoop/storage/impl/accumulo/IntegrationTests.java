@@ -15,5 +15,9 @@
  */
 package org.gradoop.storage.impl.accumulo;
 
+/**
+ * This interface serves the sole purpose to label JUnit integration tests using the
+ * {@link org.junit.experimental.categories.Category} annotation.
+ */
 public interface IntegrationTests {
 }
