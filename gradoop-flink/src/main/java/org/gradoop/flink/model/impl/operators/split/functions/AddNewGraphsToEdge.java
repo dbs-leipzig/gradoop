@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * Adds new graph id's to the edge if source and target vertex are part of
  * the same graph. Filters all edges between graphs.
  *
- * @param <E> Edge Type
+ * @param <E> Edge type.
  */
 @FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
   "f0.targetId->targetId;f0.label->label;f0.properties->properties")

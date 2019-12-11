@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Extracts a list of {@link PropertyValue} instances from a given entity using
  * a list of property keys. The order of the property keys determines the order
- * of the values in the result. If the EPGM element does not have a property,
+ * of the values in the result. If the element does not have a property,
  * the property value will be {@code PropertyValue.NULL_VALUE}.
  *
  * @param <EL> Element

@@ -33,7 +33,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  * Gradoop EPGM model wrapper for the Flink Gelly algorithm for triangle counting in a graph
  * {@link org.apache.flink.graph.library.TriangleEnumerator}.
  * Counts all triangles (closed triplets) in a graph, without taking the edge direction in account.
- * Returns the initial {@code LogicalGraph} with the number of triangles written as property to the
+ * Returns the initial {@link BaseGraph} with the number of triangles written as property to the
  * {@code GraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.
  *
  * @param <G>  Gradoop graph head type.

@@ -21,13 +21,11 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper
  * {@link AnnotateWeaklyConnectedComponents} of Flinks ConnectedComponents.
- * Splits the resulting {@link LogicalGraph} into a {@link GraphCollection} of its weakly connected
+ * Splits the resulting {@link BaseGraph} into a {@link BaseGraphCollection} of its weakly connected
  * components.
  *
  * @param <G>  Gradoop graph head type.

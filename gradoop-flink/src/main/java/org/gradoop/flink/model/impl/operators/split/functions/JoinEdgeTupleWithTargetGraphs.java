@@ -24,9 +24,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Join edge tuples with the graph sets of their targets
+ * Join edge tuples with the graph sets of their targets.
  *
- * @param <E> Edge type
+ * @param <E> Edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")

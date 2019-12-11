@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Maps the vertices to pairs, where each pair contains the vertex id and one
  * split value. The split values are determined using a user defined function.
  *
- * @param <V> Vertex type
+ * @param <V> Vertex type.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("properties")

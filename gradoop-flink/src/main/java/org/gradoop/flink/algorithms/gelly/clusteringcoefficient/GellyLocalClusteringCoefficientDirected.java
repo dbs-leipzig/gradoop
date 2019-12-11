@@ -24,14 +24,13 @@ import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalC
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalDirectedCCResultToTupleMap;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering coefficient
  * algorithm for directed graphs
  * {@link org.apache.flink.graph.library.clustering.directed.LocalClusteringCoefficient}.
- * Returns the initial {@link LogicalGraph} with local values written to the vertices.
+ * Returns the initial {@link BaseGraph} with local values written to the vertices.
  *
  * @param <G>  Gradoop graph head type.
  * @param <V>  Gradoop vertex type.

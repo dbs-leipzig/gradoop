@@ -29,11 +29,11 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
  * <p>
  * Returns a mapping of {@code VertexId -> ComponentId}
  *
- * @param <G>  Gradoop graph head type.
- * @param <V>  Gradoop vertex type.
- * @param <E>  Gradoop edge type.
- * @param <LG> Gradoop type of the graph.
- * @param <GC> Gradoop type of the graph collection.
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class ConnectedComponentsDistributionAsValues<
   G extends GraphHead,

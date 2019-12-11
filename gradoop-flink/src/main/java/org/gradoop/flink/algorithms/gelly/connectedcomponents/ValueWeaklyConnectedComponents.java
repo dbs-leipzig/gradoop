@@ -71,7 +71,7 @@ public class ValueWeaklyConnectedComponents<
   }
 
   /**
-   * Transforms a LogicalGraph to a Gelly Graph.
+   * Transforms a {@link BaseGraph} to a Gelly Graph.
    *
    * @param graph Gradoop Graph.
    * @return Gelly Graph.

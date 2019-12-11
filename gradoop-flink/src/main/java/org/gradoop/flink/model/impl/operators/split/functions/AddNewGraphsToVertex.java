@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 /**
  * Adds new graph ids to the initial vertex set
  *
- * @param <V> Vertex type
+ * @param <V> Vertex type.
  */
 @FunctionAnnotation.ReadFieldsFirst("graphIds")
 @FunctionAnnotation.ReadFieldsSecond("f1")
