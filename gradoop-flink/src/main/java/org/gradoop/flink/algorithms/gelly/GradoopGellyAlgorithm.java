@@ -17,17 +17,18 @@ package org.gradoop.flink.algorithms.gelly;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdge;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
- * Base class for Algorithms executed in Flink Gelly that returns a {@link LogicalGraph}.
+ * Base class for Algorithms executed in Flink Gelly that returns a {@link BaseGraph}.
  *
  * @param <G>  Gradoop graph head type.
  * @param <V>  Gradoop vertex type.
@@ -39,15 +40,15 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
  */
 public abstract class GradoopGellyAlgorithm<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>,
   VV, EV> extends BaseGellyAlgorithm<G, V, E, LG, GC, GradoopId, VV, EV, LG>
   implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
-   * The graph used in {@link GradoopGellyAlgorithm#execute(LG)}.
+   * The graph used in {@link #execute}.
    */
   protected BaseGraph<G, V, E, LG, GC> currentGraph;
 

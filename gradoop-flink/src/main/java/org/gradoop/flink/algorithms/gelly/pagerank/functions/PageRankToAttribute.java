@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Stores the page rank result from the left as a Property in in the right.
  *
- * @param <V> Gradoop Vertex type
+ * @param <V> Gradoop vertex type.
  */
 public class PageRankToAttribute<V extends Vertex> implements JoinFunction<PageRank.Result<GradoopId>, V, V> {
 

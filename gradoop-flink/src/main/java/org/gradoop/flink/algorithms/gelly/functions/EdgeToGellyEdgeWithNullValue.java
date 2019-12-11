@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link NullValue} as edge value.
  *
- * @param <E> Gradoop Edge type
+ * @param <E> Gradoop edge type.
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
 public class EdgeToGellyEdgeWithNullValue<E extends Edge> implements EdgeToGellyEdge<E, NullValue> {

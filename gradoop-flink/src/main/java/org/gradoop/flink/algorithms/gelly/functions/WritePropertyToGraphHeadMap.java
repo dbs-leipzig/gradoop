@@ -22,17 +22,17 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * MapFunction, that writes a given property value to the GraphHead.
  *
- * @param <G> Gradoop Graph head type
+ * @param <G> Gradoop graph head type.
  */
 public class WritePropertyToGraphHeadMap<G extends GraphHead> implements MapFunction<G, G> {
 
   /**
-   * PropertyKey to access the value
+   * PropertyKey to access the value.
    */
   private final String propertyKey;
 
   /**
-   * PropertyValue to store in GraphHead
+   * PropertyValue to store in GraphHead.
    */
   private final PropertyValue propertyValue;
 

@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link Double} as edge value.
  *
- * @param <E> Gradoop Edge type
+ * @param <E> Gradoop edge type.
  */
 public class EdgeToGellyEdgeWithDouble<E extends Edge> implements EdgeToGellyEdge<E, Double> {
 

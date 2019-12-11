@@ -22,9 +22,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Updates the vertex on the left side with the property value on the right side
+ * Updates the vertex on the left side with the property value on the right side.
  *
- * @param <V> Gradoop Vertex type
+ * @param <V> Gradoop vertex type.
  */
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
 @FunctionAnnotation.ReadFieldsFirst("f1")
@@ -32,12 +32,12 @@ public class LPVertexJoin<V extends Vertex>
   implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, PropertyValue>, V, V> {
 
   /**
-   * Property key to access the value which will be propagated
+   * Property key to access the value which will be propagated.
    */
   private final String propertyKey;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param propertyKey property key to access the propagation value
    */

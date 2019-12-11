@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link PropertyValue} as edge value.
  *
- * @param <E>  Gradoop Edge type
+ * @param <E>  Gradoop edge type.
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
 @FunctionAnnotation.ReadFields("properties")

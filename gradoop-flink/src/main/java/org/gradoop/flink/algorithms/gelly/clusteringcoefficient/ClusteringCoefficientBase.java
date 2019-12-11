@@ -24,7 +24,6 @@ import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Base class for Gradoop EPGM model wrapper for Flink Gellys implementation of the clustering coefficient
@@ -78,7 +77,7 @@ public abstract class ClusteringCoefficientBase<
    * Executes the computation of the clustering coefficient.
    *
    * @param gellyGraph Gelly graph with initialized vertices
-   * @return {@link LogicalGraph} with local values written to the vertices or global value
+   * @return {@link BaseGraph} with local values written to the vertices or global value
    * written to the graph head
    * @throws Exception Thrown if the gelly algorithm fails
    */

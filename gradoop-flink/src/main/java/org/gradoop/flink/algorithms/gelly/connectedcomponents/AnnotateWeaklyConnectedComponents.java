@@ -27,7 +27,6 @@ import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -35,7 +34,7 @@ import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 /**
  * A gradoop operator wrapping Flinks ScatterGatherIteration-Algorithm for ConnectedComponents
  * {@link org.apache.flink.graph.library.ConnectedComponents}.
- * The result will be the same {@link LogicalGraph} with a component id assigned to each vertex as a property.
+ * The result will be the same {@link BaseGraph} with a component id assigned to each vertex as a property.
  * If {@link #annotateEdges} is set to {@code true}, the component id is assigned to each edge as a property,
  * too.
  *

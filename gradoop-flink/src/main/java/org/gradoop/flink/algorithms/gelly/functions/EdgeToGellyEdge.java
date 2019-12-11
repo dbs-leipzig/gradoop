@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Convert a Gradoop {@link Edge} to a Gelly Edge.
  *
- * @param <E>  Gradoop Edge type
+ * @param <E>  Gradoop edge type.
  * @param <EV> Value type of the output gelly edge.
  */
 public interface EdgeToGellyEdge<E extends Edge, EV> extends ElementToGellyEdge<E, GradoopId, EV> {

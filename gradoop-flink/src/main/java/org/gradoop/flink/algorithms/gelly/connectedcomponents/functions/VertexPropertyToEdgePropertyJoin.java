@@ -25,8 +25,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * If the edge already has this property, compare the edge value to the vertex value and store the
  * smaller property value.
  *
- * @param <V> Gradoop Vertex type
- * @param <E> Gradoop Edge type
+ * @param <V> Gradoop vertex type.
+ * @param <E> Gradoop edge type.
  */
 public class VertexPropertyToEdgePropertyJoin<V extends Vertex, E extends Edge>
   implements JoinFunction<E, V, E> {

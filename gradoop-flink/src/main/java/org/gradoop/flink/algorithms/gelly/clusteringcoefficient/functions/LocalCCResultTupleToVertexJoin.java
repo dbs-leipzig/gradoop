@@ -23,9 +23,9 @@ import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoeffi
 
 /**
  * Writes the local clustering coefficient from {@code Tuple2<GradoopId, Double>} to the
- * corresponding Gradoop Vertex as property.
+ * corresponding Gradoop vertex as property.
  *
- * @param <V> Gradoop Vertex type
+ * @param <V> Gradoop vertex type.
  */
 public class LocalCCResultTupleToVertexJoin<V extends Vertex>
   implements JoinFunction<Tuple2<GradoopId, Double>, V, V> {
