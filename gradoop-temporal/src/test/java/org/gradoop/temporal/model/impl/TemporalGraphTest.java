@@ -215,10 +215,8 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
     LogicalGraph logicalGraph =
       getTemporalSocialNetworkLoader().getGraphCollection().reduce(new ReduceCombination<>());
 
-    TemporalGraph check = TemporalGraph.fromGraph(logicalGraph,
-      g -> TemporalGradoopTestUtils.extractTime(g),
-      v -> TemporalGradoopTestUtils.extractTime(v),
-      e -> TemporalGradoopTestUtils.extractTime(e));
+    TemporalGraph check = TemporalGraph.fromGraph(logicalGraph, g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v), e -> TemporalGradoopTestUtils.extractTime(e));
 
     collectAndAssertTrue(check.equalsByElementData(expected));
   }
