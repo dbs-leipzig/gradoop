@@ -68,7 +68,7 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
   /**
    * Parameters for this test.
    * Those are:
-   * <ol>
+   * <ol start="0">
    * <li>The time interval used.</li>
    * <li>The field of the time interval used.</li>
    * <li>The expected value.</li>

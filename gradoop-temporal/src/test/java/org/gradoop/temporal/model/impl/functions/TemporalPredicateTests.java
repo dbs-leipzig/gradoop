@@ -98,7 +98,7 @@ public class TemporalPredicateTests extends TemporalGradoopTestBase {
 
   /**
    * Parameters for this test. The test parameters are
-   * <ol>
+   * <ol start="0">
    * <li>A temporal predicate to test.</li>
    * <li>A collection of test values that are expected to be accepted. (A subset of {@link #TEST_INTERVALS}</li>
    * </ol>

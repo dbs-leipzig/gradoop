@@ -70,7 +70,7 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
 
   /**
    * Get parameters for this test. Those are
-   * <ol>
+   * <ol start="0">
    * <li>The {@link TimeDimension} to aggregate.</li>
    * <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
    * <li>The expected result of {@link MaxEdgeTime}.</li>
@@ -140,7 +140,7 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   /**
    * Returns test parameters to test aggregate functions with defaults.
    *
-   *<ol>
+   *<ol start="0">
    *   <li>The {@link TimeDimension} attribute to aggregate.</li>
    *   <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
    *</ol>
