@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Gradoop HBase Complete">
+    <test name="HBase complete Test">
+        <packages>
+            <package name="org.gradoop.storage.impl.hbase.*"/>
+        </packages>
+    </test>
+</suite>

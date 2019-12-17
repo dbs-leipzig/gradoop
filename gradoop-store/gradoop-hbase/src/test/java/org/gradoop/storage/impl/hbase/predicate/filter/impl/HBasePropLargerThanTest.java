@@ -40,7 +40,7 @@ public class HBasePropLargerThanTest {
   /**
    * Test the toHBaseFilter function
    */
-  @Test(dataProvider = "property values", groups = {"unit"})
+  @Test(dataProvider = "property values")
   public void testToHBaseFilter(String propertyKey, Object value, boolean isInclude) {
     PropertyValue propertyValue = PropertyValue.create(value);
 

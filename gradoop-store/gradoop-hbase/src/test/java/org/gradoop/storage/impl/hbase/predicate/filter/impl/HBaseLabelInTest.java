@@ -37,7 +37,7 @@ public class HBaseLabelInTest {
   /**
    * Test the toHBaseFilter function
    */
-  @Test(groups = {"unit"})
+  @Test
   public void testToHBaseFilter() {
     String testLabel1 = "test1";
     String testLabel2 = "test2";

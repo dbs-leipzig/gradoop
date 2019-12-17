@@ -24,14 +24,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <suiteXmlFiles>
-                                <suiteXmlFile>gradoop-hbase-testng.xml</suiteXmlFile>
+                                <suiteXmlFile>gradoop-hbase-complete-testng.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <properties>
-                                <property>
-                                    <name>surefire.testng.verbose</name>
-                                    <value>2</value>
-                                </property>
-                            </properties>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -94,12 +88,6 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>gradoop-hbase-unit-testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <properties>
-                        <property>
-                            <name>surefire.testng.verbose</name>
-                            <value>2</value>
-                        </property>
-                    </properties>
                 </configuration>
             </plugin>
             <!-- Creates an extra *-tests.jar which can be used as dependency -->

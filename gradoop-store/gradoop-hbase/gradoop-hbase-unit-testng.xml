@@ -4,7 +4,7 @@
     <test name="Unit Test">
         <groups>
             <run>
-                <include name="unit"/>
+                <exclude name="integration"/>
             </run>
         </groups>
         <packages>

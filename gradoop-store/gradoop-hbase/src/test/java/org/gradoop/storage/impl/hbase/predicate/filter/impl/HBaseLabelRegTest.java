@@ -37,7 +37,7 @@ public class HBaseLabelRegTest {
   /**
    * Test the toHBaseFilter function
    */
-  @Test(groups = {"unit"})
+  @Test
   public void testToHBaseFilter() {
 
     HBaseLabelReg<EPGMVertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
