@@ -47,8 +47,14 @@ import static org.testng.AssertJUnit.assertEquals;
  */
 public class AverageDurationTest extends TemporalGradoopTestBase {
 
+  /**
+   * Factory used to instantiate {@link TemporalVertex} objects.
+   */
   private TemporalVertexFactory factory;
 
+  /**
+   * Set up method initializes {@link TemporalVertexFactory}.
+   */
   @BeforeClass
   public void setUp() {
     this.factory = new TemporalVertexFactory();
@@ -64,6 +70,18 @@ public class AverageDurationTest extends TemporalGradoopTestBase {
     assertEquals(function.getIncrement(actualElement), expected);
   }
 
+  /**
+   * Provides {@link TemporalVertex} objects with varying transaction times and the expected output of
+   * {@link AverageDuration#getIncrement(TemporalElement)}.
+   * <br>
+   * Provided params:
+   * <ol start="0">
+   * <li>Temporal element</li>
+   * <li>Expected output of {@link AverageDuration#getIncrement(TemporalElement)}</li>
+   * </ol>
+   *
+   * @return Object[][]
+   */
   @DataProvider(name = "txTimeProvider")
   public  Object[][] txTimeParameters() {
     TemporalVertex v0 = factory.createVertex();
@@ -93,6 +111,18 @@ public class AverageDurationTest extends TemporalGradoopTestBase {
     assertEquals(expected, function.getIncrement(actualElement));
   }
 
+  /**
+   * Provides {@link TemporalVertex} objects with varying valid times and the expected output of
+   * {@link AverageDuration#getIncrement(TemporalElement)}.
+   * <br>
+   * Provided params:
+   * <ol start="0">
+   * <li>Temporal element</li>
+   * <li>Expected output of {@link AverageDuration#getIncrement(TemporalElement)}</li>
+   * </ol>
+   *
+   * @return Object[][]
+   */
   @DataProvider(name = "validTimeProvider")
   public  Object[][] validTimeParameters() {
     TemporalVertex v0 = factory.createVertex();

@@ -25,7 +25,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class TemporalGraphLayoutFactoryTest extends TemporalGradoopTestBase {
    *
    * @throws Exception if loading the example graph fails
    */
-  @BeforeMethod
+  @BeforeClass
   public void setUp() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -88,17 +88,17 @@ public class TemporalGraphLayoutFactoryTest extends TemporalGradoopTestBase {
   @Test
   public void testFromDataSets() throws Exception {
     // Remove graph ids first
-    vertexDataSet = vertexDataSet.map(v -> {
+    DataSet<TemporalVertex> mappedVertexDataSet = vertexDataSet.map(v -> {
       v.resetGraphIds();
       return v;
     });
-    edgeDataSet = edgeDataSet.map(e -> {
+    DataSet<TemporalEdge> mappedEdgeDataSet = edgeDataSet.map(e -> {
       e.resetGraphIds();
       return e;
     });
 
     final LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout =
-      factory.fromDataSets(vertexDataSet, edgeDataSet);
+      factory.fromDataSets(mappedVertexDataSet, mappedEdgeDataSet);
 
     Collection<TemporalGraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<TemporalVertex> loadedVertices = Lists.newArrayList();
