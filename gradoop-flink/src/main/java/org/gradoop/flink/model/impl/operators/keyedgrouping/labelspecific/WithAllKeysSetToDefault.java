@@ -65,8 +65,8 @@ public class WithAllKeysSetToDefault<E> implements CombinableFilter<E> {
   public static <E> void checkKeySupport(List<KeyFunction<E, ?>> keys) {
     for (KeyFunction<E, ?> key : keys) {
       if (!(key instanceof DefaultKeyCheckable)) {
-        throw new IllegalArgumentException("Key function " + key + " does not implement " +
-          DefaultKeyCheckable.class.getName());
+        throw new IllegalArgumentException("Key function " + key.getClass().getName() +
+          " does not implement " + DefaultKeyCheckable.class.getName());
       }
     }
   }
