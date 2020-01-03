@@ -25,8 +25,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * Test of {@link TemporalGraphLayoutFactory}
@@ -58,7 +58,7 @@ public class TemporalGraphLayoutFactoryTest extends TemporalGradoopTestBase {
    *
    * @throws Exception if loading the example graph fails
    */
-  @Before
+  @BeforeClass
   public void setUp() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -88,17 +88,17 @@ public class TemporalGraphLayoutFactoryTest extends TemporalGradoopTestBase {
   @Test
   public void testFromDataSets() throws Exception {
     // Remove graph ids first
-    vertexDataSet = vertexDataSet.map(v -> {
+    DataSet<TemporalVertex> mappedVertexDataSet = vertexDataSet.map(v -> {
       v.resetGraphIds();
       return v;
     });
-    edgeDataSet = edgeDataSet.map(e -> {
+    DataSet<TemporalEdge> mappedEdgeDataSet = edgeDataSet.map(e -> {
       e.resetGraphIds();
       return e;
     });
 
     final LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout =
-      factory.fromDataSets(vertexDataSet, edgeDataSet);
+      factory.fromDataSets(mappedVertexDataSet, mappedEdgeDataSet);
 
     Collection<TemporalGraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<TemporalVertex> loadedVertices = Lists.newArrayList();

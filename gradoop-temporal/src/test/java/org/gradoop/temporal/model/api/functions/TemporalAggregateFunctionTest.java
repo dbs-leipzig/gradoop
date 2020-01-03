@@ -21,10 +21,10 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -41,7 +41,7 @@ public class TemporalAggregateFunctionTest extends TemporalGradoopTestBase {
   /**
    * Set up this tests aggregate function. The functions returns the validFrom time.
    */
-  @Before
+  @BeforeClass
   public void setUp() {
     function = mock(TemporalAggregateFunction.class, CALLS_REAL_METHODS);
     when(function.getIncrement(any(TemporalElement.class))).thenAnswer(
@@ -62,7 +62,7 @@ public class TemporalAggregateFunctionTest extends TemporalGradoopTestBase {
    * Test if {@link TemporalAggregateFunction} handles non-temporal elements correctly.
    * (In this case an exception should be thrown, as there is no non-temporal default value set.)
    */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testWithNonTemporal() {
     Vertex vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
     function.getIncrement(vertex);
