@@ -33,7 +33,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_FROM;
 import static org.gradoop.temporal.util.TemporalGradoopTestUtils.PROPERTY_VALID_TO;

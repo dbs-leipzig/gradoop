@@ -24,8 +24,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphHeadFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.Collection;
 
