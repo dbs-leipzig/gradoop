@@ -20,8 +20,8 @@ Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension,0,24,0,0,0,3,0,1,0
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping,TemporalGroupingKeys,0,23,0,0,0,4,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring.functions,TemporalElementToDataString,0,44,0,4,0,12,0,4,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollectionFactory,52,187,0,4,9,32,7,13,7,11
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,15,147,0,0,5,29,4,19,4,19
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,11,138,0,0,4,27,3,17,3,17
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,51,111,0,0,7,27,6,17,6,17
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,29,120,0,0,5,26,4,16,4,16
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphFactory,63,133,0,0,8,20,7,10,7,10
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSource,0,49,0,0,0,12,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSink,16,111,4,4,3,27,4,6,1,5
@@ -69,9 +69,9 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalEdge
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalVertexToDataString,0,44,0,2,0,7,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction.new Object() {...},4,33,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction,62,69,7,5,8,17,7,5,0,5
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,17,90,2,6,2,16,2,6,0,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,25,82,4,4,3,15,4,4,0,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,53,144,4,25,4,32,4,17,0,5
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,65,132,5,24,6,30,5,16,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot,Snapshot,5,46,0,0,2,9,1,2,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot.functions,ByTemporalPredicate,0,32,0,0,0,6,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVVertex,16,23,0,0,4,11,4,6,4,6

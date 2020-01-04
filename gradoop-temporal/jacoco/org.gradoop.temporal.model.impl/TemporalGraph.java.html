@@ -170,7 +170,7 @@ public class TemporalGraph implements BaseGraph&lt;TemporalGraphHead, TemporalVe
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByElementData(TemporalGraph other) {
-<span class="fc" id="L173">    return callForValue(new GraphEquality&lt;&gt;(</span>
+<span class="nc" id="L173">    return callForValue(new GraphEquality&lt;&gt;(</span>
       new GraphHeadToEmptyString&lt;&gt;(),
       new TemporalVertexToDataString&lt;&gt;(),
       new TemporalEdgeToDataString&lt;&gt;(), true), other);

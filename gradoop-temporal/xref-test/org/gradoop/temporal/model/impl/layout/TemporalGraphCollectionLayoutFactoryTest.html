@@ -39,8 +39,8 @@
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.util.TemporalGradoopTestBase;
-<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.BeforeClass;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="34" href="#34">34</a>  
 <a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
 <a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Collectors;
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateElementCollections;
-<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertEquals;
 <a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">/**</em>
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> TemporalGraph temporalGraph;
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>    @Before
+<a name="61" href="#61">61</a>    @BeforeClass
 <a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setUp() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="63" href="#63">63</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="64" href="#64">64</a>  
@@ -199,7 +199,7 @@
 <a name="189" href="#189">189</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="190" href="#190">190</a> <em class="jxr_javadoccomment">   * Test the {@link TemporalGraphCollectionLayoutFactory#fromTransactions(DataSet)} method.</em>
 <a name="191" href="#191">191</a> <em class="jxr_javadoccomment">   */</em>
-<a name="192" href="#192">192</a>   @Test(expected = UnsupportedOperationException.<strong class="jxr_keyword">class</strong>)
+<a name="192" href="#192">192</a>   @Test(expectedExceptions = UnsupportedOperationException.<strong class="jxr_keyword">class</strong>)
 <a name="193" href="#193">193</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromTransactions() {
 <a name="194" href="#194">194</a>     DataSet&lt;GraphTransaction&gt; transactions = getExecutionEnvironment()
 <a name="195" href="#195">195</a>       .fromCollection(Arrays.asList(
@@ -213,7 +213,7 @@
 <a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   * Test the {@link TemporalGraphCollectionLayoutFactory#fromTransactions(DataSet, GroupReduceFunction, GroupReduceFunction)}</em>
 <a name="204" href="#204">204</a> <em class="jxr_javadoccomment">   * method.</em>
 <a name="205" href="#205">205</a> <em class="jxr_javadoccomment">   */</em>
-<a name="206" href="#206">206</a>   @Test(expected = UnsupportedOperationException.<strong class="jxr_keyword">class</strong>)
+<a name="206" href="#206">206</a>   @Test(expectedExceptions = UnsupportedOperationException.<strong class="jxr_keyword">class</strong>)
 <a name="207" href="#207">207</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromTransactionsWithReduceFunctions() {
 <a name="208" href="#208">208</a>     GroupReduceFunction reduceFunction = mock(GroupReduceFunction.<strong class="jxr_keyword">class</strong>);
 <a name="209" href="#209">209</a>     DataSet&lt;GraphTransaction&gt; transactions = getExecutionEnvironment()

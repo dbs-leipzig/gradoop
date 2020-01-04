@@ -30,12 +30,12 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.GradoopConstants;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.BeforeClass;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="25" href="#25">25</a>  
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertNotNull;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertNull;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertEquals;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertNotNull;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertNull;
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * Tests of class {@link TemporalGraphHead}</em>
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="38" href="#38">38</a>    <strong class="jxr_keyword">private</strong> TemporalGraphHeadFactory factory;
 <a name="39" href="#39">39</a>  
-<a name="40" href="#40">40</a>    @Before
+<a name="40" href="#40">40</a>    @BeforeClass
 <a name="41" href="#41">41</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setUp() {
 <a name="42" href="#42">42</a>      factory = <strong class="jxr_keyword">new</strong> TemporalGraphHeadFactory();
 <a name="43" href="#43">43</a>    }

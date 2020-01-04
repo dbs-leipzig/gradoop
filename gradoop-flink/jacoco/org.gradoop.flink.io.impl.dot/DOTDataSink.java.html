@@ -160,14 +160,14 @@ public class DOTDataSink implements DataSink {
      */
     public AbstractDotFileFormat getDotFileFormat(boolean printGraphHeadInformation) {
 
-<span class="fc" id="L163">      String htmlColorGrey = &quot;AAAAAAA&quot;;</span>
+<span class="fc" id="L163">      String x11Black = &quot;#000000&quot;;</span>
 
 <span class="pc bfc" id="L165" title="All 2 branches covered.">      switch (this) {</span>
       case SIMPLE:
 <span class="fc" id="L167">        return new DotFileFormatSimple(printGraphHeadInformation);</span>
       case HTML:
       default:
-<span class="fc" id="L170">        return new DotFileFormatHtml(printGraphHeadInformation, htmlColorGrey);</span>
+<span class="fc" id="L170">        return new DotFileFormatHtml(printGraphHeadInformation, x11Black);</span>
       }
     }
   }

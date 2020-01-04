@@ -29,8 +29,8 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.TemporalGraph;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.util.TemporalGradoopTestBase;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.BeforeMethod;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
 <a name="26" href="#26">26</a>  
@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="42" href="#42">42</a>    @Before
+<a name="42" href="#42">42</a>    @BeforeMethod
 <a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setUp() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="44" href="#44">44</a>      loader = getTemporalSocialNetworkLoader();
 <a name="45" href="#45">45</a>    }

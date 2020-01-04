@@ -184,7 +184,7 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphElementData(TemporalGraphCollection otherCollection) {
-<span class="fc" id="L187">    return callForValue(new CollectionEquality&lt;&gt;(</span>
+<span class="nc" id="L187">    return callForValue(new CollectionEquality&lt;&gt;(</span>
       new GraphHeadToEmptyString&lt;&gt;(),
       new TemporalVertexToDataString&lt;&gt;(),
       new TemporalEdgeToDataString&lt;&gt;(), true), otherCollection);
@@ -192,7 +192,7 @@ public class TemporalGraphCollection implements BaseGraphCollection&lt;
 
   @Override
   public DataSet&lt;Boolean&gt; equalsByGraphData(TemporalGraphCollection otherCollection) {
-<span class="fc" id="L195">    return callForValue(new CollectionEquality&lt;&gt;(</span>
+<span class="nc" id="L195">    return callForValue(new CollectionEquality&lt;&gt;(</span>
       new TemporalGraphHeadToDataString&lt;&gt;(),
       new TemporalVertexToDataString&lt;&gt;(),
       new TemporalEdgeToDataString&lt;&gt;(), true), otherCollection);

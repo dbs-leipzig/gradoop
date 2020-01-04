@@ -25,8 +25,8 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.temporal.util;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.junit.Assert;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.testng.AssertJUnit;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> java.time.LocalDateTime;
 <a name="22" href="#22">22</a>  
@@ -46,8 +46,8 @@
 <a name="36" href="#36">36</a>      LocalDateTime unixEpoch = LocalDateTime.of(1970, 1, 1, 0, 0);
 <a name="37" href="#37">37</a>      LocalDateTime oneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
 <a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>      Assert.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
-<a name="40" href="#40">40</a>      Assert.assertEquals(0L, toEpochMilli(unixEpoch));
+<a name="39" href="#39">39</a>      AssertJUnit.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
+<a name="40" href="#40">40</a>      AssertJUnit.assertEquals(0L, toEpochMilli(unixEpoch));
 <a name="41" href="#41">41</a>    }
 <a name="42" href="#42">42</a>  }
 </pre>

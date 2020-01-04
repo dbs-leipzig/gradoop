@@ -29,11 +29,11 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.api.TimeDimension;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.testng.annotations.Test;
 <a name="23" href="#23">23</a>  
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertSame;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertEquals;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertSame;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.testng.AssertJUnit.assertTrue;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.CALLS_REAL_METHODS;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.mock;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.mockito.Mockito.withSettings;
@@ -142,7 +142,7 @@
 <a name="132" href="#132">132</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   * Test {@link TemporalElement#getTimeByDimension(TimeDimension)} with null dimension.</em>
 <a name="134" href="#134">134</a> <em class="jxr_javadoccomment">   */</em>
-<a name="135" href="#135">135</a>   @Test(expected = NullPointerException.<strong class="jxr_keyword">class</strong>)
+<a name="135" href="#135">135</a>   @Test(expectedExceptions = NullPointerException.<strong class="jxr_keyword">class</strong>)
 <a name="136" href="#136">136</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTimeGetterWithNullTimeDimension() {
 <a name="137" href="#137">137</a>     TemporalElement elementMock = mock(TemporalElement.<strong class="jxr_keyword">class</strong>, withSettings()
 <a name="138" href="#138">138</a>       .useConstructor(GradoopId.get(), <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>)
@@ -154,7 +154,7 @@
 <a name="144" href="#144">144</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="145" href="#145">145</a> <em class="jxr_javadoccomment">   * Test {@link TemporalElement#setValidTime(Tuple2)} with an invalid interval.</em>
 <a name="146" href="#146">146</a> <em class="jxr_javadoccomment">   */</em>
-<a name="147" href="#147">147</a>   @Test(expected = IllegalArgumentException.<strong class="jxr_keyword">class</strong>)
+<a name="147" href="#147">147</a>   @Test(expectedExceptions = IllegalArgumentException.<strong class="jxr_keyword">class</strong>)
 <a name="148" href="#148">148</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testValidTimeSetterWithInvalidValues() {
 <a name="149" href="#149">149</a>     TemporalElement elementMock = mock(TemporalElement.<strong class="jxr_keyword">class</strong>, withSettings()
 <a name="150" href="#150">150</a>       .useConstructor(GradoopId.get(), <span class="jxr_string">""</span>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>)
@@ -165,7 +165,7 @@
 <a name="155" href="#155">155</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * Test {@link TemporalElement#setTransactionTime(Tuple2)} with an invalid interval.</em>
 <a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   */</em>
-<a name="158" href="#158">158</a>   @Test(expected = IllegalArgumentException.<strong class="jxr_keyword">class</strong>)
+<a name="158" href="#158">158</a>   @Test(expectedExceptions = IllegalArgumentException.<strong class="jxr_keyword">class</strong>)
 <a name="159" href="#159">159</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTransactionTimeSetterWithInvalidValues() {
 <a name="160" href="#160">160</a>     TemporalElement elementMock = mock(TemporalElement.<strong class="jxr_keyword">class</strong>, withSettings()
 <a name="161" href="#161">161</a>       .useConstructor(GradoopId.get(), <span class="jxr_string">""</span>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>)
