@@ -23,13 +23,13 @@ import org.gradoop.temporal.model.impl.operators.keyedgrouping.TemporalGroupingK
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 /**
  * Test for the {@link TimeStampKeyFunction} key function.
