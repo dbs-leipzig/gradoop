@@ -16,6 +16,7 @@
 package org.gradoop.flink.io.impl.image;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.layouting.LayoutingAlgorithmTest;
@@ -27,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-
 
 public class ImageDataSinkTest extends GradoopFlinkTestBase {
 
@@ -56,15 +56,12 @@ public class ImageDataSinkTest extends GradoopFlinkTestBase {
     RandomLayouter rl = new RandomLayouter(0, 500, 0, 500);
     LogicalGraph g = rl.execute(loader.getLogicalGraph());
 
-    ImageDataSink p =
-      new ImageDataSink(getTestPath(), 500, 500, 1000, 1000)
-        .vertexLabel("name").zoom(true, 100);
+    DataSink p = new ImageDataSink(getTestPath(), 500, 500, 1000, 1000).vertexLabel("name").zoom(true, 100);
     g.writeTo(p);
 
     env.execute();
 
     File of = new File(getTestPath());
     Assert.assertTrue(of.exists());
-
   }
 }

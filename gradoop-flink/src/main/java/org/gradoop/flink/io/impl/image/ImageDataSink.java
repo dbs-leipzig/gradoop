@@ -15,22 +15,27 @@
  */
 package org.gradoop.flink.io.impl.image;
 
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.io.FileOutputFormat;
-import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.Aggregations;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.image.functions.SourceCoordinateJoin;
+import org.gradoop.flink.io.impl.image.functions.TargetCoordinateJoin;
+import org.gradoop.flink.io.impl.image.functions.ToCoordsTuple;
+import org.gradoop.flink.io.impl.image.functions.VertexScaleMap;
+import org.gradoop.flink.io.impl.image.functions.VertexZoomMap;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.layouting.LayoutingAlgorithm;
 
 import javax.imageio.ImageIO;
@@ -50,12 +55,30 @@ import java.util.List;
  */
 
 public class ImageDataSink implements DataSink, Serializable {
-
+  /**
+   * Broadcast identifier
+   */
+  public static final String BORDER_BROADCAST = "MinMax_Broadcast";
+  /**
+   * Property key for source x coordinate
+   */
+  public static final String SOURCE_X = "source_x";
+  /**
+   * Property key for source y coordinate
+   */
+  public static final String SOURCE_Y = "source_y";
+  /**
+   * Property key for target x coordinate
+   */
+  public static final String TARGET_X = "target_x";
+  /**
+   * Property key for target y coordinate
+   */
+  public static final String TARGET_Y = "target_y";
   /**
    * ImageIO-format used for intermediate image-encodings
    */
   protected static final String INTERMEDIATE_ENCODING = "png";
-
   /**
    * Path to store the output-image
    */
@@ -125,6 +148,7 @@ public class ImageDataSink implements DataSink, Serializable {
    * Size of a order in pixels, that should be left free when using zoom.
    */
   protected int zoomBorder = 0;
+
   /**
    * Create new plotter.
    *
@@ -300,91 +324,43 @@ public class ImageDataSink implements DataSink, Serializable {
    * @return The prepared edges
    */
   protected DataSet<EPGMEdge> prepareEdges(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
-    edges = edges.join(vertices).where("sourceId").equalTo("id")
-      .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-        public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-          first.setProperty("source_x", second.getPropertyValue("X"));
-          first.setProperty("source_y", second.getPropertyValue("Y"));
-          return first;
-        }
-      }).join(vertices).where("targetId").equalTo("id")
-      .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-        public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-          first.setProperty("target_x", second.getPropertyValue("X"));
-          first.setProperty("target_y", second.getPropertyValue("Y"));
-          return first;
-        }
-      });
+    edges = edges
+      .join(vertices).where(new SourceId<>()).equalTo(new Id<>())
+      .with(new SourceCoordinateJoin())
+      .join(vertices).where(new TargetId<>()).equalTo(new Id<>())
+      .with(new TargetCoordinateJoin());
     return edges;
   }
 
   /**
    * Scale the coordinates of the graph so that the layout-space matches the requested drawing-size
    *
-   * @param inp original vertices
+   * @param vertices original vertices
    * @return vertices with scaled coordinates
    */
-  protected DataSet<EPGMVertex> scaleLayout(DataSet<EPGMVertex> inp) {
+  protected DataSet<EPGMVertex> scaleLayout(DataSet<EPGMVertex> vertices) {
 
     if (zoom) {
       final int imageWidthF = imageWidth - 2 * zoomBorder;
       final int imageHeightF = imageHeight - 2 * zoomBorder;
       final int zoomBorderF = zoomBorder;
 
-      DataSet<Tuple4<Integer, Integer, Integer, Integer>> minMaxCoords = inp.map((v) -> {
-        int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
-        int y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();
-        return new Tuple4<>(x, y, x, y);
-      }).returns(new TypeHint<Tuple4<Integer, Integer, Integer, Integer>>() {
-      }).aggregate(Aggregations.MIN, 0).and(Aggregations.MIN, 1).and(Aggregations.MAX, 2)
+      DataSet<Tuple4<Integer, Integer, Integer, Integer>> minMaxCoords = vertices
+        .map(new ToCoordsTuple())
+        .aggregate(Aggregations.MIN, 0)
+        .and(Aggregations.MIN, 1)
+        .and(Aggregations.MAX, 2)
         .and(Aggregations.MAX, 3);
 
-      return inp.map(new RichMapFunction<EPGMVertex, EPGMVertex>() {
-        private int offsetX = 0;
-        private int offsetY = 0;
-        private double zoomFactor = 1;
-
-        @Override
-        public void open(Configuration parameters) throws Exception {
-          super.open(parameters);
-          List<Tuple4<Integer, Integer, Integer, Integer>> minmaxlist =
-            getRuntimeContext().getBroadcastVariable("MINMAX");
-          offsetX = minmaxlist.get(0).f0;
-          offsetY = minmaxlist.get(0).f1;
-          int maxX = minmaxlist.get(0).f2;
-          int maxY = minmaxlist.get(0).f3;
-          int xRange = maxX - offsetX;
-          int yRange = maxY - offsetY;
-          zoomFactor =
-            (xRange > yRange) ? imageWidthF / (double) xRange : imageHeightF / (double) yRange;
-        }
-
-        @Override
-        public EPGMVertex map(EPGMVertex v) {
-          int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
-          int y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();
-          x = (int) ((x - offsetX) * zoomFactor) + zoomBorderF;
-          y = (int) ((y - offsetY) * zoomFactor) + zoomBorderF;
-          v.setProperty(LayoutingAlgorithm.X_COORDINATE_PROPERTY, x);
-          v.setProperty(LayoutingAlgorithm.Y_COORDINATE_PROPERTY, y);
-          return v;
-        }
-      }).withBroadcastSet(minMaxCoords, "MINMAX");
+      return vertices
+        .map(new VertexZoomMap(imageWidthF, imageHeightF, zoomBorderF))
+        .withBroadcastSet(minMaxCoords, BORDER_BROADCAST);
 
     } else {
 
-      final double widthScale = imageWidth / (double) layoutHeight;
+      final double widthScale = imageWidth / (double) layoutWidth;
       final double heightScale = imageHeight / (double) layoutHeight;
-      return inp.map((v) -> {
-        int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
-        int y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();
-        x = (int) (x * widthScale);
-        y = (int) (y * heightScale);
-        v.setProperty(LayoutingAlgorithm.X_COORDINATE_PROPERTY, x);
-        v.setProperty(LayoutingAlgorithm.Y_COORDINATE_PROPERTY, y);
-        return v;
-      });
-
+      return vertices.map(new VertexScaleMap(widthScale, heightScale));
     }
   }
 
@@ -400,7 +376,6 @@ public class ImageDataSink implements DataSink, Serializable {
       ImageIO.write(img, INTERMEDIATE_ENCODING, baos);
       return baos.toByteArray();
     } catch (IOException e) {
-      //can not happen
       e.printStackTrace();
     }
     return null;
@@ -417,7 +392,6 @@ public class ImageDataSink implements DataSink, Serializable {
       ByteArrayInputStream bais = new ByteArrayInputStream(arr);
       return ImageIO.read(bais);
     } catch (IOException e) {
-      //can not happen
       e.printStackTrace();
     }
     return null;
@@ -542,11 +516,11 @@ public class ImageDataSink implements DataSink, Serializable {
       }
       gfx.setStroke(new BasicStroke(edgeSize));
       try {
-        int sourceX = e.getPropertyValue("source_x").getInt();
-        int sourceY = e.getPropertyValue("source_y").getInt();
+        int sourceX = e.getPropertyValue(SOURCE_X).getInt();
+        int sourceY = e.getPropertyValue(SOURCE_Y).getInt();
 
-        int targetX = e.getPropertyValue("target_x").getInt();
-        int targetY = e.getPropertyValue("target_y").getInt();
+        int targetX = e.getPropertyValue(TARGET_X).getInt();
+        int targetY = e.getPropertyValue(TARGET_Y).getInt();
 
         gfx.drawLine(sourceX, sourceY, targetX, targetY);
       } catch (NullPointerException ef) {
@@ -629,7 +603,6 @@ public class ImageDataSink implements DataSink, Serializable {
       this.path = path;
     }
 
-
     @Override
     public void open(int taskNumber, int numTasks) throws IOException {
       super.open(taskNumber, numTasks);
@@ -645,7 +618,6 @@ public class ImageDataSink implements DataSink, Serializable {
       return path.substring(path.lastIndexOf('.') + 1);
     }
 
-
     @Override
     public void writeRecord(byte[] img) throws IOException {
       String outputFormat = getFileExtension(path);
@@ -655,9 +627,6 @@ public class ImageDataSink implements DataSink, Serializable {
       } else {
         this.stream.write(img);
       }
-
     }
-
   }
-
 }
