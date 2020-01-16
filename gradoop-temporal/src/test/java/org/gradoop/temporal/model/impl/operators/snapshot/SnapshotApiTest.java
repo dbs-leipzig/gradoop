@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -39,7 +39,7 @@ public class SnapshotApiTest extends TemporalGradoopTestBase {
    *
    * @throws IOException on failure
    */
-  @Before
+  @BeforeMethod
   public void setUp() throws IOException {
     loader = getTemporalSocialNetworkLoader();
   }

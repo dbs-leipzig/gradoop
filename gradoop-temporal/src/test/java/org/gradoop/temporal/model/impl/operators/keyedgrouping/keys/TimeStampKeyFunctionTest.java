@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import org.gradoop.temporal.model.impl.operators.keyedgrouping.TemporalGroupingK
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 /**
  * Test for the {@link TimeStampKeyFunction} key function.
