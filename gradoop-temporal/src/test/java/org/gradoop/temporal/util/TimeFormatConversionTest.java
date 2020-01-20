@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 
@@ -36,7 +36,7 @@ public class TimeFormatConversionTest {
     LocalDateTime unixEpoch = LocalDateTime.of(1970, 1, 1, 0, 0);
     LocalDateTime oneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
 
-    Assert.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
-    Assert.assertEquals(0L, toEpochMilli(unixEpoch));
+    AssertJUnit.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
+    AssertJUnit.assertEquals(0L, toEpochMilli(unixEpoch));
   }
 }
