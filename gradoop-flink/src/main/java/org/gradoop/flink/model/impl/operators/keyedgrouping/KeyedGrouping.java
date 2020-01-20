@@ -189,9 +189,9 @@ public class KeyedGrouping<
     /* Group the edge-tuples by the key fields and vertex IDs and reduce them to single elements.
        When retention of ungrouped vertices is enabled, we have to filter out edges marked for retention
        before the grouping step and then project to remove the additional ID field. */
-    DataSet<Tuple> superEdgeTuples = retainUngroupedVertices ? edgesWithUpdatedIds
+    DataSet<Tuple> superEdgeTuples = (retainUngroupedVertices ? edgesWithUpdatedIds
       .filter(new FilterEdgesToGroup<>())
-      .project(getInternalEdgeProjectionIndices()) : edgesWithUpdatedIds
+      .project(getInternalEdgeProjectionIndices()) : edgesWithUpdatedIds)
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
         GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))

@@ -105,7 +105,7 @@ public class BuildTuplesFromElements<E extends Element>
     reuseTuple = Tuple.newInstance(tupleSize);
     // Fill first fields with default ID values.
     for (int i = 0; i < tupleDataOffset; i++) {
-      reuseTuple.setField(GradoopId.NULL_VALUE, i);
+      reuseTuple.setField(GradoopId.NULL_VALUE.copy(), i);
     }
   }
 

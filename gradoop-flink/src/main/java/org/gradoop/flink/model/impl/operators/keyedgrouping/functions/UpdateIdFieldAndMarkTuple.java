@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class UpdateIdFieldAndMarkTuple<T extends Tuple>
   public T join(T edgeTuple, Tuple2<GradoopId, GradoopId> mapping) {
     if (!mapping.f0.equals(mapping.f1)) {
       // Mark the tuple and update the field, if the mapping would actually change it.
-      edgeTuple.setField(GradoopId.NULL_VALUE, GroupingConstants.EDGE_TUPLE_ID);
+      GradoopId.NULL_VALUE.copyTo(edgeTuple.getField(GroupingConstants.EDGE_TUPLE_ID));
       edgeTuple.setField(mapping.f1, index);
     }
     return edgeTuple;
