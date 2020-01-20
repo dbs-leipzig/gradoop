@@ -125,6 +125,33 @@ public class GradoopIdTest {
   }
 
   /**
+   * Test the {@link GradoopId#copy()}.
+   */
+  @Test
+  public void testCopy() {
+    GradoopId someId = GradoopId.get();
+    GradoopId copy = someId.copy();
+    assertEquals(someId, copy);
+    assertSame("toByteArray() seems to return copies of the id, not the raw byte[] data,",
+      someId.toByteArray(), someId.toByteArray());
+    assertNotSame("copy", someId, copy);
+    assertNotSame("raw data of copy", someId.toByteArray(), copy.toByteArray());
+  }
+
+  /**
+   * Test the {@link GradoopId#copyTo(GradoopId)} method.
+   */
+  @Test
+  public void testCopyTo() {
+    GradoopId someId = GradoopId.get();
+    GradoopId copy = GradoopId.get();
+    assertNotEquals(someId, copy);
+    someId.copyTo(copy);
+    assertEquals(someId, copy);
+    assertNotSame("raw data of copy target", someId.toByteArray(), copy.toByteArray());
+  }
+
+  /**
    * Test if {@link GradoopId#isValid(String)} returns false for invalid input strings
    *
    * @param input an invalid input string

@@ -28,6 +28,7 @@ import java.net.SocketException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -441,12 +442,12 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
 
   @Override
   public void copyTo(GradoopId target) {
-    target.bytes = this.bytes;
+    System.arraycopy(bytes, 0, target.bytes, 0, ID_SIZE);
   }
 
   @Override
   public GradoopId copy() {
-    return new GradoopId(this.bytes);
+    return new GradoopId(Arrays.copyOf(bytes, ID_SIZE));
   }
 
   @Override
