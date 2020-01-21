@@ -12,7 +12,7 @@
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
-    <inceptionYear>2014 - 2019</inceptionYear>
+    <inceptionYear>2014 - 2020</inceptionYear>
 
     <organization>
         <name>University of Leipzig</name>
@@ -403,7 +403,16 @@
                             <exclude>**/pom.xml</exclude>
                             <exclude>src/test/resources/**</exclude>
                             <exclude>src/main/resources/**</exclude>
+                            <exclude>src/site/site.xml</exclude>
+                            <exclude>spotbugs-exclude.xml</exclude>
+                            <exclude>.github/**</exclude>
                             <exclude>**/dev-support/**</exclude>
+                            <exclude>**/NOTICE</exclude>
+                            <exclude>**/NOTICE-binary</exclude>
+                            <exclude>licenses/**</exclude>
+                            <exclude>licenses-binary/**</exclude>
+                            <exclude>**/gradoop-common-testng.xml</exclude>
+                            <exclude>**/gradoop-hbase-testng.xml</exclude>
                         </excludes>
                         <mapping>
                             <java>SLASHSTAR_STYLE</java>
