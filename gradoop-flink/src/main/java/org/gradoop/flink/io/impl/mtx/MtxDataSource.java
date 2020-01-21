@@ -15,15 +15,13 @@
  */
 package org.gradoop.flink.io.impl.mtx;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EdgeFactory;
-import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.mtx.functions.MtxEdgeToEdge;
+import org.gradoop.flink.io.impl.mtx.functions.MtxVertexToVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,7 +42,7 @@ public class MtxDataSource implements DataSource {
   /**
    * Gradoop config
    */
-  private GradoopFlinkConfig cfg;
+  private GradoopFlinkConfig config;
   /**
    * if true, skip the pre-processing (remove multi-edges, self-edges etc.)
    */
@@ -54,38 +52,38 @@ public class MtxDataSource implements DataSource {
    * Create new MTX-Datasource
    *
    * @param path Path to the input-file
-   * @param cfg  {@link GradoopFlinkConfig} to use
+   * @param config  {@link GradoopFlinkConfig} to use
    */
-  public MtxDataSource(String path, GradoopFlinkConfig cfg) {
-    this(path, cfg, false);
+  public MtxDataSource(String path, GradoopFlinkConfig config) {
+    this(path, config, false);
   }
 
   /**
    * Create new MTX-Datasource
    *
    * @param path              Path to the input-file
-   * @param cfg               {@link GradoopFlinkConfig} to use
+   * @param config               {@link GradoopFlinkConfig} to use
    * @param skipPreprocessing if true, skip the pre-processing (remove multi-edges, self-edges etc.)
    */
-  public MtxDataSource(String path, GradoopFlinkConfig cfg, boolean skipPreprocessing) {
-    if (path == null || cfg == null) {
+  public MtxDataSource(String path, GradoopFlinkConfig config, boolean skipPreprocessing) {
+    if (path == null || config == null) {
       throw new IllegalArgumentException("Arguments can not be null");
     }
     this.path = path;
-    this.cfg = cfg;
+    this.config = config;
     this.skipPreprocessing = skipPreprocessing;
   }
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    DataSet<EPGMVertex> vertices = cfg.getExecutionEnvironment().readTextFile(path)
+    DataSet<EPGMVertex> vertices = config.getExecutionEnvironment().readTextFile(path)
       .setParallelism(1)
-      .flatMap(new MtxVertexToVertex(cfg.getLogicalGraphFactory().getVertexFactory()))
+      .flatMap(new MtxVertexToVertex(config.getLogicalGraphFactory().getVertexFactory()))
       .setParallelism(1)
       .distinct(new Id<>());
 
-    DataSet<EPGMEdge> edges = cfg.getExecutionEnvironment().readTextFile(path).setParallelism(1)
-      .flatMap(new MtxEdgeToEdge(cfg.getLogicalGraphFactory().getEdgeFactory()))
+    DataSet<EPGMEdge> edges = config.getExecutionEnvironment().readTextFile(path).setParallelism(1)
+      .flatMap(new MtxEdgeToEdge(config.getLogicalGraphFactory().getEdgeFactory()))
       .setParallelism(1);
 
     if (!skipPreprocessing) {
@@ -100,7 +98,7 @@ public class MtxDataSource implements DataSource {
       }).distinct("sourceId", "targetId");
     }
 
-    return cfg.getLogicalGraphFactory().fromDataSets(vertices, edges);
+    return config.getLogicalGraphFactory().fromDataSets(vertices, edges);
   }
 
   @Override
@@ -114,7 +112,7 @@ public class MtxDataSource implements DataSource {
    * @param line The line to check
    * @return true if comment
    */
-  private static boolean isComment(String line) {
+  public static boolean isComment(String line) {
     return line.startsWith("%");
   }
 
@@ -124,7 +122,7 @@ public class MtxDataSource implements DataSource {
    * @param text The line to check
    * @return A string containing either a space or tab character
    */
-  private static String getSplitCharacter(String text) {
+  public static String getSplitCharacter(String text) {
     return text.contains(" ") ? " " : "\t";
   }
 
@@ -134,82 +132,9 @@ public class MtxDataSource implements DataSource {
    * @param text The numerical id of the vertex from the mtx file
    * @return A {@link GradoopId} for the vertex
    */
-  private static GradoopId generateId(String text) {
+  public static GradoopId generateId(String text) {
     String hex =
       String.format("%24s", Integer.toHexString(Integer.parseInt(text))).replace(' ', '0');
     return GradoopId.fromString(hex);
-  }
-
-  /**
-   * Maps mtx-edges to {@link EPGMEdge}
-   */
-  private static class MtxEdgeToEdge implements FlatMapFunction<String, EPGMEdge> {
-    /**
-     * The EPGMEdgeFactory<Edge> to use for creating edges
-     */
-    private EdgeFactory<EPGMEdge> edgeFactory;
-    /**
-     * Is set to true once the first non-comment line is skipped.
-     * This line contains the amount of vertices and edges and no 'real' data.
-     */
-    private boolean firstSkipped = false;
-
-    /**
-     * Create new EdgeMapper
-     *
-     * @param edgeFactory The {@link EdgeFactory} to use for creating Edges
-     */
-    MtxEdgeToEdge(EdgeFactory<EPGMEdge> edgeFactory) {
-      this.edgeFactory = edgeFactory;
-    }
-
-    @Override
-    public void flatMap(String line, Collector<EPGMEdge> collector) {
-      if (!isComment(line)) {
-        if (!firstSkipped) {
-          firstSkipped = true;
-          return;
-        }
-        String[] splitted = line.split(getSplitCharacter(line));
-        collector.collect(edgeFactory
-          .initEdge(GradoopId.get(), generateId(splitted[0]), generateId(splitted[1])));
-      }
-    }
-  }
-
-  /**
-   * Maps mtx-vertices to {@link EPGMVertex}
-   */
-  private static class MtxVertexToVertex implements FlatMapFunction<String, EPGMVertex> {
-    /**
-     * The EPGMVertexFactory<Vertex> to use for creating vertices
-     */
-    private VertexFactory<EPGMVertex> vertexFactory;
-    /**
-     * Is set to true once the first non-comment line is skipped.
-     * This line contains the amount of vertices and edges and no 'real' data.
-     */
-    private boolean firstSkipped = false;
-    /**
-     * Create new VertexMapper
-     *
-     * @param vertexFactory The {@link VertexFactory} to use for creating vertices
-     */
-    MtxVertexToVertex(VertexFactory<EPGMVertex> vertexFactory) {
-      this.vertexFactory = vertexFactory;
-    }
-
-    @Override
-    public void flatMap(String line, Collector<EPGMVertex> collector) {
-      if (!isComment(line)) {
-        if (!firstSkipped) {
-          firstSkipped = true;
-          return;
-        }
-        String[] splitted = line.split(getSplitCharacter(line));
-        collector.collect(vertexFactory.initVertex(generateId(splitted[0])));
-        collector.collect(vertexFactory.initVertex(generateId(splitted[1])));
-      }
-    }
   }
 }
