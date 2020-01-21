@@ -1,0 +1,17 @@
+%%MatrixMarket matrix coordinate real general
+%------------------------------
+% Test dataset for MTX importer
+% contains 7 edges (incl. 1 self-edge and 1)
+% contains 5 vertices
+%------------------------------
+5 5 10
+1 2 1
+2 3 0.5
+3 1 0.001
+2 567 1
+1 1 -0.1
+1 2 0
+1 7 0
+2 1 -.01
+2 1 1
+2 1 0
