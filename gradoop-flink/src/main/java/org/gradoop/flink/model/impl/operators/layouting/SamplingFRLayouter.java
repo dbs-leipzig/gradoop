@@ -118,9 +118,10 @@ public class SamplingFRLayouter extends FRLayouter {
 
     return
       self.union(up).union(left).union(uright).union(uleft).union(down).union(right).union(dright)
-        .union(dleft).map(f -> {
-        f.getValue().mDiv(samplingRateF);
-        return f;
+        .union(dleft)
+        .map(f -> {
+          f.getValue().mDiv(samplingRateF);
+          return f;
         });
   }
 

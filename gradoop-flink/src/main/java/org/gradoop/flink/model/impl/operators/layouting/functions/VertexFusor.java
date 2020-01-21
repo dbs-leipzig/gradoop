@@ -118,7 +118,7 @@ public class VertexFusor {
       .join(classifiedVertices).where("0." + LEdge.TARGET_ID_POSITION).equalTo("0." + LVertex.ID_POSITION)
       .with(new CandidateGenerator(compareFunction, threshold)).groupBy("0.0")
       .reduce((a, b) -> (a.f2 > b.f2) ? a : b).map(c -> new Tuple2<>(c.f0, c.f1))
-      .returns(new TypeHint<Tuple2<LVertex, LVertex>>() {});
+      .returns(new TypeHint<Tuple2<LVertex, LVertex>>() { });
   }
 
   /**

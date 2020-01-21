@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.operators.layouting;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.concurrent.ThreadLocalRandom;
