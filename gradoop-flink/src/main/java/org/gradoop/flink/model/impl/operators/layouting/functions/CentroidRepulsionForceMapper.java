@@ -67,8 +67,7 @@ public class CentroidRepulsionForceMapper extends RichMapFunction<LVertex, Force
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    centroids =
-      getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME);
+    centroids = getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME);
     center = getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTER_BROADCAST_NAME);
   }
 

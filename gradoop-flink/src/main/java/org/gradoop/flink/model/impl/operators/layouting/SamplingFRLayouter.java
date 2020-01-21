@@ -54,7 +54,6 @@ public class SamplingFRLayouter extends FRLayouter {
       throw new IllegalArgumentException("Sampling rate must be greater than 0 and less than or " +
         "equal to 1.");
     }
-
     this.samplingRate = samplingRate;
   }
 
@@ -68,55 +67,61 @@ public class SamplingFRLayouter extends FRLayouter {
       new FRRepulsionFunction(getK(), getMaxRepulsionDistance());
 
     final double samplingRateF = this.samplingRate;
-    DataSet<LVertex> sampledVertices = vertices.filter(new FilterFunction<LVertex>() {
-      @Override
-      public boolean filter(LVertex lVertex) {
-        return ThreadLocalRandom.current().nextDouble(1) < samplingRateF;
-      }
-    });
+    DataSet<LVertex> sampledVertices = vertices.filter(
+      (FilterFunction<LVertex>) lVertex -> ThreadLocalRandom.current().nextDouble(1) < samplingRateF);
 
-    DataSet<Force> self =
-      vertices.join(sampledVertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF))
-        .equalTo(selfselector).with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> self = vertices
+      .join(sampledVertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF)).equalTo(selfselector)
+      .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> up =
-      vertices.join(sampledVertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UP))
-        .equalTo(selfselector).with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> up = vertices
+      .join(sampledVertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UP)).equalTo(selfselector)
+      .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> down =
-      vertices.join(sampledVertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.DOWN))
-        .equalTo(selfselector).with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> down = vertices
+      .join(sampledVertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.DOWN)).equalTo(selfselector)
+      .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> left =
-      vertices.join(sampledVertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.LEFT))
-        .equalTo(selfselector).with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> left = vertices
+      .join(sampledVertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.LEFT)).equalTo(selfselector)
+      .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> right = vertices.join(sampledVertices)
+    DataSet<Force> right = vertices
+      .join(sampledVertices)
       .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.RIGHT)).equalTo(selfselector)
       .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> uright = vertices.join(sampledVertices)
+    DataSet<Force> uright = vertices
+      .join(sampledVertices)
       .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPRIGHT)).equalTo(selfselector)
       .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> dright = vertices.join(sampledVertices)
+    DataSet<Force> dright = vertices
+      .join(sampledVertices)
       .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.DOWNRIGHT)).equalTo(selfselector)
       .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> uleft = vertices.join(sampledVertices)
+    DataSet<Force> uleft = vertices
+      .join(sampledVertices)
       .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPLEFT)).equalTo(selfselector)
       .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> dleft = vertices.join(sampledVertices)
+    DataSet<Force> dleft = vertices
+      .join(sampledVertices)
       .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.DOWNLEFT)).equalTo(selfselector)
       .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
 
-    return self.union(up).union(left).union(uright).union(uleft).union(down).union(right)
-      .union(dright).union(dleft).map(f -> {
+    return
+      self.union(up).union(left).union(uright).union(uleft).union(down).union(right).union(dright)
+        .union(dleft).map(f -> {
         f.getValue().mDiv(samplingRateF);
         return f;
-      });
+        });
   }
 
   @Override

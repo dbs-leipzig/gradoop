@@ -39,13 +39,10 @@ public class VertexFusorTest {
 
     LVertex receiver = new LVertex(GradoopId.get(), new Vector(10, 10), -1, generateSubVertices(4),
       new Vector(10, 10));
-    LVertex donor1 =
-      new LVertex(GradoopId.get(), new Vector(100, 100), -1, null, new Vector(10, 10));
-    LVertex donor2 =
-      new LVertex(GradoopId.get(), new Vector(1000, 1000), -1, generateSubVertices(2),
-        new Vector(10, 10));
-    LVertex donor3 =
-      new LVertex(GradoopId.get(), new Vector(10000, 10000), -1, null, new Vector(10, 10));
+    LVertex donor1 = new LVertex(GradoopId.get(), new Vector(100, 100), -1, null, new Vector(10, 10));
+    LVertex donor2 = new LVertex(GradoopId.get(), new Vector(1000, 1000), -1, generateSubVertices(2),
+      new Vector(10, 10));
+    LVertex donor3 = new LVertex(GradoopId.get(), new Vector(10000, 10000), -1, null, new Vector(10, 10));
     List<Tuple2<LVertex, LVertex>> vertices = new ArrayList<>();
     vertices.add(new Tuple2<>(donor1, receiver));
     vertices.add(new Tuple2<>(donor2, receiver));
@@ -113,5 +110,4 @@ public class VertexFusorTest {
     gen.join(source, target, collector);
     Assert.assertEquals(0, collectorList.size());
   }
-
 }

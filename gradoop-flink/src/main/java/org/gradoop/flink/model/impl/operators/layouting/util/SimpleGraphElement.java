@@ -19,6 +19,6 @@ package org.gradoop.flink.model.impl.operators.layouting.util;
  * "Artificial superclass" for LVertex and LEdge. This way vertices and edges can be contained in
  * the same DataSet.
  */
-public interface GraphElement {
+public interface SimpleGraphElement {
 
 }

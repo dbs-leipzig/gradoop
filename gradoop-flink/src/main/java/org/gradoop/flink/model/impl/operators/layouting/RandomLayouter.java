@@ -64,7 +64,6 @@ public class RandomLayouter implements LayoutingAlgorithm, MapFunction<EPGMVerte
     this.maxY = maxY;
   }
 
-
   @Override
   public LogicalGraph execute(LogicalGraph g) {
     if (rng == null) {
@@ -74,15 +73,11 @@ public class RandomLayouter implements LayoutingAlgorithm, MapFunction<EPGMVerte
     return g.getFactory().fromDataSets(placed, g.getEdges());
   }
 
-
-  //TODO having this public method just to deal with serializability of the map-class is ugly
   @Override
-  public EPGMVertex map(EPGMVertex old) throws Exception {
-    PropertyValue xcoord = PropertyValue.create(rng.nextInt(maxX - minX) + minX);
-    PropertyValue ycoord = PropertyValue.create(rng.nextInt(maxY - minY) + minY);
-    old.setProperty(X_COORDINATE_PROPERTY, xcoord);
-    old.setProperty(Y_COORDINATE_PROPERTY, ycoord);
-    return old;
+  public EPGMVertex map(EPGMVertex vertex) throws Exception {
+    vertex.setProperty(X_COORDINATE_PROPERTY, rng.nextInt(maxX - minX) + minX);
+    vertex.setProperty(Y_COORDINATE_PROPERTY, rng.nextInt(maxY - minY) + minY);
+    return vertex;
   }
 
   @Override

@@ -25,8 +25,8 @@ import java.util.List;
 /**
  * Lightweight version of {@link EPGMEdge}. Contains only data necessary for layouting.
  */
-public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopId>> implements
-  GraphElement {
+public class LEdge extends Tuple4<GradoopId, GradoopId, GradoopId, List<GradoopId>>
+  implements SimpleGraphElement {
 
   /**
    * Position of the ID-property in the tuple

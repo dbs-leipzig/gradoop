@@ -45,7 +45,7 @@ public class LGraph {
    * Create new graph
    * @param g The GraphElements (vertices and edges) for the graph
    */
-  public LGraph(DataSet<GraphElement> g) {
+  public LGraph(DataSet<SimpleGraphElement> g) {
     vertices = g.filter(e -> e instanceof LVertex).map(e -> (LVertex) e);
     edges = g.filter(e -> e instanceof LEdge).map(e -> (LEdge) e);
   }
@@ -54,8 +54,8 @@ public class LGraph {
    * Get a DataSet containing all elements of the graph
    * @return The DataSet
    */
-  public DataSet<GraphElement> getGraphElements() {
-    return vertices.map(x -> (GraphElement) x).union(edges.map(x -> (GraphElement) x));
+  public DataSet<SimpleGraphElement> getGraphElements() {
+    return vertices.map(x -> (SimpleGraphElement) x).union(edges.map(x -> (SimpleGraphElement) x));
   }
 
   /**

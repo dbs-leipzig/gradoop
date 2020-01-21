@@ -26,8 +26,8 @@ import java.util.List;
  * Lightweight/Layouting-Vertex. Has all properties of an {@link EPGMVertex} that are important for
  * the layouting. This way we do not need to drag around a full Vertex through every operation.
  */
-public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>, Vector> implements
-  GraphElement {
+public class LVertex extends Tuple5<GradoopId, Vector, Integer, List<GradoopId>, Vector>
+  implements SimpleGraphElement {
 
   /**
    * Position of the ID-property in the tuple

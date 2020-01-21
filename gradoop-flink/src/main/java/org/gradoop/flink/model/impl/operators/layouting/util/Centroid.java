@@ -27,10 +27,7 @@ import java.io.Serializable;
  * 1: Position of the centroid <br>
  * 2: Number of associated vertices <br>
  */
-public class Centroid extends Tuple3<GradoopId, Vector, Integer> implements GraphElement,
-  Serializable {
-
-
+public class Centroid extends Tuple3<GradoopId, Vector, Integer> implements SimpleGraphElement, Serializable {
   /**
    * Create a new Centroid. Id is chosen automatically.
    *

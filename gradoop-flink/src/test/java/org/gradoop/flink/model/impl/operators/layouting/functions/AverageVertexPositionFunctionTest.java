@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class TestAverageVertexPositionFunction extends GradoopFlinkTestBase {
+public class AverageVertexPositionFunctionTest extends GradoopFlinkTestBase {
   @Test
   public void testAverageCalculation() throws Exception {
     DataSet<LVertex> tv = getExecutionEnvironment()

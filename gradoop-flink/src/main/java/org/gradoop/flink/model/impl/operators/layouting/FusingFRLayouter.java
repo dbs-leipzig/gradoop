@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexFlatten
 import org.gradoop.flink.model.impl.operators.layouting.functions.VertexCompareFunction;
 import org.gradoop.flink.model.impl.operators.layouting.functions.VertexFusor;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
-import org.gradoop.flink.model.impl.operators.layouting.util.GraphElement;
+import org.gradoop.flink.model.impl.operators.layouting.util.SimpleGraphElement;
 import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
 import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
@@ -163,11 +163,11 @@ public class FusingFRLayouter extends FRLayouter {
     // Flink can only iterate over a single dataset. Therefore vertices and edges have to be
     // temporarily combined into a single dataset.
     // Also the Grapdoop datatypes are converted to internal datatypes
-    DataSet<GraphElement> tmpvertices = gradoopVertices.map((v) -> new LVertex(v));
-    DataSet<GraphElement> tmpedges = gradoopEdges.map((e) -> new LEdge(e));
-    DataSet<GraphElement> graphElements = tmpvertices.union(tmpedges);
+    DataSet<SimpleGraphElement> tmpvertices = gradoopVertices.map((v) -> new LVertex(v));
+    DataSet<SimpleGraphElement> tmpedges = gradoopEdges.map((e) -> new LEdge(e));
+    DataSet<SimpleGraphElement> graphElements = tmpvertices.union(tmpedges);
 
-    IterativeDataSet<GraphElement> loop = graphElements.iterate(
+    IterativeDataSet<SimpleGraphElement> loop = graphElements.iterate(
       (outputFormat != OutputFormat.POSTLAYOUT) ? iterations : iterations - POST_ITERATIONS);
 
     // split the combined dataset to work with the edges and vertices
@@ -268,8 +268,7 @@ public class FusingFRLayouter extends FRLayouter {
   }
 
   @Override
-  protected DataSet<LVertex> applyForces(DataSet<LVertex> vertices, DataSet<Force> forces,
-    int iterations) {
+  protected DataSet<LVertex> applyForces(DataSet<LVertex> vertices, DataSet<Force> forces, int iterations) {
     return vertices.join(forces).where(LVertex.ID_POSITION).equalTo(Force.ID_POSITION).with(applicator);
   }
 

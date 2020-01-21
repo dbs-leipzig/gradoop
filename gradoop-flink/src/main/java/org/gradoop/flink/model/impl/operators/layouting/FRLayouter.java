@@ -220,7 +220,9 @@ public class FRLayouter implements LayoutingAlgorithm {
     layout(graph);
     vertices = loop.closeWith(graph.getVertices());
 
-    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID_POSITION).equalTo("id")
+    gradoopVertices = vertices
+      .join(gradoopVertices)
+      .where(LVertex.ID_POSITION).equalTo("id")
       .with(new LVertexEPGMVertexJoinFunction());
 
     return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);
@@ -250,8 +252,10 @@ public class FRLayouter implements LayoutingAlgorithm {
     DataSet<Force> repulsions = repulsionForces(g.getVertices());
     DataSet<Force> attractions = attractionForces(g.getVertices(), g.getEdges());
 
-    DataSet<Force> forces =
-      repulsions.union(attractions).groupBy(Force.ID_POSITION).reduce((first, second) -> {
+    DataSet<Force> forces = repulsions
+      .union(attractions)
+      .groupBy(Force.ID_POSITION)
+      .reduce((first, second) -> {
         first.setValue(first.getValue().add(second.getValue()));
         return first;
       });
@@ -288,30 +292,33 @@ public class FRLayouter implements LayoutingAlgorithm {
   protected DataSet<Force> repulsionForces(DataSet<LVertex> vertices) {
     vertices = vertices.map(new FRCellIdMapper(getMaxRepulsionDistance()));
 
-    KeySelector<LVertex, Integer> selfselector =
-      new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF);
-    FRRepulsionFunction repulsionFunction =
-      new FRRepulsionFunction(getK(), getMaxRepulsionDistance());
+    KeySelector<LVertex, Integer> selfselector = new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF);
+    FRRepulsionFunction repulsionFunction = new FRRepulsionFunction(getK(), getMaxRepulsionDistance());
 
-    DataSet<Force> self =
-      vertices.join(vertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF))
-        .equalTo(selfselector).with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> self = vertices
+      .join(vertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF)).equalTo(selfselector)
+      .with((JoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> up =
-      vertices.join(vertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UP))
-        .equalTo(selfselector).with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> up = vertices
+      .join(vertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UP)).equalTo(selfselector)
+      .with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> left =
-      vertices.join(vertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.LEFT))
-        .equalTo(selfselector).with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> left = vertices
+      .join(vertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.LEFT)).equalTo(selfselector)
+      .with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> uright =
-      vertices.join(vertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPRIGHT))
-        .equalTo(selfselector).with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> uright = vertices
+      .join(vertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPRIGHT)).equalTo(selfselector)
+      .with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
-    DataSet<Force> uleft =
-      vertices.join(vertices).where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPLEFT))
-        .equalTo(selfselector).with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
+    DataSet<Force> uleft = vertices
+      .join(vertices)
+      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPLEFT)).equalTo(selfselector)
+      .with((FlatJoinFunction<LVertex, LVertex, Force>) repulsionFunction);
 
 
     return self.union(up).union(left).union(uright).union(uleft);

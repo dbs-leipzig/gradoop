@@ -67,8 +67,7 @@ public class CentroidUpdater extends RichMapFunction<LVertex, Force> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     if (getRuntimeContext().hasBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME)) {
-      centroids =
-        getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME);
+      centroids = getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME);
     }
   }
 
@@ -171,5 +170,4 @@ public class CentroidUpdater extends RichMapFunction<LVertex, Force> {
     }
     collector.collect(new Centroid(posSum.mDiv(count), count));
   }
-
 }

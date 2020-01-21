@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.CentroidUpdate
 import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;
 import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
 import org.gradoop.flink.model.impl.operators.layouting.util.Force;
-import org.gradoop.flink.model.impl.operators.layouting.util.GraphElement;
+import org.gradoop.flink.model.impl.operators.layouting.util.SimpleGraphElement;
 import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
 import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
 import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
@@ -92,10 +92,10 @@ public class CentroidFRLayouter extends FRLayouter {
 
     // flink can only iterate over one dataset at once. Create a dataset containing both
     // centroids and vertices. Split them again at the begin of every iteration
-    DataSet<GraphElement> graphElements = vertices.map(x -> x);
+    DataSet<SimpleGraphElement> graphElements = vertices.map(x -> x);
     graphElements = graphElements.union(centroids.map(x -> x));
 
-    IterativeDataSet<GraphElement> loop = graphElements.iterate(iterations);
+    IterativeDataSet<SimpleGraphElement> loop = graphElements.iterate(iterations);
     vertices = loop.filter(x -> x instanceof LVertex).map(x -> (LVertex) x);
     centroids = loop.filter(x -> x instanceof Centroid).map(x -> (Centroid) x);
 

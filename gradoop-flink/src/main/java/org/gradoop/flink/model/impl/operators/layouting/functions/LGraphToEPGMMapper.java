@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class LGraphToEPGMMapper {
 
   /**
-   * Build a new EPGM-Graph from the given LGraph, by conveting LVertices to vertices 1:1.
+   * Build a new EPGM-Graph from the given LGraph, by converting LVertices to vertices 1:1.
    *
    * @param input    The original EPGMGraph, to use it's factory
    * @param layouted The LGraph to convert
@@ -69,8 +69,7 @@ public class LGraphToEPGMMapper {
    * @return Output EPGMEdge
    */
   protected static EPGMEdge mapToEPGMEdge(LEdge le) {
-    EPGMEdge e =
-      new EPGMEdge(le.getId(), "edge", le.getSourceId(), le.getTargetId(), Properties.create(),
+    EPGMEdge e = new EPGMEdge(le.getId(), "edge", le.getSourceId(), le.getTargetId(), Properties.create(),
         null);
     e.setProperty(FusingFRLayouter.VERTEX_SIZE_PROPERTY, le.getCount());
     e.setProperty(FusingFRLayouter.SUB_ELEMENTS_PROPERTY, getSubelementListValue(le.getSubEdges()));

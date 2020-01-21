@@ -50,5 +50,4 @@ public class FRForceApplicatorTest {
     Assert.assertEquals(new Vector(125, 125), v.getPosition());
     Assert.assertEquals(new Vector(50, 50), v.getForce());
   }
-
 }
