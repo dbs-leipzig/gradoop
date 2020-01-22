@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,17 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
@@ -36,7 +40,7 @@ import static org.gradoop.temporal.model.api.TimeDimension.TRANSACTION_TIME;
 import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_FROM;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_TO;
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Test for the {@link AverageDuration} aggregate function.
@@ -44,40 +48,98 @@ import static org.junit.Assert.assertEquals;
 public class AverageDurationTest extends TemporalGradoopTestBase {
 
   /**
+   * Factory used to instantiate {@link TemporalVertex} objects.
+   */
+  private TemporalVertexFactory factory;
+
+  /**
+   * Set up method initializes {@link TemporalVertexFactory}.
+   */
+  @BeforeClass
+  public void setUp() {
+    this.factory = new TemporalVertexFactory();
+  }
+
+  /**
    * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for transaction time.
    */
-  @Test
-  public void testGetIncrementForTxTime() {
+  @Test(dataProvider = "txTimeProvider")
+  public void testGetIncrementForTxTime(TemporalElement actualElement, PropertyValue expected) {
     AverageDuration function = new AverageDuration("", TRANSACTION_TIME);
-    TemporalElement testElement = getVertexFactory().createVertex();
-    testElement.setTransactionTime(Tuple2.of(DEFAULT_TIME_FROM, DEFAULT_TIME_TO));
-    // This will produce an overflow, which is currently ignored.
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setTransactionTime(Tuple2.of(DEFAULT_TIME_FROM, 7L));
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setTransactionTime(Tuple2.of(4L, DEFAULT_TIME_TO));
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setTransactionTime(Tuple2.of(1L, 11L));
-    assertEquals(create(Arrays.asList(create(10L), create(1L))),
-      function.getIncrement(testElement));
+
+    assertEquals(function.getIncrement(actualElement), expected);
+  }
+
+  /**
+   * Provides {@link TemporalVertex} objects with varying transaction times and the expected output of
+   * {@link AverageDuration#getIncrement(TemporalElement)}.
+   * <br>
+   * Provided params:
+   * <ol start="0">
+   * <li>Temporal element</li>
+   * <li>Expected output of {@link AverageDuration#getIncrement(TemporalElement)}</li>
+   * </ol>
+   *
+   * @return Object[][]
+   */
+  @DataProvider(name = "txTimeProvider")
+  public  Object[][] txTimeParameters() {
+    TemporalVertex v0 = factory.createVertex();
+    v0.setTransactionTime(Tuple2.of(DEFAULT_TIME_FROM, DEFAULT_TIME_TO));
+    TemporalVertex v1 = factory.createVertex();
+    v1.setTransactionTime(Tuple2.of(DEFAULT_TIME_FROM, 7L));
+    TemporalVertex v2 = factory.createVertex();
+    v2.setTransactionTime(Tuple2.of(4L, DEFAULT_TIME_TO));
+    TemporalVertex v3 = factory.createVertex();
+    v3.setTransactionTime(Tuple2.of(1L, 11L));
+
+    return new Object[][]{
+      {v0, IGNORED_VALUE},
+      {v1, IGNORED_VALUE},
+      {v2, IGNORED_VALUE},
+      {v3, create(Arrays.asList(create(10L), create(1L)))}
+    };
   }
 
   /**
    * Test the implementation of {@link AverageDuration#getIncrement(TemporalElement)} for valid time.
    */
-  @Test
-  public void testGetIncrementForValidTime() {
+  @Test(dataProvider = "validTimeProvider")
+  public void testGetIncrementForValidTime(TemporalElement actualElement, PropertyValue expected) {
     AverageDuration function = new AverageDuration("", VALID_TIME);
-    TemporalElement testElement = getVertexFactory().createVertex();
-    testElement.setValidTime(Tuple2.of(DEFAULT_TIME_FROM, DEFAULT_TIME_TO));
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setValidTime(Tuple2.of(DEFAULT_TIME_FROM, 6L));
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setValidTime(Tuple2.of(3L, DEFAULT_TIME_TO));
-    assertEquals(IGNORED_VALUE, function.getIncrement(testElement));
-    testElement.setValidTime(Tuple2.of(2L, 7L));
-    assertEquals(create(Arrays.asList(create(5L), create(1L))),
-      function.getIncrement(testElement));
+
+    assertEquals(expected, function.getIncrement(actualElement));
+  }
+
+  /**
+   * Provides {@link TemporalVertex} objects with varying valid times and the expected output of
+   * {@link AverageDuration#getIncrement(TemporalElement)}.
+   * <br>
+   * Provided params:
+   * <ol start="0">
+   * <li>Temporal element</li>
+   * <li>Expected output of {@link AverageDuration#getIncrement(TemporalElement)}</li>
+   * </ol>
+   *
+   * @return Object[][]
+   */
+  @DataProvider(name = "validTimeProvider")
+  public  Object[][] validTimeParameters() {
+    TemporalVertex v0 = factory.createVertex();
+    v0.setValidTime(Tuple2.of(DEFAULT_TIME_FROM, DEFAULT_TIME_TO));
+    TemporalVertex v1 = factory.createVertex();
+    v1.setValidTime(Tuple2.of(DEFAULT_TIME_FROM, 7L));
+    TemporalVertex v2 = factory.createVertex();
+    v2.setValidTime(Tuple2.of(4L, DEFAULT_TIME_TO));
+    TemporalVertex v3 = factory.createVertex();
+    v3.setValidTime(Tuple2.of(2L, 7L));
+
+    return new Object[][]{
+      {v0, IGNORED_VALUE},
+      {v1, IGNORED_VALUE},
+      {v2, IGNORED_VALUE},
+      {v3, create(Arrays.asList(create(5L), create(1L)))}
+    };
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,8 @@ import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
@@ -32,69 +29,23 @@ import static org.gradoop.temporal.model.api.TimeDimension.Field.FROM;
 import static org.gradoop.temporal.model.api.TimeDimension.Field.TO;
 import static org.gradoop.temporal.model.api.TimeDimension.TRANSACTION_TIME;
 import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Test for {@link MinTime} and {@link MaxTime} (by testing the respective vertex- and edge-aggregations).
  */
-@RunWith(Parameterized.class)
 public class MinMaxTimeTest extends TemporalGradoopTestBase {
-
-  /**
-   * The temporal attribute to aggregate.
-   */
-  @Parameterized.Parameter
-  public TimeDimension temporalAttribute;
-
-  /**
-   * The field of the temporal attribute to aggregate.
-   */
-  @Parameterized.Parameter(1)
-  public TimeDimension.Field field;
-
-  /**
-   * The expected value for the {@link MaxEdgeTime} function.
-   */
-  @Parameterized.Parameter(2)
-  public Long expectedMaxEdge;
-
-  /**
-   * The expected value for the {@link MinEdgeTime} function.
-   */
-  @Parameterized.Parameter(3)
-  public Long expectedMinEdge;
-
-  /**
-   * The expected value for the {@link MaxVertexTime} function.
-   */
-  @Parameterized.Parameter(4)
-  public Long expectedMaxVertex;
-
-  /**
-   * The expected value for the {@link MinVertexTime} function.
-   */
-  @Parameterized.Parameter(5)
-  public Long expectedMinVertex;
-
-  /**
-   * The expected value for the {@link MaxTime} function.
-   */
-  @Parameterized.Parameter(6)
-  public Long expectedMax;
-
-  /**
-   * The expected value for the {@link MinTime} function.
-   */
-  @Parameterized.Parameter(7)
-  public Long expectedMin;
 
   /**
    * Test all {@link MinTime} and {@link MaxTime} related aggregate functions.
    *
    * @throws Exception when the execution in Flink fails.
    */
-  @Test
-  public void testAggregationFunctions() throws Exception {
+  @Test(dataProvider = "parameters")
+  public void testAggregationFunctions(TimeDimension temporalAttribute, TimeDimension.Field field, Long expectedMaxEdge,
+                                       Long expectedMinEdge, Long expectedMaxVertex, Long expectedMinVertex,
+                                       Long expectedMax, Long expectedMin) throws Exception {
+
     final String keyMaxEdge = "maxEdgeTime";
     final String keyMinEdge = "minEdgeTime";
     final String keyMaxVertex = "maxVertexTime";
@@ -118,14 +69,39 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   }
 
   /**
+   * Get parameters for this test. Those are
+   * <ol start="0">
+   * <li>The {@link TimeDimension} to aggregate.</li>
+   * <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
+   * <li>The expected result of {@link MaxEdgeTime}.</li>
+   * <li>The expected result of {@link MinEdgeTime}.</li>
+   * <li>The expected result of {@link MaxVertexTime}.</li>
+   * <li>The expected result of {@link MinVertexTime}.</li>
+   * <li>The expected result of {@link MaxTime}.</li>
+   * <li>The expected result of {@link MinTime}.</li>
+   * </ol>
+   *
+   * @return The parameters for this test.
+   */
+  @DataProvider
+  public static Object[][] parameters() {
+    return new Object[][] {
+      {TRANSACTION_TIME, FROM, 6L,        0L, 3L,        MIN_VALUE, 6L,        MIN_VALUE},
+      {TRANSACTION_TIME, TO,   MAX_VALUE, 2L, MAX_VALUE, 7L,        MAX_VALUE, 2L},
+      {VALID_TIME,       FROM, 6L,        0L, 4L,        0L,        6L,        0L},
+      {VALID_TIME,       TO,   7L,        1L, 9L,        5L,        9L,        1L}
+    };
+  }
+
+  /**
    * Test all {@link MinTime} and {@link MaxTime} related aggregate function where all
    * temporal temporal attributes are set to default values.
    * This will check if the aggregate values are null, when all of the values are set to the default value.
    *
    * @throws Exception when the execution in Flink fails.
    */
-  @Test
-  public void testAggregationFunctionsWithAllDefaults() throws Exception {
+  @Test(dataProvider = "defaultParameters")
+  public void testAggregationFunctionsWithAllDefaults(TimeDimension temporalAttribute, TimeDimension.Field field) throws Exception {
     final String keyMaxEdge = "maxEdgeTime";
     final String keyMinEdge = "minEdgeTime";
     final String keyMaxVertex = "maxVertexTime";
@@ -162,27 +138,22 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Get parameters for this test. Those are
-   * <ol>
-   * <li>The {@link TimeDimension} to aggregate.</li>
-   * <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
-   * <li>The expected result of {@link MaxEdgeTime}.</li>
-   * <li>The expected result of {@link MinEdgeTime}.</li>
-   * <li>The expected result of {@link MaxVertexTime}.</li>
-   * <li>The expected result of {@link MinVertexTime}.</li>
-   * <li>The expected result of {@link MaxTime}.</li>
-   * <li>The expected result of {@link MinTime}.</li>
-   * </ol>
+   * Returns test parameters to test aggregate functions with defaults.
    *
-   * @return The parameters for this test.
+   *<ol start="0">
+   *   <li>The {@link TimeDimension} attribute to aggregate.</li>
+   *   <li>The {@link TimeDimension.Field} of that attribute to aggregate.</li>
+   *</ol>
+   *
+   * @return Test parameters
    */
-  @Parameterized.Parameters(name = "{0}.{1}")
-  public static Iterable<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
-      {TRANSACTION_TIME, FROM, 6L,        0L, 3L,        MIN_VALUE, 6L,        MIN_VALUE},
-      {TRANSACTION_TIME, TO,   MAX_VALUE, 2L, MAX_VALUE, 7L,        MAX_VALUE, 2L},
-      {VALID_TIME,       FROM, 6L,        0L, 4L,        0L,        6L,        0L},
-      {VALID_TIME,       TO,   7L,        1L, 9L,        5L,        9L,        1L}
-    });
+  @DataProvider
+  public static Object[][] defaultParameters() {
+    return new Object[][] {
+      {TRANSACTION_TIME, FROM},
+      {TRANSACTION_TIME, TO},
+      {VALID_TIME, FROM},
+      {VALID_TIME, TO}
+    };
   }
 }
