@@ -1,0 +1,645 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<title>ImageDataSink xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../../apidocs/org/gradoop/flink/io/impl/image/ImageDataSink.html">View Javadoc</a></div><pre>
+
+<a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2020 Leipzig University (Database Research Group)</em>
+<a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.io.impl.image;
+<a name="17" href="#17">17</a>  
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.io.FileOutputFormat;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.aggregation.Aggregations;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple4;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.core.fs.FileSystem;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.core.fs.Path;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSink;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.image.functions.SourceCoordinateJoin;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.image.functions.TargetCoordinateJoin;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.image.functions.ToCoordsTuple;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.image.functions.VertexScaleMap;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.image.functions.VertexZoomMap;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.SourceId;
+<a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.TargetId;
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.layouting.LayoutingAlgorithm;
+<a name="40" href="#40">40</a>  
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> javax.imageio.ImageIO;
+<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> java.awt.Color;
+<a name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> java.awt.Graphics2D;
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> java.awt.BasicStroke;
+<a name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> java.awt.RenderingHints;
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> java.awt.image.BufferedImage;
+<a name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> java.io.ByteArrayInputStream;
+<a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> java.io.ByteArrayOutputStream;
+<a name="49" href="#49">49</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a name="50" href="#50">50</a>  <strong class="jxr_keyword">import</strong> java.io.Serializable;
+<a name="51" href="#51">51</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a name="52" href="#52">52</a>  
+<a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="54" href="#54">54</a>  <em class="jxr_javadoccomment"> * DataSink to write a layouted graph to an image</em>
+<a name="55" href="#55">55</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="56" href="#56">56</a>  
+<a name="57" href="#57">57</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> implements DataSink, Serializable {
+<a name="58" href="#58">58</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * Broadcast identifier</em>
+<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String BORDER_BROADCAST = <span class="jxr_string">"MinMax_Broadcast"</span>;
+<a name="62" href="#62">62</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   * Property key for source x coordinate</em>
+<a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String SOURCE_X = <span class="jxr_string">"source_x"</span>;
+<a name="66" href="#66">66</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * Property key for source y coordinate</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String SOURCE_Y = <span class="jxr_string">"source_y"</span>;
+<a name="70" href="#70">70</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   * Property key for target x coordinate</em>
+<a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="73" href="#73">73</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String TARGET_X = <span class="jxr_string">"target_x"</span>;
+<a name="74" href="#74">74</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="75" href="#75">75</a>  <em class="jxr_javadoccomment">   * Property key for target y coordinate</em>
+<a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="77" href="#77">77</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String TARGET_Y = <span class="jxr_string">"target_y"</span>;
+<a name="78" href="#78">78</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="79" href="#79">79</a>  <em class="jxr_javadoccomment">   * ImageIO-format used for intermediate image-encodings</em>
+<a name="80" href="#80">80</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="81" href="#81">81</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String INTERMEDIATE_ENCODING = <span class="jxr_string">"png"</span>;
+<a name="82" href="#82">82</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   * Path to store the output-image</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="85" href="#85">85</a>    <strong class="jxr_keyword">protected</strong> String path;
+<a name="86" href="#86">86</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * Width of the original layout of the graph</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> layoutWidth;
+<a name="90" href="#90">90</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * Height of the original layout of the graph</em>
+<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="93" href="#93">93</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> layoutHeight;
+<a name="94" href="#94">94</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * Width of output-image (px)</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="97" href="#97">97</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> imageWidth;
+<a name="98" href="#98">98</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * Height of output-image (px)</em>
+<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   */</em>
+<a name="101" href="#101">101</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> imageHeight;
+<a name="102" href="#102">102</a> 
+<a name="103" href="#103">103</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * Size of the vertex-symbols (px)</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   */</em>
+<a name="106" href="#106">106</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> vertexSize = 10;
+<a name="107" href="#107">107</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   * Size (width) of egde-lines (px)</em>
+<a name="109" href="#109">109</a> <em class="jxr_javadoccomment">   */</em>
+<a name="110" href="#110">110</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">float</strong> edgeSize = 1f;
+<a name="111" href="#111">111</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="112" href="#112">112</a> <em class="jxr_javadoccomment">   * Color of vertices</em>
+<a name="113" href="#113">113</a> <em class="jxr_javadoccomment">   */</em>
+<a name="114" href="#114">114</a>   <strong class="jxr_keyword">protected</strong> Color vertexColor = Color.RED;
+<a name="115" href="#115">115</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * Color of edges</em>
+<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   */</em>
+<a name="118" href="#118">118</a>   <strong class="jxr_keyword">protected</strong> Color edgeColor = Color.WHITE;
+<a name="119" href="#119">119</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * Color of the background</em>
+<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   */</em>
+<a name="122" href="#122">122</a>   <strong class="jxr_keyword">protected</strong> Color backgroundColor = Color.BLACK;
+<a name="123" href="#123">123</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="124" href="#124">124</a> <em class="jxr_javadoccomment">   * If true, do not draw vertices, only edges. Improves performance.</em>
+<a name="125" href="#125">125</a> <em class="jxr_javadoccomment">   */</em>
+<a name="126" href="#126">126</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> ignoreVertices = false;
+<a name="127" href="#127">127</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * Name of the property that should be drawn as vertex 'heading'. If null, don't draw anything</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   */</em>
+<a name="130" href="#130">130</a>   <strong class="jxr_keyword">protected</strong> String vertexLabel = <strong class="jxr_keyword">null</strong>;
+<a name="131" href="#131">131</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   * Font-size of the vertex-heading</em>
+<a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   */</em>
+<a name="134" href="#134">134</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> vertexLabelSize = 10;
+<a name="135" href="#135">135</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   * If true, use SIZE-Property to dynamically choose vertex-size.</em>
+<a name="137" href="#137">137</a> <em class="jxr_javadoccomment">   */</em>
+<a name="138" href="#138">138</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> dynamicVertexSize = false;
+<a name="139" href="#139">139</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * If true, use SIZE-Property to dynamically choose vertex-size.</em>
+<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   */</em>
+<a name="142" href="#142">142</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> dynamicEdgeSize = false;
+<a name="143" href="#143">143</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="144" href="#144">144</a> <em class="jxr_javadoccomment">   * If true, scale the layout to fill the complete drawing-space.</em>
+<a name="145" href="#145">145</a> <em class="jxr_javadoccomment">   */</em>
+<a name="146" href="#146">146</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">boolean</strong> zoom = false;
+<a name="147" href="#147">147</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="148" href="#148">148</a> <em class="jxr_javadoccomment">   * Size of a order in pixels, that should be left free when using zoom.</em>
+<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">   */</em>
+<a name="150" href="#150">150</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">int</strong> zoomBorder = 0;
+<a name="151" href="#151">151</a> 
+<a name="152" href="#152">152</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * Create new plotter.</em>
+<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   *</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * @param path         Target-path for image</em>
+<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * @param layoutWidth  Width of the graph-layout</em>
+<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * @param layoutHeight Height of the graph-layout</em>
+<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   * @param imageWidth   Wanted width of the output image</em>
+<a name="159" href="#159">159</a> <em class="jxr_javadoccomment">   * @param imageHeight  Wanted height of the output image</em>
+<a name="160" href="#160">160</a> <em class="jxr_javadoccomment">   */</em>
+<a name="161" href="#161">161</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a>(String path, <strong class="jxr_keyword">int</strong> layoutWidth, <strong class="jxr_keyword">int</strong> layoutHeight, <strong class="jxr_keyword">int</strong> imageWidth, <strong class="jxr_keyword">int</strong> imageHeight) {
+<a name="162" href="#162">162</a>     <strong class="jxr_keyword">this</strong>.path = path;
+<a name="163" href="#163">163</a>     <strong class="jxr_keyword">this</strong>.layoutWidth = layoutWidth;
+<a name="164" href="#164">164</a>     <strong class="jxr_keyword">this</strong>.layoutHeight = layoutHeight;
+<a name="165" href="#165">165</a>     <strong class="jxr_keyword">this</strong>.imageWidth = imageWidth;
+<a name="166" href="#166">166</a>     <strong class="jxr_keyword">this</strong>.imageHeight = imageHeight;
+<a name="167" href="#167">167</a>   }
+<a name="168" href="#168">168</a> 
+<a name="169" href="#169">169</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   * Create new plotter.</em>
+<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   *</em>
+<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * @param path        Target-path for image</em>
+<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   * @param algo        Layouting algorithm used to create the layout. IS used to determine</em>
+<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   *                    layout width</em>
+<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   *                    and height.</em>
+<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * @param imageWidth  Wanted width of the output image</em>
+<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   * @param imageHeight Wanted height of the output image</em>
+<a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   */</em>
+<a name="179" href="#179">179</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a>(String path, <a href="../../../../../../org/gradoop/flink/model/impl/operators/layouting/LayoutingAlgorithm.html">LayoutingAlgorithm</a> algo, <strong class="jxr_keyword">int</strong> imageWidth, <strong class="jxr_keyword">int</strong> imageHeight) {
+<a name="180" href="#180">180</a>     <strong class="jxr_keyword">this</strong>(path, algo.getWidth(), algo.getHeight(), imageWidth, imageHeight);
+<a name="181" href="#181">181</a>   }
+<a name="182" href="#182">182</a> 
+<a name="183" href="#183">183</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="184" href="#184">184</a> <em class="jxr_javadoccomment">   * Sets optional value vertexSize</em>
+<a name="185" href="#185">185</a> <em class="jxr_javadoccomment">   *</em>
+<a name="186" href="#186">186</a> <em class="jxr_javadoccomment">   * @param vertexSize the new value</em>
+<a name="187" href="#187">187</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="188" href="#188">188</a> <em class="jxr_javadoccomment">   */</em>
+<a name="189" href="#189">189</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> vertexSize(<strong class="jxr_keyword">int</strong> vertexSize) {
+<a name="190" href="#190">190</a>     <strong class="jxr_keyword">this</strong>.vertexSize = vertexSize;
+<a name="191" href="#191">191</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="192" href="#192">192</a>   }
+<a name="193" href="#193">193</a> 
+<a name="194" href="#194">194</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * Sets optional value vertexColor</em>
+<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   *</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * @param vertexColor the new value</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   */</em>
+<a name="200" href="#200">200</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> vertexColor(Color vertexColor) {
+<a name="201" href="#201">201</a>     <strong class="jxr_keyword">this</strong>.vertexColor = vertexColor;
+<a name="202" href="#202">202</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="203" href="#203">203</a>   }
+<a name="204" href="#204">204</a> 
+<a name="205" href="#205">205</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="206" href="#206">206</a> <em class="jxr_javadoccomment">   * Sets optional value edgeColor</em>
+<a name="207" href="#207">207</a> <em class="jxr_javadoccomment">   *</em>
+<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   * @param edgeColor the new value</em>
+<a name="209" href="#209">209</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="210" href="#210">210</a> <em class="jxr_javadoccomment">   */</em>
+<a name="211" href="#211">211</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> edgeColor(Color edgeColor) {
+<a name="212" href="#212">212</a>     <strong class="jxr_keyword">this</strong>.edgeColor = edgeColor;
+<a name="213" href="#213">213</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="214" href="#214">214</a>   }
+<a name="215" href="#215">215</a> 
+<a name="216" href="#216">216</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="217" href="#217">217</a> <em class="jxr_javadoccomment">   * Sets optional value ignoreVertices</em>
+<a name="218" href="#218">218</a> <em class="jxr_javadoccomment">   *</em>
+<a name="219" href="#219">219</a> <em class="jxr_javadoccomment">   * @param ignoreVertices the new value</em>
+<a name="220" href="#220">220</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   */</em>
+<a name="222" href="#222">222</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> ignoreVertices(<strong class="jxr_keyword">boolean</strong> ignoreVertices) {
+<a name="223" href="#223">223</a>     <strong class="jxr_keyword">this</strong>.ignoreVertices = ignoreVertices;
+<a name="224" href="#224">224</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="225" href="#225">225</a>   }
+<a name="226" href="#226">226</a> 
+<a name="227" href="#227">227</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   * Sets optional value vertexLabel</em>
+<a name="229" href="#229">229</a> <em class="jxr_javadoccomment">   *</em>
+<a name="230" href="#230">230</a> <em class="jxr_javadoccomment">   * @param vertexLabel the new value</em>
+<a name="231" href="#231">231</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="232" href="#232">232</a> <em class="jxr_javadoccomment">   */</em>
+<a name="233" href="#233">233</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> vertexLabel(String vertexLabel) {
+<a name="234" href="#234">234</a>     <strong class="jxr_keyword">this</strong>.vertexLabel = vertexLabel;
+<a name="235" href="#235">235</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="236" href="#236">236</a>   }
+<a name="237" href="#237">237</a> 
+<a name="238" href="#238">238</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * Sets optional value vertexLabelSize</em>
+<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   *</em>
+<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   * @param vertexLabelSize the new value</em>
+<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="243" href="#243">243</a> <em class="jxr_javadoccomment">   */</em>
+<a name="244" href="#244">244</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> vertexLabelSize(<strong class="jxr_keyword">int</strong> vertexLabelSize) {
+<a name="245" href="#245">245</a>     <strong class="jxr_keyword">this</strong>.vertexLabelSize = vertexLabelSize;
+<a name="246" href="#246">246</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="247" href="#247">247</a>   }
+<a name="248" href="#248">248</a> 
+<a name="249" href="#249">249</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="250" href="#250">250</a> <em class="jxr_javadoccomment">   * Sets optional value backgroundColor</em>
+<a name="251" href="#251">251</a> <em class="jxr_javadoccomment">   *</em>
+<a name="252" href="#252">252</a> <em class="jxr_javadoccomment">   * @param backgroundColor the new value</em>
+<a name="253" href="#253">253</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   */</em>
+<a name="255" href="#255">255</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> backgroundColor(Color backgroundColor) {
+<a name="256" href="#256">256</a>     <strong class="jxr_keyword">this</strong>.backgroundColor = backgroundColor;
+<a name="257" href="#257">257</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="258" href="#258">258</a>   }
+<a name="259" href="#259">259</a> 
+<a name="260" href="#260">260</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="261" href="#261">261</a> <em class="jxr_javadoccomment">   * Sets optional value edgeSize</em>
+<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   *</em>
+<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * @param edgeSize the new value</em>
+<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   */</em>
+<a name="266" href="#266">266</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> edgeSize(<strong class="jxr_keyword">float</strong> edgeSize) {
+<a name="267" href="#267">267</a>     <strong class="jxr_keyword">this</strong>.edgeSize = edgeSize;
+<a name="268" href="#268">268</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="269" href="#269">269</a>   }
+<a name="270" href="#270">270</a> 
+<a name="271" href="#271">271</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="272" href="#272">272</a> <em class="jxr_javadoccomment">   * Sets optional value dynamicVertexSize</em>
+<a name="273" href="#273">273</a> <em class="jxr_javadoccomment">   *</em>
+<a name="274" href="#274">274</a> <em class="jxr_javadoccomment">   * @param dynamicVertexSize the new value</em>
+<a name="275" href="#275">275</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="276" href="#276">276</a> <em class="jxr_javadoccomment">   */</em>
+<a name="277" href="#277">277</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> dynamicVertexSize(<strong class="jxr_keyword">boolean</strong> dynamicVertexSize) {
+<a name="278" href="#278">278</a>     <strong class="jxr_keyword">this</strong>.dynamicVertexSize = dynamicVertexSize;
+<a name="279" href="#279">279</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="280" href="#280">280</a>   }
+<a name="281" href="#281">281</a> 
+<a name="282" href="#282">282</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="283" href="#283">283</a> <em class="jxr_javadoccomment">   * Sets optional value dynamicEdgeSize</em>
+<a name="284" href="#284">284</a> <em class="jxr_javadoccomment">   *</em>
+<a name="285" href="#285">285</a> <em class="jxr_javadoccomment">   * @param dynamicEdgeSize the new value</em>
+<a name="286" href="#286">286</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="287" href="#287">287</a> <em class="jxr_javadoccomment">   */</em>
+<a name="288" href="#288">288</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> dynamicEdgeSize(<strong class="jxr_keyword">boolean</strong> dynamicEdgeSize) {
+<a name="289" href="#289">289</a>     <strong class="jxr_keyword">this</strong>.dynamicEdgeSize = dynamicEdgeSize;
+<a name="290" href="#290">290</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="291" href="#291">291</a>   }
+<a name="292" href="#292">292</a> 
+<a name="293" href="#293">293</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="294" href="#294">294</a> <em class="jxr_javadoccomment">   * If true, scale the graph to completely fill the layout-area</em>
+<a name="295" href="#295">295</a> <em class="jxr_javadoccomment">   *</em>
+<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   * @param zoom the new value</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   */</em>
+<a name="299" href="#299">299</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> zoom(<strong class="jxr_keyword">boolean</strong> zoom) {
+<a name="300" href="#300">300</a>     <strong class="jxr_keyword">this</strong>.zoom = zoom;
+<a name="301" href="#301">301</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="302" href="#302">302</a>   }
+<a name="303" href="#303">303</a> 
+<a name="304" href="#304">304</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="305" href="#305">305</a> <em class="jxr_javadoccomment">   * If true, scale the graph to completely fill the layout-area</em>
+<a name="306" href="#306">306</a> <em class="jxr_javadoccomment">   *</em>
+<a name="307" href="#307">307</a> <em class="jxr_javadoccomment">   * @param zoom the new value</em>
+<a name="308" href="#308">308</a> <em class="jxr_javadoccomment">   * @param border Size of a border in px, that is to be left free when placing zoomed vertices. Can</em>
+<a name="309" href="#309">309</a> <em class="jxr_javadoccomment">   *              be used to prevent vertices being cut off at the edges.</em>
+<a name="310" href="#310">310</a> <em class="jxr_javadoccomment">   * @return this (for method-chaining)</em>
+<a name="311" href="#311">311</a> <em class="jxr_javadoccomment">   */</em>
+<a name="312" href="#312">312</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> zoom(<strong class="jxr_keyword">boolean</strong> zoom, <strong class="jxr_keyword">int</strong> border) {
+<a name="313" href="#313">313</a>     <strong class="jxr_keyword">this</strong>.zoom = zoom;
+<a name="314" href="#314">314</a>     <strong class="jxr_keyword">this</strong>.zoomBorder = border;
+<a name="315" href="#315">315</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="316" href="#316">316</a>   }
+<a name="317" href="#317">317</a> 
+<a name="318" href="#318">318</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="319" href="#319">319</a> <em class="jxr_javadoccomment">   * Prepare the given edges for drawing. Assign them start- and end-coordinates from their</em>
+<a name="320" href="#320">320</a> <em class="jxr_javadoccomment">   * vertices.</em>
+<a name="321" href="#321">321</a> <em class="jxr_javadoccomment">   *</em>
+<a name="322" href="#322">322</a> <em class="jxr_javadoccomment">   * @param vertices The vertices to take the edge-coordinates from</em>
+<a name="323" href="#323">323</a> <em class="jxr_javadoccomment">   * @param edges    The raw edges</em>
+<a name="324" href="#324">324</a> <em class="jxr_javadoccomment">   * @return The prepared edges</em>
+<a name="325" href="#325">325</a> <em class="jxr_javadoccomment">   */</em>
+<a name="326" href="#326">326</a>   <strong class="jxr_keyword">protected</strong> DataSet&lt;EPGMEdge&gt; prepareEdges(DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
+<a name="327" href="#327">327</a>     edges = edges
+<a name="328" href="#328">328</a>       .join(vertices).where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="329" href="#329">329</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/functions/SourceCoordinateJoin.html">SourceCoordinateJoin</a>())
+<a name="330" href="#330">330</a>       .join(vertices).where(<strong class="jxr_keyword">new</strong> TargetId&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="331" href="#331">331</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/functions/TargetCoordinateJoin.html">TargetCoordinateJoin</a>());
+<a name="332" href="#332">332</a>     <strong class="jxr_keyword">return</strong> edges;
+<a name="333" href="#333">333</a>   }
+<a name="334" href="#334">334</a> 
+<a name="335" href="#335">335</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="336" href="#336">336</a> <em class="jxr_javadoccomment">   * Scale the coordinates of the graph so that the layout-space matches the requested drawing-size</em>
+<a name="337" href="#337">337</a> <em class="jxr_javadoccomment">   *</em>
+<a name="338" href="#338">338</a> <em class="jxr_javadoccomment">   * @param vertices original vertices</em>
+<a name="339" href="#339">339</a> <em class="jxr_javadoccomment">   * @return vertices with scaled coordinates</em>
+<a name="340" href="#340">340</a> <em class="jxr_javadoccomment">   */</em>
+<a name="341" href="#341">341</a>   <strong class="jxr_keyword">protected</strong> DataSet&lt;EPGMVertex&gt; scaleLayout(DataSet&lt;EPGMVertex&gt; vertices) {
+<a name="342" href="#342">342</a> 
+<a name="343" href="#343">343</a>     <strong class="jxr_keyword">if</strong> (zoom) {
+<a name="344" href="#344">344</a>       <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> imageWidthF = imageWidth - 2 * zoomBorder;
+<a name="345" href="#345">345</a>       <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> imageHeightF = imageHeight - 2 * zoomBorder;
+<a name="346" href="#346">346</a>       <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> zoomBorderF = zoomBorder;
+<a name="347" href="#347">347</a> 
+<a name="348" href="#348">348</a>       DataSet&lt;Tuple4&lt;Integer, Integer, Integer, Integer&gt;&gt; minMaxCoords = vertices
+<a name="349" href="#349">349</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/functions/ToCoordsTuple.html">ToCoordsTuple</a>())
+<a name="350" href="#350">350</a>         .aggregate(Aggregations.MIN, 0)
+<a name="351" href="#351">351</a>         .and(Aggregations.MIN, 1)
+<a name="352" href="#352">352</a>         .and(Aggregations.MAX, 2)
+<a name="353" href="#353">353</a>         .and(Aggregations.MAX, 3);
+<a name="354" href="#354">354</a> 
+<a name="355" href="#355">355</a>       <strong class="jxr_keyword">return</strong> vertices
+<a name="356" href="#356">356</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/functions/VertexZoomMap.html">VertexZoomMap</a>(imageWidthF, imageHeightF, zoomBorderF))
+<a name="357" href="#357">357</a>         .withBroadcastSet(minMaxCoords, BORDER_BROADCAST);
+<a name="358" href="#358">358</a> 
+<a name="359" href="#359">359</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="360" href="#360">360</a> 
+<a name="361" href="#361">361</a>       <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">double</strong> widthScale = imageWidth / (<strong class="jxr_keyword">double</strong>) layoutWidth;
+<a name="362" href="#362">362</a>       <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">double</strong> heightScale = imageHeight / (<strong class="jxr_keyword">double</strong>) layoutHeight;
+<a name="363" href="#363">363</a>       <strong class="jxr_keyword">return</strong> vertices.map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/functions/VertexScaleMap.html">VertexScaleMap</a>(widthScale, heightScale));
+<a name="364" href="#364">364</a>     }
+<a name="365" href="#365">365</a>   }
+<a name="366" href="#366">366</a> 
+<a name="367" href="#367">367</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="368" href="#368">368</a> <em class="jxr_javadoccomment">   * Convert a BufferedImage to byte[]</em>
+<a name="369" href="#369">369</a> <em class="jxr_javadoccomment">   *</em>
+<a name="370" href="#370">370</a> <em class="jxr_javadoccomment">   * @param img The image to convert</em>
+<a name="371" href="#371">371</a> <em class="jxr_javadoccomment">   * @return byte[] representation of the image</em>
+<a name="372" href="#372">372</a> <em class="jxr_javadoccomment">   */</em>
+<a name="373" href="#373">373</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> byte[] imgToArr(BufferedImage img) {
+<a name="374" href="#374">374</a>     <strong class="jxr_keyword">try</strong> {
+<a name="375" href="#375">375</a>       ByteArrayOutputStream baos = <strong class="jxr_keyword">new</strong> ByteArrayOutputStream();
+<a name="376" href="#376">376</a>       ImageIO.write(img, INTERMEDIATE_ENCODING, baos);
+<a name="377" href="#377">377</a>       <strong class="jxr_keyword">return</strong> baos.toByteArray();
+<a name="378" href="#378">378</a>     } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a name="379" href="#379">379</a>       e.printStackTrace();
+<a name="380" href="#380">380</a>     }
+<a name="381" href="#381">381</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a name="382" href="#382">382</a>   }
+<a name="383" href="#383">383</a> 
+<a name="384" href="#384">384</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="385" href="#385">385</a> <em class="jxr_javadoccomment">   * Convert byte[] to BufferedImage</em>
+<a name="386" href="#386">386</a> <em class="jxr_javadoccomment">   *</em>
+<a name="387" href="#387">387</a> <em class="jxr_javadoccomment">   * @param arr The array to convert</em>
+<a name="388" href="#388">388</a> <em class="jxr_javadoccomment">   * @return The buffered-image representation</em>
+<a name="389" href="#389">389</a> <em class="jxr_javadoccomment">   */</em>
+<a name="390" href="#390">390</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> BufferedImage arrToImg(byte[] arr) {
+<a name="391" href="#391">391</a>     <strong class="jxr_keyword">try</strong> {
+<a name="392" href="#392">392</a>       ByteArrayInputStream bais = <strong class="jxr_keyword">new</strong> ByteArrayInputStream(arr);
+<a name="393" href="#393">393</a>       <strong class="jxr_keyword">return</strong> ImageIO.read(bais);
+<a name="394" href="#394">394</a>     } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a name="395" href="#395">395</a>       e.printStackTrace();
+<a name="396" href="#396">396</a>     }
+<a name="397" href="#397">397</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a name="398" href="#398">398</a>   }
+<a name="399" href="#399">399</a> 
+<a name="400" href="#400">400</a> 
+<a name="401" href="#401">401</a>   @Override
+<a name="402" href="#402">402</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> logicalGraph) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="403" href="#403">403</a>     write(logicalGraph, <strong class="jxr_keyword">true</strong>);
+<a name="404" href="#404">404</a>   }
+<a name="405" href="#405">405</a> 
+<a name="406" href="#406">406</a>   @Override
+<a name="407" href="#407">407</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> graphCollection) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="408" href="#408">408</a>     write(graphCollection, <strong class="jxr_keyword">true</strong>);
+<a name="409" href="#409">409</a>   }
+<a name="410" href="#410">410</a> 
+<a name="411" href="#411">411</a>   @Override
+<a name="412" href="#412">412</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> logicalGraph, <strong class="jxr_keyword">boolean</strong> overwrite) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="413" href="#413">413</a> 
+<a name="414" href="#414">414</a>     <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageOutputFormat</a> pof = <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageOutputFormat</a>(path);
+<a name="415" href="#415">415</a>     FileSystem.WriteMode writeMode =
+<a name="416" href="#416">416</a>       overwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
+<a name="417" href="#417">417</a>     pof.setWriteMode(writeMode);
+<a name="418" href="#418">418</a> 
+<a name="419" href="#419">419</a>     DataSet&lt;EPGMVertex&gt; vertices = scaleLayout(logicalGraph.getVertices());
+<a name="420" href="#420">420</a>     DataSet&lt;EPGMEdge&gt; edges = prepareEdges(vertices, logicalGraph.getEdges());
+<a name="421" href="#421">421</a> 
+<a name="422" href="#422">422</a>     <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageGenerator</a> imgg = <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageGenerator</a>(<strong class="jxr_keyword">this</strong>);
+<a name="423" href="#423">423</a>     DataSet&lt;byte[]&gt; image = edges.combineGroup(imgg::combineEdges).reduce(imgg::mergeImages);
+<a name="424" href="#424">424</a>     <strong class="jxr_keyword">if</strong> (!ignoreVertices) {
+<a name="425" href="#425">425</a>       DataSet&lt;byte[]&gt; vertexImage =
+<a name="426" href="#426">426</a>         vertices.combineGroup(imgg::combineVertices).reduce(imgg::mergeImages);
+<a name="427" href="#427">427</a>       image = image.map(<strong class="jxr_keyword">new</strong> RichMapFunction&lt;byte[], byte[]&gt;() {
+<a name="428" href="#428">428</a>         @Override
+<a name="429" href="#429">429</a>         <strong class="jxr_keyword">public</strong> byte[] map(byte[] bufferedImage) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="430" href="#430">430</a>           List&lt;byte[]&gt; vertexImage = <strong class="jxr_keyword">this</strong>.getRuntimeContext().getBroadcastVariable(<span class="jxr_string">"vertexImage"</span>);
+<a name="431" href="#431">431</a>           <strong class="jxr_keyword">return</strong> imgg.mergeImages(bufferedImage, vertexImage.get(0));
+<a name="432" href="#432">432</a>         }
+<a name="433" href="#433">433</a>       }).withBroadcastSet(vertexImage, <span class="jxr_string">"vertexImage"</span>);
+<a name="434" href="#434">434</a>     }
+<a name="435" href="#435">435</a>     image = image.map(imgg::addBackground);
+<a name="436" href="#436">436</a> 
+<a name="437" href="#437">437</a>     image.output(pof).setParallelism(1);
+<a name="438" href="#438">438</a>   }
+<a name="439" href="#439">439</a> 
+<a name="440" href="#440">440</a>   @Override
+<a name="441" href="#441">441</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> write(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> graphCollection, <strong class="jxr_keyword">boolean</strong> overwrite) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="442" href="#442">442</a>     <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(<span class="jxr_string">"Plotting is not supported for GraphCollections"</span>);
+<a name="443" href="#443">443</a>   }
+<a name="444" href="#444">444</a> 
+<a name="445" href="#445">445</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="446" href="#446">446</a> <em class="jxr_javadoccomment">   * This class contains functionality to create images from graph-parts.</em>
+<a name="447" href="#447">447</a> <em class="jxr_javadoccomment">   * For some strange reasons BufferedImage can not be used as DataSet-Type without crashing the</em>
+<a name="448" href="#448">448</a> <em class="jxr_javadoccomment">   * JVM. Therefore byte[] is used as intermediate-representation.</em>
+<a name="449" href="#449">449</a> <em class="jxr_javadoccomment">   */</em>
+<a name="450" href="#450">450</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageGenerator</a> implements Serializable {
+<a name="451" href="#451">451</a> 
+<a name="452" href="#452">452</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="453" href="#453">453</a> <em class="jxr_javadoccomment">     * Contains all necessary parameters</em>
+<a name="454" href="#454">454</a> <em class="jxr_javadoccomment">     */</em>
+<a name="455" href="#455">455</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> plotter;
+<a name="456" href="#456">456</a> 
+<a name="457" href="#457">457</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="458" href="#458">458</a> <em class="jxr_javadoccomment">     * Create new ImageGenerator</em>
+<a name="459" href="#459">459</a> <em class="jxr_javadoccomment">     *</em>
+<a name="460" href="#460">460</a> <em class="jxr_javadoccomment">     * @param p Contains all necessary parameters (cannot use non-static class du to flink-madness)</em>
+<a name="461" href="#461">461</a> <em class="jxr_javadoccomment">     */</em>
+<a name="462" href="#462">462</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageGenerator</a>(<a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageDataSink</a> p) {
+<a name="463" href="#463">463</a>       <strong class="jxr_keyword">this</strong>.plotter = p;
+<a name="464" href="#464">464</a>     }
+<a name="465" href="#465">465</a> 
+<a name="466" href="#466">466</a> 
+<a name="467" href="#467">467</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="468" href="#468">468</a> <em class="jxr_javadoccomment">     * Combine multiple edges into one Image</em>
+<a name="469" href="#469">469</a> <em class="jxr_javadoccomment">     *</em>
+<a name="470" href="#470">470</a> <em class="jxr_javadoccomment">     * @param iterable  The edges to combine</em>
+<a name="471" href="#471">471</a> <em class="jxr_javadoccomment">     * @param collector The output-collector</em>
+<a name="472" href="#472">472</a> <em class="jxr_javadoccomment">     */</em>
+<a name="473" href="#473">473</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> combineEdges(Iterable&lt;EPGMEdge&gt; iterable, Collector&lt;byte[]&gt; collector) {
+<a name="474" href="#474">474</a>       BufferedImage img =
+<a name="475" href="#475">475</a>         <strong class="jxr_keyword">new</strong> BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<a name="476" href="#476">476</a>       Graphics2D gfx = img.createGraphics();
+<a name="477" href="#477">477</a>       gfx.setColor(plotter.edgeColor);
+<a name="478" href="#478">478</a>       gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+<a name="479" href="#479">479</a>       gfx.setStroke(<strong class="jxr_keyword">new</strong> BasicStroke(plotter.edgeSize));
+<a name="480" href="#480">480</a>       <strong class="jxr_keyword">for</strong> (EPGMEdge e : iterable) {
+<a name="481" href="#481">481</a>         drawEdge(gfx, e);
+<a name="482" href="#482">482</a>       }
+<a name="483" href="#483">483</a>       collector.collect(imgToArr(img));
+<a name="484" href="#484">484</a>       gfx.dispose();
+<a name="485" href="#485">485</a>     }
+<a name="486" href="#486">486</a> 
+<a name="487" href="#487">487</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="488" href="#488">488</a> <em class="jxr_javadoccomment">     * Combine multiple vertices into one Image</em>
+<a name="489" href="#489">489</a> <em class="jxr_javadoccomment">     *</em>
+<a name="490" href="#490">490</a> <em class="jxr_javadoccomment">     * @param iterable  The vertices to combine</em>
+<a name="491" href="#491">491</a> <em class="jxr_javadoccomment">     * @param collector The output-collector</em>
+<a name="492" href="#492">492</a> <em class="jxr_javadoccomment">     */</em>
+<a name="493" href="#493">493</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> combineVertices(Iterable&lt;EPGMVertex&gt; iterable, Collector&lt;byte[]&gt; collector) {
+<a name="494" href="#494">494</a>       BufferedImage img =
+<a name="495" href="#495">495</a>         <strong class="jxr_keyword">new</strong> BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<a name="496" href="#496">496</a>       Graphics2D gfx = img.createGraphics();
+<a name="497" href="#497">497</a>       gfx.setColor(plotter.vertexColor);
+<a name="498" href="#498">498</a>       <strong class="jxr_keyword">for</strong> (EPGMVertex v : iterable) {
+<a name="499" href="#499">499</a>         drawVertex(gfx, v);
+<a name="500" href="#500">500</a>       }
+<a name="501" href="#501">501</a>       collector.collect(imgToArr(img));
+<a name="502" href="#502">502</a>       gfx.dispose();
+<a name="503" href="#503">503</a>     }
+<a name="504" href="#504">504</a> 
+<a name="505" href="#505">505</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="506" href="#506">506</a> <em class="jxr_javadoccomment">     * Draw a single edge</em>
+<a name="507" href="#507">507</a> <em class="jxr_javadoccomment">     *</em>
+<a name="508" href="#508">508</a> <em class="jxr_javadoccomment">     * @param gfx The graphics-object to use for drawing</em>
+<a name="509" href="#509">509</a> <em class="jxr_javadoccomment">     * @param e   The edge to draw</em>
+<a name="510" href="#510">510</a> <em class="jxr_javadoccomment">     */</em>
+<a name="511" href="#511">511</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> drawEdge(Graphics2D gfx, EPGMEdge e) {
+<a name="512" href="#512">512</a>       gfx.setColor(plotter.edgeColor);
+<a name="513" href="#513">513</a>       <strong class="jxr_keyword">float</strong> edgeSize = plotter.edgeSize;
+<a name="514" href="#514">514</a>       <strong class="jxr_keyword">if</strong> (plotter.dynamicEdgeSize &amp;&amp; e.getPropertyValue(<span class="jxr_string">"SIZE"</span>) != <strong class="jxr_keyword">null</strong>) {
+<a name="515" href="#515">515</a>         edgeSize *= Math.sqrt((<strong class="jxr_keyword">float</strong>) e.getPropertyValue(<span class="jxr_string">"SIZE"</span>).getInt());
+<a name="516" href="#516">516</a>       }
+<a name="517" href="#517">517</a>       gfx.setStroke(<strong class="jxr_keyword">new</strong> BasicStroke(edgeSize));
+<a name="518" href="#518">518</a>       <strong class="jxr_keyword">try</strong> {
+<a name="519" href="#519">519</a>         <strong class="jxr_keyword">int</strong> sourceX = e.getPropertyValue(SOURCE_X).getInt();
+<a name="520" href="#520">520</a>         <strong class="jxr_keyword">int</strong> sourceY = e.getPropertyValue(SOURCE_Y).getInt();
+<a name="521" href="#521">521</a> 
+<a name="522" href="#522">522</a>         <strong class="jxr_keyword">int</strong> targetX = e.getPropertyValue(TARGET_X).getInt();
+<a name="523" href="#523">523</a>         <strong class="jxr_keyword">int</strong> targetY = e.getPropertyValue(TARGET_Y).getInt();
+<a name="524" href="#524">524</a> 
+<a name="525" href="#525">525</a>         gfx.drawLine(sourceX, sourceY, targetX, targetY);
+<a name="526" href="#526">526</a>       } <strong class="jxr_keyword">catch</strong> (NullPointerException ef) {
+<a name="527" href="#527">527</a> 
+<a name="528" href="#528">528</a>       }
+<a name="529" href="#529">529</a>     }
+<a name="530" href="#530">530</a> 
+<a name="531" href="#531">531</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="532" href="#532">532</a> <em class="jxr_javadoccomment">     * Draw a single vertex</em>
+<a name="533" href="#533">533</a> <em class="jxr_javadoccomment">     *</em>
+<a name="534" href="#534">534</a> <em class="jxr_javadoccomment">     * @param gfx The graphics-object to use for drawing</em>
+<a name="535" href="#535">535</a> <em class="jxr_javadoccomment">     * @param v   The vertex to draw</em>
+<a name="536" href="#536">536</a> <em class="jxr_javadoccomment">     */</em>
+<a name="537" href="#537">537</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> drawVertex(Graphics2D gfx, EPGMVertex v) {
+<a name="538" href="#538">538</a>       <strong class="jxr_keyword">int</strong> x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();
+<a name="539" href="#539">539</a>       <strong class="jxr_keyword">int</strong> y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();
+<a name="540" href="#540">540</a>       <strong class="jxr_keyword">int</strong> size = plotter.vertexSize;
+<a name="541" href="#541">541</a>       <strong class="jxr_keyword">if</strong> (plotter.dynamicVertexSize &amp;&amp; v.getPropertyValue(<span class="jxr_string">"SIZE"</span>) != <strong class="jxr_keyword">null</strong>) {
+<a name="542" href="#542">542</a>         size *= Math.sqrt((<strong class="jxr_keyword">double</strong>) v.getPropertyValue(<span class="jxr_string">"SIZE"</span>).getInt());
+<a name="543" href="#543">543</a>       }
+<a name="544" href="#544">544</a>       gfx.fillOval(x - size / 2, y - size / 2, size, size);
+<a name="545" href="#545">545</a>       <strong class="jxr_keyword">if</strong> (plotter.vertexLabel != <strong class="jxr_keyword">null</strong>) {
+<a name="546" href="#546">546</a>         String label = v.getPropertyValue(plotter.vertexLabel).getString();
+<a name="547" href="#547">547</a>         gfx.drawString(label, x, y + (plotter.vertexSize) + 10 + (plotter.vertexLabelSize / 2));
+<a name="548" href="#548">548</a>       }
+<a name="549" href="#549">549</a>     }
+<a name="550" href="#550">550</a> 
+<a name="551" href="#551">551</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="552" href="#552">552</a> <em class="jxr_javadoccomment">     * Merge two intermediate Images into one</em>
+<a name="553" href="#553">553</a> <em class="jxr_javadoccomment">     *</em>
+<a name="554" href="#554">554</a> <em class="jxr_javadoccomment">     * @param arr1 Image 1</em>
+<a name="555" href="#555">555</a> <em class="jxr_javadoccomment">     * @param arr2 Image 2</em>
+<a name="556" href="#556">556</a> <em class="jxr_javadoccomment">     * @return Output-Image</em>
+<a name="557" href="#557">557</a> <em class="jxr_javadoccomment">     */</em>
+<a name="558" href="#558">558</a>     <strong class="jxr_keyword">public</strong> byte[] mergeImages(byte[] arr1, byte[] arr2) {
+<a name="559" href="#559">559</a>       BufferedImage bufferedImage = arrToImg(arr1);
+<a name="560" href="#560">560</a>       BufferedImage t1 = arrToImg(arr2);
+<a name="561" href="#561">561</a>       Graphics2D g = bufferedImage.createGraphics();
+<a name="562" href="#562">562</a>       g.drawImage(t1, 0, 0, plotter.imageWidth, plotter.imageHeight, <strong class="jxr_keyword">null</strong>);
+<a name="563" href="#563">563</a>       g.dispose();
+<a name="564" href="#564">564</a>       <strong class="jxr_keyword">return</strong> imgToArr(bufferedImage);
+<a name="565" href="#565">565</a>     }
+<a name="566" href="#566">566</a> 
+<a name="567" href="#567">567</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="568" href="#568">568</a> <em class="jxr_javadoccomment">     * Draw a background behind the image.</em>
+<a name="569" href="#569">569</a> <em class="jxr_javadoccomment">     *</em>
+<a name="570" href="#570">570</a> <em class="jxr_javadoccomment">     * @param arr Input image</em>
+<a name="571" href="#571">571</a> <em class="jxr_javadoccomment">     * @return Input-image + black background</em>
+<a name="572" href="#572">572</a> <em class="jxr_javadoccomment">     */</em>
+<a name="573" href="#573">573</a>     <strong class="jxr_keyword">public</strong> byte[] addBackground(byte[] arr) {
+<a name="574" href="#574">574</a>       BufferedImage bufferedImage = arrToImg(arr);
+<a name="575" href="#575">575</a>       BufferedImage out =
+<a name="576" href="#576">576</a>         <strong class="jxr_keyword">new</strong> BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<a name="577" href="#577">577</a>       Graphics2D gfx = out.createGraphics();
+<a name="578" href="#578">578</a>       gfx.setColor(plotter.backgroundColor);
+<a name="579" href="#579">579</a>       gfx.fillRect(0, 0, plotter.imageWidth, plotter.imageHeight);
+<a name="580" href="#580">580</a>       gfx.drawImage(bufferedImage, 0, 0, plotter.imageWidth, plotter.imageHeight, <strong class="jxr_keyword">null</strong>);
+<a name="581" href="#581">581</a>       gfx.dispose();
+<a name="582" href="#582">582</a>       <strong class="jxr_keyword">return</strong> imgToArr(out);
+<a name="583" href="#583">583</a>     }
+<a name="584" href="#584">584</a>   }
+<a name="585" href="#585">585</a> 
+<a name="586" href="#586">586</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="587" href="#587">587</a> <em class="jxr_javadoccomment">   * OutputFormat to save BufferedImages to image files</em>
+<a name="588" href="#588">588</a> <em class="jxr_javadoccomment">   */</em>
+<a name="589" href="#589">589</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageOutputFormat</a> <strong class="jxr_keyword">extends</strong> FileOutputFormat&lt;byte[]&gt; {
+<a name="590" href="#590">590</a> 
+<a name="591" href="#591">591</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="592" href="#592">592</a> <em class="jxr_javadoccomment">     * Where to store the output-image</em>
+<a name="593" href="#593">593</a> <em class="jxr_javadoccomment">     */</em>
+<a name="594" href="#594">594</a>     <strong class="jxr_keyword">private</strong> String path;
+<a name="595" href="#595">595</a> 
+<a name="596" href="#596">596</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="597" href="#597">597</a> <em class="jxr_javadoccomment">     * Create a new plotter output format</em>
+<a name="598" href="#598">598</a> <em class="jxr_javadoccomment">     *</em>
+<a name="599" href="#599">599</a> <em class="jxr_javadoccomment">     * @param path The output-image location</em>
+<a name="600" href="#600">600</a> <em class="jxr_javadoccomment">     */</em>
+<a name="601" href="#601">601</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/io/impl/image/ImageDataSink.html">ImageOutputFormat</a>(String path) {
+<a name="602" href="#602">602</a>       <strong class="jxr_keyword">super</strong>(<strong class="jxr_keyword">new</strong> Path(path));
+<a name="603" href="#603">603</a>       <strong class="jxr_keyword">this</strong>.path = path;
+<a name="604" href="#604">604</a>     }
+<a name="605" href="#605">605</a> 
+<a name="606" href="#606">606</a>     @Override
+<a name="607" href="#607">607</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> open(<strong class="jxr_keyword">int</strong> taskNumber, <strong class="jxr_keyword">int</strong> numTasks) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="608" href="#608">608</a>       <strong class="jxr_keyword">super</strong>.open(taskNumber, numTasks);
+<a name="609" href="#609">609</a>     }
+<a name="610" href="#610">610</a> 
+<a name="611" href="#611">611</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="612" href="#612">612</a> <em class="jxr_javadoccomment">     * Get the file extension of a file</em>
+<a name="613" href="#613">613</a> <em class="jxr_javadoccomment">     *</em>
+<a name="614" href="#614">614</a> <em class="jxr_javadoccomment">     * @param path The name/path of the file</em>
+<a name="615" href="#615">615</a> <em class="jxr_javadoccomment">     * @return The extension (without dot)</em>
+<a name="616" href="#616">616</a> <em class="jxr_javadoccomment">     */</em>
+<a name="617" href="#617">617</a>     <strong class="jxr_keyword">private</strong> String getFileExtension(String path) {
+<a name="618" href="#618">618</a>       <strong class="jxr_keyword">return</strong> path.substring(path.lastIndexOf('.') + 1);
+<a name="619" href="#619">619</a>     }
+<a name="620" href="#620">620</a> 
+<a name="621" href="#621">621</a>     @Override
+<a name="622" href="#622">622</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeRecord(byte[] img) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="623" href="#623">623</a>       String outputFormat = getFileExtension(path);
+<a name="624" href="#624">624</a>       <strong class="jxr_keyword">if</strong> (!outputFormat.equals(INTERMEDIATE_ENCODING)) {
+<a name="625" href="#625">625</a>         BufferedImage bimg = arrToImg(img);
+<a name="626" href="#626">626</a>         ImageIO.write(bimg, outputFormat, <strong class="jxr_keyword">this</strong>.stream);
+<a name="627" href="#627">627</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="628" href="#628">628</a>         <strong class="jxr_keyword">this</strong>.stream.write(img);
+<a name="629" href="#629">629</a>       }
+<a name="630" href="#630">630</a>     }
+<a name="631" href="#631">631</a>   }
+<a name="632" href="#632">632</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>

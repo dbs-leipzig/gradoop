@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FRRepulsionFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">FRRepulsionFunction.java</span></div><h1>FRRepulsionFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
+
+import java.util.Random;
+
+/**
+ * A Join/Cross/FlatJoin-Function that computes the repulsion-forces between two given vertices.
+ * Implements both Join and FlatJoin to compute repulsions for a single vertex or for both
+ * vertices at once.
+ */
+public class FRRepulsionFunction implements JoinFunction&lt;LVertex, LVertex, Force&gt;,
+  CrossFunction&lt;LVertex, LVertex, Force&gt;, FlatJoinFunction&lt;LVertex, LVertex, Force&gt; {
+  /**
+   * Rng. Used to get random directions for vertices at the same position
+   */
+  private Random rng;
+  /**
+   * Parameter for the FR-Algorithm
+   */
+  private double k;
+  /**
+   * Maximum distance between two vertices that still produces a repulsion
+   */
+  private double maxDistance;
+
+  /**
+   * Object reuse for output
+   */
+<span class="fc" id="L51">  private Force firstForce = new Force();</span>
+  /**
+   * Object reuse for output
+   */
+<span class="fc" id="L55">  private Force secondForce = new Force();</span>
+  /**
+   * Object reuse
+   */
+<span class="fc" id="L59">  private Vector calculatedForce = new Vector();</span>
+  /**
+   * Object reuse
+   */
+<span class="fc" id="L63">  private Vector calculatedForce2 = new Vector();</span>
+
+  /**
+   * Create new RepulsionFunction
+   *
+   * @param k A parameter of the FR-Algorithm
+   */
+  public FRRepulsionFunction(double k) {
+<span class="fc" id="L71">    this(k, Float.MAX_VALUE);</span>
+<span class="fc" id="L72">  }</span>
+
+  /**
+   * Create new RepulsionFunction
+   *
+   * @param k           A parameter of the FR-Algorithm
+   * @param maxDistance Maximum distance between two vertices that still produces a repulsion
+   */
+<span class="fc" id="L80">  public FRRepulsionFunction(double k, double maxDistance) {</span>
+<span class="fc" id="L81">    rng = new Random();</span>
+<span class="fc" id="L82">    this.k = k;</span>
+<span class="fc" id="L83">    this.maxDistance = maxDistance;</span>
+<span class="fc" id="L84">  }</span>
+
+  /**
+   * Computes the repulsion force between two vertices ONLY FOR THE FIRST vertex
+   *
+   * @param first  First Vertex
+   * @param second Second Certex
+   * @return A force-tuple representing the repulsion-force for the first vertex
+   */
+  @Override
+  public Force join(LVertex first, LVertex second) {
+<span class="fc" id="L95">    Vector force = calculateForce(first, second);</span>
+<span class="fc" id="L96">    firstForce.set(first.getId(), force);</span>
+<span class="fc" id="L97">    return firstForce;</span>
+  }
+
+  /**
+   * Alias for join() to fullfill the CrossFunction-Interface.
+   *
+   * @param vertex  First Vertex
+   * @param vertex2 Second Certex
+   * @return A force-tuple representing the repulsion-force for the first vertex
+   */
+  @Override
+  public Force cross(LVertex vertex, LVertex vertex2) {
+<span class="nc" id="L109">    return join(vertex, vertex2);</span>
+  }
+
+
+  /**
+   * Computes the repulsion force between two vertices ONLY FOR THE FIRST vertex
+   * ATTENTION! Subsequent calls will modify previously returned results!
+   *
+   * @param first  First Vertex
+   * @param second Second Certex
+   * @return A force-tuple representing the repulsion-force for the first vertex
+   */
+  protected Vector calculateForce(LVertex first, LVertex second) {
+<span class="fc" id="L122">    Vector pos1 = first.getPosition();</span>
+<span class="fc" id="L123">    Vector pos2 = second.getPosition();</span>
+<span class="fc" id="L124">    double distance = pos1.distance(pos2);</span>
+<span class="fc" id="L125">    Vector direction = pos2.mSub(pos1);</span>
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">    if (first.getId().equals(second.getId())) {</span>
+<span class="fc" id="L128">      calculatedForce.reset();</span>
+<span class="fc" id="L129">      return calculatedForce;</span>
+    }
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    if (distance &gt; maxDistance) {</span>
+<span class="fc" id="L133">      calculatedForce.reset();</span>
+<span class="fc" id="L134">      return calculatedForce;</span>
+    }
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    if (distance == 0) {</span>
+      // generate a pseudo-random (but deterministic) direction
+<span class="fc" id="L139">      int hash = first.getId().hashCode() + second.getId().hashCode();</span>
+<span class="fc" id="L140">      int x = hash &gt;&gt; 16;</span>
+<span class="fc" id="L141">      int y = hash &amp; 0xFFFF;</span>
+<span class="fc" id="L142">      distance = 0.1;</span>
+<span class="fc" id="L143">      direction.setX(x);</span>
+<span class="fc" id="L144">      direction.setY(y);</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">      if (first.getId().compareTo(second.getId()) &gt; 0) {</span>
+<span class="nc" id="L146">        direction.mMul(-1);</span>
+      }
+    }
+
+<span class="fc" id="L150">    calculatedForce.set(direction.mNormalized()</span>
+<span class="fc" id="L151">      .mMul(-Math.pow(k, 2) / distance).mMul(first.getCount() * second.getCount()));</span>
+<span class="fc" id="L152">    return calculatedForce;</span>
+  }
+
+  /**
+   * Implement FlatJoin and produce the force-tuples for both vertices at once.
+   * (Forces of magnitude 0 will be ignored)
+   *
+   * @param first     The first vertex
+   * @param second    The second vertex
+   * @param collector Contains up to two force-tuples representing repulsion-forces between both
+   *                  vertices.
+   */
+  @Override
+  public void join(LVertex first, LVertex second, Collector&lt;Force&gt; collector) {
+
+<span class="fc" id="L167">    Vector force = calculateForce(first, second);</span>
+
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (force.magnitude() == 0) {</span>
+<span class="fc" id="L170">      return;</span>
+    }
+
+<span class="fc" id="L173">    firstForce.set(first.getId(), force);</span>
+
+<span class="fc" id="L175">    calculatedForce2.set(force).mMul(-1);</span>
+<span class="fc" id="L176">    secondForce.set(second.getId(), calculatedForce2);</span>
+
+<span class="fc" id="L178">    collector.collect(firstForce);</span>
+<span class="fc" id="L179">    collector.collect(secondForce);</span>
+<span class="fc" id="L180">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

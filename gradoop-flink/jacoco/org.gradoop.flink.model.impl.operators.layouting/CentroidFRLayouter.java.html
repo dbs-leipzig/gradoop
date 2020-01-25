@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CentroidFRLayouter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting</a> &gt; <span class="el_source">CentroidFRLayouter.java</span></div><h1>CentroidFRLayouter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.layouting.functions.AverageVertexPositionsFunction;
+import org.gradoop.flink.model.impl.operators.layouting.util.Centroid;
+import org.gradoop.flink.model.impl.operators.layouting.functions.CentroidRepulsionForceMapper;
+import org.gradoop.flink.model.impl.operators.layouting.functions.CentroidUpdater;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.SimpleGraphElement;
+import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
+import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
+
+/**
+ * Layout a graph using approximate repulsive forces calculated using centroids as described
+ * &lt;a href=&quot;https://www.researchgate.net/publication/281348264_Distributed_Graph_Layout_with_Spark&quot;&gt;
+ * here&lt;/a&gt;
+ * Very fast, even for large inputs.
+ */
+public class CentroidFRLayouter extends FRLayouter {
+
+  /**
+   * Fraction of all vertices a centroid should minimally have
+   */
+  public static final double MIN_MASS_FACTOR = 0.0025d;
+  /**
+   * Fraction of all vertices a centroid should maximally have
+   */
+  public static final double MAX_MASS_FACTOR = 0.05d;
+  /**
+   * Name for the Centroid BroadcastSet
+   */
+  public static final String CENTROID_BROADCAST_NAME = &quot;centroids&quot;;
+  /**
+   * Name for the Center BroadcastSet
+   */
+  public static final String CENTER_BROADCAST_NAME = &quot;center&quot;;
+  /**
+   * DataSet containing the current centroids
+   */
+  private DataSet&lt;Centroid&gt; centroids;
+  /**
+   * DataSet containing the current graph-center
+   */
+  private DataSet&lt;Vector&gt; center;
+
+  /**
+   * Create new CentroidFRLayouter
+   *
+   * @param iterations  Number of iterations to perform
+   * @param vertexCount Approximate number of vertices in the input-graph
+   */
+  public CentroidFRLayouter(int iterations, int vertexCount) {
+<span class="fc" id="L77">    super(iterations, vertexCount);</span>
+<span class="fc" id="L78">  }</span>
+
+  @Override
+  public LogicalGraph execute(LogicalGraph g) {
+
+<span class="fc" id="L83">    g = createInitialLayout(g);</span>
+
+<span class="fc" id="L85">    DataSet&lt;EPGMVertex&gt; gradoopVertices = g.getVertices();</span>
+<span class="fc" id="L86">    DataSet&lt;EPGMEdge&gt; gradoopEdges = g.getEdges();</span>
+
+<span class="fc" id="L88">    DataSet&lt;LVertex&gt; vertices = gradoopVertices.map(LVertex::new);</span>
+<span class="fc" id="L89">    DataSet&lt;LEdge&gt; edges = gradoopEdges.map(LEdge::new);</span>
+
+<span class="fc" id="L91">    centroids = chooseInitialCentroids(vertices);</span>
+
+    // flink can only iterate over one dataset at once. Create a dataset containing both
+    // centroids and vertices. Split them again at the begin of every iteration
+<span class="fc" id="L95">    DataSet&lt;SimpleGraphElement&gt; graphElements = vertices.map(x -&gt; x);</span>
+<span class="fc" id="L96">    graphElements = graphElements.union(centroids.map(x -&gt; x));</span>
+
+<span class="fc" id="L98">    IterativeDataSet&lt;SimpleGraphElement&gt; loop = graphElements.iterate(iterations);</span>
+<span class="fc" id="L99">    vertices = loop.filter(x -&gt; x instanceof LVertex).map(x -&gt; (LVertex) x);</span>
+<span class="fc" id="L100">    centroids = loop.filter(x -&gt; x instanceof Centroid).map(x -&gt; (Centroid) x);</span>
+
+<span class="fc" id="L102">    centroids = calculateNewCentroids(centroids, vertices);</span>
+<span class="fc" id="L103">    center = calculateLayoutCenter(vertices);</span>
+
+<span class="fc" id="L105">    LGraph graph = new LGraph(vertices, edges);</span>
+    // we have overridden repulsionForces() so layout() will use or new centroid-based solution
+<span class="fc" id="L107">    layout(graph);</span>
+
+<span class="fc" id="L109">    graphElements = graph.getVertices().map(x -&gt; x);</span>
+<span class="fc" id="L110">    graphElements = graphElements.union(centroids.map(x -&gt; x));</span>
+
+<span class="fc" id="L112">    graphElements = loop.closeWith(graphElements);</span>
+
+<span class="fc" id="L114">    vertices = graphElements.filter(x -&gt; x instanceof LVertex).map(x -&gt; (LVertex) x);</span>
+
+<span class="fc" id="L116">    gradoopVertices = vertices.join(gradoopVertices).where(LVertex.ID_POSITION).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L117">      .with(new LVertexEPGMVertexJoinFunction());</span>
+
+<span class="fc" id="L119">    return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);</span>
+  }
+
+  /* override and calculate repulsionFoces using centroids. Everything else stays like in the
+  original FR */
+  @Override
+  protected DataSet&lt;Force&gt; repulsionForces(DataSet&lt;LVertex&gt; vertices) {
+<span class="fc" id="L126">    return vertices.map(new CentroidRepulsionForceMapper(new FRRepulsionFunction(getK())))</span>
+<span class="fc" id="L127">      .withBroadcastSet(centroids, CENTROID_BROADCAST_NAME)</span>
+<span class="fc" id="L128">      .withBroadcastSet(center, CENTER_BROADCAST_NAME);</span>
+  }
+
+  /**
+   * Randomly choose some vertex-positions as start centroids
+   *
+   * @param vertices Current (randomly placed) vertices of the graph
+   * @return Random centroids to use (always at least one)
+   */
+  protected DataSet&lt;Centroid&gt; chooseInitialCentroids(DataSet&lt;LVertex&gt; vertices) {
+    // Choose a sample rate that will statistically result in clusters with a mass exactly
+    // between min and max allowed mass
+<span class="fc" id="L140">    final double sampleRate =</span>
+      1.0 / (((MIN_MASS_FACTOR + MAX_MASS_FACTOR) / 2.0) * numberOfVertices);
+    // Because of the randomness of the layouting it is possible that on small graphs no vertex
+    // is chosen as centroid. This would result in problems. Therefore we union with one single
+    // vertex, so there is ALWAYS at least one centroid
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    return vertices.filter((v) -&gt; Math.random() &lt; sampleRate).union(vertices.first(1))</span>
+<span class="fc" id="L146">      .map(v -&gt; new Centroid(v.getPosition(), 0));</span>
+  }
+
+  /**
+   * Calculate the current centroids for the graph
+   *
+   * @param centroids The old/current centroids
+   * @param vertices  The current vertices of the graph
+   * @return The new centroids (to use for the next iteration)
+   */
+  protected DataSet&lt;Centroid&gt; calculateNewCentroids(DataSet&lt;Centroid&gt; centroids,
+    DataSet&lt;LVertex&gt; vertices) {
+
+<span class="fc" id="L159">    CentroidUpdater updater =</span>
+      new CentroidUpdater(numberOfVertices, MIN_MASS_FACTOR, MAX_MASS_FACTOR);
+
+<span class="fc" id="L162">    return updater.updateCentroids(centroids, vertices);</span>
+  }
+
+  /**
+   * Calculate the current center of the graph-layout
+   *
+   * @param vertices Current vertices of the graph
+   * @return The average of all vertex positions
+   */
+  protected DataSet&lt;Vector&gt; calculateLayoutCenter(DataSet&lt;LVertex&gt; vertices) {
+<span class="fc" id="L172">    return new AverageVertexPositionsFunction().averagePosition(vertices);</span>
+  }
+
+
+  @Override
+  public String toString() {
+<span class="nc" id="L178">    return &quot;CentroidFRLayouter{&quot; + &quot;iterations=&quot; + iterations + &quot;, k=&quot; + getK() + &quot;, width=&quot; +</span>
+<span class="nc" id="L179">      getWidth() + &quot;, height=&quot; + getHeight() + &quot;, numberOfVertices=&quot; + numberOfVertices +</span>
+      &quot;, useExistingLayout=&quot; + useExistingLayout + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

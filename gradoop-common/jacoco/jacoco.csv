@@ -32,7 +32,7 @@ Gradoop Common,org.gradoop.common.model.impl.properties.strategies,AbstractFixSi
 Gradoop Common,org.gradoop.common.model.impl.properties.strategies,PropertyValueStrategyFactory,44,297,4,24,7,58,4,20,0,10
 Gradoop Common,org.gradoop.common.util,GradoopConstants,7,0,0,0,2,0,2,0,2,0
 Gradoop Common,org.gradoop.common.util,Order,24,0,0,0,3,0,1,0,1,0
-Gradoop Common,org.gradoop.common.util,AsciiGraphLoader,16,707,3,41,5,144,4,50,1,31
+Gradoop Common,org.gradoop.common.util,AsciiGraphLoader,20,715,3,41,6,146,4,50,1,31
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes,513,366,53,27,93,73,59,34,19,34
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder.UnsafeComparer,57,129,12,10,10,26,8,6,0,3
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder.PureJavaComparer,69,0,12,0,12,0,8,0,2,0
@@ -40,7 +40,7 @@ Gradoop Common,org.gradoop.common.model.impl.properties.bytes,UnsafeAvailChecker
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.ByteArrayComparator,16,0,0,0,5,0,3,0,3,0
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder,6,24,0,0,3,7,1,2,1,2
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,UnsafeAvailChecker,8,49,3,3,3,13,3,2,0,2
-Gradoop Common,org.gradoop.common.model.impl.id,GradoopId,88,616,10,46,24,106,19,40,9,22
+Gradoop Common,org.gradoop.common.model.impl.id,GradoopId,77,633,10,46,21,109,17,42,7,24
 Gradoop Common,org.gradoop.common.model.impl.id,GradoopIdSet,26,366,5,41,8,95,8,41,3,23
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMGraphElement,18,46,2,4,3,14,4,7,2,6
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMElement,35,161,6,20,14,31,11,22,5,15

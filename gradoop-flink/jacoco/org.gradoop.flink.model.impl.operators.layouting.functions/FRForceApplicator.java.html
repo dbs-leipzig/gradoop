@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FRForceApplicator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">FRForceApplicator.java</span></div><h1>FRForceApplicator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.common.functions.RichJoinFunction;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
+
+/**
+ * Applies forces to vertices.
+ * Uses simulated annealing with exponentially decreasing temperature.
+ * Confines new coordinates to the layouting-space
+ */
+public class FRForceApplicator extends RichJoinFunction&lt;LVertex, Force, LVertex&gt; {
+
+  /**
+   * Width of the layouting-space
+   */
+  protected int layoutWidth;
+  /**
+   * Height of the layouting space
+   */
+  protected int layoutHeight;
+  /**
+   * cache the last computed temperature and re-use if possible to reduce needed computing-power
+   */
+<span class="fc" id="L41">  protected int lastIteration = -1;</span>
+  /**
+   * cache the last computed temperature and re-use if possible to reduce needed computing-power
+   */
+<span class="fc" id="L45">  protected double lastSpeedLimit = 0;</span>
+  /**
+   * Speed at which the cooling-schedule starts
+   */
+  private double startSpeed;
+  /**
+   * Speed at which the cooling-schedule ends
+   */
+  private double endSpeed;
+  /**
+   * Base of the exponentially-decreasing function for the speed
+   */
+  private double base;
+  /**
+   * Maximum number of iterations
+   */
+  private int maxIterations;
+  /**
+   * Calculate temperature as if this number of iterations had already passed
+   */
+<span class="fc" id="L65">  private int previousIterations = 0;</span>
+
+  /**
+   * Create new FRForceApplicator
+   *
+   * @param width         The width of the layouting-space
+   * @param height        The height of the layouting-space
+   * @param k             A parameter of the FR-Algorithm.
+   * @param maxIterations Number of iterations the FR-Algorithm will have
+   */
+<span class="fc" id="L75">  public FRForceApplicator(int width, int height, double k, int maxIterations) {</span>
+<span class="fc" id="L76">    this.layoutWidth = width;</span>
+<span class="fc" id="L77">    this.layoutHeight = height;</span>
+<span class="fc" id="L78">    this.startSpeed = Math.sqrt((double) width * (double) width + (double) height * (double) height) / 2.0;</span>
+<span class="fc" id="L79">    this.endSpeed = k / 10.0;</span>
+<span class="fc" id="L80">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L81">    calculateBase();</span>
+<span class="fc" id="L82">  }</span>
+
+  /**
+   * Gets startSpeed
+   *
+   * @return value of startSpeed
+   */
+  public double getStartSpeed() {
+<span class="nc" id="L90">    return startSpeed;</span>
+  }
+
+  /**
+   * Sets startSpeed (overrides default)
+   *
+   * @param startSpeed the new value
+   */
+  public void setStartSpeed(double startSpeed) {
+<span class="nc" id="L99">    this.startSpeed = startSpeed;</span>
+<span class="nc" id="L100">    calculateBase();</span>
+<span class="nc" id="L101">  }</span>
+
+  /**
+   * Gets endSpeed
+   *
+   * @return value of endSpeed
+   */
+  public double getEndSpeed() {
+<span class="nc" id="L109">    return endSpeed;</span>
+  }
+
+  /**
+   * Sets endSpeed (overrides default)
+   *
+   * @param endSpeed the new value
+   */
+  public void setEndSpeed(double endSpeed) {
+<span class="nc" id="L118">    this.endSpeed = endSpeed;</span>
+<span class="nc" id="L119">    calculateBase();</span>
+<span class="nc" id="L120">  }</span>
+
+  /**
+   * Gets previousIterations
+   *
+   * @return value of previousIterations
+   */
+  public int getPreviousIterations() {
+<span class="nc" id="L128">    return previousIterations;</span>
+  }
+
+  /**
+   * Sets previousIterations
+   *
+   * @param previousIterations the new value
+   */
+  public void setPreviousIterations(int previousIterations) {
+<span class="fc" id="L137">    this.previousIterations = previousIterations;</span>
+<span class="fc" id="L138">    calculateBase();</span>
+<span class="fc" id="L139">  }</span>
+
+  /**
+   * Gets maxIterations
+   *
+   * @return value of maxIterations
+   */
+  public int getMaxIterations() {
+<span class="nc" id="L147">    return maxIterations;</span>
+  }
+
+  /**
+   * Sets maxIterations
+   *
+   * @param maxIterations the new value
+   */
+  public void setMaxIterations(int maxIterations) {
+<span class="nc" id="L156">    this.maxIterations = maxIterations;</span>
+<span class="nc" id="L157">  }</span>
+
+  /**
+   * Calculate the base for the exponential function
+   */
+  private void calculateBase() {
+<span class="fc" id="L163">    this.base = Math.pow(endSpeed / startSpeed, 1.0 / (maxIterations + previousIterations - 1));</span>
+<span class="fc" id="L164">  }</span>
+
+  /**
+   * Calculate the desired speed for a given iteration
+   *
+   * @param iteration Iteration to calculate speed for
+   * @return Desired speed
+   */
+  public double speedForIteration(int iteration) {
+<span class="fc" id="L173">    iteration += previousIterations;</span>
+    // cache last result to avoid costly pow
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (iteration != lastIteration) {</span>
+<span class="fc" id="L176">      lastSpeedLimit = startSpeed * Math.pow(base, iteration);</span>
+<span class="fc" id="L177">      lastIteration = iteration;</span>
+    }
+<span class="fc" id="L179">    return lastSpeedLimit;</span>
+  }
+
+
+  /**
+   * Apply force to vertex.
+   * Honors speedLimit and vertex-mass. Confines position to layout-area.
+   *
+   * @param vertex     Vertex to move
+   * @param force      Force acting on the vertex
+   * @param speedLimit Current speedLimit
+   */
+  public void apply(LVertex vertex, Force force, double speedLimit) {
+<span class="fc" id="L192">    Vector position = vertex.getPosition();</span>
+<span class="fc" id="L193">    Vector movement = force.getValue();</span>
+<span class="fc" id="L194">    apply(position, movement.div(vertex.getCount()), speedLimit);</span>
+<span class="fc" id="L195">    vertex.setForce(movement);</span>
+<span class="fc" id="L196">    vertex.setPosition(position);</span>
+<span class="fc" id="L197">  }</span>
+
+
+  /**
+   * Raw version of apply() using just vectors.
+   *
+   * @param position   Position to modify
+   * @param movement   Movement to apply
+   * @param speedLimit Current speedLimit
+   */
+  public void apply(Vector position, Vector movement, double speedLimit) {
+<span class="fc" id="L208">    position.mAdd(movement.clamped(speedLimit));</span>
+<span class="fc" id="L209">    position.mConfined(0, layoutWidth - 1, 0, layoutHeight - 1);</span>
+<span class="fc" id="L210">  }</span>
+
+  @Override
+  public LVertex join(LVertex first, Force second) throws Exception {
+<span class="fc" id="L214">    apply(first, second, speedForIteration(getIterationRuntimeContext().getSuperstepNumber()));</span>
+<span class="fc" id="L215">    return first;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

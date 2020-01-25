@@ -135,43 +135,70 @@
 <a name="125" href="#125">125</a>   }
 <a name="126" href="#126">126</a> 
 <a name="127" href="#127">127</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * Test if {@link GradoopId#isValid(String)} returns false for invalid input strings</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   *</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param input an invalid input string</em>
-<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   */</em>
-<a name="132" href="#132">132</a>   @Test(dataProvider = <span class="jxr_string">"invalid strings"</span>)
-<a name="133" href="#133">133</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testIsValidWithInvalidInput(String input) {
-<a name="134" href="#134">134</a>     assertFalse(<span class="jxr_string">"Invalid input string was evaluated as valid: "</span> + input,
-<a name="135" href="#135">135</a>       GradoopId.isValid(input));
-<a name="136" href="#136">136</a>   }
-<a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>   @DataProvider(name = <span class="jxr_string">"invalid strings"</span>)
-<a name="139" href="#139">139</a>   <strong class="jxr_keyword">private</strong> Object[][] invalidStringsDataProvider() {
-<a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> Object[][] {
-<a name="141" href="#141">141</a>       {<span class="jxr_string">"abc3451d98ebd3452fff32a"</span>},   <em class="jxr_comment">// too short</em>
-<a name="142" href="#142">142</a>       {<span class="jxr_string">"1234567891011121131415161"</span>}, <em class="jxr_comment">// too long</em>
-<a name="143" href="#143">143</a>       {<span class="jxr_string">"12345678910111211314151G"</span>}}; <em class="jxr_comment">// 'G' is not a valid char in a hex string</em>
-<a name="144" href="#144">144</a>   }
-<a name="145" href="#145">145</a> 
-<a name="146" href="#146">146</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="147" href="#147">147</a> <em class="jxr_javadoccomment">   * Test if {@link GradoopId#isValid(String)} returns true for valid input strings.</em>
-<a name="148" href="#148">148</a> <em class="jxr_javadoccomment">   *</em>
-<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">   * @param input a valid input string</em>
-<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">   */</em>
-<a name="151" href="#151">151</a>   @Test(dataProvider = <span class="jxr_string">"valid strings"</span>)
-<a name="152" href="#152">152</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testIsValidWithValidInput(String input) {
-<a name="153" href="#153">153</a>     assertTrue(<span class="jxr_string">"Valid input string was evaluated as invalid: "</span> + input,
-<a name="154" href="#154">154</a>       GradoopId.isValid(input));
-<a name="155" href="#155">155</a>   }
-<a name="156" href="#156">156</a> 
-<a name="157" href="#157">157</a>   @DataProvider(name = <span class="jxr_string">"valid strings"</span>)
-<a name="158" href="#158">158</a>   <strong class="jxr_keyword">private</strong> Object[][] validStringDataProvider() {
-<a name="159" href="#159">159</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> Object[][] {
-<a name="160" href="#160">160</a>       {<span class="jxr_string">"912345678910111213141516"</span>},
-<a name="161" href="#161">161</a>       {<span class="jxr_string">"1AB363914FD1325CC43790AB"</span>},
-<a name="162" href="#162">162</a>       {<span class="jxr_string">"bcdef12345678910bac76d4e"</span>}};
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * Test the {@link GradoopId#copy()}.</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   */</em>
+<a name="130" href="#130">130</a>   @Test
+<a name="131" href="#131">131</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCopy() {
+<a name="132" href="#132">132</a>     GradoopId someId = GradoopId.get();
+<a name="133" href="#133">133</a>     GradoopId copy = someId.copy();
+<a name="134" href="#134">134</a>     assertEquals(someId, copy);
+<a name="135" href="#135">135</a>     assertSame(<span class="jxr_string">"toByteArray() seems to return copies of the id, not the raw byte[] data,"</span>,
+<a name="136" href="#136">136</a>       someId.toByteArray(), someId.toByteArray());
+<a name="137" href="#137">137</a>     assertNotSame(<span class="jxr_string">"copy"</span>, someId, copy);
+<a name="138" href="#138">138</a>     assertNotSame(<span class="jxr_string">"raw data of copy"</span>, someId.toByteArray(), copy.toByteArray());
+<a name="139" href="#139">139</a>   }
+<a name="140" href="#140">140</a> 
+<a name="141" href="#141">141</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * Test the {@link GradoopId#copyTo(GradoopId)} method.</em>
+<a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   */</em>
+<a name="144" href="#144">144</a>   @Test
+<a name="145" href="#145">145</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCopyTo() {
+<a name="146" href="#146">146</a>     GradoopId someId = GradoopId.get();
+<a name="147" href="#147">147</a>     GradoopId copy = GradoopId.get();
+<a name="148" href="#148">148</a>     assertNotEquals(someId, copy);
+<a name="149" href="#149">149</a>     someId.copyTo(copy);
+<a name="150" href="#150">150</a>     assertEquals(someId, copy);
+<a name="151" href="#151">151</a>     assertNotSame(<span class="jxr_string">"raw data of copy target"</span>, someId.toByteArray(), copy.toByteArray());
+<a name="152" href="#152">152</a>   }
+<a name="153" href="#153">153</a> 
+<a name="154" href="#154">154</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * Test if {@link GradoopId#isValid(String)} returns false for invalid input strings</em>
+<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   *</em>
+<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * @param input an invalid input string</em>
+<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   */</em>
+<a name="159" href="#159">159</a>   @Test(dataProvider = <span class="jxr_string">"invalid strings"</span>)
+<a name="160" href="#160">160</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testIsValidWithInvalidInput(String input) {
+<a name="161" href="#161">161</a>     assertFalse(<span class="jxr_string">"Invalid input string was evaluated as valid: "</span> + input,
+<a name="162" href="#162">162</a>       GradoopId.isValid(input));
 <a name="163" href="#163">163</a>   }
-<a name="164" href="#164">164</a> }
+<a name="164" href="#164">164</a> 
+<a name="165" href="#165">165</a>   @DataProvider(name = <span class="jxr_string">"invalid strings"</span>)
+<a name="166" href="#166">166</a>   <strong class="jxr_keyword">private</strong> Object[][] invalidStringsDataProvider() {
+<a name="167" href="#167">167</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> Object[][] {
+<a name="168" href="#168">168</a>       {<span class="jxr_string">"abc3451d98ebd3452fff32a"</span>},   <em class="jxr_comment">// too short</em>
+<a name="169" href="#169">169</a>       {<span class="jxr_string">"1234567891011121131415161"</span>}, <em class="jxr_comment">// too long</em>
+<a name="170" href="#170">170</a>       {<span class="jxr_string">"12345678910111211314151G"</span>}}; <em class="jxr_comment">// 'G' is not a valid char in a hex string</em>
+<a name="171" href="#171">171</a>   }
+<a name="172" href="#172">172</a> 
+<a name="173" href="#173">173</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   * Test if {@link GradoopId#isValid(String)} returns true for valid input strings.</em>
+<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   *</em>
+<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * @param input a valid input string</em>
+<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   */</em>
+<a name="178" href="#178">178</a>   @Test(dataProvider = <span class="jxr_string">"valid strings"</span>)
+<a name="179" href="#179">179</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testIsValidWithValidInput(String input) {
+<a name="180" href="#180">180</a>     assertTrue(<span class="jxr_string">"Valid input string was evaluated as invalid: "</span> + input,
+<a name="181" href="#181">181</a>       GradoopId.isValid(input));
+<a name="182" href="#182">182</a>   }
+<a name="183" href="#183">183</a> 
+<a name="184" href="#184">184</a>   @DataProvider(name = <span class="jxr_string">"valid strings"</span>)
+<a name="185" href="#185">185</a>   <strong class="jxr_keyword">private</strong> Object[][] validStringDataProvider() {
+<a name="186" href="#186">186</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> Object[][] {
+<a name="187" href="#187">187</a>       {<span class="jxr_string">"912345678910111213141516"</span>},
+<a name="188" href="#188">188</a>       {<span class="jxr_string">"1AB363914FD1325CC43790AB"</span>},
+<a name="189" href="#189">189</a>       {<span class="jxr_string">"bcdef12345678910bac76d4e"</span>}};
+<a name="190" href="#190">190</a>   }
+<a name="191" href="#191">191</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

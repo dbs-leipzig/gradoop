@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LGraphToEPGMMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">LGraphToEPGMMapper.java</span></div><h1>LGraphToEPGMMapper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.layouting.FusingFRLayouter;
+import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
+import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Converts an LGraph to an EPGM Graph
+ */
+<span class="fc" id="L35">public class LGraphToEPGMMapper {</span>
+
+  /**
+   * Build a new EPGM-Graph from the given LGraph, by converting LVertices to vertices 1:1.
+   *
+   * @param input    The original EPGMGraph, to use it's factory
+   * @param layouted The LGraph to convert
+   * @return The converted LGraph
+   */
+  public LogicalGraph buildSimplifiedGraph(LogicalGraph input, LGraph layouted) {
+<span class="fc" id="L45">    DataSet&lt;EPGMVertex&gt; vertices = layouted.getVertices().map(LGraphToEPGMMapper::mapTpEPGMVertex);</span>
+<span class="fc" id="L46">    DataSet&lt;EPGMEdge&gt; edges = layouted.getEdges().map(LGraphToEPGMMapper::mapToEPGMEdge);</span>
+<span class="fc" id="L47">    return input.getFactory().fromDataSets(vertices, edges);</span>
+  }
+
+  /**
+   * Map LVertex to EPGMVertex.
+   *
+   * @param lv Input LVertex
+   * @return Output EPGMVertex
+   */
+  protected static EPGMVertex mapTpEPGMVertex(LVertex lv) {
+<span class="fc" id="L57">    EPGMVertex v = new EPGMVertex(lv.getId(), &quot;vertex&quot;, Properties.create(), null);</span>
+<span class="fc" id="L58">    lv.getPosition().setVertexPosition(v);</span>
+<span class="fc" id="L59">    v.setProperty(FusingFRLayouter.VERTEX_SIZE_PROPERTY, lv.getCount());</span>
+<span class="fc" id="L60">    v.setProperty(FusingFRLayouter.SUB_ELEMENTS_PROPERTY,</span>
+<span class="fc" id="L61">      getSubelementListValue(lv.getSubVertices()));</span>
+<span class="fc" id="L62">    return v;</span>
+  }
+
+  /**
+   * Map LEdge to EPGMEdge.
+   *
+   * @param le Input LEdge
+   * @return Output EPGMEdge
+   */
+  protected static EPGMEdge mapToEPGMEdge(LEdge le) {
+<span class="nc" id="L72">    EPGMEdge e = new EPGMEdge(le.getId(), &quot;edge&quot;, le.getSourceId(), le.getTargetId(), Properties.create(),</span>
+        null);
+<span class="nc" id="L74">    e.setProperty(FusingFRLayouter.VERTEX_SIZE_PROPERTY, le.getCount());</span>
+<span class="nc" id="L75">    e.setProperty(FusingFRLayouter.SUB_ELEMENTS_PROPERTY, getSubelementListValue(le.getSubEdges()));</span>
+<span class="nc" id="L76">    return e;</span>
+  }
+
+  /**
+   * Helper function to convert the List of sub-elements into a comma seperated string
+   * Gradoop (especially the CSVDataSink) seems to have trouble with lists of PropertyValues, so
+   * this is the easies workaround
+   *
+   * @param ids List of GradoopIds
+   * @return A comma seperated string of ids
+   */
+  protected static String getSubelementListValue(List&lt;GradoopId&gt; ids) {
+<span class="fc" id="L88">    return ids.stream().map(GradoopId::toString).collect(Collectors.joining(&quot;,&quot;));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

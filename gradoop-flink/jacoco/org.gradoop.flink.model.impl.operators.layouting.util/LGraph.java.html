@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.util</a> &gt; <span class="el_source">LGraph.java</span></div><h1>LGraph.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.util;
+
+import org.apache.flink.api.java.DataSet;
+
+/**
+ * Lightweight/Layouting-Graph. This way we do not need to drag around
+ * a full {@link org.gradoop.flink.model.impl.epgm.LogicalGraph} through every operation.
+ */
+public class LGraph {
+  /**
+   * Vertices of the graph
+   */
+  private DataSet&lt;LVertex&gt; vertices;
+  /**
+   * Edges of the graph
+   */
+  private DataSet&lt;LEdge&gt; edges;
+
+  /**
+   * Create new graph
+   * @param vertices The vertices for the graph
+   * @param edges The edges for the graph
+   */
+<span class="fc" id="L39">  public LGraph(DataSet&lt;LVertex&gt; vertices, DataSet&lt;LEdge&gt; edges) {</span>
+<span class="fc" id="L40">    this.vertices = vertices;</span>
+<span class="fc" id="L41">    this.edges = edges;</span>
+<span class="fc" id="L42">  }</span>
+
+  /**
+   * Create new graph
+   * @param g The GraphElements (vertices and edges) for the graph
+   */
+<span class="fc" id="L48">  public LGraph(DataSet&lt;SimpleGraphElement&gt; g) {</span>
+<span class="fc" id="L49">    vertices = g.filter(e -&gt; e instanceof LVertex).map(e -&gt; (LVertex) e);</span>
+<span class="fc" id="L50">    edges = g.filter(e -&gt; e instanceof LEdge).map(e -&gt; (LEdge) e);</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Get a DataSet containing all elements of the graph
+   * @return The DataSet
+   */
+  public DataSet&lt;SimpleGraphElement&gt; getGraphElements() {
+<span class="fc" id="L58">    return vertices.map(x -&gt; (SimpleGraphElement) x).union(edges.map(x -&gt; (SimpleGraphElement) x));</span>
+  }
+
+  /**
+   * Gets vertices
+   *
+   * @return value of vertices
+   */
+  public DataSet&lt;LVertex&gt; getVertices() {
+<span class="fc" id="L67">    return vertices;</span>
+  }
+
+  /**
+   * Sets vertices
+   *
+   * @param vertices the new value
+   */
+  public void setVertices(DataSet&lt;LVertex&gt; vertices) {
+<span class="fc" id="L76">    this.vertices = vertices;</span>
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * Gets edges
+   *
+   * @return value of edges
+   */
+  public DataSet&lt;LEdge&gt; getEdges() {
+<span class="fc" id="L85">    return edges;</span>
+  }
+
+  /**
+   * Sets edges
+   *
+   * @param edges the new value
+   */
+  public void setEdges(DataSet&lt;LEdge&gt; edges) {
+<span class="nc" id="L94">    this.edges = edges;</span>
+<span class="nc" id="L95">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

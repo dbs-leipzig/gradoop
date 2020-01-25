@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Vector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.util</a> &gt; <span class="el_source">Vector.java</span></div><h1>Vector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.util;
+
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.operators.layouting.LayoutingAlgorithm;
+
+import java.io.Serializable;
+
+
+/**
+ * Simple helper-class for some vector-math.
+ * All math-operations will return a new Vector (instead of modifying the existing vector). This
+ * prevents strange side-effects when performing complex computations.
+ */
+public class Vector implements Serializable {
+
+  /**
+   * X-coordinate of vector
+   */
+  private double x;
+  /**
+   * Y-coordinate of vector
+   */
+  private double y;
+
+  /**
+   * Construct a vector from x and y coordinates
+   *
+   * @param x X-Coordinate of the new vector
+   * @param y Y-Coordinate of the new vector
+   */
+<span class="fc" id="L46">  public Vector(double x, double y) {</span>
+<span class="fc" id="L47">    this.x = x;</span>
+<span class="fc" id="L48">    this.y = y;</span>
+<span class="fc" id="L49">    check();</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Construct new zero-Vector
+   */
+<span class="fc" id="L55">  public Vector() {</span>
+<span class="fc" id="L56">    x = 0d;</span>
+<span class="fc" id="L57">    y = 0d;</span>
+<span class="fc" id="L58">  }</span>
+
+  /**
+   * Ensure that this vector does not contain any NaN-values.
+   * Throws IllegalStateException if x or y is NaN.
+   */
+  private void check() {
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">    if (Double.isNaN(x) || Double.isNaN(y)) {</span>
+<span class="nc" id="L66">      throw new IllegalStateException(</span>
+        &quot;A vector should never be NaN. There is probably a bug in &quot; + &quot;your code&quot;);
+    }
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Create a vector from the coordinate-properties of a Vertex
+   *
+   * @param v The vertex to extract position coordinates from properties (X,Y)
+   * @return A matching vector
+   */
+  public static Vector fromVertexPosition(EPGMVertex v) {
+<span class="fc" id="L78">    double x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();</span>
+<span class="fc" id="L79">    double y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();</span>
+<span class="fc" id="L80">    return new Vector(x, y);</span>
+  }
+
+  /**
+   * Set the coordinate-properties of a vertex to the values of this vector
+   *
+   * @param v The vertex that will receive the values of this vector as coordinates
+   */
+  public void setVertexPosition(EPGMVertex v) {
+<span class="fc" id="L89">    v.setProperty(LayoutingAlgorithm.X_COORDINATE_PROPERTY, (int) x);</span>
+<span class="fc" id="L90">    v.setProperty(LayoutingAlgorithm.Y_COORDINATE_PROPERTY, (int) y);</span>
+<span class="fc" id="L91">  }</span>
+
+  /**
+   * Substract another vector from this vector and return the result
+   *
+   * @param other Vector to substract
+   * @return this-other
+   */
+  public Vector sub(Vector other) {
+<span class="fc" id="L100">    return new Vector(x - other.x, y - other.y);</span>
+  }
+
+  /**
+   * Add another vector to this vector and return the result
+   *
+   * @param other The vector to add
+   * @return this+other
+   */
+  public Vector add(Vector other) {
+<span class="fc" id="L110">    return new Vector(x + other.x, y + other.y);</span>
+  }
+
+  /**
+   * Multiply this vector by a factor and return the result
+   *
+   * @param factor The factor to multiply this vector with
+   * @return this*factor
+   */
+  public Vector mul(double factor) {
+<span class="fc" id="L120">    return new Vector(x * factor, y * factor);</span>
+  }
+
+  /**
+   * Divide this vector by a factor and return the result
+   *
+   * @param factor The factor to divide this vector by
+   * @return this/factor
+   */
+  public Vector div(double factor) {
+<span class="fc" id="L130">    return new Vector(x / factor, y / factor);</span>
+  }
+
+  /**
+   * Calculate the euclidean distance between this vector and another vector
+   *
+   * @param other The other vector
+   * @return Math.sqrt(Math.pow ( x - other.x, 2) + Math.pow(y - other.y, 2))
+   */
+  public double distance(Vector other) {
+<span class="fc" id="L140">    return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));</span>
+  }
+
+  /**
+   * Calculate the scalar-product of this vector
+   *
+   * @param other The other vector
+   * @return Skalar-product of this and other
+   */
+  public double scalar(Vector other) {
+<span class="fc" id="L150">    return x * other.x + y * other.y;</span>
+  }
+
+  /**
+   * Clamp this vector to a given length.
+   * The returned vector will have the same orientation as this one, but will have at most a
+   * length of maxLen.
+   * If maxLen is smaller the the lenght of this Vector this vector (a copy of it) will be returned.
+   *
+   * @param maxLen maximum lenght of vector
+   * @return This vector but constrained to the given length
+   */
+  public Vector clamped(double maxLen) {
+<span class="fc" id="L163">    double len = magnitude();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (len == 0) {</span>
+<span class="fc" id="L165">      return new Vector(0, 0);</span>
+    }
+<span class="fc" id="L167">    double newx = (x / len) * Math.min(len, maxLen);</span>
+<span class="fc" id="L168">    double newy = (y / len) * Math.min(len, maxLen);</span>
+<span class="fc" id="L169">    return new Vector(newx, newy);</span>
+  }
+
+  /**
+   * Normalize this vector.
+   *
+   * @return a vector with the same orientation as this one and a length of 1. If this vector is
+   * (0,0) then (0,0) will be returned instead.
+   */
+  public Vector normalized() {
+<span class="fc" id="L179">    double len = magnitude();</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (len == 0) {</span>
+<span class="fc" id="L181">      return new Vector(0, 0);</span>
+    }
+<span class="fc" id="L183">    double newx = x / len;</span>
+<span class="fc" id="L184">    double newy = y / len;</span>
+<span class="fc" id="L185">    return new Vector(newx, newy);</span>
+  }
+
+  /**
+   * Get the lenght of this vector
+   *
+   * @return euclidean length of this vector
+   */
+  public double magnitude() {
+<span class="fc" id="L194">    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));</span>
+  }
+
+  /**
+   * Confine this point to the given bounding-box.
+   *
+   * @param minX Bounding-box
+   * @param maxX Bounding-box
+   * @param minY Bounding-box
+   * @param maxY Bounding-box
+   * @return A vector that does not violate the given bounding box.
+   */
+  public Vector confined(double minX, double maxX, double minY, double maxY) {
+<span class="fc" id="L207">    double newx = Math.min(Math.max(x, minX), maxX);</span>
+<span class="fc" id="L208">    double newy = Math.min(Math.max(y, minY), maxY);</span>
+<span class="fc" id="L209">    return new Vector(newx, newy);</span>
+  }
+
+  /**
+   * Calculates the (unsigned) angle between this vector and the given vecotr
+   *
+   * @param other The other vector
+   * @return The angle
+   */
+  public double angle(Vector other) {
+<span class="fc" id="L219">    return Math.acos(scalar(other) / (magnitude() * other.magnitude())) / Math.PI * 180;</span>
+  }
+
+  /**
+   * Rotate this vector anti-clockwise by the given angle (in degrees)
+   *
+   * @param angle The angle o rotate this vector by
+   * @return The rotated vector
+   */
+  public Vector rotate(double angle) {
+<span class="fc" id="L229">    angle = angle / 180 * Math.PI;</span>
+<span class="fc" id="L230">    double newx = x * Math.cos(angle) - y * Math.sin(angle);</span>
+<span class="fc" id="L231">    double newy = x * Math.sin(angle) + y * Math.cos(angle);</span>
+<span class="fc" id="L232">    return new Vector(newx, newy);</span>
+  }
+
+  @Override
+  public boolean equals(Object other) {
+<span class="fc bfc" id="L237" title="All 4 branches covered.">    if (other != null &amp;&amp; other instanceof Vector) {</span>
+<span class="fc" id="L238">      Vector otherv = (Vector) other;</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">      return this.distance(otherv) &lt; 0.000000001;</span>
+    }
+<span class="fc" id="L241">    return false;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L246">    return ((int) x &lt;&lt; 16) + (int) y;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L251">    return &quot;Vector{&quot; + &quot;x=&quot; + x + &quot;, y=&quot; + y + '}';</span>
+  }
+
+  /** X-coordinate of vector
+   *
+   * @return X coordinate of the vector
+   **/
+  public double getX() {
+<span class="fc" id="L259">    return x;</span>
+  }
+
+  /** Set X-coordinate of vector
+   * @param x Set X coordinate of the vector
+   **/
+  public void setX(double x) {
+<span class="fc" id="L266">    this.x = x;</span>
+<span class="fc" id="L267">    check();</span>
+<span class="fc" id="L268">  }</span>
+
+  /** Y-Coordinate of vector
+   * @return Y coordinate of the vector
+   */
+  public double getY() {
+<span class="fc" id="L274">    return y;</span>
+  }
+
+  /** Set Y-Coordinate of vector
+   * @param y Set Y coordinate of the vector
+   **/
+  public void setY(double y) {
+<span class="fc" id="L281">    this.y = y;</span>
+<span class="fc" id="L282">    check();</span>
+<span class="fc" id="L283">  }</span>
+
+  /**
+   * Set x and y at once
+   *
+   * @param x X to set
+   * @param y y to set
+   * @return This object for method-chaining
+   */
+  public Vector set(double x, double y) {
+<span class="nc" id="L293">    this.x = x;</span>
+<span class="nc" id="L294">    this.y = y;</span>
+<span class="nc" id="L295">    check();</span>
+<span class="nc" id="L296">    return this;</span>
+  }
+
+  /**
+   * Copy the values of the other vector into this one
+   *
+   * @param other The other vector
+   * @return this
+   */
+  public Vector set(Vector other) {
+<span class="fc" id="L306">    x = other.x;</span>
+<span class="fc" id="L307">    y = other.y;</span>
+<span class="fc" id="L308">    check();</span>
+<span class="fc" id="L309">    return this;</span>
+  }
+
+  /**
+   * Reset this vector to 0
+   *
+   * @return This object for method-chaining
+   */
+  public Vector reset() {
+<span class="fc" id="L318">    x = 0d;</span>
+<span class="fc" id="L319">    y = 0d;</span>
+<span class="fc" id="L320">    return this;</span>
+  }
+
+  /**
+   * Copy this object
+   *
+   * @return A copy of this object
+   */
+  public Vector copy() {
+<span class="fc" id="L329">    return new Vector(x, y);</span>
+  }
+
+  //-----------------------------------------------------------------------------------
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Substract another vector from this vector and return the result
+   *
+   * @param other Vector to substract
+   * @return this-other
+   */
+  public Vector mSub(Vector other) {
+<span class="fc" id="L342">    x -= other.x;</span>
+<span class="fc" id="L343">    y -= other.y;</span>
+<span class="fc" id="L344">    check();</span>
+<span class="fc" id="L345">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Add another vector to this vector and return the result
+   *
+   * @param other The vector to add
+   * @return this+other
+   */
+  public Vector mAdd(Vector other) {
+<span class="fc" id="L356">    x += other.x;</span>
+<span class="fc" id="L357">    y += other.y;</span>
+<span class="fc" id="L358">    check();</span>
+<span class="fc" id="L359">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Multiply this vector by a factor and return the result
+   *
+   * @param factor The factor to multiply this vector with
+   * @return this*factor
+   */
+  public Vector mMul(double factor) {
+<span class="fc" id="L370">    x *= factor;</span>
+<span class="fc" id="L371">    y *= factor;</span>
+<span class="fc" id="L372">    check();</span>
+<span class="fc" id="L373">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Divide this vector by a factor and return the result
+   *
+   * @param factor The factor to divide this vector by
+   * @return this/factor
+   */
+  public Vector mDiv(double factor) {
+<span class="fc" id="L384">    x /= factor;</span>
+<span class="fc" id="L385">    y /= factor;</span>
+<span class="fc" id="L386">    check();</span>
+<span class="fc" id="L387">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Clamp this vector to a given length.
+   * The returned vector will have the same orientation as this one, but will have at most a
+   * length of maxLen.
+   * If maxLen is smaller the the lenght of this Vector this vector (a copy of it) will be returned.
+   *
+   * @param maxLen maximum lenght of vector
+   * @return This vector but constrained to the given length
+   */
+  public Vector mClamped(double maxLen) {
+<span class="fc" id="L401">    double len = magnitude();</span>
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">    if (len == 0) {</span>
+<span class="nc" id="L403">      return new Vector(0, 0);</span>
+    }
+<span class="fc" id="L405">    x = (x / len) * Math.min(len, maxLen);</span>
+<span class="fc" id="L406">    y = (y / len) * Math.min(len, maxLen);</span>
+<span class="fc" id="L407">    check();</span>
+<span class="fc" id="L408">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Normalize this vector.
+   *
+   * @return a vector with the same orientation as this one and a length of 1. If this vector is
+   * (0,0) then (0,0) will be returned instead.
+   */
+  public Vector mNormalized() {
+<span class="fc" id="L419">    double len = magnitude();</span>
+<span class="fc bfc" id="L420" title="All 2 branches covered.">    if (len == 0) {</span>
+<span class="fc" id="L421">      x = 0.0;</span>
+<span class="fc" id="L422">      y = 0.0;</span>
+<span class="fc" id="L423">      return this;</span>
+    }
+<span class="fc" id="L425">    x /= len;</span>
+<span class="fc" id="L426">    y /= len;</span>
+<span class="fc" id="L427">    check();</span>
+<span class="fc" id="L428">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant. Modifies this vector instead of creating a new one. BE CAREFUL!
+   * Confine this point to the given bounding-box.
+   *
+   * @param minX Bounding-box
+   * @param maxX Bounding-box
+   * @param minY Bounding-box
+   * @param maxY Bounding-box
+   * @return A vector that does not violate the given bounding box.
+   */
+  public Vector mConfined(double minX, double maxX, double minY, double maxY) {
+<span class="fc" id="L442">    x = Math.min(Math.max(x, minX), maxX);</span>
+<span class="fc" id="L443">    y = Math.min(Math.max(y, minY), maxY);</span>
+<span class="fc" id="L444">    check();</span>
+<span class="fc" id="L445">    return this;</span>
+  }
+
+  /**
+   * Alternative MUTATING variant.  Rotate this vector anti-clockwise by the given angle (in
+   * degrees)
+   *
+   * @param angle The angle o rotate this vector by
+   * @return The rotated vector
+   */
+  public Vector mRotate(double angle) {
+<span class="fc" id="L456">    angle = angle / 180 * Math.PI;</span>
+<span class="fc" id="L457">    double newx = x * Math.cos(angle) - y * Math.sin(angle);</span>
+<span class="fc" id="L458">    double newy = x * Math.sin(angle) + y * Math.cos(angle);</span>
+<span class="fc" id="L459">    x = newx;</span>
+<span class="fc" id="L460">    y = newy;</span>
+<span class="fc" id="L461">    check();</span>
+<span class="fc" id="L462">    return this;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

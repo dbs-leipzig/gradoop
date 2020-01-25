@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FusingFRLayouter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting</a> &gt; <span class="el_source">FusingFRLayouter.java</span></div><h1>FusingFRLayouter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.layouting.functions.DefaultVertexCompareFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRForceApplicator;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LGraphToEPGMMapper;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexFlattener;
+import org.gradoop.flink.model.impl.operators.layouting.functions.VertexCompareFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.VertexFusor;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.SimpleGraphElement;
+import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
+import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+
+
+/**
+ * A special variant of the FRLayouter that combines similar vertices during the layouting,
+ * creating a simplified version of the graph.
+ */
+public class FusingFRLayouter extends FRLayouter {
+
+  /**
+   * Specifies the different available Output-Formats for the layouter
+   */
+<span class="fc" id="L47">  public enum OutputFormat {</span>
+    /**
+     * Output the simplified graph. The output-graph will loose all information except for the
+     * GradoopIds. Vertices/Edges will have &quot;SUBELEMENTS&quot;-Property containing a comma
+     * separated string listing all element-ids that were
+     * combined into the super-element. Edges and Vertices will have a &quot;SIZE&quot;-Property containing
+     * the number of sub-elements contained in this super-element.
+     */
+<span class="fc" id="L55">    SIMPLIFIED,</span>
+    /**
+     * Grouped vertices will be resolved into the original vertices and will be placed randomly
+     * close to another.
+     */
+<span class="fc" id="L60">    EXTRACTED,</span>
+    /**
+     * Like EXTRACTED, but vertices of a supernode will be placed at exactly the same position.
+     */
+<span class="fc" id="L64">    RAWEXTRACTED,</span>
+    /**
+     * Like EXTRACTED, but performs some more layouting-iterations after the extraction. At least 11
+     * iterations are needed to used POSTLAYOUT.
+     */
+<span class="fc" id="L69">    POSTLAYOUT</span>
+  }
+
+  /**
+   * Name of the property that will contain the number of sub-vertices or sub-edges for a vertex or
+   * edge
+   */
+  public static final String VERTEX_SIZE_PROPERTY = &quot;SIZE&quot;;
+  /**
+   * The name of the property where the ids of the sub-vertices (or sub-edges) of a
+   * supervertex/superedge are stored.
+   */
+  public static final String SUB_ELEMENTS_PROPERTY = &quot;SUBELEMENTS&quot;;
+  /**
+   * Iterations used for the after-fusing layouting. (If {@link OutputFormat#POSTLAYOUT} is used.)
+   */
+  private static final int POST_ITERATIONS = 10;
+  /**
+   * Only vertices with a similarity of at least threshold are combined
+   */
+  protected double threshold;
+  /**
+   * Compare function to use. Null means use default.
+   */
+<span class="fc" id="L93">  protected VertexCompareFunction compareFunction = null;</span>
+  /**
+   * The output format chosen by the user
+   */
+  protected OutputFormat outputFormat;
+  /**
+   * The force-applicator used by layout(). Can be modified to change the layout behavior.
+   */
+  protected FRForceApplicator applicator;
+
+  /**
+   * Create new FusingFRLayouter
+   *
+   * @param iterations   Number of iterations to perform
+   * @param vertexCount  Number of vertices in the input-graph (used to compute default-values)
+   * @param threshold    Only vertices with a similarity of at least threshold are combined. Lower
+   *                     values will lead to a more simplified output-graph. Valid values are {@code
+   *                     &gt;= 0 }
+   *                     and {@code &lt;= 1 }.
+   * @param outputFormat Chosen OutputFormat. See {@link OutputFormat}
+   */
+  public FusingFRLayouter(int iterations, int vertexCount, double threshold,
+    OutputFormat outputFormat) {
+<span class="fc" id="L116">    super(iterations, vertexCount);</span>
+
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">    if (threshold &lt; 0 || threshold &gt; 1) {</span>
+<span class="nc" id="L119">      throw new IllegalArgumentException(&quot;Threshold must be between 0 and 1&quot;);</span>
+    }
+
+<span class="pc bpc" id="L122" title="3 of 4 branches missed.">    if (outputFormat == OutputFormat.POSTLAYOUT &amp;&amp; iterations &lt;= POST_ITERATIONS) {</span>
+<span class="nc" id="L123">      throw new IllegalArgumentException(&quot;When using OutputFormat.POSTLAYOUT, at least 11 &quot; +</span>
+        &quot;iterations are needed&quot;);
+    }
+
+<span class="fc" id="L127">    this.threshold = threshold;</span>
+<span class="fc" id="L128">    this.outputFormat = outputFormat;</span>
+<span class="fc" id="L129">  }</span>
+
+  /**
+   * Sets optional value compareFunction. If no custom function is used
+   * DefaultVertexCompareFunction will be used.
+   *
+   * @param compareFunction the new value
+   * @return this layouter
+   */
+  public FusingFRLayouter compareFunction(VertexCompareFunction compareFunction) {
+<span class="nc" id="L139">    this.compareFunction = compareFunction;</span>
+<span class="nc" id="L140">    return this;</span>
+  }
+
+  /**
+   * Gets compareFunction
+   *
+   * @return value of compareFunction
+   */
+  public VertexCompareFunction getCompareFunction() {
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    return (compareFunction != null) ? compareFunction : new DefaultVertexCompareFunction(getK());</span>
+  }
+
+  @Override
+  public LogicalGraph execute(LogicalGraph g) {
+
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    applicator = new FRForceApplicator(getWidth(), getHeight(), getK(),</span>
+      (outputFormat != OutputFormat.POSTLAYOUT) ? iterations : iterations - POST_ITERATIONS);
+
+<span class="fc" id="L158">    g = createInitialLayout(g);</span>
+
+<span class="fc" id="L160">    DataSet&lt;EPGMVertex&gt; gradoopVertices = g.getVertices();</span>
+<span class="fc" id="L161">    DataSet&lt;EPGMEdge&gt; gradoopEdges = g.getEdges();</span>
+
+    // Flink can only iterate over a single dataset. Therefore vertices and edges have to be
+    // temporarily combined into a single dataset.
+    // Also the Grapdoop datatypes are converted to internal datatypes
+<span class="fc" id="L166">    DataSet&lt;SimpleGraphElement&gt; tmpvertices = gradoopVertices.map((v) -&gt; new LVertex(v));</span>
+<span class="fc" id="L167">    DataSet&lt;SimpleGraphElement&gt; tmpedges = gradoopEdges.map((e) -&gt; new LEdge(e));</span>
+<span class="fc" id="L168">    DataSet&lt;SimpleGraphElement&gt; graphElements = tmpvertices.union(tmpedges);</span>
+
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    IterativeDataSet&lt;SimpleGraphElement&gt; loop = graphElements.iterate(</span>
+      (outputFormat != OutputFormat.POSTLAYOUT) ? iterations : iterations - POST_ITERATIONS);
+
+    // split the combined dataset to work with the edges and vertices
+<span class="fc" id="L174">    LGraph graph = new LGraph(loop);</span>
+
+    // perform the layouting
+<span class="fc" id="L177">    layout(graph);</span>
+
+    // Use the VertexFusor to create a simplified version of the graph
+<span class="fc" id="L180">    graph = new VertexFusor(getCompareFunction(), threshold).execute(graph);</span>
+
+    // again, combine vertices and edges into a single dataset to perform iterations
+<span class="fc" id="L183">    graphElements = graph.getGraphElements();</span>
+<span class="fc" id="L184">    graphElements = loop.closeWith(graphElements);</span>
+
+    // again, split the combined dataset  (after all iterations have been completed)
+<span class="fc" id="L187">    graph = new LGraph(graphElements);</span>
+
+
+<span class="pc bpc" id="L190" title="4 of 5 branches missed.">    switch (outputFormat) {</span>
+    case SIMPLIFIED:
+<span class="fc" id="L192">      return buildSimplifiedGraph(g, graph);</span>
+    case EXTRACTED:
+<span class="nc" id="L194">      return buildExtractedGraph(g, graph, true);</span>
+    case RAWEXTRACTED:
+<span class="nc" id="L196">      return buildExtractedGraph(g, graph, false);</span>
+    case POSTLAYOUT:
+<span class="nc" id="L198">      return buildPostLayoutGraph(g, graph);</span>
+    default:
+<span class="nc" id="L200">      throw new IllegalArgumentException(&quot;Unsupported output-format&quot;);</span>
+    }
+
+  }
+
+  /**
+   * Extract all subverties/subedges from the super-vertices/super-edges and place them at the
+   * location of the super-vertex (and add some random jitter to the positions).
+   * Then some more layouting-iteraions are performed.
+   *
+   * @param input Original input graph
+   * @param graph Result of the layouting
+   * @return The final graph, containing all vertices and edges from the original graph.
+   */
+  protected LogicalGraph buildPostLayoutGraph(LogicalGraph input, LGraph graph) {
+<span class="nc" id="L215">    DataSet&lt;LVertex&gt; vertices = graph.getVertices().flatMap(new LVertexFlattener(true, getK()));</span>
+
+<span class="nc" id="L217">    DataSet&lt;LEdge&gt; edges = input.getEdges().map(LEdge::new);</span>
+<span class="nc" id="L218">    graph.setEdges(edges);</span>
+
+
+    // use a new applicator for all following layouting iterations. The new applicator will
+    // behave as if iteration x of n is actually iterations+x of n+POST_ITERATIONS
+<span class="nc" id="L223">    applicator =</span>
+<span class="nc" id="L224">      new FRForceApplicator(getWidth(), getHeight(), getK(), iterations + POST_ITERATIONS);</span>
+<span class="nc" id="L225">    applicator.setPreviousIterations(iterations);</span>
+
+    // do some more layouting iterations
+<span class="nc" id="L228">    IterativeDataSet&lt;LVertex&gt; loop = vertices.iterate(POST_ITERATIONS);</span>
+<span class="nc" id="L229">    graph.setVertices(loop);</span>
+<span class="nc" id="L230">    layout(graph);</span>
+<span class="nc" id="L231">    vertices = loop.closeWith(graph.getVertices());</span>
+
+
+<span class="nc" id="L234">    DataSet&lt;EPGMVertex&gt; gradoopVertices =</span>
+<span class="nc" id="L235">      vertices.join(input.getVertices()).where(LVertex.ID_POSITION).equalTo(&quot;id&quot;)</span>
+<span class="nc" id="L236">        .with(new LVertexEPGMVertexJoinFunction());</span>
+
+<span class="nc" id="L238">    return input.getFactory().fromDataSets(gradoopVertices, input.getEdges());</span>
+  }
+
+  /**
+   * Simply translate the internal representations back to {@link LogicalGraph}.
+   *
+   * @param input    Original input graph
+   * @param layouted Result of the layouting
+   * @return The layouted graph in the Gradoop-format
+   */
+  protected LogicalGraph buildSimplifiedGraph(LogicalGraph input, LGraph layouted) {
+<span class="fc" id="L249">    return new LGraphToEPGMMapper().buildSimplifiedGraph(input, layouted);</span>
+  }
+
+  /**
+   * Extract all subverties/subedges from the super-vertices/super-edges and place them at the
+   * location of the super-vertex (and add some random jitter to the positions)
+   *
+   * @param input    Original input graph
+   * @param layouted Result of the layouting
+   * @param jitter   Enable/disable adding jitter to subvertex positions
+   * @return The final graph, containing all vertices and edges from the original graph.
+   */
+  protected LogicalGraph buildExtractedGraph(LogicalGraph input, LGraph layouted,
+    final boolean jitter) {
+
+<span class="nc" id="L264">    DataSet&lt;EPGMVertex&gt; vertices =</span>
+<span class="nc" id="L265">      layouted.getVertices().flatMap(new LVertexFlattener(jitter, getK())).join(input.getVertices())</span>
+<span class="nc" id="L266">        .where(LVertex.ID_POSITION).equalTo(new Id&lt;&gt;()).with(new LVertexEPGMVertexJoinFunction());</span>
+<span class="nc" id="L267">    return input.getFactory().fromDataSets(vertices, input.getEdges());</span>
+  }
+
+  @Override
+  protected DataSet&lt;LVertex&gt; applyForces(DataSet&lt;LVertex&gt; vertices, DataSet&lt;Force&gt; forces, int iterations) {
+<span class="fc" id="L272">    return vertices.join(forces).where(LVertex.ID_POSITION).equalTo(Force.ID_POSITION).with(applicator);</span>
+  }
+
+
+  @Override
+  public String toString() {
+<span class="nc" id="L278">    return &quot;FusingFRLayouter{&quot; + &quot;threshold=&quot; + threshold + &quot;, outputFormat=&quot; + outputFormat +</span>
+<span class="nc" id="L279">      &quot;, iterations=&quot; + iterations + &quot;, k=&quot; + getK() + &quot;, width=&quot; + getWidth() + &quot;, height=&quot; +</span>
+<span class="nc" id="L280">      getHeight() + &quot;, maxRepulsionDistance=&quot; + getMaxRepulsionDistance() + &quot;, numberOfVertices=&quot; +</span>
+      numberOfVertices + &quot;, useExistingLayout=&quot; + useExistingLayout + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

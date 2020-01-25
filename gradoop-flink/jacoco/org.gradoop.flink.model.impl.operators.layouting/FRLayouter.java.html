@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FRLayouter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting</a> &gt; <span class="el_source">FRLayouter.java</span></div><h1>FRLayouter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRAttractionFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRCellIdMapper;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRCellIdSelector;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRForceApplicator;
+import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunction;
+import org.gradoop.flink.model.impl.operators.layouting.functions.LVertexEPGMVertexJoinFunction;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.LEdge;
+import org.gradoop.flink.model.impl.operators.layouting.util.LGraph;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+
+/**
+ * Layouts a graph using the Fruchtermann-Reingold algorithm
+ */
+public class FRLayouter implements LayoutingAlgorithm {
+
+  /**
+   * Default value for parameter k. All other default-values are derived from that.
+   */
+  protected static final double DEFAULT_K = 100;
+
+  /**
+   * Number of iterations to perform
+   */
+  protected int iterations;
+  /**
+   * User supplied k. Main-parameter of the FR-Algorithm. Optimum distance between connected
+   * vertices.
+   */
+<span class="fc" id="L57">  protected double k = 0;</span>
+  /**
+   * User supplied width of the layouting-space
+   */
+<span class="fc" id="L61">  protected int width = 0;</span>
+  /**
+   * User supplied height of the layouting-space
+   */
+<span class="fc" id="L65">  protected int height = 0;</span>
+  /**
+   * User supplied maximum distance for computing repulsion-forces between vertices
+   */
+<span class="fc" id="L69">  protected int maxRepulsionDistance = 0;</span>
+  /**
+   * (Estimated) number of vertices in the graph. Needed to calculate default
+   * parameters
+   */
+  protected int numberOfVertices;
+  /**
+   * If true, do not create a random initial layout but use the existing layout of the graph
+   * instead.
+   */
+<span class="fc" id="L79">  protected boolean useExistingLayout = false;</span>
+  /**
+   * Perform the layouting as if this number of iterations had already passed
+   */
+<span class="fc" id="L83">  private int startAtIteration = 0;</span>
+
+
+  /**
+   * Create new Instance of FRLayouter.
+   *
+   * @param iterations  Number of iterations to perform
+   * @param vertexCount (Estimated) number of vertices in the graph. Needed to calculate default
+   *                    parammeters
+   */
+<span class="fc" id="L93">  public FRLayouter(int iterations, int vertexCount) {</span>
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">    if (iterations &lt;= 0 || vertexCount &lt;= 0) {</span>
+<span class="nc" id="L95">      throw new IllegalArgumentException(&quot;Iterations and vertexcount must both be greater than 0.&quot;);</span>
+    }
+<span class="fc" id="L97">    this.iterations = iterations;</span>
+<span class="fc" id="L98">    this.numberOfVertices = vertexCount;</span>
+<span class="fc" id="L99">  }</span>
+
+
+  /**
+   * Override default k-parameter of the FR-Algorithm
+   * Default: 100
+   *
+   * @param k new k
+   * @return this (for method-chaining)
+   */
+  public FRLayouter k(double k) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">    if (k &lt;= 0) {</span>
+<span class="nc" id="L111">      throw new IllegalArgumentException(&quot;K must be greater than 0.&quot;);</span>
+    }
+<span class="nc" id="L113">    this.k = k;</span>
+<span class="nc" id="L114">    return this;</span>
+  }
+
+  /**
+   * Override default layout-space size
+   * Default:  width = height = Math.sqrt(Math.pow(k, 2) * numberOfVertices) * 0.5
+   *
+   * @param width  new width
+   * @param height new height
+   * @return this (for method-chaining)
+   */
+  public FRLayouter area(int width, int height) {
+<span class="nc bnc" id="L126" title="All 4 branches missed.">    if (width &lt;= 0 || height &lt;= 0) {</span>
+<span class="nc" id="L127">      throw new IllegalArgumentException(&quot;Width and height must both be greater than 0.&quot;);</span>
+    }
+<span class="nc" id="L129">    this.width = width;</span>
+<span class="nc" id="L130">    this.height = height;</span>
+<span class="nc" id="L131">    return this;</span>
+  }
+
+  /**
+   * Override default maxRepulsionDistance of the FR-Algorithm. Vertices with larger distance
+   * are ignored in repulsion-force calculation
+   * Default-Value is relative to current k. If k is overridden, this is changed
+   * accordingly automatically.
+   * Default: 2k
+   *
+   * @param maxRepulsionDistance new value
+   * @return this (for method-chaining)
+   */
+  public FRLayouter maxRepulsionDistance(int maxRepulsionDistance) {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">    if (maxRepulsionDistance &lt;= 0) {</span>
+<span class="nc" id="L146">      throw new IllegalArgumentException(&quot;MaxRepulsionDistance must be greater than 0.&quot;);</span>
+    }
+<span class="nc" id="L148">    this.maxRepulsionDistance = maxRepulsionDistance;</span>
+<span class="nc" id="L149">    return this;</span>
+  }
+
+  /**
+   * Use the existing layout as starting point instead of creating a random one.
+   * If used, EVERY vertex in the input-graph MUST have an X and Y property!
+   *
+   * @param uel whether to re-use the existing layout or not
+   * @return this (for method chaining)
+   */
+  public FRLayouter useExistingLayout(boolean uel) {
+<span class="nc" id="L160">    this.useExistingLayout = uel;</span>
+<span class="nc" id="L161">    return this;</span>
+  }
+
+  /**
+   * Perform the layouting as if this number of iterations had already passed
+   *
+   * @param startAtIteration the number of previous iterations
+   * @return this (for method-chaining)
+   */
+  public FRLayouter startAtIteration(int startAtIteration) {
+<span class="nc bnc" id="L171" title="All 2 branches missed.">    if (startAtIteration &lt; 0) {</span>
+<span class="nc" id="L172">      throw new IllegalArgumentException(&quot;Start-Iteration must be greater than or equal to 0.&quot;);</span>
+    }
+<span class="nc" id="L174">    this.startAtIteration = startAtIteration;</span>
+<span class="nc" id="L175">    return this;</span>
+  }
+
+  /**
+   * Gets k
+   *
+   * @return value of k
+   */
+  public double getK() {
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    return (k != 0) ? k : DEFAULT_K;</span>
+  }
+
+
+  @Override
+  public int getWidth() {
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">    return (width != 0) ? width : (int) Math.sqrt(Math.pow(DEFAULT_K, 2) * numberOfVertices);</span>
+  }
+
+  @Override
+  public int getHeight() {
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">    return (height != 0) ? height : (int) Math.sqrt(Math.pow(DEFAULT_K, 2) * numberOfVertices);</span>
+  }
+
+  /**
+   * Gets maxRepulsionDistance
+   *
+   * @return value of maxRepulsionDistance
+   */
+  public int getMaxRepulsionDistance() {
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">    return (maxRepulsionDistance != 0) ? maxRepulsionDistance : (int) (2 * getK());</span>
+  }
+
+  @Override
+  public LogicalGraph execute(LogicalGraph g) {
+
+<span class="fc" id="L210">    g = createInitialLayout(g);</span>
+
+<span class="fc" id="L212">    DataSet&lt;EPGMVertex&gt; gradoopVertices = g.getVertices();</span>
+<span class="fc" id="L213">    DataSet&lt;EPGMEdge&gt; gradoopEdges = g.getEdges();</span>
+
+<span class="fc" id="L215">    DataSet&lt;LVertex&gt; vertices = gradoopVertices.map((v) -&gt; new LVertex(v));</span>
+<span class="fc" id="L216">    DataSet&lt;LEdge&gt; edges = gradoopEdges.map((e) -&gt; new LEdge(e));</span>
+
+<span class="fc" id="L218">    IterativeDataSet&lt;LVertex&gt; loop = vertices.iterate(iterations);</span>
+<span class="fc" id="L219">    LGraph graph = new LGraph(loop, edges);</span>
+<span class="fc" id="L220">    layout(graph);</span>
+<span class="fc" id="L221">    vertices = loop.closeWith(graph.getVertices());</span>
+
+<span class="fc" id="L223">    gradoopVertices = vertices</span>
+<span class="fc" id="L224">      .join(gradoopVertices)</span>
+<span class="fc" id="L225">      .where(LVertex.ID_POSITION).equalTo(&quot;id&quot;)</span>
+<span class="fc" id="L226">      .with(new LVertexEPGMVertexJoinFunction());</span>
+
+<span class="fc" id="L228">    return g.getFactory().fromDataSets(gradoopVertices, gradoopEdges);</span>
+  }
+
+  /**
+   * Creates a layout as the starting-point for the algorithm. If useExistingLayout is false, the
+   * created layout is random, else it is the already existing layout of the graph.
+   *
+   * @param g The graph to layout
+   * @return The randomly layouted input graph
+   */
+  protected LogicalGraph createInitialLayout(LogicalGraph g) {
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">    if (useExistingLayout) {</span>
+<span class="nc" id="L240">      return g;</span>
+    }
+<span class="fc" id="L242">    return new RandomLayouter(getWidth() / 10, getWidth() - (getWidth() / 10), getHeight() / 10,</span>
+<span class="fc" id="L243">      getHeight() - (getHeight() / 10)).execute(g);</span>
+  }
+
+  /**
+   * Perform the actual layouting (calculate and apply forces)
+   *
+   * @param g The Graph to layout. It is modified by this method.
+   */
+  protected void layout(LGraph g) {
+<span class="fc" id="L252">    DataSet&lt;Force&gt; repulsions = repulsionForces(g.getVertices());</span>
+<span class="fc" id="L253">    DataSet&lt;Force&gt; attractions = attractionForces(g.getVertices(), g.getEdges());</span>
+
+<span class="fc" id="L255">    DataSet&lt;Force&gt; forces = repulsions</span>
+<span class="fc" id="L256">      .union(attractions)</span>
+<span class="fc" id="L257">      .groupBy(Force.ID_POSITION)</span>
+<span class="fc" id="L258">      .reduce((first, second) -&gt; {</span>
+<span class="fc" id="L259">        first.setValue(first.getValue().add(second.getValue()));</span>
+<span class="fc" id="L260">        return first;</span>
+      });
+
+<span class="fc" id="L263">    g.setVertices(applyForces(g.getVertices(), forces, iterations));</span>
+<span class="fc" id="L264">  }</span>
+
+  /**
+   * Applies the given forces to the given vertices.
+   *
+   * @param vertices   Vertices to move
+   * @param forces     Forces to apply. At most one per vertex. The id indicates which vertex
+   *                   the force should be applied to
+   * @param iterations Number of iterations that will be performed (NOT the number of the
+   *                   current iteration). It is used to compute the simulated annealing shedule.
+   * @return The input vertices with x and y coordinated changed according to the given force and
+   * current iteration number.
+   */
+  protected DataSet&lt;LVertex&gt; applyForces(DataSet&lt;LVertex&gt; vertices, DataSet&lt;Force&gt; forces,
+    int iterations) {
+<span class="fc" id="L279">    FRForceApplicator applicator =</span>
+<span class="fc" id="L280">      new FRForceApplicator(getWidth(), getHeight(), getK(), iterations);</span>
+<span class="fc" id="L281">    applicator.setPreviousIterations(startAtIteration);</span>
+<span class="fc" id="L282">    return vertices.join(forces).where(LVertex.ID_POSITION).equalTo(Force.ID_POSITION).with(applicator);</span>
+  }
+
+
+  /**
+   * Calculates the repulsive forces between the given vertices.
+   *
+   * @param vertices A dataset of vertices
+   * @return Dataset of applied forces. May (and will) contain multiple forces for each vertex.
+   */
+  protected DataSet&lt;Force&gt; repulsionForces(DataSet&lt;LVertex&gt; vertices) {
+<span class="fc" id="L293">    vertices = vertices.map(new FRCellIdMapper(getMaxRepulsionDistance()));</span>
+
+<span class="fc" id="L295">    KeySelector&lt;LVertex, Integer&gt; selfselector = new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF);</span>
+<span class="fc" id="L296">    FRRepulsionFunction repulsionFunction = new FRRepulsionFunction(getK(), getMaxRepulsionDistance());</span>
+
+<span class="fc" id="L298">    DataSet&lt;Force&gt; self = vertices</span>
+<span class="fc" id="L299">      .join(vertices)</span>
+<span class="fc" id="L300">      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.SELF)).equalTo(selfselector)</span>
+<span class="fc" id="L301">      .with((JoinFunction&lt;LVertex, LVertex, Force&gt;) repulsionFunction);</span>
+
+<span class="fc" id="L303">    DataSet&lt;Force&gt; up = vertices</span>
+<span class="fc" id="L304">      .join(vertices)</span>
+<span class="fc" id="L305">      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UP)).equalTo(selfselector)</span>
+<span class="fc" id="L306">      .with((FlatJoinFunction&lt;LVertex, LVertex, Force&gt;) repulsionFunction);</span>
+
+<span class="fc" id="L308">    DataSet&lt;Force&gt; left = vertices</span>
+<span class="fc" id="L309">      .join(vertices)</span>
+<span class="fc" id="L310">      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.LEFT)).equalTo(selfselector)</span>
+<span class="fc" id="L311">      .with((FlatJoinFunction&lt;LVertex, LVertex, Force&gt;) repulsionFunction);</span>
+
+<span class="fc" id="L313">    DataSet&lt;Force&gt; uright = vertices</span>
+<span class="fc" id="L314">      .join(vertices)</span>
+<span class="fc" id="L315">      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPRIGHT)).equalTo(selfselector)</span>
+<span class="fc" id="L316">      .with((FlatJoinFunction&lt;LVertex, LVertex, Force&gt;) repulsionFunction);</span>
+
+<span class="fc" id="L318">    DataSet&lt;Force&gt; uleft = vertices</span>
+<span class="fc" id="L319">      .join(vertices)</span>
+<span class="fc" id="L320">      .where(new FRCellIdSelector(FRCellIdSelector.NeighborType.UPLEFT)).equalTo(selfselector)</span>
+<span class="fc" id="L321">      .with((FlatJoinFunction&lt;LVertex, LVertex, Force&gt;) repulsionFunction);</span>
+
+
+<span class="fc" id="L324">    return self.union(up).union(left).union(uright).union(uleft);</span>
+  }
+
+  /**
+   * Compute the attractive-forces between all vertices connected by edges.
+   *
+   * @param vertices The vertices
+   * @param edges    The edges between vertices
+   * @return A mapping from VertexId to x and y forces
+   */
+  protected DataSet&lt;Force&gt; attractionForces(DataSet&lt;LVertex&gt; vertices, DataSet&lt;LEdge&gt; edges) {
+<span class="fc" id="L335">    return edges.join(vertices).where(LEdge.SOURCE_ID_POSITION).equalTo(LVertex.ID_POSITION).join(vertices)</span>
+<span class="fc" id="L336">      .where(&quot;f0.&quot; + LEdge.TARGET_ID_POSITION).equalTo(LVertex.ID_POSITION).with(</span>
+<span class="fc" id="L337">        (first, second) -&gt; new Tuple3&lt;LVertex, LVertex, Integer&gt;(first.f1, second,</span>
+<span class="fc" id="L338">          first.f0.getCount())).returns(new TypeHint&lt;Tuple3&lt;LVertex, LVertex, Integer&gt;&gt;() {</span>
+<span class="fc" id="L339">            }).flatMap(new FRAttractionFunction(getK()));</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L344">    return &quot;FRLayouter{&quot; + &quot;iterations=&quot; + iterations + &quot;, k=&quot; + getK() + &quot;, with=&quot; + getWidth() +</span>
+<span class="nc" id="L345">      &quot;, height=&quot; + getHeight() + &quot;, maxRepulsionDistance=&quot; + getMaxRepulsionDistance() +</span>
+      &quot;, numberOfVertices=&quot; + numberOfVertices + &quot;, useExistingLayout=&quot; + useExistingLayout + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

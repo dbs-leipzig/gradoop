@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CentroidUpdater.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">CentroidUpdater.java</span></div><h1>CentroidUpdater.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.layouting.CentroidFRLayouter;
+import org.gradoop.flink.model.impl.operators.layouting.util.Centroid;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
+
+import java.util.List;
+
+/**
+ * Bundles Operations to update the centroid dataset of the CentroidFRLayouter.
+ */
+public class CentroidUpdater extends RichMapFunction&lt;LVertex, Force&gt; {
+  /**
+   * List of current centroids. Usually populated using broadcastVariables, but can be
+   * populated manually for testing. Used for getClosestCentroidForVertex()
+   */
+  protected List&lt;Centroid&gt; centroids;
+  /**
+   * Fraction of all vertices a centroid should minimally have
+   */
+  private double minMassFactor;
+  /**
+   * Fraction of all vertices a centroid should minimally have
+   */
+  private double maxMassFactor;
+  /**
+   * Number of vertices in the graph
+   */
+  private int vertexCount;
+
+  /**
+   * Create new updater
+   *
+   * @param vertexCount Number of vertices in the graph
+   * @param minMassFactor Factor of total vertices a centroid must have at least
+   * @param maxMassFactor Factor of total vertices a centroid must have as most
+   */
+<span class="fc" id="L59">  public CentroidUpdater(int vertexCount, double minMassFactor, double maxMassFactor) {</span>
+<span class="fc" id="L60">    this.vertexCount = vertexCount;</span>
+<span class="fc" id="L61">    this.minMassFactor = minMassFactor;</span>
+<span class="fc" id="L62">    this.maxMassFactor = maxMassFactor;</span>
+<span class="fc" id="L63">  }</span>
+
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L68">    super.open(parameters);</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">    if (getRuntimeContext().hasBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME)) {</span>
+<span class="fc" id="L70">      centroids = getRuntimeContext().getBroadcastVariable(CentroidFRLayouter.CENTROID_BROADCAST_NAME);</span>
+    }
+<span class="fc" id="L72">  }</span>
+
+  /**
+   * Update the centroids.
+   *
+   * @param centroids Current centroids
+   * @param vertices Current vertices
+   * @return Newly calculated centroids
+   */
+  public DataSet&lt;Centroid&gt; updateCentroids(DataSet&lt;Centroid&gt; centroids, DataSet&lt;LVertex&gt; vertices) {
+<span class="fc" id="L82">    centroids = centroids.flatMap(this::removeOrSplitCentroids);</span>
+<span class="fc" id="L83">    return vertices.map(this)</span>
+<span class="fc" id="L84">      .withBroadcastSet(centroids, CentroidFRLayouter.CENTROID_BROADCAST_NAME).groupBy(Force.ID_POSITION)</span>
+<span class="fc" id="L85">      .reduceGroup(this::calculateNewCentroidPosition);</span>
+  }
+
+  /**
+   * Remove centroids that are to specific and split split centroids that are to general
+   *
+   * @param c         Current centroids
+   * @param collector Collector for new centroids
+   */
+  protected void removeOrSplitCentroids(Centroid c, Collector&lt;Centroid&gt; collector) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (c.getCount() == 0) {</span>
+<span class="fc" id="L96">      collector.collect(c);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    } else if (c.getCount() &lt; minMassFactor * vertexCount) {</span>
+      // do nothing
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    } else if (c.getCount() &gt; maxMassFactor * vertexCount) {</span>
+<span class="fc" id="L100">      Centroid splitted =</span>
+<span class="fc" id="L101">        new Centroid(c.getPosition().add(new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1)),</span>
+<span class="fc" id="L102">          c.getCount() / 2);</span>
+<span class="fc" id="L103">      c.setCount(c.getCount() / 2);</span>
+<span class="fc" id="L104">      collector.collect(c);</span>
+<span class="fc" id="L105">      collector.collect(splitted);</span>
+<span class="fc" id="L106">    } else {</span>
+<span class="fc" id="L107">      collector.collect(c);</span>
+    }
+<span class="fc" id="L109">  }</span>
+
+  /**
+   * For every vertex chooses the closest centroid.
+   * The Force-class is abused here, because it bundles a GradoopId and a Vector (what is
+   * exactly what we need here)
+   * We can not give it a proper name and use method-references as then it would no be
+   * * recognised as RichMapFunction.
+   *
+   * @param vertex The current vertices
+   * @return A Force object with the id of the centroid and the position of the vertex.
+   * @throws IllegalStateException If there are no centroids. (Therefore can not choose a closest
+   *                               centroid.
+   */
+  public Force map(LVertex vertex) {
+
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (centroids == null) {</span>
+<span class="nc" id="L126">      throw new IllegalStateException(&quot;DataSet of centroids MUST be broadcasted to this class&quot;);</span>
+    }
+
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    if (centroids.size() == 0) {</span>
+<span class="nc" id="L130">      throw new IllegalStateException(</span>
+        &quot;There are no centroids (left). This should NEVER happen. Layouting failed...&quot;);
+    }
+
+<span class="fc" id="L134">    Force best = new Force();</span>
+<span class="fc" id="L135">    double bestDist = Double.MAX_VALUE;</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    for (Centroid c : centroids) {</span>
+<span class="fc" id="L137">      double dist = c.getPosition().distance(vertex.getPosition());</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      if (dist &lt; bestDist) {</span>
+<span class="fc" id="L139">        best.set(c.getId(), vertex.getPosition());</span>
+<span class="fc" id="L140">        bestDist = dist;</span>
+      }
+<span class="fc" id="L142">    }</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">    if (best.getId() == null) {</span>
+<span class="nc" id="L144">      throw new IllegalStateException(&quot;There is no closest centroid. This means there &quot; +</span>
+        &quot;is a bug in this implementation, probably a NaN occured &quot; +
+        &quot;during distance calculation.&quot;);
+    }
+<span class="fc" id="L148">    return best;</span>
+  }
+
+  /**
+   * Expects the group of vertex-positions for a centroid. Calculates the new position of the
+   * centroid as average of the vertex-positions.
+   * &lt;p&gt;
+   * forceObjects does not really contain &quot;forces&quot;, but it has the fields needed herre (id and
+   * vector). The id of the force object represents the id of the centroid of which the new
+   * position is calculated and the
+   * force-vector is the position of a vertex belonging to the centroid.
+   *
+   * @param forceObjects List of vertex positions, wrapped in Force-objects.
+   * @param collector    The newly created centoid
+   */
+  protected void calculateNewCentroidPosition(Iterable&lt;Force&gt; forceObjects,
+    Collector&lt;Centroid&gt; collector) {
+<span class="fc" id="L165">    int count = 0;</span>
+<span class="fc" id="L166">    Vector posSum = new Vector();</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    for (Force f : forceObjects) {</span>
+<span class="fc" id="L168">      count++;</span>
+<span class="fc" id="L169">      posSum.mAdd(f.getValue());</span>
+<span class="fc" id="L170">    }</span>
+<span class="fc" id="L171">    collector.collect(new Centroid(posSum.mDiv(count), count));</span>
+<span class="fc" id="L172">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

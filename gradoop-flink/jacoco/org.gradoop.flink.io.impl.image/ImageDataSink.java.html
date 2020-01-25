@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ImageDataSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.image</a> &gt; <span class="el_source">ImageDataSink.java</span></div><h1>ImageDataSink.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.image;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.io.FileOutputFormat;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.aggregation.Aggregations;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.image.functions.SourceCoordinateJoin;
+import org.gradoop.flink.io.impl.image.functions.TargetCoordinateJoin;
+import org.gradoop.flink.io.impl.image.functions.ToCoordsTuple;
+import org.gradoop.flink.io.impl.image.functions.VertexScaleMap;
+import org.gradoop.flink.io.impl.image.functions.VertexZoomMap;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.operators.layouting.LayoutingAlgorithm;
+
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.BasicStroke;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * DataSink to write a layouted graph to an image
+ */
+
+public class ImageDataSink implements DataSink, Serializable {
+  /**
+   * Broadcast identifier
+   */
+  public static final String BORDER_BROADCAST = &quot;MinMax_Broadcast&quot;;
+  /**
+   * Property key for source x coordinate
+   */
+  public static final String SOURCE_X = &quot;source_x&quot;;
+  /**
+   * Property key for source y coordinate
+   */
+  public static final String SOURCE_Y = &quot;source_y&quot;;
+  /**
+   * Property key for target x coordinate
+   */
+  public static final String TARGET_X = &quot;target_x&quot;;
+  /**
+   * Property key for target y coordinate
+   */
+  public static final String TARGET_Y = &quot;target_y&quot;;
+  /**
+   * ImageIO-format used for intermediate image-encodings
+   */
+  protected static final String INTERMEDIATE_ENCODING = &quot;png&quot;;
+  /**
+   * Path to store the output-image
+   */
+  protected String path;
+  /**
+   * Width of the original layout of the graph
+   */
+  protected int layoutWidth;
+  /**
+   * Height of the original layout of the graph
+   */
+  protected int layoutHeight;
+  /**
+   * Width of output-image (px)
+   */
+  protected int imageWidth;
+  /**
+   * Height of output-image (px)
+   */
+  protected int imageHeight;
+
+  /**
+   * Size of the vertex-symbols (px)
+   */
+<span class="fc" id="L106">  protected int vertexSize = 10;</span>
+  /**
+   * Size (width) of egde-lines (px)
+   */
+<span class="fc" id="L110">  protected float edgeSize = 1f;</span>
+  /**
+   * Color of vertices
+   */
+<span class="fc" id="L114">  protected Color vertexColor = Color.RED;</span>
+  /**
+   * Color of edges
+   */
+<span class="fc" id="L118">  protected Color edgeColor = Color.WHITE;</span>
+  /**
+   * Color of the background
+   */
+<span class="fc" id="L122">  protected Color backgroundColor = Color.BLACK;</span>
+  /**
+   * If true, do not draw vertices, only edges. Improves performance.
+   */
+<span class="fc" id="L126">  protected boolean ignoreVertices = false;</span>
+  /**
+   * Name of the property that should be drawn as vertex 'heading'. If null, don't draw anything
+   */
+<span class="fc" id="L130">  protected String vertexLabel = null;</span>
+  /**
+   * Font-size of the vertex-heading
+   */
+<span class="fc" id="L134">  protected int vertexLabelSize = 10;</span>
+  /**
+   * If true, use SIZE-Property to dynamically choose vertex-size.
+   */
+<span class="fc" id="L138">  protected boolean dynamicVertexSize = false;</span>
+  /**
+   * If true, use SIZE-Property to dynamically choose vertex-size.
+   */
+<span class="fc" id="L142">  protected boolean dynamicEdgeSize = false;</span>
+  /**
+   * If true, scale the layout to fill the complete drawing-space.
+   */
+<span class="fc" id="L146">  protected boolean zoom = false;</span>
+  /**
+   * Size of a order in pixels, that should be left free when using zoom.
+   */
+<span class="fc" id="L150">  protected int zoomBorder = 0;</span>
+
+  /**
+   * Create new plotter.
+   *
+   * @param path         Target-path for image
+   * @param layoutWidth  Width of the graph-layout
+   * @param layoutHeight Height of the graph-layout
+   * @param imageWidth   Wanted width of the output image
+   * @param imageHeight  Wanted height of the output image
+   */
+<span class="fc" id="L161">  public ImageDataSink(String path, int layoutWidth, int layoutHeight, int imageWidth, int imageHeight) {</span>
+<span class="fc" id="L162">    this.path = path;</span>
+<span class="fc" id="L163">    this.layoutWidth = layoutWidth;</span>
+<span class="fc" id="L164">    this.layoutHeight = layoutHeight;</span>
+<span class="fc" id="L165">    this.imageWidth = imageWidth;</span>
+<span class="fc" id="L166">    this.imageHeight = imageHeight;</span>
+<span class="fc" id="L167">  }</span>
+
+  /**
+   * Create new plotter.
+   *
+   * @param path        Target-path for image
+   * @param algo        Layouting algorithm used to create the layout. IS used to determine
+   *                    layout width
+   *                    and height.
+   * @param imageWidth  Wanted width of the output image
+   * @param imageHeight Wanted height of the output image
+   */
+  public ImageDataSink(String path, LayoutingAlgorithm algo, int imageWidth, int imageHeight) {
+<span class="nc" id="L180">    this(path, algo.getWidth(), algo.getHeight(), imageWidth, imageHeight);</span>
+<span class="nc" id="L181">  }</span>
+
+  /**
+   * Sets optional value vertexSize
+   *
+   * @param vertexSize the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink vertexSize(int vertexSize) {
+<span class="nc" id="L190">    this.vertexSize = vertexSize;</span>
+<span class="nc" id="L191">    return this;</span>
+  }
+
+  /**
+   * Sets optional value vertexColor
+   *
+   * @param vertexColor the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink vertexColor(Color vertexColor) {
+<span class="nc" id="L201">    this.vertexColor = vertexColor;</span>
+<span class="nc" id="L202">    return this;</span>
+  }
+
+  /**
+   * Sets optional value edgeColor
+   *
+   * @param edgeColor the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink edgeColor(Color edgeColor) {
+<span class="nc" id="L212">    this.edgeColor = edgeColor;</span>
+<span class="nc" id="L213">    return this;</span>
+  }
+
+  /**
+   * Sets optional value ignoreVertices
+   *
+   * @param ignoreVertices the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink ignoreVertices(boolean ignoreVertices) {
+<span class="nc" id="L223">    this.ignoreVertices = ignoreVertices;</span>
+<span class="nc" id="L224">    return this;</span>
+  }
+
+  /**
+   * Sets optional value vertexLabel
+   *
+   * @param vertexLabel the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink vertexLabel(String vertexLabel) {
+<span class="fc" id="L234">    this.vertexLabel = vertexLabel;</span>
+<span class="fc" id="L235">    return this;</span>
+  }
+
+  /**
+   * Sets optional value vertexLabelSize
+   *
+   * @param vertexLabelSize the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink vertexLabelSize(int vertexLabelSize) {
+<span class="nc" id="L245">    this.vertexLabelSize = vertexLabelSize;</span>
+<span class="nc" id="L246">    return this;</span>
+  }
+
+  /**
+   * Sets optional value backgroundColor
+   *
+   * @param backgroundColor the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink backgroundColor(Color backgroundColor) {
+<span class="nc" id="L256">    this.backgroundColor = backgroundColor;</span>
+<span class="nc" id="L257">    return this;</span>
+  }
+
+  /**
+   * Sets optional value edgeSize
+   *
+   * @param edgeSize the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink edgeSize(float edgeSize) {
+<span class="nc" id="L267">    this.edgeSize = edgeSize;</span>
+<span class="nc" id="L268">    return this;</span>
+  }
+
+  /**
+   * Sets optional value dynamicVertexSize
+   *
+   * @param dynamicVertexSize the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink dynamicVertexSize(boolean dynamicVertexSize) {
+<span class="nc" id="L278">    this.dynamicVertexSize = dynamicVertexSize;</span>
+<span class="nc" id="L279">    return this;</span>
+  }
+
+  /**
+   * Sets optional value dynamicEdgeSize
+   *
+   * @param dynamicEdgeSize the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink dynamicEdgeSize(boolean dynamicEdgeSize) {
+<span class="nc" id="L289">    this.dynamicEdgeSize = dynamicEdgeSize;</span>
+<span class="nc" id="L290">    return this;</span>
+  }
+
+  /**
+   * If true, scale the graph to completely fill the layout-area
+   *
+   * @param zoom the new value
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink zoom(boolean zoom) {
+<span class="nc" id="L300">    this.zoom = zoom;</span>
+<span class="nc" id="L301">    return this;</span>
+  }
+
+  /**
+   * If true, scale the graph to completely fill the layout-area
+   *
+   * @param zoom the new value
+   * @param border Size of a border in px, that is to be left free when placing zoomed vertices. Can
+   *              be used to prevent vertices being cut off at the edges.
+   * @return this (for method-chaining)
+   */
+  public ImageDataSink zoom(boolean zoom, int border) {
+<span class="fc" id="L313">    this.zoom = zoom;</span>
+<span class="fc" id="L314">    this.zoomBorder = border;</span>
+<span class="fc" id="L315">    return this;</span>
+  }
+
+  /**
+   * Prepare the given edges for drawing. Assign them start- and end-coordinates from their
+   * vertices.
+   *
+   * @param vertices The vertices to take the edge-coordinates from
+   * @param edges    The raw edges
+   * @return The prepared edges
+   */
+  protected DataSet&lt;EPGMEdge&gt; prepareEdges(DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
+<span class="fc" id="L327">    edges = edges</span>
+<span class="fc" id="L328">      .join(vertices).where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L329">      .with(new SourceCoordinateJoin())</span>
+<span class="fc" id="L330">      .join(vertices).where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L331">      .with(new TargetCoordinateJoin());</span>
+<span class="fc" id="L332">    return edges;</span>
+  }
+
+  /**
+   * Scale the coordinates of the graph so that the layout-space matches the requested drawing-size
+   *
+   * @param vertices original vertices
+   * @return vertices with scaled coordinates
+   */
+  protected DataSet&lt;EPGMVertex&gt; scaleLayout(DataSet&lt;EPGMVertex&gt; vertices) {
+
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">    if (zoom) {</span>
+<span class="fc" id="L344">      final int imageWidthF = imageWidth - 2 * zoomBorder;</span>
+<span class="fc" id="L345">      final int imageHeightF = imageHeight - 2 * zoomBorder;</span>
+<span class="fc" id="L346">      final int zoomBorderF = zoomBorder;</span>
+
+<span class="fc" id="L348">      DataSet&lt;Tuple4&lt;Integer, Integer, Integer, Integer&gt;&gt; minMaxCoords = vertices</span>
+<span class="fc" id="L349">        .map(new ToCoordsTuple())</span>
+<span class="fc" id="L350">        .aggregate(Aggregations.MIN, 0)</span>
+<span class="fc" id="L351">        .and(Aggregations.MIN, 1)</span>
+<span class="fc" id="L352">        .and(Aggregations.MAX, 2)</span>
+<span class="fc" id="L353">        .and(Aggregations.MAX, 3);</span>
+
+<span class="fc" id="L355">      return vertices</span>
+<span class="fc" id="L356">        .map(new VertexZoomMap(imageWidthF, imageHeightF, zoomBorderF))</span>
+<span class="fc" id="L357">        .withBroadcastSet(minMaxCoords, BORDER_BROADCAST);</span>
+
+    } else {
+
+<span class="nc" id="L361">      final double widthScale = imageWidth / (double) layoutWidth;</span>
+<span class="nc" id="L362">      final double heightScale = imageHeight / (double) layoutHeight;</span>
+<span class="nc" id="L363">      return vertices.map(new VertexScaleMap(widthScale, heightScale));</span>
+    }
+  }
+
+  /**
+   * Convert a BufferedImage to byte[]
+   *
+   * @param img The image to convert
+   * @return byte[] representation of the image
+   */
+  protected static byte[] imgToArr(BufferedImage img) {
+    try {
+<span class="fc" id="L375">      ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L376">      ImageIO.write(img, INTERMEDIATE_ENCODING, baos);</span>
+<span class="fc" id="L377">      return baos.toByteArray();</span>
+<span class="nc" id="L378">    } catch (IOException e) {</span>
+<span class="nc" id="L379">      e.printStackTrace();</span>
+    }
+<span class="nc" id="L381">    return null;</span>
+  }
+
+  /**
+   * Convert byte[] to BufferedImage
+   *
+   * @param arr The array to convert
+   * @return The buffered-image representation
+   */
+  protected static BufferedImage arrToImg(byte[] arr) {
+    try {
+<span class="fc" id="L392">      ByteArrayInputStream bais = new ByteArrayInputStream(arr);</span>
+<span class="fc" id="L393">      return ImageIO.read(bais);</span>
+<span class="nc" id="L394">    } catch (IOException e) {</span>
+<span class="nc" id="L395">      e.printStackTrace();</span>
+    }
+<span class="nc" id="L397">    return null;</span>
+  }
+
+
+  @Override
+  public void write(LogicalGraph logicalGraph) throws IOException {
+<span class="fc" id="L403">    write(logicalGraph, true);</span>
+<span class="fc" id="L404">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection) throws IOException {
+<span class="nc" id="L408">    write(graphCollection, true);</span>
+<span class="nc" id="L409">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+
+<span class="fc" id="L414">    ImageOutputFormat pof = new ImageOutputFormat(path);</span>
+<span class="pc bpc" id="L415" title="1 of 2 branches missed.">    FileSystem.WriteMode writeMode =</span>
+      overwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
+<span class="fc" id="L417">    pof.setWriteMode(writeMode);</span>
+
+<span class="fc" id="L419">    DataSet&lt;EPGMVertex&gt; vertices = scaleLayout(logicalGraph.getVertices());</span>
+<span class="fc" id="L420">    DataSet&lt;EPGMEdge&gt; edges = prepareEdges(vertices, logicalGraph.getEdges());</span>
+
+<span class="fc" id="L422">    ImageGenerator imgg = new ImageGenerator(this);</span>
+<span class="fc" id="L423">    DataSet&lt;byte[]&gt; image = edges.combineGroup(imgg::combineEdges).reduce(imgg::mergeImages);</span>
+<span class="pc bpc" id="L424" title="1 of 2 branches missed.">    if (!ignoreVertices) {</span>
+<span class="fc" id="L425">      DataSet&lt;byte[]&gt; vertexImage =</span>
+<span class="fc" id="L426">        vertices.combineGroup(imgg::combineVertices).reduce(imgg::mergeImages);</span>
+<span class="fc" id="L427">      image = image.map(new RichMapFunction&lt;byte[], byte[]&gt;() {</span>
+        @Override
+        public byte[] map(byte[] bufferedImage) throws Exception {
+<span class="fc" id="L430">          List&lt;byte[]&gt; vertexImage = this.getRuntimeContext().getBroadcastVariable(&quot;vertexImage&quot;);</span>
+<span class="fc" id="L431">          return imgg.mergeImages(bufferedImage, vertexImage.get(0));</span>
+        }
+<span class="fc" id="L433">      }).withBroadcastSet(vertexImage, &quot;vertexImage&quot;);</span>
+    }
+<span class="fc" id="L435">    image = image.map(imgg::addBackground);</span>
+
+<span class="fc" id="L437">    image.output(pof).setParallelism(1);</span>
+<span class="fc" id="L438">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
+<span class="nc" id="L442">    throw new UnsupportedOperationException(&quot;Plotting is not supported for GraphCollections&quot;);</span>
+  }
+
+  /**
+   * This class contains functionality to create images from graph-parts.
+   * For some strange reasons BufferedImage can not be used as DataSet-Type without crashing the
+   * JVM. Therefore byte[] is used as intermediate-representation.
+   */
+  protected static class ImageGenerator implements Serializable {
+
+    /**
+     * Contains all necessary parameters
+     */
+    private ImageDataSink plotter;
+
+    /**
+     * Create new ImageGenerator
+     *
+     * @param p Contains all necessary parameters (cannot use non-static class du to flink-madness)
+     */
+<span class="fc" id="L462">    public ImageGenerator(ImageDataSink p) {</span>
+<span class="fc" id="L463">      this.plotter = p;</span>
+<span class="fc" id="L464">    }</span>
+
+
+    /**
+     * Combine multiple edges into one Image
+     *
+     * @param iterable  The edges to combine
+     * @param collector The output-collector
+     */
+    public void combineEdges(Iterable&lt;EPGMEdge&gt; iterable, Collector&lt;byte[]&gt; collector) {
+<span class="fc" id="L474">      BufferedImage img =</span>
+        new BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<span class="fc" id="L476">      Graphics2D gfx = img.createGraphics();</span>
+<span class="fc" id="L477">      gfx.setColor(plotter.edgeColor);</span>
+<span class="fc" id="L478">      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);</span>
+<span class="fc" id="L479">      gfx.setStroke(new BasicStroke(plotter.edgeSize));</span>
+<span class="fc bfc" id="L480" title="All 2 branches covered.">      for (EPGMEdge e : iterable) {</span>
+<span class="fc" id="L481">        drawEdge(gfx, e);</span>
+<span class="fc" id="L482">      }</span>
+<span class="fc" id="L483">      collector.collect(imgToArr(img));</span>
+<span class="fc" id="L484">      gfx.dispose();</span>
+<span class="fc" id="L485">    }</span>
+
+    /**
+     * Combine multiple vertices into one Image
+     *
+     * @param iterable  The vertices to combine
+     * @param collector The output-collector
+     */
+    public void combineVertices(Iterable&lt;EPGMVertex&gt; iterable, Collector&lt;byte[]&gt; collector) {
+<span class="fc" id="L494">      BufferedImage img =</span>
+        new BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<span class="fc" id="L496">      Graphics2D gfx = img.createGraphics();</span>
+<span class="fc" id="L497">      gfx.setColor(plotter.vertexColor);</span>
+<span class="fc bfc" id="L498" title="All 2 branches covered.">      for (EPGMVertex v : iterable) {</span>
+<span class="fc" id="L499">        drawVertex(gfx, v);</span>
+<span class="fc" id="L500">      }</span>
+<span class="fc" id="L501">      collector.collect(imgToArr(img));</span>
+<span class="fc" id="L502">      gfx.dispose();</span>
+<span class="fc" id="L503">    }</span>
+
+    /**
+     * Draw a single edge
+     *
+     * @param gfx The graphics-object to use for drawing
+     * @param e   The edge to draw
+     */
+    private void drawEdge(Graphics2D gfx, EPGMEdge e) {
+<span class="fc" id="L512">      gfx.setColor(plotter.edgeColor);</span>
+<span class="fc" id="L513">      float edgeSize = plotter.edgeSize;</span>
+<span class="pc bpc" id="L514" title="3 of 4 branches missed.">      if (plotter.dynamicEdgeSize &amp;&amp; e.getPropertyValue(&quot;SIZE&quot;) != null) {</span>
+<span class="nc" id="L515">        edgeSize *= Math.sqrt((float) e.getPropertyValue(&quot;SIZE&quot;).getInt());</span>
+      }
+<span class="fc" id="L517">      gfx.setStroke(new BasicStroke(edgeSize));</span>
+      try {
+<span class="fc" id="L519">        int sourceX = e.getPropertyValue(SOURCE_X).getInt();</span>
+<span class="fc" id="L520">        int sourceY = e.getPropertyValue(SOURCE_Y).getInt();</span>
+
+<span class="fc" id="L522">        int targetX = e.getPropertyValue(TARGET_X).getInt();</span>
+<span class="fc" id="L523">        int targetY = e.getPropertyValue(TARGET_Y).getInt();</span>
+
+<span class="fc" id="L525">        gfx.drawLine(sourceX, sourceY, targetX, targetY);</span>
+<span class="nc" id="L526">      } catch (NullPointerException ef) {</span>
+
+<span class="fc" id="L528">      }</span>
+<span class="fc" id="L529">    }</span>
+
+    /**
+     * Draw a single vertex
+     *
+     * @param gfx The graphics-object to use for drawing
+     * @param v   The vertex to draw
+     */
+    private void drawVertex(Graphics2D gfx, EPGMVertex v) {
+<span class="fc" id="L538">      int x = v.getPropertyValue(LayoutingAlgorithm.X_COORDINATE_PROPERTY).getInt();</span>
+<span class="fc" id="L539">      int y = v.getPropertyValue(LayoutingAlgorithm.Y_COORDINATE_PROPERTY).getInt();</span>
+<span class="fc" id="L540">      int size = plotter.vertexSize;</span>
+<span class="pc bpc" id="L541" title="3 of 4 branches missed.">      if (plotter.dynamicVertexSize &amp;&amp; v.getPropertyValue(&quot;SIZE&quot;) != null) {</span>
+<span class="nc" id="L542">        size *= Math.sqrt((double) v.getPropertyValue(&quot;SIZE&quot;).getInt());</span>
+      }
+<span class="fc" id="L544">      gfx.fillOval(x - size / 2, y - size / 2, size, size);</span>
+<span class="pc bpc" id="L545" title="1 of 2 branches missed.">      if (plotter.vertexLabel != null) {</span>
+<span class="fc" id="L546">        String label = v.getPropertyValue(plotter.vertexLabel).getString();</span>
+<span class="fc" id="L547">        gfx.drawString(label, x, y + (plotter.vertexSize) + 10 + (plotter.vertexLabelSize / 2));</span>
+      }
+<span class="fc" id="L549">    }</span>
+
+    /**
+     * Merge two intermediate Images into one
+     *
+     * @param arr1 Image 1
+     * @param arr2 Image 2
+     * @return Output-Image
+     */
+    public byte[] mergeImages(byte[] arr1, byte[] arr2) {
+<span class="fc" id="L559">      BufferedImage bufferedImage = arrToImg(arr1);</span>
+<span class="fc" id="L560">      BufferedImage t1 = arrToImg(arr2);</span>
+<span class="fc" id="L561">      Graphics2D g = bufferedImage.createGraphics();</span>
+<span class="fc" id="L562">      g.drawImage(t1, 0, 0, plotter.imageWidth, plotter.imageHeight, null);</span>
+<span class="fc" id="L563">      g.dispose();</span>
+<span class="fc" id="L564">      return imgToArr(bufferedImage);</span>
+    }
+
+    /**
+     * Draw a background behind the image.
+     *
+     * @param arr Input image
+     * @return Input-image + black background
+     */
+    public byte[] addBackground(byte[] arr) {
+<span class="fc" id="L574">      BufferedImage bufferedImage = arrToImg(arr);</span>
+<span class="fc" id="L575">      BufferedImage out =</span>
+        new BufferedImage(plotter.imageWidth, plotter.imageHeight, BufferedImage.TYPE_INT_ARGB);
+<span class="fc" id="L577">      Graphics2D gfx = out.createGraphics();</span>
+<span class="fc" id="L578">      gfx.setColor(plotter.backgroundColor);</span>
+<span class="fc" id="L579">      gfx.fillRect(0, 0, plotter.imageWidth, plotter.imageHeight);</span>
+<span class="fc" id="L580">      gfx.drawImage(bufferedImage, 0, 0, plotter.imageWidth, plotter.imageHeight, null);</span>
+<span class="fc" id="L581">      gfx.dispose();</span>
+<span class="fc" id="L582">      return imgToArr(out);</span>
+    }
+  }
+
+  /**
+   * OutputFormat to save BufferedImages to image files
+   */
+  protected static class ImageOutputFormat extends FileOutputFormat&lt;byte[]&gt; {
+
+    /**
+     * Where to store the output-image
+     */
+    private String path;
+
+    /**
+     * Create a new plotter output format
+     *
+     * @param path The output-image location
+     */
+    public ImageOutputFormat(String path) {
+<span class="fc" id="L602">      super(new Path(path));</span>
+<span class="fc" id="L603">      this.path = path;</span>
+<span class="fc" id="L604">    }</span>
+
+    @Override
+    public void open(int taskNumber, int numTasks) throws IOException {
+<span class="fc" id="L608">      super.open(taskNumber, numTasks);</span>
+<span class="fc" id="L609">    }</span>
+
+    /**
+     * Get the file extension of a file
+     *
+     * @param path The name/path of the file
+     * @return The extension (without dot)
+     */
+    private String getFileExtension(String path) {
+<span class="fc" id="L618">      return path.substring(path.lastIndexOf('.') + 1);</span>
+    }
+
+    @Override
+    public void writeRecord(byte[] img) throws IOException {
+<span class="fc" id="L623">      String outputFormat = getFileExtension(path);</span>
+<span class="pc bpc" id="L624" title="1 of 2 branches missed.">      if (!outputFormat.equals(INTERMEDIATE_ENCODING)) {</span>
+<span class="nc" id="L625">        BufferedImage bimg = arrToImg(img);</span>
+<span class="nc" id="L626">        ImageIO.write(bimg, outputFormat, this.stream);</span>
+<span class="nc" id="L627">      } else {</span>
+<span class="fc" id="L628">        this.stream.write(img);</span>
+      }
+<span class="fc" id="L630">    }</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

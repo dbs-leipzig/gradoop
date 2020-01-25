@@ -22,6 +22,7 @@ import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.GDLHandler;
+import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.GraphElement;
 import org.s1ck.gdl.model.Vertex;
@@ -96,15 +97,16 @@ public class QueryHandler {
    *
    * @param gdlString GDL query string
    */
-<span class="fc" id="L99">  public QueryHandler(String gdlString) {</span>
-<span class="fc" id="L100">    gdlHandler = new GDLHandler.Builder()</span>
-<span class="fc" id="L101">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
-<span class="fc" id="L102">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
-<span class="fc" id="L103">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
-<span class="fc" id="L104">      .buildFromString(gdlString);</span>
-<span class="fc" id="L105">    edgeCache = gdlHandler.getEdgeCache(true, true);</span>
-<span class="fc" id="L106">    vertexCache = gdlHandler.getVertexCache(true, true);</span>
-<span class="fc" id="L107">  }</span>
+<span class="fc" id="L100">  public QueryHandler(String gdlString) {</span>
+<span class="fc" id="L101">    gdlHandler = new GDLHandler.Builder()</span>
+<span class="fc" id="L102">      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)</span>
+<span class="fc" id="L103">      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)</span>
+<span class="fc" id="L104">      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)</span>
+<span class="fc" id="L105">      .setErrorStrategy(new BailSyntaxErrorStrategy())</span>
+<span class="fc" id="L106">      .buildFromString(gdlString);</span>
+<span class="fc" id="L107">    edgeCache = gdlHandler.getEdgeCache(true, true);</span>
+<span class="fc" id="L108">    vertexCache = gdlHandler.getVertexCache(true, true);</span>
+<span class="fc" id="L109">  }</span>
 
   /**
    * Returns all vertices in the query.
@@ -112,7 +114,7 @@ public class QueryHandler {
    * @return vertices
    */
   public Collection&lt;Vertex&gt; getVertices() {
-<span class="fc" id="L115">    return gdlHandler.getVertices();</span>
+<span class="fc" id="L117">    return gdlHandler.getVertices();</span>
   }
 
   /**
@@ -121,7 +123,7 @@ public class QueryHandler {
    * @return edges
    */
   public Collection&lt;Edge&gt; getEdges() {
-<span class="fc" id="L124">    return gdlHandler.getEdges();</span>
+<span class="fc" id="L126">    return gdlHandler.getEdges();</span>
   }
 
   /**
@@ -130,10 +132,10 @@ public class QueryHandler {
    * @return triples
    */
   public Collection&lt;Triple&gt; getTriples() {
-<span class="fc" id="L133">    return getEdges().stream()</span>
-<span class="fc" id="L134">      .map(e -&gt; new Triple(</span>
-<span class="fc" id="L135">        getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))</span>
-<span class="fc" id="L136">      .collect(Collectors.toList());</span>
+<span class="fc" id="L135">    return getEdges().stream()</span>
+<span class="fc" id="L136">      .map(e -&gt; new Triple(</span>
+<span class="fc" id="L137">        getVertexById(e.getSourceVertexId()), e, getVertexById(e.getTargetVertexId())))</span>
+<span class="fc" id="L138">      .collect(Collectors.toList());</span>
   }
 
   /**
@@ -142,7 +144,7 @@ public class QueryHandler {
    * @return all query variables
    */
   public Set&lt;String&gt; getAllVariables() {
-<span class="fc" id="L145">    return Sets.union(getVertexVariables(), getEdgeVariables());</span>
+<span class="fc" id="L147">    return Sets.union(getVertexVariables(), getEdgeVariables());</span>
   }
 
   /**
@@ -151,7 +153,7 @@ public class QueryHandler {
    * @return all vertex variables
    */
   public Set&lt;String&gt; getVertexVariables() {
-<span class="fc" id="L154">    return vertexCache.keySet();</span>
+<span class="fc" id="L156">    return vertexCache.keySet();</span>
   }
 
   /**
@@ -160,7 +162,7 @@ public class QueryHandler {
    * @return all edge variables
    */
   public Set&lt;String&gt; getEdgeVariables() {
-<span class="fc" id="L163">    return edgeCache.keySet();</span>
+<span class="fc" id="L165">    return edgeCache.keySet();</span>
   }
 
   /**
@@ -170,10 +172,10 @@ public class QueryHandler {
    * @return predicates
    */
   public CNF getPredicates() {
-<span class="fc bfc" id="L173" title="All 2 branches covered.">    if (gdlHandler.getPredicates().isPresent()) {</span>
-<span class="fc" id="L174">      return QueryPredicate.createFrom(gdlHandler.getPredicates().get()).asCNF();</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (gdlHandler.getPredicates().isPresent()) {</span>
+<span class="fc" id="L176">      return QueryPredicate.createFrom(gdlHandler.getPredicates().get()).asCNF();</span>
     } else {
-<span class="fc" id="L176">      return new CNF();</span>
+<span class="fc" id="L178">      return new CNF();</span>
     }
   }
 
@@ -183,7 +185,7 @@ public class QueryHandler {
    * @return vertex count
    */
   public int getVertexCount() {
-<span class="fc" id="L186">    return getVertices().size();</span>
+<span class="fc" id="L188">    return getVertices().size();</span>
   }
 
   /**
@@ -192,7 +194,7 @@ public class QueryHandler {
    * @return edge count
    */
   public int getEdgeCount() {
-<span class="fc" id="L195">    return getEdges().size();</span>
+<span class="fc" id="L197">    return getEdges().size();</span>
   }
 
   /**
@@ -201,7 +203,7 @@ public class QueryHandler {
    * @return true, if single vertex graph
    */
   public boolean isSingleVertexGraph() {
-<span class="fc bfc" id="L204" title="All 4 branches covered.">    return getVertexCount() == 1 &amp;&amp; getEdgeCount() == 0;</span>
+<span class="fc bfc" id="L206" title="All 4 branches covered.">    return getVertexCount() == 1 &amp;&amp; getEdgeCount() == 0;</span>
   }
 
   /**
@@ -210,10 +212,10 @@ public class QueryHandler {
    * @return diameter
    */
   public int getDiameter() {
-<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    if (diameter == null) {</span>
-<span class="fc" id="L214">      diameter = GraphMetrics.getDiameter(this);</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">    if (diameter == null) {</span>
+<span class="fc" id="L216">      diameter = GraphMetrics.getDiameter(this);</span>
     }
-<span class="fc" id="L216">    return diameter;</span>
+<span class="fc" id="L218">    return diameter;</span>
   }
 
   /**
@@ -222,10 +224,10 @@ public class QueryHandler {
    * @return radius
    */
   public int getRadius() {
-<span class="pc bpc" id="L225" title="1 of 2 branches missed.">    if (radius == null) {</span>
-<span class="fc" id="L226">      radius = GraphMetrics.getRadius(this);</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">    if (radius == null) {</span>
+<span class="fc" id="L228">      radius = GraphMetrics.getRadius(this);</span>
     }
-<span class="fc" id="L228">    return radius;</span>
+<span class="fc" id="L230">    return radius;</span>
   }
 
   /**
@@ -234,10 +236,10 @@ public class QueryHandler {
    * @return connected components
    */
   public Map&lt;Integer, Set&lt;String&gt;&gt; getComponents() {
-<span class="nc bnc" id="L237" title="All 2 branches missed.">    if (components == null) {</span>
-<span class="nc" id="L238">      components = GraphMetrics.getComponents(this);</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">    if (components == null) {</span>
+<span class="nc" id="L240">      components = GraphMetrics.getComponents(this);</span>
     }
-<span class="nc" id="L240">    return components;</span>
+<span class="nc" id="L242">    return components;</span>
   }
 
   /**
@@ -247,7 +249,7 @@ public class QueryHandler {
    * @return True if the variable points to a vertex
    */
   public boolean isVertex(String variable) {
-<span class="fc" id="L250">    return vertexCache.containsKey(variable);</span>
+<span class="fc" id="L252">    return vertexCache.containsKey(variable);</span>
   }
 
   /**
@@ -257,7 +259,7 @@ public class QueryHandler {
    * @return True if the variable points to an edge
    */
   public boolean isEdge(String variable) {
-<span class="fc" id="L260">    return edgeCache.containsKey(variable);</span>
+<span class="fc" id="L262">    return edgeCache.containsKey(variable);</span>
   }
 
   /**
@@ -268,10 +270,10 @@ public class QueryHandler {
    * @return vertex or {@code null}
    */
   public Vertex getVertexById(Long id) {
-<span class="fc bfc" id="L271" title="All 2 branches covered.">    if (idToVertexCache == null) {</span>
-<span class="fc" id="L272">      idToVertexCache = initCache(getVertices(), Vertex::getId, Function.identity());</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">    if (idToVertexCache == null) {</span>
+<span class="fc" id="L274">      idToVertexCache = initCache(getVertices(), Vertex::getId, Function.identity());</span>
     }
-<span class="fc" id="L274">    return idToVertexCache.get(id);</span>
+<span class="fc" id="L276">    return idToVertexCache.get(id);</span>
   }
 
   /**
@@ -282,10 +284,10 @@ public class QueryHandler {
    * @return edge or {@code null}
    */
   public Edge getEdgeById(Long id) {
-<span class="fc bfc" id="L285" title="All 2 branches covered.">    if (idToEdgeCache == null) {</span>
-<span class="fc" id="L286">      idToEdgeCache = initCache(getEdges(), Edge::getId, Function.identity());</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">    if (idToEdgeCache == null) {</span>
+<span class="fc" id="L288">      idToEdgeCache = initCache(getEdges(), Edge::getId, Function.identity());</span>
     }
-<span class="fc" id="L288">    return idToEdgeCache.get(id);</span>
+<span class="fc" id="L290">    return idToEdgeCache.get(id);</span>
   }
 
   /**
@@ -296,7 +298,7 @@ public class QueryHandler {
    * @return vertex or {@code null}
    */
   public Vertex getVertexByVariable(String variable) {
-<span class="fc" id="L299">    return vertexCache.get(variable);</span>
+<span class="fc" id="L301">    return vertexCache.get(variable);</span>
   }
 
 
@@ -308,7 +310,7 @@ public class QueryHandler {
    * @return edge or {@code null}
    */
   public Edge getEdgeByVariable(String variable) {
-<span class="fc" id="L311">    return edgeCache.get(variable);</span>
+<span class="fc" id="L313">    return edgeCache.get(variable);</span>
   }
 
   /**
@@ -319,10 +321,10 @@ public class QueryHandler {
    * @return vertices or {@code null}
    */
   public Collection&lt;Vertex&gt; getVerticesByLabel(String label) {
-<span class="pc bpc" id="L322" title="1 of 2 branches missed.">    if (labelToVertexCache == null) {</span>
-<span class="fc" id="L323">      labelToVertexCache = initSetCache(getVertices(), Vertex::getLabel, Function.identity());</span>
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">    if (labelToVertexCache == null) {</span>
+<span class="fc" id="L325">      labelToVertexCache = initSetCache(getVertices(), Vertex::getLabel, Function.identity());</span>
     }
-<span class="fc" id="L325">    return labelToVertexCache.get(label);</span>
+<span class="fc" id="L327">    return labelToVertexCache.get(label);</span>
   }
 
   /**
@@ -333,10 +335,10 @@ public class QueryHandler {
    * @return edges or {@code null}
    */
   public Collection&lt;Edge&gt; getEdgesByLabel(String label) {
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">    if (labelToEdgeCache == null) {</span>
-<span class="fc" id="L337">      labelToEdgeCache = initSetCache(getEdges(), Edge::getLabel, Function.identity());</span>
+<span class="pc bpc" id="L338" title="1 of 2 branches missed.">    if (labelToEdgeCache == null) {</span>
+<span class="fc" id="L339">      labelToEdgeCache = initSetCache(getEdges(), Edge::getLabel, Function.identity());</span>
     }
-<span class="fc" id="L339">    return labelToEdgeCache.get(label);</span>
+<span class="fc" id="L341">    return labelToEdgeCache.get(label);</span>
   }
 
   /**
@@ -347,14 +349,14 @@ public class QueryHandler {
    * @return incoming and outgoing edges
    */
   public Collection&lt;Edge&gt; getEdgesByVertexId(Long vertexId) {
-<span class="fc" id="L350">    List&lt;Edge&gt; result = Lists.newArrayList();</span>
-<span class="fc bfc" id="L351" title="All 2 branches covered.">    if (getEdgesBySourceVertexId(vertexId) != null) {</span>
-<span class="fc" id="L352">      result.addAll(getEdgesBySourceVertexId(vertexId));</span>
+<span class="fc" id="L352">    List&lt;Edge&gt; result = Lists.newArrayList();</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">    if (getEdgesBySourceVertexId(vertexId) != null) {</span>
+<span class="fc" id="L354">      result.addAll(getEdgesBySourceVertexId(vertexId));</span>
     }
-<span class="fc bfc" id="L354" title="All 2 branches covered.">    if (getEdgesByTargetVertexId(vertexId) != null) {</span>
-<span class="fc" id="L355">      result.addAll(getEdgesByTargetVertexId(vertexId));</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">    if (getEdgesByTargetVertexId(vertexId) != null) {</span>
+<span class="fc" id="L357">      result.addAll(getEdgesByTargetVertexId(vertexId));</span>
     }
-<span class="fc" id="L357">    return result;</span>
+<span class="fc" id="L359">    return result;</span>
   }
 
   /**
@@ -365,10 +367,10 @@ public class QueryHandler {
    * @return outgoing edges or {@code null}
    */
   public Collection&lt;Edge&gt; getEdgesBySourceVertexId(Long vertexId) {
-<span class="fc bfc" id="L368" title="All 2 branches covered.">    if (sourceIdToEdgeCache == null) {</span>
-<span class="fc" id="L369">      sourceIdToEdgeCache = initSetCache(getEdges(), Edge::getSourceVertexId, Function.identity());</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">    if (sourceIdToEdgeCache == null) {</span>
+<span class="fc" id="L371">      sourceIdToEdgeCache = initSetCache(getEdges(), Edge::getSourceVertexId, Function.identity());</span>
     }
-<span class="fc" id="L371">    return sourceIdToEdgeCache.get(vertexId);</span>
+<span class="fc" id="L373">    return sourceIdToEdgeCache.get(vertexId);</span>
   }
 
   /**
@@ -379,7 +381,7 @@ public class QueryHandler {
    * @return outgoing edge ids or {@code null}
    */
   public Collection&lt;Long&gt; getEdgeIdsBySourceVertexId(Long vertexId) {
-<span class="fc" id="L382">    return getIds(getEdgesBySourceVertexId(vertexId));</span>
+<span class="fc" id="L384">    return getIds(getEdgesBySourceVertexId(vertexId));</span>
   }
 
   /**
@@ -390,10 +392,10 @@ public class QueryHandler {
    * @return incoming edges or {@code null}
    */
   public Collection&lt;Edge&gt; getEdgesByTargetVertexId(Long vertexId) {
-<span class="fc bfc" id="L393" title="All 2 branches covered.">    if (targetIdToEdgeCache == null) {</span>
-<span class="fc" id="L394">      targetIdToEdgeCache = initSetCache(getEdges(), Edge::getTargetVertexId, Function.identity());</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">    if (targetIdToEdgeCache == null) {</span>
+<span class="fc" id="L396">      targetIdToEdgeCache = initSetCache(getEdges(), Edge::getTargetVertexId, Function.identity());</span>
     }
-<span class="fc" id="L396">    return targetIdToEdgeCache.get(vertexId);</span>
+<span class="fc" id="L398">    return targetIdToEdgeCache.get(vertexId);</span>
   }
 
   /**
@@ -404,7 +406,7 @@ public class QueryHandler {
    * @return incoming edge ids or {@code null}
    */
   public Collection&lt;Long&gt; getEdgeIdsByTargetVertexId(Long vertexId) {
-<span class="nc" id="L407">    return getIds(getEdgesByTargetVertexId(vertexId));</span>
+<span class="nc" id="L409">    return getIds(getEdgesByTargetVertexId(vertexId));</span>
   }
 
   /**
@@ -415,10 +417,10 @@ public class QueryHandler {
    * @return preceding edges or {@code null}
    */
   public Collection&lt;Edge&gt; getPredecessors(Long edgeId) {
-<span class="fc" id="L418">    Collection&lt;Edge&gt; predecessors =</span>
-<span class="fc" id="L419">      getEdgesByTargetVertexId(getEdgeById(edgeId).getSourceVertexId());</span>
-<span class="pc bpc" id="L420" title="1 of 2 branches missed.">    return predecessors != null ?</span>
-<span class="pc" id="L421">      Lists.newArrayList(predecessors) : Lists.newArrayList();</span>
+<span class="fc" id="L420">    Collection&lt;Edge&gt; predecessors =</span>
+<span class="fc" id="L421">      getEdgesByTargetVertexId(getEdgeById(edgeId).getSourceVertexId());</span>
+<span class="pc bpc" id="L422" title="1 of 2 branches missed.">    return predecessors != null ?</span>
+<span class="pc" id="L423">      Lists.newArrayList(predecessors) : Lists.newArrayList();</span>
   }
 
   /**
@@ -429,10 +431,10 @@ public class QueryHandler {
    * @return succeeding edges or {@code null}
    */
   public Collection&lt;Edge&gt; getSuccessors(Long edgeId) {
-<span class="fc" id="L432">    Collection&lt;Edge&gt; successors =</span>
-<span class="fc" id="L433">      getEdgesBySourceVertexId(getEdgeById(edgeId).getTargetVertexId());</span>
-<span class="pc bpc" id="L434" title="1 of 2 branches missed.">    return successors != null ?</span>
-<span class="pc" id="L435">      Lists.newArrayList(successors) : Lists.newArrayList();</span>
+<span class="fc" id="L434">    Collection&lt;Edge&gt; successors =</span>
+<span class="fc" id="L435">      getEdgesBySourceVertexId(getEdgeById(edgeId).getTargetVertexId());</span>
+<span class="pc bpc" id="L436" title="1 of 2 branches missed.">    return successors != null ?</span>
+<span class="pc" id="L437">      Lists.newArrayList(successors) : Lists.newArrayList();</span>
   }
 
   /**
@@ -443,7 +445,7 @@ public class QueryHandler {
    * @return preceding edge ids or {@code null}
    */
   public Collection&lt;Long&gt; getPredecessorIds(Long edgeId) {
-<span class="nc" id="L446">    return getIds(getPredecessors(edgeId));</span>
+<span class="nc" id="L448">    return getIds(getPredecessors(edgeId));</span>
   }
 
   /**
@@ -454,7 +456,7 @@ public class QueryHandler {
    * @return succeeding edge ids or {@code null}
    */
   public Collection&lt;Long&gt; getSuccessorIds(Long edgeId) {
-<span class="nc" id="L457">    return getIds(getSuccessors(edgeId));</span>
+<span class="nc" id="L459">    return getIds(getSuccessors(edgeId));</span>
   }
 
   /**
@@ -465,20 +467,20 @@ public class QueryHandler {
    * @return adjacent vertices
    */
   public Collection&lt;Vertex&gt; getNeighbors(Long vertexId) {
-<span class="fc" id="L468">    Set&lt;Vertex&gt; neighbors = Sets.newHashSet();</span>
-<span class="fc" id="L469">    Collection&lt;Edge&gt; outgoingEdges = getEdgesBySourceVertexId(vertexId);</span>
-<span class="fc bfc" id="L470" title="All 2 branches covered.">    if (outgoingEdges != null) {</span>
-<span class="fc bfc" id="L471" title="All 2 branches covered.">      for (Edge edge : outgoingEdges) {</span>
-<span class="fc" id="L472">        neighbors.add(getVertexById(edge.getTargetVertexId()));</span>
-<span class="fc" id="L473">      }</span>
+<span class="fc" id="L470">    Set&lt;Vertex&gt; neighbors = Sets.newHashSet();</span>
+<span class="fc" id="L471">    Collection&lt;Edge&gt; outgoingEdges = getEdgesBySourceVertexId(vertexId);</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">    if (outgoingEdges != null) {</span>
+<span class="fc bfc" id="L473" title="All 2 branches covered.">      for (Edge edge : outgoingEdges) {</span>
+<span class="fc" id="L474">        neighbors.add(getVertexById(edge.getTargetVertexId()));</span>
+<span class="fc" id="L475">      }</span>
     }
-<span class="fc" id="L475">    Collection&lt;Edge&gt; incomingEdges = getEdgesByTargetVertexId(vertexId);</span>
-<span class="fc bfc" id="L476" title="All 2 branches covered.">    if (incomingEdges != null) {</span>
-<span class="fc bfc" id="L477" title="All 2 branches covered.">      for (Edge edge : incomingEdges) {</span>
-<span class="fc" id="L478">        neighbors.add(getVertexById(edge.getSourceVertexId()));</span>
-<span class="fc" id="L479">      }</span>
+<span class="fc" id="L477">    Collection&lt;Edge&gt; incomingEdges = getEdgesByTargetVertexId(vertexId);</span>
+<span class="fc bfc" id="L478" title="All 2 branches covered.">    if (incomingEdges != null) {</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">      for (Edge edge : incomingEdges) {</span>
+<span class="fc" id="L480">        neighbors.add(getVertexById(edge.getSourceVertexId()));</span>
+<span class="fc" id="L481">      }</span>
     }
-<span class="fc" id="L481">    return neighbors;</span>
+<span class="fc" id="L483">    return neighbors;</span>
   }
 
   /**
@@ -489,11 +491,11 @@ public class QueryHandler {
    * @return adjacent vertex ids
    */
   public Collection&lt;Long&gt; getNeighborIds(Long vertexId) {
-<span class="fc" id="L492">    Set&lt;Long&gt; neighbors = Sets.newHashSet();</span>
-<span class="fc bfc" id="L493" title="All 2 branches covered.">    for (Vertex vertex : getNeighbors(vertexId)) {</span>
-<span class="fc" id="L494">      neighbors.add(vertex.getId());</span>
-<span class="fc" id="L495">    }</span>
-<span class="fc" id="L496">    return neighbors;</span>
+<span class="fc" id="L494">    Set&lt;Long&gt; neighbors = Sets.newHashSet();</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">    for (Vertex vertex : getNeighbors(vertexId)) {</span>
+<span class="fc" id="L496">      neighbors.add(vertex.getId());</span>
+<span class="fc" id="L497">    }</span>
+<span class="fc" id="L498">    return neighbors;</span>
   }
 
   /**
@@ -504,15 +506,15 @@ public class QueryHandler {
    * @return mapping between existing variables and their corresponding label
    */
   public Map&lt;String, String&gt; getLabelsForVariables(Collection&lt;String&gt; variables) {
-<span class="fc" id="L507">    return variables.stream()</span>
-<span class="pc bpc" id="L508" title="1 of 4 branches missed.">      .filter(var -&gt; isEdge(var) || isVertex(var))</span>
-<span class="fc" id="L509">      .map(var -&gt; {</span>
-<span class="fc bfc" id="L510" title="All 2 branches covered.">        if (isEdge(var)) {</span>
-<span class="fc" id="L511">          return Pair.of(var, getEdgeByVariable(var).getLabel());</span>
+<span class="fc" id="L509">    return variables.stream()</span>
+<span class="pc bpc" id="L510" title="1 of 4 branches missed.">      .filter(var -&gt; isEdge(var) || isVertex(var))</span>
+<span class="fc" id="L511">      .map(var -&gt; {</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">        if (isEdge(var)) {</span>
+<span class="fc" id="L513">          return Pair.of(var, getEdgeByVariable(var).getLabel());</span>
         } else {
-<span class="fc" id="L513">          return Pair.of(var, getVertexByVariable(var).getLabel());</span>
+<span class="fc" id="L515">          return Pair.of(var, getVertexByVariable(var).getLabel());</span>
         }
-<span class="fc" id="L515">      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));</span>
+<span class="fc" id="L517">      }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));</span>
   }
 
   /**
@@ -521,11 +523,11 @@ public class QueryHandler {
    * @return mapping from edge variable to source/target variable
    */
   public Map&lt;String, Pair&lt;String, String&gt;&gt; getSourceTargetVariables() {
-<span class="fc" id="L524">    return getEdges().stream()</span>
-<span class="fc" id="L525">      .map(e -&gt; Pair.of(e.getVariable(), Pair</span>
-<span class="fc" id="L526">        .of(getVertexById(e.getSourceVertexId()).getVariable(),</span>
-<span class="fc" id="L527">          getVertexById(e.getTargetVertexId()).getVariable())))</span>
-<span class="fc" id="L528">      .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));</span>
+<span class="fc" id="L526">    return getEdges().stream()</span>
+<span class="fc" id="L527">      .map(e -&gt; Pair.of(e.getVariable(), Pair</span>
+<span class="fc" id="L528">        .of(getVertexById(e.getSourceVertexId()).getVariable(),</span>
+<span class="fc" id="L529">          getVertexById(e.getTargetVertexId()).getVariable())))</span>
+<span class="fc" id="L530">      .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));</span>
   }
 
   /**
@@ -537,14 +539,14 @@ public class QueryHandler {
    */
   private &lt;EL extends GraphElement&gt; Collection&lt;Long&gt;
   getIds(Collection&lt;EL&gt; elements) {
-<span class="fc" id="L540">    List&lt;Long&gt; ids = null;</span>
-<span class="pc bpc" id="L541" title="1 of 2 branches missed.">    if (elements != null) {</span>
-<span class="fc" id="L542">      ids = Lists.newArrayListWithCapacity(elements.size());</span>
-<span class="fc bfc" id="L543" title="All 2 branches covered.">      for (EL el : elements) {</span>
-<span class="fc" id="L544">        ids.add(el.getId());</span>
-<span class="fc" id="L545">      }</span>
+<span class="fc" id="L542">    List&lt;Long&gt; ids = null;</span>
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">    if (elements != null) {</span>
+<span class="fc" id="L544">      ids = Lists.newArrayListWithCapacity(elements.size());</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">      for (EL el : elements) {</span>
+<span class="fc" id="L546">        ids.add(el.getId());</span>
+<span class="fc" id="L547">      }</span>
     }
-<span class="fc" id="L547">    return ids;</span>
+<span class="fc" id="L549">    return ids;</span>
   }
 
   /**
@@ -553,11 +555,11 @@ public class QueryHandler {
    * @return center vertices
    */
   public Collection&lt;Vertex&gt; getCenterVertices() {
-<span class="fc" id="L556">    List&lt;Vertex&gt; result = Lists.newArrayList();</span>
-<span class="fc bfc" id="L557" title="All 2 branches covered.">    for (Long vId : getCentralVertexIds()) {</span>
-<span class="fc" id="L558">      result.add(getVertexById(vId));</span>
-<span class="fc" id="L559">    }</span>
-<span class="fc" id="L560">    return result;</span>
+<span class="fc" id="L558">    List&lt;Vertex&gt; result = Lists.newArrayList();</span>
+<span class="fc bfc" id="L559" title="All 2 branches covered.">    for (Long vId : getCentralVertexIds()) {</span>
+<span class="fc" id="L560">      result.add(getVertexById(vId));</span>
+<span class="fc" id="L561">    }</span>
+<span class="fc" id="L562">    return result;</span>
   }
 
   /**
@@ -566,7 +568,7 @@ public class QueryHandler {
    * @return center vertex
    */
   public Vertex getCenterVertex() {
-<span class="nc" id="L569">    return getCenterVertices().iterator().next();</span>
+<span class="nc" id="L571">    return getCenterVertices().iterator().next();</span>
   }
 
   /**
@@ -575,15 +577,15 @@ public class QueryHandler {
    * @return vertex identifiers
    */
   public Collection&lt;Long&gt; getCentralVertexIds() {
-<span class="fc" id="L578">    Map&lt;Long, Integer&gt; eccMap = GraphMetrics.getEccentricity(this);</span>
-<span class="fc" id="L579">    Integer min = Collections.min(eccMap.values());</span>
-<span class="fc" id="L580">    List&lt;Long&gt; result = Lists.newArrayList();</span>
-<span class="fc bfc" id="L581" title="All 2 branches covered.">    for (Map.Entry&lt;Long, Integer&gt; eccEntry : eccMap.entrySet()) {</span>
-<span class="fc bfc" id="L582" title="All 2 branches covered.">      if (eccEntry.getValue().equals(min)) {</span>
-<span class="fc" id="L583">        result.add(eccEntry.getKey());</span>
+<span class="fc" id="L580">    Map&lt;Long, Integer&gt; eccMap = GraphMetrics.getEccentricity(this);</span>
+<span class="fc" id="L581">    Integer min = Collections.min(eccMap.values());</span>
+<span class="fc" id="L582">    List&lt;Long&gt; result = Lists.newArrayList();</span>
+<span class="fc bfc" id="L583" title="All 2 branches covered.">    for (Map.Entry&lt;Long, Integer&gt; eccEntry : eccMap.entrySet()) {</span>
+<span class="fc bfc" id="L584" title="All 2 branches covered.">      if (eccEntry.getValue().equals(min)) {</span>
+<span class="fc" id="L585">        result.add(eccEntry.getKey());</span>
       }
-<span class="fc" id="L585">    }</span>
-<span class="fc" id="L586">    return result;</span>
+<span class="fc" id="L587">    }</span>
+<span class="fc" id="L588">    return result;</span>
   }
 
   /**
@@ -604,7 +606,7 @@ public class QueryHandler {
   private &lt;EL, KT, VT&gt; Map&lt;KT, VT&gt; initCache(Collection&lt;EL&gt; elements,
     Function&lt;EL, KT&gt; keySelector, Function&lt;EL, VT&gt; valueSelector) {
 
-<span class="fc" id="L607">    return elements.stream().collect(Collectors.toMap(keySelector, valueSelector));</span>
+<span class="fc" id="L609">    return elements.stream().collect(Collectors.toMap(keySelector, valueSelector));</span>
   }
 
   /**
@@ -625,11 +627,11 @@ public class QueryHandler {
   private &lt;EL, KT, VT&gt; Map&lt;KT, Set&lt;VT&gt;&gt; initSetCache(Collection&lt;EL&gt; elements,
     Function&lt;EL, KT&gt; keySelector, Function&lt;EL, VT&gt; valueSelector) {
 
-<span class="fc" id="L628">    return elements.stream()</span>
-<span class="fc" id="L629">      .collect(</span>
-<span class="fc" id="L630">        Collectors.groupingBy(</span>
+<span class="fc" id="L630">    return elements.stream()</span>
+<span class="fc" id="L631">      .collect(</span>
+<span class="fc" id="L632">        Collectors.groupingBy(</span>
           keySelector,
-<span class="fc" id="L632">          Collectors.mapping(valueSelector, Collectors.toSet())</span>
+<span class="fc" id="L634">          Collectors.mapping(valueSelector, Collectors.toSet())</span>
       ));
   }
 
@@ -640,28 +642,28 @@ public class QueryHandler {
    * @param renameFunction The renaming function, mapping old to new variable names.
    */
   public void updateGeneratedVariableNames(Function&lt;String, String&gt; renameFunction) {
-<span class="fc" id="L643">    Set&lt;String&gt; generatedEdgeVariables = gdlHandler.getEdgeCache(false, true).keySet();</span>
-<span class="fc" id="L644">    Set&lt;String&gt; generatedVertexVariables = gdlHandler.getVertexCache(false, true).keySet();</span>
-<span class="fc" id="L645">    Map&lt;String, Vertex&gt; newVertexCache = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L646">    Map&lt;String, Edge&gt; newEdgeCache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L645">    Set&lt;String&gt; generatedEdgeVariables = gdlHandler.getEdgeCache(false, true).keySet();</span>
+<span class="fc" id="L646">    Set&lt;String&gt; generatedVertexVariables = gdlHandler.getVertexCache(false, true).keySet();</span>
+<span class="fc" id="L647">    Map&lt;String, Vertex&gt; newVertexCache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L648">    Map&lt;String, Edge&gt; newEdgeCache = new HashMap&lt;&gt;();</span>
     // Update vertices.
-<span class="fc bfc" id="L648" title="All 2 branches covered.">    for (Vertex vertex : getVertices()) {</span>
-<span class="fc" id="L649">      final String variable = vertex.getVariable();</span>
-<span class="pc bpc" id="L650" title="1 of 2 branches missed.">      if (generatedVertexVariables.contains(variable)) {</span>
-<span class="nc" id="L651">        vertex.setVariable(renameFunction.apply(variable));</span>
+<span class="fc bfc" id="L650" title="All 2 branches covered.">    for (Vertex vertex : getVertices()) {</span>
+<span class="fc" id="L651">      final String variable = vertex.getVariable();</span>
+<span class="pc bpc" id="L652" title="1 of 2 branches missed.">      if (generatedVertexVariables.contains(variable)) {</span>
+<span class="nc" id="L653">        vertex.setVariable(renameFunction.apply(variable));</span>
       }
-<span class="fc" id="L653">      newVertexCache.put(vertex.getVariable(), vertex);</span>
-<span class="fc" id="L654">    }</span>
+<span class="fc" id="L655">      newVertexCache.put(vertex.getVariable(), vertex);</span>
+<span class="fc" id="L656">    }</span>
     // Update edges.
-<span class="fc bfc" id="L656" title="All 2 branches covered.">    for (Edge edge : getEdges()) {</span>
-<span class="fc" id="L657">      final String variable = edge.getVariable();</span>
-<span class="fc bfc" id="L658" title="All 2 branches covered.">      if (generatedEdgeVariables.contains(variable)) {</span>
-<span class="fc" id="L659">        edge.setVariable(renameFunction.apply(variable));</span>
+<span class="fc bfc" id="L658" title="All 2 branches covered.">    for (Edge edge : getEdges()) {</span>
+<span class="fc" id="L659">      final String variable = edge.getVariable();</span>
+<span class="fc bfc" id="L660" title="All 2 branches covered.">      if (generatedEdgeVariables.contains(variable)) {</span>
+<span class="fc" id="L661">        edge.setVariable(renameFunction.apply(variable));</span>
       }
-<span class="fc" id="L661">      newEdgeCache.put(edge.getVariable(), edge);</span>
-<span class="fc" id="L662">    }</span>
-<span class="fc" id="L663">    vertexCache = Collections.unmodifiableMap(newVertexCache);</span>
-<span class="fc" id="L664">    edgeCache = Collections.unmodifiableMap(newEdgeCache);</span>
-<span class="fc" id="L665">  }</span>
+<span class="fc" id="L663">      newEdgeCache.put(edge.getVariable(), edge);</span>
+<span class="fc" id="L664">    }</span>
+<span class="fc" id="L665">    vertexCache = Collections.unmodifiableMap(newVertexCache);</span>
+<span class="fc" id="L666">    edgeCache = Collections.unmodifiableMap(newEdgeCache);</span>
+<span class="fc" id="L667">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

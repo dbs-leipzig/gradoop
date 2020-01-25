@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FRAttractionFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">FRAttractionFunction.java</span></div><h1>FRAttractionFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.layouting.util.Force;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
+
+/**
+ * Computes Attraction forces between two Vertices.
+ * Input: two vertices that are connected by an edge.
+ * Output: two force-tuples (one for each vertex) representing the attraction-forces between the
+ * vertices.
+ */
+public class FRAttractionFunction implements
+  FlatMapFunction&lt;Tuple3&lt;LVertex, LVertex, Integer&gt;, Force&gt;,
+  MapFunction&lt;Tuple3&lt;LVertex, LVertex, Integer&gt;, Force&gt; {
+  /**
+   * Parameter for the FR-Algorithm
+   */
+  private double k;
+
+  /**
+   * Object reuse for output
+   */
+<span class="fc" id="L43">  private Force firstForce = new Force();</span>
+  /**
+   * Object reuse for output
+   */
+<span class="fc" id="L47">  private Force secondForce = new Force();</span>
+  /**
+   * Object reuse for output
+   */
+<span class="fc" id="L51">  private Vector force = new Vector();</span>
+  /**
+   * Object reuse
+   */
+<span class="fc" id="L55">  private Vector force2 = new Vector();</span>
+
+
+  /**
+   * Create new FRAttractionFunction
+   *
+   * @param k Algorithm factor. Optimum distance between connected vertices
+   */
+<span class="fc" id="L63">  public FRAttractionFunction(double k) {</span>
+<span class="fc" id="L64">    this.k = k;</span>
+<span class="fc" id="L65">  }</span>
+
+
+  @Override
+  public void flatMap(Tuple3&lt;LVertex, LVertex, Integer&gt; vertices, Collector&lt;Force&gt; collector) {
+<span class="fc" id="L70">    Force f = map(vertices);</span>
+<span class="fc" id="L71">    secondForce.set(vertices.f1.getId(), f.getValue().mul(-1));</span>
+<span class="fc" id="L72">    collector.collect(f);</span>
+<span class="fc" id="L73">    collector.collect(secondForce);</span>
+<span class="fc" id="L74">  }</span>
+
+  @Override
+  public Force map(Tuple3&lt;LVertex, LVertex, Integer&gt; vertices) {
+<span class="fc" id="L78">    Vector pos1 = vertices.f0.getPosition();</span>
+<span class="fc" id="L79">    Vector pos2 = vertices.f1.getPosition();</span>
+<span class="fc" id="L80">    double distance = pos1.distance(pos2);</span>
+
+<span class="fc" id="L82">    force.set(pos2.mSub(pos1).mNormalized().mMul(Math.pow(distance, 2) / k).mMul(vertices.f2));</span>
+<span class="fc" id="L83">    force2.set(force).mMul(-1);</span>
+
+<span class="fc" id="L85">    firstForce.set(vertices.f0.getId(), force);</span>
+
+<span class="fc" id="L87">    return firstForce;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

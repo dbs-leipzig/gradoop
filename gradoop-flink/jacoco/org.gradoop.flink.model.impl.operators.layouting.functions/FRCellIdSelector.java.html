@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FRCellIdSelector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.layouting.functions</a> &gt; <span class="el_source">FRCellIdSelector.java</span></div><h1>FRCellIdSelector.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.layouting.functions;
+
+import org.apache.flink.api.java.functions.KeySelector;
+import org.gradoop.flink.model.impl.operators.layouting.util.LVertex;
+
+/**
+ * A KeySelector that extracts the cellid of a Vertex.
+ */
+public class FRCellIdSelector implements KeySelector&lt;LVertex, Integer&gt; {
+
+  /**
+   * Type of neighbor to select if from
+   */
+<span class="fc" id="L29">  public enum NeighborType { UP, DOWN, LEFT, RIGHT, UPRIGHT, DOWNRIGHT, UPLEFT, DOWNLEFT, SELF }</span>
+
+  /**
+   * Type of neighbor to get cellid from
+   */
+  private NeighborType type;
+
+  /**
+   * A KeySelector that extracts the cellid of a Vertex. (Or the cellid of one of it's neighbors)
+   *
+   * @param type Selects which id to return. The 'real' one or the id of a specific neighbor.
+   */
+<span class="fc" id="L41">  public FRCellIdSelector(NeighborType type) {</span>
+<span class="fc" id="L42">    this.type = type;</span>
+<span class="fc" id="L43">  }</span>
+
+  @Override
+  public Integer getKey(LVertex value) {
+<span class="fc" id="L47">    int cellid = value.getCellid();</span>
+<span class="fc" id="L48">    int xcell = cellid &gt;&gt; 16;</span>
+<span class="fc" id="L49">    int ycell = cellid &amp; 0xFFFF;</span>
+<span class="fc bfc" id="L50" title="All 6 branches covered.">    if (type == NeighborType.RIGHT || type == NeighborType.UPRIGHT ||</span>
+      type == NeighborType.DOWNRIGHT) {
+<span class="fc" id="L52">      xcell++;</span>
+    }
+<span class="fc bfc" id="L54" title="All 6 branches covered.">    if (type == NeighborType.LEFT || type == NeighborType.DOWNLEFT || type == NeighborType.UPLEFT) {</span>
+<span class="fc" id="L55">      xcell--;</span>
+    }
+<span class="fc bfc" id="L57" title="All 6 branches covered.">    if (type == NeighborType.UP || type == NeighborType.UPLEFT || type == NeighborType.UPRIGHT) {</span>
+<span class="fc" id="L58">      ycell--;</span>
+    }
+<span class="fc bfc" id="L60" title="All 6 branches covered.">    if (type == NeighborType.DOWN || type == NeighborType.DOWNLEFT ||</span>
+      type == NeighborType.DOWNRIGHT) {
+<span class="fc" id="L62">      ycell++;</span>
+    }
+
+<span class="fc" id="L65">    return xcell &lt;&lt; 16 | ycell;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

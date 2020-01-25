@@ -17,6 +17,8 @@ org.gradoop.flink.io.impl.dot.functions
 org.gradoop.flink.io.impl.edgelist
 org.gradoop.flink.io.impl.gdl
 org.gradoop.flink.io.impl.graph
+org.gradoop.flink.io.impl.image
+org.gradoop.flink.io.impl.mtx
 org.gradoop.flink.io.impl.statistics
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.model
@@ -44,6 +46,9 @@ org.gradoop.flink.model.impl.operators.grouping
 org.gradoop.flink.model.impl.operators.intersection
 org.gradoop.flink.model.impl.operators.keyedgrouping.functions
 org.gradoop.flink.model.impl.operators.keyedgrouping.keys
+org.gradoop.flink.model.impl.operators.layouting
+org.gradoop.flink.model.impl.operators.layouting.functions
+org.gradoop.flink.model.impl.operators.layouting.util
 org.gradoop.flink.model.impl.operators.limit
 org.gradoop.flink.model.impl.operators.matching
 org.gradoop.flink.model.impl.operators.matching.common.functions
