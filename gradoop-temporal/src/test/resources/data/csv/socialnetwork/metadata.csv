@@ -1,0 +1,7 @@
+v;Forum;title:string
+e;hasModerator;__valFrom:long,__valTo:long,since:int
+e;knows;__valFrom:long,since:int
+v;Person;__valFrom:long,age:int,city:string,gender:string,locIP:string,name:string,speaks:string
+g;Community;interest:string,vertexCount:int
+g;Forum;
+e;hasMember;__valFrom:long,__valTo:long

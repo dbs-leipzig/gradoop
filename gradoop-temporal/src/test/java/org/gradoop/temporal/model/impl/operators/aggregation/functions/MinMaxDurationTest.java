@@ -233,7 +233,7 @@ public class MinMaxDurationTest extends TemporalGradoopTestBase {
   @Test
   public void testDurationWithDefaultValues() throws Exception {
     LogicalGraph logicalGraph  = getSocialNetworkLoader().getLogicalGraph();
-    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(logicalGraph);
+    TemporalGraph temporalGraph = TemporalGraph.fromGraph(logicalGraph);
     temporalGraph = temporalGraph.aggregate(
       new MinDuration("minDur", VALID_TIME),
       new MaxDuration("maxDur", VALID_TIME));
