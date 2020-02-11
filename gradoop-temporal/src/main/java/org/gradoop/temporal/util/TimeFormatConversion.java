@@ -38,11 +38,11 @@ public class TimeFormatConversion {
   }
 
   /**
-   * Converts milliseconds since Unix epoch to the respective {@link LocalDateTime} object.
+   * Converts a unix timestamp as a {@code long} to a {@link LocalDateTime} object.
    * The assumed time zone is UTC.
    *
    * @param epochMillis time value as long in milliseconds since Unix epoch.
-   * @return Representation of the the provided time stamp as {@link LocalDateTime} object with UTC time zone.
+   * @return Representation of the provided time stamp as {@link LocalDateTime} object in UTC time zone.
    */
   public static LocalDateTime toLocalDateTime(long epochMillis) {
     return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);
