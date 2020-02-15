@@ -243,7 +243,7 @@
 <a name="233" href="#233">233</a>   @Test
 <a name="234" href="#234">234</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDurationWithDefaultValues() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="235" href="#235">235</a>     LogicalGraph logicalGraph  = getSocialNetworkLoader().getLogicalGraph();
-<a name="236" href="#236">236</a>     TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(logicalGraph);
+<a name="236" href="#236">236</a>     TemporalGraph temporalGraph = TemporalGraph.fromGraph(logicalGraph);
 <a name="237" href="#237">237</a>     temporalGraph = temporalGraph.aggregate(
 <a name="238" href="#238">238</a>       <strong class="jxr_keyword">new</strong> MinDuration(<span class="jxr_string">"minDur"</span>, VALID_TIME),
 <a name="239" href="#239">239</a>       <strong class="jxr_keyword">new</strong> MaxDuration(<span class="jxr_string">"maxDur"</span>, VALID_TIME));
