@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.util;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
@@ -34,5 +35,16 @@ public class TimeFormatConversion {
   public static long toEpochMilli(LocalDateTime time) {
     Objects.requireNonNull(time);
     return time.toInstant(ZoneOffset.UTC).toEpochMilli();
+  }
+
+  /**
+   * Converts a unix timestamp as a {@code long} to a {@link LocalDateTime} object.
+   * The assumed time zone is UTC.
+   *
+   * @param epochMillis time value as long in milliseconds since Unix epoch.
+   * @return Representation of the provided time stamp as {@link LocalDateTime} object in UTC time zone.
+   */
+  public static LocalDateTime toLocalDateTime(long epochMillis) {
+    return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);
   }
 }
