@@ -36,7 +36,7 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,ValidDurin
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,DeletedIn,11,40,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Succeeds,11,40,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Between,11,38,0,4,4,6,1,5,1,3
-Gradoop Temporal,org.gradoop.temporal.util,TimeFormatConversion,3,8,0,0,1,2,1,1,1,1
+Gradoop Temporal,org.gradoop.temporal.util,TimeFormatConversion,3,13,0,0,1,3,1,2,1,2
 Gradoop Temporal,org.gradoop.temporal.util,TemporalGradoopConfig,0,55,0,0,0,12,0,6,0,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,EdgeToTemporalEdge,0,61,0,2,0,15,0,4,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,GraphHeadToTemporalGraphHead,0,44,0,2,0,12,0,4,0,3

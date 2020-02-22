@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.util;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
@@ -22,7 +23,7 @@ import java.util.Objects;
 /**
  * Utility class that provides methods for the conversion of different time formats.
  */
-<span class="nc" id="L25">public class TimeFormatConversion {</span>
+<span class="nc" id="L26">public class TimeFormatConversion {</span>
 
     /**
      * Converts a {@link LocalDateTime} object and converts it to respective milliseconds since Unix Epoch.
@@ -32,8 +33,19 @@ import java.util.Objects;
      * @return Representation of the the provided time stamp in milliseconds since Unix Epoch.
      */
   public static long toEpochMilli(LocalDateTime time) {
-<span class="fc" id="L35">    Objects.requireNonNull(time);</span>
-<span class="fc" id="L36">    return time.toInstant(ZoneOffset.UTC).toEpochMilli();</span>
+<span class="fc" id="L36">    Objects.requireNonNull(time);</span>
+<span class="fc" id="L37">    return time.toInstant(ZoneOffset.UTC).toEpochMilli();</span>
+  }
+
+  /**
+   * Converts a unix timestamp as a {@code long} to a {@link LocalDateTime} object.
+   * The assumed time zone is UTC.
+   *
+   * @param epochMillis time value as long in milliseconds since Unix epoch.
+   * @return Representation of the provided time stamp as {@link LocalDateTime} object in UTC time zone.
+   */
+  public static LocalDateTime toLocalDateTime(long epochMillis) {
+<span class="fc" id="L48">    return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
