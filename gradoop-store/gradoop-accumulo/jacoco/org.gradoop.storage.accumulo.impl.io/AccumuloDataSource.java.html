@@ -69,8 +69,8 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     @Nonnull AccumuloEPGMStore store,
     @Nonnull GradoopFlinkConfig config
   ) {
-<span class="fc" id="L72">    this(store, config, null, null, null);</span>
-<span class="fc" id="L73">  }</span>
+<span class="nc" id="L72">    this(store, config, null, null, null);</span>
+<span class="nc" id="L73">  }</span>
 
   /**
    * Creates a new Accumulo data source.
@@ -88,31 +88,31 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
     @Nullable AccumuloQueryHolder&lt;EPGMVertex&gt; vertexQuery,
     @Nullable AccumuloQueryHolder&lt;EPGMEdge&gt; edgeQuery
   ) {
-<span class="fc" id="L91">    super(store, config);</span>
-<span class="fc" id="L92">    this.graphHeadQuery = graphQuery;</span>
-<span class="fc" id="L93">    this.vertexQuery = vertexQuery;</span>
-<span class="fc" id="L94">    this.edgeQuery = edgeQuery;</span>
-<span class="fc" id="L95">  }</span>
+<span class="nc" id="L91">    super(store, config);</span>
+<span class="nc" id="L92">    this.graphHeadQuery = graphQuery;</span>
+<span class="nc" id="L93">    this.vertexQuery = vertexQuery;</span>
+<span class="nc" id="L94">    this.edgeQuery = edgeQuery;</span>
+<span class="nc" id="L95">  }</span>
 
   @Override
   public LogicalGraph getLogicalGraph() {
-<span class="fc" id="L99">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
+<span class="nc" id="L99">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() {
-<span class="fc" id="L104">    GraphCollectionFactory factory = getFlinkConfig().getGraphCollectionFactory();</span>
-<span class="fc" id="L105">    ExecutionEnvironment env = getFlinkConfig().getExecutionEnvironment();</span>
-<span class="fc" id="L106">    return factory.fromDataSets(</span>
+<span class="nc" id="L104">    GraphCollectionFactory factory = getFlinkConfig().getGraphCollectionFactory();</span>
+<span class="nc" id="L105">    ExecutionEnvironment env = getFlinkConfig().getExecutionEnvironment();</span>
+<span class="nc" id="L106">    return factory.fromDataSets(</span>
       /*graph head format*/
-<span class="fc" id="L108">      env.createInput(new GraphHeadInputFormat(</span>
-<span class="fc" id="L109">        getStore().getConfig().getAccumuloProperties(),</span>
+<span class="nc" id="L108">      env.createInput(new GraphHeadInputFormat(</span>
+<span class="nc" id="L109">        getStore().getConfig().getAccumuloProperties(),</span>
         graphHeadQuery)),
       /*vertex input format*/
-<span class="fc" id="L112">      env.createInput(new VertexInputFormat(getStore().getConfig().getAccumuloProperties(),</span>
+<span class="nc" id="L112">      env.createInput(new VertexInputFormat(getStore().getConfig().getAccumuloProperties(),</span>
         vertexQuery)),
       /*edge input format*/
-<span class="fc" id="L115">      env.createInput(new EdgeInputFormat(getStore().getConfig().getAccumuloProperties(),</span>
+<span class="nc" id="L115">      env.createInput(new EdgeInputFormat(getStore().getConfig().getAccumuloProperties(),</span>
         edgeQuery)));
   }
 
@@ -121,10 +121,10 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   public AccumuloDataSource applyGraphPredicate(
     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query
   ) {
-<span class="fc" id="L124">    AccumuloQueryHolder&lt;EPGMGraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);</span>
-<span class="fc" id="L125">    return new AccumuloDataSource(</span>
-<span class="fc" id="L126">      getStore(),</span>
-<span class="fc" id="L127">      getFlinkConfig(),</span>
+<span class="nc" id="L124">    AccumuloQueryHolder&lt;EPGMGraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);</span>
+<span class="nc" id="L125">    return new AccumuloDataSource(</span>
+<span class="nc" id="L126">      getStore(),</span>
+<span class="nc" id="L127">      getFlinkConfig(),</span>
       newGraphQuery,
       vertexQuery,
       edgeQuery
@@ -136,10 +136,10 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   public AccumuloDataSource applyVertexPredicate(
     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query
   ) {
-<span class="fc" id="L139">    AccumuloQueryHolder&lt;EPGMVertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);</span>
-<span class="fc" id="L140">    return new AccumuloDataSource(</span>
-<span class="fc" id="L141">      getStore(),</span>
-<span class="fc" id="L142">      getFlinkConfig(),</span>
+<span class="nc" id="L139">    AccumuloQueryHolder&lt;EPGMVertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);</span>
+<span class="nc" id="L140">    return new AccumuloDataSource(</span>
+<span class="nc" id="L141">      getStore(),</span>
+<span class="nc" id="L142">      getFlinkConfig(),</span>
       graphHeadQuery,
       newVertexQuery,
       edgeQuery
@@ -151,10 +151,10 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   public AccumuloDataSource applyEdgePredicate(
     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query
   ) {
-<span class="fc" id="L154">    AccumuloQueryHolder&lt;EPGMEdge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);</span>
-<span class="fc" id="L155">    return new AccumuloDataSource(</span>
-<span class="fc" id="L156">      getStore(),</span>
-<span class="fc" id="L157">      getFlinkConfig(),</span>
+<span class="nc" id="L154">    AccumuloQueryHolder&lt;EPGMEdge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);</span>
+<span class="nc" id="L155">    return new AccumuloDataSource(</span>
+<span class="nc" id="L156">      getStore(),</span>
+<span class="nc" id="L157">      getFlinkConfig(),</span>
       graphHeadQuery,
       vertexQuery,
       newEdgeQuery

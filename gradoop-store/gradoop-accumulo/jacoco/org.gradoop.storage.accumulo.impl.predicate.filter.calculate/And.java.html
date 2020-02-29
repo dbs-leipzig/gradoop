@@ -33,20 +33,20 @@ public final class And&lt;T extends Element&gt; implements AccumuloElementFilter
   /**
    * Predicate list
    */
-<span class="fc" id="L36">  private final List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L36">  private final List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates = new ArrayList&lt;&gt;();</span>
 
   /**
    * Create a new conjunctive principles
    *
    * @param predicates predicates
    */
-<span class="fc" id="L43">  private And(List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates) {</span>
-<span class="pc bpc" id="L44" title="1 of 2 branches missed.">    if (predicates.size() &lt; 2) {</span>
+<span class="nc" id="L43">  private And(List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates) {</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">    if (predicates.size() &lt; 2) {</span>
 <span class="nc" id="L45">      throw new IllegalArgumentException(String.format(&quot;predicates len(=%d) &lt; 2&quot;,</span>
 <span class="nc" id="L46">        predicates.size()));</span>
     }
-<span class="fc" id="L48">    this.predicates.addAll(predicates);</span>
-<span class="fc" id="L49">  }</span>
+<span class="nc" id="L48">    this.predicates.addAll(predicates);</span>
+<span class="nc" id="L49">  }</span>
 
   /**
    * Create a conjunctive formula
@@ -57,9 +57,9 @@ public final class And&lt;T extends Element&gt; implements AccumuloElementFilter
    */
   @SafeVarargs
   public static &lt;T extends Element&gt; And&lt;T&gt; create(AccumuloElementFilter&lt;T&gt;... predicates) {
-<span class="fc" id="L60">    List&lt;AccumuloElementFilter&lt;T&gt;&gt; formula = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L61">    Collections.addAll(formula, predicates);</span>
-<span class="fc" id="L62">    return new And&lt;&gt;(formula);</span>
+<span class="nc" id="L60">    List&lt;AccumuloElementFilter&lt;T&gt;&gt; formula = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L61">    Collections.addAll(formula, predicates);</span>
+<span class="nc" id="L62">    return new And&lt;&gt;(formula);</span>
   }
 
   @Override
@@ -74,11 +74,11 @@ public final class And&lt;T extends Element&gt; implements AccumuloElementFilter
 
   @Override
   public String toString() {
-<span class="fc" id="L77">    StringJoiner joiner = new StringJoiner(&quot; AND &quot;);</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">    for (AccumuloElementFilter&lt;T&gt; predicate : predicates) {</span>
-<span class="fc" id="L79">      joiner.add(&quot;(&quot; + predicate.toString() + &quot;)&quot;);</span>
-<span class="fc" id="L80">    }</span>
-<span class="fc" id="L81">    return joiner.toString();</span>
+<span class="nc" id="L77">    StringJoiner joiner = new StringJoiner(&quot; AND &quot;);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">    for (AccumuloElementFilter&lt;T&gt; predicate : predicates) {</span>
+<span class="nc" id="L79">      joiner.add(&quot;(&quot; + predicate.toString() + &quot;)&quot;);</span>
+<span class="nc" id="L80">    }</span>
+<span class="nc" id="L81">    return joiner.toString();</span>
   }
 
 }

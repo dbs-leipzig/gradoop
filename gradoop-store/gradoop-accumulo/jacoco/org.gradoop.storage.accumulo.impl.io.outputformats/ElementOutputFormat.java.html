@@ -71,50 +71,50 @@ public class ElementOutputFormat&lt;E extends EPGMElement&gt; implements OutputF
    * @param elementType output element type
    * @param config gradoop accumulo configuration
    */
-<span class="fc" id="L74">  public ElementOutputFormat(@Nonnull Class&lt;E&gt; elementType, @Nonnull GradoopAccumuloConfig config) {</span>
-<span class="fc" id="L75">    this.elementType = elementType;</span>
-<span class="fc" id="L76">    this.config = config;</span>
-<span class="fc" id="L77">  }</span>
+<span class="nc" id="L74">  public ElementOutputFormat(@Nonnull Class&lt;E&gt; elementType, @Nonnull GradoopAccumuloConfig config) {</span>
+<span class="nc" id="L75">    this.elementType = elementType;</span>
+<span class="nc" id="L76">    this.config = config;</span>
+<span class="nc" id="L77">  }</span>
 
 
   @Override
   public void configure(Configuration configuration) {
     // do nothing
-<span class="fc" id="L83">  }</span>
+<span class="nc" id="L83">  }</span>
 
 
   @Override
   public final void open(int taskNumber, int numTasks) throws IOException {
     try {
-<span class="fc" id="L89">      this.store = new AccumuloEPGMStore(config);</span>
+<span class="nc" id="L89">      this.store = new AccumuloEPGMStore(config);</span>
 <span class="nc" id="L90">    } catch (AccumuloSecurityException | AccumuloException e) {</span>
 <span class="nc" id="L91">      throw new IOException(e);</span>
-<span class="fc" id="L92">    }</span>
-<span class="fc" id="L93">  }</span>
+<span class="nc" id="L92">    }</span>
+<span class="nc" id="L93">  }</span>
 
 
   @Override
   public final void writeRecord(E record) {
-<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (elementType == EPGMEdge.class) {</span>
-<span class="fc" id="L99">      this.store.writeEdge((Edge) record);</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (elementType == EPGMVertex.class) {</span>
-<span class="fc" id="L101">      this.store.writeVertex((Vertex) record);</span>
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    } else if (elementType == EPGMGraphHead.class) {</span>
-<span class="fc" id="L103">      this.store.writeGraphHead((GraphHead) record);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">    if (elementType == EPGMEdge.class) {</span>
+<span class="nc" id="L99">      this.store.writeEdge((Edge) record);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">    } else if (elementType == EPGMVertex.class) {</span>
+<span class="nc" id="L101">      this.store.writeVertex((Vertex) record);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">    } else if (elementType == EPGMGraphHead.class) {</span>
+<span class="nc" id="L103">      this.store.writeGraphHead((GraphHead) record);</span>
     } else {
 <span class="nc" id="L105">      throw new IllegalArgumentException(String.format(&quot;illegal element type %s&quot;, elementType));</span>
     }
-<span class="fc" id="L107">    cacheCount++;</span>
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    if (cacheCount % EPGMGraphOutput.DEFAULT_CACHE_SIZE == 0) {</span>
+<span class="nc" id="L107">    cacheCount++;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">    if (cacheCount % EPGMGraphOutput.DEFAULT_CACHE_SIZE == 0) {</span>
 <span class="nc" id="L109">      store.flush();</span>
     }
-<span class="fc" id="L111">  }</span>
+<span class="nc" id="L111">  }</span>
 
 
   @Override
   public final void close() {
-<span class="fc" id="L116">    store.flush();</span>
-<span class="fc" id="L117">    store.close();</span>
-<span class="fc" id="L118">  }</span>
+<span class="nc" id="L116">    store.flush();</span>
+<span class="nc" id="L117">    store.close();</span>
+<span class="nc" id="L118">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

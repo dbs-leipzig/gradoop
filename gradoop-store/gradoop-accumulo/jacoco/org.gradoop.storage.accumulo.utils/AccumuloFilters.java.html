@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
   public static &lt;T extends Element&gt; AccumuloLabelIn&lt;T&gt; labelIn(
     @Nonnull String... value
   ) {
-<span class="fc" id="L44">    return new AccumuloLabelIn&lt;&gt;(value);</span>
+<span class="nc" id="L44">    return new AccumuloLabelIn&lt;&gt;(value);</span>
   }
 
   /**
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
   public static &lt;T extends Element&gt; AccumuloLabelReg&lt;T&gt; labelReg(
     @Nonnull Pattern reg
   ) {
-<span class="fc" id="L58">    return new AccumuloLabelReg&lt;&gt;(reg);</span>
+<span class="nc" id="L58">    return new AccumuloLabelReg&lt;&gt;(reg);</span>
   }
 
   /**
@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
     @Nonnull String key,
     @Nonnull Object value
   ) {
-<span class="fc" id="L74">    return new AccumuloPropEquals&lt;&gt;(key, value);</span>
+<span class="nc" id="L74">    return new AccumuloPropEquals&lt;&gt;(key, value);</span>
   }
 
   /**
@@ -89,7 +89,7 @@ import java.util.regex.Pattern;
     Object value,
     boolean include
   ) {
-<span class="fc" id="L92">    return new AccumuloPropLargerThan&lt;&gt;(key, value, include);</span>
+<span class="nc" id="L92">    return new AccumuloPropLargerThan&lt;&gt;(key, value, include);</span>
   }
 
   /**
@@ -105,7 +105,7 @@ import java.util.regex.Pattern;
     @Nonnull String key,
     @Nonnull Pattern reg
   ) {
-<span class="fc" id="L108">    return new AccumuloPropReg&lt;&gt;(key, reg);</span>
+<span class="nc" id="L108">    return new AccumuloPropReg&lt;&gt;(key, reg);</span>
   }
 
 }

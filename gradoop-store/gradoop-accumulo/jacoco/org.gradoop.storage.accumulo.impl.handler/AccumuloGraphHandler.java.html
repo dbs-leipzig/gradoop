@@ -37,33 +37,33 @@ public class AccumuloGraphHandler implements AccumuloRowHandler&lt;EPGMGraphHead
    *
    * @param factory graph head factory
    */
-<span class="fc" id="L40">  public AccumuloGraphHandler(GraphHeadFactory&lt;EPGMGraphHead&gt; factory) {</span>
-<span class="fc" id="L41">    this.factory = factory;</span>
-<span class="fc" id="L42">  }</span>
+<span class="nc" id="L40">  public AccumuloGraphHandler(GraphHeadFactory&lt;EPGMGraphHead&gt; factory) {</span>
+<span class="nc" id="L41">    this.factory = factory;</span>
+<span class="nc" id="L42">  }</span>
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
     GraphHead record
   ) {
-<span class="fc" id="L49">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
+<span class="nc" id="L49">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
 
-<span class="fc" id="L51">    Iterable&lt;String&gt; keys = record.getPropertyKeys();</span>
-<span class="pc bpc" id="L52" title="1 of 2 branches missed.">    if (keys != null) {</span>
-<span class="fc" id="L53">      keys.forEach(key -&gt; mutation.put(</span>
+<span class="nc" id="L51">    Iterable&lt;String&gt; keys = record.getPropertyKeys();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">    if (keys != null) {</span>
+<span class="nc" id="L53">      keys.forEach(key -&gt; mutation.put(</span>
         /*cf*/AccumuloTables.KEY.PROPERTY,
         /*cq*/key,
-<span class="fc" id="L56">        /*value*/new Value(record.getPropertyValue(key).getRawBytes())));</span>
+<span class="nc" id="L56">        /*value*/new Value(record.getPropertyValue(key).getRawBytes())));</span>
     }
-<span class="fc" id="L58">    return mutation;</span>
+<span class="nc" id="L58">    return mutation;</span>
   }
 
   @Override
   public EPGMGraphHead readRow(GraphHead origin) {
-<span class="fc" id="L63">    return factory.initGraphHead(</span>
-<span class="fc" id="L64">      /*edge id*/origin.getId(),</span>
-<span class="fc" id="L65">      /*label*/origin.getLabel(),</span>
-<span class="fc" id="L66">      /*properties*/origin.getProperties());</span>
+<span class="nc" id="L63">    return factory.initGraphHead(</span>
+<span class="nc" id="L64">      /*edge id*/origin.getId(),</span>
+<span class="nc" id="L65">      /*label*/origin.getLabel(),</span>
+<span class="nc" id="L66">      /*properties*/origin.getProperties());</span>
   }
 
 }

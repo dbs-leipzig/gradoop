@@ -38,48 +38,48 @@ public class AccumuloEdgeHandler implements AccumuloRowHandler&lt;EPGMEdge, Edge
    *
    * @param factory edge factory
    */
-<span class="fc" id="L41">  public AccumuloEdgeHandler(EdgeFactory&lt;EPGMEdge&gt; factory) {</span>
-<span class="fc" id="L42">    this.factory = factory;</span>
-<span class="fc" id="L43">  }</span>
+<span class="nc" id="L41">  public AccumuloEdgeHandler(EdgeFactory&lt;EPGMEdge&gt; factory) {</span>
+<span class="nc" id="L42">    this.factory = factory;</span>
+<span class="nc" id="L43">  }</span>
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
     Edge record
   ) {
-<span class="fc" id="L50">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
-<span class="fc" id="L51">    mutation.put(AccumuloTables.KEY.SOURCE, AccumuloTables.KEY.NONE,</span>
-<span class="fc" id="L52">      record.getSourceId().toString());</span>
-<span class="fc" id="L53">    mutation.put(AccumuloTables.KEY.TARGET, AccumuloTables.KEY.NONE,</span>
-<span class="fc" id="L54">      record.getTargetId().toString());</span>
+<span class="nc" id="L50">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
+<span class="nc" id="L51">    mutation.put(AccumuloTables.KEY.SOURCE, AccumuloTables.KEY.NONE,</span>
+<span class="nc" id="L52">      record.getSourceId().toString());</span>
+<span class="nc" id="L53">    mutation.put(AccumuloTables.KEY.TARGET, AccumuloTables.KEY.NONE,</span>
+<span class="nc" id="L54">      record.getTargetId().toString());</span>
 
     //encode properties value bytes as base64 string
-<span class="fc" id="L57">    Iterable&lt;String&gt; keys = record.getPropertyKeys();</span>
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (keys != null) {</span>
-<span class="fc" id="L59">      keys.forEach(key -&gt; mutation.put(</span>
+<span class="nc" id="L57">    Iterable&lt;String&gt; keys = record.getPropertyKeys();</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">    if (keys != null) {</span>
+<span class="nc" id="L59">      keys.forEach(key -&gt; mutation.put(</span>
         /*cf*/AccumuloTables.KEY.PROPERTY,
         /*cq*/key,
-<span class="fc" id="L62">        /*value*/new Value(record.getPropertyValue(key).getRawBytes())));</span>
+<span class="nc" id="L62">        /*value*/new Value(record.getPropertyValue(key).getRawBytes())));</span>
     }
 
     //write graph ids
-<span class="fc" id="L66">    GradoopIdSet ids = record.getGraphIds();</span>
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if (ids != null) {</span>
-<span class="fc" id="L68">      ids.forEach(</span>
-<span class="fc" id="L69">        id -&gt; mutation.put(AccumuloTables.KEY.GRAPH, id.toString(), AccumuloTables.KEY.NONE));</span>
+<span class="nc" id="L66">    GradoopIdSet ids = record.getGraphIds();</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">    if (ids != null) {</span>
+<span class="nc" id="L68">      ids.forEach(</span>
+<span class="nc" id="L69">        id -&gt; mutation.put(AccumuloTables.KEY.GRAPH, id.toString(), AccumuloTables.KEY.NONE));</span>
     }
-<span class="fc" id="L71">    return mutation;</span>
+<span class="nc" id="L71">    return mutation;</span>
   }
 
   @Override
   public EPGMEdge readRow(Edge origin) {
-<span class="fc" id="L76">    return factory.initEdge(</span>
-<span class="fc" id="L77">      origin.getId(),</span>
-<span class="fc" id="L78">      origin.getLabel(),</span>
-<span class="fc" id="L79">      origin.getSourceId(),</span>
-<span class="fc" id="L80">      origin.getTargetId(),</span>
-<span class="fc" id="L81">      origin.getProperties(),</span>
-<span class="fc" id="L82">      origin.getGraphIds());</span>
+<span class="nc" id="L76">    return factory.initEdge(</span>
+<span class="nc" id="L77">      origin.getId(),</span>
+<span class="nc" id="L78">      origin.getLabel(),</span>
+<span class="nc" id="L79">      origin.getSourceId(),</span>
+<span class="nc" id="L80">      origin.getTargetId(),</span>
+<span class="nc" id="L81">      origin.getProperties(),</span>
+<span class="nc" id="L82">      origin.getGraphIds());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

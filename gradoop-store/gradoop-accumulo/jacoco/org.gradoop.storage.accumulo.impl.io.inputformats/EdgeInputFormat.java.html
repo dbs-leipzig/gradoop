@@ -63,18 +63,18 @@ public class EdgeInputFormat extends BaseInputFormat&lt;EPGMEdge&gt; {
     @Nonnull Properties properties,
     @Nullable AccumuloQueryHolder&lt;EPGMEdge&gt; predicate
   ) {
-<span class="fc" id="L66">    super(properties, predicate);</span>
-<span class="fc" id="L67">  }</span>
+<span class="nc" id="L66">    super(properties, predicate);</span>
+<span class="nc" id="L67">  }</span>
 
   @Override
   protected void initiate() {
-<span class="fc" id="L71">    iterator = new GradoopEdgeIterator();</span>
-<span class="fc" id="L72">    handler = new AccumuloEdgeHandler(new EPGMEdgeFactory());</span>
-<span class="fc" id="L73">  }</span>
+<span class="nc" id="L71">    iterator = new GradoopEdgeIterator();</span>
+<span class="nc" id="L72">    handler = new AccumuloEdgeHandler(new EPGMEdgeFactory());</span>
+<span class="nc" id="L73">  }</span>
 
   @Override
   protected String getTableName(String prefix) {
-<span class="fc" id="L77">    return String.format(&quot;%s%s&quot;, prefix, AccumuloTables.EDGE);</span>
+<span class="nc" id="L77">    return String.format(&quot;%s%s&quot;, prefix, AccumuloTables.EDGE);</span>
   }
 
   @Override
@@ -83,14 +83,14 @@ public class EdgeInputFormat extends BaseInputFormat&lt;EPGMEdge&gt; {
     int iteratorSettingPriority,
     Map&lt;String, String&gt; options
   ) {
-<span class="fc" id="L86">    scanner.addScanIterator(</span>
+<span class="nc" id="L86">    scanner.addScanIterator(</span>
       new IteratorSetting(iteratorSettingPriority, GradoopEdgeIterator.class, options));
-<span class="fc" id="L88">  }</span>
+<span class="nc" id="L88">  }</span>
 
   @Override
   protected EPGMEdge mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
-<span class="fc" id="L92">    Edge decoded = iterator.fromRow(row);</span>
-<span class="fc" id="L93">    return handler.readRow(decoded);</span>
+<span class="nc" id="L92">    Edge decoded = iterator.fromRow(row);</span>
+<span class="nc" id="L93">    return handler.readRow(decoded);</span>
   }
 
 }

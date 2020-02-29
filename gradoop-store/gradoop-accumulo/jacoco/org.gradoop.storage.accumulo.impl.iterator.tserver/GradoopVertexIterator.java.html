@@ -37,21 +37,21 @@ import java.util.Objects;
 /**
  * Accumulo gradoop vertex iterator
  */
-<span class="fc" id="L40">public class GradoopVertexIterator extends BaseElementIterator&lt;Vertex&gt; {</span>
+<span class="nc" id="L40">public class GradoopVertexIterator extends BaseElementIterator&lt;Vertex&gt; {</span>
 
   /**
    * EPGMVertex factory
    */
-<span class="fc" id="L45">  private final EPGMVertexFactory factory = new EPGMVertexFactory();</span>
+<span class="nc" id="L45">  private final EPGMVertexFactory factory = new EPGMVertexFactory();</span>
 
   @Nonnull
   @Override
   public EPGMVertex fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException {
     //map from serialize content
-<span class="fc" id="L51">    EPGMVertex content = KryoUtils.loads(pair.getValue().get(), EPGMVertex.class);</span>
-<span class="fc" id="L52">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
+<span class="nc" id="L51">    EPGMVertex content = KryoUtils.loads(pair.getValue().get(), EPGMVertex.class);</span>
+<span class="nc" id="L52">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
     //read from content
-<span class="fc" id="L54">    return content;</span>
+<span class="nc" id="L54">    return content;</span>
   }
 
   @Nonnull
