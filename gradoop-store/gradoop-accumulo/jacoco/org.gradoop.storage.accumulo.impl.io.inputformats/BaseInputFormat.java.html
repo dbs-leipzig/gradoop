@@ -93,10 +93,10 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
   BaseInputFormat(
     Properties properties,
     AccumuloQueryHolder&lt;T&gt; predicate
-<span class="nc" id="L96">  ) {</span>
-<span class="nc" id="L97">    this.properties = properties;</span>
-<span class="nc" id="L98">    this.predicate = predicate;</span>
-<span class="nc" id="L99">  }</span>
+<span class="fc" id="L96">  ) {</span>
+<span class="fc" id="L97">    this.properties = properties;</span>
+<span class="fc" id="L98">    this.predicate = predicate;</span>
+<span class="fc" id="L99">  }</span>
 
   /**
    * Invoke hook after connector initiate
@@ -136,33 +136,33 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
 
   @Override
   public void open(GenericInputSplit split) throws IOException {
-<span class="nc" id="L139">    super.open(split);</span>
+<span class="fc" id="L139">    super.open(split);</span>
     try {
-<span class="nc" id="L141">      String user = (String) properties</span>
-<span class="nc" id="L142">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER);</span>
-<span class="nc" id="L143">      String password = (String) properties</span>
-<span class="nc" id="L144">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault.PASSWORD);</span>
-<span class="nc" id="L145">      String instance = (String) properties</span>
-<span class="nc" id="L146">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE);</span>
-<span class="nc" id="L147">      String zkHosts = (String) properties</span>
-<span class="nc" id="L148">        .getOrDefault(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.INSTANCE);</span>
-<span class="nc" id="L149">      String tableName = getTableName((String) properties</span>
-<span class="nc" id="L150">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX));</span>
-<span class="nc" id="L151">      Authorizations auth = (Authorizations) properties</span>
-<span class="nc" id="L152">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
+<span class="fc" id="L141">      String user = (String) properties</span>
+<span class="fc" id="L142">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER);</span>
+<span class="fc" id="L143">      String password = (String) properties</span>
+<span class="fc" id="L144">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault.PASSWORD);</span>
+<span class="fc" id="L145">      String instance = (String) properties</span>
+<span class="fc" id="L146">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE);</span>
+<span class="fc" id="L147">      String zkHosts = (String) properties</span>
+<span class="fc" id="L148">        .getOrDefault(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.INSTANCE);</span>
+<span class="fc" id="L149">      String tableName = getTableName((String) properties</span>
+<span class="fc" id="L150">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX));</span>
+<span class="fc" id="L151">      Authorizations auth = (Authorizations) properties</span>
+<span class="fc" id="L152">        .getOrDefault(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
           AccumuloDefault.AUTHORIZATION);
-<span class="nc" id="L154">      int batchSize = (int) properties</span>
-<span class="nc" id="L155">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
-<span class="nc" id="L156">          AccumuloDefault.BATCH_SCANNER_THREADS);</span>
-<span class="nc" id="L157">      int iteratorPriority = (int) properties</span>
-<span class="nc" id="L158">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY,</span>
-<span class="nc" id="L159">          AccumuloDefault.ITERATOR_PRIORITY);</span>
+<span class="fc" id="L154">      int batchSize = (int) properties</span>
+<span class="fc" id="L155">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
+<span class="fc" id="L156">          AccumuloDefault.BATCH_SCANNER_THREADS);</span>
+<span class="fc" id="L157">      int iteratorPriority = (int) properties</span>
+<span class="fc" id="L158">        .getOrDefault(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY,</span>
+<span class="fc" id="L159">          AccumuloDefault.ITERATOR_PRIORITY);</span>
 
-<span class="nc" id="L161">      Connector conn = new ZooKeeperInstance(instance, zkHosts)</span>
-<span class="nc" id="L162">        .getConnector(user, new PasswordToken(password));</span>
+<span class="fc" id="L161">      Connector conn = new ZooKeeperInstance(instance, zkHosts)</span>
+<span class="fc" id="L162">        .getConnector(user, new PasswordToken(password));</span>
 
-<span class="nc" id="L164">      List&lt;Range&gt; ranges = doSplits(</span>
-<span class="nc" id="L165">        split.getTotalNumberOfSplits(),</span>
+<span class="fc" id="L164">      List&lt;Range&gt; ranges = doSplits(</span>
+<span class="fc" id="L165">        split.getTotalNumberOfSplits(),</span>
         tableName,
         user,
         password,
@@ -170,43 +170,43 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
         zkHosts,
         auth);
 
-<span class="nc" id="L173">      Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L174" title="All 4 branches missed.">      if (predicate != null &amp;&amp; predicate.getReduceFilter() != null) {</span>
-<span class="nc" id="L175">        options.put(AccumuloTables.KEY_PREDICATE, predicate.getReduceFilter().encode());</span>
+<span class="fc" id="L173">      Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L174" title="1 of 4 branches missed.">      if (predicate != null &amp;&amp; predicate.getReduceFilter() != null) {</span>
+<span class="fc" id="L175">        options.put(AccumuloTables.KEY_PREDICATE, predicate.getReduceFilter().encode());</span>
       }
-<span class="nc bnc" id="L177" title="All 2 branches missed.">      if (split.getSplitNumber() + 1 &gt; ranges.size()) {</span>
-<span class="nc" id="L178">        scanner = null;</span>
-<span class="nc" id="L179">        iterator = Collections.emptyIterator();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      if (split.getSplitNumber() + 1 &gt; ranges.size()) {</span>
+<span class="fc" id="L178">        scanner = null;</span>
+<span class="fc" id="L179">        iterator = Collections.emptyIterator();</span>
       } else {
-<span class="nc" id="L181">        scanner = conn.createBatchScanner(tableName, auth, batchSize);</span>
-<span class="nc" id="L182">        attachIterator(scanner, iteratorPriority, options);</span>
-<span class="nc" id="L183">        scanner.setRanges(Lists.newArrayList(ranges.get(split.getSplitNumber())));</span>
-<span class="nc" id="L184">        iterator = scanner.iterator();</span>
+<span class="fc" id="L181">        scanner = conn.createBatchScanner(tableName, auth, batchSize);</span>
+<span class="fc" id="L182">        attachIterator(scanner, iteratorPriority, options);</span>
+<span class="fc" id="L183">        scanner.setRanges(Lists.newArrayList(ranges.get(split.getSplitNumber())));</span>
+<span class="fc" id="L184">        iterator = scanner.iterator();</span>
       }
 
-<span class="nc" id="L187">      initiate();</span>
+<span class="fc" id="L187">      initiate();</span>
 <span class="nc" id="L188">    } catch (AccumuloException | AccumuloSecurityException | TableNotFoundException e) {</span>
 <span class="nc" id="L189">      throw new IOException(e);</span>
-<span class="nc" id="L190">    }</span>
-<span class="nc" id="L191">  }</span>
+<span class="fc" id="L190">    }</span>
+<span class="fc" id="L191">  }</span>
 
   @Override
   public boolean reachedEnd() {
-<span class="nc bnc" id="L195" title="All 2 branches missed.">    return !iterator.hasNext();</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">    return !iterator.hasNext();</span>
   }
 
   @Override
   public T nextRecord(T reuse) throws IOException {
-<span class="nc" id="L200">    return mapRow(iterator.next());</span>
+<span class="fc" id="L200">    return mapRow(iterator.next());</span>
   }
 
   @Override
   public void close() throws IOException {
-<span class="nc" id="L205">    super.close();</span>
-<span class="nc bnc" id="L206" title="All 2 branches missed.">    if (scanner != null) {</span>
-<span class="nc" id="L207">      scanner.close();</span>
+<span class="fc" id="L205">    super.close();</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">    if (scanner != null) {</span>
+<span class="fc" id="L207">      scanner.close();</span>
     }
-<span class="nc" id="L209">  }</span>
+<span class="fc" id="L209">  }</span>
 
   /**
    * Split table into ranges according to {@link AccumuloRowInputFormat#getSplits} suggest
@@ -232,22 +232,22 @@ public abstract class BaseInputFormat&lt;T extends EPGMElement&gt; extends Gener
     @Nonnull String zkHosts,
     @Nonnull Authorizations auth
   ) throws IOException, AccumuloSecurityException {
-<span class="nc" id="L235">    AccumuloRowInputFormat format = new AccumuloRowInputFormat();</span>
-<span class="nc" id="L236">    JobConf conf = new JobConf();</span>
-<span class="nc" id="L237">    AccumuloRowInputFormat.setInputTableName(conf, tableName);</span>
-<span class="nc" id="L238">    AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));</span>
-<span class="nc" id="L239">    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()</span>
-<span class="nc" id="L240">      .withInstance(instance)</span>
-<span class="nc" id="L241">      .withZkHosts(zkHosts));</span>
-<span class="nc" id="L242">    AccumuloRowInputFormat.setScanAuthorizations(conf, auth);</span>
-<span class="nc bnc" id="L243" title="All 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getQueryRanges() != null) {</span>
+<span class="fc" id="L235">    AccumuloRowInputFormat format = new AccumuloRowInputFormat();</span>
+<span class="fc" id="L236">    JobConf conf = new JobConf();</span>
+<span class="fc" id="L237">    AccumuloRowInputFormat.setInputTableName(conf, tableName);</span>
+<span class="fc" id="L238">    AccumuloRowInputFormat.setConnectorInfo(conf, user, new PasswordToken(password));</span>
+<span class="fc" id="L239">    AccumuloRowInputFormat.setZooKeeperInstance(conf, ClientConfiguration.create()</span>
+<span class="fc" id="L240">      .withInstance(instance)</span>
+<span class="fc" id="L241">      .withZkHosts(zkHosts));</span>
+<span class="fc" id="L242">    AccumuloRowInputFormat.setScanAuthorizations(conf, auth);</span>
+<span class="pc bpc" id="L243" title="1 of 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getQueryRanges() != null) {</span>
 <span class="nc" id="L244">      AccumuloRowInputFormat.setRanges(conf, predicate.getQueryRanges());</span>
     }
-<span class="nc" id="L246">    InputSplit[] splits = format.getSplits(conf, maxSplit);</span>
-<span class="nc" id="L247">    return Stream.of(splits)</span>
-<span class="nc" id="L248">      .map(it -&gt; (RangeInputSplit) it)</span>
-<span class="nc" id="L249">      .map(RangeInputSplit::getRange)</span>
-<span class="nc" id="L250">      .collect(Collectors.toList());</span>
+<span class="fc" id="L246">    InputSplit[] splits = format.getSplits(conf, maxSplit);</span>
+<span class="fc" id="L247">    return Stream.of(splits)</span>
+<span class="fc" id="L248">      .map(it -&gt; (RangeInputSplit) it)</span>
+<span class="fc" id="L249">      .map(RangeInputSplit::getRange)</span>
+<span class="fc" id="L250">      .collect(Collectors.toList());</span>
   }
 
 }

@@ -87,7 +87,7 @@ public class AccumuloEPGMStore implements
   /**
    * accumulo epgm store logger
    */
-<span class="nc" id="L90">  private static final Logger LOG = LoggerFactory.getLogger(AccumuloEPGMStore.class);</span>
+<span class="fc" id="L90">  private static final Logger LOG = LoggerFactory.getLogger(AccumuloEPGMStore.class);</span>
 
   /**
    * gradoop accumulo configuration
@@ -131,18 +131,18 @@ public class AccumuloEPGMStore implements
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   public AccumuloEPGMStore(@Nonnull GradoopAccumuloConfig config)
-<span class="nc" id="L134">    throws AccumuloSecurityException, AccumuloException {</span>
-<span class="nc" id="L135">    this.config = config;</span>
-<span class="nc" id="L136">    this.conn = createConnector();</span>
-<span class="nc" id="L137">    createTablesIfNotExists();</span>
+<span class="fc" id="L134">    throws AccumuloSecurityException, AccumuloException {</span>
+<span class="fc" id="L135">    this.config = config;</span>
+<span class="fc" id="L136">    this.conn = createConnector();</span>
+<span class="fc" id="L137">    createTablesIfNotExists();</span>
     try {
-<span class="nc" id="L139">      graphWriter = conn.createBatchWriter(getGraphHeadName(), new BatchWriterConfig());</span>
-<span class="nc" id="L140">      vertexWriter = conn.createBatchWriter(getVertexTableName(), new BatchWriterConfig());</span>
-<span class="nc" id="L141">      edgeWriter = conn.createBatchWriter(getEdgeTableName(), new BatchWriterConfig());</span>
+<span class="fc" id="L139">      graphWriter = conn.createBatchWriter(getGraphHeadName(), new BatchWriterConfig());</span>
+<span class="fc" id="L140">      vertexWriter = conn.createBatchWriter(getVertexTableName(), new BatchWriterConfig());</span>
+<span class="fc" id="L141">      edgeWriter = conn.createBatchWriter(getEdgeTableName(), new BatchWriterConfig());</span>
 <span class="nc" id="L142">    } catch (TableNotFoundException e) {</span>
 <span class="nc" id="L143">      throw new IllegalStateException(e); //should not be here</span>
-<span class="nc" id="L144">    }</span>
-<span class="nc" id="L145">  }</span>
+<span class="fc" id="L144">    }</span>
+<span class="fc" id="L145">  }</span>
 
   /**
    * Create an accumulo client connector with given configuration
@@ -155,77 +155,77 @@ public class AccumuloEPGMStore implements
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
-<span class="nc" id="L158">    return new ZooKeeperInstance(</span>
-<span class="nc" id="L159">      /*instannce*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),</span>
-<span class="nc" id="L160">      /*zookeepers*/config.get(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS)</span>
-<span class="nc" id="L161">    ).getConnector(</span>
-<span class="nc" id="L162">      /*user*/config.get(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),</span>
+<span class="fc" id="L158">    return new ZooKeeperInstance(</span>
+<span class="fc" id="L159">      /*instannce*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),</span>
+<span class="fc" id="L160">      /*zookeepers*/config.get(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS)</span>
+<span class="fc" id="L161">    ).getConnector(</span>
+<span class="fc" id="L162">      /*user*/config.get(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),</span>
       /*password*/
-<span class="nc" id="L164">      new PasswordToken(config.get(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault</span>
+<span class="fc" id="L164">      new PasswordToken(config.get(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault</span>
         .PASSWORD)));
   }
 
   @Override
   public GradoopAccumuloConfig getConfig() {
-<span class="nc" id="L170">    return config;</span>
+<span class="fc" id="L170">    return config;</span>
   }
 
   @Override
   public String getVertexTableName() {
-<span class="nc" id="L175">    return config.getVertexTable();</span>
+<span class="fc" id="L175">    return config.getVertexTable();</span>
   }
 
   @Override
   public String getEdgeTableName() {
-<span class="nc" id="L180">    return config.getEdgeTable();</span>
+<span class="fc" id="L180">    return config.getEdgeTable();</span>
   }
 
   @Override
   public String getGraphHeadName() {
-<span class="nc" id="L185">    return config.getGraphHeadTable();</span>
+<span class="fc" id="L185">    return config.getGraphHeadTable();</span>
   }
 
   @Override
   public void writeGraphHead(@Nonnull GraphHead record) {
-<span class="nc" id="L190">    writeRecord(record, graphWriter, config.getGraphHandler());</span>
-<span class="nc" id="L191">  }</span>
+<span class="fc" id="L190">    writeRecord(record, graphWriter, config.getGraphHandler());</span>
+<span class="fc" id="L191">  }</span>
 
   @Override
   public void writeVertex(@Nonnull Vertex record) {
-<span class="nc" id="L195">    writeRecord(record, vertexWriter, config.getVertexHandler());</span>
-<span class="nc" id="L196">  }</span>
+<span class="fc" id="L195">    writeRecord(record, vertexWriter, config.getVertexHandler());</span>
+<span class="fc" id="L196">  }</span>
 
   @Override
   public void writeEdge(@Nonnull Edge record) {
-<span class="nc" id="L200">    writeRecord(record, edgeWriter, config.getEdgeHandler());</span>
-<span class="nc" id="L201">  }</span>
+<span class="fc" id="L200">    writeRecord(record, edgeWriter, config.getEdgeHandler());</span>
+<span class="fc" id="L201">  }</span>
 
   @Override
   public void setAutoFlush(boolean autoFlush) {
-<span class="nc" id="L205">    this.autoFlush = autoFlush;</span>
-<span class="nc" id="L206">  }</span>
+<span class="fc" id="L205">    this.autoFlush = autoFlush;</span>
+<span class="fc" id="L206">  }</span>
 
   @Override
   public void flush() {
     try {
-<span class="nc" id="L211">      graphWriter.flush();</span>
-<span class="nc" id="L212">      vertexWriter.flush();</span>
-<span class="nc" id="L213">      edgeWriter.flush();</span>
+<span class="fc" id="L211">      graphWriter.flush();</span>
+<span class="fc" id="L212">      vertexWriter.flush();</span>
+<span class="fc" id="L213">      edgeWriter.flush();</span>
 <span class="nc" id="L214">    } catch (MutationsRejectedException e) {</span>
 <span class="nc" id="L215">      throw new RuntimeException(e);</span>
-<span class="nc" id="L216">    }</span>
-<span class="nc" id="L217">  }</span>
+<span class="fc" id="L216">    }</span>
+<span class="fc" id="L217">  }</span>
 
   @Override
   public void close() {
     try {
-<span class="nc" id="L222">      graphWriter.close();</span>
-<span class="nc" id="L223">      vertexWriter.close();</span>
-<span class="nc" id="L224">      edgeWriter.close();</span>
+<span class="fc" id="L222">      graphWriter.close();</span>
+<span class="fc" id="L223">      vertexWriter.close();</span>
+<span class="fc" id="L224">      edgeWriter.close();</span>
 <span class="nc" id="L225">    } catch (MutationsRejectedException e) {</span>
 <span class="nc" id="L226">      throw new RuntimeException(e);</span>
-<span class="nc" id="L227">    }</span>
-<span class="nc" id="L228">  }</span>
+<span class="fc" id="L227">    }</span>
+<span class="fc" id="L228">  }</span>
 
   /**
    * Drop all tables used by this store instance.
@@ -233,15 +233,15 @@ public class AccumuloEPGMStore implements
    * @throws IOException when deleting tables fails.
    */
   public void dropTables() throws IOException {
-<span class="nc bnc" id="L236" title="All 2 branches missed.">    for (String tableName : new String[] {</span>
-<span class="nc" id="L237">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()}) {</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">    for (String tableName : new String[] {</span>
+<span class="fc" id="L237">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()}) {</span>
       try {
-<span class="nc" id="L239">        dropTableIfExists(tableName);</span>
+<span class="fc" id="L239">        dropTableIfExists(tableName);</span>
 <span class="nc" id="L240">      } catch (AccumuloSecurityException | AccumuloException e) {</span>
 <span class="nc" id="L241">        throw new IOException(&quot;Failed to delete table &quot; + tableName, e);</span>
-<span class="nc" id="L242">      }</span>
+<span class="fc" id="L242">      }</span>
     }
-<span class="nc" id="L244">  }</span>
+<span class="fc" id="L244">  }</span>
 
   /**
    * Truncate all tables handled by this store instance, i.e. delete all rows.
@@ -250,23 +250,23 @@ public class AccumuloEPGMStore implements
    * @throws IOException when deleting or creating tables fails.
    */
   public void truncateTables() throws IOException {
-<span class="nc" id="L253">    dropTables();</span>
+<span class="fc" id="L253">    dropTables();</span>
     try {
-<span class="nc" id="L255">      createTablesIfNotExists();</span>
+<span class="fc" id="L255">      createTablesIfNotExists();</span>
 <span class="nc" id="L256">    } catch (AccumuloSecurityException | AccumuloException e) {</span>
 <span class="nc" id="L257">      throw new IOException(&quot;Failed to create tables.&quot;, e);</span>
-<span class="nc" id="L258">    }</span>
-<span class="nc" id="L259">  }</span>
+<span class="fc" id="L258">    }</span>
+<span class="fc" id="L259">  }</span>
 
   @Nullable
   @Override
   public EPGMGraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
     ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query = Query
-<span class="nc" id="L265">      .elements()</span>
-<span class="nc" id="L266">      .fromSets(graphId)</span>
-<span class="nc" id="L267">      .noFilter();</span>
-<span class="nc" id="L268">    try (ClosableIterator&lt;EPGMGraphHead&gt; it = getGraphSpace(query, 1)) {</span>
-<span class="nc bnc" id="L269" title="All 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+<span class="fc" id="L265">      .elements()</span>
+<span class="fc" id="L266">      .fromSets(graphId)</span>
+<span class="fc" id="L267">      .noFilter();</span>
+<span class="fc" id="L268">    try (ClosableIterator&lt;EPGMGraphHead&gt; it = getGraphSpace(query, 1)) {</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
@@ -274,11 +274,11 @@ public class AccumuloEPGMStore implements
   @Override
   public EPGMVertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
     ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query = Query
-<span class="nc" id="L277">      .elements()</span>
-<span class="nc" id="L278">      .fromSets(vertexId)</span>
-<span class="nc" id="L279">      .noFilter();</span>
-<span class="nc" id="L280">    try (ClosableIterator&lt;EPGMVertex&gt; it = getVertexSpace(query, 1)) {</span>
-<span class="nc bnc" id="L281" title="All 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+<span class="fc" id="L277">      .elements()</span>
+<span class="fc" id="L278">      .fromSets(vertexId)</span>
+<span class="fc" id="L279">      .noFilter();</span>
+<span class="fc" id="L280">    try (ClosableIterator&lt;EPGMVertex&gt; it = getVertexSpace(query, 1)) {</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
@@ -286,11 +286,11 @@ public class AccumuloEPGMStore implements
   @Override
   public EPGMEdge readEdge(@Nonnull GradoopId edgeId) throws IOException {
     ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query = Query
-<span class="nc" id="L289">      .elements()</span>
-<span class="nc" id="L290">      .fromSets(edgeId)</span>
-<span class="nc" id="L291">      .noFilter();</span>
-<span class="nc" id="L292">    try (ClosableIterator&lt;EPGMEdge&gt; it = getEdgeSpace(query, 1)) {</span>
-<span class="nc bnc" id="L293" title="All 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+<span class="fc" id="L289">      .elements()</span>
+<span class="fc" id="L290">      .fromSets(edgeId)</span>
+<span class="fc" id="L291">      .noFilter();</span>
+<span class="fc" id="L292">    try (ClosableIterator&lt;EPGMEdge&gt; it = getEdgeSpace(query, 1)) {</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
@@ -300,27 +300,27 @@ public class AccumuloEPGMStore implements
     @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query,
     int cacheSize
   ) throws IOException {
-<span class="nc bnc" id="L303" title="All 2 branches missed.">    if (query != null &amp;&amp;</span>
-<span class="nc bnc" id="L304" title="All 2 branches missed.">      query.getQueryRanges() != null &amp;&amp;</span>
-<span class="nc bnc" id="L305" title="All 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="fc bfc" id="L303" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
 <span class="nc" id="L306">      return new EmptyClosableIterator&lt;&gt;();</span>
     }
 
-<span class="nc bnc" id="L309" title="All 2 branches missed.">    if (query != null) {</span>
-<span class="nc" id="L310">      LOG.info(query.toString());</span>
+<span class="fc bfc" id="L309" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L310">      LOG.info(query.toString());</span>
     }
 
-<span class="nc" id="L313">    BatchScanner scanner = createBatchScanner(</span>
-<span class="nc" id="L314">      getGraphHeadName(),</span>
+<span class="fc" id="L313">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L314">      getGraphHeadName(),</span>
       GradoopGraphHeadIterator.class,
       query);
-<span class="nc" id="L317">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
-<span class="nc bnc" id="L318" title="All 2 branches missed.">    if (!iterator.hasNext()) {</span>
-<span class="nc" id="L319">      return new EmptyClosableIterator&lt;&gt;();</span>
+<span class="fc" id="L317">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L319">      return new EmptyClosableIterator&lt;&gt;();</span>
     } else {
-<span class="nc" id="L321">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+<span class="fc" id="L321">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
         new GradoopGraphHeadIterator(),
-<span class="nc" id="L323">        config.getGraphHandler(),</span>
+<span class="fc" id="L323">        config.getGraphHandler(),</span>
         cacheSize);
     }
   }
@@ -331,27 +331,27 @@ public class AccumuloEPGMStore implements
     @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query,
     int cacheSize
   ) throws IOException {
-<span class="nc bnc" id="L334" title="All 2 branches missed.">    if (query != null &amp;&amp;</span>
-<span class="nc bnc" id="L335" title="All 2 branches missed.">      query.getQueryRanges() != null &amp;&amp;</span>
-<span class="nc bnc" id="L336" title="All 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
 <span class="nc" id="L337">      return new EmptyClosableIterator&lt;&gt;();</span>
     }
 
-<span class="nc bnc" id="L340" title="All 2 branches missed.">    if (query != null) {</span>
-<span class="nc" id="L341">      LOG.info(query.toString());</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L341">      LOG.info(query.toString());</span>
     }
 
-<span class="nc" id="L344">    BatchScanner scanner = createBatchScanner(</span>
-<span class="nc" id="L345">      getVertexTableName(),</span>
+<span class="fc" id="L344">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L345">      getVertexTableName(),</span>
       GradoopVertexIterator.class,
       query);
-<span class="nc" id="L348">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
-<span class="nc bnc" id="L349" title="All 2 branches missed.">    if (!iterator.hasNext()) {</span>
-<span class="nc" id="L350">      return new EmptyClosableIterator&lt;&gt;();</span>
+<span class="fc" id="L348">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L350">      return new EmptyClosableIterator&lt;&gt;();</span>
     } else {
-<span class="nc" id="L352">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+<span class="fc" id="L352">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
         new GradoopVertexIterator(),
-<span class="nc" id="L354">        config.getVertexHandler(),</span>
+<span class="fc" id="L354">        config.getVertexHandler(),</span>
         cacheSize);
     }
   }
@@ -362,27 +362,27 @@ public class AccumuloEPGMStore implements
     @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query,
     int cacheSize
   ) throws IOException {
-<span class="nc bnc" id="L365" title="All 2 branches missed.">    if (query != null &amp;&amp;</span>
-<span class="nc bnc" id="L366" title="All 2 branches missed.">      query.getQueryRanges() != null &amp;&amp;</span>
-<span class="nc bnc" id="L367" title="All 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="fc bfc" id="L365" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L367" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
 <span class="nc" id="L368">      return new EmptyClosableIterator&lt;&gt;();</span>
     }
 
-<span class="nc bnc" id="L371" title="All 2 branches missed.">    if (query != null) {</span>
-<span class="nc" id="L372">      LOG.info(query.toString());</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L372">      LOG.info(query.toString());</span>
     }
 
-<span class="nc" id="L375">    BatchScanner scanner = createBatchScanner(</span>
-<span class="nc" id="L376">      getEdgeTableName(),</span>
+<span class="fc" id="L375">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L376">      getEdgeTableName(),</span>
       GradoopEdgeIterator.class,
       query);
-<span class="nc" id="L379">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
-<span class="nc bnc" id="L380" title="All 2 branches missed.">    if (!iterator.hasNext()) {</span>
-<span class="nc" id="L381">      return new EmptyClosableIterator&lt;&gt;();</span>
+<span class="fc" id="L379">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L381">      return new EmptyClosableIterator&lt;&gt;();</span>
     } else {
-<span class="nc" id="L383">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+<span class="fc" id="L383">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
         new GradoopEdgeIterator(),
-<span class="nc" id="L385">        config.getEdgeHandler(),</span>
+<span class="fc" id="L385">        config.getEdgeHandler(),</span>
         cacheSize);
     }
   }
@@ -400,18 +400,18 @@ public class AccumuloEPGMStore implements
     @Nonnull BatchWriter writer,
     @Nonnull AccumuloRowHandler handler
   ) {
-<span class="nc" id="L403">    Mutation mutation = new Mutation(record.getId().toString());</span>
+<span class="fc" id="L403">    Mutation mutation = new Mutation(record.getId().toString());</span>
     //noinspection unchecked
-<span class="nc" id="L405">    mutation = handler.writeRow(mutation, record);</span>
+<span class="fc" id="L405">    mutation = handler.writeRow(mutation, record);</span>
     try {
-<span class="nc" id="L407">      writer.addMutation(mutation);</span>
-<span class="nc bnc" id="L408" title="All 2 branches missed.">      if (autoFlush) {</span>
+<span class="fc" id="L407">      writer.addMutation(mutation);</span>
+<span class="pc bpc" id="L408" title="1 of 2 branches missed.">      if (autoFlush) {</span>
 <span class="nc" id="L409">        writer.flush();</span>
       }
 <span class="nc" id="L411">    } catch (MutationsRejectedException e) {</span>
 <span class="nc" id="L412">      throw new RuntimeException(e);</span>
-<span class="nc" id="L413">    }</span>
-<span class="nc" id="L414">  }</span>
+<span class="fc" id="L413">    }</span>
+<span class="fc" id="L414">  }</span>
 
   /**
    * Create accumulo batch scanner with element predicate
@@ -428,36 +428,36 @@ public class AccumuloEPGMStore implements
     Class&lt;? extends SortedKeyValueIterator&lt;Key, Value&gt;&gt; iterator,
     @Nullable ElementQuery&lt;AccumuloElementFilter&lt;T&gt;&gt; predicate
   ) throws IOException {
-<span class="nc" id="L431">    Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L432" title="All 4 branches missed.">    if (predicate != null &amp;&amp; predicate.getFilterPredicate() != null) {</span>
-<span class="nc" id="L433">      options.put(AccumuloTables.KEY_PREDICATE, predicate.getFilterPredicate().encode());</span>
+<span class="fc" id="L431">    Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L432" title="All 4 branches covered.">    if (predicate != null &amp;&amp; predicate.getFilterPredicate() != null) {</span>
+<span class="fc" id="L433">      options.put(AccumuloTables.KEY_PREDICATE, predicate.getFilterPredicate().encode());</span>
     }
     BatchScanner scanner;
     try {
-<span class="nc" id="L437">      scanner = conn.createBatchScanner(table,</span>
-<span class="nc" id="L438">        config.get(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
+<span class="fc" id="L437">      scanner = conn.createBatchScanner(table,</span>
+<span class="fc" id="L438">        config.get(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
           AccumuloDefault.AUTHORIZATION),
-<span class="nc" id="L440">        config.get(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
-<span class="nc" id="L441">          AccumuloDefault.BATCH_SCANNER_THREADS));</span>
-<span class="nc" id="L442">      int priority =</span>
-<span class="nc" id="L443">        config.get(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY, AccumuloDefault</span>
+<span class="fc" id="L440">        config.get(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
+<span class="fc" id="L441">          AccumuloDefault.BATCH_SCANNER_THREADS));</span>
+<span class="fc" id="L442">      int priority =</span>
+<span class="fc" id="L443">        config.get(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY, AccumuloDefault</span>
           .ITERATOR_PRIORITY);
-<span class="nc" id="L445">      scanner.addScanIterator(new IteratorSetting(</span>
+<span class="fc" id="L445">      scanner.addScanIterator(new IteratorSetting(</span>
         /*iterator priority*/priority,
         /*iterator class*/iterator,
         /*args*/options));
 
-<span class="nc bnc" id="L450" title="All 2 branches missed.">      if (predicate == null ||</span>
-<span class="nc bnc" id="L451" title="All 2 branches missed.">        predicate.getQueryRanges() == null) {</span>
-<span class="nc" id="L452">        scanner.setRanges(Lists.newArrayList(new Range()));</span>
+<span class="fc bfc" id="L450" title="All 2 branches covered.">      if (predicate == null ||</span>
+<span class="fc bfc" id="L451" title="All 2 branches covered.">        predicate.getQueryRanges() == null) {</span>
+<span class="fc" id="L452">        scanner.setRanges(Lists.newArrayList(new Range()));</span>
       } else {
-<span class="nc" id="L454">        scanner.setRanges(Range.mergeOverlapping(predicate.getQueryRanges()</span>
-<span class="nc" id="L455">          .stream()</span>
-<span class="nc" id="L456">          .map(GradoopId::toString)</span>
-<span class="nc" id="L457">          .map(Range::exact)</span>
-<span class="nc" id="L458">          .collect(Collectors.toList())));</span>
+<span class="fc" id="L454">        scanner.setRanges(Range.mergeOverlapping(predicate.getQueryRanges()</span>
+<span class="fc" id="L455">          .stream()</span>
+<span class="fc" id="L456">          .map(GradoopId::toString)</span>
+<span class="fc" id="L457">          .map(Range::exact)</span>
+<span class="fc" id="L458">          .collect(Collectors.toList())));</span>
       }
-<span class="nc" id="L460">      return scanner;</span>
+<span class="fc" id="L460">      return scanner;</span>
 
 <span class="nc" id="L462">    } catch (TableNotFoundException e) {</span>
 <span class="nc" id="L463">      throw new IOException(e);</span>
@@ -474,30 +474,30 @@ public class AccumuloEPGMStore implements
    * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
    */
   private void createTablesIfNotExists() throws AccumuloSecurityException, AccumuloException {
-<span class="nc" id="L477">    String prefix =</span>
-<span class="nc" id="L478">      config.get(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX);</span>
-<span class="nc bnc" id="L479" title="All 2 branches missed.">    if (prefix.contains(&quot;.&quot;)) {</span>
-<span class="nc" id="L480">      String namespace = prefix.substring(0, prefix.indexOf(&quot;.&quot;));</span>
+<span class="fc" id="L477">    String prefix =</span>
+<span class="fc" id="L478">      config.get(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX);</span>
+<span class="pc bpc" id="L479" title="1 of 2 branches missed.">    if (prefix.contains(&quot;.&quot;)) {</span>
+<span class="fc" id="L480">      String namespace = prefix.substring(0, prefix.indexOf(&quot;.&quot;));</span>
       try {
-<span class="nc bnc" id="L482" title="All 2 branches missed.">        if (!conn.namespaceOperations().exists(namespace)) {</span>
-<span class="nc" id="L483">          conn.namespaceOperations().create(namespace);</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">        if (!conn.namespaceOperations().exists(namespace)) {</span>
+<span class="fc" id="L483">          conn.namespaceOperations().create(namespace);</span>
         }
 <span class="nc" id="L485">      } catch (NamespaceExistsException ignore) {</span>
         //ignore if it is exists, maybe create by another process or thread
-<span class="nc" id="L487">      }</span>
+<span class="fc" id="L487">      }</span>
     }
-<span class="nc bnc" id="L489" title="All 2 branches missed.">    for (String table : new String[] {</span>
-<span class="nc" id="L490">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">    for (String table : new String[] {</span>
+<span class="fc" id="L490">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()</span>
     }) {
       try {
-<span class="nc bnc" id="L493" title="All 2 branches missed.">        if (!conn.tableOperations().exists(table)) {</span>
-<span class="nc" id="L494">          conn.tableOperations().create(table);</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">        if (!conn.tableOperations().exists(table)) {</span>
+<span class="fc" id="L494">          conn.tableOperations().create(table);</span>
         }
 <span class="nc" id="L496">      } catch (TableExistsException ignore) {</span>
         //ignore if it is exists, maybe create by another process or thread
-<span class="nc" id="L498">      }</span>
+<span class="fc" id="L498">      }</span>
     }
-<span class="nc" id="L500">  }</span>
+<span class="fc" id="L500">  }</span>
 
   /**
    * Delete a table if it exists.
@@ -508,14 +508,14 @@ public class AccumuloEPGMStore implements
    */
   private void dropTableIfExists(@Nonnull String tableName) throws AccumuloSecurityException,
     AccumuloException {
-<span class="nc bnc" id="L511" title="All 2 branches missed.">    if (conn.tableOperations().exists(tableName)) {</span>
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">    if (conn.tableOperations().exists(tableName)) {</span>
       try {
-<span class="nc" id="L513">        conn.tableOperations().delete(tableName);</span>
+<span class="fc" id="L513">        conn.tableOperations().delete(tableName);</span>
 <span class="nc" id="L514">      } catch (TableNotFoundException e) {</span>
         // We checked before if it exists, so this should not happen.
 <span class="nc" id="L516">        throw new IllegalStateException(e);</span>
-<span class="nc" id="L517">      }</span>
+<span class="fc" id="L517">      }</span>
     }
-<span class="nc" id="L519">  }</span>
+<span class="fc" id="L519">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

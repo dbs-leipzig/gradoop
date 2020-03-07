@@ -81,7 +81,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
   /**
    * accumulo properties
    */
-<span class="nc" id="L84">  private final Properties accumuloProperties = new Properties();</span>
+<span class="fc" id="L84">  private final Properties accumuloProperties = new Properties();</span>
 
   /**
    * row handler for EPGMGraphHead
@@ -109,11 +109,11 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
     AccumuloGraphHandler graphHandler,
     AccumuloVertexHandler vertexHandler,
     AccumuloEdgeHandler edgeHandler
-<span class="nc" id="L112">  ) {</span>
-<span class="nc" id="L113">    this.graphHandler = graphHandler;</span>
-<span class="nc" id="L114">    this.vertexHandler = vertexHandler;</span>
-<span class="nc" id="L115">    this.edgeHandler = edgeHandler;</span>
-<span class="nc" id="L116">  }</span>
+<span class="fc" id="L112">  ) {</span>
+<span class="fc" id="L113">    this.graphHandler = graphHandler;</span>
+<span class="fc" id="L114">    this.vertexHandler = vertexHandler;</span>
+<span class="fc" id="L115">    this.edgeHandler = edgeHandler;</span>
+<span class="fc" id="L116">  }</span>
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -122,10 +122,10 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return Default Gradoop Accumulo configuration.
    */
   public static GradoopAccumuloConfig getDefaultConfig() {
-<span class="nc" id="L125">    EPGMGraphHeadFactory graphHeadFactory = new EPGMGraphHeadFactory();</span>
-<span class="nc" id="L126">    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();</span>
-<span class="nc" id="L127">    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();</span>
-<span class="nc" id="L128">    return new GradoopAccumuloConfig(</span>
+<span class="fc" id="L125">    EPGMGraphHeadFactory graphHeadFactory = new EPGMGraphHeadFactory();</span>
+<span class="fc" id="L126">    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();</span>
+<span class="fc" id="L127">    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();</span>
+<span class="fc" id="L128">    return new GradoopAccumuloConfig(</span>
       new AccumuloGraphHandler(graphHeadFactory),
       new AccumuloVertexHandler(vertexFactory),
       new AccumuloEdgeHandler(edgeFactory));
@@ -139,8 +139,8 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return configure itself
    */
   public GradoopAccumuloConfig set(String key, Object value) {
-<span class="nc" id="L142">    accumuloProperties.put(key, value);</span>
-<span class="nc" id="L143">    return this;</span>
+<span class="fc" id="L142">    accumuloProperties.put(key, value);</span>
+<span class="fc" id="L143">    return this;</span>
   }
 
   /**
@@ -152,12 +152,12 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return integer value
    */
   public &lt;T&gt; T get(String key, T defValue) {
-<span class="nc" id="L155">    Object value = accumuloProperties.get(key);</span>
-<span class="nc bnc" id="L156" title="All 2 branches missed.">    if (value == null) {</span>
-<span class="nc" id="L157">      return defValue;</span>
+<span class="fc" id="L155">    Object value = accumuloProperties.get(key);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (value == null) {</span>
+<span class="fc" id="L157">      return defValue;</span>
     } else {
       //noinspection unchecked
-<span class="nc" id="L160">      return (T) value;</span>
+<span class="fc" id="L160">      return (T) value;</span>
     }
   }
 
@@ -167,7 +167,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return accumulo properties
    */
   public Properties getAccumuloProperties() {
-<span class="nc" id="L170">    return accumuloProperties;</span>
+<span class="fc" id="L170">    return accumuloProperties;</span>
   }
 
   /**
@@ -176,7 +176,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return graph handler
    */
   public AccumuloGraphHandler getGraphHandler() {
-<span class="nc" id="L179">    return graphHandler;</span>
+<span class="fc" id="L179">    return graphHandler;</span>
   }
 
   /**
@@ -185,7 +185,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return vertex handler
    */
   public AccumuloVertexHandler getVertexHandler() {
-<span class="nc" id="L188">    return vertexHandler;</span>
+<span class="fc" id="L188">    return vertexHandler;</span>
   }
 
   /**
@@ -194,7 +194,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return edge handler
    */
   public AccumuloEdgeHandler getEdgeHandler() {
-<span class="nc" id="L197">    return edgeHandler;</span>
+<span class="fc" id="L197">    return edgeHandler;</span>
   }
 
   /**
@@ -203,7 +203,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return edge table name
    */
   public String getEdgeTable() {
-<span class="nc" id="L206">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.EDGE;</span>
+<span class="fc" id="L206">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.EDGE;</span>
   }
 
   /**
@@ -212,7 +212,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return vertex table name
    */
   public String getVertexTable() {
-<span class="nc" id="L215">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.VERTEX;</span>
+<span class="fc" id="L215">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.VERTEX;</span>
   }
 
   /**
@@ -221,7 +221,7 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
    * @return graph head table name
    */
   public String getGraphHeadTable() {
-<span class="nc" id="L224">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.GRAPH;</span>
+<span class="fc" id="L224">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.GRAPH;</span>
   }
 
   @Override

@@ -76,7 +76,7 @@ public class ClientClosableIterator&lt;R extends EPGMElement, E extends Element&
   /**
    * element cache size
    */
-<span class="nc" id="L79">  private List&lt;E&gt; cache = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L79">  private List&lt;E&gt; cache = new ArrayList&lt;&gt;();</span>
 
   /**
    * cache closable iterator constructor
@@ -91,49 +91,49 @@ public class ClientClosableIterator&lt;R extends EPGMElement, E extends Element&
     @Nonnull BaseElementIterator&lt;E&gt; codec,
     @Nonnull AccumuloRowHandler&lt;R, E&gt; handler,
     int cacheSize
-<span class="nc" id="L94">  ) {</span>
-<span class="nc" id="L95">    this.codec = codec;</span>
-<span class="nc" id="L96">    this.scanner = scanner;</span>
-<span class="nc" id="L97">    this.cacheSize = cacheSize;</span>
-<span class="nc" id="L98">    this.handler = handler;</span>
-<span class="nc" id="L99">    this.inner = scanner.iterator();</span>
-<span class="nc" id="L100">  }</span>
+<span class="fc" id="L94">  ) {</span>
+<span class="fc" id="L95">    this.codec = codec;</span>
+<span class="fc" id="L96">    this.scanner = scanner;</span>
+<span class="fc" id="L97">    this.cacheSize = cacheSize;</span>
+<span class="fc" id="L98">    this.handler = handler;</span>
+<span class="fc" id="L99">    this.inner = scanner.iterator();</span>
+<span class="fc" id="L100">  }</span>
 
   @Override
   public void close() {
-<span class="nc" id="L104">    scanner.close();</span>
-<span class="nc" id="L105">  }</span>
+<span class="fc" id="L104">    scanner.close();</span>
+<span class="fc" id="L105">  }</span>
 
   @Override
   public boolean hasNext() {
-<span class="nc bnc" id="L109" title="All 2 branches missed.">    if (!cache.isEmpty()) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    if (!cache.isEmpty()) {</span>
       //cache is not empty
-<span class="nc" id="L111">      return true;</span>
+<span class="fc" id="L111">      return true;</span>
 
-<span class="nc bnc" id="L113" title="All 2 branches missed.">    } else if (inner.hasNext()) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">    } else if (inner.hasNext()) {</span>
       //cache is empty, read elements to cache
-<span class="nc bnc" id="L115" title="All 4 branches missed.">      while (inner.hasNext() &amp;&amp; cache.size() &lt; cacheSize) {</span>
-<span class="nc" id="L116">        E next = null;</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">      while (inner.hasNext() &amp;&amp; cache.size() &lt; cacheSize) {</span>
+<span class="fc" id="L116">        E next = null;</span>
         try {
-<span class="nc" id="L118">          next = codec.fromRow(inner.next());</span>
+<span class="fc" id="L118">          next = codec.fromRow(inner.next());</span>
 <span class="nc" id="L119">        } catch (IOException e) {</span>
 <span class="nc" id="L120">          e.printStackTrace();</span>
-<span class="nc" id="L121">        }</span>
-<span class="nc" id="L122">        cache.add(next);</span>
-<span class="nc" id="L123">      }</span>
-<span class="nc" id="L124">      return hasNext();</span>
+<span class="fc" id="L121">        }</span>
+<span class="fc" id="L122">        cache.add(next);</span>
+<span class="fc" id="L123">      }</span>
+<span class="fc" id="L124">      return hasNext();</span>
 
     } else {
       //cache is empty and iterator has no element any more
-<span class="nc" id="L128">      return false;</span>
+<span class="fc" id="L128">      return false;</span>
 
     }
   }
 
   @Override
   public R next() {
-<span class="nc" id="L135">    E row = cache.remove(0);</span>
-<span class="nc" id="L136">    return handler.readRow(row);</span>
+<span class="fc" id="L135">    E row = cache.remove(0);</span>
+<span class="fc" id="L136">    return handler.readRow(row);</span>
   }
 
 }

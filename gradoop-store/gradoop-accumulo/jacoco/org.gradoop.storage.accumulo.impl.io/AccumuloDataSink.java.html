@@ -43,8 +43,8 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
     @Nonnull AccumuloEPGMStore store,
     @Nonnull GradoopFlinkConfig flinkConfig
   ) {
-<span class="nc" id="L46">    super(store, flinkConfig);</span>
-<span class="nc" id="L47">  }</span>
+<span class="fc" id="L46">    super(store, flinkConfig);</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
@@ -53,8 +53,8 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
   @Override
   public void write(GraphCollection graphCollection) throws IOException {
-<span class="nc" id="L56">    write(graphCollection, false);</span>
-<span class="nc" id="L57">  }</span>
+<span class="fc" id="L56">    write(graphCollection, false);</span>
+<span class="fc" id="L57">  }</span>
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
@@ -63,16 +63,16 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
 
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
-<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (overWrite) {</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (overWrite) {</span>
 <span class="nc" id="L67">      getStore().truncateTables();</span>
     }
-<span class="nc" id="L69">    graphCollection.getGraphHeads()</span>
-<span class="nc" id="L70">      .output(new ElementOutputFormat&lt;&gt;(EPGMGraphHead.class, getAccumuloConfig()));</span>
-<span class="nc" id="L71">    graphCollection.getVertices()</span>
-<span class="nc" id="L72">      .output(new ElementOutputFormat&lt;&gt;(EPGMVertex.class, getAccumuloConfig()));</span>
-<span class="nc" id="L73">    graphCollection.getEdges()</span>
-<span class="nc" id="L74">      .output(new ElementOutputFormat&lt;&gt;(EPGMEdge.class, getAccumuloConfig()));</span>
-<span class="nc" id="L75">  }</span>
+<span class="fc" id="L69">    graphCollection.getGraphHeads()</span>
+<span class="fc" id="L70">      .output(new ElementOutputFormat&lt;&gt;(EPGMGraphHead.class, getAccumuloConfig()));</span>
+<span class="fc" id="L71">    graphCollection.getVertices()</span>
+<span class="fc" id="L72">      .output(new ElementOutputFormat&lt;&gt;(EPGMVertex.class, getAccumuloConfig()));</span>
+<span class="fc" id="L73">    graphCollection.getEdges()</span>
+<span class="fc" id="L74">      .output(new ElementOutputFormat&lt;&gt;(EPGMEdge.class, getAccumuloConfig()));</span>
+<span class="fc" id="L75">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

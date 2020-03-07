@@ -59,12 +59,12 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
   private AccumuloQueryHolder(
     @Nullable List&lt;Range&gt; logicalRanges,
     @Nullable AccumuloElementFilter&lt;T&gt; reduceFilter
-<span class="nc" id="L62">  ) {</span>
-<span class="nc" id="L63">    RangeWrapper wrapper = new RangeWrapper();</span>
-<span class="nc" id="L64">    wrapper.ranges = logicalRanges;</span>
-<span class="nc" id="L65">    this.queryRanges = wrapper.encrypt();</span>
-<span class="nc" id="L66">    this.reduceFilter = reduceFilter;</span>
-<span class="nc" id="L67">  }</span>
+<span class="fc" id="L62">  ) {</span>
+<span class="fc" id="L63">    RangeWrapper wrapper = new RangeWrapper();</span>
+<span class="fc" id="L64">    wrapper.ranges = logicalRanges;</span>
+<span class="fc" id="L65">    this.queryRanges = wrapper.encrypt();</span>
+<span class="fc" id="L66">    this.reduceFilter = reduceFilter;</span>
+<span class="fc" id="L67">  }</span>
 
   /**
    * Create a predicate within a certain id ranges
@@ -76,15 +76,15 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
   public static &lt;T extends Element&gt; AccumuloQueryHolder&lt;T&gt; create(
     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;T&gt;&gt; query
   ) {
-<span class="nc" id="L79">    List&lt;Range&gt; ranges = Range.mergeOverlapping(Optional.ofNullable(query.getQueryRanges())</span>
-<span class="nc" id="L80">      .orElse(GradoopIdSet.fromExisting())</span>
-<span class="nc" id="L81">      .stream()</span>
-<span class="nc" id="L82">      .map(GradoopId::toString)</span>
-<span class="nc" id="L83">      .map(Range::exact)</span>
-<span class="nc" id="L84">      .collect(Collectors.toList()));</span>
-<span class="nc" id="L85">    return new AccumuloQueryHolder&lt;&gt;(</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">      query.getQueryRanges() == null ? null : ranges,</span>
-<span class="nc" id="L87">      query.getFilterPredicate());</span>
+<span class="fc" id="L79">    List&lt;Range&gt; ranges = Range.mergeOverlapping(Optional.ofNullable(query.getQueryRanges())</span>
+<span class="fc" id="L80">      .orElse(GradoopIdSet.fromExisting())</span>
+<span class="fc" id="L81">      .stream()</span>
+<span class="fc" id="L82">      .map(GradoopId::toString)</span>
+<span class="fc" id="L83">      .map(Range::exact)</span>
+<span class="fc" id="L84">      .collect(Collectors.toList()));</span>
+<span class="fc" id="L85">    return new AccumuloQueryHolder&lt;&gt;(</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">      query.getQueryRanges() == null ? null : ranges,</span>
+<span class="fc" id="L87">      query.getFilterPredicate());</span>
   }
 
   /**
@@ -110,7 +110,7 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
    * @return seek range
    */
   public List&lt;Range&gt; getQueryRanges() {
-<span class="nc bnc" id="L113" title="All 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
   }
 
   /**
@@ -119,7 +119,7 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
    * @return accumulo element filter
    */
   public AccumuloElementFilter&lt;T&gt; getReduceFilter() {
-<span class="nc" id="L122">    return reduceFilter;</span>
+<span class="fc" id="L122">    return reduceFilter;</span>
   }
 
   @Override
@@ -150,7 +150,7 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
      */
     private byte[] encrypt() {
       try {
-<span class="nc" id="L153">        return KryoUtils.dumps(this);</span>
+<span class="fc" id="L153">        return KryoUtils.dumps(this);</span>
 <span class="nc" id="L154">      } catch (IOException e) {</span>
 <span class="nc" id="L155">        throw new RuntimeException(e);</span>
       }
@@ -164,7 +164,7 @@ public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializabl
      */
     private static RangeWrapper decrypt(byte[] data) {
       try {
-<span class="nc" id="L167">        return KryoUtils.loads(data, RangeWrapper.class);</span>
+<span class="fc" id="L167">        return KryoUtils.loads(data, RangeWrapper.class);</span>
 <span class="nc" id="L168">      } catch (IOException e) {</span>
 <span class="nc" id="L169">        throw new RuntimeException(e);</span>
       }

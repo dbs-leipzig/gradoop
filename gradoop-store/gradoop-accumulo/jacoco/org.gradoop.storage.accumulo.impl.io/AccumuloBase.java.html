@@ -45,10 +45,10 @@ abstract class AccumuloBase {
   AccumuloBase(
     @Nonnull AccumuloEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig flinkConfig
-<span class="nc" id="L48">  ) {</span>
-<span class="nc" id="L49">    this.flinkConfig = flinkConfig;</span>
-<span class="nc" id="L50">    this.epgmStore = epgmStore;</span>
-<span class="nc" id="L51">  }</span>
+<span class="fc" id="L48">  ) {</span>
+<span class="fc" id="L49">    this.flinkConfig = flinkConfig;</span>
+<span class="fc" id="L50">    this.epgmStore = epgmStore;</span>
+<span class="fc" id="L51">  }</span>
 
   /**
    * Get Accumulo EPGM Store instance
@@ -56,7 +56,7 @@ abstract class AccumuloBase {
    * @return accumulo epgm store instance
    */
   AccumuloEPGMStore getStore() {
-<span class="nc" id="L59">    return epgmStore;</span>
+<span class="fc" id="L59">    return epgmStore;</span>
   }
 
   /**
@@ -65,7 +65,7 @@ abstract class AccumuloBase {
    * @return accumulo configuration
    */
   GradoopAccumuloConfig getAccumuloConfig() {
-<span class="nc" id="L68">    return epgmStore.getConfig();</span>
+<span class="fc" id="L68">    return epgmStore.getConfig();</span>
   }
 
   /**
@@ -74,7 +74,7 @@ abstract class AccumuloBase {
    * @return flink configuration
    */
   GradoopFlinkConfig getFlinkConfig() {
-<span class="nc" id="L77">    return flinkConfig;</span>
+<span class="fc" id="L77">    return flinkConfig;</span>
   }
 
 }

@@ -35,9 +35,9 @@ public final class Not&lt;T extends Element&gt; implements AccumuloElementFilter
    *
    * @param predicate predicate
    */
-<span class="nc" id="L38">  private Not(AccumuloElementFilter&lt;T&gt; predicate) {</span>
-<span class="nc" id="L39">    this.predicate = predicate;</span>
-<span class="nc" id="L40">  }</span>
+<span class="fc" id="L38">  private Not(AccumuloElementFilter&lt;T&gt; predicate) {</span>
+<span class="fc" id="L39">    this.predicate = predicate;</span>
+<span class="fc" id="L40">  }</span>
 
   /**
    * Create a negative formula
@@ -47,7 +47,7 @@ public final class Not&lt;T extends Element&gt; implements AccumuloElementFilter
    * @return negative filter instance
    */
   public static &lt;T extends Element&gt; Not&lt;T&gt; of(AccumuloElementFilter&lt;T&gt; predicate) {
-<span class="nc" id="L50">    return new Not&lt;&gt;(predicate);</span>
+<span class="fc" id="L50">    return new Not&lt;&gt;(predicate);</span>
   }
 
   @Override

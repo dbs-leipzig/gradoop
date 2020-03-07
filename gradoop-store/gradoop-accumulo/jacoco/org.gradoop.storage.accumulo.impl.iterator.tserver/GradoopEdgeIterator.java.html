@@ -37,21 +37,21 @@ import java.util.Objects;
 /**
  * Accumulo gradoop edges iterator
  */
-<span class="nc" id="L40">public class GradoopEdgeIterator extends BaseElementIterator&lt;Edge&gt; {</span>
+<span class="fc" id="L40">public class GradoopEdgeIterator extends BaseElementIterator&lt;Edge&gt; {</span>
 
   /**
    * EPGMEdge factory
    */
-<span class="nc" id="L45">  private final EPGMEdgeFactory factory = new EPGMEdgeFactory();</span>
+<span class="fc" id="L45">  private final EPGMEdgeFactory factory = new EPGMEdgeFactory();</span>
 
   @Nonnull
   @Override
   public EPGMEdge fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException {
     //map from serialize content
-<span class="nc" id="L51">    EPGMEdge content = KryoUtils.loads(pair.getValue().get(), EPGMEdge.class);</span>
-<span class="nc" id="L52">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
+<span class="fc" id="L51">    EPGMEdge content = KryoUtils.loads(pair.getValue().get(), EPGMEdge.class);</span>
+<span class="fc" id="L52">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
     //read from content
-<span class="nc" id="L54">    return content;</span>
+<span class="fc" id="L54">    return content;</span>
   }
 
   @Nonnull

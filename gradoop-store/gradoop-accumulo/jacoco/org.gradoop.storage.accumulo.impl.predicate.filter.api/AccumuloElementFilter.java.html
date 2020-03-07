@@ -74,11 +74,11 @@ public interface AccumuloElementFilter&lt;T extends Element&gt;
    * @return encoded string
    */
   default String encode() {
-<span class="nc" id="L77">    try (</span>
-<span class="nc" id="L78">      ByteArrayOutputStream arr = new ByteArrayOutputStream();</span>
-<span class="nc" id="L79">      ObjectOutputStream out = new ObjectOutputStream(arr)) {</span>
-<span class="nc" id="L80">      out.writeObject(this);</span>
-<span class="nc" id="L81">      return Base64.getEncoder().encodeToString(arr.toByteArray());</span>
+<span class="fc" id="L77">    try (</span>
+<span class="fc" id="L78">      ByteArrayOutputStream arr = new ByteArrayOutputStream();</span>
+<span class="fc" id="L79">      ObjectOutputStream out = new ObjectOutputStream(arr)) {</span>
+<span class="fc" id="L80">      out.writeObject(this);</span>
+<span class="fc" id="L81">      return Base64.getEncoder().encodeToString(arr.toByteArray());</span>
 <span class="nc" id="L82">    } catch (IOException e) {</span>
 <span class="nc" id="L83">      throw new RuntimeException(e);</span>
     }
@@ -92,7 +92,7 @@ public interface AccumuloElementFilter&lt;T extends Element&gt;
    */
   @Nonnull
   default AccumuloElementFilter&lt;T&gt; or(@Nonnull AccumuloElementFilter&lt;T&gt; another) {
-<span class="nc" id="L95">    return Or.create(this, another);</span>
+<span class="fc" id="L95">    return Or.create(this, another);</span>
   }
 
   /**
@@ -103,7 +103,7 @@ public interface AccumuloElementFilter&lt;T extends Element&gt;
    */
   @Nonnull
   default AccumuloElementFilter&lt;T&gt; and(@Nonnull AccumuloElementFilter&lt;T&gt; another) {
-<span class="nc" id="L106">    return And.create(this, another);</span>
+<span class="fc" id="L106">    return And.create(this, another);</span>
   }
 
   /**
@@ -112,7 +112,7 @@ public interface AccumuloElementFilter&lt;T extends Element&gt;
    */
   @Nonnull
   default AccumuloElementFilter&lt;T&gt; negate() {
-<span class="nc" id="L115">    return Not.of(this);</span>
+<span class="fc" id="L115">    return Not.of(this);</span>
   }
 
 }

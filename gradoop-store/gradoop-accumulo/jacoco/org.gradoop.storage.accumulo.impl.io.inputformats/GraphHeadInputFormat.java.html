@@ -63,18 +63,18 @@ public class GraphHeadInputFormat extends BaseInputFormat&lt;EPGMGraphHead&gt; {
     @Nonnull Properties properties,
     @Nullable AccumuloQueryHolder&lt;EPGMGraphHead&gt; predicate
   ) {
-<span class="nc" id="L66">    super(properties, predicate);</span>
-<span class="nc" id="L67">  }</span>
+<span class="fc" id="L66">    super(properties, predicate);</span>
+<span class="fc" id="L67">  }</span>
 
   @Override
   protected void initiate() {
-<span class="nc" id="L71">    iterator = new GradoopGraphHeadIterator();</span>
-<span class="nc" id="L72">    handler = new AccumuloGraphHandler(new EPGMGraphHeadFactory());</span>
-<span class="nc" id="L73">  }</span>
+<span class="fc" id="L71">    iterator = new GradoopGraphHeadIterator();</span>
+<span class="fc" id="L72">    handler = new AccumuloGraphHandler(new EPGMGraphHeadFactory());</span>
+<span class="fc" id="L73">  }</span>
 
   @Override
   protected String getTableName(String prefix) {
-<span class="nc" id="L77">    return String.format(&quot;%s%s&quot;, prefix, AccumuloTables.GRAPH);</span>
+<span class="fc" id="L77">    return String.format(&quot;%s%s&quot;, prefix, AccumuloTables.GRAPH);</span>
   }
 
   @Override
@@ -83,14 +83,14 @@ public class GraphHeadInputFormat extends BaseInputFormat&lt;EPGMGraphHead&gt; {
     int iteratorSettingPriority,
     Map&lt;String, String&gt; options
   ) {
-<span class="nc" id="L86">    scanner.addScanIterator(</span>
+<span class="fc" id="L86">    scanner.addScanIterator(</span>
       new IteratorSetting(iteratorSettingPriority, GradoopGraphHeadIterator.class, options));
-<span class="nc" id="L88">  }</span>
+<span class="fc" id="L88">  }</span>
 
   @Override
   protected EPGMGraphHead mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
-<span class="nc" id="L92">    GraphHead decoded = iterator.fromRow(row);</span>
-<span class="nc" id="L93">    return handler.readRow(decoded);</span>
+<span class="fc" id="L92">    GraphHead decoded = iterator.fromRow(row);</span>
+<span class="fc" id="L93">    return handler.readRow(decoded);</span>
   }
 
 }

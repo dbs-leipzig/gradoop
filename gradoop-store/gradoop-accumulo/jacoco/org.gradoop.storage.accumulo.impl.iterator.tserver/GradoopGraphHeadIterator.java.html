@@ -36,21 +36,21 @@ import java.util.Objects;
 /**
  * Accumulo gradoop graph head iterator
  */
-<span class="nc" id="L39">public class GradoopGraphHeadIterator extends BaseElementIterator&lt;GraphHead&gt; {</span>
+<span class="fc" id="L39">public class GradoopGraphHeadIterator extends BaseElementIterator&lt;GraphHead&gt; {</span>
 
   /**
    * Graph head factory
    */
-<span class="nc" id="L44">  private final EPGMGraphHeadFactory factory = new EPGMGraphHeadFactory();</span>
+<span class="fc" id="L44">  private final EPGMGraphHeadFactory factory = new EPGMGraphHeadFactory();</span>
 
   @Nonnull
   @Override
   public GraphHead fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException {
     //map from serialize content
-<span class="nc" id="L50">    EPGMGraphHead content = KryoUtils.loads(pair.getValue().get(), EPGMGraphHead.class);</span>
-<span class="nc" id="L51">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
+<span class="fc" id="L50">    EPGMGraphHead content = KryoUtils.loads(pair.getValue().get(), EPGMGraphHead.class);</span>
+<span class="fc" id="L51">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
     //read from content
-<span class="nc" id="L53">    return content;</span>
+<span class="fc" id="L53">    return content;</span>
   }
 
   @Nonnull
