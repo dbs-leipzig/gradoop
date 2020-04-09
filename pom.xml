@@ -159,7 +159,8 @@
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.commons-lang.version>2.6</dep.commons-lang.version>
         <dep.flink.version>1.7.2</dep.flink.version>
-        <dep.gdl.version>0.3.2</dep.gdl.version>
+        <!-- only for the thesis, change later -->
+        <dep.gdl.version>0.4</dep.gdl.version>
         <dep.guava.version>11.0.2</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
@@ -466,6 +467,7 @@
 
     <reporting>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -657,11 +659,14 @@
             </dependency>
 
             <!-- Others -->
+
+            <!-- currently 0.4, but only for the thesis, change back to 0.3.x later!-->
             <dependency>
                 <groupId>com.github.s1ck</groupId>
                 <artifactId>gdl</artifactId>
                 <version>${dep.gdl.version}</version>
             </dependency>
+
 
             <dependency>
                 <groupId>me.lemire.integercompression</groupId>
