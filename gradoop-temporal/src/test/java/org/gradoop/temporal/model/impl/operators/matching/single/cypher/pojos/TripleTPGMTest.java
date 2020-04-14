@@ -1,4 +1,4 @@
-package org.gradoop.temporal.model.impl.operators.matching.pojos;
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;

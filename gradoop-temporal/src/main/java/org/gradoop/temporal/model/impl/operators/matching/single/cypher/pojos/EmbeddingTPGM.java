@@ -69,7 +69,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
      * @param val_t the val_to value
      */
     public void addTimeData(Long tx_f, Long tx_t, Long val_f, Long val_t){
-        if(tx_f > tx_t || val_f > val_t || tx_f < 0 || tx_t < 0 || val_f < 0 || val_t < 0){
+        if(tx_f > tx_t || val_f > val_t || tx_f < 0 || val_f < 0){
             throw new IllegalArgumentException("to must be >= from, time fields are not negative");
         }
         byte[] newTimeData = new byte[timeData.length+ 4*Long.BYTES];
@@ -78,7 +78,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
         System.arraycopy(additionalData, 0, newTimeData, timeData.length, 4*Long.BYTES);
         timeData = newTimeData;
     }
-    
+
 
     /**
      * Appends a GradoopId as well as the specified properties and its time fields to the embedding.

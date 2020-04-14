@@ -1,9 +1,8 @@
-package org.gradoop.temporal.model.impl.operators.matching.pojos;
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.junit.Test;
 
@@ -23,6 +22,7 @@ public class EmbeddingTPGMMetaDataTest {
         entryMap.put(Pair.of("a", EmbeddingTPGMMetaData.EntryType.VERTEX), 0);
         entryMap.put(Pair.of("b", EmbeddingTPGMMetaData.EntryType.VERTEX), 1);
         entryMap.put(Pair.of("c", EmbeddingTPGMMetaData.EntryType.EDGE), 2);
+        entryMap.put(Pair.of("d", EmbeddingMetaData.EntryType.PATH), 3);
 
         Map<Pair<String, String>, Integer> propertyMap = new HashMap<>();
         propertyMap.put(Pair.of("a", "age"), 0);
@@ -30,7 +30,7 @@ public class EmbeddingTPGMMetaDataTest {
         propertyMap.put(Pair.of("c", "since"), 2);
 
         Map<String, ExpandDirection> directionMap = new HashMap<>();
-        directionMap.put("b", ExpandDirection.OUT);
+        directionMap.put("d", ExpandDirection.OUT);
 
         Map<String, Integer> timeDataMap = new HashMap<>();
         timeDataMap.put("a", 0);
@@ -40,13 +40,15 @@ public class EmbeddingTPGMMetaDataTest {
         EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData(
                 entryMap, propertyMap, directionMap, timeDataMap);
 
-        assertThat(metaData.getEntryCount(), is(3));
+        assertThat(metaData.getEntryCount(), is(4));
         assertThat(metaData.getEntryColumn("a"), is(0));
         assertThat(metaData.getEntryColumn("b"), is(1));
         assertThat(metaData.getEntryColumn("c"), is(2));
+        assertThat(metaData.getEntryColumn("d"), is(3));
         assertThat(metaData.getEntryType("a"), is(EmbeddingTPGMMetaData.EntryType.VERTEX));
         assertThat(metaData.getEntryType("b"), is(EmbeddingTPGMMetaData.EntryType.VERTEX));
         assertThat(metaData.getEntryType("c"), is(EmbeddingTPGMMetaData.EntryType.EDGE));
+        assertThat(metaData.getEntryType("d"), is(EmbeddingTPGMMetaData.EntryType.PATH));
 
         assertThat(metaData.getPropertyCount(), is(3));
         assertThat(metaData.getPropertyColumn("a", "age"), is(0));
@@ -57,7 +59,7 @@ public class EmbeddingTPGMMetaDataTest {
         assertEquals(metaData.getTimeColumn("b"), 2);
         assertEquals(metaData.getTimeColumn("c"), 3);
 
-        assertThat(metaData.getDirection("b"), is(ExpandDirection.OUT));
+        assertThat(metaData.getDirection("d"), is(ExpandDirection.OUT));
 
     }
 

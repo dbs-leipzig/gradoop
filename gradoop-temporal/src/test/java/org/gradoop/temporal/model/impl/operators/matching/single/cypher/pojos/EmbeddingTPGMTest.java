@@ -1,10 +1,8 @@
-package org.gradoop.temporal.model.impl.operators.matching.pojos;
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.junit.Test;
 

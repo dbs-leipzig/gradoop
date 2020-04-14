@@ -138,6 +138,7 @@ public class EmbeddingTPGMMetaData extends
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .collect(Collectors.toList());
 
+
         return String.format("EmbeddingMetaData{entryMapping=%s, propertyMapping=%s, timeDataMapping=%s}",
                 sortedEntries, sortedProperties, sortedTimeData);
     }
