@@ -3,6 +3,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 
@@ -70,5 +71,15 @@ public class JoinTestUtil {
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         Arrays.stream(ids).forEach(embedding::add);
         return embedding;
+    }
+
+    protected Properties getProperties(List<String> propertyNames) {
+        Properties properties = new Properties();
+
+        for (String propertyName : propertyNames) {
+            properties.set(propertyName, propertyName);
+        }
+
+        return properties;
     }
 }
