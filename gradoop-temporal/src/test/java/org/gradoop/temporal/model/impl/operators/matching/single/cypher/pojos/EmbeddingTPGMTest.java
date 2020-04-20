@@ -189,13 +189,18 @@ public class EmbeddingTPGMTest {
         GradoopId b = GradoopId.get();
         GradoopId c = GradoopId.get();
 
+        Long[] aTime = new Long[]{1L, 2L, 3L, 4L};
+        Long[] bTime = new Long[]{3L, 4L, 5L, 6L};
+        Long[] cTime = new Long[]{5L, 6L, 7L, 8L};
+
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         embedding.add(a);
         embedding.add(b);
         embedding.add(c);
+        embedding.addTimeData(aTime[0], aTime[1], aTime[2], aTime[3]);
+        embedding.addTimeData(bTime[0], bTime[1], bTime[2], bTime[3]);
+        embedding.addTimeData(cTime[0], cTime[1], cTime[2], cTime[3]);
 
-        embedding.addTimeData(1234L, 2345L, 4567L, 5678L);
-        embedding.addTimeData(789L, 9876L, 765L, 4567L);
 
         EmbeddingTPGM reversed = embedding.reverse();
 
@@ -203,8 +208,12 @@ public class EmbeddingTPGMTest {
         assertEquals(b, reversed.getId(1));
         assertEquals(a, reversed.getId(2));
 
-        assertArrayEquals(reversed.getTimeData(), embedding.getTimeData());
+        System.out.println(reversed);
 
+
+        assertArrayEquals(cTime, reversed.getTimes(0));
+        assertArrayEquals(bTime, reversed.getTimes(1));
+        assertArrayEquals(aTime, reversed.getTimes(2));
     }
 
     @Test

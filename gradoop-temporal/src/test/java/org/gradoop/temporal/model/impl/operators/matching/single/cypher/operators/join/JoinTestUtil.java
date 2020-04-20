@@ -2,6 +2,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertTrue;
@@ -67,6 +69,21 @@ public class JoinTestUtil {
      * @param ids identifies to be contained in the embedding
      * @return embedding containing the specified ids
      */
+    public static EmbeddingTPGM createEmbeddingTPGM(GradoopId[]ids, Long[][] times) {
+        assert(ids.length == times.length);
+        EmbeddingTPGM embedding = new EmbeddingTPGM();
+        Arrays.stream(ids).forEach(embedding::add);
+        Arrays.stream(times).forEach(arr -> embedding.addTimeData(arr[0], arr[1], arr[2], arr[3]));
+        return embedding;
+    }
+
+    /**
+     * Creates an embedding from the given list of identifiers. The order of the identifiers
+     * determines the order in the embedding.
+     *
+     * @param ids identifies to be contained in the embedding
+     * @return embedding containing the specified ids
+     */
     public static EmbeddingTPGM createEmbeddingTPGM(GradoopId... ids) {
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         Arrays.stream(ids).forEach(embedding::add);
@@ -81,5 +98,56 @@ public class JoinTestUtil {
         }
 
         return properties;
+    }
+
+    /**
+     * Checks if the given data set contains at least one embedding matching the given predicate.
+     *
+     * @param embeddings data set containing embeddings
+     * @param predicate predicate
+     * @throws Exception on failure
+     */
+    public static void assertEmbeddingTPGMExists(DataSet<EmbeddingTPGM> embeddings,
+                                             Predicate<EmbeddingTPGM> predicate) throws Exception {
+        assertEmbeddingTPGMExists(embeddings.collect(), predicate);
+    }
+
+    /**
+     * Checks if the given list contains at least one embedding matching the given predicate.
+     *
+     * @param embeddings list of embeddings
+     * @param predicate predicate
+     */
+    public static void assertEmbeddingTPGMExists(List<EmbeddingTPGM> embeddings, Predicate<EmbeddingTPGM> predicate) {
+        assertTrue(embeddings.stream().anyMatch(predicate));
+    }
+
+    /**
+     * Creates a data set of the specified size containing equal embeddings described by the given ids.
+     *
+     * @param env execution environment
+     * @param size number of embeddings in the generated data set
+     * @param ids ids contained in each embedding
+     * @return data set of embeddings
+     */
+    public static DataSet<EmbeddingTPGM> createEmbeddings(ExecutionEnvironment env, int size, GradoopId... ids) {
+        List<EmbeddingTPGM> embeddings = new ArrayList<>(size);
+        IntStream.range(0, size).forEach(i -> embeddings.add(createEmbeddingTPGM(ids)));
+        return env.fromCollection(embeddings);
+    }
+
+    /**
+     * Creates a data set of the specified size containing equal embeddings described by the given ids.
+     *
+     * @param env execution environment
+     * @param ids ids contained in each embedding
+     * @param times time data for each element
+     * @return data set of embeddings
+     */
+    public static DataSet<EmbeddingTPGM> createEmbeddings(ExecutionEnvironment env, GradoopId[] ids, Long[][] times) {
+        assert(ids.length == times.length);
+        List<EmbeddingTPGM> embeddings = new ArrayList<>(ids.length);
+        IntStream.range(0, ids.length).forEach(i -> embeddings.add(createEmbeddingTPGM(ids, times)));
+        return env.fromCollection(embeddings);
     }
 }

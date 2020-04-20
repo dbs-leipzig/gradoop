@@ -115,6 +115,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
         if(offset <0 || offset >= timeData.length ){
             throw new IndexOutOfBoundsException();
         }
+
         return ArrayUtils.subarray(timeData, offset, offset+4*Long.BYTES);
     }
 
@@ -228,10 +229,10 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
     }
 
     /**
-     * Reverses the order of the entries stored in the embedding.
+     * Reverses the order of the entries and time data stored in the embedding.
      * The order of the properties will stay untouched.
      * Method is already present in Embedding, but must be adjusted to new return type EmbeddingTPGM
-     * @return  A new Embedding (TPGM!) with reversed entry order
+     * @return  A new Embedding (TPGM!) with reversed entry and time data order
      */
     public EmbeddingTPGM reverse(){
         /*//could be implemented like
@@ -248,7 +249,17 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
             );
         }
 
-        return new EmbeddingTPGM(newIdData, getPropertyData(), getIdListData(), timeData);
+        byte[] newTimeData = new byte[timeData.length];
+        int timeDataLen = timeData.length / (4*Long.BYTES);
+        for (int i = timeDataLen -1 ; i >= 0; i--) {
+            System.arraycopy(
+                    getRawTimeEntry(i), 0,
+                    newTimeData,  (timeDataLen - (1+i))*4*Long.BYTES,
+                    4*Long.BYTES
+            );
+        }
+
+        return new EmbeddingTPGM(newIdData, getPropertyData(), getIdListData(), newTimeData);
     }
 
     // ---------------------------------------------------------------------------------------------
