@@ -22,6 +22,7 @@ import java.util.List;
  * <ul>
  * <li>new entries of the right embedding are always appended to the left embedding</li>
  * <li>all properties from the right side are appended to the properties of the left side
+ * <li> all time data from the right side are appended to the time data of the left side</li>
  * </ul>
  */
 public class ValueJoin implements PhysicalTPGMOperator {

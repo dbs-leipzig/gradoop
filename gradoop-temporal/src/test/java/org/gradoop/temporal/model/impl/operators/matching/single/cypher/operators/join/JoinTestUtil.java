@@ -5,9 +5,13 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +19,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -22,6 +29,25 @@ import static org.junit.Assert.assertTrue;
  * adapted to temporal Embeddings
  */
 public class JoinTestUtil {
+    /**
+     * Checks if the given embedding contains the expected entries and the expected property values
+     * as well as the time data in the same order as determined by the specified lists.
+     *
+     * @param embedding embedding
+     * @param expectedEntries expected id entries
+     * @param expectedProperties expected property value
+     * @param expectedTime expected time data
+     */
+    public static void assertEmbeddingTPGM(EmbeddingTPGM embedding,
+                                       List<GradoopId> expectedEntries, List<PropertyValue> expectedProperties,
+                                       List<Long[]> expectedTime) {
+        expectedEntries.forEach(entry ->
+                assertThat(embedding.getId(expectedEntries.indexOf(entry)), is(entry)));
+        expectedProperties.forEach(value ->
+                assertThat(embedding.getProperty(expectedProperties.indexOf(value)), is(value)));
+        expectedTime.forEach((time ->
+                assertArrayEquals(embedding.getTimes(expectedTime.indexOf(time)), expectedTime.get(expectedTime.indexOf(time)))));
+    }
 
     /**
      * Checks if the given data set contains at least one embedding that matches the given path.
@@ -36,6 +62,31 @@ public class JoinTestUtil {
         assertTrue(embeddings.collect().stream()
                 .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding)))
         );
+    }
+
+    /**
+     * Checks if the given data set contains at least one embedding that matches the given path.
+     *
+     * @param embeddings data set containing embedding
+     * @param path expected path
+     * @param times expected time data
+     * @throws Exception on failure
+     */
+    public static void assertEmbeddingTPGMExists(DataSet<EmbeddingTPGM> embeddings, GradoopId[]path, Long[][] times)
+            throws Exception {
+        List<GradoopId> pathList = Lists.newArrayList(path);
+        assertTrue(embeddings.collect().stream()
+                .anyMatch(embedding -> pathList.equals(embeddingToIdList(embedding))
+                    && Arrays.equals(embedding.getTimeData(), timesToByteArray(times)))
+        );
+    }
+
+    private static byte[] timesToByteArray(Long[][] times) {
+        EmbeddingTPGM emb = new EmbeddingTPGM();
+        for (Long[] t: times){
+            emb.addTimeData(t[0], t[1], t[2], t[3]);
+        }
+        return emb.getTimeData();
     }
 
     /**

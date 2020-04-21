@@ -190,7 +190,6 @@ public class ExpandEmbeddingTPGM implements Serializable {
     public EmbeddingTPGM toEmbeddingTPGM(){
         EmbeddingTPGM embedding = base;
         embedding.add(path);
-        //TODO correct?
         embedding.add(endVertex);
         embedding.addTimeData(endVertexTimeData[0], endVertexTimeData[1], endVertexTimeData[2], endVertexTimeData[3]);
         return embedding;

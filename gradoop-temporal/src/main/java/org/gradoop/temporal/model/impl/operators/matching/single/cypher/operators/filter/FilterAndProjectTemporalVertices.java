@@ -20,7 +20,7 @@ import java.util.List;
  * Example:
  * <br>
  * Given a Vertex
- * {@code (0, "Person", {name:"Alice", age:23}, valid_from:123, valid_to:1234, tx_from:678, tx_to:6789)}, a predicate {@code "age = 23"} and
+ * {@code (0, "Person", {name:"Alice", age:23}, tx_from:123, tx_to:1234, valid_from:678, valid_to:6789)}, a predicate {@code "age = 23"} and
  * projection property keys [name, location] the operator creates an
  * {@link EmbeddingTPGM}:
  * <br>

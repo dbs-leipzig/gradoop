@@ -20,7 +20,7 @@ import java.util.List;
  * <ul>
  * <li>new entries of the right embedding are always appended to the left embedding</li>
  * <li>duplicate fields are removed, i.e., the join columns are stored once in the result</li>
- * <li>all properties and time data from the right side are appended to the proeprties of the left
+ * <li>all properties and time data from the right side are appended to the properties of the left
  * side,
  *     <em>no</em> deduplication is performed</li>
  * </ul>

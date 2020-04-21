@@ -97,6 +97,14 @@ public class EmbeddingTPGMMetaData extends
         }
     }
 
+    /**
+     * Number of variables for which time data is stored
+     * @return number of variables for which time data is stored
+     */
+    public int getTimeCount(){
+        return timeDataMapping.size();
+    }
+
     @Override
     public boolean equals(Object o){
         if (this == o) {
