@@ -77,4 +77,9 @@ public class CartesianProductTest extends PhysicalTPGMOperatorTest {
         assertEmbeddingTPGMExists(result, e1, e2, e3, v2, e1);
         assertEmbeddingTPGMExists(result, e1, e2, e3, v0, e2);
     }
+
+    @Test
+    public void testCrossWithoutFullTimeData(){
+
+    }
 }

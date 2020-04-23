@@ -9,6 +9,7 @@ import org.apache.flink.types.CopyableValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -69,8 +70,10 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
      * @param val_t the val_to value
      */
     public void addTimeData(Long tx_f, Long tx_t, Long val_f, Long val_t){
-        if(tx_f > tx_t || val_f > val_t || tx_f < 0 || val_f < 0){
-            throw new IllegalArgumentException("to must be >= from, time fields are not negative");
+        tx_f = tx_f<0? TemporalElement.DEFAULT_TIME_FROM : tx_f;
+        val_f = val_f<0? TemporalElement.DEFAULT_TIME_FROM : val_f;
+        if(tx_f > tx_t || val_f > val_t || tx_t < 0 || val_t < 0){
+            throw new IllegalArgumentException("to must be >= from, to fields are not negative");
         }
         byte[] newTimeData = new byte[timeData.length+ 4*Long.BYTES];
         System.arraycopy(timeData, 0, newTimeData,0, timeData.length);
@@ -113,7 +116,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
     public byte[] getRawTimeEntry(int column){
         int offset = 4*Long.BYTES*column;
         if(offset <0 || offset >= timeData.length ){
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Column "+column+"out of bounds");
         }
 
         return ArrayUtils.subarray(timeData, offset, offset+4*Long.BYTES);

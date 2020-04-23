@@ -59,9 +59,12 @@ public class EmbeddingTPGMMetaData extends
     public EmbeddingTPGMMetaData(EmbeddingTPGMMetaData metaData){
         super(metaData);
         this.timeDataMapping = new HashMap<>();
+        Set<String> timeVariables = metaData.getTimeDataMapping().keySet();
         metaData.getVariables().forEach(var -> {
             if(metaData.getEntryType(var)!=EntryType.PATH) {
-                this.timeDataMapping.put(var, metaData.getTimeColumn(var));
+                if(timeVariables.contains(var)) {
+                    this.timeDataMapping.put(var, metaData.getTimeColumn(var));
+                }
             }
         });
 

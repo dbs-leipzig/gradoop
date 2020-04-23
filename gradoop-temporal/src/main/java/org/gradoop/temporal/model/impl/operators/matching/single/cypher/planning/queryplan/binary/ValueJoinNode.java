@@ -14,6 +14,7 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.Em
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -135,7 +136,12 @@ public class ValueJoinNode extends BinaryNode implements JoinNode {
 
         // append all time data from the right to the left side
         int timeCount = leftInputMetaData.getTimeCount();
+        Set<String> rightTimeVariables = rightInputMetaData.getTimeDataMapping().keySet();
+        // not possible to iterate over rightTimeVariables, sequence of variables is important
         for (String var : rightInputMetaData.getVariables()){
+            if(!rightTimeVariables.contains(var)){
+                continue;
+            }
             embeddingMetaData.setTimeColumn(var, timeCount++);
         }
         return embeddingMetaData;

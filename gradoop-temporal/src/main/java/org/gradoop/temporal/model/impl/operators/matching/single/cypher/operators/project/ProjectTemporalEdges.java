@@ -9,6 +9,11 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Projects a TPGM Edge by a set of properties.
+ * <p>
+ * {@code TemporalEdge -> EmbeddingTPGM(ProjectionEmbedding(Edge))}
+ */
 public class ProjectTemporalEdges implements PhysicalTPGMOperator {
     /**
      * Input edge

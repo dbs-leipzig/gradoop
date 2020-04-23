@@ -41,7 +41,6 @@ public class ValueJoinNodeTest {
         leftInputMetaData.setPropertyColumn("e1", "since", 1);
         leftInputMetaData.setTimeColumn("v1", 0);
         leftInputMetaData.setTimeColumn("e1", 1);
-        leftInputMetaData.setTimeColumn("v2", 2);
 
         EmbeddingTPGMMetaData rightInputMetaData = new EmbeddingTPGMMetaData();
         rightInputMetaData.setEntryColumn("v3", EmbeddingTPGMMetaData.EntryType.VERTEX, 0);
@@ -79,13 +78,12 @@ public class ValueJoinNodeTest {
         assertThat(outputMetaData.getPropertyColumn("e2", "since"), is(3));
         assertThat(outputMetaData.getPropertyColumn("v4", "age"), is(4));
 
-        assertThat(outputMetaData.getTimeCount(), is(6));
+        assertThat(outputMetaData.getTimeCount(), is(5));
         assertThat(outputMetaData.getTimeColumn("v1"), is(0));
         assertThat(outputMetaData.getTimeColumn("e1"), is(1));
-        assertThat(outputMetaData.getTimeColumn("v2"), is(2));
-        assertThat(outputMetaData.getTimeColumn("v3"), is(3));
-        assertThat(outputMetaData.getTimeColumn("e2"), is(4));
-        assertThat(outputMetaData.getTimeColumn("v4"), is(5));
+        assertThat(outputMetaData.getTimeColumn("v3"), is(2));
+        assertThat(outputMetaData.getTimeColumn("e2"), is(3));
+        assertThat(outputMetaData.getTimeColumn("v4"), is(4));
     }
 
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")

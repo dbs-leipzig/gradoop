@@ -4,6 +4,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsTPGMBulk;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Binary node that wraps an {@link ExpandEmbeddingsTPGMBulk} operator.
  */
-public class ExpandEmbeddingsTPGMNode extends BinaryNode {
+public class ExpandEmbeddingsTPGMNode extends BinaryNode implements JoinNode {
     /**
      * Column to expand the embedding from.
      */

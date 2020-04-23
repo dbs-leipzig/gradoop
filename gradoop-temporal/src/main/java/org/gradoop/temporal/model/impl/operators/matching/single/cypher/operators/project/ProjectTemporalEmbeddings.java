@@ -8,6 +8,10 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.Em
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Projects Embeddings by a set of properties.
+ * For each entry in the embeddings a different property set can be specified
+ */
 public class ProjectTemporalEmbeddings implements PhysicalTPGMOperator {
     /**
      * Input Embeddings

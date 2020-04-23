@@ -5,6 +5,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 
@@ -43,4 +44,13 @@ public class TemporalQueryHandler extends QueryHandler {
         }
     }
 
+    /**
+     * Returns the expansion conditions for a path.
+     * @param startVariable
+     * @return
+     */
+    public ExpansionCriteria getExpansionCondition(String startVariable) {
+        //TODO implement
+        return new ExpansionCriteria();
+    }
 }

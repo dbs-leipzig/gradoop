@@ -31,6 +31,8 @@ public class FilterTemporalEmbedding extends RichFilterFunction<EmbeddingTPGM> {
 
     @Override
     public boolean filter(EmbeddingTPGM embedding) {
+        System.out.println("Evaluating "+embedding+" on predicate "+predicates);
+        System.out.println("Metadata: "+metaData);
         return predicates.evaluate(embedding, metaData);
     }
 }

@@ -103,6 +103,14 @@ implements FilterNode, ProjectionNode {
     }
 
     /**
+     * Returns the name of the edge variable
+     * @return name of the edge variable
+     */
+    public String getEdgeVariable(){
+        return edgeVariable;
+    }
+
+    /**
      * checks whether edge is a self-loop
      * @return true iff edge is a self-loop
      */

@@ -13,6 +13,8 @@ import org.junit.Test;
 
 import org.apache.flink.api.java.DataSet;
 
+import java.util.Arrays;
+
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.join.JoinTestUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -62,6 +64,7 @@ public class JoinTPGMEmbeddingsTest {
                 embedding.getTimes(3).equals(new Long[]{1L, 2L, 3L, 4L}));
         assertEmbeddingTPGMExists(result, v0, e0, v1);
     }
+
 
     @Test
     public void testSingleJoinPartners() throws Exception {
