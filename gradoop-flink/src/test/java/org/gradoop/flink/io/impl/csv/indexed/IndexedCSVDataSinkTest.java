@@ -268,7 +268,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = getFilePath("/data/csv/input_indexed");
+    String csvPath = getFilePath("/data/csv/input_indexed_graph_collection");
 
     String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 

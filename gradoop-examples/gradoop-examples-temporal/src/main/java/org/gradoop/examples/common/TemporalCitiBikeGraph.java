@@ -184,7 +184,7 @@ public class TemporalCitiBikeGraph {
     LogicalGraph networkGraph = loader.getLogicalGraph();
 
     // transform to temporal graph by extracting time intervals from vertices
-    return TemporalGraph.fromLogicalGraph(networkGraph)
+    return TemporalGraph.fromGraph(networkGraph)
       .transformVertices(TemporalCitiBikeGraph::extractTripPeriod);
   }
 

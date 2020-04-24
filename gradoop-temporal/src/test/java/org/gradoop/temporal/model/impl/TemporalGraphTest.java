@@ -20,10 +20,14 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.temporal.io.api.TemporalDataSource;
+import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.gradoop.temporal.util.TemporalGradoopTestUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -156,11 +160,13 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the {@link TemporalGraph#fromLogicalGraph(LogicalGraph)} method.
+   * Test the {@link TemporalGraph#fromGraph} method.
+   *
+   * @throws Exception if loading the graph fails
    */
   @Test
-  public void testFromLogicalGraph() throws Exception {
-    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(testLogicalGraph);
+  public void testFromGraph() throws Exception {
+    TemporalGraph temporalGraph = TemporalGraph.fromGraph(testLogicalGraph);
 
     Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
     Collection<TemporalVertex> loadedVertices = new ArrayList<>();
@@ -193,5 +199,28 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
     loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
     loadedVertices.forEach(this::checkDefaultTemporalElement);
     loadedEdges.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the {@link TemporalGraph#fromGraph} method with TimeInterval Extractors as parameters
+   *
+   * @throws Exception if loading the graph from the csv data source fails
+   */
+  @Test
+  public void testFromGraphWithTimeIntervalExtractors() throws Exception {
+
+    String path = getFilePath("/data/csv/socialnetwork/");
+    TemporalDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
+    TemporalGraphCollection temporalGraphCollection = csvDataSource.getTemporalGraphCollection();
+    TemporalGraph expected = temporalGraphCollection.reduce(new ReduceCombination<>());
+    LogicalGraph logicalGraph =
+      getTemporalSocialNetworkLoader().getGraphCollection().reduce(new ReduceCombination<>());
+
+    TemporalGraph check = TemporalGraph.fromGraph(logicalGraph,
+      g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v),
+      e -> TemporalGradoopTestUtils.extractTime(e));
+
+    collectAndAssertTrue(check.equalsByElementData(expected));
   }
 }

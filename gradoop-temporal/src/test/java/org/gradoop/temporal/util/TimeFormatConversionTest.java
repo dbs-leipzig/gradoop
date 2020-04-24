@@ -20,8 +20,6 @@ import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 
-import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
-
 /**
  * Test class of {@link TimeFormatConversion}.
  */
@@ -36,7 +34,22 @@ public class TimeFormatConversionTest {
     LocalDateTime unixEpoch = LocalDateTime.of(1970, 1, 1, 0, 0);
     LocalDateTime oneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
 
-    AssertJUnit.assertEquals(1234567890000L, toEpochMilli(oneTwoThree));
-    AssertJUnit.assertEquals(0L, toEpochMilli(unixEpoch));
+    AssertJUnit.assertEquals(1234567890000L, TimeFormatConversion.toEpochMilli(oneTwoThree));
+    AssertJUnit.assertEquals(0L, TimeFormatConversion.toEpochMilli(unixEpoch));
+  }
+
+  /**
+   * Tests whether {@link TimeFormatConversion#toLocalDateTime(long)} converts a given {@code long}
+   * to the correct {@link LocalDateTime} object, if UTC is assumed.
+   */
+  @Test
+  public void toLocalDateTimeTest() {
+    LocalDateTime expectedUnixEpochZero = LocalDateTime.of(1970, 1, 1, 0, 0);
+    LocalDateTime expectedOneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
+    long inputUnixEpochZero = 0L;
+    long inputOneTwoThree = 1234567890000L;
+
+    AssertJUnit.assertEquals(expectedUnixEpochZero, TimeFormatConversion.toLocalDateTime(inputUnixEpochZero));
+    AssertJUnit.assertEquals(expectedOneTwoThree, TimeFormatConversion.toLocalDateTime(inputOneTwoThree));
   }
 }
