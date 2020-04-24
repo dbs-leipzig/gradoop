@@ -169,7 +169,6 @@ public class ElementsFromEmbeddingTPGMTest {
                 getPropertyValue("__variable_mapping").getMap();
         List<PropertyValue> pValues = variableMapping.get(PropertyValue.create("p"))
                 .getList();
-        System.out.println(pValues);
         assertEquals(pValues.get(0).getGradoopId(), e1);
         assertEquals(pValues.get(1).getGradoopId(), v);
         assertEquals(pValues.get(2).getGradoopId(), e2);

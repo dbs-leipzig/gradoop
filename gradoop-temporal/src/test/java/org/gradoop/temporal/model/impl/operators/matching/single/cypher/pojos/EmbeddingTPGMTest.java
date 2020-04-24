@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.junit.Test;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadValue;
@@ -16,7 +17,6 @@ public class EmbeddingTPGMTest {
     public void testAppendSingleTimes(){
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         embedding.addTimeData(1000L,1500L, 345435L, 356959L);
-        System.out.println(embedding);
         assertArrayEquals(embedding.getTimes(0), new Long[]{1000L,1500L, 345435L, 356959L});
         assertEquals(embedding.getTimeData().length,4*Long.BYTES);
         assertEquals(embedding.getRawTimeEntry(0).length, 4*Long.BYTES);
@@ -103,10 +103,11 @@ public class EmbeddingTPGMTest {
         embedding.addTimeData(3L, -41L, 12L, 1234L);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddIllegalTime5(){
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         embedding.addTimeData(3L, 41L, -12356L, 1234L);
+        assertEquals(embedding.getTimes(0)[2], TemporalElement.DEFAULT_TIME_FROM);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -175,7 +176,6 @@ public class EmbeddingTPGMTest {
         embedding.add(id, PropertyValue.create("a"), PropertyValue.create(42), PropertyValue.create("foobar"));
         embedding.addTimeData(1234L, 12345L, 456L, 567L);
         embedding.addTimeData(123L, 1234L, 45678L, 56789L);
-        System.out.println(embedding.getTimeData().length);
         EmbeddingTPGM projection = embedding.project(Lists.newArrayList(0, 2));
         // no time fields deleted by projection
         assertArrayEquals(embedding.getTimes(0), new Long[]{1234L, 12345L, 456L, 567L});
@@ -208,7 +208,6 @@ public class EmbeddingTPGMTest {
         assertEquals(b, reversed.getId(1));
         assertEquals(a, reversed.getId(2));
 
-        System.out.println(reversed);
 
 
         assertArrayEquals(cTime, reversed.getTimes(0));

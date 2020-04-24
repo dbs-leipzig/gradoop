@@ -166,7 +166,6 @@ public class ElementsFromEmbeddingTPGM<
         for (String pathVariable : metaData.getPathVariables()) {
             ExpandDirection direction = metaData.getDirection(pathVariable);
             List<GradoopId> path = embedding.getIdList(metaData.getEntryColumn(pathVariable));
-            System.out.println("Path: "+path);
             List<PropertyValue> mappingValue = new ArrayList<>(path.size());
             for (int i = 0; i < path.size(); i += 2) {
                 edgeId = path.get(i);

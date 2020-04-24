@@ -33,7 +33,6 @@ public class FilterAndProjectTemporalVertex extends
     public FilterAndProjectTemporalVertex(CNF predicates, List<String> projectionPropertyKeys) {
         this.predicates = predicates;
         this.projectionPropertyKeys = projectionPropertyKeys;
-        System.out.println(predicates);
     }
 
     @Override
