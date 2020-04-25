@@ -660,7 +660,7 @@ Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,AlphabeticalLa
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,UndirectedDFSBranchComparator,71,0,8,0,13,0,6,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,ProportionalLabelComparator,31,0,4,0,7,0,4,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,34,202,22,36,6,47,17,14,0,2
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,0,92,0,12,0,19,0,8,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,3,89,1,11,1,18,1,7,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,0,31,0,4,0,7,0,4,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,DFSCodeUtils,1,49,2,6,0,11,2,6,0,4
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,Simple16Compressor,3,54,0,4,1,11,1,7,1,5
@@ -888,7 +888,7 @@ Gradoop Flink,org.gradoop.flink.model.api.epgm,BaseGraphCollectionOperators,10,1
 Gradoop Flink,org.gradoop.flink.model.impl.operators.overlap,OverlapBase,0,21,0,0,0,7,0,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.overlap,ReduceOverlap,0,26,0,0,0,6,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.overlap,Overlap,0,45,0,0,0,12,0,2,0,2
-Gradoop Flink,org.gradoop.flink.io.impl.csv.indexed,IndexedCSVDataSource,0,206,0,0,0,32,0,16,0,16
+Gradoop Flink,org.gradoop.flink.io.impl.csv.indexed,IndexedCSVDataSource,0,214,0,0,0,34,0,16,0,16
 Gradoop Flink,org.gradoop.flink.io.impl.csv.indexed,IndexedCSVDataSink,23,148,5,7,6,35,7,6,3,4
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion,EPGMGraphTransactionToLabeledGraph,0,67,0,4,0,14,0,4,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion,DFSCodeToEPGMGraphTransaction,1,223,2,8,0,40,2,6,0,3
@@ -917,7 +917,7 @@ Gradoop Flink,org.gradoop.flink.model.api.operators,ApplicableUnaryBaseGraphToBa
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,ToCoordsTuple,0,41,0,0,0,10,0,2,0,2
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexScaleMap,45,0,0,0,11,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,TargetCoordinateJoin,0,17,0,0,0,7,0,2,0,2
-Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexZoomMap,6,134,1,1,0,26,1,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexZoomMap,7,133,1,1,0,26,1,3,0,3
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,SourceCoordinateJoin,0,17,0,0,0,7,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation.functions,LPMessageFunction,0,8,0,0,0,3,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation.functions,LPVertexJoin,0,15,0,0,0,5,0,2,0,2

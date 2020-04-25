@@ -33,7 +33,6 @@ import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -66,8 +65,8 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    * @param config  gradoop configuration
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) {
-<span class="fc" id="L69">    this(csvPath, config, new Configuration());</span>
-<span class="fc" id="L70">  }</span>
+<span class="fc" id="L68">    this(csvPath, config, new Configuration());</span>
+<span class="fc" id="L69">  }</span>
 
   /**
    * Creates a new data source.
@@ -77,48 +76,56 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    * @param hdfsConf HDFS configuration
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf) {
-<span class="fc" id="L80">    super(csvPath, conf);</span>
-<span class="fc" id="L81">    Objects.requireNonNull(hdfsConf);</span>
-<span class="fc" id="L82">    this.hdfsConfig = hdfsConf;</span>
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L79">    super(csvPath, conf);</span>
+<span class="fc" id="L80">    Objects.requireNonNull(hdfsConf);</span>
+<span class="fc" id="L81">    this.hdfsConfig = hdfsConf;</span>
+<span class="fc" id="L82">  }</span>
 
+  /**
+   * Will use a single graph head of the collection as final graph head for the graph.
+   * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.
+   *
+   * {@inheritDoc}
+   */
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-<span class="fc" id="L87">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
+<span class="fc" id="L92">    GraphCollection collection = getGraphCollection();</span>
+<span class="fc" id="L93">    return collection.getGraphFactory()</span>
+<span class="fc" id="L94">      .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-<span class="fc" id="L92">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
-<span class="fc" id="L93">    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);</span>
-<span class="fc" id="L94">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =</span>
-<span class="fc" id="L95">      source.readDistributed(getMetaDataPath(), getConfig());</span>
+<span class="fc" id="L99">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
+<span class="fc" id="L100">    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);</span>
+<span class="fc" id="L101">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =</span>
+<span class="fc" id="L102">      source.readDistributed(getMetaDataPath(), getConfig());</span>
 
-<span class="fc" id="L97">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
-<span class="fc" id="L98">    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();</span>
+<span class="fc" id="L104">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+<span class="fc" id="L105">    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();</span>
 
-<span class="fc" id="L100">    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()</span>
-<span class="fc" id="L101">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))</span>
-<span class="fc" id="L102">        .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))</span>
-<span class="fc" id="L103">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L104">        .filter(graphHead -&gt; graphHead.getLabel().equals(label))))</span>
-<span class="fc" id="L105">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
-
-<span class="fc" id="L107">    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()</span>
-<span class="fc" id="L108">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))</span>
-<span class="fc" id="L109">        .map(new CSVLineToVertex(factory.getVertexFactory()))</span>
+<span class="fc" id="L107">    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()</span>
+<span class="fc" id="L108">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))</span>
+<span class="fc" id="L109">        .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))</span>
 <span class="fc" id="L110">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L111">        .filter(vertex -&gt; vertex.getLabel().equals(label))))</span>
+<span class="fc" id="L111">        .filter(graphHead -&gt; graphHead.getLabel().equals(label))))</span>
 <span class="fc" id="L112">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
 
-<span class="fc" id="L114">    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()</span>
-<span class="fc" id="L115">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))</span>
-<span class="fc" id="L116">        .map(new CSVLineToEdge(factory.getEdgeFactory()))</span>
+<span class="fc" id="L114">    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()</span>
+<span class="fc" id="L115">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))</span>
+<span class="fc" id="L116">        .map(new CSVLineToVertex(factory.getVertexFactory()))</span>
 <span class="fc" id="L117">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L118">        .filter(edge -&gt; edge.getLabel().equals(label))))</span>
+<span class="fc" id="L118">        .filter(vertex -&gt; vertex.getLabel().equals(label))))</span>
 <span class="fc" id="L119">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
 
-<span class="fc" id="L121">    return factory.fromIndexedDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L121">    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()</span>
+<span class="fc" id="L122">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))</span>
+<span class="fc" id="L123">        .map(new CSVLineToEdge(factory.getEdgeFactory()))</span>
+<span class="fc" id="L124">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L125">        .filter(edge -&gt; edge.getLabel().equals(label))))</span>
+<span class="fc" id="L126">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+
+<span class="fc" id="L128">    return factory.fromIndexedDataSets(graphHeads, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
