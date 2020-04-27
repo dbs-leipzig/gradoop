@@ -31,7 +31,6 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
 import java.util.List;
-
 public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
 
     protected DataSet<TemporalVertex> createVerticesWithProperties(List<String> propertyNames) {

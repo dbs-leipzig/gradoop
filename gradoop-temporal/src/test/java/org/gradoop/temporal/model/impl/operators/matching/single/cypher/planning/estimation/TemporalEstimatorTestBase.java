@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+
 public abstract class TemporalEstimatorTestBase {
 
     static GraphStatistics STATS;
