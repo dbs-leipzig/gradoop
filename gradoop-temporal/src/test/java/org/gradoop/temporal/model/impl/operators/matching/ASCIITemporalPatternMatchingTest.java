@@ -2,7 +2,11 @@ package org.gradoop.temporal.model.impl.operators.matching;
 
 
 
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.TestData;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -19,9 +23,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * base class for all temporal pattern matching tests that read ASCII-data as input db.
+ */
 @RunWith(Parameterized.class)
 public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTestBase {
 
@@ -88,7 +96,7 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
         TemporalGraphCollection expected = toTemporalGraphCollection(
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
-
+        System.out.println(result.getGraphHeads().count());
         collectAndAssertTrue(result.equalsByGraphElementIds(expected));
     }
 
@@ -106,8 +114,28 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
         TemporalGraphCollection expected = transformExpectedToTemporal(
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
-
+        //System.out.println(result.getGraphHeads().count());
         collectAndAssertTrue(result.equalsByGraphElementData(expected));
+    }
+
+    @Test
+    public void testVariableMappingExists() throws Exception {
+        FlinkAsciiGraphLoader loader = getLoader();
+
+        // initialize with data graph
+        TemporalGraph db = getTemporalGraphFromLoader(loader);
+
+        // append the expected result
+        loader.appendToDatabaseFromString(expectedCollection);
+
+        // execute and validate
+        List<TemporalGraphHead> graphHeads = getImplementation(queryGraph, false)
+                .execute(db).getGraphHeads().collect();
+
+        for (TemporalGraphHead graphHead : graphHeads) {
+            assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
+        }
+
     }
 
     /**

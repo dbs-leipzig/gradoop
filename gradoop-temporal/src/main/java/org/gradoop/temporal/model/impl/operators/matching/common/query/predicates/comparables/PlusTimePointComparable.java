@@ -14,18 +14,18 @@ import java.util.Set;
 /**
  * Wraps a {@link org.s1ck.gdl.model.comparables.time.PlusTimePoint}
  */
-public class PlusTimePointComparable extends QueryComparable {
+public abstract class PlusTimePointComparable extends QueryComparable {
 
     /**
      * The wrapped PlusTimePoint
-     */
+     *//*
     PlusTimePoint plusTimePoint;
 
-    /**
+    *//**
      * Creates a new wrapper
      *
      * @param plusTimePoint the wrapped PlusTimePoint
-     */
+     *//*
     public PlusTimePointComparable(PlusTimePoint plusTimePoint) {
         this.plusTimePoint = plusTimePoint;
     }
@@ -97,5 +97,5 @@ public class PlusTimePointComparable extends QueryComparable {
     public int hashCode(){
         return plusTimePoint != null ? plusTimePoint.hashCode() : 0;
     }
-
+*/
 }

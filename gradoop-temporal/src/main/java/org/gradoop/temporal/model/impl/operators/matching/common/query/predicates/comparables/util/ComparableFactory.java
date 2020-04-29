@@ -38,9 +38,9 @@ public class ComparableFactory {
             return new TimeLiteralComparable((TimeLiteral) expression);
         } else if(expression.getClass() == TimeSelector.class){
             return new TimeSelectorComparable((TimeSelector) expression);
-        } else if(expression.getClass() == PlusTimePoint.class){
+        } /*else if(expression.getClass() == PlusTimePoint.class){
             return new PlusTimePointComparable((PlusTimePoint) expression);
-        } else {
+        }*/ else {
             throw new IllegalArgumentException(
                     expression.getClass() + " is not a GDL ComparableExpression"
             );

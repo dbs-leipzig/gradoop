@@ -89,7 +89,6 @@ public class ComparisonExpression extends QueryPredicate {
   public boolean evaluate(GraphElement element) {
     PropertyValue lhsValue = getLhs().evaluate(element);
     PropertyValue rhsValue = getRhs().evaluate(element);
-
     return compare(lhsValue, rhsValue);
   }
 

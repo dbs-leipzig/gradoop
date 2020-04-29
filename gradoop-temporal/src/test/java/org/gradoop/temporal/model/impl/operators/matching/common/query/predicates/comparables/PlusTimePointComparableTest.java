@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotEquals;
 
 public class PlusTimePointComparableTest {
 
-    @Test
+    /*@Test
     public void testSimpleLiteralPlusTimePointComparable() {
         //-----------------------------------------------
         // test data
@@ -95,5 +95,5 @@ public class PlusTimePointComparableTest {
         //---------------------------------------------------
         TemporalVertex vertex = new TemporalVertexFactory().createVertex();
         assertEquals(reference, wrapper.evaluate(vertex));
-    }
+    }*/
 }

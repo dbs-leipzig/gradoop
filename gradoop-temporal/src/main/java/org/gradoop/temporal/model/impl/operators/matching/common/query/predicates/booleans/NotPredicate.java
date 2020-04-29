@@ -51,7 +51,7 @@ public class NotPredicate extends org.gradoop.flink.model.impl.operators.matchin
             Predicate[] otherArguments = expression.getArguments();
             Or or = new Or(
                     new Not(otherArguments[0]),
-                    new Not(otherArguments[0])
+                    new Not(otherArguments[1])
             );
             return QueryPredicateFactory.createFrom(or).asCNF();
 
@@ -72,7 +72,7 @@ public class NotPredicate extends org.gradoop.flink.model.impl.operators.matchin
                             otherArguments[1]),
                     new And(
                             new Not(otherArguments[0]),
-                            new Not(otherArguments[0]))
+                            new Not(otherArguments[1]))
             );
 
             return QueryPredicateFactory.createFrom(or).asCNF();
