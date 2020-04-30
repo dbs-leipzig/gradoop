@@ -19,7 +19,9 @@ public class HomomorphismFromToData implements TemporalTestData {
         data.add(new String[]{
                 "FromTo_HOM_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE e.val.fromTo(2013-06-01T00:35:00, 2013-06-01T00:40:00)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE e.val.fromTo(2013-06-01T00:35:00, " +
+                        "2013-06-01T00:40:00)"),
                 "expected1,expected2,expected3,expected4",
                 "expected1[(s7)-[e5]->(s2)], expected2[(s2)-[e2]->(s2)]," +
                         "expected3[(s8)-[e6]->(s9)], expected4[(s28)-[e18]->(s29)]"
@@ -33,8 +35,9 @@ public class HomomorphismFromToData implements TemporalTestData {
         data.add(new String[]{
                 "FromTo_HOM_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b)<-[e2]-(a) WHERE a.id=486 AND " +
-                        "e1.val.fromTo(e2.val_from, e2.val_to)",
+                        "e1.val.fromTo(e2.val_from, e2.val_to)"),
                 "expected1,expected2,expected3,expected4",
                 "expected1[(s21)-[e13]->(s11)<-[e13]-(s21)]," +
                         "expected2[(s21)-[e13]->(s11)<-[e19]-(s21)]," +
@@ -50,7 +53,9 @@ public class HomomorphismFromToData implements TemporalTestData {
         data.add(new String[]{
                 "FromTo_HOM_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE NOT e.val.fromTo(2013-06-01T00:04:00, 2013-06-01T00:08:00)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE NOT e.val" +
+                        ".fromTo(2013-06-01T00:04:00, 2013-06-01T00:08:00)"),
                 "expected1,expected2,expected3",
                 "expected1[(s3)-[e3]->(s4)], expected2[(s21)-[e19]->(s11)], " +
                         "expected3[(s28)-[e18]->(s29)]"
@@ -63,10 +68,11 @@ public class HomomorphismFromToData implements TemporalTestData {
          * 5.[(Lispenard St) -> (Broadway & W 51 St)]
          */
         data.add(new String[]{
-                "From_HOM_4_default_citibike",
+                "FromTo_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:34:00,2013-06-01T00:35:00)" +
-                        ".fromTo(e.val_from, e.val_to)",
+                        ".fromTo(e.val_from, e.val_to)"),
                 "expected1,expected2,expected3,expected4,expected5",
                 "expected1[(s7)-[e5]->(s2)], expected2[(s2)-[e2]->(s2)]," +
                         "expected3[(s12)-[e8]->(s13)], expected4[(s8)-[e6]->(s9)]," +
@@ -77,11 +83,57 @@ public class HomomorphismFromToData implements TemporalTestData {
          * 1.[Broadway & W24) -[edgeId:0]-> (9 Ave & W18)
          */
         data.add(new String[]{
-                "From_HOM_5_default_citibike",
+                "FromTo_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE a.id=444 AND e.val.fromTo(2013-06-01T00:00:01,2013-06-01T00:00:08)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE a.id=444 AND e.val.fromTo(" +
+                        "2013-06-01T00:00:01,2013-06-01T00:00:08)"),
                 "expected1",
                 "expected1[(s0)-[e0]->(s1)]"
+        });
+        /*
+         * 1.[(Broadway & W24 St)]
+         * 2.[(Little West St & 1 Pl)]
+         */
+        data.add(new String[]{
+                "FromTo_HOM_6_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) WHERE a.tx.fromTo(2013-05-10T23:50:00," +
+                                "2013-05-11T00:01:00)"
+                ),
+                "expected1,expected2",
+                "expected1[(s0)], expected2[(s5)]"
+
+        });
+        /*
+         * 1.[(Hicks St) -> (Hicks St)]
+         * 2.[(Lispenard St) -> (Broadway & W 51 St)]
+         */
+        data.add(new String[]{
+                "FromTo_HOM_7_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:34:00,2013-06-01T00:35:00)" +
+                                ".fromTo(e.val_from, e.val_to)" +
+                                "AND a.val.overlaps(Interval(2013-05-10, 2013-05-15))"),
+                "expected1,expected2",
+                "expected1[(s2)-[e2]->(s2)], expected2[(s28)-[e18]->(s29)]"
+        });
+        /*
+         * (empty)
+         */
+        data.add(new String[]{
+                "FromTo_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE NOT(" +
+                                "a.tx.fromTo(2013-06-01,2013-06-30) OR " +
+                                "e.tx.fromTo(2013-06-01,2013-06-30) OR " +
+                                "b.tx.fromTo(2013-06-01,2013-06-30))"
+                ),
+                "",
+                ""
         });
         return data;
 

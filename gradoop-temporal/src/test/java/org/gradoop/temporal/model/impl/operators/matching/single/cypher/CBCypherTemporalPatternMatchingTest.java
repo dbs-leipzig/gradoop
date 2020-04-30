@@ -16,6 +16,7 @@ import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPattern
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismBeforeData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
@@ -31,14 +32,6 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
      * Path to the default GDL file.
      */
     public static final String defaultData = "src/test/resources/data/patternmatchingtest/citibikesample";
-
-    /*@Parameterized.Parameters(name = "{index}: {0}")
-    public static Iterable data() {
-        ArrayList<String[]> data = new ArrayList<>();
-        data.addAll(new IsomorphismBeforeData().getData());
-        return data;
-    }*/
-
 
 
     /**
@@ -61,6 +54,25 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
     };
 
     /**
+     * Set the vertice's {@code valid_from} and {@code tx_from} according to the {@code start}
+     * property and the vertice's {@code valid_to} and {@code tx_to} according to the
+     * {@code end} property. Both properties are retained.
+     */
+    private final MapFunction<TemporalVertex, TemporalVertex> vertexTransform = new
+            MapFunction<TemporalVertex, TemporalVertex>() {
+                @Override
+                public TemporalVertex map(TemporalVertex value) throws Exception {
+                    long start = value.getPropertyValue("start").getLong();
+                    long end = value.getPropertyValue("end").getLong();
+                    value.setValidTime(new Tuple2<>(start, end));
+                    value.setTransactionTime(value.getValidTime());
+                    //value.removeProperty("start");
+                    //value.removeProperty("end");
+                    return value;
+                }
+            };
+
+    /**
      * initializes a test with a data graph
      * @param testName name of the test
      * @param queryGraph the query graph as GDL-string
@@ -73,24 +85,36 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
         super(testName, dataGraphPath, queryGraph, expectedGraphVariables, expectedCollection);
     }
 
+    /**
+     * Edits a typical query so that no default asOf(now) predicates are appended to
+     * it during query processing.
+     * This is achieved by appending a simple tx_to condition that should always be
+     * true (if a tx_to condition is there, no default asOf()s are added)
+     * @param query a query containing a variable {@code e}, {@code e1} or {@code a}
+     * @return query with practically same semantics but changed so that no default
+     *  asOfs are added
+     */
+    public static String noDefaultAsOf(String query){
+        if(query.contains("[e]")){
+            return query+" AND e.tx_to.after(1970-01-01)";
+        }
+        else if(query.contains("[e1]")){
+            return query+" AND e1.tx_to.after(1970-01-01)";
+        }
+        else if(query.contains("(a)")){
+            return query+" AND a.tx_to.after(1970-01-01)";
+        }
+        throw new IllegalArgumentException("Query must contain 'e', 'e1' or 'a'");
+    }
     @Override
     protected TemporalGraphCollection transformExpectedToTemporal(GraphCollection gc) throws Exception {
         //transform edges
         TemporalGraphCollection tgc = toTemporalGraphCollection(gc);
         DataSet<TemporalEdge> newEdges = tgc.getEdges().map(edgeTransform);
-        tgc = tgc.getFactory().fromDataSets(tgc.getGraphHeads(), tgc.getVertices(), newEdges);
+        DataSet<TemporalVertex> newVertices = tgc.getVertices().map(vertexTransform);
+        tgc = tgc.getFactory().fromDataSets(tgc.getGraphHeads(), newVertices, newEdges);
         return tgc;
     }
-
-    /*@Override
-    public TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphCollection>
-    getImplementation(String queryGraph, boolean attachData) {
-        // dummy value for dummy GraphStatistics
-        int n = 42;
-        GraphStatistics stats = new GraphStatistics(n,n,n,n);
-        return new CypherTemporalPatternMatching(queryGraph, attachData, MatchStrategy.ISOMORPHISM,
-                MatchStrategy.ISOMORPHISM, stats);
-    }*/
 
     @Override
     protected TemporalGraph getTemporalGraphFromLoader(FlinkAsciiGraphLoader loader) throws Exception {
@@ -100,7 +124,7 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
             e.printStackTrace();
         }
         LogicalGraph g = loader.getLogicalGraph();
-        //new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
+        new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
         return transformToTemporalGraph(g);
     }
 
@@ -116,8 +140,8 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
     private TemporalGraph transformToTemporalGraph(LogicalGraph g) throws Exception {
         TemporalGraph tg = toTemporalGraph(g);
         List<TemporalEdge> newEdges = tg.getEdges().map(edgeTransform).collect();
-        return tg.getFactory().fromCollections(tg.getVertices().collect(),
-                newEdges);
+        List<TemporalVertex> newVertices = tg.getVertices().map(vertexTransform).collect();
+        return tg.getFactory().fromCollections(newVertices, newEdges);
     }
 
     @Override

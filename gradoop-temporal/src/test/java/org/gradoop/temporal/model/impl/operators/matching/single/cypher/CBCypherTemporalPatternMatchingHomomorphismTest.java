@@ -17,13 +17,14 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Iterable data() {
         ArrayList<String[]> data = new ArrayList<>();
-        //data.addAll(new HomomorphismBeforeData().getData());
-        //data.addAll(new HomomorphismOverlapsData().getData());
-        //data.addAll(new HomomorphismAfterData().getData());
-        //data.addAll(new HomomorphismFromToData().getData());
-        //data.addAll(new HomomorphismBetweenData().getData());
-        //data.addAll(new HomomorphismPrecedesData().getData());
+        data.addAll(new HomomorphismBeforeData().getData());
+        data.addAll(new HomomorphismOverlapsData().getData());
+        data.addAll(new HomomorphismAfterData().getData());
+        data.addAll(new HomomorphismFromToData().getData());
+        data.addAll(new HomomorphismBetweenData().getData());
+        data.addAll(new HomomorphismPrecedesData().getData());
         data.addAll(new HomomorphismSucceedsData().getData());
+        data.addAll(new HomomorphismAsOfData().getData());
         return data;
     }
 

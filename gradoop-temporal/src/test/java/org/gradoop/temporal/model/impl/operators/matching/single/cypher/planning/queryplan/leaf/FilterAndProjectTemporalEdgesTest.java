@@ -94,7 +94,7 @@ public class FilterAndProjectTemporalEdgesTest {
         DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3);
 
         //only matched by e1
-        String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 AND e.tx.asOf(1970-01-01T00:00:01)";
+        String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 AND e.tx_to.after(1970-01-01T00:00:01)";
 
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
         CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));

@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 public class FilterEstimatorTest extends TemporalEstimatorTestBase {
     @Test
     public void testVertex() throws Exception {
-        String query = "MATCH (n) WHERE n.tx.asOf(2019-01-01)";
+        String query = "MATCH (n) WHERE n.tx_to.after(2019-01-01)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
 
         FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(null,

@@ -19,13 +19,14 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Iterable data() {
         ArrayList<String[]> data = new ArrayList<>();
-        //data.addAll(new IsomorphismBeforeData().getData());
-        //data.addAll(new IsomorphismOverlapsData().getData());
-        //data.addAll(new IsomorphismAfterData().getData());
-        //data.addAll(new IsomorphismFromToData().getData());
-        //data.addAll(new IsomorphismBetweenData().getData());
-        //data.addAll(new IsomorphismPrecedesData().getData());
+        data.addAll(new IsomorphismBeforeData().getData());
+        data.addAll(new IsomorphismOverlapsData().getData());
+        data.addAll(new IsomorphismAfterData().getData());
+        data.addAll(new IsomorphismFromToData().getData());
+        data.addAll(new IsomorphismBetweenData().getData());
+        data.addAll(new IsomorphismPrecedesData().getData());
         data.addAll(new IsomorphismSucceedsData().getData());
+        data.addAll(new IsomorphismAsOfData().getData());
         return data;
     }
 

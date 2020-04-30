@@ -13,7 +13,9 @@ import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
+import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
@@ -30,9 +32,8 @@ import static org.junit.Assert.assertTrue;
 public class TemporalQueryHandlerTest {
 
     @Test
-    public void testGetPredicates(){
+    public void testGetPredicatesWithoutDefaultAsOf(){
         String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.tx_to)";
-        GDLHandler gdlHandler = new GDLHandler.Builder().buildFromString(testquery);
         TemporalQueryHandler handler = new TemporalQueryHandler(testquery);
 
         And and = new And(
@@ -46,6 +47,57 @@ public class TemporalQueryHandlerTest {
         QueryPredicate expected = QueryPredicateFactory.createFrom(and);
 
         assertEquals(expected.asCNF(), handler.getPredicates());
+    }
+
+    @Test
+    public void testGetPredicatesWithDefaultAsOf(){
+        String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.val_to)";
+        TemporalQueryHandler handler = new TemporalQueryHandler(testquery);
+        TimeLiteral now = handler.getNow();
+        And and = new And(
+                new Comparison(new TimeSelector("v2", "val_to"),
+                        Comparator.GT,
+                        new TimeSelector("v1", "tx_from")),
+                new Comparison(new PropertySelector("e1", "__label__"),
+                        Comparator.EQ,
+                        new Literal("test"))
+        );
+        And defaultAsOfV1 = getAsOf("v1", now);
+        And defaultAsOfE1 = getAsOf("e1", now);
+        And defaultAsOfV2 = getAsOf("v2", now);
+
+        Predicate expectedGDLPredicate = new And(and, defaultAsOfE1);
+        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV2);
+        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
+        QueryPredicate expected = QueryPredicateFactory.createFrom(expectedGDLPredicate);
+
+        assertEquals(expected.asCNF(), handler.getPredicates());
+
+        //without any other predicates
+        testquery = "MATCH (v1)-[e1]->(v2)";
+        handler = new TemporalQueryHandler(testquery);
+        now = handler.getNow();
+        defaultAsOfV1 = getAsOf("v1", now);
+        defaultAsOfE1 = getAsOf("e1", now);
+        defaultAsOfV2 = getAsOf("v2", now);
+        expectedGDLPredicate = new And(defaultAsOfE1, defaultAsOfV2);
+        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
+        expected = QueryPredicateFactory.createFrom(expectedGDLPredicate);
+        assertEquals(expected.asCNF(), handler.getPredicates());
+
+    }
+
+    private And getAsOf(String var, TimeLiteral now){
+        return new And(
+                new Comparison(
+                        new TimeSelector(var, TimeSelector.TimeField.TX_FROM),
+                        Comparator.LTE, now
+                ),
+                new Comparison(
+                        new TimeSelector(var, TimeSelector.TimeField.TX_TO),
+                        Comparator.GTE, now
+                )
+        );
     }
 
 

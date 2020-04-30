@@ -18,7 +18,9 @@ public class IsomorphismBetweenData implements TemporalTestData {
         data.add(new String[]{
                 "Between_ISO_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE a.id=444 AND e.val.between(2013-06-01T00:00:01,2013-06-01T00:00:08)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE a.id=444 AND " +
+                        "e.val.between(2013-06-01T00:00:01,2013-06-01T00:00:08)"),
                 "expected1,expected2",
                 "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
         });
@@ -31,7 +33,9 @@ public class IsomorphismBetweenData implements TemporalTestData {
         data.add(new String[]{
                 "FromTo_ISO_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE e.val.between(2013-06-01T00:35:00, 2013-06-01T00:40:00)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE e.val.between(2013-06-01T00:35:00, " +
+                        "2013-06-01T00:40:00)"),
                 "expected1,expected2,expected3",
                 "expected1[(s7)-[e5]->(s2)]," +
                         "expected2[(s8)-[e6]->(s9)], expected3[(s28)-[e18]->(s29)]"
@@ -45,7 +49,9 @@ public class IsomorphismBetweenData implements TemporalTestData {
         data.add(new String[]{
                 "FromTo_ISO_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
-                "MATCH (a)-[e]->(b) WHERE NOT e.val.between(2013-06-01T00:04:00, 2013-06-01T00:08:00)",
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                "MATCH (a)-[e]->(b) WHERE NOT " +
+                        "e.val.between(2013-06-01T00:04:00, 2013-06-01T00:08:00)"),
                 "expected1,expected2,expected3",
                 "expected1[(s3)-[e3]->(s4)], expected2[(s21)-[e19]->(s11)], " +
                         "expected3[(s28)-[e18]->(s29)]"
@@ -58,8 +64,9 @@ public class IsomorphismBetweenData implements TemporalTestData {
         data.add(new String[]{
                 "From_ISO_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b)<-[e2]-(a) WHERE a.id=486 AND " +
-                        "e1.val.between(e2.val_from, e2.val_to)",
+                        "e1.val.between(e2.val_from, e2.val_to)"),
                 "expected1,expected2",
                 "expected1[(s21)-[e19]->(s11)<-[e13]-(s21)]," +
                         "expected2[(s21)-[e13]->(s11)<-[e19]-(s21)]"
@@ -74,12 +81,27 @@ public class IsomorphismBetweenData implements TemporalTestData {
         data.add(new String[]{
                 "From_ISO_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:34:00,2013-06-01T00:35:00)" +
-                        ".between(e.val_from, e.val_to)",
+                        ".between(e.val_from, e.val_to)"),
                 "expected1,expected2,expected3,expected4",
                 "expected1[(s7)-[e5]->(s2)]," +
                         "expected2[(s12)-[e8]->(s13)], expected3[(s8)-[e6]->(s9)]," +
                         "expected4[(s28)-[e18]->(s29)]"
+        });
+
+        /*
+         * 1.[(E15 St & Irving Pl) -> (Washington Park)]
+         */
+        data.add(new String[]{
+                "FromTo_ISO_6_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE NOT " +
+                                "e.val.between(2013-06-01T00:04:00, 2013-06-01T00:08:00) AND " +
+                                "b.val.between(2013-07-22T00:00:00, 2013-07-30)"),
+                "expected1",
+                "expected1[(s3)-[e3]->(s4)]"
         });
 
         return data;
