@@ -122,7 +122,7 @@ public class HomomorphismBetweenData implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s7)-[e5]->(s2)], expected2[(s12)-[e8]->(s13)]"
         });
-
+        //(empty)
         data.add(new String[]{
                 "Between_HOM_8_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -131,6 +131,18 @@ public class HomomorphismBetweenData implements TemporalTestData {
                 ),
                 "",
                 ""
+        });
+        //1.[(Broadway & W 24 St) (Broadway & W 24 St)]
+        //2.[(Broadway & W 24 St) (Little West St & 1 Pl)]
+        data.add(new String[]{
+                "FromTo_HOM_10_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) (b) WHERE tx.fromTo(1970-01-01,2013-05-11) " +
+                                "AND a.id<=b.id"
+                ),
+                "expected1",
+                "expected1[(s0) (s0)]"
         });
         return data;
 

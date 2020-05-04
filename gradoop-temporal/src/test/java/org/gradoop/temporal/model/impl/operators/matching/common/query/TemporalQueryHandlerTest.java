@@ -4,7 +4,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Triple;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.junit.Test;
 import org.s1ck.gdl.GDLHandler;
@@ -36,7 +40,7 @@ public class TemporalQueryHandlerTest {
         String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.tx_to)";
         TemporalQueryHandler handler = new TemporalQueryHandler(testquery);
 
-        And and = new And(
+        Predicate and = new And(
                 new Comparison(new TimeSelector("v2", "tx_to"),
                         Comparator.GT,
                         new TimeSelector("v1", "tx_from")),
@@ -44,9 +48,7 @@ public class TemporalQueryHandlerTest {
                         Comparator.EQ,
                         new Literal("test"))
         );
-        QueryPredicate expected = QueryPredicateFactory.createFrom(and);
-
-        assertEquals(expected.asCNF(), handler.getPredicates());
+        assertPredicateEquals(and, handler.getPredicates());
     }
 
     @Test
@@ -54,7 +56,7 @@ public class TemporalQueryHandlerTest {
         String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.val_to)";
         TemporalQueryHandler handler = new TemporalQueryHandler(testquery);
         TimeLiteral now = handler.getNow();
-        And and = new And(
+        Predicate and = new And(
                 new Comparison(new TimeSelector("v2", "val_to"),
                         Comparator.GT,
                         new TimeSelector("v1", "tx_from")),
@@ -69,9 +71,8 @@ public class TemporalQueryHandlerTest {
         Predicate expectedGDLPredicate = new And(and, defaultAsOfE1);
         expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV2);
         expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
-        QueryPredicate expected = QueryPredicateFactory.createFrom(expectedGDLPredicate);
 
-        assertEquals(expected.asCNF(), handler.getPredicates());
+        assertPredicateEquals(expectedGDLPredicate, handler.getPredicates());
 
         //without any other predicates
         testquery = "MATCH (v1)-[e1]->(v2)";
@@ -82,10 +83,36 @@ public class TemporalQueryHandlerTest {
         defaultAsOfV2 = getAsOf("v2", now);
         expectedGDLPredicate = new And(defaultAsOfE1, defaultAsOfV2);
         expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
-        expected = QueryPredicateFactory.createFrom(expectedGDLPredicate);
-        assertEquals(expected.asCNF(), handler.getPredicates());
+        assertPredicateEquals(expectedGDLPredicate, handler.getPredicates());
 
     }
+
+    private void assertPredicateEquals(Predicate expectedGDL, CNF result){
+        CNF expected = QueryPredicateFactory.createFrom(expectedGDL).asCNF();
+        equalCNFs(expected, result);
+    }
+
+    private void equalCNFs(CNF a, CNF b){
+        assertEquals(a.getPredicates().size(), b.getPredicates().size());
+        for(CNFElement aElement: a.getPredicates()){
+            ComparisonExpression aComp = aElement.getPredicates().get(0);
+            boolean foundA = false;
+            for(CNFElement bElement: b.getPredicates()){
+                ComparisonExpression bComp = bElement.getPredicates().get(0);
+                if(comparisonEqual(aComp, bComp)){
+                    foundA= true;
+                }
+            }
+            assertTrue(foundA);
+        }
+    }
+
+    private boolean comparisonEqual(ComparisonExpression a, ComparisonExpression b){
+        Comparison aComp = ((ComparisonExpressionTPGM)a).getGDLComparison();
+        Comparison bComp = ((ComparisonExpressionTPGM)b).getGDLComparison();
+        return (aComp.equals(bComp)||aComp.switchSides().equals(bComp));
+    }
+
 
     private And getAsOf(String var, TimeLiteral now){
         return new And(

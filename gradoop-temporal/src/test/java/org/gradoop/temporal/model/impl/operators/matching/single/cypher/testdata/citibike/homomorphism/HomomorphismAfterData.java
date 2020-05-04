@@ -108,6 +108,31 @@ public class HomomorphismAfterData implements TemporalTestData {
                 "",
                 ""
         });
+        /*
+         * cf. HOM_4
+         * 1.[(Hicks St)->(Hicks St)]
+         * */
+        data.add(new String[]{
+                "Before_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from)" +
+                                "AND NOT 2013-06-01T00:30:00.after(tx_to)"),
+                "expected1",
+                "expected1[(s2)-[e2]->(s2)]"
+        });
+        /*
+         * (empty)
+         */
+        data.add(new String[]{
+                "Before_HOM9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) WHERE val_from.after(tx_to)"
+                ),
+                "",
+                ""
+        });
         return data;
     }
 }

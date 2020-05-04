@@ -74,7 +74,8 @@ public class FilterAndProjectTemporalVerticesTest {
 
         DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(vertex1, vertex2, vertex3);
 
-        String query = "MATCH (n) WHERE n.foo = 23 AND n.tx_from.before(1970-01-01T00:00:01)";
+        String query = "MATCH (n) WHERE n.foo = 23 AND n.tx_from.before(1970-01-01T00:00:01) " +
+                "AND n.tx_to.before(2020-01-01)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
         CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("n"));
         Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("n");

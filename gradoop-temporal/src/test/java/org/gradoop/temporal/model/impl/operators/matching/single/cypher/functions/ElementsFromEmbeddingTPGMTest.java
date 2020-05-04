@@ -184,12 +184,14 @@ public class ElementsFromEmbeddingTPGMTest {
     }
 
     private Long[] getRandomTime(){
-        int min = 0;
-        int max = 1000;
-        Long tx_from = (long) (Math.random()*max);
-        Long tx_to = tx_from + ((long)(Math.random()*max));
-        Long valid_from = (long) (Math.random()*max);
-        Long valid_to = valid_from + ((long)(Math.random()*max));
+        int min_from = 0;
+        int max_from = 100;
+        int min_to = 500;
+        int max_to = 1000;
+        Long tx_from = (long) (Math.random()*max_from);
+        Long tx_to = min_to + ((long)(Math.random()*max_to));
+        Long valid_from = (long) (Math.random()*max_from);
+        Long valid_to = min_to + ((long)(Math.random()*max_to));
         return new Long[]{tx_from, tx_to, valid_from, valid_to};
     }
 }

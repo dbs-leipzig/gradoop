@@ -107,6 +107,20 @@ public class HomomorphismBeforeData implements TemporalTestData {
                 ),
                 "",
                 ""
+        });/*
+        /*
+         * 1.[(Broadway & E14)]
+         */
+        data.add(new String[]{
+                "Before_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) WHERE a.tx_to.before(2013-07-11) AND" +
+                                " 2013-05-28.before(val_from)"
+                ),
+                "expected1",
+                "expected1[(s8)]"
+
         });
         return data;
     }

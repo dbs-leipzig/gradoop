@@ -79,6 +79,13 @@ public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
     }
 
     protected CNF predicateFromQuery(String query) {
+        // no default asOf-predicates:
+        if(!query.contains("WHERE")){
+            query+= " WHERE tx_to.after(1970-01-01T00:00:00)";
+        }
+        else {
+            query += " AND tx_to.after(1970-01-01T00:00:00)";
+        }
         return new TemporalQueryHandler(query).getPredicates();
     }
 }

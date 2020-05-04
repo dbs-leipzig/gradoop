@@ -35,4 +35,8 @@ public class ComparisonExpressionTPGM extends ComparisonExpression {
         return ComparableFactory.createComparableFrom(comparison.getComparableExpressions()[1]);
     }
 
+    public Comparison getGDLComparison(){
+        return comparison;
+    }
+
 }

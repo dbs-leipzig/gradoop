@@ -112,6 +112,7 @@ public class FilterAndProjectTemporalTriple extends RichFlatMapFunction<TripleTP
             if (!(triple.getSourceId().equals(triple.getTargetId()))) {
                 isValid = false;
             }
+            // not correct, both variables could have the same name...
         } else if (isVertexIso && triple.getSourceId().equals(triple.getTargetId())) {
             isValid = false;
         }

@@ -3,6 +3,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.functio
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
@@ -122,10 +123,15 @@ public class ElementsFromEmbeddingTPGM<
         // create graph head for this embedding
         TemporalGraphHead graphHead = graphHeadFactory.createGraphHead();
 
+        // used to determine global time
+        Long[] globalTime = new Long[]{TemporalElement.DEFAULT_TIME_FROM,
+        TemporalElement.DEFAULT_TIME_TO, TemporalElement.DEFAULT_TIME_FROM, TemporalElement.DEFAULT_TIME_TO};
+
         // vertices
         for (String vertexVariable : metaData.getVertexVariables()) {
             GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
             Long[] tempData = embedding.getTimes(metaData.getTimeColumn(vertexVariable));
+            globalTime = updateGlobalTime(globalTime, tempData);
 
             if (labelMapping.containsKey(vertexVariable)) {
                 String label = labelMapping.get(vertexVariable);
@@ -149,6 +155,7 @@ public class ElementsFromEmbeddingTPGM<
                     metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
 
             timeData = embedding.getTimes(metaData.getTimeColumn(edgeVariable));
+            globalTime = updateGlobalTime(globalTime, timeData);
 
             if (labelMapping.containsKey(edgeVariable)) {
                 String label = labelMapping.get(edgeVariable);
@@ -209,8 +216,38 @@ public class ElementsFromEmbeddingTPGM<
             variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));
         }
 
+        if(globalTime[0]>globalTime[1]){
+            globalTime[0]= Long.MIN_VALUE;
+            globalTime[1] = Long.MIN_VALUE;
+        }
+        if(globalTime[2]>globalTime[3]){
+            globalTime[2]= Long.MIN_VALUE;
+            globalTime[3] = Long.MIN_VALUE;
+        }
+
         graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
+        graphHead.setTransactionTime(new Tuple2<>(globalTime[0], globalTime[1]));
+        graphHead.setValidTime(new Tuple2<>(globalTime[2], globalTime[3]));
         out.collect(graphHead);
+
+
+
+    }
+
+    /**
+     * Updates existing global time data (tx_from, tx_to, val_from, val_to) with time data
+     * from an element.
+     * @param global global time data
+     * @param local time data of an element
+     * @return updated global time data
+     */
+    private Long[] updateGlobalTime(Long[] global, Long[] local){
+        return new Long[]{
+                Math.max(global[0], local[0]),
+                Math.min(global[1], local[1]),
+                Math.max(global[2], local[2]),
+                Math.min(global[3], local[3])
+        };
     }
 
     /**

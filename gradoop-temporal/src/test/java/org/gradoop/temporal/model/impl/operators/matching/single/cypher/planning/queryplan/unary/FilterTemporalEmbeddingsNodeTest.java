@@ -35,7 +35,8 @@ public class FilterTemporalEmbeddingsNodeTest {
 
     @Test
     public void testExecute() throws Exception {
-        String query = "MATCH (a)-->(b) WHERE a.age > b.age AND a.tx_from.before(b.tx_from)";
+        String query = "MATCH (a)-->(b) WHERE a.age > b.age AND a.tx_from.before(b.tx_from)" +
+                " AND a.tx_to.before(2020-01-01)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
         CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("a", "b"));
 

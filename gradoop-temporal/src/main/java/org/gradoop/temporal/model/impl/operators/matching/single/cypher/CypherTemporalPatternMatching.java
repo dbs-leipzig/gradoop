@@ -127,16 +127,17 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
                                 queryHandler.getSourceTargetVariables()));
 
         // Post processing
-        return
-                doAttachData() ? PostProcessor.<TemporalGraphHead, TemporalVertex,
+        TemporalGraphCollection graphCollection = doAttachData() ?
+                PostProcessor.<TemporalGraphHead, TemporalVertex,
                                         TemporalEdge, TemporalGraph, TemporalGraphCollection>
-                                        extractGraphCollectionWithData(
+                        extractGraphCollectionWithData(
                                                 finalElements, graph, true) :
-                
-                                        PostProcessor.<TemporalGraphHead, TemporalVertex,
+                PostProcessor.<TemporalGraphHead, TemporalVertex,
                                                 TemporalEdge, TemporalGraph, TemporalGraphCollection>
-                                                extractGraphCollection(finalElements, graph.getCollectionFactory(),
+                        extractGraphCollection(finalElements, graph.getCollectionFactory(),
                                                 true);
+
+        return graphCollection;
     }
 
     /**

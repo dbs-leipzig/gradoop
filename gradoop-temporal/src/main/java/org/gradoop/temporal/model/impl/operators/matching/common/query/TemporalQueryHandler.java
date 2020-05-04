@@ -88,8 +88,8 @@ public class TemporalQueryHandler extends QueryHandler {
         }
         else{
             // add v.asOf(now) for every element in the query
-            ArrayList<String> vars = new ArrayList<>(gdlHandler.getEdgeCache().keySet());
-            vars.addAll(gdlHandler.getVertexCache().keySet());
+            ArrayList<String> vars = new ArrayList<>(gdlHandler.getEdgeCache(true, true).keySet());
+            vars.addAll(gdlHandler.getVertexCache(true, true).keySet());
             And asOf0 = new And(
                     new Comparison(
                             new TimeSelector(vars.get(0), TimeSelector.TimeField.TX_FROM),
