@@ -6,7 +6,6 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.*;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismBeforeData;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.junit.runners.Parameterized;
 
@@ -25,6 +24,7 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
         data.addAll(new HomomorphismPrecedesData().getData());
         data.addAll(new HomomorphismSucceedsData().getData());
         data.addAll(new HomomorphismAsOfData().getData());
+        data.addAll(new HomomorphismComplexQueryData().getData());
         return data;
     }
 

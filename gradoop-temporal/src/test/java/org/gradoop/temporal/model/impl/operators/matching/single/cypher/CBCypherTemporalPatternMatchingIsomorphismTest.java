@@ -27,6 +27,7 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
         data.addAll(new IsomorphismPrecedesData().getData());
         data.addAll(new IsomorphismSucceedsData().getData());
         data.addAll(new IsomorphismAsOfData().getData());
+        data.addAll(new IsomorphismComplexQueryData().getData());
         return data;
     }
 
