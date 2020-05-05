@@ -129,6 +129,8 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         // initialize with data graph
         TemporalGraph db = getTemporalGraphFromLoader(loader);
 
+        
+
         // append the expected result
         loader.appendToDatabaseFromString(expectedCollection);
 
