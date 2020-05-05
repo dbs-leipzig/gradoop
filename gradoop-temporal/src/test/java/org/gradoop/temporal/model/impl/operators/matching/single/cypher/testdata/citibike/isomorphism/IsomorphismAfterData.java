@@ -18,7 +18,7 @@ public class IsomorphismAfterData implements TemporalTestData {
          * 2. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
          */
         data.add(new String[]{
-                "Before_ISO_1_default_citibike",
+                "After_ISO_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE " +
@@ -31,7 +31,7 @@ public class IsomorphismAfterData implements TemporalTestData {
          * 1. [(Broadway & E14) -> (S 5 Pl) <- (Henry St & Grand St)]
          */
         data.add(new String[]{
-                "Before_ISO_2_default_citibike",
+                "After_ISO_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE b.id=532 AND e1.tx_from.after(e2.tx_from) " +
@@ -44,7 +44,7 @@ public class IsomorphismAfterData implements TemporalTestData {
          * 2.[(9 Ave & W22) -> (8 Ave & W31) <-[edgeId:13]- (Broadway & W29)]
          */
         data.add(new String[]{
-                "Before_ISO_3_default_citibike",
+                "After_ISO_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE b.id=521 AND e1.bikeID=16100 " +
@@ -58,7 +58,7 @@ public class IsomorphismAfterData implements TemporalTestData {
          * 2.[Broadway & W24) -[edgeId:1]-> (9 Ave & W18)
          */
         data.add(new String[]{
-                "Before_ISO_4_default_citibike",
+                "After_ISO_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from)"),
@@ -69,7 +69,7 @@ public class IsomorphismAfterData implements TemporalTestData {
          * (empty)
          */
         data.add(new String[]{
-                "Before_ISO_5_default_citibike",
+                "After_ISO_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE " +

@@ -21,7 +21,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 3. [(E15 St) -> (Washington P.)      (Hicks St) -> (Hicks St)]
          */
         data.add(new String[]{
-                "Before_HOM_1_default_citibike",
+                "After_HOM_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b) (c)-[e2]->(d) " +
@@ -36,7 +36,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 1. [(Broadway & W29)-[edgeId:13]->(8 Ave & W31)      (Broadway & W29)-[edgeId:19]->(8 Ave & W31)]
          */
         data.add(new String[]{
-                "Before_HOM_2_default_citibike",
+                "After_HOM_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE a.id=486 AND c.id=486 " +
@@ -49,7 +49,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 1. [(Hicks St & Montague) -> (Hicks St & Montague) <- (W 37 St & 5 Ave)]
          */
         data.add(new String[]{
-                "Before_HOM_3_default_citibike",
+                "After_HOM_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE b.id=406 AND " +
@@ -64,7 +64,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 3.[Broadway & W24) -[edgeId:1]-> (9 Ave & W18)
          */
         data.add(new String[]{
-                "Before_HOM_4_default_citibike",
+                "After_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                 "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from)"),
@@ -88,7 +88,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 1.[(Hicks St)->(Hicks St)]
          */
         data.add(new String[]{
-                "Before_HOM_6_default_citibike",
+                "After_HOM_6_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from) " +
@@ -113,7 +113,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * 1.[(Hicks St)->(Hicks St)]
          * */
         data.add(new String[]{
-                "Before_HOM_8_default_citibike",
+                "After_HOM_8_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from)" +
@@ -125,7 +125,7 @@ public class HomomorphismAfterData implements TemporalTestData {
          * (empty)
          */
         data.add(new String[]{
-                "Before_HOM9_default_citibike",
+                "After_HOM9_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a) WHERE val_from.after(tx_to)"
