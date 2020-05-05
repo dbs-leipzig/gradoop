@@ -11,11 +11,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 
+import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
+import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.*;
@@ -112,6 +114,9 @@ public class ElementsFromEmbeddingTPGMTest {
 
 
         checkElement((TemporalEdge) result.get(3), e1, "e1Label", e1Time);
+
+        TemporalGraphHead head = (TemporalGraphHead) result.get(4);
+        checkHead(head, v1Time, v2Time, v3Time, e1Time);
     }
 
     @Test
@@ -174,6 +179,121 @@ public class ElementsFromEmbeddingTPGMTest {
         assertEquals(pValues.get(2).getGradoopId(), e2);
         assertEquals(pValues.get(3).getGradoopId(), w);
         assertEquals(pValues.get(4).getGradoopId(), e3);
+
+        TemporalGraphHead head = (TemporalGraphHead) result.get(7);
+        checkHead(head, sourceTime, targetTime);
+
+    }
+
+    @Test
+    public void testDeadPattern() throws Exception {
+        EmbeddingTPGM embedding = new EmbeddingTPGM();
+        EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+
+        //------------------------------------
+        // Vertices
+        //------------------------------------
+        //ids
+        GradoopId v1 = GradoopId.get();
+        GradoopId v2 = GradoopId.get();
+        //times
+        Long[] v1Time = new Long[]{1L, 2L, 1L, 2L};
+        Long[] v2Time = new Long[]{3L, 4L, 3L, 4L};
+
+        //insert into embedding and metadata
+        embedding.add(v1);
+        embedding.add(v2);
+
+        for(Long[] time: new Long[][]{v1Time, v2Time}){
+            embedding.addTimeData(time[0], time[1], time[2], time[3]);
+        }
+
+        metaData.setEntryColumn("v1", EmbeddingMetaData.EntryType.VERTEX, 0);
+        metaData.setEntryColumn("v2", EmbeddingMetaData.EntryType.VERTEX, 1);
+        metaData.setTimeColumn("v1", 0);
+        metaData.setTimeColumn("v2", 1);
+
+        DataSet<EmbeddingTPGM> input = ExecutionEnvironment.getExecutionEnvironment()
+                .fromElements(embedding);
+
+        List<Element> result = input.flatMap(
+                new ElementsFromEmbeddingTPGM<TemporalGraphHead,
+                        TemporalVertex, TemporalEdge>(ghFactory, vFactory, eFactory,
+                        metaData, new HashMap<>(), new HashMap<>())).collect();
+
+        assertEquals(result.size(), 3);
+        TemporalGraphHead head = (TemporalGraphHead) result.get(2);
+        checkHead(head, v1Time, v2Time);
+    }
+
+    private void checkHead(TemporalGraphHead head, Long[]...times){
+
+        Long[] txFroms = new Long[times.length];
+        Long[] txTos = new Long[times.length];
+        Long[] valFroms = new Long[times.length];
+        Long[] valTos = new Long[times.length];
+        for(int i = 0; i<times.length; i++){
+            txFroms[i] = times[i][0];
+            txTos[i] = times[i][1];
+            valFroms[i] = times[i][2];
+            valTos[i] = times[i][3];
+        }
+        Long txFrom = getMax(txFroms);
+        Long txTo = getMin(txTos);
+        if(txFrom > txTo){
+            txFrom = Long.MIN_VALUE;
+            txTo = Long.MIN_VALUE;
+        }
+        Long valFrom = getMax(valFroms);
+        Long valTo = getMin(valTos);
+        if(valFrom > valTo){
+            valFrom = Long.MIN_VALUE;
+            valTo = Long.MIN_VALUE;
+        }
+
+        if(txTo > txFrom){
+            assertEquals(head.getPropertyValue("hasTxLifetime"), PropertyValue.create(true));
+        }
+        else{
+            assertEquals(head.getPropertyValue("hasTxLifetime"), PropertyValue.create(false));
+        }
+
+        if(valTo > valFrom){
+            assertEquals(head.getPropertyValue("hasValidLifetime"), PropertyValue.create(true));
+        }
+        else{
+            assertEquals(head.getPropertyValue("hasValidLifetime"), PropertyValue.create(false));
+        }
+
+        Long txDuration = (txTo-txFrom > 0) ? txTo-txFrom : 0L;
+
+        Long validDuration = (valTo-valFrom > 0) ? valTo-valFrom : 0L;
+        assertEquals(head.getValidFrom(), valFrom);
+        assertEquals(head.getValidTo(), valTo);
+        assertEquals(head.getTxFrom(), txFrom);
+        assertEquals(head.getTxTo(), txTo);
+        assertEquals((Long) head.getPropertyValue("txLifetime").getLong(), txDuration);
+        assertEquals((Long) head.getPropertyValue("validLifetime").getLong(), validDuration);
+    }
+
+    private long getMin(Long...args){
+        long min = Long.MAX_VALUE;
+        for(long arg: args){
+            if(arg<min){
+                min = arg;
+            }
+        }
+        return min;
+    }
+
+    private long getMax(Long...args){
+        long max = Long.MIN_VALUE;
+        for(long arg: args){
+            if(arg>max){
+                max = arg;
+            }
+        }
+        return max;
     }
 
     private void checkElement(TemporalElement v, GradoopId id, String label, Long[] time){

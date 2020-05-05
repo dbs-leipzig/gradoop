@@ -219,10 +219,23 @@ public class ElementsFromEmbeddingTPGM<
         if(globalTime[0]>globalTime[1]){
             globalTime[0]= Long.MIN_VALUE;
             globalTime[1] = Long.MIN_VALUE;
+            graphHead.setProperty("hasTxLifetime", PropertyValue.create(false));
+            graphHead.setProperty("txLifetime", PropertyValue.create(0L));
         }
+        else{
+            graphHead.setProperty("hasTxLifetime", PropertyValue.create(true));
+            graphHead.setProperty("txLifetime", PropertyValue.create(globalTime[1]-globalTime[0]));
+        }
+
         if(globalTime[2]>globalTime[3]){
             globalTime[2]= Long.MIN_VALUE;
             globalTime[3] = Long.MIN_VALUE;
+            graphHead.setProperty("hasValidLifetime", PropertyValue.create(false));
+            graphHead.setProperty("validLifetime", PropertyValue.create(0L));
+        }
+        else{
+            graphHead.setProperty("hasValidLifetime", PropertyValue.create(true));
+            graphHead.setProperty("validLifetime", PropertyValue.create(globalTime[3]-globalTime[2]));
         }
 
         graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
