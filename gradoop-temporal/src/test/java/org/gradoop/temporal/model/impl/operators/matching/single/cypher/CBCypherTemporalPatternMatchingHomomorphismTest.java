@@ -16,22 +16,22 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Iterable data() {
         ArrayList<String[]> data = new ArrayList<>();
-        data.addAll(new HomomorphismBeforeData().getData());
-        data.addAll(new HomomorphismOverlapsData().getData());
-        data.addAll(new HomomorphismAfterData().getData());
-        data.addAll(new HomomorphismFromToData().getData());
-        data.addAll(new HomomorphismBetweenData().getData());
-        data.addAll(new HomomorphismPrecedesData().getData());
-        data.addAll(new HomomorphismSucceedsData().getData());
-        data.addAll(new HomomorphismAsOfData().getData());
-        data.addAll(new HomomorphismComplexQueryData().getData());
-        data.addAll(new HomomorphismMergeAndJoinData().getData());
-        data.addAll(new HomomorphismContainsData().getData());
-        data.addAll(new HomomorphismComparisonData().getData());
-        data.addAll(new HomomorphismImmediatelyPrecedesTest().getData());
-        data.addAll(new HomomorphismImmediatelySucceedsTest().getData());
-        data.addAll(new HomomorphismEqualsTest().getData());
-        data.addAll(new HomomorphismMinMaxTest().getData());
+          data.addAll(new HomomorphismBeforeData().getData());
+          data.addAll(new HomomorphismOverlapsData().getData());
+          data.addAll(new HomomorphismAfterData().getData());
+          data.addAll(new HomomorphismFromToData().getData());
+          data.addAll(new HomomorphismBetweenData().getData());
+          data.addAll(new HomomorphismPrecedesData().getData());
+          data.addAll(new HomomorphismSucceedsData().getData());
+          data.addAll(new HomomorphismAsOfData().getData());
+          data.addAll(new HomomorphismComplexQueryData().getData());
+          data.addAll(new HomomorphismMergeAndJoinData().getData());
+          data.addAll(new HomomorphismContainsData().getData());
+          data.addAll(new HomomorphismComparisonData().getData());
+          data.addAll(new HomomorphismImmediatelyPrecedesTest().getData());
+          data.addAll(new HomomorphismImmediatelySucceedsTest().getData());
+          data.addAll(new HomomorphismEqualsTest().getData());
+          data.addAll(new HomomorphismMinMaxTest().getData());
         return data;
     }
 

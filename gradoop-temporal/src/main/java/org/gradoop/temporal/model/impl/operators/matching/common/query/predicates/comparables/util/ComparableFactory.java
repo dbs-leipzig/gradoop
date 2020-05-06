@@ -4,16 +4,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PlusTimePointComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.*;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.comparables.time.PlusTimePoint;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.s1ck.gdl.model.comparables.time.*;
 
 /**
  * Class for creating a {@link QueryComparable} wrapper for a GDL {@link ComparableExpression}
@@ -38,7 +34,12 @@ public class ComparableFactory {
             return new TimeLiteralComparable((TimeLiteral) expression);
         } else if(expression.getClass() == TimeSelector.class){
             return new TimeSelectorComparable((TimeSelector) expression);
-        } /*else if(expression.getClass() == PlusTimePoint.class){
+        } else if(expression.getClass() == MinTimePoint.class){
+            return new MinTimePointComparable((MinTimePoint) expression);
+        } else if(expression.getClass() == MaxTimePoint.class){
+            return new MaxTimePointComparable((MaxTimePoint) expression);
+        }
+        /*else if(expression.getClass() == PlusTimePoint.class){
             return new PlusTimePointComparable((PlusTimePoint) expression);
         }*/ else {
             throw new IllegalArgumentException(

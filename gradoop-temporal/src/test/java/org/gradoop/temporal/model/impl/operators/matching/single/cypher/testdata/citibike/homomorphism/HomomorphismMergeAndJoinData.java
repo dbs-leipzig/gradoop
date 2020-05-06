@@ -48,6 +48,7 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
 
         // do not merge/join when no overlap
         // 1. [(Broadway & W 24 St) -[e1]-> (9 Ave & W 18)]
+        
         data.add(new String[]{
                 "MergeJoin_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -59,6 +60,7 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
                 "expected1[(s0)-[e1]->(s1)]"
         });
         // 1. [(Broadway & W 24 St) -[e1]-> (9 Ave & W 18)]
+        
         data.add(new String[]{
                 "MergeJoin_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -71,15 +73,15 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
         });
         // 1. [(Broadway & W24 St) -[e0]-> (9 Ave & W 18 St)]
         // 2. [(Broadway & W24 St) -[e1]-> (9 Ave & W 18 St)]
-        data.add(new String[]{
-                "MergeJoin_HOM_6_default_citibike",
-                CBCypherTemporalPatternMatchingTest.defaultData,
-                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-                        "MATCH (a)-[e]->(b) WHERE val.join(a.val).overlaps(Interval(2013-05-01, 2013-05-11))"
-                ),
-                "expected1,expected2",
-                "expected1[(s0)-[e0]->(s1)],expected2[(s0)-[e1]->(s1)]"
-        });
+//        data.add(new String[]{
+//                "MergeJoin_HOM_6_default_citibike",
+//                CBCypherTemporalPatternMatchingTest.defaultData,
+//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+//                        "MATCH (a)-[e]->(b) WHERE val.join(a.val).overlaps(Interval(2013-05-01, 2013-05-11))"
+//                ),
+//                "expected1,expected2",
+//                "expected1[(s0)-[e0]->(s1)],expected2[(s0)-[e1]->(s1)]"
+//        });
 
         return data;
     }

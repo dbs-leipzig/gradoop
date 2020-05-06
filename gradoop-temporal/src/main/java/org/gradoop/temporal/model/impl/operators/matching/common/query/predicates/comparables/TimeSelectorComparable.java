@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Wraps an {@link org.s1ck.gdl.model.comparables.time.TimeSelector}
  */
-public class TimeSelectorComparable extends QueryComparable {
+public class TimeSelectorComparable extends TemporalComparable {
 
     /**
      * The wrapped TimeSelector
@@ -115,5 +115,10 @@ public class TimeSelectorComparable extends QueryComparable {
     @Override
     public int hashCode(){
         return timeSelector != null ? timeSelector.hashCode() : 0;
+    }
+
+    @Override
+    public boolean isGlobal() {
+        return timeSelector.isGlobal();
     }
 }

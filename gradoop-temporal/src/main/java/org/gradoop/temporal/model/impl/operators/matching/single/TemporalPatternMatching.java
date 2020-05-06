@@ -79,7 +79,7 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
         Preconditions.checkState(!Strings.isNullOrEmpty(query),
                 "Query must not be null or empty");
         this.query         = query;
-        this.queryHandler  = new TemporalQueryHandler(query);
+        this.queryHandler  = new TemporalQueryHandler(query, false);
         this.attachData    = attachData;
         this.log           = log;
     }

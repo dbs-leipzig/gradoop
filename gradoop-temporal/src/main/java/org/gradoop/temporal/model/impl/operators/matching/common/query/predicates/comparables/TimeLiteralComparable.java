@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Wraps a {@link org.s1ck.gdl.model.comparables.time.TimeLiteral}
  */
-public class TimeLiteralComparable extends QueryComparable {
+public class TimeLiteralComparable extends TemporalComparable {
 
     /**
      * The wrapped TimeLiteral
@@ -61,5 +61,10 @@ public class TimeLiteralComparable extends QueryComparable {
     @Override
     public int hashCode(){
         return timeLiteral != null ? timeLiteral.hashCode() : 0;
+    }
+
+    @Override
+    public boolean isGlobal() {
+        return false;
     }
 }

@@ -39,4 +39,8 @@ public class ComparisonExpressionTPGM extends ComparisonExpression {
         return comparison;
     }
 
+    public boolean isTemporal(){
+        return comparison.isTemporal();
+    }
+
 }

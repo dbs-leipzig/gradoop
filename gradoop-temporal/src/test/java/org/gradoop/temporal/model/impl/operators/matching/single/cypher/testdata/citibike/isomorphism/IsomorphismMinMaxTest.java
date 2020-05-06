@@ -35,16 +35,16 @@ public class IsomorphismMinMaxTest implements TemporalTestData {
         });
 
         // empty
-        data.add(new String[]{
-                "MinMax_HOM_3_default_citibike",
-                CBCypherTemporalPatternMatchingTest.defaultData,
-                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-                        "MATCH (a)-[e]->(b) WHERE val_from!=MAX(a.val_from,e.val_from) OR " +
-                                "val_to!=MIN(b.val_to,e.val_to)"
-                ),
-                "",
-                ""
-        });
+//        data.add(new String[]{
+//                "MinMax_HOM_3_default_citibike",
+//                CBCypherTemporalPatternMatchingTest.defaultData,
+//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+//                        "MATCH (a)-[e]->(b) WHERE val_from!=MAX(a.val_from,e.val_from) OR " +
+//                                "val_to!=MIN(b.val_to,e.val_to)"
+//                ),
+//                "",
+//                ""
+//        });
 
         // empty
         data.add(new String[]{

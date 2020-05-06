@@ -28,8 +28,7 @@ import org.junit.runners.Parameterized;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * base class for all temporal pattern matching tests that read ASCII-data as input db.
@@ -129,7 +128,7 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         // initialize with data graph
         TemporalGraph db = getTemporalGraphFromLoader(loader);
 
-        
+
 
         // append the expected result
         loader.appendToDatabaseFromString(expectedCollection);
@@ -184,17 +183,21 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
                     ((TemporalVertex)element).getGraphIds() :
                     ((TemporalEdge)element).getGraphIds();
             for(GradoopId graph: graphs){
+                if(globalTime.get(graph)[1] == TemporalElement.DEFAULT_TIME_FROM ||
+                globalTime.get(graph)[3] == TemporalElement.DEFAULT_TIME_FROM){
+                    continue;
+                }
                 Long newTxFrom = Math.max(element.getTxFrom(), globalTime.get(graph)[0]);
                 Long newTxTo = Math.min(element.getTxTo(), globalTime.get(graph)[1]);
                 Long newValFrom = Math.max(element.getTxFrom(), globalTime.get(graph)[2]);
                 Long newValTo = Math.min(element.getTxTo(), globalTime.get(graph)[3]);
                 if(newTxFrom > newTxTo){
                     newTxFrom = TemporalElement.DEFAULT_TIME_FROM;
-                    newTxTo = TemporalElement.DEFAULT_TIME_TO;
+                    newTxTo = TemporalElement.DEFAULT_TIME_FROM;
                 }
                 if(newValFrom > newValTo){
                     newValFrom = TemporalElement.DEFAULT_TIME_FROM;
-                    newValTo = TemporalElement.DEFAULT_TIME_TO;
+                    newValTo = TemporalElement.DEFAULT_TIME_FROM;
                 }
                 globalTime.put(graph, new Long[]{newTxFrom, newTxTo, newValFrom, newValTo});
             }
@@ -214,8 +217,26 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
             Long[] expected = globalTime.get(head.getId());
             assertEquals(head.getTxFrom(), expected[0]);
             assertEquals(head.getTxTo(), expected[1]);
+            if(expected[1] == Long.MIN_VALUE){
+                assertFalse(head.getPropertyValue("hasTxLifetime").getBoolean());
+                assertEquals(head.getPropertyValue("txLifetime").getLong(), 0L);
+            }
+            else{
+                assertTrue(head.getPropertyValue("hasTxLifetime").getBoolean());
+                assertEquals(head.getPropertyValue("txLifetime").getLong(),
+                        expected[1]-expected[0]);
+            }
             assertEquals(head.getValidFrom(), expected[2]);
             assertEquals(head.getValidTo(), expected[3]);
+            if(expected[3] == Long.MIN_VALUE){
+                assertFalse(head.getPropertyValue("hasValidLifetime").getBoolean());
+                assertEquals(head.getPropertyValue("validLifetime").getLong(), 0L);
+            }
+            else{
+                assertTrue(head.getPropertyValue("hasValidLifetime").getBoolean());
+                assertEquals(head.getPropertyValue("validLifetime").getLong(),
+                        expected[3]-expected[2]);
+            }
         }
 
     }

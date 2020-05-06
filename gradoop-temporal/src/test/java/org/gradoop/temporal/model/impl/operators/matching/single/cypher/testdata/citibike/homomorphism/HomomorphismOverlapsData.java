@@ -87,6 +87,7 @@ public class HomomorphismOverlapsData implements TemporalTestData {
          * 3.[(Little West St & 1 Pl)]
          * 4.[(Fulton St & Grand Ave)]
          */
+        
         data.add(new String[]{
                 "Overlaps_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -97,11 +98,12 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1,expected2,expected3,expected4",
                 "expected1[(s0)], expected2[(s25)], expected3[(s5)], expected4[(s20)]"
         });
-
-        /*
-         * 1.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
-         * 2.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
-         */
+//
+//        /*
+//         * 1.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
+//         * 2.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
+//         */
+//        
         data.add(new String[]{
                 "Overlaps_HOM_6_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -113,31 +115,32 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
         });
-        /*
-         * (empty)
-         */
-        data.add(new String[]{
-             "Overlaps_HOM_7_default_citibike",
-             CBCypherTemporalPatternMatchingTest.defaultData,
-             CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-                     "MATCH (a)-[e]->(b) WHERE NOT(a.val.overlaps(e.val) AND " +
-                             "a.val.overlaps(b.val) AND b.val.overlaps(e.val))"
-             ),
-             "",
-             ""
-        });
+//        /*
+//         * (empty)
+//         */
+//        data.add(new String[]{
+//             "Overlaps_HOM_7_default_citibike",
+//             CBCypherTemporalPatternMatchingTest.defaultData,
+//             CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+//                     "MATCH (a)-[e]->(b) WHERE NOT(a.val.overlaps(e.val) AND " +
+//                             "a.val.overlaps(b.val) AND b.val.overlaps(e.val))"
+//             ),
+//             "",
+//             ""
+//        });
 
         // 1. [(Murray St & West St) (Shevchenko Pl)]
-        data.add(new String[]{
-                "Overlaps_HOM_8_default_citibike",
-                CBCypherTemporalPatternMatchingTest.defaultData,
-                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-                        "MATCH (a) (b) WHERE a.Id=309 AND (b.id=300 OR b.id=347) " +
-                                "AND val.overlaps(Interval(2013-05-20, 2013-05-21))"
-                ),
-                "expected1",
-                "[(s24) (s25)]"
-        });
+        // GLOBAL
+//        data.add(new String[]{
+//                "Overlaps_HOM_8_default_citibike",
+//                CBCypherTemporalPatternMatchingTest.defaultData,
+//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+//                        "MATCH (a) (b) WHERE a.Id=309 AND (b.id=300 OR b.id=347) " +
+//                                "AND val.overlaps(Interval(2013-05-20, 2013-05-21))"
+//                ),
+//                "expected1",
+//                "[(s24) (s25)]"
+//        });
         return data;
     }
 }

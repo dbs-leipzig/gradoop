@@ -48,15 +48,15 @@ public class HomomorphismContainsData implements TemporalTestData {
         });
 
         //(empty)
-        data.add(new String[]{
-                "Contains_HOM_4_default_citibike",
-                CBCypherTemporalPatternMatchingTest.defaultData,
-                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-                        "MATCH (a) WHERE NOT a.tx.contains(a.tx)"
-                ),
-                "",
-                ""
-        });
+//        data.add(new String[]{
+//                "Contains_HOM_4_default_citibike",
+//                CBCypherTemporalPatternMatchingTest.defaultData,
+//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+//                        "MATCH (a) WHERE NOT a.tx.contains(a.tx)"
+//                ),
+//                "",
+//                ""
+//        });
 
         return data;
     }

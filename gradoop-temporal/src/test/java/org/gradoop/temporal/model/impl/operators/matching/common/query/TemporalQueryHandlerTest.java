@@ -21,6 +21,7 @@ import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
+import org.s1ck.gdl.model.predicates.booleans.Or;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
@@ -31,6 +32,10 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.s1ck.gdl.utils.Comparator.GT;
+import static org.s1ck.gdl.utils.Comparator.LT;
 
 
 public class TemporalQueryHandlerTest {
@@ -42,7 +47,7 @@ public class TemporalQueryHandlerTest {
 
         Predicate and = new And(
                 new Comparison(new TimeSelector("v2", "tx_to"),
-                        Comparator.GT,
+                        GT,
                         new TimeSelector("v1", "tx_from")),
                 new Comparison(new PropertySelector("e1", "__label__"),
                         Comparator.EQ,
@@ -58,7 +63,7 @@ public class TemporalQueryHandlerTest {
         TimeLiteral now = handler.getNow();
         Predicate and = new And(
                 new Comparison(new TimeSelector("v2", "val_to"),
-                        Comparator.GT,
+                        GT,
                         new TimeSelector("v1", "tx_from")),
                 new Comparison(new PropertySelector("e1", "__label__"),
                         Comparator.EQ,
@@ -85,6 +90,68 @@ public class TemporalQueryHandlerTest {
         expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
         assertPredicateEquals(expectedGDLPredicate, handler.getPredicates());
 
+    }
+
+    @Test
+    public void testGlobalPredicates(){
+        // no global predicates
+        String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_to.before(b.val_to)";
+        TimeSelector aTxTo = new TimeSelector("a", TX_TO);
+        TimeSelector bValTo = new TimeSelector("b", VAL_TO);
+        TemporalQueryHandler handler = new TemporalQueryHandler(testquery, false);
+        Predicate expectedPredicate = new And(
+                new Comparison(aTxTo, LT, bValTo),
+                new Comparison(new PropertySelector("e1", "__label__"),
+                        Comparator.EQ,
+                        new Literal("test"))
+        );
+        assertPredicateEquals(expectedPredicate, handler.getPredicates());
+        assertEquals(handler.getGlobalPredicates().size(), 0);
+        //assertEquals(handler.getNonGlobalPredicates().size(), 2);
+        assertEquals(handler.getNonGlobalPredicates(), handler.getPredicates());
+
+        // global and non-global predicates
+        testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) OR a.val_to.after(b.val_to)";
+        handler = new TemporalQueryHandler(testquery, false);
+        TimeSelector globalTxTo = new TimeSelector(TimeSelector.GLOBAL_SELECTOR, TX_TO);
+        TimeSelector aValTo = new TimeSelector("a", VAL_TO);
+        System.out.println(handler.getPredicates());
+        expectedPredicate = new And(
+                new Or(
+                       new Comparison(globalTxTo, LT, bValTo),
+                       new Comparison(aValTo, GT, bValTo)
+                ),
+                new Comparison(new PropertySelector("e1", "__label__"),
+                        Comparator.EQ,
+                        new Literal("test"))
+        );
+        Predicate expectedGlobal = new Or(
+                new Comparison(globalTxTo, LT, bValTo),
+                new Comparison(aValTo, GT, bValTo)
+        );
+        Predicate expectedNonGlobal = new Comparison(
+                new PropertySelector("e1", "__label__"),
+                Comparator.EQ,
+                new Literal("test"));
+
+        assertPredicateEquals(expectedPredicate, handler.getPredicates());
+        assertEquals(handler.getGlobalPredicates().size(), 1);
+        assertPredicateEquals(expectedGlobal, handler.getGlobalPredicates());
+        assertEquals(handler.getNonGlobalPredicates().size(), 1);
+        assertPredicateEquals(expectedNonGlobal, handler.getNonGlobalPredicates());
+
+        // only global
+        testquery = "MATCH (a)-[e]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
+        handler = new TemporalQueryHandler(testquery, false);
+        System.out.println(handler.getPredicates());
+        expectedPredicate = new And(
+                new Comparison(globalTxTo, LT, bValTo),
+                new Comparison(aValTo, GT, new TimeSelector(TimeSelector.GLOBAL_SELECTOR, VAL_TO))
+        );
+        assertEquals(handler.getGlobalPredicates().size(), 2);
+        assertEquals(handler.getNonGlobalPredicates().size(), 0);
+        assertEquals(handler.getGlobalPredicates(), handler.getPredicates());
+        assertPredicateEquals(expectedPredicate, handler.getGlobalPredicates());
     }
 
     private void assertPredicateEquals(Predicate expectedGDL, CNF result){
@@ -121,7 +188,7 @@ public class TemporalQueryHandlerTest {
                         Comparator.LTE, now
                 ),
                 new Comparison(
-                        new TimeSelector(var, TimeSelector.TimeField.TX_TO),
+                        new TimeSelector(var, TX_TO),
                         Comparator.GTE, now
                 )
         );

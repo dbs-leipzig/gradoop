@@ -78,4 +78,5 @@ public abstract class QueryComparable implements Serializable {
    * @return set of property keys
    */
   public abstract Set<String> getPropertyKeys(String variable);
+
 }

@@ -4,6 +4,10 @@ import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.s1ck.gdl.GDLHandler;
@@ -15,9 +19,8 @@ import org.s1ck.gdl.model.predicates.booleans.And;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Wraps a {@link GDLHandler} and adds functionality needed for query
@@ -36,11 +39,22 @@ public class TemporalQueryHandler extends QueryHandler {
     private final TimeLiteral now;
 
     /**
-     * Creates a new query handler.
+     * Creates a new query handler that postprocesses the query, i.e. reduces it to simple comparisons.
      *
      * @param gdlString GDL query string
      */
     public TemporalQueryHandler(String gdlString) {
+        this(gdlString, true);
+    }
+
+    /**
+     * Creates a new query handler.
+     *
+     * @param gdlString GDL query string
+     * @param processQuery flag to indicate whether query should be postprocessed, i.e. reduced to simple
+     *                     comparisons
+     */
+    public TemporalQueryHandler(String gdlString, boolean processQuery){
         super(gdlString);
         now = new TimeLiteral("now");
         gdlHandler = new GDLHandler.Builder()
@@ -48,11 +62,13 @@ public class TemporalQueryHandler extends QueryHandler {
                 .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
                 .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
                 .setErrorStrategy(new BailSyntaxErrorStrategy())
+                .setProcessQuery(processQuery)
                 .buildFromString(gdlString);
     }
 
     @Override
     public CNF getPredicates() {
+        System.out.println(gdlHandler.getPredicates());
         if (gdlHandler.getPredicates().isPresent()) {
             Predicate predicate = gdlHandler.getPredicates().get();
             predicate = preprocessPredicate(predicate);
@@ -60,6 +76,52 @@ public class TemporalQueryHandler extends QueryHandler {
         } else {
             return QueryPredicateFactory.createFrom(preprocessPredicate(null)).asCNF();
         }
+    }
+
+    /**
+     * Returns a CNF of all disjunctions in the query that do not contain a global time selector.
+     *
+     * @return non-global CNF
+     */
+    public CNF getNonGlobalPredicates(){
+        List<CNFElement> disj = getPredicates().getPredicates().stream()
+                .filter(p -> !isGlobal(p))
+                .collect(Collectors.toList());
+        return new CNF(disj);
+    }
+
+    /**
+     * Returns a CNF of all disjunctions in the query that contain a global time selector.
+     *
+     * @return CNF of disjunctions containing global selectors
+     */
+    public CNF getGlobalPredicates(){
+        List<CNFElement> disj = getPredicates().getPredicates().stream()
+                .filter(p -> isGlobal(p))
+                .collect(Collectors.toList());
+        return new CNF(disj);
+    }
+
+    /**
+     * Checks whether a single disjunction is global, i.e. contains a global time selector
+     *
+     * @param element the disjunction to check
+     * @return true iff the disjunction contains a global time selector
+     */
+    private boolean isGlobal(CNFElement element){
+        for(ComparisonExpression comp: element.getPredicates()){
+            comp = (ComparisonExpressionTPGM) comp;
+            if(!((ComparisonExpressionTPGM) comp).isTemporal()){
+                return false;
+            }
+            else{
+                if(((TemporalComparable)comp.getLhs()).isGlobal() ||
+                ((TemporalComparable)comp.getRhs()).isGlobal()){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
