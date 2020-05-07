@@ -115,32 +115,32 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
         });
-//        /*
-//         * (empty)
-//         */
-//        data.add(new String[]{
-//             "Overlaps_HOM_7_default_citibike",
-//             CBCypherTemporalPatternMatchingTest.defaultData,
-//             CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                     "MATCH (a)-[e]->(b) WHERE NOT(a.val.overlaps(e.val) AND " +
-//                             "a.val.overlaps(b.val) AND b.val.overlaps(e.val))"
-//             ),
-//             "",
-//             ""
-//        });
+        /*
+         * (empty)
+         */
+        data.add(new String[]{
+             "Overlaps_HOM_7_default_citibike",
+             CBCypherTemporalPatternMatchingTest.defaultData,
+             CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                     "MATCH (a)-[e]->(b) WHERE NOT(a.val.overlaps(e.val) AND " +
+                             "a.val.overlaps(b.val) AND b.val.overlaps(e.val))"
+             ),
+             "",
+             ""
+        });
 
         // 1. [(Murray St & West St) (Shevchenko Pl)]
         // GLOBAL
-//        data.add(new String[]{
-//                "Overlaps_HOM_8_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a) (b) WHERE a.Id=309 AND (b.id=300 OR b.id=347) " +
-//                                "AND val.overlaps(Interval(2013-05-20, 2013-05-21))"
-//                ),
-//                "expected1",
-//                "[(s24) (s25)]"
-//        });
+        data.add(new String[]{
+                "Overlaps_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) (b) WHERE a.Id=309 AND (b.id=300 OR b.id=347) " +
+                                "AND val.overlaps(Interval(2013-05-20, 2013-05-21))"
+                ),
+                "expected1",
+                "[(s24) (s25)]"
+        });
         return data;
     }
 }

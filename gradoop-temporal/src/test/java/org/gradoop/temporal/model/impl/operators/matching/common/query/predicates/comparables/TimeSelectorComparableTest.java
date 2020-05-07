@@ -80,7 +80,7 @@ public class TimeSelectorComparableTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testThrowErrorIfElementNotPresent() {
-        TimeSelector selector = new TimeSelector("a", "valid_from");
+        TimeSelector selector = new TimeSelector("a", "val_from");
         TimeSelectorComparable wrapper = new TimeSelectorComparable(selector);
 
         EmbeddingTPGM embedding = new EmbeddingTPGM();
@@ -93,4 +93,5 @@ public class TimeSelectorComparableTest {
 
         wrapper.evaluate(embedding, metaData);
     }
+
 }

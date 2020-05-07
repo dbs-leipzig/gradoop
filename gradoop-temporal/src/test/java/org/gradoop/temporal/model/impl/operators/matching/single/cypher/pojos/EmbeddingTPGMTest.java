@@ -134,12 +134,16 @@ public class EmbeddingTPGMTest {
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         byte[] test = new byte[]{123, -97, 83, 98, 1, 3, 5, -9, 24, 55, 99, -101, 111, 67, 89, 89,
                 123, 97, -83, 98, 1, -3, -5, 9, 24, 55, 99, -101, 111, -67, 89, 89};
-        embedding.setTimeData(test);
+        byte[] global = new byte[]{123, 97, -83, 98, 1, -3, -5, 9, 24, 55, 99, -101, 111, -67, 89, 89};
+        embedding.setTimeData(test, global);
         assertArrayEquals(embedding.getTimeData(), test);
+        assertArrayEquals(embedding.getRawGlobalTimes(), global);
         byte[] test2 = new byte[]{34, 8, 45, 75, 1, 3, 5, 9, 23, 23, 66, 73, 121, 125, 101, 41,
         98, 67, 23, 53, 82, 98, 25, 91, 88, 122, 45, 87, 78, 90, 99, 100};
-        embedding.setTimeData(test2);
+        byte[] global2 = new byte[]{98, 67, 23, 53, 1, 3, 5, 9, 88, 122, 45, 87, 78, 90, 99, 100};
+        embedding.setTimeData(test2, global2);
         assertArrayEquals(embedding.getTimeData(), test2);
+        assertArrayEquals(embedding.getRawGlobalTimes(), global2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -147,7 +151,7 @@ public class EmbeddingTPGMTest {
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         byte[] test = new byte[]{123, -97, 83, 98, 1, 3, 5, -9, 24, 55, 99, -101, 111, 67, 89, 89,
                 123, 97, -83, 98, 1, -3, -5};
-        embedding.setTimeData(test);
+        embedding.setTimeData(test, test);
     }
 
     @Test
@@ -165,7 +169,7 @@ public class EmbeddingTPGMTest {
         };
 
         embedding.add(idList);
-        embedding.setTimeData(new byte[]{});
+        embedding.setTimeData(new byte[]{}, new byte[]{});
         assertEquals(2, embedding.size());
     }
 
@@ -189,9 +193,11 @@ public class EmbeddingTPGMTest {
         GradoopId b = GradoopId.get();
         GradoopId c = GradoopId.get();
 
-        Long[] aTime = new Long[]{1L, 2L, 3L, 4L};
-        Long[] bTime = new Long[]{3L, 4L, 5L, 6L};
-        Long[] cTime = new Long[]{5L, 6L, 7L, 8L};
+        Long[] aTime = new Long[]{1L, 12L, 3L, 14L};
+        Long[] bTime = new Long[]{3L, 14L, 5L, 16L};
+        Long[] cTime = new Long[]{5L, 16L, 7L, 18L};
+
+        Long[] global = new Long[]{5L, 12L, 7L, 14L};
 
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         embedding.add(a);
@@ -213,6 +219,8 @@ public class EmbeddingTPGMTest {
         assertArrayEquals(cTime, reversed.getTimes(0));
         assertArrayEquals(bTime, reversed.getTimes(1));
         assertArrayEquals(aTime, reversed.getTimes(2));
+
+        assertArrayEquals(global, reversed.getGlobalTimes());
     }
 
     @Test
@@ -243,6 +251,34 @@ public class EmbeddingTPGMTest {
         assertTrue(e1.equals(e2));
         e2.addTimeData(1234L, 12345L, 2345L, 23456L);
         assertFalse(e1.equals(e2));
+    }
+
+    @Test
+    public void testGlobalTimes(){
+        EmbeddingTPGM embedding = new EmbeddingTPGM();
+        Long[] time1 = new Long[]{5L, 20L, 4L, 21L};
+        embedding.addTimeData(time1[0], time1[1], time1[2], time1[3]);
+        assertArrayEquals(embedding.getGlobalTimes(), time1);
+        embedding.addTimeData(4L, 21L, 3L, 22L);
+        assertArrayEquals(embedding.getGlobalTimes(), time1);
+        embedding.addTimeData(6L, 18L, 2L, 23L);
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{6L, 18L, 4L, 21L});
+        embedding.addTimeData(5L, 20L, 3L, 10L);
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{6L, 18L, 4L, 10L});
+        embedding.addTimeData(19L, 22L, 6L, 8L);
+        Long defaultValue = TemporalElement.DEFAULT_TIME_FROM;
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
+                6L, 8L});
+        embedding.addTimeData(7L, 17L, 5L, 8L);
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
+                6L, 8L});
+        embedding.addTimeData(1234L, 12345L, 8L, 10L);
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
+                8L, 8L});
+        embedding.addTimeData(1234L, 12345L, 12L, 24L);
+        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
+                defaultValue, defaultValue});
+
     }
 
 

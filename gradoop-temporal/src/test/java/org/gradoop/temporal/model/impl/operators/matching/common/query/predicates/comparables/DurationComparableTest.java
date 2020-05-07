@@ -1,0 +1,65 @@
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
+import org.junit.Test;
+import org.s1ck.gdl.model.comparables.time.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.*;
+
+public class DurationComparableTest {
+
+    @Test
+    public void testOnEmbedding(){
+        EmbeddingTPGM embedding = new EmbeddingTPGM();
+        EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+
+        embedding.addTimeData(1L, 100L, 5L, 50L);
+        embedding.addTimeData(10L, 42L, 2L, 42L);
+        metaData.setTimeColumn("a", 0);
+        metaData.setTimeColumn("b", 1);
+
+        TimeSelector aValFrom = new TimeSelector("a", TimeSelector.TimeField.VAL_FROM);
+        TimeSelector bValFrom = new TimeSelector("b", TimeSelector.TimeField.VAL_FROM);
+        TimeSelector aValTo = new TimeSelector("a", VAL_TO);
+        TimeSelector bValTo = new TimeSelector("b", VAL_TO);
+        TimeLiteral l1 = new TimeLiteral("1970-01-01T00:00:00");
+
+        Duration aVal = new Duration(aValFrom, aValTo);
+        DurationComparable aValWrapper = new DurationComparable(aVal);
+
+        assertEquals(aValWrapper.evaluate(embedding, metaData).getLong(), 45L);
+
+        Duration d2 = new Duration(l1, bValTo);
+        assertEquals(new DurationComparable(d2).evaluate(embedding, metaData).getLong(), 42L);
+
+        TimeLiteral l2 = new TimeLiteral("1970-01-01T00:00:01");
+        Duration d3 = new Duration(l1, l2);
+        assertEquals(new DurationComparable(d3).evaluate(embedding, metaData).getLong(), 1000L);
+    }
+
+    @Test
+    public void testOnElement(){
+        TemporalVertex vertex = new TemporalVertexFactory().createVertex();
+        vertex.setTransactionTime(new Tuple2<>(0L, 100L));
+        vertex.setValidTime(new Tuple2<>(10L, 90L));
+
+        TimeSelector txFrom = new TimeSelector("a", TX_FROM);
+        TimeSelector txTo = new TimeSelector("a", TX_TO);
+        Duration d1 = new Duration(txFrom, txTo);
+        DurationComparable wrapper1 = new DurationComparable(d1);
+
+        assertEquals(wrapper1.evaluate(vertex).getLong(), 100L);
+
+        MinTimePoint mn = new MinTimePoint(txTo, new TimeSelector("a", VAL_TO));
+        MaxTimePoint mx = new MaxTimePoint(new TimeLiteral("1970-01-01T00:00:01"), txFrom);
+
+        Duration d2 = new Duration(mn, mx);
+        DurationComparable wrapper2 = new DurationComparable(d2);
+        assertEquals(wrapper2.evaluate(vertex).getLong(), 910L);
+    }
+}

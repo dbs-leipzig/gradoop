@@ -38,6 +38,10 @@ public class ComparableFactory {
             return new MinTimePointComparable((MinTimePoint) expression);
         } else if(expression.getClass() == MaxTimePoint.class){
             return new MaxTimePointComparable((MaxTimePoint) expression);
+        } else if(expression.getClass()==TimeConstant.class){
+            return new TimeConstantComparable((TimeConstant) expression);
+        } else if(expression.getClass()==Duration.class){
+            return new DurationComparable((Duration)expression);
         }
         /*else if(expression.getClass() == PlusTimePoint.class){
             return new PlusTimePointComparable((PlusTimePoint) expression);

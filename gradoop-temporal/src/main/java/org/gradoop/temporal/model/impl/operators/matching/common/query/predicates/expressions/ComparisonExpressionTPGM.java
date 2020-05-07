@@ -1,9 +1,15 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions;
 
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
+import org.s1ck.gdl.utils.Comparator;
 
 /**
  * Wraps a {@link org.s1ck.gdl.model.predicates.expressions.Comparison}
@@ -34,6 +40,9 @@ public class ComparisonExpressionTPGM extends ComparisonExpression {
     public QueryComparable getRhs() {
         return ComparableFactory.createComparableFrom(comparison.getComparableExpressions()[1]);
     }
+
+    
+
 
     public Comparison getGDLComparison(){
         return comparison;

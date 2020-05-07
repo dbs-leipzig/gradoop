@@ -107,27 +107,27 @@ public class HomomorphismComparisonData implements TemporalTestData {
          * cf. HOM_4
          * 1.[(Hicks St)->(Hicks St)]
          * */
-//        data.add(new String[]{
-//                "Comparison_HOM_8_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00 >= e.tx_from " +
-//                                "AND NOT 2013-06-01T00:30:00> tx_to"),
-//                "expected1",
-//                "expected1[(s2)-[e2]->(s2)]"
-//        });
-//        /*
-//         * (empty)
-//         */
-//        data.add(new String[]{
-//                "Comparison_HOM9_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a) WHERE val_from > tx_to"
-//                ),
-//                "",
-//                ""
-//        });
+        data.add(new String[]{
+                "Comparison_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00 >= e.tx_from " +
+                                "AND NOT 2013-06-01T00:30:00> tx_to"),
+                "expected1",
+                "expected1[(s2)-[e2]->(s2)]"
+        });
+        /*
+         * (empty)
+         */
+        data.add(new String[]{
+                "Comparison_HOM9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) WHERE val_from > tx_to"
+                ),
+                "",
+                ""
+        });
 
         /*
          * 1. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
@@ -227,17 +227,17 @@ public class HomomorphismComparisonData implements TemporalTestData {
         /*
          * 1.[(Broadway & E14)]
          */
-//        data.add(new String[]{
-//                "Comparison_HOM_17_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a) WHERE a.tx_to < 2013-07-11 AND" +
-//                                " 2013-05-28.before(val_from)"
-//                ),
-//                "expected1",
-//                "expected1[(s8)]"
-//
-//        });
+        data.add(new String[]{
+                "Comparison_HOM_17_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) WHERE a.tx_to < 2013-07-11 AND" +
+                                " 2013-05-28.before(val_from)"
+                ),
+                "expected1",
+                "expected1[(s8)]"
+
+        });
 
         return data;
     }

@@ -31,12 +31,13 @@ public class TimeLiteralComparable extends TemporalComparable {
 
     @Override
     public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData){
-        return PropertyValue.create(timeLiteral.evaluate());
+        return PropertyValue.create((long)timeLiteral.evaluate().get());
     }
 
     @Override
     public PropertyValue evaluate(GraphElement element){
-        return PropertyValue.create(timeLiteral.evaluate());
+        return PropertyValue.create(
+                (long)timeLiteral.evaluate().get());
     }
 
     @Override

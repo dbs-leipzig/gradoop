@@ -60,7 +60,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
         });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
-        /*data.add(new String[]{
+        data.add(new String[]{
                 "ImmSucceedes_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
@@ -70,7 +70,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
                 ),
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
-        });*/
+        });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         // 2.[(E 15 St & Irving Pl) -> (Washington Park))

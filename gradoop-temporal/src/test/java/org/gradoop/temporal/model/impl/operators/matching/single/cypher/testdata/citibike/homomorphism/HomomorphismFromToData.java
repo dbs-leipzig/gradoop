@@ -142,27 +142,27 @@ public class HomomorphismFromToData implements TemporalTestData {
          * 3.[(Broadway & E 14) -[edgeId:6]-> (S 5 Pl & S 5 St)]
          * 4.[(Lispenard St) -> (Broadway & W 51 St)]
          */
-//        data.add(new String[]{
-//                "FromTo_HOM_9_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE val.fromTo(2013-06-01T00:35:00, " +
-//                                "2013-06-01T00:40:00)"),
-//                "expected1,expected2,expected3,expected4",
-//                "expected1[(s7)-[e5]->(s2)], expected2[(s2)-[e2]->(s2)]," +
-//                        "expected3[(s8)-[e6]->(s9)], expected4[(s28)-[e18]->(s29)]"
-//        });
-//
-//        //1.[(Broadway & W 24 St) (Broadway & W 24 St)]
-//        data.add(new String[]{
-//                "FromTo_HOM_10_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a) (b) WHERE tx.fromTo(1970-01-01,2013-05-11)"
-//                ),
-//                "expected1",
-//                "expected1[(s0) (s0)]"
-//        });
+        data.add(new String[]{
+                "FromTo_HOM_9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE val.fromTo(2013-06-01T00:35:00, " +
+                                "2013-06-01T00:40:00)"),
+                "expected1,expected2,expected3,expected4",
+                "expected1[(s7)-[e5]->(s2)], expected2[(s2)-[e2]->(s2)]," +
+                        "expected3[(s8)-[e6]->(s9)], expected4[(s28)-[e18]->(s29)]"
+        });
+
+        //1.[(Broadway & W 24 St) (Broadway & W 24 St)]
+        data.add(new String[]{
+                "FromTo_HOM_10_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) (b) WHERE tx.fromTo(1970-01-01,2013-05-11)"
+                ),
+                "expected1",
+                "expected1[(s0) (s0)]"
+        });
         return data;
 
     }

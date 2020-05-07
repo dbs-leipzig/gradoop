@@ -39,6 +39,11 @@ public class TemporalQueryHandler extends QueryHandler {
     private final TimeLiteral now;
 
     /**
+     * variable name in a global time selector in the query
+     */
+    public static final String GLOBAL_SELECTOR = TimeSelector.GLOBAL_SELECTOR;
+
+    /**
      * Creates a new query handler that postprocesses the query, i.e. reduces it to simple comparisons.
      *
      * @param gdlString GDL query string
@@ -82,7 +87,7 @@ public class TemporalQueryHandler extends QueryHandler {
      * Returns a CNF of all disjunctions in the query that do not contain a global time selector.
      *
      * @return non-global CNF
-     */
+     *//*
     public CNF getNonGlobalPredicates(){
         List<CNFElement> disj = getPredicates().getPredicates().stream()
                 .filter(p -> !isGlobal(p))
@@ -90,17 +95,17 @@ public class TemporalQueryHandler extends QueryHandler {
         return new CNF(disj);
     }
 
-    /**
+    *//**
      * Returns a CNF of all disjunctions in the query that contain a global time selector.
      *
      * @return CNF of disjunctions containing global selectors
-     */
+     *//*
     public CNF getGlobalPredicates(){
         List<CNFElement> disj = getPredicates().getPredicates().stream()
                 .filter(p -> isGlobal(p))
                 .collect(Collectors.toList());
         return new CNF(disj);
-    }
+    }*/
 
     /**
      * Checks whether a single disjunction is global, i.e. contains a global time selector

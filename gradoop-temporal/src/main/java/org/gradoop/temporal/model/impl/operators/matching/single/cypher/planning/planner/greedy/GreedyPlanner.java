@@ -37,10 +37,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.s1ck.gdl.utils.Comparator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.*;
@@ -148,7 +145,7 @@ public class GreedyPlanner<
         for (Vertex vertex : queryHandler.getVertices()) {
             String vertexVariable = vertex.getVariable();
             CNF allPredicates = queryHandler.getPredicates();
-            // TODO: this might be moved to the FilterAndProject node in issue #510
+
             CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
             Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
@@ -179,8 +176,9 @@ public class GreedyPlanner<
             String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
 
             CNF allPredicates = queryHandler.getPredicates();
-            // TODO: this might be moved the the FilterAndProject node in issue #510
+
             CNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
+
             Set<String> projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
 
             boolean isPath = edge.getUpperBound() != 1;

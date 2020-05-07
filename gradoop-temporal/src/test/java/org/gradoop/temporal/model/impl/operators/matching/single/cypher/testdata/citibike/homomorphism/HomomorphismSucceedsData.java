@@ -127,17 +127,17 @@ public class HomomorphismSucceedsData implements TemporalTestData {
          * 2.[(E 20 St & Park Ave) -> (E 20 St & Park Ave)]
          * 3.[(Lispenard St) -> (Broadway & W 51 St)]
          */
-//        data.add(new String[]{
-//                "Succeeds_HOM_8_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE tx.succeeds(Interval(2013-06-01T00:00:00, " +
-//                                "2013-06-01T00:07:00))"
-//                ),
-//                "expected1,expected2,expected3",
-//                "expected1[(s21)-[e19]->(s11)], expected2[(s27)-[e17]->(s27)], " +
-//                        "expected3[(s28)-[e18]->(s29)]"
-//        });
+        data.add(new String[]{
+                "Succeeds_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE tx.succeeds(Interval(2013-06-01T00:00:00, " +
+                                "2013-06-01T00:07:00))"
+                ),
+                "expected1,expected2,expected3",
+                "expected1[(s21)-[e19]->(s11)], expected2[(s27)-[e17]->(s27)], " +
+                        "expected3[(s28)-[e18]->(s29)]"
+        });
 
         return data;
     }

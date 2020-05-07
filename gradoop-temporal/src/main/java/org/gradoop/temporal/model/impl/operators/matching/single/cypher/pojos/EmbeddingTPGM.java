@@ -38,12 +38,15 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
      */
     private byte[] timeData;
 
+    private byte[] globalTimes;
+
     /**
      * Creates an empty embedding
      */
     public EmbeddingTPGM(){
         super();
         timeData = new byte[0];
+        globalTimes = longsToByteArray(Long.MIN_VALUE, Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
     /**
@@ -53,9 +56,10 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
      * @param idListData IdLists stored in internal byte array format
      * @param timeData time fields stored in internal byte array format
      */
-    public EmbeddingTPGM(byte[] idData, byte[] propertyData, byte[] idListData, byte[] timeData){
+    public EmbeddingTPGM(byte[] idData, byte[] propertyData, byte[] idListData, byte[] timeData, byte[] globalTimes){
         super(idData, propertyData, idListData);
         this.timeData = timeData;
+        this.globalTimes = globalTimes;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -72,14 +76,16 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
     public void addTimeData(Long tx_f, Long tx_t, Long val_f, Long val_t){
         tx_f = tx_f<0? TemporalElement.DEFAULT_TIME_FROM : tx_f;
         val_f = val_f<0? TemporalElement.DEFAULT_TIME_FROM : val_f;
-        if(tx_f > tx_t || val_f > val_t || tx_t < 0 || val_t < 0){
-            throw new IllegalArgumentException("to must be >= from, to fields are not negative");
+        if(tx_f > tx_t || val_f > val_t){
+            throw new IllegalArgumentException("to must be >= from");
         }
         byte[] newTimeData = new byte[timeData.length+ 4*Long.BYTES];
         System.arraycopy(timeData, 0, newTimeData,0, timeData.length);
         byte[] additionalData = longsToByteArray(tx_f, tx_t, val_f, val_t);
         System.arraycopy(additionalData, 0, newTimeData, timeData.length, 4*Long.BYTES);
         timeData = newTimeData;
+
+        updateGlobalTimes(tx_f, tx_t, val_f, val_t);
     }
 
 
@@ -97,6 +103,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
                     long val_from, long val_to){
         super.add(id, properties);
         addTimeData(tx_from, tx_to, val_from, val_to);
+        updateGlobalTimes(tx_from, tx_to, val_from, val_to);
     }
 
     /**
@@ -106,6 +113,16 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
      */
     public Long[] getTimes(int column){
         return byteArrayToLongs(getRawTimeEntry(column));
+    }
+
+
+    /**
+     * Returns the array {@code {global tx_from, global tx_to, global val_from, global val_to}}
+     *
+     * @return {@code {global tx_from, global tx_to, global val_from, global val_to}}
+     */
+    public Long[] getGlobalTimes(){
+        return byteArrayToLongs(globalTimes);
     }
 
     /**
@@ -200,15 +217,24 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
     }
 
     /**
+     * Returns the internal representation of the global time data
+     * @return internal representation of the global time data
+     */
+    public byte[] getRawGlobalTimes(){
+        return globalTimes;
+    }
+    /**
      * sets the time data
      * @param timeData byte representation of n*4 Longs
+     * @param globalTimes byte representation of {global tx_from, global tx_to, global val_from, global val_to}
      */
-    public void setTimeData(byte[] timeData){
+    public void setTimeData(byte[] timeData, byte[] globalTimes){
         if ((timeData.length % (4*Long.BYTES))!=0){
             throw new IllegalArgumentException("no byte representation of time data!");
         }
         // no other check for correctness here, for the sake of efficiency...
         this.timeData = timeData;
+        this.globalTimes = globalTimes;
     }
 
     /**
@@ -228,7 +254,7 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
             newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));
         }
 
-        return new EmbeddingTPGM(getIdData(), newPropertyData, getIdListData(), timeData);
+        return new EmbeddingTPGM(getIdData(), newPropertyData, getIdListData(), timeData, globalTimes);
     }
 
     /**
@@ -262,7 +288,60 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
             );
         }
 
-        return new EmbeddingTPGM(newIdData, getPropertyData(), getIdListData(), newTimeData);
+        return new EmbeddingTPGM(newIdData, getPropertyData(), getIdListData(), newTimeData, globalTimes);
+    }
+
+    /**
+     * Updates the global time of the subgraph represented by the embedding when new time data is added.
+     * Only changes the global time if it isn't already invalid.
+     * @param tx_from tx_from of a newly added element
+     * @param tx_to tx_to of a newly added element
+     * @param val_from val_from of a newly added element
+     * @param val_to valÖto of a newly added element
+     */
+    private void updateGlobalTimes(Long tx_from, Long tx_to, Long val_from, Long val_to){
+        Long[] global = byteArrayToLongs(globalTimes);
+        if(tx_from > global[0] && global[1]>TemporalElement.DEFAULT_TIME_FROM){
+            if(tx_from > global[1]){
+                global[0] = TemporalElement.DEFAULT_TIME_FROM;
+                global[1] = TemporalElement.DEFAULT_TIME_FROM;
+            }
+            else {
+                global[0] = tx_from;
+            }
+        }
+
+        if(tx_to < global[1]){
+            if(tx_to < global[0]){
+                global[0] = TemporalElement.DEFAULT_TIME_FROM;
+                global[1] = TemporalElement.DEFAULT_TIME_FROM;
+            }
+            else {
+                global[1] = tx_to;
+            }
+        }
+
+        if(val_from > global[2] && global[3]>TemporalElement.DEFAULT_TIME_FROM){
+            if(val_from > global[3]){
+                global[2] = TemporalElement.DEFAULT_TIME_FROM;
+                global[3] = TemporalElement.DEFAULT_TIME_FROM;
+            }
+            else{
+                global[2] = val_from;
+            }
+        }
+
+        if(val_to < global[3]){
+            if(val_to < global[2]){
+                global[2] = TemporalElement.DEFAULT_TIME_FROM;
+                global[3] = TemporalElement.DEFAULT_TIME_FROM;
+            }
+            else{
+                global[3] = val_to;
+            }
+        }
+
+        globalTimes = longsToByteArray(global);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -279,16 +358,19 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
             byte[] newIdData = new byte[idData.length];
             byte[] newPropertyData = new byte[propertyData.length];
             byte[] newIdListData = new byte[idListData.length];
-            ((EmbeddingTPGM) target).timeData = new byte[timeData.length];
+            byte[] newTimes = new byte[timeData.length];
+            byte[] newGlobalTimes = new byte[4*Long.BYTES];
 
             System.arraycopy(idData, 0, newIdData, 0, idData.length);
             System.arraycopy(propertyData, 0, newPropertyData, 0, propertyData.length);
             System.arraycopy(idListData, 0, newIdListData, 0, idListData.length);
 
-            System.arraycopy(timeData, 0, ((EmbeddingTPGM) target).timeData, 0, timeData.length);
+            System.arraycopy(timeData, 0, newTimes, 0, timeData.length);
+            System.arraycopy(globalTimes, 0, newGlobalTimes, 0, globalTimes.length);
             target.setIdData(newIdData);
             target.setPropertyData(newPropertyData);
             target.setIdListData(newIdListData);
+            ((EmbeddingTPGM) target).setTimeData(newTimes, newGlobalTimes);
         }
         else{
             super.copyTo(target);
@@ -307,6 +389,8 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
         super.write(out);
         out.writeInt(timeData.length);
         out.write(timeData);
+        out.writeInt(globalTimes.length);
+        out.write(globalTimes);
     }
 
     @Override
@@ -343,10 +427,19 @@ public class EmbeddingTPGM extends org.gradoop.flink.model.impl.operators.matchi
             }
         }
 
+        sizeBuffer = in.readInt();
+        byte[] globalT = new byte[sizeBuffer];
+        if (sizeBuffer > 0) {
+            if (in.read(globalT) != sizeBuffer) {
+                throw new RuntimeException("Deserialisation of Embedding failed");
+            }
+        }
+
         setIdData(ids);
         setPropertyData(newPropertyData);
         setIdListData(idLists);
         timeData = tData;
+        globalTimes = globalT;
     }
 
     @Override

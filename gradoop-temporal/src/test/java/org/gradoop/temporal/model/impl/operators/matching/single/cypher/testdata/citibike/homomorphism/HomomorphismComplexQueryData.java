@@ -31,16 +31,16 @@ public class HomomorphismComplexQueryData implements TemporalTestData {
          * 5.[(Broadway & E 14) -[edgeId:6]-> (S 5 Pl & S 5 St)]
          * 6.[(Lispenard St) -> (Broadway & W 51 St)]
          */
-//        data.add(new String[]{
-//                "Complex_HOM_2_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                "MATCH (a)-[e]->(b) WHERE e.asOf(2013-06-01T00:01:00) OR  val.fromTo(2013-06-01T00:35:00," +
-//                        " 2013-06-01T00:40:00)",
-//                "expected1,expected2,expected3,expected4,expected5,expected6",
-//                "expected1[(s2)-[e2]->(s2)], expected2[(s0)-[e0]->(s1)]," +
-//                        "expected3[(s0)-[e1]->(s1)], expected4[(s7)-[e5]->(s2)], " +
-//                        " expected5[(s8)-[e6]->(s9)], expected6[(s28)-[e18]->(s29)]"
-//        });
+        data.add(new String[]{
+                "Complex_HOM_2_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                "MATCH (a)-[e]->(b) WHERE e.asOf(2013-06-01T00:01:00) OR  val.fromTo(2013-06-01T00:35:00," +
+                        " 2013-06-01T00:40:00)",
+                "expected1,expected2,expected3,expected4,expected5,expected6",
+                "expected1[(s2)-[e2]->(s2)], expected2[(s0)-[e0]->(s1)]," +
+                        "expected3[(s0)-[e1]->(s1)], expected4[(s7)-[e5]->(s2)], " +
+                        " expected5[(s8)-[e6]->(s9)], expected6[(s28)-[e18]->(s29)]"
+        });
 
         return data;
     }

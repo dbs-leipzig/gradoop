@@ -8,10 +8,8 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.Em
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.time.PlusTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.model.comparables.time.util.TimeConstant;
 import scala.sys.Prop;
 
 import static org.junit.Assert.assertEquals;

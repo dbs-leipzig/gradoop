@@ -2,12 +2,14 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.Min;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Triple;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinTime;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.junit.Test;
@@ -17,6 +19,7 @@ import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
+import org.s1ck.gdl.model.comparables.time.MinTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.Predicate;
@@ -97,7 +100,11 @@ public class TemporalQueryHandlerTest {
         // no global predicates
         String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_to.before(b.val_to)";
         TimeSelector aTxTo = new TimeSelector("a", TX_TO);
+        TimeSelector bTxTo = new TimeSelector("b", TX_TO);
+        TimeSelector e1TxTo = new TimeSelector("e1", TX_TO);
+        TimeSelector aValTo = new TimeSelector("a", VAL_TO);
         TimeSelector bValTo = new TimeSelector("b", VAL_TO);
+        TimeSelector e1ValTo = new TimeSelector("e1", VAL_TO);
         TemporalQueryHandler handler = new TemporalQueryHandler(testquery, false);
         Predicate expectedPredicate = new And(
                 new Comparison(aTxTo, LT, bValTo),
@@ -106,15 +113,12 @@ public class TemporalQueryHandlerTest {
                         new Literal("test"))
         );
         assertPredicateEquals(expectedPredicate, handler.getPredicates());
-        assertEquals(handler.getGlobalPredicates().size(), 0);
-        //assertEquals(handler.getNonGlobalPredicates().size(), 2);
-        assertEquals(handler.getNonGlobalPredicates(), handler.getPredicates());
 
         // global and non-global predicates
         testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) OR a.val_to.after(b.val_to)";
         handler = new TemporalQueryHandler(testquery, false);
-        TimeSelector globalTxTo = new TimeSelector(TimeSelector.GLOBAL_SELECTOR, TX_TO);
-        TimeSelector aValTo = new TimeSelector("a", VAL_TO);
+        MinTimePoint globalTxTo = new MinTimePoint(e1TxTo, aTxTo, bTxTo);
+
         System.out.println(handler.getPredicates());
         expectedPredicate = new And(
                 new Or(
@@ -135,23 +139,18 @@ public class TemporalQueryHandlerTest {
                 new Literal("test"));
 
         assertPredicateEquals(expectedPredicate, handler.getPredicates());
-        assertEquals(handler.getGlobalPredicates().size(), 1);
-        assertPredicateEquals(expectedGlobal, handler.getGlobalPredicates());
-        assertEquals(handler.getNonGlobalPredicates().size(), 1);
-        assertPredicateEquals(expectedNonGlobal, handler.getNonGlobalPredicates());
 
         // only global
-        testquery = "MATCH (a)-[e]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
+        testquery = "MATCH (a)-[e1]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
         handler = new TemporalQueryHandler(testquery, false);
         System.out.println(handler.getPredicates());
+        MinTimePoint globalValTo = new MinTimePoint(e1ValTo, aValTo, bValTo);
         expectedPredicate = new And(
                 new Comparison(globalTxTo, LT, bValTo),
-                new Comparison(aValTo, GT, new TimeSelector(TimeSelector.GLOBAL_SELECTOR, VAL_TO))
+                new Comparison(aValTo, GT, globalValTo)
         );
-        assertEquals(handler.getGlobalPredicates().size(), 2);
-        assertEquals(handler.getNonGlobalPredicates().size(), 0);
-        assertEquals(handler.getGlobalPredicates(), handler.getPredicates());
-        assertPredicateEquals(expectedPredicate, handler.getGlobalPredicates());
+
+        assertPredicateEquals(expectedPredicate, handler.getPredicates());
     }
 
     private void assertPredicateEquals(Predicate expectedGDL, CNF result){

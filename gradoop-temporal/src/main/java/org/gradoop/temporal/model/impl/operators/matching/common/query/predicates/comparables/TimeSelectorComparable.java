@@ -1,11 +1,11 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
@@ -51,13 +51,14 @@ public class TimeSelectorComparable extends TemporalComparable {
 
     @Override
     public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData){
-        //cast into TPGM subclasses
-        int timeColumn = ((EmbeddingTPGMMetaData) metaData).getTimeColumn(timeSelector.getVariable());
-        Long[] timeValues = ((EmbeddingTPGM) embedding).getTimes(timeColumn);
+        Long[] timeValues = ((EmbeddingTPGM) embedding).getTimes(
+                        ((EmbeddingTPGMMetaData) metaData).getTimeColumn(timeSelector.getVariable())
+                );
 
         TimeSelector.TimeField field = timeSelector.getTimeProp();
 
         Long time = -1L;
+
         if(field.equals(TimeSelector.TimeField.TX_FROM)) {
             time = timeValues[0];
         }
@@ -76,6 +77,7 @@ public class TimeSelectorComparable extends TemporalComparable {
 
     @Override
     public PropertyValue evaluate(GraphElement element){
+        // here no distinction from global selectors, as element is always a single vertex or edge
         Long time = -1L;
         TimeSelector.TimeField field = timeSelector.getTimeProp();
         if(field.equals(TimeSelector.TimeField.TX_FROM)) {
