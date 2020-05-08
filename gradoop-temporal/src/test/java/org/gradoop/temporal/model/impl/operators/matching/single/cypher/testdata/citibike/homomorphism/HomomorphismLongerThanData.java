@@ -1,0 +1,150 @@
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism;
+
+import org.gradoop.temporal.model.impl.operators.matching.TemporalTestData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.CBCypherTemporalPatternMatchingTest;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class HomomorphismLongerThanData implements TemporalTestData {
+    @Override
+    public Collection<String[]> getData() {
+        ArrayList<String[]> data = new ArrayList<>();
+
+        //1.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        //2.[(Stanton St & Chrystie) -> (Hancock St & Bedford Ave)]
+        //3.[(Lispenard St & Broadway) -> (Broadway & W 51)]
+        //4.[(W 37 St & 5 Ave) -> (Hicks St & Montague St)]
+        //5.[(Hicks St & Montague St) -> (Hicks St & Montague St)]
+        data.add(new String[]{
+           "LongerThan_HOM_1_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE val.longerThan(Minutes(30))"
+                ),
+                "expected1,expected2,expected3,expected4,expected5",
+                "expected1[(s8)-[e6]->(s9)], expected2[(s12)-[e8]->(s13)], " +
+                        "expected3[(s28)-[e18]->(s29)], expected4[(s7)-[e5]->(s2)], " +
+                        "expected5[(s2)-[e2]->(s2)]"
+        });
+
+        //1.[(Murray St & West St) -> (Shevchenko Pl & E 7 St)]
+        //2.[(Murray St & West St) -> (Greenwich St & W Houston St)]
+        //3.[(DeKalb Ave & S Portland Ave) -> (Fulton St & Grand Ave)]
+        data.add(new String[]{
+                "LongerThan_HOM_2_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).longerThan(Days(75))"
+                ),
+                "expected1,expected2,expected3",
+                "expected1[(s24)-[e15]->(s25)], expected2[(s24)-[e16]->(s26)], expected3[(s19)-[e12]->(s20)]"
+        });
+
+        //empty
+        data.add(new String[]{
+                "LongerThan_HOM_3_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(Hours(1))"
+                ),
+                "",
+                ""
+        });
+
+        //1.[(E15 St) -> (Washington Park)]
+        data.add(new String[]{
+                "LongerThan_HOM_4_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01T00:00:00, 1970-01-01T00:05:00)" +
+                                ".longerThan(val)"
+                ),
+                "expected1",
+                "expected1[(s3)-[e3]->(s4)]"
+        });
+
+        //1.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        //2.[(Stanton St & Chrystie) -> (Hancock St & Bedford Ave)]
+        //3.[(Lispenard St & Broadway) -> (Broadway & W 51)]
+        //4.[(W 37 St & 5 Ave) -> (Hicks St & Montague St)]
+        //5.[(Hicks St & Montague St) -> (Hicks St & Montague St)]
+        data.add(new String[]{
+           "LongerThan_HOM_5_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE val.longerThan(Interval(" +
+                                "1970-01-01, 1970-01-01T00:30:00))"
+                ),
+                "expected1,expected2,expected3,expected4,expected5",
+                "expected1[(s8)-[e6]->(s9)], expected2[(s12)-[e8]->(s13)], " +
+                        "expected3[(s28)-[e18]->(s29)], expected4[(s7)-[e5]->(s2)], " +
+                        "expected5[(s2)-[e2]->(s2)]"
+        });
+
+        //empty
+        data.add(new String[]{
+                "LongerThan_HOM_6_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE NOT b.tx.longerThan(val)"
+                ),
+                "",
+                ""
+        });
+
+        //1.[(Henry St & Grand St) (Murray St & West St)]
+        //2.[(Henry St & Grand St) (Shevchenko Pl)]
+        data.add(new String[]{
+                "LongerThan_HOM_7_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a) (b) WHERE a.vertexId=18 AND b.val.longerThan(a.val)"
+                ),
+                "expected1,expected2",
+                "expected1[(s18)(s24)], expected2[(s18)(s25)]"
+        });
+
+        // 1.[(9 Ave & W18)<-[e1]-(Broadway & W24)-[e0]->(9 Ave & W18)]
+        // 2.[(Greenwich St)<-(Murray St & West St)->(Shevchenko Pl)]
+        // 3.[(8 Ave & W31)<-[e19]-(Broadway & W29)-[e13]->(8 Ave & W31)]
+        data.add(new String[]{
+                "LongerThan_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE e1.tx.longerThan(e2.tx)"
+                ),
+                "expected1,expected2,expected3",
+                "expected1[(s1)<-[e1]-(s0)-[e0]->(s1)], expected2[(s26)<-[e16]-(s24)-[e15]->(s25)], " +
+                        "expected3[(s11)<-[e19]-(s21)-[e13]->(s11)]"
+        });
+
+        // 1.[(Broadway & E14 St) -> (S 5 Pl & S 5 St)]
+        // 2.[(Hicks St & Montague St) -> (Hicks St & Montague St)]
+        data.add(new String[]{
+                "LongerThan_HOM_9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(" +
+                                "Interval(2013-06-01T00:01:47, 2013-06-01T00:35:35))"
+                ),
+                "expected1,expected2",
+                "expected1[(s8)-[e6]->(s9)], expected2[(s2)-[e2]->(s2)]"
+        });
+
+        //1.[(E15 St) -> (Washington Park)]
+        data.add(new String[]{
+                "LongerThan_HOM_10_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(" +
+                                "MIN(1970-01-01T00:00:00, tx_to), 1970-01-01T00:05:00)" +
+                                ".longerThan(val)"
+                ),
+                "expected1",
+                "expected1[(s3)-[e3]->(s4)]"
+        });
+
+        return data;
+    }
+}

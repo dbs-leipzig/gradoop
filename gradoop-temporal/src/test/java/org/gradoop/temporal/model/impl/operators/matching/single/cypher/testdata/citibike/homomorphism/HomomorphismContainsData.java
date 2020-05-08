@@ -58,6 +58,36 @@ public class HomomorphismContainsData implements TemporalTestData {
                 ""
         });
 
+        // 1.[(Hicks St)->(Hicks St)]
+        // 2.[(E20 St & Park Ave)->(E20 St & Park Ave)]
+        // 3.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        data.add(new String[]{
+                "Contains_HOM_5_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(a.tx)"
+                ),
+                "expected1,expected2,expected3",
+                "expected1[(s2)-[e2]->(s2)], expected2[(s27)-[e17]->(s27)], " +
+                        "expected3[(s8)-[e6]->(s9)]"
+        });
+
+        // 1.[(Hicks St)->(Hicks St)]
+        // 2.[(E20 St & Park Ave)->(E20 St & Park Ave)]
+        // 3.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        data.add(new String[]{
+                "Contains_HOM_6_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(" +
+                                "Interval(MIN(a.tx_from, 2020-01-01, e.tx_from), " +
+                                "MAX(a.tx_to, e.tx_to, 1970-01-01)))"
+                ),
+                "expected1,expected2,expected3",
+                "expected1[(s2)-[e2]->(s2)], expected2[(s27)-[e17]->(s27)], " +
+                        "expected3[(s8)-[e6]->(s9)]"
+        });
+
         return data;
     }
 }

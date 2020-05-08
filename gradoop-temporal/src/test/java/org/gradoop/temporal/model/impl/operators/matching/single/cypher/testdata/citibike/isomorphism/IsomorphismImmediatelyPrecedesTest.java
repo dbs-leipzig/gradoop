@@ -63,17 +63,17 @@ public class IsomorphismImmediatelyPrecedesTest implements TemporalTestData {
         });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
-//        data.add(new String[]{
-//                "ImmPrecedes_ISO_5_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01, 2013-06-01T00:04:22)" +
-//                                ".immediatelyPrecedes(" +
-//                                "val) AND tx.immediatelyPrecedes(Interval(2013-06-01T00:18:11,2020-05-05))"
-//                ),
-//                "expected1",
-//                "expected1[(s14)-[e9]->(s15)]"
-//        });
+        data.add(new String[]{
+                "ImmPrecedes_ISO_5_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01, 2013-06-01T00:04:22)" +
+                                ".immediatelyPrecedes(" +
+                                "val) AND tx.immediatelyPrecedes(Interval(2013-06-01T00:18:11,2020-05-05))"
+                ),
+                "expected1",
+                "expected1[(s14)-[e9]->(s15)]"
+        });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         // 2.[(E 15 St & Irving Pl) -> (Washington Park))
@@ -98,6 +98,20 @@ public class IsomorphismImmediatelyPrecedesTest implements TemporalTestData {
                 ),
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
+        });
+
+        // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
+        // 2.[(E 15 St & Irving Pl) -> (Washington Park))
+        data.add(new String[]{
+                "ImmPrecedes_ISO_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).immediatelyPrecedes(" +
+                                "Interval(MAX(2013-07-23, 1970-01-01), " +
+                                "MIN(2021-01-01, 2020-05-05, b.val_to)))"
+                ),
+                "expected1,expected2",
+                "expected1[(s14)-[e9]->(s15)], expected2[(s3)-[e3]->(s4)]"
         });
 
         return data;

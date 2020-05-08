@@ -27,6 +27,7 @@ import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -115,6 +116,7 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
         // execute and validate
         TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
+        printResult(result);
         TemporalGraphCollection expected = transformExpectedToTemporal(
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
         //System.out.println(result.getGraphHeads().count());
@@ -239,6 +241,18 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
             }
         }
 
+    }
+
+    private void printResult(TemporalGraphCollection gc) throws Exception {
+        ArrayList<Integer> vertices = gc.getVertices().collect().stream()
+                .map(v -> v.getPropertyValue("vertexId").getInt())
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Integer> edges = gc.getEdges().collect().stream()
+                .map(v -> v.getPropertyValue("edgeId").getInt())
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        System.out.println("Vertices "+vertices);
+        System.out.println("Edges "+edges);
     }
 
     /**

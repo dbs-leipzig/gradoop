@@ -23,6 +23,7 @@ public class IsomorphismEqualsTest implements TemporalTestData {
                 "",
                 ""
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_ISO_2_default_citibike",
@@ -34,6 +35,7 @@ public class IsomorphismEqualsTest implements TemporalTestData {
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_ISO_3_default_citibike",
@@ -45,6 +47,7 @@ public class IsomorphismEqualsTest implements TemporalTestData {
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
         });
+
         // empty
         data.add(new String[]{
                 "Equals_ISO_4_default_citibike",
@@ -55,6 +58,7 @@ public class IsomorphismEqualsTest implements TemporalTestData {
                 "",
                 ""
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_ISO_5_default_citibike",
@@ -78,6 +82,7 @@ public class IsomorphismEqualsTest implements TemporalTestData {
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
         });
+
         //empty
         data.add(new String[]{
                 "Equals_ISO_7_default_citibike",
@@ -90,27 +95,27 @@ public class IsomorphismEqualsTest implements TemporalTestData {
         });
 
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
-//        data.add(new String[]{
-//                "Equals_ISO_8_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE val.equals(Interval(" +
-//                                "2013-06-01T00:04:22, 2013-06-01T00:18:11))"
-//                ),
-//                "expected1",
-//                "expected1[(s14)-[e9]->(s15)]"
-//        });
-//
-//        // empty
-//        data.add(new String[]{
-//                "Equals_ISO_9_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE NOT tx.equals(e1.tx.merge(e2.tx))"
-//                ),
-//                "",
-//                ""
-//        });
+        data.add(new String[]{
+                "Equals_ISO_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE val.equals(Interval(" +
+                                "2013-06-01T00:04:22, 2013-06-01T00:18:11))"
+                ),
+                "expected1",
+                "expected1[(s14)-[e9]->(s15)]"
+        });
+
+        // empty
+        data.add(new String[]{
+                "Equals_ISO_9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE NOT tx.equals(e1.tx.merge(e2.tx))"
+                ),
+                "",
+                ""
+        });
 
         return data;
     }

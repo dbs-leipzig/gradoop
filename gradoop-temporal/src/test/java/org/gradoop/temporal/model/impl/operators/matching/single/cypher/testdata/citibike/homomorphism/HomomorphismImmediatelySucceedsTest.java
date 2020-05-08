@@ -13,7 +13,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         data.add(new String[]{
-                "ImmSucceedes_HOM_1_default_citibike",
+                "ImmSucceeds_HOM_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:18:11, 2020-05-05)" +
@@ -25,7 +25,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         data.add(new String[]{
-                "ImmSucceedes_HOM_2_default_citibike",
+                "ImmSucceeds_HOM_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE " +
@@ -37,7 +37,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         data.add(new String[]{
-                "ImmSucceedes_HOM_3_default_citibike",
+                "ImmSucceeds_HOM_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-07-23, 2020-05-05)" +
@@ -49,7 +49,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // empty
         data.add(new String[]{
-                "ImmSucceedes_HOM_4_default_citibike",
+                "ImmSucceeds_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-07-23T00:00:01, 2020-05-05).immediatelySucceeds(" +
@@ -61,7 +61,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         data.add(new String[]{
-                "ImmSucceedes_HOM_5_default_citibike",
+                "ImmSucceeds_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE val" +
@@ -75,7 +75,7 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         // 2.[(E 15 St & Irving Pl) -> (Washington Park))
         data.add(new String[]{
-                "ImmSucceedes_HOM_6_default_citibike",
+                "ImmSucceeds_HOM_6_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-07-23, 2020-05-05).immediatelySucceeds(" +
@@ -87,11 +87,24 @@ public class HomomorphismImmediatelySucceedsTest implements TemporalTestData {
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         data.add(new String[]{
-                "ImmSucceedes_HOM_7_default_citibike",
+                "ImmSucceeds_HOM_7_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-07-18, 2020-05-05).immediatelySucceeds(" +
                                 "a.tx.merge(b.val))"
+                ),
+                "expected1",
+                "expected1[(s14)-[e9]->(s15)]"
+        });
+
+        // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
+        data.add(new String[]{
+                "ImmSucceeds_HOM_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(" +
+                                "MAX(a.val_from, 2013-07-23), 2020-05-05)" +
+                                ".immediatelySucceeds(Interval(MIN(1970-01-01, a.val_from), a.val_to))"
                 ),
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"

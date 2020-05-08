@@ -12,6 +12,7 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     @Override
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<>();
+
         // 1. [ (9 Ave & W 18)<-[e0]-(Broadway & W24)-[e1]-> (9 Ave & W  18)]
         // 2. [ (9 Ave & W 18)<-[e1]-(Broadway & W24)-[e0]-> (9 Ave & W  18)]
         data.add(new String[]{
@@ -24,6 +25,7 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s1)<-[e0]-(s0)-[e1]->(s1)],expected2[(s1)<-[e1]-(s0)-[e0]->(s1)]"
         });
+
         // 1. [ (9 Ave & W 18)<-[e0]-(Broadway & W24)-[e1]-> (9 Ave & W  18)]
         // 2. [ (9 Ave & W 18)<-[e1]-(Broadway & W24)-[e0]-> (9 Ave & W  18)]
         data.add(new String[]{

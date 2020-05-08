@@ -11,11 +11,10 @@ public class HomomorphismAsOfData implements TemporalTestData {
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<>();
 
-        /*
-         * 1.[(Hicks St) -> (Hicks St)]
-         * 2.[(Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
-         * 3.[(Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
-         */
+        
+         // 1.[(Hicks St) -> (Hicks St)]
+         // 2.[(Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
+         // 3.[(Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
         data.add(new String[]{
                 "AsOf_HOM_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -25,11 +24,10 @@ public class HomomorphismAsOfData implements TemporalTestData {
                         "expected3[(s0)-[e1]->(s1)]"
         });
 
-        /*
-         * 1.[(Greenwich St & W Houston)<-(Murray St & West St)->(Shevchenko Pl)]
-         * 2.[(Shevchenko Pl)<-(Murray St & West St)->(Shevchenko Pl)]
-         * 3.[(Greenwich St & W Houston)<-(Murray St & West St)->(Greenwich St & W Houston)]
-         */
+        
+         // 1.[(Greenwich St & W Houston)<-(Murray St & West St)->(Shevchenko Pl)]
+         // 2.[(Shevchenko Pl)<-(Murray St & West St)->(Shevchenko Pl)]
+         // 3.[(Greenwich St & W Houston)<-(Murray St & West St)->(Greenwich St & W Houston)]
         data.add(new String[]{
                 "AsOf_HOM_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -39,11 +37,10 @@ public class HomomorphismAsOfData implements TemporalTestData {
                         "expected3[(s26)<-[e16]-(s24)-[e16]->(s26)]"
         });
 
-        /*
-         * 1.[(Broadway & W 29 St) -[edgeId:19]-> (8 Ave & W 31)]
-         * 2.[(E15 St & Irving) -> (Washington Park)
-         * 2.[(Lispenard St) -> (Broadway & W 51)]
-         */
+        
+         // 1.[(Broadway & W 29 St) -[edgeId:19]-> (8 Ave & W 31)]
+         // 2.[(E15 St & Irving) -> (Washington Park)
+         // 2.[(Lispenard St) -> (Broadway & W 51)]
         data.add(new String[]{
                 "AsOf_HOM3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -53,11 +50,10 @@ public class HomomorphismAsOfData implements TemporalTestData {
                         " expected3[(s28)-[e18]->(s29)]"
         });
 
-        /*
-         * 1.[(Stanton St & Chrystie ST)]
-         * 2.[(Shevchenko Pl & E 7 St)]
-         * 3.[(Fulton St & Grand Ave)]
-         */
+        
+         // 1.[(Stanton St & Chrystie ST)]
+         // 2.[(Shevchenko Pl & E 7 St)]
+         // 3.[(Fulton St & Grand Ave)]
         data.add(new String[]{
                 "AsOf_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -66,9 +62,8 @@ public class HomomorphismAsOfData implements TemporalTestData {
                 "expected1[(s12)], expected2[(s25)], expected3[(s20)]"
         });
 
-        /*
-         * 1.[(Lispenard St) -> (Broadway & W 51)]
-         */
+        
+         // 1.[(Lispenard St) -> (Broadway & W 51)]
         data.add(new String[]{
                 "AsOf_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -77,15 +72,26 @@ public class HomomorphismAsOfData implements TemporalTestData {
                 "expected1",
                 "expected1[(s28)-[e18]->(s29)]"
         });
-        /*
-         * (empty)
-         */
+        
+         // (empty)
         data.add(new String[]{
                 "AsOf_HOM_6_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 "MATCH (a)-[e]->(b) WHERE a.asOf(2020-04-28) OR b.asOf(2012-12-12)",
                 "",
                 ""
+        });
+
+        // 1.[(Greenwich St & W Houston)<-(Murray St & West St)->(Shevchenko Pl)]
+        // 2.[(Shevchenko Pl)<-(Murray St & West St)->(Shevchenko Pl)]
+        // 3.[(Greenwich St & W Houston)<-(Murray St & West St)->(Greenwich St & W Houston)]
+        data.add(new String[]{
+                "AsOf_HOM_7_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.asOf(MAX(e1.val_from, a.val_from))",
+                "expected1,expected2,expected3",
+                "expected1[(s26)<-[e16]-(s24)-[e15]->(s25)], expected2[(s25)<-[e15]-(s24)-[e15]->(s25)]," +
+                        "expected3[(s26)<-[e16]-(s24)-[e16]->(s26)]"
         });
 
         return data;

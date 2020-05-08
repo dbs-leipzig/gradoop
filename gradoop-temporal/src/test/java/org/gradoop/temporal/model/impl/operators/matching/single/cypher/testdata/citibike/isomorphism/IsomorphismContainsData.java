@@ -12,9 +12,10 @@ public class IsomorphismContainsData implements TemporalTestData {
     @Override
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<>();
+
         //1.[(Broadway & E14) -> (S 5 Pl & S 5 St) <- (Henry St & Grand St)]
         data.add(new String[]{
-                "Contains_HOM_1_default_citibike",
+                "Contains_ISO_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE e1!=e2 AND e1.val.contains(e2.val)"
@@ -22,10 +23,11 @@ public class IsomorphismContainsData implements TemporalTestData {
                 "expected1",
                 "expected1[(s8)-[e6]->(s9)<-[e11]-(s18)]"
         });
+
         //1.[(Broadway & E14)->(S5 Pl & S 5 St)]
         //2.[(W37 St & 5 Ave)->(Hicks St & Montague St)]
         data.add(new String[]{
-                "Contains_HOM_2_default_citibike",
+                "Contains_ISO_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE e.val.contains(2013-06-01T00:35:35) AND " +
@@ -37,7 +39,7 @@ public class IsomorphismContainsData implements TemporalTestData {
 
         // 1.[(Murray St & West St) -> (Shevchenko Pl)]
         data.add(new String[]{
-                "Contains_HOM_3_default_citibike",
+                "Contains_ISO_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).contains(Interval(" +
@@ -49,13 +51,37 @@ public class IsomorphismContainsData implements TemporalTestData {
 
         //(empty)
         data.add(new String[]{
-                "Contains_HOM_4_default_citibike",
+                "Contains_ISO_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE NOT(a.tx.contains(b.tx_from) OR b.val.contains(b.tx_to))"
                 ),
                 "",
                 ""
+        });
+
+        // 1.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        data.add(new String[]{
+                "Contains_ISO_5_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(a.tx)"
+                ),
+                "expected1",
+                "expected1[(s8)-[e6]->(s9)]"
+        });
+
+        // 1.[(Broadway & E14) -> (S 5 Pl & S 5 St)]
+        data.add(new String[]{
+                "Contains_ISO_6_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(" +
+                                "Interval(MIN(a.tx_from, 2020-01-01, e.tx_from), " +
+                                "MAX(a.tx_to, e.tx_to, 1970-01-01)))"
+                ),
+                "expected1",
+                "expected1[(s8)-[e6]->(s9)]"
         });
 
         return data;

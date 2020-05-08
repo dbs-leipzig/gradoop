@@ -6,17 +6,16 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.CBCypher
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Inversions from {@link IsomorphismBeforeData}.
- */
+//
+ // Inversions from {@link IsomorphismBeforeData}.
+ 
 public class IsomorphismAfterData implements TemporalTestData {
     @Override
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<>();
-        /*
-         * 1. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
-         * 2. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
-         */
+        
+         // 1. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
+         // 2. [(E15 St) -> (Washington P.)      (Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
         data.add(new String[]{
                 "After_ISO_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -27,9 +26,8 @@ public class IsomorphismAfterData implements TemporalTestData {
                 "expected1[(s3)-[e3]->(s4) (s0)-[e0]->(s1)], " +
                         "expected2[(s3)-[e3]->(s4) (s0)-[e1]->(s1)]"
         });
-        /*
-         * 1. [(Broadway & E14) -> (S 5 Pl) <- (Henry St & Grand St)]
-         */
+        
+         // 1. [(Broadway & E14) -> (S 5 Pl) <- (Henry St & Grand St)]
         data.add(new String[]{
                 "After_ISO_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -39,10 +37,9 @@ public class IsomorphismAfterData implements TemporalTestData {
                 "expected1",
                 "expected1[(s8)-[e6]->(s9)<-[e11]-(s18)]"
         });
-        /*
-         * 1.[(9 Ave & W22) -> (8 Ave & W31) <-[edgeId:19]- (Broadway & W29)]
-         * 2.[(9 Ave & W22) -> (8 Ave & W31) <-[edgeId:13]- (Broadway & W29)]
-         */
+        
+         // 1.[(9 Ave & W22) -> (8 Ave & W31) <-[edgeId:19]- (Broadway & W29)]
+         // 2.[(9 Ave & W22) -> (8 Ave & W31) <-[edgeId:13]- (Broadway & W29)]
         data.add(new String[]{
                 "After_ISO_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -53,10 +50,9 @@ public class IsomorphismAfterData implements TemporalTestData {
                 "expected1[(s10)-[e7]->(s11)<-[e19]-(s21)], " +
                         "expected2[(s10)-[e7]->(s11)<-[e13]-(s21)]"
         });
-        /*
-         * 1.[Broadway & W24) -[edgeId:0]-> (9 Ave & W18)
-         * 2.[Broadway & W24) -[edgeId:1]-> (9 Ave & W18)
-         */
+        
+         // 1.[Broadway & W24) -[edgeId:0]-> (9 Ave & W18)
+         // 2.[Broadway & W24) -[edgeId:1]-> (9 Ave & W18)
         data.add(new String[]{
                 "After_ISO_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -65,9 +61,8 @@ public class IsomorphismAfterData implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
         });
-        /*
-         * (empty)
-         */
+        
+         // (empty)
         data.add(new String[]{
                 "After_ISO_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,

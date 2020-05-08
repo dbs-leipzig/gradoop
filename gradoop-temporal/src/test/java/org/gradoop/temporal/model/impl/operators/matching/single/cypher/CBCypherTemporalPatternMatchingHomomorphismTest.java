@@ -32,6 +32,10 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
           data.addAll(new HomomorphismImmediatelySucceedsTest().getData());
           data.addAll(new HomomorphismEqualsTest().getData());
           data.addAll(new HomomorphismMinMaxTest().getData());
+        data.addAll(new HomomorphismLongerThanData().getData());
+        data.addAll(new HomomorphismShorterThanData().getData());
+        data.addAll(new HomomorphismLengthAtLeastData().getData());
+        data.addAll(new HomomorphismLengthAtMostData().getData());
         return data;
     }
 

@@ -63,17 +63,17 @@ public class IsomorphismImmediatelySucceedsTest implements TemporalTestData {
         });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
-//        data.add(new String[]{
-//                "ImmSucceedes_ISO_5_default_citibike",
-//                CBCypherTemporalPatternMatchingTest.defaultData,
-//                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-//                        "MATCH (a)-[e]->(b) WHERE val" +
-//                                ".immediatelySucceeds(Interval(1970-01-01, 2013-06-01T00:04:22)) " +
-//                                "AND Interval(2013-06-01T00:18:11,2020-05-05).immediatelySucceeds(tx)"
-//                ),
-//                "expected1",
-//                "expected1[(s14)-[e9]->(s15)]"
-//        });
+        data.add(new String[]{
+                "ImmSucceedes_ISO_5_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE val" +
+                                ".immediatelySucceeds(Interval(1970-01-01, 2013-06-01T00:04:22)) " +
+                                "AND Interval(2013-06-01T00:18:11,2020-05-05).immediatelySucceeds(tx)"
+                ),
+                "expected1",
+                "expected1[(s14)-[e9]->(s15)]"
+        });
 
         // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
         // 2.[(E 15 St & Irving Pl) -> (Washington Park))
@@ -95,6 +95,19 @@ public class IsomorphismImmediatelySucceedsTest implements TemporalTestData {
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(2013-07-18, 2020-05-05).immediatelySucceeds(" +
                                 "a.tx.merge(b.val))"
+                ),
+                "expected1",
+                "expected1[(s14)-[e9]->(s15)]"
+        });
+
+        // 1.[(9 Ave & W14) -> (Mercer St & Spring St)]
+        data.add(new String[]{
+                "ImmSucceeds_ISO_8_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e]->(b) WHERE Interval(" +
+                                "MAX(a.val_from, 2013-07-23), 2020-05-05)" +
+                                ".immediatelySucceeds(Interval(MIN(1970-01-01, a.val_from), a.val_to))"
                 ),
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"

@@ -10,6 +10,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     @Override
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<>();
+
         //1.[(Hicks St)->(Hicks St)]
         //2.[(E20 St & Park Ave) -> (E20 St & Park Ave)]
         data.add(new String[]{
@@ -21,6 +22,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s2)-[e2]->(s2)], expected2[(s27)-[e17]->(s27)]"
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_HOM_2_default_citibike",
@@ -32,6 +34,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_HOM_3_default_citibike",
@@ -43,6 +46,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
                 "expected1",
                 "expected1[(s14)-[e9]->(s15)]"
         });
+
         // empty
         data.add(new String[]{
                 "Equals_HOM_4_default_citibike",
@@ -53,6 +57,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
                 "",
                 ""
         });
+
         // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
         data.add(new String[]{
                 "Equals_HOM_5_default_citibike",

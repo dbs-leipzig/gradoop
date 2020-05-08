@@ -10,11 +10,9 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     @Override
     public Collection<String[]> getData() {
         ArrayList<String[]> data = new ArrayList<String[]>();
-        /*
-         * from Overlaps_ISO_3_default_citibike
-         * 1.[(Stanton St & Chrystie St) -[e8]-> (Hancock St & Bedford Ave)
-         *      (E15 St & Irving Pl)-[e3]->(Washington Park)]
-         */
+
+         // 1.[(Stanton St & Chrystie St) -[e8]-> (Hancock St & Bedford Ave)
+         //      (E15 St & Irving Pl)-[e3]->(Washington Park)]
         data.add(new String[]{
                 "Overlaps_HOM_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -24,17 +22,16 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1",
                 "expected1[(s12)-[e8]->(s13) (s3)-[e3]->(s4)]"
         });
-        /*
-         * identical edges overlap, too
-         * 1.[(Broadway & W29) -[edgeId:7]-> (8 Ave & W 31)
-         *          (Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
-         * 2.[(Broadway & W29) -[edgeId:7]-> (8 Ave & W 31)
-         *          (Broadway & W29) -[edgeId:7]->(8 Ave & W31)]
-         * 3.[(Broadway & W29) -[edgeId:19]-> (8 Ave & W 31)
-         *           (Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
-         * 4.[(Broadway & W29) -[edgeId:19]-> (8 Ave & W 31)
-         *           (Broadway & W29) -[edgeId:7]->(8 Ave & W31)]
-         */
+        
+         // identical edges overlap, too
+         // 1.[(Broadway & W29) -[edgeId:7]-> (8 Ave & W 31)
+         //          (Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
+         // 2.[(Broadway & W29) -[edgeId:7]-> (8 Ave & W 31)
+         //          (Broadway & W29) -[edgeId:7]->(8 Ave & W31)]
+         // 3.[(Broadway & W29) -[edgeId:19]-> (8 Ave & W 31)
+         //           (Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
+         // 4.[(Broadway & W29) -[edgeId:19]-> (8 Ave & W 31)
+         //           (Broadway & W29) -[edgeId:7]->(8 Ave & W31)]
         data.add(new String[]{
                 "Overlaps_HOM_2_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -47,10 +44,9 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                         "expected3[(s21)-[e19]->(s11) (s21)-[e13]->(s11)], " +
                         "expected4[(s21)-[e19]->(s11) (s21)-[e19]->(s11)]"
         });
-        /*
-         * 1.[(Hicks St & Montague)-[edgeId:2]->(Hicks St & Montague)
-         *                  (W37 St & 4 Ave)-[edgeId:5]->(Hicks St & Montague)]
-         */
+        
+         // 1.[(Hicks St & Montague)-[edgeId:2]->(Hicks St & Montague)
+         //           (W37 St & 4 Ave)-[edgeId:5]->(Hicks St & Montague)]
         data.add(new String[]{
                 "Overlaps_HOM_3_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -61,13 +57,12 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1",
                 "expected1[(s2)-[e2]->(s2) (s7)-[e5]->(s2)]"
         });
-        /*
-         * 1.[(Hicks St & Montague)->(Hicks St & Montague)]
-         * 2.[(Broadway & E14 St) -> (S5 Pl & S5 St)]
-         * 3.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
-         * 4.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
-         * 5.[(Lispenard St & Broadway) -> (Broadway & W51 St)]
-         */
+        
+         // 1.[(Hicks St & Montague)->(Hicks St & Montague)]
+         // 2.[(Broadway & E14 St) -> (S5 Pl & S5 St)]
+         // 3.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
+         // 4.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
+         // 5.[(Lispenard St & Broadway) -> (Broadway & W51 St)]
         data.add(new String[]{
                 "Overlaps_HOM_4_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -81,13 +76,11 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                         "expected4[(s0)-[e1]->(s1)], expected5[(s28)-[e18]->(s29)]"
         });
 
-        /*
-         * 1.[(Broadway & W24 St)]
-         * 2.[(Shevchenko Pl & E7 St)]
-         * 3.[(Little West St & 1 Pl)]
-         * 4.[(Fulton St & Grand Ave)]
-         */
         
+         // 1.[(Broadway & W24 St)]
+         // 2.[(Shevchenko Pl & E7 St)]
+         // 3.[(Little West St & 1 Pl)]
+         // 4.[(Fulton St & Grand Ave)]
         data.add(new String[]{
                 "Overlaps_HOM_5_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -98,12 +91,10 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1,expected2,expected3,expected4",
                 "expected1[(s0)], expected2[(s25)], expected3[(s5)], expected4[(s20)]"
         });
-//
-//        /*
-//         * 1.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
-//         * 2.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
-//         */
-//        
+
+        
+         // 1.[(Broadway & W24 St) -[edgeId:0]-> (9 Ave & W18)]
+         // 2.[(Broadway & W24 St) -[edgeId:1]-> (9 Ave & W18)]
         data.add(new String[]{
                 "Overlaps_HOM_6_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -115,9 +106,8 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1,expected2",
                 "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
         });
-        /*
-         * (empty)
-         */
+        
+         // (empty)
         data.add(new String[]{
              "Overlaps_HOM_7_default_citibike",
              CBCypherTemporalPatternMatchingTest.defaultData,
@@ -130,7 +120,6 @@ public class HomomorphismOverlapsData implements TemporalTestData {
         });
 
         // 1. [(Murray St & West St) (Shevchenko Pl)]
-        // GLOBAL
         data.add(new String[]{
                 "Overlaps_HOM_8_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
@@ -141,6 +130,20 @@ public class HomomorphismOverlapsData implements TemporalTestData {
                 "expected1",
                 "[(s24) (s25)]"
         });
+
+        // 1.[(Stanton St & Chrystie St) -[e8]-> (Hancock St & Bedford Ave)
+        //      (E15 St & Irving Pl)-[e3]->(Washington Park)]
+        data.add(new String[]{
+                "Overlaps_HOM_9_default_citibike",
+                CBCypherTemporalPatternMatchingTest.defaultData,
+                CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+                        "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE e1.edgeId=8 " +
+                                "AND NOT Interval(e1.val_from, MIN(e1.val_to, 2020-05-01))" +
+                                ".overlaps(e2.val)"),
+                "expected1",
+                "expected1[(s12)-[e8]->(s13) (s3)-[e3]->(s4)]"
+        });
+
         return data;
     }
 }

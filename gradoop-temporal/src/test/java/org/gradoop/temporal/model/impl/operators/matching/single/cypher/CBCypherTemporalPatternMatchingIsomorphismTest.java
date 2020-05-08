@@ -34,6 +34,11 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
         data.addAll(new IsomorphismImmediatelySucceedsTest().getData());
         data.addAll(new IsomorphismEqualsTest().getData());
         data.addAll(new IsomorphismMinMaxTest().getData());
+        data.addAll(new IsomorphismLongerThanData().getData());
+        data.addAll(new IsomorphismShorterThanData().getData());
+        data.addAll(new IsomorphismLengthAtLeastData().getData());
+        data.addAll(new IsomorphismLengthAtMostData().getData());
+        data.addAll(new IsomorphismMergeAndJoinData().getData());
         return data;
     }
 
@@ -54,7 +59,7 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     @Override
     public TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphCollection>
     getImplementation(String queryGraph, boolean attachData) {
-        // dummy value for dummy GraphStatistics
+         //dummy value for dummy GraphStatistics
         int n = 42;
         GraphStatistics stats = new GraphStatistics(n,n,n,n);
         return new CypherTemporalPatternMatching(queryGraph, attachData, MatchStrategy.ISOMORPHISM,
