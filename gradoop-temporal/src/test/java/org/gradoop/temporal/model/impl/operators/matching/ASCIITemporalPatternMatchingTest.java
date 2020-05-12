@@ -97,14 +97,35 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
         loader.appendToDatabaseFromString(expectedCollection);
 
+
+
         TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
-        TemporalGraphCollection expected = toTemporalGraphCollection(
+
+        TemporalGraphCollection expectedByID = toTemporalGraphCollection(
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
+
+        TemporalGraphCollection expectedByData = transformExpectedToTemporal(
+                loader.getGraphCollectionByVariables(expectedGraphVariables));
+
         System.out.println(result.getGraphHeads().count());
-        collectAndAssertTrue(result.equalsByGraphElementIds(expected));
+
+        List<TemporalGraphHead> graphHeads = result.getGraphHeads().collect();
+        System.out.println("expected: "+expectedCollection);
+        printResult(result);
+        // exists variable mapping?
+        for (TemporalGraphHead graphHead : graphHeads) {
+            assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
+        }
+
+        // element id equality
+        collectAndAssertTrue(result.equalsByGraphElementIds(expectedByData));
+        // graph element equality
+        collectAndAssertTrue(result.equalsByGraphElementData(expectedByData));
+        // correct times in graph head
+        testGraphHeads(result);
     }
 
-    @Test
+    /*@Test
     public void testGraphElementEquality() throws Exception {
         FlinkAsciiGraphLoader loader = getLoader();
 
@@ -121,9 +142,9 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
         //System.out.println(result.getGraphHeads().count());
         collectAndAssertTrue(result.equalsByGraphElementData(expected));
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testVariableMappingExists() throws Exception {
         FlinkAsciiGraphLoader loader = getLoader();
 
@@ -144,21 +165,9 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
             assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
         }
 
-    }
+    }*/
 
-    @Test
-    public void testGraphHeads() throws Exception {
-        FlinkAsciiGraphLoader loader = getLoader();
-
-        // initialize with data graph
-        TemporalGraph db = getTemporalGraphFromLoader(loader);
-
-        // append the expected result
-        loader.appendToDatabaseFromString(expectedCollection);
-
-        // execute and validate
-        TemporalGraphCollection result = getImplementation(queryGraph, true)
-                .execute(db);
+    private void testGraphHeads(TemporalGraphCollection result) throws Exception {
         List<TemporalVertex> vertices = result.getVertices().collect();
         List<TemporalEdge> edges = result.getEdges().collect();
         List<TemporalElement> elements = new ArrayList<>(vertices);

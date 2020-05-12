@@ -139,7 +139,7 @@ public class IsomorphismLongerThanData implements TemporalTestData {
 
         //1.[(E15 St) -> (Washington Park)]
         data.add(new String[]{
-                "LongerThan_HOM_11_default_citibike",
+                "LongerThan_ISO_11_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
                         "MATCH (a)-[e]->(b) WHERE Interval(" +

@@ -6,9 +6,11 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.*;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.util.RandomTestGenerator;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.junit.runners.Parameterized;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTemporalPatternMatchingTest {
@@ -24,7 +26,6 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
           data.addAll(new HomomorphismPrecedesData().getData());
           data.addAll(new HomomorphismSucceedsData().getData());
           data.addAll(new HomomorphismAsOfData().getData());
-          data.addAll(new HomomorphismComplexQueryData().getData());
           data.addAll(new HomomorphismMergeAndJoinData().getData());
           data.addAll(new HomomorphismContainsData().getData());
           data.addAll(new HomomorphismComparisonData().getData());
@@ -36,6 +37,14 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
         data.addAll(new HomomorphismShorterThanData().getData());
         data.addAll(new HomomorphismLengthAtLeastData().getData());
         data.addAll(new HomomorphismLengthAtMostData().getData());
+//        System.out.println(data.size());
+//        try {
+//            data.addAll(new RandomTestGenerator(data).createRandomTestCases(20));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+        data.addAll(new HomomorphismFailedData().getData());
         return data;
     }
 

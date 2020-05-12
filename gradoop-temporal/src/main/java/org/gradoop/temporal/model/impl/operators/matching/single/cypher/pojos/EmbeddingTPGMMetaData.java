@@ -96,7 +96,7 @@ public class EmbeddingTPGMMetaData extends
             return timeDataMapping.get(var);
         }
         catch(NullPointerException e){
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("no time column for "+var);
         }
     }
 

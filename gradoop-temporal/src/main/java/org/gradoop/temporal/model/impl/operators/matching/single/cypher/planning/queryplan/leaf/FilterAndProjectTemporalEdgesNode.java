@@ -129,7 +129,6 @@ implements FilterNode, ProjectionNode {
 
         embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);
         embeddingMetaData.setTimeColumn(edgeVariable, 0);
-
         return embeddingMetaData;
     }
 

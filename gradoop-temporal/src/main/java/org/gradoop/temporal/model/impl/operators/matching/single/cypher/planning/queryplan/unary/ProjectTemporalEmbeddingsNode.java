@@ -64,8 +64,11 @@ public class ProjectTemporalEmbeddingsNode extends UnaryNode implements Projecti
         childMetaData.getVariables().forEach(var -> embeddingMetaData.setEntryColumn(
                 var, childMetaData.getEntryType(var), childMetaData.getEntryColumn(var)));
 
-        childMetaData.getVariables().forEach(var -> embeddingMetaData.setTimeColumn(
+
+        childMetaData.getTimeDataMapping().keySet().forEach(var -> embeddingMetaData.setTimeColumn(
                 var, childMetaData.getTimeColumn(var)));
+
+
 
         IntStream.range(0, projectionKeys.size()).forEach(i ->
                 embeddingMetaData.setPropertyColumn(
