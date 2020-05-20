@@ -19,26 +19,26 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Iterable data() {
         ArrayList<String[]> data = new ArrayList<>();
-//        data.addAll(new IsomorphismBeforeData().getData());
-//        data.addAll(new IsomorphismOverlapsData().getData());
-//        data.addAll(new IsomorphismAfterData().getData());
-//        data.addAll(new IsomorphismFromToData().getData());
-//        data.addAll(new IsomorphismBetweenData().getData());
-//        data.addAll(new IsomorphismPrecedesData().getData());
-//        data.addAll(new IsomorphismSucceedsData().getData());
-//        data.addAll(new IsomorphismAsOfData().getData());
-//        data.addAll(new IsomorphismComplexQueryData().getData());
-//        data.addAll(new IsomorphismContainsData().getData());
-//        data.addAll(new IsomorphismComparisonData().getData());
-//        data.addAll(new IsomorphismImmediatelyPrecedesTest().getData());
-//        data.addAll(new IsomorphismImmediatelySucceedsTest().getData());
-//        data.addAll(new IsomorphismEqualsTest().getData());
-//        data.addAll(new IsomorphismMinMaxTest().getData());
-//        data.addAll(new IsomorphismLongerThanData().getData());
-//        data.addAll(new IsomorphismShorterThanData().getData());
-//        data.addAll(new IsomorphismLengthAtLeastData().getData());
-//        data.addAll(new IsomorphismLengthAtMostData().getData());
-//        data.addAll(new IsomorphismMergeAndJoinData().getData());
+        data.addAll(new IsomorphismBeforeData().getData());
+        data.addAll(new IsomorphismOverlapsData().getData());
+        data.addAll(new IsomorphismAfterData().getData());
+        data.addAll(new IsomorphismFromToData().getData());
+        data.addAll(new IsomorphismBetweenData().getData());
+        data.addAll(new IsomorphismPrecedesData().getData());
+        data.addAll(new IsomorphismSucceedsData().getData());
+        data.addAll(new IsomorphismAsOfData().getData());
+        data.addAll(new IsomorphismComplexQueryData().getData());
+        data.addAll(new IsomorphismContainsData().getData());
+        data.addAll(new IsomorphismComparisonData().getData());
+        data.addAll(new IsomorphismImmediatelyPrecedesTest().getData());
+        data.addAll(new IsomorphismImmediatelySucceedsTest().getData());
+        data.addAll(new IsomorphismEqualsTest().getData());
+        data.addAll(new IsomorphismMinMaxTest().getData());
+        data.addAll(new IsomorphismLongerThanData().getData());
+        data.addAll(new IsomorphismShorterThanData().getData());
+        data.addAll(new IsomorphismLengthAtLeastData().getData());
+        data.addAll(new IsomorphismLengthAtMostData().getData());
+        data.addAll(new IsomorphismMergeAndJoinData().getData());
         data.addAll(new IsomorphismComplexQueryData().getData());
         return data;
     }

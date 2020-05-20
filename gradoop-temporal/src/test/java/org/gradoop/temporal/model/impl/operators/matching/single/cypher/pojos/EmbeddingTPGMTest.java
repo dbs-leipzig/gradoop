@@ -135,15 +135,13 @@ public class EmbeddingTPGMTest {
         byte[] test = new byte[]{123, -97, 83, 98, 1, 3, 5, -9, 24, 55, 99, -101, 111, 67, 89, 89,
                 123, 97, -83, 98, 1, -3, -5, 9, 24, 55, 99, -101, 111, -67, 89, 89};
         byte[] global = new byte[]{123, 97, -83, 98, 1, -3, -5, 9, 24, 55, 99, -101, 111, -67, 89, 89};
-        embedding.setTimeData(test, global);
+        embedding.setTimeData(test);
         assertArrayEquals(embedding.getTimeData(), test);
-        assertArrayEquals(embedding.getRawGlobalTimes(), global);
         byte[] test2 = new byte[]{34, 8, 45, 75, 1, 3, 5, 9, 23, 23, 66, 73, 121, 125, 101, 41,
         98, 67, 23, 53, 82, 98, 25, 91, 88, 122, 45, 87, 78, 90, 99, 100};
         byte[] global2 = new byte[]{98, 67, 23, 53, 1, 3, 5, 9, 88, 122, 45, 87, 78, 90, 99, 100};
-        embedding.setTimeData(test2, global2);
+        embedding.setTimeData(test2);
         assertArrayEquals(embedding.getTimeData(), test2);
-        assertArrayEquals(embedding.getRawGlobalTimes(), global2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -151,7 +149,7 @@ public class EmbeddingTPGMTest {
         EmbeddingTPGM embedding = new EmbeddingTPGM();
         byte[] test = new byte[]{123, -97, 83, 98, 1, 3, 5, -9, 24, 55, 99, -101, 111, 67, 89, 89,
                 123, 97, -83, 98, 1, -3, -5};
-        embedding.setTimeData(test, test);
+        embedding.setTimeData(test);
     }
 
     @Test
@@ -169,7 +167,7 @@ public class EmbeddingTPGMTest {
         };
 
         embedding.add(idList);
-        embedding.setTimeData(new byte[]{}, new byte[]{});
+        embedding.setTimeData(new byte[]{});
         assertEquals(2, embedding.size());
     }
 
@@ -220,7 +218,6 @@ public class EmbeddingTPGMTest {
         assertArrayEquals(bTime, reversed.getTimes(1));
         assertArrayEquals(aTime, reversed.getTimes(2));
 
-        assertArrayEquals(global, reversed.getGlobalTimes());
     }
 
     @Test
@@ -244,41 +241,13 @@ public class EmbeddingTPGMTest {
         e1.addTimeData(1234L, 12345L, 2345L, 23456L);
         EmbeddingTPGM e2 = new EmbeddingTPGM();
         e2.addTimeData(1234L, 12345L, 2345L, 23456L);
-        assertTrue(e1.equals(e2));
+        assertEquals(e1, e2);
         GradoopId id = GradoopId.get();
         e1.add(id, PropertyValue.create(42), PropertyValue.create("Foobar"));
         e2.add(id, PropertyValue.create(42), PropertyValue.create("Foobar"));
-        assertTrue(e1.equals(e2));
+        assertEquals(e1, e2);
         e2.addTimeData(1234L, 12345L, 2345L, 23456L);
-        assertFalse(e1.equals(e2));
-    }
-
-    @Test
-    public void testGlobalTimes(){
-        EmbeddingTPGM embedding = new EmbeddingTPGM();
-        Long[] time1 = new Long[]{5L, 20L, 4L, 21L};
-        embedding.addTimeData(time1[0], time1[1], time1[2], time1[3]);
-        assertArrayEquals(embedding.getGlobalTimes(), time1);
-        embedding.addTimeData(4L, 21L, 3L, 22L);
-        assertArrayEquals(embedding.getGlobalTimes(), time1);
-        embedding.addTimeData(6L, 18L, 2L, 23L);
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{6L, 18L, 4L, 21L});
-        embedding.addTimeData(5L, 20L, 3L, 10L);
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{6L, 18L, 4L, 10L});
-        embedding.addTimeData(19L, 22L, 6L, 8L);
-        Long defaultValue = TemporalElement.DEFAULT_TIME_FROM;
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
-                6L, 8L});
-        embedding.addTimeData(7L, 17L, 5L, 8L);
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
-                6L, 8L});
-        embedding.addTimeData(1234L, 12345L, 8L, 10L);
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
-                8L, 8L});
-        embedding.addTimeData(1234L, 12345L, 12L, 24L);
-        assertArrayEquals(embedding.getGlobalTimes(), new Long[]{defaultValue, defaultValue,
-                defaultValue, defaultValue});
-
+        assertNotEquals(e1, e2);
     }
 
 

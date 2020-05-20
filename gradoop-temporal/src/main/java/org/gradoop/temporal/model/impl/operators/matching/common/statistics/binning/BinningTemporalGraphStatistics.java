@@ -1,0 +1,610 @@
+package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.Binning;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.util.Util;
+import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.s1ck.gdl.utils.Comparator;
+
+import java.util.*;
+
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.*;
+import static org.s1ck.gdl.utils.Comparator.*;
+
+/**
+ * Wraps for a graph a set of {@link TemporalElementStats}, one for each combination
+ * (vertex / edge) x (label).
+ * Provides methods to estimate the probability that comparisons hold, based on
+ * the wrapped statistics.
+ */
+public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
+
+    /**
+     * Statistics for every vertex label
+     */
+    private Map<String, TemporalElementStats> vertexStats;
+
+    /**
+     * Statistics for every edge label
+     */
+    private Map<String, TemporalElementStats> edgeStats;
+
+    /**
+     * Overall vertex count in the graph (exact)
+     */
+    private Long vertexCount;
+
+    /**
+     * Overall edge count in the graph (exact)
+     */
+    private Long edgeCount;
+
+    /**
+     * Creates new graph statistics
+     * @param vertexStats list of vertex statistics (one element for each label)
+     * @param edgeStats list of edge statistics (one element for each label)
+     */
+    protected BinningTemporalGraphStatistics(List<TemporalElementStats> vertexStats,
+                                             List<TemporalElementStats> edgeStats){
+        this.vertexStats = new HashMap<>();
+        this.edgeStats = new HashMap<>();
+        this.vertexCount = 0L;
+        this.edgeCount = 0L;
+        for(TemporalElementStats edgeStat : edgeStats){
+            this.edgeStats.put(edgeStat.getLabel(), edgeStat);
+            this.edgeCount += edgeStat.getElementCount();
+        }
+        for(TemporalElementStats vertexStat : vertexStats){
+            this.vertexStats.put(vertexStat.getLabel(), vertexStat);
+            this.vertexCount += vertexStat.getElementCount();
+        }
+    }
+
+    /**
+     * Returns the vertex statistics list
+     * @return vertex statistics list
+     */
+    public Map<String, TemporalElementStats> getVertexStats(){
+        return vertexStats;
+    }
+
+    /**
+     * Returns the edge statistics list
+     * @return edge statistics list
+     */
+    public Map<String, TemporalElementStats> getEdgeStats(){
+        return edgeStats;
+    }
+
+    @Override
+    public BinningTemporalGraphStatisticsFactory getFactory() {
+        return new BinningTemporalGraphStatisticsFactory();
+    }
+
+    @Override
+    public double estimateTemporalProb(ElementType type1, Optional<String> label1,
+                                       TimeSelector.TimeField field1, Comparator comp, Long value) {
+        // no further estimations for = and !=
+        if(comp == EQ){
+            return 0.001;
+        }
+        else if(comp == Comparator.NEQ){
+            return 0.999;
+        }
+        // <, <=, >=, >
+        if(!label1.isPresent()){
+            return estimateTemporalProb(type1, field1, comp, value);
+        }
+        else{
+            TemporalElementStats elementStats = type1 == ElementType.VERTEX ?
+                    vertexStats.get(label1.get()) : edgeStats.get(label1.get());
+            Binning bins = getBins(elementStats, field1);
+            return estimateFromBins(bins, comp, value);
+        }
+    }
+
+    @Override
+    public double estimateDurationProb(ElementType type, Optional<String> label, Comparator comp,
+                                       boolean transaction, Long value) {
+        Map<String, TemporalElementStats> statsMap = type==ElementType.VERTEX ?
+                vertexStats : edgeStats;
+        List<TemporalElementStats> relevantStats = label.isPresent() ?
+                new ArrayList<>(Arrays.asList(statsMap.get(label.get()))) :
+                new ArrayList<>(statsMap.values());
+
+        double sum= 0.;
+        long numElements = 0;
+        for(TemporalElementStats stat: relevantStats){
+            numElements += stat.getElementCount();
+        }
+
+        for(TemporalElementStats stat : relevantStats){
+
+            double[] durationStats = transaction ?
+                    stat.getTxDurationStats() : stat.getValDurationStats();
+            NormalDistribution durationDist = new NormalDistribution(
+                    durationStats[0], Math.max(Math.sqrt(durationStats[1]), 0.001));
+            double estimation = 0.;
+
+            if(comp == EQ){
+                estimation =  durationDist.density(value);
+            } else if(comp == NEQ){
+                estimation = 1. - durationDist.density(value);
+            } else if(comp == LTE){
+                estimation = durationDist.cumulativeProbability(value);
+            } else if(comp == LT){
+                estimation = durationDist.cumulativeProbability(value) -
+                        durationDist.density(value);
+            } else if(comp == GT){
+                estimation = 1 - durationDist.cumulativeProbability(value);
+            } else if(comp == GTE){
+                estimation = 1- (durationDist.cumulativeProbability(value)) +
+                        durationDist.density(value);
+            }
+            sum += estimation * ((double)stat.getElementCount() / numElements);
+        }
+        return sum;
+    }
+
+    @Override
+    public double estimatePropertyProb(ElementType type, Optional<String> label, String property, Comparator comp, PropertyValue value) {
+        Map<String, TemporalElementStats> statsMap = type==ElementType.VERTEX ?
+                vertexStats : edgeStats;
+        List<TemporalElementStats> relevantStats = label.isPresent() ?
+                new ArrayList<>(Arrays.asList(statsMap.get(label.get()))) :
+                new ArrayList<>(statsMap.values());
+
+        if(isNumerical(value)){
+            return estimateNumericalPropertyProb(relevantStats, property, comp, value);
+        }
+        else{
+            return estimateCategoricalPropertyProb(relevantStats, property, comp, value);
+        }
+
+    }
+
+    @Override
+    public double estimatePropertyProb(ElementType type1, Optional<String> label1, String property1, Comparator comp,
+                                       ElementType type2, Optional<String> label2, String property2) {
+        Map<String, TemporalElementStats> statsMap1 = type1==ElementType.VERTEX ?
+                vertexStats : edgeStats;
+        List<TemporalElementStats> relevantStats1 = label1.isPresent() ?
+                new ArrayList<>(Arrays.asList(statsMap1.get(label1.get()))) :
+                new ArrayList<>(statsMap1.values());
+        Map<String, TemporalElementStats> statsMap2 = type2==ElementType.VERTEX ?
+                vertexStats : edgeStats;
+        List<TemporalElementStats> relevantStats2 = label2.isPresent() ?
+                new ArrayList<>(Arrays.asList(statsMap2.get(label2.get()))) :
+                new ArrayList<>(statsMap1.values());
+        // check if numerical or not
+        boolean numerical1 = false;
+        boolean numerical2 = false;
+        for(TemporalElementStats s: relevantStats1){
+            if(s.getNumericalPropertyStatsEstimation().containsKey(property1)){
+                numerical1 = true;
+            }
+        }
+        for(TemporalElementStats s: relevantStats2){
+            if(s.getNumericalPropertyStatsEstimation().containsKey(property2)){
+                numerical2 = true;
+            }
+        }
+        // numerical properties can not be compared to categorical
+        if(numerical1!=numerical2){
+            return 0.;
+        }
+        else if(!numerical1){
+            return estimateCategoricalPropertyProb(relevantStats1, property1, comp,
+                    relevantStats2, property2);
+        }
+        else{
+            return estimateNumericalPropertyProb(relevantStats1, property1, comp,
+                    relevantStats2, property2);
+        }
+    }
+
+    /**
+     * Estimates the probability that a comparison on numerical property data holds.
+     * RHS and LHS elements are described by a list of element statistics
+     * Note that the method assumes lhs and rhs to be independent, i.e. a call
+     * does not yield a reasonable value for comparing the same property of the
+     * exact same element.
+     *
+     * @param relevantStats1 statistics for lhs elements
+     * @param property1 lhs property to compare
+     * @param comp comparator
+     * @param relevantStats2 statistics for the rhs elements
+     * @param property2 rhs property to compare
+     * @return estimation of probability that the comparison holds
+     */
+    private double estimateNumericalPropertyProb(List<TemporalElementStats> relevantStats1, String property1,
+                                                 Comparator comp, List<TemporalElementStats> relevantStats2,
+                                                 String property2) {
+        long count1 = relevantStats1.stream()
+                .map(TemporalElementStats::getElementCount)
+                .reduce(0L, Long::sum);
+        long count2 = relevantStats2.stream()
+                .map(TemporalElementStats::getElementCount)
+                .reduce(0L, Long::sum);
+        long totalCount = count1*count2;
+
+        double outerSum = 0.;
+        for(TemporalElementStats s1: relevantStats1){
+            double innerSum=0.;
+            for(TemporalElementStats s2: relevantStats2){
+                double prob = estimateNumericalPropertyProb(s1, property1, comp, s2, property2);
+                double weight = ((double) s1.getElementCount()*s2.getElementCount())
+                        / totalCount;
+                innerSum += prob*weight;
+            }
+            outerSum += innerSum;
+        }
+        return outerSum;
+    }
+
+    /**
+     * Estimates the probability that a comparison between numerical properties holds.
+     * LHS and RHS are described by one statistics element. They are assumed to be
+     * independent, otherwise the estimation may not be reasonable.
+     *
+     * @param stats1 lhs statistics
+     * @param property1 lhs property to compare
+     * @param comp comparator
+     * @param stats2 rhs statistics
+     * @param property2 rhs property to compare
+     * @return estimation of probability that the comparison holds
+     */
+    private double estimateNumericalPropertyProb(TemporalElementStats stats1, String property1,
+                                                 Comparator comp,
+                                                 TemporalElementStats stats2, String property2){
+        Map<String, Double[]> map1 = stats1.getNumericalPropertyStatsEstimation();
+        Map<String, Double[]> map2 = stats2.getNumericalPropertyStatsEstimation();
+        Double[] propStats1 = map1.getOrDefault(property1, null);
+        Double[] propStats2 = map2.getOrDefault(property2, null);
+        if(propStats1 == null || propStats2 == null){
+            return 0.0001;
+        }
+        double occurrence = stats1.getNumericalOccurrenceEstimation()
+                .getOrDefault(property1, 0.) *
+                stats2.getNumericalOccurrenceEstimation().getOrDefault(property2, 0.);
+        // assuming both properties are normally distributed,
+        // their difference is also normally distributed
+        NormalDistribution differenceDist = new NormalDistribution(
+                propStats1[0] - propStats2[0],
+                Math.max(Math.sqrt(propStats1[1]+propStats2[1]), 0.001));
+
+        if(comp==EQ){
+            return occurrence*differenceDist.density(0.);
+        } else if(comp==NEQ){
+            return occurrence* (1. - differenceDist.density(0.));
+        } else if(comp==LTE){
+            return occurrence * (differenceDist.cumulativeProbability(0.));
+        } else if(comp==LT){
+            return occurrence * (differenceDist.cumulativeProbability(0.) -
+                    differenceDist.density(0.));
+        } else if(comp==GTE){
+            return occurrence * (1. - differenceDist.cumulativeProbability(0.) +
+                    differenceDist.density(0.));
+        } else{
+            //GT
+            return occurrence * (1. - differenceDist.cumulativeProbability(0.));
+        }
+    }
+
+    /**
+     * Estimates the probability that a comparison between categorical property values holds.
+     * LHS and RHS are described by lists of stats
+     * @param relevantStats1 lhs statistics
+     * @param property1 lhs property to compare
+     * @param comp comparator
+     * @param relevantStats2 rhs statistics
+     * @param property2 rhs property to compare
+     * @return estimation of the probability that the comparison holds
+     */
+    private double estimateCategoricalPropertyProb(List<TemporalElementStats> relevantStats1, String property1,
+                                                   Comparator comp,
+                                                   List<TemporalElementStats> relevantStats2, String property2) {
+        long count1 = relevantStats1.stream()
+                .map(TemporalElementStats::getElementCount)
+                .reduce(0L, Long::sum);
+        long count2 = relevantStats2.stream()
+                .map(TemporalElementStats::getElementCount)
+                .reduce(0L, Long::sum);
+        long totalCount = count1*count2;
+
+        double outerSum = 0.;
+        for(TemporalElementStats s1: relevantStats1){
+            double innerSum=0.;
+            for(TemporalElementStats s2: relevantStats2){
+                double prob = estimateCategoricalPropertyProb(s1, property1, comp, s2, property2);
+                double weight = ((double) s1.getElementCount()*s2.getElementCount())
+                        / totalCount;
+                innerSum += prob*weight;
+            }
+            outerSum += innerSum;
+        }
+        return outerSum;
+    }
+
+    /**
+     * Estimates the probability that a comparison between categorical properties holds.
+     * LHS and RHS are both described by a statistics element.
+     * @param stats1 lhs statistics
+     * @param property1 lhs property to compare
+     * @param comp comparator
+     * @param stats2 rhs statistics
+     * @param property2 rhs property to compare
+     * @return estimation of the probability that the comparison holds
+     */
+    private double estimateCategoricalPropertyProb(TemporalElementStats stats1, String property1,
+                                                   Comparator comp,
+                                                   TemporalElementStats stats2, String property2){
+        Map<String, Map<PropertyValue, Double>> map1 =
+                stats1.getCategoricalSelectivityEstimation();
+        Map<String, Map<PropertyValue, Double>> map2 =
+                stats2.getCategoricalSelectivityEstimation();
+        Map<PropertyValue, Double> propStats1 = map1.getOrDefault(property1, null);
+        Map<PropertyValue, Double> propStats2 = map2.getOrDefault(property2, null);
+        if(propStats1 == null || propStats2 == null){
+            return 0.0001;
+        } if(comp==EQ || comp==NEQ){
+            double sum = 0.;
+            for(PropertyValue value1: propStats1.keySet()){
+                double val1Selectivity = propStats1.get(value1);
+                for(PropertyValue value2: propStats2.keySet()){
+                    if(value1.equals(value2)) {
+                        double val2Selectivity = propStats2.get(value2);
+                        sum += val1Selectivity * val2Selectivity;
+                    }
+                }
+            }
+            return comp==EQ ? sum : 1.-sum;
+        } else{
+            // shouldn't happen, categorical variables can only be compared with EQ or NEQ
+            return 0.;
+        }
+    }
+
+    /**
+     * Determines if a {@link PropertyValue} is numerical
+     * @param value the PropertyValue to check
+     * @return true iff the value is of numerical type (Float, Double, Integer, Long)
+     */
+    private boolean isNumerical(PropertyValue value){
+        Class clz = value.getType();
+        return clz.equals(Float.class) || clz.equals(Double.class) ||
+                clz.equals(Integer.class) || clz.equals(Long.class);
+    }
+
+    /**
+     * Estimates the probability that a comparison between a categorical property value
+     * and a constant holds
+     * @param relevantStats statistics for the lhs (the elements that can have the
+     *                      property in question)
+     * @param property the property
+     * @param comp comparator of the comparison
+     * @param value rhs of the comparison
+     * @return estimation of the probability that the comparison holds
+     */
+    private double estimateCategoricalPropertyProb(List<TemporalElementStats> relevantStats, String property, Comparator comp, PropertyValue value) {
+        if(comp!=EQ && comp!=NEQ){
+            return 0.;
+        }
+        long overallCount = 0L;
+        boolean found = false;
+        for(TemporalElementStats stat: relevantStats){
+            overallCount += stat.getElementCount();
+            if(stat.getCategoricalSelectivityEstimation().keySet().contains(property)){
+                found = true;
+            }
+        }
+
+        if(!found){
+            return 0.0001;
+        }
+
+        double prob = 0.;
+        for(TemporalElementStats stat: relevantStats){
+            if(! stat.getCategoricalSelectivityEstimation().keySet().contains(property)){
+                prob+= 0.0001 * ((double) stat.getElementCount()/overallCount);
+                continue;
+            }
+            prob += stat.getCategoricalSelectivityEstimation()
+                    .get(property)
+                    .getOrDefault(value, 0.0000001)*
+                    ((double) stat.getElementCount()/overallCount);
+        }
+        if(comp==EQ){
+            return prob;
+        }
+        else{
+            //NEQ
+            return 1 - prob;
+        }
+    }
+
+    /**
+     * Estimates the probability that a comparison between a numerical property value
+     * and a numerical constant holds
+     * @param relevantStats statistics for the lhs (the elements that can have the
+     *                      property in question)
+     * @param property the property
+     * @param comp comparator of the comparison
+     * @param value rhs of the comparison
+     * @return estimation of the probability that the comparison holds
+     */
+    private double estimateNumericalPropertyProb(List<TemporalElementStats> relevantStats, String property, Comparator comp, PropertyValue value) {
+        long overallCount = 0L;
+        for(TemporalElementStats stat: relevantStats){
+            overallCount += stat.getElementCount();
+        }
+        double sum = 0.;
+        for(TemporalElementStats stat: relevantStats){
+            sum += estimateNumericalPropertyProb(stat, property, comp, value)
+            * (((double)stat.getElementCount()/overallCount));
+        }
+        return sum;
+    }
+
+    private double estimateNumericalPropertyProb(TemporalElementStats stat, String property,
+                                                 Comparator comp, PropertyValue value){
+        if(!stat.getNumericalPropertyStatsEstimation().containsKey(property)){
+            return 0.001;
+        }
+        Double[] propertyStats = stat.getNumericalPropertyStatsEstimation().get(property);
+        NormalDistribution dist = new NormalDistribution(propertyStats[0],
+                Math.max(Math.sqrt(propertyStats[1]), 0.001));
+        double doubleValue = Util.propertyValueToDouble(value);
+        double occurenceProb = stat.getNumericalOccurrenceEstimation().get(property);
+        if(comp== EQ){
+            return 0.001 * occurenceProb;
+        } else if(comp==NEQ){
+            return (1. - 0.001) * occurenceProb;
+        } else if(comp==LTE){
+            return dist.cumulativeProbability(doubleValue) * occurenceProb;
+        } else if(comp==LT){
+            return occurenceProb * (dist.cumulativeProbability(doubleValue) - 0.001);
+        } else if(comp==GTE){
+            return occurenceProb*
+                    (1. - dist.cumulativeProbability(doubleValue) + 0.001);
+        } else{
+            //GT
+            return occurenceProb*(1. - dist.cumulativeProbability(doubleValue));
+        }
+    }
+
+    /**
+     * Estimates probability of a comparison for elements without label (i.e. probability is determined
+     * over all vertices/edges)
+     *
+     * @param type1 type of the comparison's lhs (vertex/edge)
+     * @param field1 field of the lhs (tx_from, tx_to, valid_from, valid_to)
+     * @param comp comparator
+     * @param value rhs (constant value)
+     * @return estimation of probability that the specified comparison holds
+     */
+    private double estimateTemporalProb(ElementType type1, TimeSelector.TimeField field1,
+                                        Comparator comp, Long value) {
+        double sum = 0.;
+        Map<String, TemporalElementStats> stats = type1 == ElementType.VERTEX?
+                vertexStats : edgeStats;
+
+        Long overallCount = type1 == ElementType.VERTEX? vertexCount : edgeCount;
+        for(TemporalElementStats elementStat: stats.values()){
+            Binning bins = getBins(elementStat, field1);
+            sum += (estimateFromBins(bins, comp, value) *
+                    (elementStat.getElementCount() / (double) overallCount));
+        }
+        return sum;
+    }
+
+    /**
+     * Estimates the probability that a comparison holds using bin statistics
+     * @param bins the bins that describe the lhs of the comparison
+     * @param comp comparator, not EQ or NEQ
+     * @param value rhs of the comparison
+     * @return estimation of probability that the comparison holds
+     */
+    private double estimateFromBins(Binning bins, Comparator comp, Long value) {
+        int[] valueBins = findBins(bins, value);
+        int numBins = bins.getBins().length;
+
+        if(comp == Comparator.LT){
+            return ((double) valueBins[0]) / ((double) numBins);
+        }
+        else if(comp == LTE){
+            return ((double) valueBins[1]) / ((double) numBins);
+        }
+        else if(comp == Comparator.GT){
+            // 1 - LTE estimation
+            return 1 - ((double) valueBins[1]) / ((double) numBins);
+        }
+        else{
+            // 1- LT estimation for GTE
+            return 1 - ((double) valueBins[0]) / ((double) numBins);
+        }
+    }
+
+    /**
+     * Finds the bins in which a value falls
+     * @param bins bins to search for the value
+     * @param value value to search
+     * @return integer array containing the lowest suitable bin index and the highest.
+     * A value can fall into more than one bin in a row, as the bins are equal width.
+     * E.g., binning a sequence {@code 1,2,2,3} into 4 bins would yield 2 suitable bins
+     * for the value {@code 2}
+     */
+    private int[] findBins(Binning bins, Long value) {
+        Long[] binReps = bins.getBins();
+        int bin = Arrays.binarySearch(binReps, value);
+        if(bin<0){
+            bin = -bin;
+        }
+        bin = Math.min(bin, binReps.length-1);
+        // bins are equal size, so the same bin could occur more than once
+        // the lowest bin in which value fits
+        int minBin = bin;
+        // the "highest" bin in which value fits
+        int maxBin = bin;
+        while(minBin>=0 && matchesBin(binReps, value, minBin)){
+            minBin--;
+        }
+        minBin++;
+        while(maxBin<binReps.length && matchesBin(binReps, value, maxBin)){
+            maxBin++;
+        }
+        maxBin--;
+        return new int[]{minBin, maxBin};
+    }
+
+    /**
+     * Checks whether a suitable bin was found for a value.
+     *
+     * @param arr the array of bins
+     * @param value the value to search
+     * @param index index of the potentially suitable bin
+     * @return true iff index denotes a suitable bin for value
+     */
+    private boolean matchesBin(Long[] arr, Long value, int index){
+        if(arr.length==1){
+            return true;
+        }
+        if(index == arr.length-1){
+            return value >= arr[index];
+        }
+        else if(index==0){
+            return value < arr[index+1];
+        }
+        else{
+            boolean lowerCond = value >= arr[index];
+            boolean upperCond = value==Long.MAX_VALUE? value <= arr[index+1] :
+                    value < arr[index+1];
+            return lowerCond && upperCond;
+        }
+    }
+
+    /**
+     * Auxiliary method to get the bin for a certain time field (tx_from, tx_to, valid_from, valid_to)
+     * @param elementStats element statistics from which to retrieve the bin
+     * @param field1 time field
+     * @return binning statistics for the time field
+     */
+    private Binning getBins(TemporalElementStats elementStats, TimeSelector.TimeField field1) {
+        if(field1 == TimeSelector.TimeField.TX_FROM){
+            return elementStats.getEstimatedTimeBins()[0];
+        }
+        else if(field1 == TX_TO){
+            return elementStats.getEstimatedTimeBins()[1];
+        }
+        else if(field1 == TimeSelector.TimeField.VAL_FROM){
+            return elementStats.getEstimatedTimeBins()[2];
+        }
+        else{
+            return elementStats.getEstimatedTimeBins()[3];
+        }
+    }
+
+}

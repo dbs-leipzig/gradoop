@@ -150,8 +150,7 @@ public class MergeTemporalEmbeddings implements
         reuseEmbedding.setIdData(mergeIdData(left, right));
         reuseEmbedding.setPropertyData(mergePropertyData(left, right));
         reuseEmbedding.setIdListData(mergeIdListData(left, right));
-        byte[][] newTimeData = mergeTimeData(left, right);
-        reuseEmbedding.setTimeData(newTimeData[0], newTimeData[1]);
+        reuseEmbedding.setTimeData(mergeTimeData(left, right));
     }
 
     /**
@@ -247,24 +246,8 @@ public class MergeTemporalEmbeddings implements
      * @param right the right hand side embedding
      * @return the merged data represented as byte array
      */
-    private byte[][] mergeTimeData(EmbeddingTPGM left, EmbeddingTPGM right){
-        return new byte[][]{
-                ArrayUtils.addAll(left.getTimeData(), right.getTimeData()),
-                computeNewGlobal(left.getGlobalTimes(), right.getGlobalTimes())
-        };
-    }
-
-    /**
-     * Determines the new global time when merging two embeddings.
-     * @param leftGlobal global time data of the first embedding to merge
-     * @param rightGlobal global time data of the second embedding to merge
-     * @return new global time data in raw byte format
-     */
-    private byte[] computeNewGlobal(Long[] leftGlobal, Long[] rightGlobal){
-        EmbeddingTPGM dummy = new EmbeddingTPGM();
-        dummy.addTimeData(leftGlobal[0], leftGlobal[1], leftGlobal[2], leftGlobal[3]);
-        dummy.addTimeData(rightGlobal[0], rightGlobal[1], rightGlobal[2], rightGlobal[3]);
-        return dummy.getRawGlobalTimes();
+    private byte[] mergeTimeData(EmbeddingTPGM left, EmbeddingTPGM right){
+        return ArrayUtils.addAll(left.getTimeData(), right.getTimeData());
     }
 
 }

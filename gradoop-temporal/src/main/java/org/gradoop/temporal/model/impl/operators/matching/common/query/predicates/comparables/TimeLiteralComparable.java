@@ -29,6 +29,14 @@ public class TimeLiteralComparable extends TemporalComparable {
         this.timeLiteral = timeLiteral;
     }
 
+    /**
+     * Returns the wrapped {@link TimeLiteral}
+     * @return wrapped literal
+     */
+    public TimeLiteral getTimeLiteral(){
+        return timeLiteral;
+    }
+
     @Override
     public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData){
         return PropertyValue.create((long)timeLiteral.evaluate().get());

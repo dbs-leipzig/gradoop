@@ -7,6 +7,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.Duration;
+import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +33,12 @@ public class DurationComparable extends TemporalComparable {
     TemporalComparable to;
 
     /**
+     * Long describing the current system time
+     */
+    // TODO set it from the outside
+    Long now;
+
+    /**
      * Creates a new wrapper
      * @param duration the Duration to be wrapped
      */
@@ -39,17 +46,22 @@ public class DurationComparable extends TemporalComparable {
         this.duration = duration;
         this.from = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getFrom());
         this.to = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getTo());
+        this.now = new TimeLiteral("now").getMilliseconds();
     }
 
     @Override
     public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-        return PropertyValue.create(to.evaluate(embedding, metaData).getLong() -
+        Long toLong = to.evaluate(embedding, metaData).getLong() == Long.MAX_VALUE ?
+                now : to.evaluate(embedding, metaData).getLong();
+        return PropertyValue.create(toLong -
                 from.evaluate(embedding, metaData).getLong());
     }
 
     @Override
     public PropertyValue evaluate(GraphElement element) {
-        return PropertyValue.create(to.evaluate(element).getLong() -
+        Long toLong = to.evaluate(element).getLong() == Long.MAX_VALUE ?
+                now : to.evaluate(element).getLong();
+        return PropertyValue.create(toLong -
                 from.evaluate(element).getLong());
     }
 
