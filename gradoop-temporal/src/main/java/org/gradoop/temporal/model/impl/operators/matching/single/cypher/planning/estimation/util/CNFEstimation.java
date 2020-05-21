@@ -89,7 +89,8 @@ public class CNFEstimation {
                 double sign = i%2==0 ? -1. : 1.;
                 Set<Set<Integer>> tupleIndexLists = getNTuples(i, comparisons.size()-1);
                 for(Set<Integer> tupleIndex : tupleIndexLists){
-                    ArrayList<ComparisonExpressionTPGM> subCNFComparisons = new ArrayList<>();
+                    ArrayList<ComparisonExpressionTPGM> subCNFComparisons =
+                            new ArrayList<>();
                     for(int index: tupleIndex){
                         subCNFComparisons.add(comparisons.get(index));
                     }
@@ -112,9 +113,9 @@ public class CNFEstimation {
      * @return list of n-tuples
      */
     private Set<Set<Integer>> getNTuples(int n, int max) {
-        if(n<0){
+        if(n<=0){
             throw new IllegalArgumentException("n must be > 0");
-        } else if(n==0){
+        } else if(n==1){
             Set<Set<Integer>> set = new HashSet<>();
             for(int i=0; i<=max; i++){
                 set.add(new HashSet<>(Arrays.asList(i)));
@@ -162,35 +163,7 @@ public class CNFEstimation {
             return estimateComparisonOnDifferent(comparisonExpression);
         }
         else{
-            return estimateComparisonOnSame(comparisonExpression);
-        }
-    }
-
-    private double estimateComparisonOnSame(ComparisonExpressionTPGM comparisonExpression) {
-        if(comparisonExpression instanceof ComparisonExpressionTPGM){
-            return estimateCompOnSameTPGM((ComparisonExpressionTPGM) comparisonExpression);
-        }
-        else{
-            return estimateCompOnSame(comparisonExpression);
-        }
-    }
-
-    private double estimateCompOnSame(ComparisonExpressionTPGM comparisonExpression) {
-        QueryComparableTPGM lhs = comparisonExpression.getLhs();
-        QueryComparableTPGM rhs = comparisonExpression.getRhs();
-        Comparator comp = comparisonExpression.getComparator();
-
-        if((lhs instanceof PropertySelectorComparable
-                && rhs instanceof LiteralComparable)
-                || (lhs instanceof LiteralComparable
-                && rhs instanceof PropertySelectorComparable) ){
-            return simplePropertyEstimation(comparisonExpression);
-        } else if(lhs instanceof PropertySelectorComparable &&
-                rhs instanceof PropertySelectorComparable){
-            return complexPropertyEstimation(comparisonExpression);
-        }
-        else{
-            return 1.;
+            return estimateCompOnSameTPGM(comparisonExpression);
         }
     }
 
@@ -216,11 +189,22 @@ public class CNFEstimation {
                     || (lhs instanceof TimeConstantComparable && rhs instanceof DurationComparable)){
                 return simpleDurationEstimation((ComparisonExpressionTPGM) comparisonExpression);
             } else{
-                return 0.5;
+                return 1.;
             }
         }
         else{
-            return 1.;
+            if((lhs instanceof PropertySelectorComparable
+                    && rhs instanceof LiteralComparable)
+                    || (lhs instanceof LiteralComparable
+                    && rhs instanceof PropertySelectorComparable) ){
+                return simplePropertyEstimation(comparisonExpression);
+            } else if(lhs instanceof PropertySelectorComparable &&
+                    rhs instanceof PropertySelectorComparable){
+                return complexPropertyEstimation(comparisonExpression);
+            }
+            else{
+                return 1.;
+            }
         }
     }
 

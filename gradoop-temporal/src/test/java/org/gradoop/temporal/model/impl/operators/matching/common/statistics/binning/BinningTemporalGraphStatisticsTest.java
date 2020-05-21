@@ -16,6 +16,7 @@ import org.s1ck.gdl.utils.Comparator;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.EDGE;
 import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.VERTEX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -91,18 +92,27 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
 
         //works for unbounded (values hard to estimate, as they aren't actually
         // normally distributed here
-        double estimation1 = stats.estimateDurationProb(VERTEX, Optional.empty(),
-                EQ, false, 10L);
-        double estimation2 = stats.estimateDurationProb(VERTEX, Optional.of("v1"),
+        // all lengths normally distributed from 0 to 100
+        double estimation1 = stats.estimateDurationProb(EDGE, Optional.empty(),
+                EQ, false, 50L);
+        assertEquals(estimation1, 0.01, 0.01);
+        double estimation2 = stats.estimateDurationProb(EDGE, Optional.of("edge"),
                 NEQ, true, 1000000L);
-        double estimation3 = stats.estimateDurationProb(VERTEX, Optional.of("v2"),
-                LT, false, 0L);
-        double estimation4 = stats.estimateDurationProb(VERTEX, Optional.empty(),
-                LTE, true, 1234L);
-        double estimation5 = stats.estimateDurationProb(VERTEX, Optional.of("v1"),
-                GT, false, 1000L);
-        double estimation6 = stats.estimateDurationProb(VERTEX, Optional.of("v2"),
-                GTE, true, 1000000L);
+        assertEquals(estimation2, 1., 0.0001);
+        double estimation3 = stats.estimateDurationProb(EDGE, Optional.empty(),
+                LT, false, 75L);
+        assertEquals(estimation3, 0.75, 0.1);
+        double estimation4 = stats.estimateDurationProb(EDGE, Optional.empty(),
+                LTE, true, 75L);
+        assertEquals(estimation4, 0.75, 0.1);
+        assertTrue(estimation4 > estimation3);
+        double estimation5 = stats.estimateDurationProb(EDGE, Optional.of("edge"),
+                GT, false, 50L);
+        assertEquals(estimation5, 0.5, 0.05);
+        double estimation6 = stats.estimateDurationProb(EDGE, Optional.of("edge"),
+                GTE, true, 50L);
+        assertEquals(estimation6, 0.5, 0.05);
+        assertTrue(estimation6 > estimation5);
     }
 
     @Test
@@ -408,12 +418,13 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
         ArrayList<TemporalEdge> edgeList = new ArrayList<>();
         String edgeLabel = "edge";
         int numEdges = 100;
-        // identical tx and val times. From ranges from 0 to 100, to from 200 to 300 (all bounded)
+        // identical tx and val times.
+        // All bounded, length equally distributed from 0 to 100
         for(int i=0; i<numEdges; i++){
             TemporalEdge edge = new TemporalEdge();
             edge.setId(GradoopId.get());
             edge.setLabel(edgeLabel);
-            edge.setTransactionTime(new Tuple2<>((long) i, 200L+i));
+            edge.setTransactionTime(new Tuple2<>((long) i, (long)i+i));
             edge.setValidTime(edge.getTransactionTime());
             edgeList.add(edge);
         }
