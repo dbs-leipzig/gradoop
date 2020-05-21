@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest {
     @Test
     public void testFilterWithNoPredicates() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a]->()");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->()");
 
         TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
         Properties properties = Properties.create();
@@ -43,7 +44,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testFilterEdgesByProperties() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
 
         TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
         Properties properties = Properties.create();
@@ -70,7 +71,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testFilterEdgesByLabel() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
 
         TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
         TemporalEdge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
@@ -91,7 +92,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testFilterEdgesByTime() throws Exception {
-        CNF predicates = predicateFromQuery(
+        TemporalCNF predicates = predicateFromQuery(
                 "MATCH ()-[a]->() WHERE a.val_from.before(1970-01-01T00:00:01)");
 
         TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
@@ -115,7 +116,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testResultingEntryList() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
         Properties properties = Properties.create();
         properties.set("name", "Alice");
@@ -141,7 +142,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testProjectionOfAvailableValues() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
         Properties properties = Properties.create();
         properties.set("name", "Alice");
@@ -162,7 +163,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testProjectionOfMissingValues() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+        TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
         Properties properties = Properties.create();
         properties.set("name", "Alice");
@@ -184,7 +185,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     @Test
     public void testProjectLoop() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
+        TemporalCNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
 
         GradoopId a = GradoopId.get();
         TemporalEdge edge = new TemporalEdgeFactory().createEdge(a, a);

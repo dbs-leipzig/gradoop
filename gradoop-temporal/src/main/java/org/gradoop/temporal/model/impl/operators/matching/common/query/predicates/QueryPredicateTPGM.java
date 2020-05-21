@@ -1,7 +1,7 @@
-package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util;
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryPredicateTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans.AndPredicate;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans.NotPredicate;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans.OrPredicate;
@@ -14,17 +14,18 @@ import org.s1ck.gdl.model.predicates.booleans.Or;
 import org.s1ck.gdl.model.predicates.booleans.Xor;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 
+import java.io.Serializable;
+
 /**
- * Class for creating a {@link QueryPredicate} wrapper for a GDL {@link Predicate}
+ * Wrapps a Predicate
  */
-public class QueryPredicateFactory {
+public abstract class QueryPredicateTPGM implements Serializable {
+
 
     /**
-     * Create a wrapper for a GDL comparable
-     *
-     * @param predicate the GDL predicate to wrap
-     * @return wrapper for predicate
-     * @throws IllegalArgumentException if predicate is no GDL Predicate
+     * Generic wrapper function to createFrom a given predicate
+     * @param predicate the predicate to be warpped
+     * @return the wrapped predicate
      */
     public static QueryPredicateTPGM createFrom(Predicate predicate) {
         if (predicate.getClass() == And.class) {
@@ -45,5 +46,9 @@ public class QueryPredicateFactory {
             throw new IllegalArgumentException(predicate.getClass() + " is not a GDL Predicate");
         }
     }
-
+    /**
+     * Converts the predicate into Conjunctive Normal Form
+     * @return the predicate in CNF
+     */
+    public abstract TemporalCNF asCNF();
 }

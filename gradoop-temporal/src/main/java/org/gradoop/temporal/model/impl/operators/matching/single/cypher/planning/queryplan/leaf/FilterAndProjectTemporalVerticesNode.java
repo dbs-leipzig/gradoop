@@ -4,6 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalVertices;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
@@ -28,7 +29,7 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
     /**
      * Filter predicate that is applied on the input data set
      */
-    private CNF filterPredicate;
+    private TemporalCNF filterPredicate;
     /**
      * Property keys used for projection
      */
@@ -42,7 +43,7 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
      * @param projectionKeys property keys whose associated values are projected to the output
      */
     public FilterAndProjectTemporalVerticesNode(DataSet<TemporalVertex> vertices, String vertexVariable,
-                                        CNF filterPredicate, Set<String> projectionKeys) {
+                                                TemporalCNF filterPredicate, Set<String> projectionKeys) {
         this.vertices = vertices;
         this.vertexVariable = vertexVariable;
         this.filterPredicate = filterPredicate;
@@ -62,8 +63,8 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
      *
      * @return filter predicate
      */
-    public CNF getFilterPredicate() {
-        return new CNF(filterPredicate);
+    public TemporalCNF getFilterPredicate() {
+        return new TemporalCNF(filterPredicate);
     }
 
     /**

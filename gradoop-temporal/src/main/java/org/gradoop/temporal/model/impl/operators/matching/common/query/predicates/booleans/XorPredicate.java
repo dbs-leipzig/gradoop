@@ -2,6 +2,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryPredicateTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
@@ -12,12 +14,11 @@ import org.s1ck.gdl.model.predicates.booleans.Xor;
 import java.util.Objects;
 
 /**
- * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
- * Extension for temporal predicates
+ * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
  */
-public class XorPredicate extends org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.XorPredicate {
+public class XorPredicate extends QueryPredicateTPGM {
     /**
-     * Holds the wrapped predicate
+     * Holdes the wrapped predicate
      */
     private final Xor xor;
 
@@ -27,29 +28,38 @@ public class XorPredicate extends org.gradoop.flink.model.impl.operators.matchin
      * @param xor The wrapped xor predicate
      */
     public XorPredicate(Xor xor) {
-        super(xor);
         this.xor = xor;
     }
 
-    @Override
-    public CNF asCNF() {
+    /**
+     * Converts the predicate into conjunctive normal form
+     *
+     * @return predicate in cnf
+     */
+    public TemporalCNF asCNF() {
         Predicate lhs = xor.getArguments()[0];
         Predicate rhs = xor.getArguments()[1];
 
-        QueryPredicate wrapper = QueryPredicateFactory.createFrom(
+        QueryPredicateTPGM wrapper = QueryPredicateFactory.createFrom(
                 new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs))
         );
 
         return wrapper.asCNF();
     }
 
-    @Override
-    public QueryPredicate getLhs() {
+    /**
+     * Returns the wrapped left hand side predicate
+     * @return wrapped left hand side predicate
+     */
+    public QueryPredicateTPGM getLhs() {
         return QueryPredicateFactory.createFrom(xor.getArguments()[0]);
     }
 
-    @Override
-    public QueryPredicate getRhs() {
+    /**
+     * Returns the wrapped right hand side predicate
+     * @return wrapped right hand side predicate
+     */
+    public QueryPredicateTPGM getRhs() {
         return QueryPredicateFactory.createFrom(xor.getArguments()[1]);
     }
 

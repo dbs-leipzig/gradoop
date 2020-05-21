@@ -7,6 +7,7 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.Em
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
+import org.s1ck.gdl.model.comparables.time.TimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.util.HashSet;
@@ -122,5 +123,10 @@ public class TimeSelectorComparable extends TemporalComparable {
     @Override
     public boolean isGlobal() {
         return timeSelector.isGlobal();
+    }
+
+    @Override
+    public TimePoint getWrappedComparable() {
+        return timeSelector;
     }
 }

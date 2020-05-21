@@ -4,6 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class FilterTemporalEmbeddingsTest extends PhysicalTPGMOperatorTest {
     @Test
     public void testFilterEmbeddings() throws Exception {
-        CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
+        TemporalCNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
         PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(23)};
         PropertyValue[] propertiesB = new PropertyValue[]{PropertyValue.create(42)};
@@ -42,7 +43,7 @@ public class FilterTemporalEmbeddingsTest extends PhysicalTPGMOperatorTest {
 
     @Test
     public void testKeepEmbeddings() throws Exception {
-        CNF predicates = predicateFromQuery(
+        TemporalCNF predicates = predicateFromQuery(
                 "MATCH (a),(b) WHERE a.age > b.age AND a.tx.overlaps(b.val)");
 
         PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};
@@ -71,7 +72,7 @@ public class FilterTemporalEmbeddingsTest extends PhysicalTPGMOperatorTest {
 
     @Test
     public void testDontAlterEmbeddingTPGM() throws Exception {
-        CNF predicates = predicateFromQuery(
+        TemporalCNF predicates = predicateFromQuery(
                 "MATCH (a),(b) WHERE a.age > b.age AND a.tx.overlaps(b.val)");
 
         PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};

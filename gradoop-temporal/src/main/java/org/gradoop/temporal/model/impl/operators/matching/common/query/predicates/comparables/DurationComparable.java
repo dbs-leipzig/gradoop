@@ -8,6 +8,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.Duration;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
+import org.s1ck.gdl.model.comparables.time.TimePoint;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -73,6 +74,11 @@ public class DurationComparable extends TemporalComparable {
     @Override
     public boolean isGlobal() {
         return from.isGlobal() || to.isGlobal();
+    }
+
+    @Override
+    public TimePoint getWrappedComparable() {
+        return duration;
     }
 
     @Override

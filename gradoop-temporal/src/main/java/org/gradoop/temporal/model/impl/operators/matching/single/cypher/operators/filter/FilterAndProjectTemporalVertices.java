@@ -1,5 +1,6 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter;
 
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperator;
 
 import org.apache.flink.api.java.DataSet;
@@ -34,7 +35,7 @@ public class FilterAndProjectTemporalVertices implements PhysicalTPGMOperator {
     /**
      * Predicates in conjunctive normal form
      */
-    private final CNF predicates;
+    private final TemporalCNF predicates;
     /**
      * Property keys used for projection
      */
@@ -52,7 +53,7 @@ public class FilterAndProjectTemporalVertices implements PhysicalTPGMOperator {
      * @param predicates Predicates used to filter vertices
      * @param projectionPropertyKeys Property keys used for projection
      */
-    public FilterAndProjectTemporalVertices(DataSet<TemporalVertex> input, CNF predicates,
+    public FilterAndProjectTemporalVertices(DataSet<TemporalVertex> input, TemporalCNF predicates,
                                     List<String> projectionPropertyKeys) {
         this.input = input;
         this.predicates = predicates;

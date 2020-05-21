@@ -4,6 +4,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalEdges;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
@@ -39,7 +40,7 @@ implements FilterNode, ProjectionNode {
     /**
      * Filter predicate that is applied on the input data set
      */
-    private CNF filterPredicate;
+    private TemporalCNF filterPredicate;
     /**
      * Property keys used for projection
      */
@@ -62,7 +63,7 @@ implements FilterNode, ProjectionNode {
      */
     public FilterAndProjectTemporalEdgesNode(DataSet<TemporalEdge> edges,
                                              String sourceVariable, String edgeVariable, String targetVariable,
-                                             CNF filterPredicate, Set<String> projectionKeys, boolean isPath) {
+                                             TemporalCNF filterPredicate, Set<String> projectionKeys, boolean isPath) {
         this.edges = edges;
         this.sourceVariable = sourceVariable;
         this.edgeVariable = edgeVariable;
@@ -89,8 +90,8 @@ implements FilterNode, ProjectionNode {
      *
      * @return filter predicate
      */
-    public CNF getFilterPredicate() {
-        return new CNF(filterPredicate);
+    public TemporalCNF getFilterPredicate() {
+        return new TemporalCNF(filterPredicate);
     }
 
     /**

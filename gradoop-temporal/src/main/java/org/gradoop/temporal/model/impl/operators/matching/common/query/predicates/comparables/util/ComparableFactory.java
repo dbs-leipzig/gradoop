@@ -1,9 +1,9 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.*;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
@@ -12,7 +12,7 @@ import org.s1ck.gdl.model.comparables.PropertySelector;
 import org.s1ck.gdl.model.comparables.time.*;
 
 /**
- * Class for creating a {@link QueryComparable} wrapper for a GDL {@link ComparableExpression}
+ * Class for creating a {@link QueryComparableTPGM} wrapper for a GDL {@link ComparableExpression}
  */
 public class ComparableFactory {
 
@@ -23,7 +23,7 @@ public class ComparableFactory {
      * @return wrapper for expression
      * @throws IllegalArgumentException if expression is no GDL ComparableExpression
      */
-    public static QueryComparable createComparableFrom(ComparableExpression expression){
+    public static QueryComparableTPGM createComparableFrom(ComparableExpression expression){
         if (expression.getClass() == Literal.class) {
             return new LiteralComparable((Literal) expression);
         } else if (expression.getClass() == PropertySelector.class) {

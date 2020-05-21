@@ -2,8 +2,10 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
+import org.s1ck.gdl.model.comparables.time.TimePoint;
 
-public abstract class TemporalComparable extends QueryComparable {
+public abstract class TemporalComparable extends QueryComparableTPGM {
 
     /**
      * checks whether the comparable contains a global time selector.
@@ -16,4 +18,10 @@ public abstract class TemporalComparable extends QueryComparable {
      * be no longer considered.
      */
     public static final PropertyValue INVALID_GLOBAL = PropertyValue.create("___INVALIDGLOBAL");
+
+    /**
+     * Returns the wrapped time point
+     * @return wrapped time point
+     */
+    public abstract TimePoint getWrappedComparable();
 }

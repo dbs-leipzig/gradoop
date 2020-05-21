@@ -6,6 +6,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans.AndPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
@@ -30,7 +31,7 @@ public class FilterTemporalVertexTest {
     @Test
     public void testFilterTemporalVertex(){
         String query = "MATCH (a) WHERE (1970-01-01.before(a.tx_from)) AND a.prop=\"test\"";
-        CNF cnf  = new TemporalQueryHandler(query).getPredicates();
+        TemporalCNF cnf  = new TemporalQueryHandler(query).getPredicates();
 
         FilterTemporalVertex filter = new FilterTemporalVertex(cnf);
 

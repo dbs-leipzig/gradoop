@@ -2,6 +2,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 
@@ -47,7 +48,7 @@ public class PlanTableEntry {
     /**
      * Remaining predicates
      */
-    private final CNF predicates;
+    private final TemporalCNF predicates;
     /**
      * The estimator containing the query plan.
      */
@@ -65,7 +66,7 @@ public class PlanTableEntry {
      * @param predicates predicates not covered by this plan
      * @param estimator cardinality estimator
      */
-    public PlanTableEntry(Type type, Set<String> processedVars, CNF predicates,
+    public PlanTableEntry(Type type, Set<String> processedVars, TemporalCNF predicates,
                           QueryPlanEstimator estimator) {
         this.type = type;
         this.processedVars = processedVars;
@@ -87,7 +88,7 @@ public class PlanTableEntry {
      *
      * @return remaining predicates
      */
-    public CNF getPredicates() {
+    public TemporalCNF getPredicates() {
         return predicates;
     }
 

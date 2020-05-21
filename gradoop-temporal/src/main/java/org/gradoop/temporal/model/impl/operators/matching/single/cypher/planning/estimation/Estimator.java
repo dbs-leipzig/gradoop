@@ -11,7 +11,7 @@ public abstract class Estimator {
     /**
      * Query handler to get information about query elements
      */
-    private final QueryHandler queryHandler;
+    private final TemporalQueryHandler queryHandler;
     /**
      * Statistics about the search graph
      */
@@ -28,7 +28,7 @@ public abstract class Estimator {
         this.graphStatistics = graphStatistics;
     }
 
-    public QueryHandler getQueryHandler() {
+    public TemporalQueryHandler getQueryHandler() {
         return queryHandler;
     }
 

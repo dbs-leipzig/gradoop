@@ -2,6 +2,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 
@@ -12,7 +13,7 @@ public class FilterTemporalEmbedding extends RichFilterFunction<EmbeddingTPGM> {
     /**
      * Predicates used for filtering
      */
-    private final CNF predicates;
+    private final TemporalCNF predicates;
     /**
      * Mapping of variables names to embedding column
      */
@@ -24,7 +25,7 @@ public class FilterTemporalEmbedding extends RichFilterFunction<EmbeddingTPGM> {
      * @param predicates predicates used for filtering
      * @param metaData mapping of variable names to embedding column
      */
-    public FilterTemporalEmbedding(CNF predicates, EmbeddingTPGMMetaData metaData) {
+    public FilterTemporalEmbedding(TemporalCNF predicates, EmbeddingTPGMMetaData metaData) {
         this.predicates = predicates;
         this.metaData = metaData;
     }

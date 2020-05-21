@@ -4,11 +4,13 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.util.GradoopConstants;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
@@ -144,9 +146,9 @@ public class GreedyPlanner<
     private void createVertexPlans(PlanTable planTable) {
         for (Vertex vertex : queryHandler.getVertices()) {
             String vertexVariable = vertex.getVariable();
-            CNF allPredicates = queryHandler.getPredicates();
+            TemporalCNF allPredicates = queryHandler.getPredicates();
 
-            CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
+            TemporalCNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
             Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
             DataSet<TemporalVertex> vertices =
@@ -175,9 +177,9 @@ public class GreedyPlanner<
             String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
             String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
 
-            CNF allPredicates = queryHandler.getPredicates();
+            TemporalCNF allPredicates = queryHandler.getPredicates();
 
-            CNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
+            TemporalCNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
 
             Set<String> projectionKeys = allPredicates.getPropertyKeys(edgeVariable);
 
@@ -288,7 +290,7 @@ public class GreedyPlanner<
         processedVariables.addAll(rightEntry.getProcessedVariables());
         // create resulting predicates
         // TODO: this might be moved to the join/expand node in issue #510
-        CNF predicates = mergePredicates(leftEntry, rightEntry);
+        TemporalCNF predicates = mergePredicates(leftEntry, rightEntry);
 
         return new PlanTableEntry(GRAPH, processedVariables, predicates,
                 new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
@@ -313,7 +315,8 @@ public class GreedyPlanner<
         Vertex sourceVertex = queryHandler.getVertexById(queryEdge.getSourceVertexId());
         Vertex targetVertex = queryHandler.getVertexById(queryEdge.getTargetVertexId());
 
-        ExpansionCriteria criteria = queryHandler.getExpansionCondition(pathVariable);
+        // TODO replace with query handler method, when implemented
+        ExpansionCriteria criteria = new ExpansionCriteria();
 
         int lowerBound = queryEdge.getLowerBound();
         int upperBound = queryEdge.getUpperBound();
@@ -345,8 +348,8 @@ public class GreedyPlanner<
 
         for (PlanTableEntry entry : currentTable) {
             Set<String> variables = Sets.newHashSet(entry.getProcessedVariables());
-            CNF predicates = entry.getPredicates();
-            CNF subCNF = predicates.removeSubCNF(variables);
+            TemporalCNF predicates = entry.getPredicates();
+            TemporalCNF subCNF = predicates.removeSubCNF(variables);
             if (subCNF.size() > 0) {
                 FilterTemporalEmbeddingsNode node = new FilterTemporalEmbeddingsNode(
                         entry.getQueryPlan().getRoot(), subCNF);
@@ -413,7 +416,7 @@ public class GreedyPlanner<
             PlanTableEntry leftEntry = currentTable.get(i);
             for (int j = i + 1; j < currentTable.size(); j++) {
                 PlanTableEntry rightEntry = currentTable.get(j);
-                CNF joinPredicate = getJoinPredicate(leftEntry, rightEntry);
+                TemporalCNF joinPredicate = getJoinPredicate(leftEntry, rightEntry);
                 if (joinPredicate.size() > 0) {
                     newTable.add(createValueJoinEntry(leftEntry, rightEntry, joinPredicate));
                 } else {
@@ -432,17 +435,17 @@ public class GreedyPlanner<
      * @param rightEntry second entry
      * @return variables that are available in both input entries
      */
-    private CNF getJoinPredicate(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
+    private TemporalCNF getJoinPredicate(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
         Set<String> allVariables = leftEntry.getAllVariables();
         allVariables.addAll(rightEntry.getAllVariables());
 
-        CNF leftPredicates = new CNF(leftEntry.getPredicates());
-        CNF rightPredicates = new CNF(rightEntry.getPredicates());
+        TemporalCNF leftPredicates = new TemporalCNF(leftEntry.getPredicates());
+        TemporalCNF rightPredicates = new TemporalCNF(rightEntry.getPredicates());
         leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
         rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
-        CNF predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);
+        TemporalCNF predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);
 
-        return new CNF(
+        return new TemporalCNF(
                 predicates.getPredicates()
                         .stream()
                         .filter(p ->
@@ -470,7 +473,7 @@ public class GreedyPlanner<
         Set<String> processedVariables = leftEntry.getProcessedVariables();
         processedVariables.addAll(rightEntry.getProcessedVariables());
 
-        CNF predicates = mergePredicates(leftEntry, rightEntry);
+        TemporalCNF predicates = mergePredicates(leftEntry, rightEntry);
 
         return new PlanTableEntry(
                 GRAPH,
@@ -490,7 +493,8 @@ public class GreedyPlanner<
      * @return new value join node
      */
     private PlanTableEntry createValueJoinEntry(PlanTableEntry leftEntry,
-                                                PlanTableEntry rightEntry, CNF joinPredicate) {
+                                                PlanTableEntry rightEntry,
+                                                TemporalCNF joinPredicate) {
 
         List<Pair<String, String>> leftProperties = new ArrayList<>();
         List<Pair<String, String>> rightProperties = new ArrayList<>();
@@ -498,8 +502,8 @@ public class GreedyPlanner<
         List<Pair<String, String>> leftTimes = new ArrayList<>();
         List<Pair<String, String>> rightTimes = new ArrayList<>();
 
-        for (CNFElement e : joinPredicate.getPredicates()) {
-            ComparisonExpression comparison = e.getPredicates().get(0);
+        for (CNFElementTPGM e : joinPredicate.getPredicates()) {
+            ComparisonExpressionTPGM comparison = e.getPredicates().get(0);
 
             Pair<String, String> joinExpression = extractJoinExpression(comparison.getLhs());
             if (leftEntry.getAllVariables().contains(joinExpression.getKey())) {
@@ -547,7 +551,7 @@ public class GreedyPlanner<
         Set<String> processedVariables = leftEntry.getProcessedVariables();
         processedVariables.addAll(rightEntry.getProcessedVariables());
 
-        CNF predicates = mergePredicates(leftEntry, rightEntry);
+        TemporalCNF predicates = mergePredicates(leftEntry, rightEntry);
 
         return new PlanTableEntry(
                 GRAPH,
@@ -575,7 +579,7 @@ public class GreedyPlanner<
      * @param comparable query comparable
      * @return join property
      */
-    private Pair<String, String> extractJoinExpression(QueryComparable comparable) {
+    private Pair<String, String> extractJoinExpression(QueryComparableTPGM comparable) {
         if (comparable instanceof PropertySelectorComparable) {
             PropertySelectorComparable propertySelector = (PropertySelectorComparable) comparable;
             return Pair.of(propertySelector.getVariable(), propertySelector.getPropertyKey());
@@ -597,9 +601,9 @@ public class GreedyPlanner<
      * @param rightEntry right side plan table entry
      * @return Merged predicates
      */
-    private CNF mergePredicates(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
-        CNF leftPredicates = new CNF(leftEntry.getPredicates());
-        CNF rightPredicates = new CNF(rightEntry.getPredicates());
+    private TemporalCNF mergePredicates(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
+        TemporalCNF leftPredicates = new TemporalCNF(leftEntry.getPredicates());
+        TemporalCNF rightPredicates = new TemporalCNF(rightEntry.getPredicates());
         leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());
         rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
         return leftPredicates.and(rightPredicates);

@@ -5,6 +5,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
@@ -26,7 +27,7 @@ public class MaxTimePointComparable extends TemporalComparable {
     /**
      * Wrappers for the arguments
      */
-    ArrayList<QueryComparable> args;
+    ArrayList<QueryComparableTPGM> args;
 
     /**
      * Creates a new wrapper.
@@ -44,7 +45,7 @@ public class MaxTimePointComparable extends TemporalComparable {
     @Override
     public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
         long max = Long.MIN_VALUE;
-        for(QueryComparable arg: args){
+        for(QueryComparableTPGM arg: args){
             long argValue = arg.evaluate(embedding, metaData).getLong();
             if(argValue > max){
                 max = argValue;
@@ -61,7 +62,7 @@ public class MaxTimePointComparable extends TemporalComparable {
                     " a single GraphElement!");
         }
         long max = Long.MIN_VALUE;
-        for(QueryComparable arg: args){
+        for(QueryComparableTPGM arg: args){
             long argValue = arg.evaluate(element).getLong();
             if(argValue > max){
                 max = argValue;
@@ -89,9 +90,9 @@ public class MaxTimePointComparable extends TemporalComparable {
             return false;
         }
 
-        for(QueryComparable arg: args){
+        for(QueryComparableTPGM arg: args){
             boolean foundMatch = false;
-            for(QueryComparable candidate: that.args){
+            for(QueryComparableTPGM candidate: that.args){
                 if(arg.equals(candidate)){
                     foundMatch= true;
                 }
@@ -111,6 +112,11 @@ public class MaxTimePointComparable extends TemporalComparable {
     @Override
     public boolean isGlobal() {
         return maxTimePoint.isGlobal();
+    }
+
+    @Override
+    public TimePoint getWrappedComparable() {
+        return maxTimePoint;
     }
 }
 

@@ -5,6 +5,7 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -17,7 +18,7 @@ public class FilterTemporalEdgeTest {
     @Test
     public void testFilterTemporalEdge(){
         String query = "MATCH (a)-[e]->(b) WHERE (e.val_to.before(2020-04-11)) AND e.prop=\"test\"";
-        CNF cnf  = new TemporalQueryHandler(query).getPredicates().getSubCNF("e");
+        TemporalCNF cnf  = new TemporalQueryHandler(query).getPredicates().getSubCNF("e");
 
         FilterTemporalEdge filter = new FilterTemporalEdge(cnf);
 

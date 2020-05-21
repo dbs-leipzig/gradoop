@@ -44,7 +44,7 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
 //            e.printStackTrace();
 //            return null;
 //        }
-        data.addAll(new HomomorphismFailedData().getData());
+        //data.addAll(new HomomorphismFailedData().getData());
         return data;
     }
 

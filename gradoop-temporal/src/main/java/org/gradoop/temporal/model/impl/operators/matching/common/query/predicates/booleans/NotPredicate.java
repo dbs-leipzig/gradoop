@@ -1,7 +1,21 @@
-package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans;
-
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans;/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryPredicateTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
@@ -15,10 +29,10 @@ import org.s1ck.gdl.utils.Comparator;
 import java.util.Objects;
 
 /**
- * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
- * Extension for temporal predicates
+ * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
  */
-public class NotPredicate extends org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.NotPredicate {
+public class NotPredicate extends QueryPredicateTPGM {
+
     /**
      * Holds the wrapped not predicate
      */
@@ -29,17 +43,20 @@ public class NotPredicate extends org.gradoop.flink.model.impl.operators.matchin
      * @param not the wrapped not predicate
      */
     public NotPredicate(Not not) {
-        super(not);
         this.not = not;
     }
 
+    /**
+     * Converts the predicate into conjunctive normal form
+     * @return predicate in cnf
+     */
     @Override
-    public CNF asCNF() {
+    public TemporalCNF asCNF() {
         Predicate expression = not.getArguments()[0];
 
         if (expression.getClass() == Comparison.class) {
-            CNF cnf = new CNF();
-            CNFElement cnfElement = new CNFElement();
+            TemporalCNF cnf = new TemporalCNF();
+            CNFElementTPGM cnfElement = new CNFElementTPGM();
             cnfElement.addPredicate(new ComparisonExpressionTPGM(invertComparison((Comparison) expression)));
             cnf.addPredicate(cnfElement);
             return cnf;

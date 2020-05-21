@@ -7,6 +7,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -29,7 +30,7 @@ public class FilterAndProjectTemporalVerticesTest {
     public void testMetaDataInitialization() throws Exception {
         String variable = "a";
         FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(
-                null, variable, new CNF(), Sets.newHashSet());
+                null, variable, new TemporalCNF(), Sets.newHashSet());
 
         EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
         assertThat(embeddingMetaData.getEntryColumn(variable), is(0));
@@ -77,7 +78,7 @@ public class FilterAndProjectTemporalVerticesTest {
         String query = "MATCH (n) WHERE n.foo = 23 AND n.tx_from.before(1970-01-01T00:00:01) " +
                 "AND n.tx_to.before(2020-01-01)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-        CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("n"));
+        TemporalCNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("n"));
         Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("n");
 
         FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(

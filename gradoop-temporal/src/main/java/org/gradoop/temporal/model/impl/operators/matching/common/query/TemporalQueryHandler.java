@@ -1,17 +1,24 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
+import org.s1ck.gdl.model.Edge;
+import org.s1ck.gdl.model.Vertex;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.Predicate;
@@ -20,6 +27,7 @@ import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +35,7 @@ import java.util.stream.Collectors;
  * processing during graph pattern matching.
  * Extension for temporal queries
  */
-public class TemporalQueryHandler extends QueryHandler {
+public class TemporalQueryHandler{
     /**
      * GDL handler
      */
@@ -42,6 +50,53 @@ public class TemporalQueryHandler extends QueryHandler {
      * variable name in a global time selector in the query
      */
     public static final String GLOBAL_SELECTOR = TimeSelector.GLOBAL_SELECTOR;
+
+    /**
+     * Graph diameter
+     */
+    private Integer diameter;
+    /**
+     * Graph radius
+     */
+    private Integer radius;
+    /**
+     * Graph components
+     */
+    private Map<Integer, Set<String>> components;
+    /**
+     * Cache: vId --> Vertex with Id == vId
+     */
+    private Map<Long, Vertex> idToVertexCache;
+    /**
+     * Cache: eId --> Edge with Id == eId
+     */
+    private Map<Long, Edge> idToEdgeCache;
+    /**
+     * Cache: l -> Vertices with Label == l
+     */
+    private Map<String, Set<Vertex>> labelToVertexCache;
+    /**
+     * Cache: l -> Edges with Label = l
+     */
+    private Map<String, Set<Edge>> labelToEdgeCache;
+    /**
+     * Cache: vId -> Edges with Source Id == vId
+     */
+    private Map<Long, Set<Edge>> sourceIdToEdgeCache;
+    /**
+     * Cache: vId -> Edges with Target Id == vId
+     */
+    private Map<Long, Set<Edge>> targetIdToEdgeCache;
+
+    /**
+     * The edge cache of the GDL handler.
+     */
+    private Map<String, Edge> edgeCache;
+
+    /**
+     * The vertex cache of the GDL handler.
+     */
+    private Map<String, Vertex> vertexCache;
 
     /**
      * Creates a new query handler that postprocesses the query, i.e. reduces it to simple comparisons.
@@ -60,7 +115,6 @@ public class TemporalQueryHandler extends QueryHandler {
      *                     comparisons
      */
     public TemporalQueryHandler(String gdlString, boolean processQuery){
-        super(gdlString);
         now = new TimeLiteral("now");
         gdlHandler = new GDLHandler.Builder()
                 .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
@@ -69,10 +123,62 @@ public class TemporalQueryHandler extends QueryHandler {
                 .setErrorStrategy(new BailSyntaxErrorStrategy())
                 .setProcessQuery(processQuery)
                 .buildFromString(gdlString);
+        edgeCache = gdlHandler.getEdgeCache(true, true);
+        vertexCache = gdlHandler.getVertexCache(true, true);
     }
 
-    @Override
-    public CNF getPredicates() {
+    /**
+     * Returns all vertices in the query.
+     *
+     * @return vertices
+     */
+    public Collection<Vertex> getVertices() {
+        return gdlHandler.getVertices();
+    }
+
+    /**
+     * Returns all edges in the query.
+     *
+     * @return edges
+     */
+    public Collection<Edge> getEdges() {
+        return gdlHandler.getEdges();
+    }
+
+    /**
+     * Returns all variables contained in the pattern.
+     *
+     * @return all query variables
+     */
+    public Set<String> getAllVariables() {
+        return Sets.union(getVertexVariables(), getEdgeVariables());
+    }
+
+    /**
+     * Returns all vertex variables contained in the pattern.
+     *
+     * @return all vertex variables
+     */
+    public Set<String> getVertexVariables() {
+        return vertexCache.keySet();
+    }
+
+    /**
+     * Returns all edge variables contained in the pattern.
+     *
+     * @return all edge variables
+     */
+    public Set<String> getEdgeVariables() {
+        return edgeCache.keySet();
+    }
+
+    /**
+     * Returns all available predicates in Conjunctive Normal Form {@link TemporalCNF}. If there are no
+     * predicated defined in the query, a CNF containing zero predicates is returned.
+     *
+     * @return predicates
+     */
+    public TemporalCNF getPredicates() {
         System.out.println(gdlHandler.getPredicates());
         if (gdlHandler.getPredicates().isPresent()) {
             Predicate predicate = gdlHandler.getPredicates().get();
@@ -113,10 +219,9 @@ public class TemporalQueryHandler extends QueryHandler {
      * @param element the disjunction to check
      * @return true iff the disjunction contains a global time selector
      */
-    private boolean isGlobal(CNFElement element){
-        for(ComparisonExpression comp: element.getPredicates()){
-            comp = (ComparisonExpressionTPGM) comp;
-            if(!((ComparisonExpressionTPGM) comp).isTemporal()){
+    private boolean isGlobal(CNFElementTPGM element){
+        for(ComparisonExpressionTPGM comp: element.getPredicates()){
+            if(!comp.isTemporal()){
                 return false;
             }
             else{
@@ -196,12 +301,185 @@ public class TemporalQueryHandler extends QueryHandler {
     }
 
     /**
-     * Returns the expansion conditions for a path.
-     * @param startVariable
-     * @return
+     * Checks if the graph returns a single vertex and no edges (no loops).
+     *
+     * @return true, if single vertex graph
      */
-    public ExpansionCriteria getExpansionCondition(String startVariable) {
-        //TODO implement
-        return new ExpansionCriteria();
+    public boolean isSingleVertexGraph() {
+        return getVertexCount() == 1 && getEdgeCount() == 0;
     }
+
+    /**
+     * Returns the number of vertices in the query graph.
+     *
+     * @return vertex count
+     */
+    public int getVertexCount() {
+        return getVertices().size();
+    }
+
+    /**
+     * Returns the number of edges in the query graph.
+     *
+     * @return edge count
+     */
+    public int getEdgeCount() {
+        return getEdges().size();
+    }
+
+    /**
+     * Returns the vertex associated with the given variable or {@code null} if the variable does
+     * not exist. The variable can be either user-defined or auto-generated.
+     *
+     * @param variable query vertex variable
+     * @return vertex or {@code null}
+     */
+    public Vertex getVertexByVariable(String variable) {
+        return vertexCache.get(variable);
+    }
+
+
+    /**
+     * Returns the Edge associated with the given variable or {@code null} if the variable does
+     * not exist. The variable can be either user-defined or auto-generated.
+     *
+     * @param variable query edge variable
+     * @return edge or {@code null}
+     */
+    public Edge getEdgeByVariable(String variable) {
+        return edgeCache.get(variable);
+    }
+
+    /**
+     * Returns the vertex associated with the given id or {@code null} if the
+     * vertex does not exist.
+     *
+     * @param id vertex id
+     * @return vertex or {@code null}
+     */
+    public Vertex getVertexById(Long id) {
+        if (idToVertexCache == null) {
+            idToVertexCache = initCache(getVertices(), Vertex::getId, Function.identity());
+        }
+        return idToVertexCache.get(id);
+    }
+
+    /**
+     * Returns the edge associated with the given id or {@code null} if the
+     * edge does not exist.
+     *
+     * @param id edge id
+     * @return edge or {@code null}
+     */
+    public Edge getEdgeById(Long id) {
+        if (idToEdgeCache == null) {
+            idToEdgeCache = initCache(getEdges(), Edge::getId, Function.identity());
+        }
+        return idToEdgeCache.get(id);
+    }
+
+    /**
+     * Initializes a cache for the given data where every key maps to exactly one element (injective).
+     * Key selector will be called on every element to extract the caches key.
+     * Value selector will be called on every element to extract the value.
+     * Returns a cache of type
+     * KT -> VT
+     *
+     * @param elements elements the cache will be build from
+     * @param keySelector key selector function extraction cache keys from elements
+     * @param valueSelector value selector function extraction cache values from elements
+     * @param <EL> the element type
+     * @param <KT> the cache key type
+     * @param <VT> the cache value type
+     * @return cache KT -> VT
+     */
+    private <EL, KT, VT> Map<KT, VT> initCache(Collection<EL> elements,
+                                               Function<EL, KT> keySelector, Function<EL, VT> valueSelector) {
+
+        return elements.stream().collect(Collectors.toMap(keySelector, valueSelector));
+    }
+
+    /**
+     * Returns a mapping from edge variable to the corresponding source and target variables.
+     *
+     * @return mapping from edge variable to source/target variable
+     */
+    public Map<String, Pair<String, String>> getSourceTargetVariables() {
+        return getEdges().stream()
+                .map(e -> Pair.of(e.getVariable(), Pair
+                        .of(getVertexById(e.getSourceVertexId()).getVariable(),
+                                getVertexById(e.getTargetVertexId()).getVariable())))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    }
+
+    /**
+     * Update variable names of vertices and edges with a generated variable name.
+     * This will also update the vertex- and edge-caches of this handler.
+     *
+     * @param renameFunction The renaming function, mapping old to new variable names.
+     */
+    public void updateGeneratedVariableNames(Function<String, String> renameFunction) {
+        Set<String> generatedEdgeVariables = gdlHandler.getEdgeCache(false, true).keySet();
+        Set<String> generatedVertexVariables = gdlHandler.getVertexCache(false, true).keySet();
+        Map<String, Vertex> newVertexCache = new HashMap<>();
+        Map<String, Edge> newEdgeCache = new HashMap<>();
+        // Update vertices.
+        for (Vertex vertex : getVertices()) {
+            final String variable = vertex.getVariable();
+            if (generatedVertexVariables.contains(variable)) {
+                vertex.setVariable(renameFunction.apply(variable));
+            }
+            newVertexCache.put(vertex.getVariable(), vertex);
+        }
+        // Update edges.
+        for (Edge edge : getEdges()) {
+            final String variable = edge.getVariable();
+            if (generatedEdgeVariables.contains(variable)) {
+                edge.setVariable(renameFunction.apply(variable));
+            }
+            newEdgeCache.put(edge.getVariable(), edge);
+        }
+        vertexCache = Collections.unmodifiableMap(newVertexCache);
+        edgeCache = Collections.unmodifiableMap(newEdgeCache);
+    }
+
+    /**
+     * Returns a mapping between the given variables (if existent) and the corresponding element
+     * label.
+     *
+     * @param variables query variables
+     * @return mapping between existing variables and their corresponding label
+     */
+    public Map<String, String> getLabelsForVariables(Collection<String> variables) {
+        return variables.stream()
+                .filter(var -> isEdge(var) || isVertex(var))
+                .map(var -> {
+                    if (isEdge(var)) {
+                        return Pair.of(var, getEdgeByVariable(var).getLabel());
+                    } else {
+                        return Pair.of(var, getVertexByVariable(var).getLabel());
+                    }
+                }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    }
+
+    /**
+     * Checks if the given variable points to a vertex.
+     *
+     * @param variable the elements variable
+     * @return True if the variable points to a vertex
+     */
+    public boolean isVertex(String variable) {
+        return vertexCache.containsKey(variable);
+    }
+
+    /**
+     * Checks if the given variable points to an edge.
+     *
+     * @param variable the elements variable
+     * @return True if the variable points to an edge
+     */
+    public boolean isEdge(String variable) {
+        return edgeCache.containsKey(variable);
+    }
+
 }

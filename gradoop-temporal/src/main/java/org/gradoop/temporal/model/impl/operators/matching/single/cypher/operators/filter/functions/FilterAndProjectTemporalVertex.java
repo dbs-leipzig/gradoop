@@ -3,6 +3,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -18,7 +19,7 @@ public class FilterAndProjectTemporalVertex extends
     /**
      * Predicates used for filtering
      */
-    private final CNF predicates;
+    private final TemporalCNF predicates;
     /**
      * Property keys used for value projection
      */
@@ -30,7 +31,7 @@ public class FilterAndProjectTemporalVertex extends
      * @param predicates predicates used for filtering
      * @param projectionPropertyKeys property keys that will be used for projection
      */
-    public FilterAndProjectTemporalVertex(CNF predicates, List<String> projectionPropertyKeys) {
+    public FilterAndProjectTemporalVertex(TemporalCNF predicates, List<String> projectionPropertyKeys) {
         System.out.println("FilterAndProjectTemporalVertex predicates: "+predicates);
         this.predicates = predicates;
         this.projectionPropertyKeys = projectionPropertyKeys;

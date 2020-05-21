@@ -1,6 +1,7 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter;
 
 
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperator;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -22,7 +23,7 @@ public class FilterTemporalEmbeddings implements PhysicalTPGMOperator {
     /**
      * Predicates in conjunctive normal form
      */
-    private CNF predicates;
+    private TemporalCNF predicates;
     /**
      * Maps variable names to embedding entries;
      */
@@ -39,7 +40,7 @@ public class FilterTemporalEmbeddings implements PhysicalTPGMOperator {
      * @param predicates Predicates to used for filtering
      * @param metaData Maps variable names to embedding entries
      */
-    public FilterTemporalEmbeddings(DataSet<EmbeddingTPGM> input, CNF predicates,
+    public FilterTemporalEmbeddings(DataSet<EmbeddingTPGM> input, TemporalCNF predicates,
                                     EmbeddingTPGMMetaData metaData) {
         this.input = input;
         this.predicates = predicates;

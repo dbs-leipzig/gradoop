@@ -5,6 +5,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.s1ck.gdl.model.comparables.time.TimeConstant;
+import org.s1ck.gdl.model.comparables.time.TimePoint;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +39,11 @@ public class TimeConstantComparable extends TemporalComparable {
     @Override
     public boolean isGlobal() {
         return false;
+    }
+
+    @Override
+    public TimePoint getWrappedComparable() {
+        return constant;
     }
 
     @Override

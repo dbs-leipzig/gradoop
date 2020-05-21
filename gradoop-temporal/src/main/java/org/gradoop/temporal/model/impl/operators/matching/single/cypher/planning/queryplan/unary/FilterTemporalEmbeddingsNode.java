@@ -3,6 +3,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterTemporalEmbeddings;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
@@ -16,14 +17,14 @@ public class FilterTemporalEmbeddingsNode extends UnaryNode implements FilterNod
     /**
      * Filter predicate that is applied on the embedding
      */
-    private CNF filterPredicate;
+    private TemporalCNF filterPredicate;
     /**
      * Creates a new node.
      *
      * @param childNode input plan node
      * @param filterPredicate filter predicate to be applied on embeddings
      */
-    public FilterTemporalEmbeddingsNode(PlanNode childNode, CNF filterPredicate) {
+    public FilterTemporalEmbeddingsNode(PlanNode childNode, TemporalCNF filterPredicate) {
         super(childNode);
         this.filterPredicate = filterPredicate;
     }
@@ -41,8 +42,8 @@ public class FilterTemporalEmbeddingsNode extends UnaryNode implements FilterNod
      *
      * @return filter predicate
      */
-    public CNF getFilterPredicate() {
-        return new CNF(filterPredicate);
+    public TemporalCNF getFilterPredicate() {
+        return new TemporalCNF(filterPredicate);
     }
 
     @Override

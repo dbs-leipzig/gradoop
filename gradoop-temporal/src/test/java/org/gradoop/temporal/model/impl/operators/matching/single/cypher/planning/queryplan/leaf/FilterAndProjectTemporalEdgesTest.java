@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
@@ -30,7 +31,7 @@ public class FilterAndProjectTemporalEdgesTest {
         String edgeVariable   = "e";
         String targetVariable = "b";
         FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
-                null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
+                null, sourceVariable, edgeVariable, targetVariable, new TemporalCNF(), new HashSet<>(), false);
 
         EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
         assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
@@ -47,7 +48,7 @@ public class FilterAndProjectTemporalEdgesTest {
         String edgeVariable   = "e";
         String targetVariable = "a";
         FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
-                null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
+                null, sourceVariable, edgeVariable, targetVariable, new TemporalCNF(), new HashSet<>(), false);
 
         EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
         assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
@@ -97,7 +98,7 @@ public class FilterAndProjectTemporalEdgesTest {
         String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 AND e.tx_to.after(1970-01-01T00:00:01)";
 
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-        CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
+        TemporalCNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
         Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
 
         FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges, "a", "e", "b",

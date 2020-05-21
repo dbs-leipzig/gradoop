@@ -1,6 +1,7 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryPredicateTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.QueryPredicateFactory;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
@@ -8,9 +9,8 @@ import java.util.Objects;
 
 /**
  * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
- * Extension for temporal predicates
  */
-public class OrPredicate extends org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicate {
+public class OrPredicate extends QueryPredicateTPGM {
     /**
      * Holds the wrapped or predicate
      */
@@ -21,17 +21,30 @@ public class OrPredicate extends org.gradoop.flink.model.impl.operators.matching
      * @param or the wrapped or predicate
      */
     public OrPredicate(Or or) {
-        super(or);
         this.or = or;
     }
 
-    @Override
-    public QueryPredicate getLhs() {
+    /**
+     * Converts the predicate into conjunctive normal form
+     * @return predicate in cnf
+     */
+    public TemporalCNF asCNF() {
+        return getLhs().asCNF().or(getRhs().asCNF());
+    }
+
+    /**
+     * Returns the left hand side predicate
+     * @return the left hand side predicate
+     */
+    public QueryPredicateTPGM getLhs() {
         return QueryPredicateFactory.createFrom(or.getArguments()[0]);
     }
 
-    @Override
-    public QueryPredicate getRhs() {
+    /**
+     * Returns the right hand side predicate
+     * @return the right hand side predicate
+     */
+    public QueryPredicateTPGM getRhs() {
         return QueryPredicateFactory.createFrom(or.getArguments()[1]);
     }
 

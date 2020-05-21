@@ -25,6 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -78,7 +79,7 @@ public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
         return properties;
     }
 
-    protected CNF predicateFromQuery(String query) {
+    protected TemporalCNF predicateFromQuery(String query) {
         // no default asOf-predicates:
         if(!query.contains("WHERE")){
             query+= " WHERE tx_to.after(1970-01-01T00:00:00)";
