@@ -158,9 +158,10 @@
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.commons-lang.version>2.6</dep.commons-lang.version>
-        <dep.flink.version>1.7.2</dep.flink.version>
+        <dep.flink.version>1.10.1</dep.flink.version>
         <dep.gdl.version>0.3.2</dep.gdl.version>
         <dep.guava.version>11.0.2</dep.guava.version>
+        <dep.flink-hadoop.version>2.8.3-10.0</dep.flink-hadoop.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.12</dep.junit.version>
@@ -620,8 +621,8 @@
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-shaded-hadoop2</artifactId>
-                <version>${dep.flink.version}</version>
+                <artifactId>flink-shaded-hadoop-2</artifactId>
+                <version>${dep.flink-hadoop.version}</version>
             </dependency>
 
             <!-- Accumulo -->

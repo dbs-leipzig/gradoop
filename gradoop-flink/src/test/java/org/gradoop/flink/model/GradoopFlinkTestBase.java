@@ -17,7 +17,6 @@ package org.gradoop.flink.model;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.gradoop.common.GradoopTestUtils;
@@ -47,10 +46,6 @@ import static org.junit.Assert.assertTrue;
  * Base class for Flink-based unit tests with the same cluster.
  */
 public abstract class GradoopFlinkTestBase {
-
-  private static final int DEFAULT_PARALLELISM = 4;
-
-  private static final long TASKMANAGER_MEMORY_SIZE_MB = 512;
 
   @ClassRule
   public static MiniClusterWithClientResource miniClusterResource = getMiniCluster();
@@ -131,14 +126,9 @@ public abstract class GradoopFlinkTestBase {
    * {@see http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E}
    */
   private static MiniClusterWithClientResource getMiniCluster() {
-    Configuration config = new Configuration();
-    config.setLong("taskmanager.memory.size", TASKMANAGER_MEMORY_SIZE_MB);
-
     return new MiniClusterWithClientResource(
       new MiniClusterResourceConfiguration.Builder()
-        .setNumberTaskManagers(1)
-        .setNumberSlotsPerTaskManager(DEFAULT_PARALLELISM)
-        .setConfiguration(config).build());
+        .setNumberTaskManagers(1).build());
   }
 
   //----------------------------------------------------------------------------

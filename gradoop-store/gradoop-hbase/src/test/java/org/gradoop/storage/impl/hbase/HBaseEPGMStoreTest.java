@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,9 +40,10 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import static org.gradoop.common.GradoopTestUtils.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 
 /**
  * Test class of {@link HBaseEPGMStore} with main I/O functionality.
@@ -203,7 +204,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(expectedExceptions = UnsupportedTypeException.class)
+  @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
@@ -367,7 +368,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
       boolean hasNext = space.hasNext();
       // Make sure to close the iterator before the assertion.
       space.close();
-      assertFalse(hasNext, message);
+      assertFalse(message, hasNext);
     }
   }
 
@@ -400,8 +401,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     validateGraphElements(originalEdge, loadedEdge);
 
     assert loadedEdge != null;
-    assertEquals(loadedEdge.getSourceId(), originalEdge.getSourceId(), "source vertex mismatch");
-    assertEquals(loadedEdge.getTargetId(), originalEdge.getTargetId(), "target vertex mismatch");
+    assertEquals("source vertex mismatch", originalEdge.getSourceId(), loadedEdge.getSourceId());
+    assertEquals("target vertex mismatch", originalEdge.getTargetId(), loadedEdge.getTargetId());
   }
-
 }

@@ -352,7 +352,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     } catch (Exception e) {
       assertTrue(
         e instanceof JobExecutionException &&
-          e.getCause() instanceof UnsupportedTypeException);
+          e.getCause().getCause() instanceof UnsupportedTypeException);
     }
   }
 

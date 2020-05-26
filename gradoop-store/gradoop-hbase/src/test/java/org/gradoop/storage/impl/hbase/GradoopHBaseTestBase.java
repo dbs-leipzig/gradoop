@@ -25,8 +25,6 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.hbase.config.GradoopHBaseConfig;
 import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
 import org.gradoop.storage.hbase.impl.factory.HBaseEPGMStoreFactory;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -75,7 +73,6 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if setting up HBase test cluster fails
    */
-  @BeforeSuite
   public static void setUpHBase() throws Exception {
     if (utility == null) {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
@@ -88,7 +85,6 @@ public class GradoopHBaseTestBase {
    *
    * @throws Exception if closing HBase test cluster fails
    */
-  @AfterSuite
   public static void tearDownHBase() throws Exception {
     if (utility != null) {
       utility.shutdownMiniCluster();

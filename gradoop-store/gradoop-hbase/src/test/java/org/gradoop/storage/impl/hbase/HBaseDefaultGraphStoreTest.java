@@ -23,7 +23,6 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.hbase.config.GradoopHBaseConfig;
 import org.gradoop.storage.hbase.impl.HBaseEPGMStore;
 import org.gradoop.storage.hbase.impl.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBaseLabelIn;
@@ -32,28 +31,30 @@ import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropEquals;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropLargerThan;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
 import org.gradoop.storage.hbase.utils.HBaseFilters;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Test class for {@link HBaseEPGMStore}
  */
-public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * A static HBase store with social media graph stored
    */
-  static HBaseEPGMStore[] epgmStores;
+  static HBaseEPGMStore socialNetworkStore;
 
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data
@@ -62,20 +63,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @BeforeClass
   public static void setUp() throws IOException {
-    epgmStores = new HBaseEPGMStore[3];
-
-    epgmStores[0] = openEPGMStore("HBaseGraphStoreTest.");
-    writeSocialGraphToStore(epgmStores[0]);
-
-    final GradoopHBaseConfig splitConfig = GradoopHBaseConfig.getDefaultConfig();
-    splitConfig.enablePreSplitRegions(32);
-    epgmStores[1] = openEPGMStore("HBaseGraphStoreSplitRegionTest.", splitConfig);
-    writeSocialGraphToStore(epgmStores[1]);
-
-    final GradoopHBaseConfig spreadingConfig = GradoopHBaseConfig.getDefaultConfig();
-    spreadingConfig.useSpreadingByte(32);
-    epgmStores[2] = openEPGMStore("HBaseGraphStoreSpreadingByteTest.", spreadingConfig);
-    writeSocialGraphToStore(epgmStores[2]);
+    socialNetworkStore = openEPGMStore("HBaseGraphStoreTest.");
+    writeSocialGraphToStore(socialNetworkStore);
   }
 
   /**
@@ -85,41 +74,9 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    */
   @AfterClass
   public static void tearDown() throws IOException {
-    for (HBaseEPGMStore store : epgmStores) {
-      if (store != null) {
-        store.dropTables();
-        store.close();
-      }
-    }
-  }
-
-  /**
-   * Parameters for tests. 0 => default store config; 1 => pre-split regions; 2 => spreading byte
-   *
-   * @return the integer to choose the epgm store to test
-   */
-  @DataProvider(name = "store index")
-  public static Object[][] storeIndexProvider() {
-    return new Object[][] {{0}, {1}, {2}};
-  }
-
-  /**
-   * Test, whether the store uses the correct region splitting.
-   */
-  @Test(dataProvider = "store index")
-  public void testConfig(int storeIndex) {
-    switch (storeIndex) {
-    case 1:
-      assertTrue(epgmStores[storeIndex].getConfig().getVertexHandler().isPreSplitRegions());
-      assertTrue(epgmStores[storeIndex].getConfig().getEdgeHandler().isPreSplitRegions());
-      assertTrue(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isPreSplitRegions());
-      break;
-    case 2:
-      assertTrue(epgmStores[storeIndex].getConfig().getVertexHandler().isSpreadingByteUsed());
-      assertTrue(epgmStores[storeIndex].getConfig().getEdgeHandler().isSpreadingByteUsed());
-      assertTrue(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isSpreadingByteUsed());
-      break;
-    default:
+    if (socialNetworkStore != null) {
+      socialNetworkStore.dropTables();
+      socialNetworkStore.close();
     }
   }
 
@@ -128,8 +85,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetGraphSpaceWithIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetGraphSpaceWithIdPredicate() throws IOException {
     // Fetch all graph heads from gdl file
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
     // Select only a subset
@@ -139,7 +96,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
-    List<EPGMGraphHead> queryResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> queryResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromSets(ids)
         .noFilter())
@@ -153,12 +110,12 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetGraphSpaceWithoutIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetGraphSpaceWithoutIdPredicate() throws IOException {
     // Fetch all graph heads from gdl file
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads());
     // Query the graph store with an empty predicate
-    List<EPGMGraphHead> queryResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> queryResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .noFilter())
@@ -172,8 +129,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetVertexSpaceWithIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetVertexSpaceWithIdPredicate() throws IOException {
     // Fetch all vertices from gdl file
     List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices());
     // Select only a subset
@@ -184,7 +141,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
-    List<EPGMVertex> queryResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> queryResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromSets(ids)
         .noFilter())
@@ -198,12 +155,12 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetVertexSpaceWithoutIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetVertexSpaceWithoutIdPredicate() throws IOException {
     // Fetch all vertices from gdl file
     List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices());
     // Query the graph store with an empty predicate
-    List<EPGMVertex> queryResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> queryResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .noFilter())
@@ -217,8 +174,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetEdgeSpaceWithIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetEdgeSpaceWithIdPredicate() throws IOException {
     // Fetch all edges from gdl file
     List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges());
     // Select only a subset
@@ -228,7 +185,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
-    List<EPGMEdge> queryResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> queryResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromSets(ids)
         .noFilter())
@@ -242,12 +199,12 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetEdgeSpaceWithoutIdPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetEdgeSpaceWithoutIdPredicate() throws IOException {
     // Fetch all edges from gdl file
     List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges());
     // Query the graph store with an empty predicate
-    List<EPGMEdge> queryResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> queryResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .noFilter())
@@ -262,8 +219,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithLabelInPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithLabelInPredicate() throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -282,19 +239,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .collect(Collectors.toList());
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.labelIn(LABEL_FORUM)))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.labelIn(LABEL_HAS_MODERATOR, LABEL_HAS_MEMBER)))
       .readRemainsAndClose();
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.<EPGMVertex>labelIn(LABEL_TAG, LABEL_FORUM).negate()))
@@ -311,8 +268,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithLabelRegPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithLabelRegPredicate() throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -330,19 +287,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .collect(Collectors.toList());
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.labelReg(PATTERN_GRAPH)))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.<EPGMEdge>labelReg(PATTERN_EDGE).negate()))
       .readRemainsAndClose();
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
@@ -359,8 +316,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithPropEqualsPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithPropEqualsPredicate() throws IOException {
     // Create the expected graph elements
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
     PropertyValue propertyValueSince = PropertyValue.create(2013);
@@ -386,19 +343,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .collect(Collectors.toList());
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propEquals(PROP_VERTEX_COUNT, propertyValueVertexCount)))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propEquals(PROP_SINCE, propertyValueSince)))
       .readRemainsAndClose();
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity)))
@@ -415,8 +372,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithPropLargerThanPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithPropLargerThanPredicate() throws IOException {
     // Create the expected graph elements
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
     PropertyValue propertyValueSince = PropertyValue.create(2014);
@@ -445,20 +402,20 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .collect(Collectors.toList());
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propLargerThan(PROP_VERTEX_COUNT,
           propertyValueVertexCount, true)))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propLargerThan(PROP_SINCE, propertyValueSince, false)))
       .readRemainsAndClose();
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false)))
@@ -475,8 +432,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithPropRegPredicate(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithPropRegPredicate() throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -501,19 +458,19 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .collect(Collectors.toList());
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propReg(PROP_INTEREST, PATTERN_GRAPH_PROP)))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propReg(PROP_STATUS, PATTERN_EDGE_PROP)))
       .readRemainsAndClose();
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.propReg(PROP_NAME, PATTERN_VERTEX_PROP)))
@@ -533,8 +490,8 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testGetElementSpaceWithChainedPredicates(int storeIndex) throws IOException {
+  @Test
+  public void testGetElementSpaceWithChainedPredicates() throws IOException {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = getSocialGraphHeads()
       .stream()
@@ -556,7 +513,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
       .subList(1, 4);
 
     // Query the store
-    List<EPGMGraphHead> graphHeadResult = epgmStores[storeIndex].getGraphSpace(
+    List<EPGMGraphHead> graphHeadResult = socialNetworkStore.getGraphSpace(
       Query.elements()
         .fromAll()
         .where(HBaseFilters.<EPGMGraphHead>labelIn("Community")
@@ -564,7 +521,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
             .or(HBaseFilters.propEquals(PROP_INTEREST, "Graphs")))))
       .readRemainsAndClose();
 
-    List<EPGMEdge> edgeResult = epgmStores[storeIndex].getEdgeSpace(
+    List<EPGMEdge> edgeResult = socialNetworkStore.getEdgeSpace(
       Query.elements()
         .fromAll()
         // WHERE edge.label LIKE '^has.*$' OR edge.since < 2015
@@ -577,7 +534,7 @@ public class HBaseGraphStoreTest extends GradoopHBaseTestBase {
         .or(HBaseFilters.<EPGMVertex>propEquals(PROP_NAME, vertices.get(1).getPropertyValue("name"))
           .or(HBaseFilters.propEquals(PROP_NAME, vertices.get(2).getPropertyValue("name")))));
 
-    List<EPGMVertex> vertexResult = epgmStores[storeIndex].getVertexSpace(
+    List<EPGMVertex> vertexResult = socialNetworkStore.getVertexSpace(
       Query.elements()
         .fromAll()
         .where(vertexFilter))

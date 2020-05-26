@@ -21,13 +21,13 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBaseLabelIn;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_META;
 import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.COL_LABEL;
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test class for {@link HBaseLabelIn}
@@ -55,6 +55,6 @@ public class HBaseLabelInTest {
       );
       expectedFilterList.addFilter(valueFilter);
     }
-    assertEquals(edgeFilter.toHBaseFilter(false).toString(), expectedFilterList.toString());
+    assertEquals(expectedFilterList.toString(), edgeFilter.toHBaseFilter(false).toString());
   }
 }

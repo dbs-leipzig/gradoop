@@ -221,7 +221,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     } catch (Exception e) {
       assertTrue(
         e instanceof JobExecutionException &&
-          e.getCause() instanceof UnsupportedTypeException);
+          e.getCause().getCause() instanceof UnsupportedTypeException);
     }
   }
 

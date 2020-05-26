@@ -23,13 +23,13 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.regex.Pattern;
 
 import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_TYPE;
 import static org.gradoop.storage.hbase.impl.constants.HBaseConstants.CF_PROPERTY_VALUE;
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test class for {@link HBasePropReg}
@@ -68,7 +68,7 @@ public class HBasePropRegTest {
     expectedFilter.addFilter(typeFilter);
     expectedFilter.addFilter(valueFilter);
 
-    assertEquals(vertexFilter.toHBaseFilter(false).toString(), expectedFilter.toString(),
-      "Failed during filter comparison for key [" + key + "].");
+    assertEquals("Failed during filter comparison for key [" + key + "].",
+      expectedFilter.toString(), vertexFilter.toHBaseFilter(false).toString());
   }
 }

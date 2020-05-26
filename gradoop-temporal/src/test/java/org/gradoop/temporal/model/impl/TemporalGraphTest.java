@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,16 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.temporal.io.api.TemporalDataSource;
+import org.gradoop.temporal.io.impl.csv.TemporalCSVDataSource;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.gradoop.temporal.util.TemporalGradoopTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,9 +38,8 @@ import java.util.List;
 
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.*;
+
 
 /**
  * Test class of {@link TemporalGraph}.
@@ -156,11 +160,11 @@ public class TemporalGraphTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the {@link TemporalGraph#fromLogicalGraph(LogicalGraph)} method.
+   * Test the {@link TemporalGraph#fromGraph(BaseGraph)} (LogicalGraph)} method.
    */
   @Test
   public void testFromLogicalGraph() throws Exception {
-    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(testLogicalGraph);
+    TemporalGraph temporalGraph = TemporalGraph.fromGraph(testLogicalGraph);
 
     Collection<TemporalGraphHead> loadedGraphHeads = new ArrayList<>();
     Collection<TemporalVertex> loadedVertices = new ArrayList<>();

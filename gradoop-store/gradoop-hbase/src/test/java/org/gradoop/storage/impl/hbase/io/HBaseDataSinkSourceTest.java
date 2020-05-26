@@ -40,14 +40,19 @@ import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropEquals;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropLargerThan;
 import org.gradoop.storage.hbase.impl.predicate.filter.impl.HBasePropReg;
 import org.gradoop.storage.hbase.utils.HBaseFilters;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
+import org.junit.runners.Parameterized;
+
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,13 +60,14 @@ import java.util.stream.Collectors;
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 
 /**
  * Test class for {@link HBaseDataSource} and {@link HBaseDataSink}
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(Parameterized.class)
 public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
@@ -112,16 +118,30 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @return the integer to choose the epgm store to test
    */
-  @DataProvider(name = "store index")
-  public static Object[][] storeIndexProvider() {
-    return new Object[][] {{0}, {1}, {2}};
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{0}, {1}, {2}});
+  }
+
+  /**
+   * The store index to decide which store should be tested.
+   */
+  private int storeIndex;
+
+  /**
+   * Test class constructor creates an instance of this test
+   *
+   * @param storeIndex the store index to decide which store should be tested
+   */
+  public HBaseDataSinkSourceTest(int storeIndex) {
+    this.storeIndex = storeIndex;
   }
 
   /**
    * Test the configuration of the stores.
    */
-  @Test(dataProvider = "store index")
-  public void testConfig(int storeIndex) {
+  @Test
+  public void testConfig() {
     switch (storeIndex) {
     case 1:
       assertTrue(epgmStores[storeIndex].getConfig().getVertexHandler().isPreSplitRegions());
@@ -158,8 +178,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws IOException on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadFromSource(int storeIndex) throws Exception {
+  @Test
+  public void testReadFromSource() throws Exception {
     // read social graph from HBase via EPGMDatabase
     GraphCollection collection = new HBaseDataSource(epgmStores[storeIndex], getConfig())
       .getGraphCollection();
@@ -186,8 +206,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadFromSourceWithEmptyPredicates(int storeIndex) throws Exception {
+  @Test
+  public void testReadFromSourceWithEmptyPredicates() throws Exception {
     // Define HBase source
     HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
@@ -225,8 +245,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource} with graph head id predicates
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithGraphIdPredicate(int storeIndex) throws Throwable {
+  @Test
+  public void testReadWithGraphIdPredicate() throws Throwable {
     List<EPGMGraphHead> testGraphs = new ArrayList<>(getSocialGraphHeads())
       .subList(1, 3);
 
@@ -259,8 +279,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource} with vertex id predicates
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithVertexIdPredicate(int storeIndex) throws Throwable {
+  @Test
+  public void testReadWithVertexIdPredicate() throws Throwable {
     List<EPGMVertex> testVertices = new ArrayList<>(getSocialVertices())
       .subList(0, 3);
 
@@ -294,8 +314,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource} with edge id predicates
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithEdgeIdPredicate(int storeIndex) throws Throwable {
+  @Test
+  public void testReadWithEdgeIdPredicate() throws Throwable {
     List<EPGMEdge> testEdges = new ArrayList<>(getSocialEdges())
       .subList(0, 3);
 
@@ -332,8 +352,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithLabelInPredicate(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithLabelInPredicate() throws Exception {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -390,8 +410,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithLabelRegPredicate(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithLabelRegPredicate() throws Exception {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -444,8 +464,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithPropEqualsPredicate(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithPropEqualsPredicate() throws Exception {
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
     PropertyValue propertyValueSince = PropertyValue.create(2013);
     PropertyValue propertyValueCity = PropertyValue.create("Leipzig");
@@ -506,8 +526,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithPropLargerThanPredicate(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithPropLargerThanPredicate() throws Exception {
     PropertyValue propertyValueVertexCount = PropertyValue.create(3);
     PropertyValue propertyValueSince = PropertyValue.create(2014);
     PropertyValue propertyValueAge = PropertyValue.create(30);
@@ -574,8 +594,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithPropRegPredicate(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithPropRegPredicate() throws Exception {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
@@ -625,9 +645,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    assertEquals(loadedGraphHeads.size(), 1);
-    assertEquals(loadedEdges.size(), 2);
-    assertEquals(loadedVertices.size(), 2);
+    assertEquals(1, loadedGraphHeads.size());
+    assertEquals(2, loadedEdges.size());
+    assertEquals(2, loadedVertices.size());
 
     validateElementCollections(graphHeads, loadedGraphHeads);
     validateElementCollections(vertices, loadedVertices);
@@ -642,8 +662,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testReadWithChainedPredicates(int storeIndex) throws Exception {
+  @Test
+  public void testReadWithChainedPredicates() throws Exception {
     // Extract parts of social graph to filter for
     List<EPGMGraphHead> graphHeads = getSocialGraphHeads()
       .stream()
@@ -700,9 +720,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    assertEquals(loadedGraphHeads.size(), 1);
-    assertEquals(loadedEdges.size(), 21);
-    assertEquals(loadedVertices.size(), 3);
+    assertEquals(1, loadedGraphHeads.size());
+    assertEquals(21, loadedEdges.size());
+    assertEquals(3, loadedVertices.size());
 
     validateElementCollections(graphHeads, loadedGraphHeads);
     validateElementCollections(vertices, loadedVertices);
@@ -716,8 +736,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(dataProvider = "store index")
-  public void testWriteToSink(int storeIndex) throws Exception {
+  @Test
+  public void testWriteToSink() throws Exception {
     // Create an empty store
     HBaseEPGMStore newStore;
 
