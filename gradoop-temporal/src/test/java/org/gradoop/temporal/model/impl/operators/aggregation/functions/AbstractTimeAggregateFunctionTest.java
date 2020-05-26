@@ -21,18 +21,20 @@ import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
  * Test for the {@link AbstractTimeAggregateFunction}. This test will check if
  * the correct temporal attribute is read from an element.
  */
+@RunWith(Parameterized.class)
 public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
 
   /**
@@ -41,9 +43,27 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
   private TemporalElement testElement;
 
   /**
+   * The interval to consider.
+   */
+  @Parameterized.Parameter
+  public TimeDimension interval;
+
+  /**
+   * The field in the interval.
+   */
+  @Parameterized.Parameter(1)
+  public TimeDimension.Field field;
+
+  /**
+   * The expected value.
+   */
+  @Parameterized.Parameter(2)
+  public long expectedValue;
+
+  /**
    * Set up this test.
    */
-  @BeforeClass
+  @Before
   public void setUp() {
     testElement = getConfig().getTemporalGraphFactory().getVertexFactory().createVertex();
     testElement.setTransactionTime(Tuple2.of(1L, 2L));
@@ -54,8 +74,8 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
    * Test if the {@link AbstractTimeAggregateFunction#getIncrement(TemporalElement)} returns
    * the correct field.
    */
-  @Test(dataProvider = "timeIntervals")
-  public void testGetIncrement(TimeDimension interval, TimeDimension.Field field, long expectedValue) {
+  @Test
+  public void testGetIncrement() {
     // Create a mock of the abstract function. (The first constructor parameter, the property key,
     // is irrelevant for this test.
     TemporalAggregateFunction mock = mock(AbstractTimeAggregateFunction.class, withSettings()
@@ -68,7 +88,7 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
   /**
    * Parameters for this test.
    * Those are:
-   * <ol start="0">
+   * <ol>
    * <li>The time interval used.</li>
    * <li>The field of the time interval used.</li>
    * <li>The expected value.</li>
@@ -76,8 +96,8 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
    *
    * @return Parameters in the given format.
    */
-  @DataProvider(name = "timeIntervals")
-  public static Object[][] timeIntervals() {
+  @Parameterized.Parameters(name = "{1} of {0}")
+  public static Object[][] parameters() {
     return new Object[][] {
       {TimeDimension.TRANSACTION_TIME, TimeDimension.Field.FROM, 1L},
       {TimeDimension.TRANSACTION_TIME, TimeDimension.Field.TO, 2L},

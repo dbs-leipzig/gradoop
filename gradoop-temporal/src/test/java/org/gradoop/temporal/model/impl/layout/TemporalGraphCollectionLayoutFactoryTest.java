@@ -29,8 +29,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +38,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -58,7 +58,7 @@ public class TemporalGraphCollectionLayoutFactoryTest extends TemporalGradoopTes
 
   private TemporalGraph temporalGraph;
 
-  @BeforeClass
+  @Before
   public void setUp() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
@@ -189,7 +189,7 @@ public class TemporalGraphCollectionLayoutFactoryTest extends TemporalGradoopTes
   /**
    * Test the {@link TemporalGraphCollectionLayoutFactory#fromTransactions(DataSet)} method.
    */
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testFromTransactions() {
     DataSet<GraphTransaction> transactions = getExecutionEnvironment()
       .fromCollection(Arrays.asList(
@@ -203,7 +203,7 @@ public class TemporalGraphCollectionLayoutFactoryTest extends TemporalGradoopTes
    * Test the {@link TemporalGraphCollectionLayoutFactory#fromTransactions(DataSet, GroupReduceFunction, GroupReduceFunction)}
    * method.
    */
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testFromTransactionsWithReduceFunctions() {
     GroupReduceFunction reduceFunction = mock(GroupReduceFunction.class);
     DataSet<GraphTransaction> transactions = getExecutionEnvironment()

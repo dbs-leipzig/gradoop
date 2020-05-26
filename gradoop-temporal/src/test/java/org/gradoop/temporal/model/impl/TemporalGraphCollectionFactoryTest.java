@@ -30,8 +30,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,8 +42,8 @@ import java.util.List;
 import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.gradoop.temporal.util.TemporalGradoopTestUtils.validateTPGMElementCollections;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Test class of {@link TemporalGraphCollectionFactory}.
@@ -60,7 +60,7 @@ public class TemporalGraphCollectionFactoryTest extends TemporalGradoopTestBase 
    */
   private TemporalGraphCollectionFactory factory;
 
-  @BeforeClass
+  @Before
   public void setUp() throws IOException {
     loader = getSocialNetworkLoader();
     factory = getConfig().getTemporalGraphCollectionFactory();

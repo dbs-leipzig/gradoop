@@ -21,11 +21,11 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests of class {@link TemporalEdge}
@@ -37,7 +37,7 @@ public class TemporalEdgeTest {
    */
   private TemporalEdgeFactory factory;
 
-  @BeforeClass
+  @Before
   public void setUp() {
     factory = new TemporalEdgeFactory();
   }

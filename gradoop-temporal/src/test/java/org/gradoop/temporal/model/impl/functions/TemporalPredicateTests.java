@@ -28,8 +28,9 @@ import org.gradoop.temporal.model.impl.functions.predicates.Precedes;
 import org.gradoop.temporal.model.impl.functions.predicates.Succeeds;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,12 +38,13 @@ import java.util.List;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for some the provided temporal predicate implementations.
  */
+@RunWith(Parameterized.class)
 public class TemporalPredicateTests extends TemporalGradoopTestBase {
 
   /**
@@ -78,38 +80,53 @@ public class TemporalPredicateTests extends TemporalGradoopTestBase {
   /**
    * A list of all test time-intervals.
    */
-  private static final List<Tuple2<Long, Long>> TEST_INTERVALS = Arrays.asList(
-    INTERVAL_INF_INF, INTERVAL_INF_0, INTERVAL_0_INF, INTERVAL_MINUS1_1, INTERVAL_0_1, INTERVAL_MINUS1_0);
+  private static final List<Tuple2<Long, Long>> TEST_INTERVALS = Arrays
+    .asList(INTERVAL_INF_INF, INTERVAL_INF_0, INTERVAL_0_INF, INTERVAL_MINUS1_1, INTERVAL_0_1,
+      INTERVAL_MINUS1_0);
+
+  /**
+   * The temporal predicate to test.
+   */
+  @Parameterized.Parameter
+  public TemporalPredicate predicate;
+
+  /**
+   * A collection of test intervals that should be accepted by the currently tested predicate.
+   */
+  @Parameterized.Parameter(1)
+  public List<Tuple2<Long, Long>> expectedAccepted;
 
   /**
    * Run the test. Check a temporal predicate against all test intervals and verifies results.
    */
-  @Test(dataProvider = "temporalPredicates")
-  public void runTest(TemporalPredicate actualPredicate, List<Tuple2<Long, Long>> expectedAccepted) {
+  @Test
+  public void runTest() {
     for (Tuple2<Long, Long> testValue : TEST_INTERVALS) {
-      boolean result = actualPredicate.test(testValue.f0, testValue.f1);
+      boolean result = predicate.test(testValue.f0, testValue.f1);
       if (expectedAccepted.contains(testValue)) {
-        assertTrue(actualPredicate + " did not accept " + testValue, result);
+        assertTrue(predicate + " did not accept " + testValue, result);
       } else {
-        assertFalse(actualPredicate + " accepted " + testValue, result);
+        assertFalse(predicate + " accepted " + testValue, result);
       }
     }
   }
 
   /**
    * Parameters for this test. The test parameters are
-   * <ol start="0">
+   * <ol>
    * <li>A temporal predicate to test.</li>
-   * <li>A collection of test values that are expected to be accepted. (A subset of {@link #TEST_INTERVALS}</li>
+   * <li>A collection of test values that are expected to be accepted. (A subset of
+   * {@link #TEST_INTERVALS}</li>
    * </ol>
    *
-   * @return An array of object arrays in the form described above.
+   * @return An iterable of object arrays of in form described above.
    */
-  @DataProvider(name = "temporalPredicates")
-  public static Object[][] temporalPredicates() {
-    return new Object[][]{
+  @Parameterized.Parameters(name = "{0} = {1}")
+  public static Iterable<Object[]> parameters() {
+    return Arrays.asList(new Object[][]{
       {new AsOf(1L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF)},
-      {new AsOf(0L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_0_1, INTERVAL_MINUS1_1)},
+      {new AsOf(0L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_0_1,
+        INTERVAL_MINUS1_1)},
       {new Between(0L, 3L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_0_1, INTERVAL_MINUS1_1)},
       {new Between(-1L, 0L), TEST_INTERVALS},
       {new ContainedIn(-1L, 1L), Arrays.asList(INTERVAL_MINUS1_0, INTERVAL_0_1, INTERVAL_MINUS1_1)},
@@ -117,15 +134,18 @@ public class TemporalPredicateTests extends TemporalGradoopTestBase {
       {new CreatedIn(-2L, -1L), Arrays.asList(INTERVAL_MINUS1_1, INTERVAL_MINUS1_0)},
       {new CreatedIn(0L, 3L), Arrays.asList(INTERVAL_0_1, INTERVAL_0_INF)},
       {new DeletedIn(-2L, 0L), Arrays.asList(INTERVAL_INF_0, INTERVAL_MINUS1_0)},
-      {new DeletedIn(0L, 1L), Arrays.asList(INTERVAL_INF_0, INTERVAL_0_1, INTERVAL_MINUS1_0, INTERVAL_MINUS1_1)},
+      {new DeletedIn(0L, 1L), Arrays.asList(INTERVAL_INF_0, INTERVAL_0_1, INTERVAL_MINUS1_0,
+        INTERVAL_MINUS1_1)},
       {new FromTo(0L, 3L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_0_1, INTERVAL_MINUS1_1)},
-      {new FromTo(-1L, 0L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_INF_0, INTERVAL_MINUS1_1, INTERVAL_MINUS1_0)},
+      {new FromTo(-1L, 0L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_INF_0, INTERVAL_MINUS1_1,
+        INTERVAL_MINUS1_0)},
       {new ValidDuring(-2L, 0L), Arrays.asList(INTERVAL_INF_0, INTERVAL_INF_INF)},
-      {new ValidDuring(0L, 1L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_MINUS1_1, INTERVAL_0_1)},
+      {new ValidDuring(0L, 1L), Arrays.asList(INTERVAL_INF_INF, INTERVAL_0_INF, INTERVAL_MINUS1_1,
+        INTERVAL_0_1)},
       {new Precedes(0L, 1L), Arrays.asList(INTERVAL_MINUS1_0, INTERVAL_INF_0)},
       {new Overlaps(-1L, 1L), Arrays.asList(INTERVAL_INF_0, INTERVAL_MINUS1_0, INTERVAL_0_1, INTERVAL_0_INF,
         INTERVAL_INF_INF, INTERVAL_MINUS1_1)},
       {new Succeeds(-2L, 0L), Arrays.asList(INTERVAL_0_INF, INTERVAL_0_1)}
-    };
+    });
   }
 }

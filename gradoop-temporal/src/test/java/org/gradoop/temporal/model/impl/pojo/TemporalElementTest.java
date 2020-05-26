@@ -19,11 +19,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.temporal.model.api.TimeDimension;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertSame;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -132,7 +132,7 @@ public class TemporalElementTest {
   /**
    * Test {@link TemporalElement#getTimeByDimension(TimeDimension)} with null dimension.
    */
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expected = NullPointerException.class)
   public void testTimeGetterWithNullTimeDimension() {
     TemporalElement elementMock = mock(TemporalElement.class, withSettings()
       .useConstructor(GradoopId.get(), null, null, null, null)
@@ -144,7 +144,7 @@ public class TemporalElementTest {
   /**
    * Test {@link TemporalElement#setValidTime(Tuple2)} with an invalid interval.
    */
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testValidTimeSetterWithInvalidValues() {
     TemporalElement elementMock = mock(TemporalElement.class, withSettings()
       .useConstructor(GradoopId.get(), "", null, null, null)
@@ -155,7 +155,7 @@ public class TemporalElementTest {
   /**
    * Test {@link TemporalElement#setTransactionTime(Tuple2)} with an invalid interval.
    */
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testTransactionTimeSetterWithInvalidValues() {
     TemporalElement elementMock = mock(TemporalElement.class, withSettings()
       .useConstructor(GradoopId.get(), "", null, null, null)

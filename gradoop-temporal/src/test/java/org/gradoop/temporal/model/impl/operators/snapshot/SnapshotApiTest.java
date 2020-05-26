@@ -19,8 +19,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 
@@ -39,7 +39,7 @@ public class SnapshotApiTest extends TemporalGradoopTestBase {
    *
    * @throws IOException on failure
    */
-  @BeforeMethod
+  @Before
   public void setUp() throws IOException {
     loader = getTemporalSocialNetworkLoader();
   }

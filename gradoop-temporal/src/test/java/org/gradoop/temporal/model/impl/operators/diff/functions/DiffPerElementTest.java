@@ -29,22 +29,30 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertSame;
-import static org.testng.AssertJUnit.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  * Test for the {@link DiffPerElement} map function.
  */
+@RunWith(Parameterized.class)
 public class DiffPerElementTest extends TemporalGradoopTestBase {
+
+  /**
+   * The temporal dimension to test.
+   */
+  @Parameterized.Parameter
+  public TimeDimension dimension;
 
   /**
    * A temporal predicate accepting all ranges.
@@ -67,11 +75,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @throws Exception when the flap map function throws an exception.
    */
-  @Test(dataProvider = "timeDimensions")
-  public void testWithEdges(TimeDimension dimension) throws Exception {
+  @Test
+  public void testWithEdges() throws Exception {
     EdgeFactory<TemporalEdge> edgeFactory =
       getConfig().getTemporalGraphFactory().getEdgeFactory();
-    runTestForElement(() -> edgeFactory.createEdge(GradoopId.get(), GradoopId.get()), dimension);
+    runTestForElement(() -> edgeFactory.createEdge(GradoopId.get(), GradoopId.get()));
   }
 
   /**
@@ -79,11 +87,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @throws Exception when the execution in Flink fails.
    */
-  @Test(dataProvider = "timeDimensions")
-  public void testWithEdgesInDataSets(TimeDimension dimension) throws Exception {
+  @Test
+  public void testWithEdgesInDataSets() throws Exception {
     EdgeFactory<TemporalEdge> edgeFactory =
       getConfig().getTemporalGraphFactory().getEdgeFactory();
-    runTestOnDataSet(() -> edgeFactory.createEdge(GradoopId.get(), GradoopId.get()), dimension);
+    runTestOnDataSet(() -> edgeFactory.createEdge(GradoopId.get(), GradoopId.get()));
   }
 
   /**
@@ -91,11 +99,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @throws Exception when the flat map function throws an exception.
    */
-  @Test(dataProvider = "timeDimensions")
-  public void testWithVertices(TimeDimension dimension) throws Exception {
+  @Test
+  public void testWithVertices() throws Exception {
     VertexFactory<TemporalVertex> vertexFactory =
       getConfig().getTemporalGraphFactory().getVertexFactory();
-    runTestForElement(vertexFactory::createVertex, dimension);
+    runTestForElement(vertexFactory::createVertex);
   }
 
   /**
@@ -103,11 +111,11 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @throws Exception when the execution in Flink fails.
    */
-  @Test(dataProvider = "timeDimensions")
-  public void testWithVerticesInDataSets(TimeDimension dimension) throws Exception {
+  @Test
+  public void testWithVerticesInDataSets() throws Exception {
     VertexFactory<TemporalVertex> vertexFactory =
       getConfig().getTemporalGraphFactory().getVertexFactory();
-    runTestOnDataSet(vertexFactory::createVertex, dimension);
+    runTestOnDataSet(vertexFactory::createVertex);
   }
 
   /**
@@ -132,11 +140,9 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @param elementFactory A supplier used to create the test elements.
    * @param <E> The temporal element type to test the map function on.
-   * @param dimension The {@link TimeDimension} to compute the diff for.
    * @throws Exception When the flat map operation throws an exception.
    */
-  private <E extends TemporalElement> void runTestForElement(Supplier<E> elementFactory, TimeDimension dimension)
-    throws Exception {
+  private <E extends TemporalElement> void runTestForElement(Supplier<E> elementFactory) throws Exception {
     // The element will be present in both snapshots, it is "equal".
     E testElement = elementFactory.get();
     testElement.setValidTime(TEST_TIME);
@@ -176,11 +182,9 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
    *
    * @param elementFactory A supplier used to create the test elements.
    * @param <E> The temporal element type to test the map function on.
-   * @param dimension The {@link TimeDimension} to base the computation on.
    * @throws Exception when the execution in Flink fails.
    */
-  private <E extends TemporalElement> void runTestOnDataSet(Supplier<E> elementFactory, TimeDimension dimension)
-    throws Exception {
+  private <E extends TemporalElement> void runTestOnDataSet(Supplier<E> elementFactory) throws Exception {
     // A predicate used to check if a range was valid before 0 (unix timestamp).
     TemporalPredicate beforeEpoch = (from, to) -> from < 0;
     // A predicate used to check if a range was valid after 0 (unix timestamp).
@@ -234,16 +238,8 @@ public class DiffPerElementTest extends TemporalGradoopTestBase {
     }
   }
 
-  /**
-   * Returns all supported {@link TimeDimension}s as parameters.
-   *
-   * @return {@link TimeDimension}
-   */
-  @DataProvider
-  public static Object[][] timeDimensions() {
-    return new Object[][]{
-      {TimeDimension.TRANSACTION_TIME},
-      {TimeDimension.VALID_TIME}
-    };
+  @Parameterized.Parameters(name = "{0}")
+  public static Iterable<Object> parameters() {
+    return Arrays.asList(new Object[] {TimeDimension.VALID_TIME, TimeDimension.TRANSACTION_TIME});
   }
 }

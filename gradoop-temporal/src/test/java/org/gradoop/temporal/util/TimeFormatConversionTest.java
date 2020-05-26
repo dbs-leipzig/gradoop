@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.gradoop.temporal.util;
 
-import org.testng.AssertJUnit;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
+
+import static org.gradoop.temporal.util.TimeFormatConversion.toEpochMilli;
 
 /**
  * Test class of {@link TimeFormatConversion}.
@@ -34,8 +36,8 @@ public class TimeFormatConversionTest {
     LocalDateTime unixEpoch = LocalDateTime.of(1970, 1, 1, 0, 0);
     LocalDateTime oneTwoThree = LocalDateTime.of(2009, 2, 13, 23, 31, 30);
 
-    AssertJUnit.assertEquals(1234567890000L, TimeFormatConversion.toEpochMilli(oneTwoThree));
-    AssertJUnit.assertEquals(0L, TimeFormatConversion.toEpochMilli(unixEpoch));
+    Assert.assertEquals(1234567890000L, TimeFormatConversion.toEpochMilli(oneTwoThree));
+    Assert.assertEquals(0L, TimeFormatConversion.toEpochMilli(unixEpoch));
   }
 
   /**
@@ -49,7 +51,7 @@ public class TimeFormatConversionTest {
     long inputUnixEpochZero = 0L;
     long inputOneTwoThree = 1234567890000L;
 
-    AssertJUnit.assertEquals(expectedUnixEpochZero, TimeFormatConversion.toLocalDateTime(inputUnixEpochZero));
-    AssertJUnit.assertEquals(expectedOneTwoThree, TimeFormatConversion.toLocalDateTime(inputOneTwoThree));
+    Assert.assertEquals(expectedUnixEpochZero, TimeFormatConversion.toLocalDateTime(inputUnixEpochZero));
+    Assert.assertEquals(expectedOneTwoThree, TimeFormatConversion.toLocalDateTime(inputOneTwoThree));
   }
 }

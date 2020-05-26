@@ -28,7 +28,7 @@ import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.TimeInterval
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.TimeStampKeyFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;

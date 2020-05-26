@@ -26,7 +26,7 @@ import org.gradoop.temporal.model.impl.operators.snapshot.functions.ByTemporalPr
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
-import static org.testng.AssertJUnit.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Test for the {@link ByTemporalPredicate} filter function.
