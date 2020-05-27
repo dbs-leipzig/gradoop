@@ -72,7 +72,7 @@ Stable:
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
 </dependency>
 ```
 
