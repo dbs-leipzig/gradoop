@@ -18,8 +18,12 @@ package org.gradoop.temporal.model.impl;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -31,9 +35,10 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.model.api.TemporalGraphOperators;
+import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalEdgeToEdge;
-import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.functions.tpgm.TemporalVertexToVertex;
+import org.gradoop.temporal.model.impl.functions.tpgm.TemporalGraphHeadToGraphHead;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalEdgeToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalGraphHeadToDataString;
 import org.gradoop.temporal.model.impl.operators.tostring.TemporalVertexToDataString;
@@ -213,16 +218,56 @@ public class TemporalGraph implements BaseGraph<TemporalGraphHead, TemporalVerte
   }
 
   /**
-   * Convenience API function to create a {@link TemporalGraph} from an existing {@link LogicalGraph} with
+   * Convenience API function to create a {@link TemporalGraph} from an existing {@link BaseGraph} with
    * default values for the temporal attributes.
    *
-   * @param logicalGraph the existing logical graph instance
+   * @param baseGraph the existing graph instance
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The type of the graph.
+   * @param <GC> The type of the Graph collection
    * @return a temporal graph with default temporal values
    * @see TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
-  public static TemporalGraph fromLogicalGraph(LogicalGraph logicalGraph) {
-    return TemporalGradoopConfig.fromGradoopFlinkConfig(logicalGraph.getConfig()).getTemporalGraphFactory()
-      .fromNonTemporalGraph(logicalGraph);
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraph fromGraph(LG baseGraph) {
+    return TemporalGradoopConfig.fromGradoopFlinkConfig(baseGraph.getConfig()).getTemporalGraphFactory()
+      .fromNonTemporalGraph(baseGraph);
+  }
+
+  /**
+   * Function to create a {@link TemporalGraph} from an existing {@link BaseGraph} with valid times
+   * depending on the three given {@link TimeIntervalExtractor} instances
+   *
+   * @param baseGraph the existing Graph
+   * @param graphTimeExtractor mapFunction to generate valid times for graphHead
+   * @param vertexTimeExtractor mapFunction to generate valid times for vertices
+   * @param edgeTimeExtractor mapFunction to generate valid times for edges
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The type of the graph.
+   * @param <GC> The type of the Graph collection
+   * @return a temporal graph with new valid time values
+   */
+  public static <
+    G extends GraphHead,
+    V extends Vertex, E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> TemporalGraph fromGraph(LG baseGraph,
+      TimeIntervalExtractor<G> graphTimeExtractor,
+      TimeIntervalExtractor<V> vertexTimeExtractor,
+      TimeIntervalExtractor<E> edgeTimeExtractor) {
+    TemporalGradoopConfig temporalGradoopConfig = TemporalGradoopConfig.fromGradoopFlinkConfig(
+      baseGraph.getConfig());
+    return temporalGradoopConfig.getTemporalGraphFactory().fromNonTemporalDataSets(
+      baseGraph.getGraphHead(), graphTimeExtractor, baseGraph.getVertices(), vertexTimeExtractor,
+      baseGraph.getEdges(), edgeTimeExtractor);
   }
 
   /**
