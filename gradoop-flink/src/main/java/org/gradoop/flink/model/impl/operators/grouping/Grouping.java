@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.util.GradoopConstants;
@@ -26,9 +27,13 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.filters.Not;
+import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.SetVertexAsSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -93,7 +98,7 @@ public abstract class Grouping<
   implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
    * Used as property key to declare a label based grouping.
-   *
+   * <p>
    * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
    */
   public static final String LABEL_SYMBOL = ":label";
@@ -124,22 +129,29 @@ public abstract class Grouping<
   private final List<LabelGroup> edgeLabelGroups;
 
   /**
+   * A flag that indicates whether vertices that are not member of any labelGroup are retained
+   * as they are to supervertices, including their edges.
+   * If set to false, said vertices will be collapsed into a single group/ supervertex.
+   */
+  private final boolean retainVerticesWithoutGroup;
+
+  /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
-  Grouping(
-    boolean useVertexLabels,
-    boolean useEdgeLabels,
-    List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
-    this.useVertexLabels   = useVertexLabels;
-    this.useEdgeLabels     = useEdgeLabels;
+  Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
+    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroup) {
+    this.useVertexLabels = useVertexLabels;
+    this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
-    this.edgeLabelGroups   = edgeLabelGroups;
+    this.edgeLabelGroups = edgeLabelGroups;
+    this.retainVerticesWithoutGroup = retainVerticesWithoutGroup;
   }
 
   @Override
@@ -191,6 +203,16 @@ public abstract class Grouping<
    */
   protected boolean useEdgeLabels() {
     return useEdgeLabels;
+  }
+
+  /**
+   * True, iff vertices without labels will be converted to individual groups/ supervertices.
+   * False, iff vertices without labels will be collapsed into a single group/ supervertice.
+   *
+   * @return true, iff vertices will be converted
+   */
+  protected boolean isRetainingVerticesWithoutGroup() {
+    return retainVerticesWithoutGroup;
   }
 
   /**
@@ -253,15 +275,17 @@ public abstract class Grouping<
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param graph input graph
+   * @param edgeFactory edgeFactory
+   * @param edgesToGroup input edgesToGroup
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
   protected DataSet<E> buildSuperEdges(
-    LG graph,
+    EdgeFactory<E> edgeFactory,
+    DataSet<E> edgesToGroup,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
-    DataSet<EdgeGroupItem> edges = graph.getEdges()
+    DataSet<EdgeGroupItem> edges = edgesToGroup
       // build edge group items
       .flatMap(new BuildEdgeGroupItem<>(useEdgeLabels(), getEdgeLabelGroups()))
       // join edges with vertex-group-map on source-id == vertex-id
@@ -285,7 +309,7 @@ public abstract class Grouping<
     return groupEdges(combinedEdges)
       .reduceGroup(new ReduceEdgeGroupItems<>(
         useEdgeLabels(),
-        graph.getFactory().getEdgeFactory()));
+        edgeFactory));
   }
 
   /**
@@ -297,6 +321,47 @@ public abstract class Grouping<
   protected abstract LG groupInternal(LG graph);
 
   /**
+   * Returns a verified subgraph that only includes vertices that are not member of any labelGroups.
+   *
+   * @param graph to filter
+   * @return subgraph
+   */
+  LG getSubgraphOfRetainedVertices(LG graph) {
+    return graph.vertexInducedSubgraph(
+      new Not<>(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels())));
+  }
+
+  /**
+   * Removes all edges of {@code edgesToSubtract} from {@code edges}.
+   *
+   * @param edges           set of edges
+   * @param edgesToSubtract set of edges to be removed
+   * @return subtracted set of edges
+   */
+  DataSet<E> subtractEdges(DataSet<E> edges, DataSet<E> edgesToSubtract) {
+    return edges
+      .leftOuterJoin(edgesToSubtract)
+      .where("sourceId", "targetId")
+      .equalTo("sourceId", "targetId")
+      .with(new LeftWhenRightIsNull<>());
+  }
+
+  /**
+   * Is used when {@link Grouping#retainVerticesWithoutGroup} is set.
+   * To add support for grouped edges between retained vertices and supervertices,
+   * retained vertices are singleton groups and are their group representatives themselves.
+   *
+   * @param vertexToRepresentativeMap vertex representative map to add to
+   * @param retainedVertices retained vertices
+   * @return updated vertexToRepresentativeMap
+   */
+  DataSet<VertexWithSuperVertex> updateVertexRepresentatives(
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap, DataSet<V> retainedVertices) {
+    return vertexToRepresentativeMap
+      .union(retainedVertices.map(new SetVertexAsSuperVertex<>()));
+  }
+
+  /**
    * Used for building a grouping operator instance.
    */
   public static final class GroupingBuilder {
@@ -306,7 +371,7 @@ public abstract class Grouping<
      */
     private GroupingStrategy strategy;
     /**
-     * True, iff vertex labels shall be considered.
+     * True, if vertex labels shall be considered.
      */
     private boolean useVertexLabel;
 
@@ -345,6 +410,13 @@ public abstract class Grouping<
     private List<AggregateFunction> globalEdgeAggregateFunctions;
 
     /**
+     * A flag that indicates whether vertices that are not member of any labelGroup are retained
+     * as they are to supervertices, including their edges.
+     * If set to false, said vertices will be collapsed into a single group/ supervertex.
+     */
+    private boolean retainVerticesWithoutGroup;
+
+    /**
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
@@ -372,6 +444,17 @@ public abstract class Grouping<
     public GroupingBuilder setStrategy(GroupingStrategy strategy) {
       Objects.requireNonNull(strategy);
       this.strategy = strategy;
+      return this;
+    }
+
+    /**
+     * Set {@link Grouping#retainVerticesWithoutGroup} to true, vertices that are not member of any
+     * labelGroup are retained as they are to supervertices, including their edges.
+     *
+     * @return this builder
+     */
+    public GroupingBuilder retainVerticesWithoutGroup() {
+      this.retainVerticesWithoutGroup = true;
       return this;
     }
 
@@ -687,13 +770,19 @@ public abstract class Grouping<
       switch (strategy) {
       case GROUP_REDUCE:
         groupingOperator = new GroupingGroupReduce<>(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          retainVerticesWithoutGroup);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine<>(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          retainVerticesWithoutGroup);
         break;
       case GROUP_WITH_KEYFUNCTIONS:
+        if (retainVerticesWithoutGroup) {
+          throw new UnsupportedOperationException("Retaining vertices without group is not yet supported" +
+            " with this strategy.");
+        }
         groupingOperator = KeyedGroupingUtils.createInstance(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
           globalVertexAggregateFunctions, globalEdgeAggregateFunctions);
@@ -705,4 +794,5 @@ public abstract class Grouping<
       return groupingOperator;
     }
   }
+
 }

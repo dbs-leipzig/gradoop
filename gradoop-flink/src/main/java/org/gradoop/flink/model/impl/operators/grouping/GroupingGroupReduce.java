@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGrou
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -71,26 +72,31 @@ public class GroupingGroupReduce<
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
-  GroupingGroupReduce(
-    boolean useVertexLabels,
-    boolean useEdgeLabels,
-    List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
-    super(
-      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
+  GroupingGroupReduce(boolean useVertexLabels, boolean useEdgeLabels,
+    List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups,
+    boolean retainVerticesWithoutGroup) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
+      retainVerticesWithoutGroup);
   }
 
   @Override
   protected LG groupInternal(LG graph) {
 
-    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      // map vertex to vertex group item
-      .flatMap(new BuildVertexGroupItem<>(useVertexLabels(), getVertexLabelGroups()));
+    DataSet<V> vertices = isRetainingVerticesWithoutGroup() ?
+      graph.getVertices()
+        .filter(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels())) :
+      graph.getVertices();
+
+    // map vertex to vertex group item
+    DataSet<VertexGroupItem> verticesForGrouping = vertices.flatMap(
+      new BuildVertexGroupItem<>(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
@@ -109,9 +115,33 @@ public class GroupingGroupReduce<
       // build vertex to group representative tuple
       .map(new BuildVertexWithSuperVertex());
 
-    // build super edges
-    DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> edgesToGroup = graph.getEdges();
+
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
+
+      // To add support for grouped edges between retained vertices and supervertices,
+      // vertices are their group representatives themselves
+      vertexToRepresentativeMap =
+        updateVertexRepresentatives(vertexToRepresentativeMap,
+          retainedVerticesSubgraph.getVertices());
+
+      // don't execute grouping on edges between retained vertices
+      // but execute on edges between retained vertices and grouped vertices
+      //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
+      edgesToGroup = subtractEdges(graph.getEdges(), retainedVerticesSubgraph.getEdges());
+    }
+
+    DataSet<E> superEdges =
+      buildSuperEdges(graph.getFactory().getEdgeFactory(), edgesToGroup, vertexToRepresentativeMap);
+
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
+      superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());
+      superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());
+    }
 
     return graph.getFactory().fromDataSets(superVertices, superEdges);
   }
+
 }

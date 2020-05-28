@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.keyedgrouping;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.DurationKeyFunction;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.TimeIntervalKeyFunction;
@@ -73,7 +74,7 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting a time stamp.
    * @see TimeStampKeyFunction
    */
-  public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
+  public static <T extends TemporalElement> KeyFunctionWithDefaultValue<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField) {
     return timeStamp(interval, intervalField, null);
   }
@@ -92,7 +93,7 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting the time stamp or part of it.
    * @see TimeStampKeyFunction
    */
-  public static <T extends TemporalElement> KeyFunction<T, Long> timeStamp(
+  public static <T extends TemporalElement> KeyFunctionWithDefaultValue<T, Long> timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField,
     TemporalField fieldOfTimeStamp) {
     return new TimeStampKeyFunction<>(interval, intervalField, fieldOfTimeStamp);

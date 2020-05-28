@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class UnsafeAvailChecker {
           m.setAccessible(true);
           UNALIGNED = (Boolean) m.invoke(null);
         } catch (ReflectiveOperationException e) {
-          LOG.warn("java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types" +
+          LOG.warn("java.nio.Bits#unaligned() check failed. Unsafe based read/write of primitive types " +
             "won't be used", e);
         }
       }

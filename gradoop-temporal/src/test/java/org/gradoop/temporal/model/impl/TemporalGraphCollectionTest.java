@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.temporal.io.api.TemporalDataSink;
 import org.gradoop.temporal.io.api.TemporalDataSource;
@@ -29,6 +30,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
+import org.gradoop.temporal.util.TemporalGradoopTestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -224,7 +226,7 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
   }
 
   /**
-   * Test the {@link TemporalGraphCollection#fromGraphCollection(GraphCollection)} method.
+   * Test the {@link TemporalGraphCollection#fromGraphCollection(BaseGraphCollection)} method.
    */
   @Test
   public void testFromGraphCollection() throws Exception {
@@ -261,5 +263,28 @@ public class TemporalGraphCollectionTest extends TemporalGradoopTestBase {
     loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
     loadedVertices.forEach(this::checkDefaultTemporalElement);
     loadedEdges.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the
+   * {@link TemporalGraphCollection#fromGraphCollection} method with TimeInterval
+   * extractors as parameters
+   *
+   * @throws Exception if loading the graph from the csv data source fails
+   */
+  @Test
+  public void testFromGraphCollectionWithTimeExtractors() throws Exception {
+
+    String path = getFilePath("/data/csv/socialnetwork/");
+    TemporalCSVDataSource csvDataSource = new TemporalCSVDataSource(path, getConfig());
+    TemporalGraphCollection expected = csvDataSource.getTemporalGraphCollection();
+    GraphCollection graphCollection = getTemporalSocialNetworkLoader().getGraphCollection();
+
+    TemporalGraphCollection check = TemporalGraphCollection.fromGraphCollection(graphCollection,
+      g -> TemporalGradoopTestUtils.extractTime(g),
+      v -> TemporalGradoopTestUtils.extractTime(v),
+      e -> TemporalGradoopTestUtils.extractTime(e));
+
+    collectAndAssertTrue(check.equalsByGraphElementData(expected));
   }
 }

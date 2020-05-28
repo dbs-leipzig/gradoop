@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.epgm;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -33,8 +32,6 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
-import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -144,21 +141,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  @Override
-  public CAPFQueryResult cypher(String query) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, this.config.getExecutionEnvironment()
-    );
-    return capfQuery.execute(this);
-  }
-
-  @Override
-  public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
-    CAPFQuery capfQuery = new CAPFQuery(
-      query, metaData, this.config.getExecutionEnvironment());
-    return capfQuery.execute(this);
-  }
 
   @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {

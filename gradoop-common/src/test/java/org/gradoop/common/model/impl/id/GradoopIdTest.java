@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,33 @@ public class GradoopIdTest {
     assertTrue("First ID is smaller then the minimum.", first.compareTo(min) >= 0);
     assertTrue("Second ID is smaller then the minimum.", second.compareTo(min) >= 0);
     assertTrue(first == min || second == min);
+  }
+
+  /**
+   * Test the {@link GradoopId#copy()}.
+   */
+  @Test
+  public void testCopy() {
+    GradoopId someId = GradoopId.get();
+    GradoopId copy = someId.copy();
+    assertEquals(someId, copy);
+    assertSame("toByteArray() seems to return copies of the id, not the raw byte[] data,",
+      someId.toByteArray(), someId.toByteArray());
+    assertNotSame("copy", someId, copy);
+    assertNotSame("raw data of copy", someId.toByteArray(), copy.toByteArray());
+  }
+
+  /**
+   * Test the {@link GradoopId#copyTo(GradoopId)} method.
+   */
+  @Test
+  public void testCopyTo() {
+    GradoopId someId = GradoopId.get();
+    GradoopId copy = GradoopId.get();
+    assertNotEquals(someId, copy);
+    someId.copyTo(copy);
+    assertEquals(someId, copy);
+    assertNotSame("raw data of copy target", someId.toByteArray(), copy.toByteArray());
   }
 
   /**

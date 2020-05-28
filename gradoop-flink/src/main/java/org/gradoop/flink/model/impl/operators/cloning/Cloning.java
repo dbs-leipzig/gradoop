@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeSourceUpdateJoin;
-import org.gradoop.flink.model.impl.operators.cloning.functions.EdgeTargetUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeSourceUpdateJoin;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeTargetUpdateJoin;
 import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpdater;
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 
