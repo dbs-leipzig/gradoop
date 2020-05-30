@@ -26,8 +26,8 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
   public int compare(WithCount&lt;String&gt; a, WithCount&lt;String&gt; b) {
     int comparison;
 
-<span class="fc bfc" id="L29" title="All 2 branches covered.">    if (a.getCount() &gt; b.getCount()) {</span>
-<span class="fc" id="L30">      comparison = -1;</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">    if (a.getCount() &gt; b.getCount()) {</span>
+<span class="nc" id="L30">      comparison = -1;</span>
 <span class="fc bfc" id="L31" title="All 2 branches covered.">    } else if (a.getCount() &lt; b.getCount()) {</span>
 <span class="fc" id="L32">      comparison = 1;</span>
     } else {
