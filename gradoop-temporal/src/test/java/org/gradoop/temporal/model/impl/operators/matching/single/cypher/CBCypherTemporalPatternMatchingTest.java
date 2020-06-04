@@ -124,7 +124,7 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
             e.printStackTrace();
         }
         LogicalGraph g = loader.getLogicalGraph();
-        new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
+        //new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
         return transformToTemporalGraph(g);
     }
 

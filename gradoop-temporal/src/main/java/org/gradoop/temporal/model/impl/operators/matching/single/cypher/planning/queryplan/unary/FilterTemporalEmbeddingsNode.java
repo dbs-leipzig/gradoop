@@ -31,9 +31,12 @@ public class FilterTemporalEmbeddingsNode extends UnaryNode implements FilterNod
 
     @Override
     public DataSet<EmbeddingTPGM> execute() {
+        DataSet<EmbeddingTPGM> child = getChildNode().execute();
+
         FilterTemporalEmbeddings op =
                 new FilterTemporalEmbeddings(getChildNode().execute(), filterPredicate, getEmbeddingMetaData());
         op.setName(toString());
+
         return op.evaluate();
     }
 

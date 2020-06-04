@@ -54,7 +54,7 @@ public class ComparisonExpressionTPGM extends QueryPredicateTPGM {
     }
 
     /**
-     * Evaluates the comparisson for the given embedding
+     * Evaluates the comparison for the given embedding
      *
      * @param embedding the embedding record holding the data
      * @param metaData the embedding meta data
@@ -93,8 +93,8 @@ public class ComparisonExpressionTPGM extends QueryPredicateTPGM {
             return
                     comparison.getComparator() == Comparator.EQ  && result ==  0 ||
                             comparison.getComparator() == Comparator.NEQ && result !=  0 ||
-                            comparison.getComparator() == Comparator.LT  && result == -1 ||
-                            comparison.getComparator() == Comparator.GT  && result ==  1 ||
+                            comparison.getComparator() == Comparator.LT  && result < 0 ||
+                            comparison.getComparator() == Comparator.GT  && result > 0 ||
                             comparison.getComparator() == Comparator.LTE && result <=  0 ||
                             comparison.getComparator() == Comparator.GTE && result >=  0;
 
@@ -162,7 +162,8 @@ public class ComparisonExpressionTPGM extends QueryPredicateTPGM {
 
         ComparisonExpressionTPGM that = (ComparisonExpressionTPGM) o;
 
-        return Objects.equals(comparison, that.comparison);
+        return getLhs().equals(that.getLhs()) && getComparator().equals(that.getComparator()) &&
+                getRhs().equals(that.getRhs());
 
     }
 

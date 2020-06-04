@@ -6,6 +6,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
+import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.ElementSelector;
 
 import java.util.HashSet;
@@ -51,6 +52,11 @@ public class ElementSelectorComparable extends QueryComparableTPGM {
     @Override
     public Set<String> getPropertyKeys(String variable) {
         return new HashSet<>();
+    }
+
+    @Override
+    public ComparableExpression getWrappedComparable() {
+        return elementSelector;
     }
 
     @Override

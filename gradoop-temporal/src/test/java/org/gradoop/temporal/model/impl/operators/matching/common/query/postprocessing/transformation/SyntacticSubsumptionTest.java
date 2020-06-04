@@ -1,0 +1,105 @@
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.junit.Test;
+import org.s1ck.gdl.model.comparables.time.TimeLiteral;
+import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.s1ck.gdl.model.predicates.expressions.Comparison;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.s1ck.gdl.utils.Comparator.*;
+
+public class SyntacticSubsumptionTest {
+    TimeSelector ts1 = new TimeSelector("a", TimeSelector.TimeField.TX_FROM);
+    TimeSelector ts2 = new TimeSelector("b", TimeSelector.TimeField.TX_TO);
+
+    TimeLiteral tl1 = new TimeLiteral("now");
+
+    Comparison lte1 = new Comparison(ts1, LTE, ts2);
+    Comparison lt1 = new Comparison(ts1, LT, ts2);
+    Comparison eq = new Comparison(ts1, EQ, ts2);
+    Comparison neq = new Comparison(ts1, NEQ, ts2);
+
+    Comparison withLiteral = new Comparison(ts1, LTE, tl1);
+
+    Comparison lte2 = new Comparison(ts2, LTE, ts1);
+    Comparison lt2 = new Comparison(ts2, LT, ts1);
+
+    SyntacticSubsumption subsumer = new SyntacticSubsumption();
+
+    @Test
+    public void syntacticSubsumtionTest() {
+        TemporalCNF cnf1 = Util.cnfFromLists(
+                //subsumed by (eq)
+                Arrays.asList(lte1, eq, lt2),
+                Arrays.asList(eq),
+                // subsumed by (eq)
+                Arrays.asList(lt1, eq),
+                Arrays.asList(lte1, lt2)
+        );
+        TemporalCNF expected1 = Util.cnfFromLists(
+                Arrays.asList(eq),
+                Arrays.asList(lte1, lt2)
+        );
+        assertEquals(subsumer.transformCNF(cnf1), expected1);
+    }
+
+    @Test
+    public void syntacticSubsumtionTest2() {
+
+        TemporalCNF cnf2 = Util.cnfFromLists(
+                //subsumed by (eq, lt2)
+                Arrays.asList(lte1, eq, lt2),
+                Arrays.asList(eq, lt2)
+        );
+        TemporalCNF expected2 = Util.cnfFromLists(
+                Arrays.asList(eq, lt2)
+        );
+        assertEquals(subsumer.transformCNF(cnf2), expected2);
+    }
+
+    @Test
+    public void syntacticSubsumtionsTest3(){
+        // no subsumtions here
+        TemporalCNF cnf3 = Util.cnfFromLists(
+                Arrays.asList(lte1, eq, lt2),
+                Arrays.asList(lt1, eq)
+        );
+        // gets resorted...
+        TemporalCNF expected3 = Util.cnfFromLists(
+                Arrays.asList(lt1, eq),
+                Arrays.asList(lte1, eq, lt2)
+        );
+        assertEquals(subsumer.transformCNF(cnf3), expected3);
+    }
+
+    @Test
+    public void syntacticSubsumtionTest4() {
+
+        TemporalCNF cnf4 = Util.cnfFromLists(
+                //subsumed by (eq, lt2)
+                Arrays.asList(lte1, eq, lt2, lte1),
+                Arrays.asList(eq, lt2, eq)
+        );
+        TemporalCNF expected4 = Util.cnfFromLists(
+                Arrays.asList(eq, lt2)
+        );
+        assertEquals(subsumer.transformCNF(cnf4), expected4);
+    }
+
+    @Test
+    public void syntacticSubsumtionTest5() {
+
+        TemporalCNF cnf5 = Util.cnfFromLists(
+                //subsumed by (eq, lt2)
+                Arrays.asList(withLiteral),
+                Arrays.asList(withLiteral)
+        );
+        TemporalCNF expected5 = Util.cnfFromLists(
+                Arrays.asList(withLiteral)
+        );
+        assertEquals(subsumer.transformCNF(cnf5), expected5);
+    }
+}

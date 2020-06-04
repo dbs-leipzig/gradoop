@@ -3,6 +3,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 
 /**
  * Base class for estimators that provides some utility methods.
@@ -15,7 +16,7 @@ public abstract class Estimator {
     /**
      * Statistics about the search graph
      */
-    private final GraphStatistics graphStatistics;
+    private final TemporalGraphStatistics graphStatistics;
 
     /**
      * Creates a new estimator.
@@ -23,7 +24,7 @@ public abstract class Estimator {
      * @param queryHandler query handler
      * @param graphStatistics graph statistics
      */
-    Estimator(TemporalQueryHandler queryHandler, GraphStatistics graphStatistics) {
+    Estimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics) {
         this.queryHandler = queryHandler;
         this.graphStatistics = graphStatistics;
     }
@@ -32,7 +33,7 @@ public abstract class Estimator {
         return queryHandler;
     }
 
-    public GraphStatistics getGraphStatistics() {
+    public TemporalGraphStatistics getGraphStatistics() {
         return graphStatistics;
     }
 
@@ -56,10 +57,8 @@ public abstract class Estimator {
      * @return number of elements with the given label
      */
     long getCardinality(String label, boolean isVertex) {
-        long cardinality = isVertex ? graphStatistics.getVertexCount(label) :
+        return isVertex ?
+                graphStatistics.getVertexCount(label) :
                 graphStatistics.getEdgeCount(label);
-
-        return cardinality > 0 ? cardinality :
-                isVertex ? graphStatistics.getVertexCount() : graphStatistics.getEdgeCount();
     }
 }

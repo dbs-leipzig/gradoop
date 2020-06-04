@@ -1,11 +1,15 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.Binning;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.util.Util;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
@@ -43,6 +47,18 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
     private Long edgeCount;
 
     /**
+     * Maps edge labels to a very rough estimation of their number of distinct
+     * source vertices.
+     */
+    private Map<String, Long> distinctSourceCount;
+
+    /**
+     * Maps edge labels to a very rough estimation of their number of distinct
+     * target vertices.
+     */
+    private Map<String, Long> distinctTargetCount;
+
+    /**
      * Creates new graph statistics
      * @param vertexStats list of vertex statistics (one element for each label)
      * @param edgeStats list of edge statistics (one element for each label)
@@ -61,7 +77,32 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
             this.vertexStats.put(vertexStat.getLabel(), vertexStat);
             this.vertexCount += vertexStat.getElementCount();
         }
+        initDistinctVertices();
     }
+
+    private void initDistinctVertices() {
+        this.distinctSourceCount = new HashMap<>();
+        this.distinctTargetCount = new HashMap<>();
+
+        for(String label: edgeStats.keySet()){
+            TemporalElementStats stats = edgeStats.get(label);
+            List<TemporalElement> sample = stats.getSample();
+            int sampleSize = sample.size();
+            HashSet<GradoopId> sourceIds = new HashSet<>();
+            HashSet<GradoopId> targetIds = new HashSet<>();
+            for(TemporalElement edge: sample){
+                sourceIds.add(((TemporalEdge) edge).getSourceId());
+                targetIds.add(((TemporalEdge)edge).getTargetId());
+            }
+            long sourceEstimation = sourceIds.size() *
+                    (stats.getElementCount()/sampleSize);
+            long targetEstimation = targetIds.size() *
+                    (stats.getElementCount()/sampleSize);
+            distinctSourceCount.put(label, sourceEstimation);
+            distinctTargetCount.put(label, targetEstimation);
+        }
+    }
+
 
     /**
      * Returns the vertex statistics list
@@ -85,6 +126,58 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
     }
 
     @Override
+    public long getVertexCount(String label) {
+        if(label.isEmpty()){
+            return getVertexCount();
+        }
+        if(vertexStats.containsKey(label)){
+            return vertexStats.get(label).getElementCount();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getVertexCount() {
+        return vertexCount;
+    }
+
+    @Override
+    public long getEdgeCount(String label) {
+        if(label.isEmpty()){
+            return edgeCount;
+        }
+        if(edgeStats.containsKey(label)){
+            return edgeStats.get(label).getElementCount();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getEdgeCount() {
+        return edgeCount;
+    }
+
+    @Override
+    public long getDistinctSourceVertexCount(String edgeLabel) {
+        return distinctSourceCount.getOrDefault(edgeLabel, 0L);
+    }
+
+    @Override
+    public long getDistinctSourceVertexCount() {
+        return distinctSourceCount.values().stream().reduce(0L, Long::sum);
+    }
+
+    @Override
+    public long getDistinctTargetVertexCount() {
+        return distinctTargetCount.values().stream().reduce(0L, Long::sum);
+    }
+
+    @Override
+    public long getDistinctTargetVertexCount(String edgeLabel) {
+        return distinctTargetCount.getOrDefault(edgeLabel, 0L);
+    }
+
+    @Override
     public double estimateTemporalProb(ElementType type1, Optional<String> label1,
                                        TimeSelector.TimeField field1, Comparator comp, Long value) {
         // no further estimations for = and !=
@@ -95,12 +188,17 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
             return 0.999;
         }
         // <, <=, >=, >
-        if(!label1.isPresent()){
+        if(!(label1.isPresent())){
             return estimateTemporalProb(type1, field1, comp, value);
         }
         else{
-            TemporalElementStats elementStats = type1 == ElementType.VERTEX ?
-                    vertexStats.get(label1.get()) : edgeStats.get(label1.get());
+            TemporalElementStats elementStats = (type1 == ElementType.VERTEX) ?
+                    vertexStats.getOrDefault(label1.get(), null) :
+                    edgeStats.getOrDefault(label1.get(), null);
+            // label not in keys
+            if(elementStats==null){
+                return 0.001;
+            }
             Binning bins = getBins(elementStats, field1);
             return estimateFromBins(bins, comp, value);
         }
@@ -109,7 +207,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
     @Override
     public double estimateDurationProb(ElementType type, Optional<String> label, Comparator comp,
                                        boolean transaction, Long value) {
-        Map<String, TemporalElementStats> statsMap = type==ElementType.VERTEX ?
+        Map<String, TemporalElementStats> statsMap = (type == ElementType.VERTEX) ?
                 vertexStats : edgeStats;
         List<TemporalElementStats> relevantStats = label.isPresent() ?
                 new ArrayList<>(Arrays.asList(statsMap.get(label.get()))) :
@@ -153,9 +251,18 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
     public double estimatePropertyProb(ElementType type, Optional<String> label, String property, Comparator comp, PropertyValue value) {
         Map<String, TemporalElementStats> statsMap = type==ElementType.VERTEX ?
                 vertexStats : edgeStats;
-        List<TemporalElementStats> relevantStats = label.isPresent() ?
-                new ArrayList<>(Arrays.asList(statsMap.get(label.get()))) :
-                new ArrayList<>(statsMap.values());
+
+        List<TemporalElementStats> relevantStats = null;
+        if(label.isPresent()){
+            if(statsMap.containsKey(label.get())){
+                relevantStats = new ArrayList<>(Arrays.asList(statsMap.get(label.get())));
+            }else{
+                return 0.001;
+            }
+        } else{
+            relevantStats = new ArrayList<>(statsMap.values());
+        }
+
 
         if(isNumerical(value)){
             return estimateNumericalPropertyProb(relevantStats, property, comp, value);
@@ -454,11 +561,11 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
         if(!stat.getNumericalPropertyStatsEstimation().containsKey(property)){
             return 0.001;
         }
-        Double[] propertyStats = stat.getNumericalPropertyStatsEstimation().get(property);
+        Double[] propertyStats = (Double[]) stat.getNumericalPropertyStatsEstimation().get(property);
         NormalDistribution dist = new NormalDistribution(propertyStats[0],
                 Math.max(Math.sqrt(propertyStats[1]), 0.001));
         double doubleValue = Util.propertyValueToDouble(value);
-        double occurenceProb = stat.getNumericalOccurrenceEstimation().get(property);
+        double occurenceProb = (double) stat.getNumericalOccurrenceEstimation().get(property);
         if(comp== EQ){
             return 0.001 * occurenceProb;
         } else if(comp==NEQ){
@@ -597,7 +704,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
             return elementStats.getEstimatedTimeBins()[0];
         }
         else if(field1 == TX_TO){
-            return elementStats.getEstimatedTimeBins()[1];
+            return elementStats
+                    .getEstimatedTimeBins()[1];
         }
         else if(field1 == TimeSelector.TimeField.VAL_FROM){
             return elementStats.getEstimatedTimeBins()[2];

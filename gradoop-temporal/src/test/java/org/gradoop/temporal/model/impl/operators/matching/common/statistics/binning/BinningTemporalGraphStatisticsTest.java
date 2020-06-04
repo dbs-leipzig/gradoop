@@ -320,6 +320,40 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
 
     }
 
+    @Test
+    public void countTest(){
+        BinningTemporalGraphStatistics stats = getDummyStats();
+        long count1 = stats.getEdgeCount();
+        assertEquals(count1, 100);
+        long count2 = stats.getEdgeCount("edge");
+        assertEquals(count2, 100);
+        long count3 = stats.getEdgeCount("notThere");
+        assertEquals(count3, 0);
+
+        long count4 = stats.getVertexCount();
+        assertEquals(count4, 200);
+        long count5 = stats.getVertexCount("v1");
+        assertEquals(count5, 100);
+        long count6 = stats.getVertexCount("v2");
+        assertEquals(count6, 100);
+        long count7 = stats.getVertexCount("notThere");
+        assertEquals(count7, 0);
+
+        long count8 = stats.getDistinctSourceVertexCount();
+        long count9 = stats.getDistinctSourceVertexCount("edge");
+        assertEquals(count8, count9);
+        assertEquals(count8, 10);
+        long count10 = stats.getDistinctTargetVertexCount();
+        long count11 = stats.getDistinctTargetVertexCount("edge");
+        assertEquals(count10, count11);
+        assertEquals(count11, 20);
+
+        long count12 = stats.getDistinctSourceVertexCount("notThere");
+        long count13 = stats.getDistinctTargetVertexCount("notThere");
+        assertEquals(count12, count13);
+        assertEquals(count12, 0);
+    }
+
     /**
      * Creates a BinningTemporalGraphStatistics object
      * Vertices:
@@ -328,12 +362,23 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
      *                      = "y" (34 vertices)
      *          "numProp"   = 0,2,...,100 (50 vertices)
      *          "numProp2"  = 0,3,6,...,297 (100 vertices)
+     *          tx_from goes from 100L to 200L, val_from from 150L to 250L (100 vertices)
+     *          tx_to goes from 300L to 350L for half of the vertices, other half is unbounded
+     *          val_to goes from 350L to 450L for half of the vertices, other half is unbounded
+     *
      *      100 "v2" vertices:
      *          "catProp"   = "y" (20 vertices)
      *          "numProp"   = 0,10,...,90 (10 vertices)
      *          "gender"    = "m" (34 vertices)
      *                      = "f" (66 vertices)
-     * Edges: (not relevant)
+     *          tx_from goes from 1000L to 2000L, val_from from 3000L to 4000L (100 vertices)
+     *          tx_to goes from 1500L to 2500L (step 20) for half of the vertices, other half is unbounded
+     *          val_to goes from 3500L to 4500L for half of the vertices (step 20), other half is unbounded
+     *
+     * Edges: identical tx and val times, their length equally distributed
+     *          from 0 to 100L
+     *          10 different source vertices, 20 target vertices
+     *
      * @return dummy statistics
      */
     private BinningTemporalGraphStatistics getDummyStats(){
@@ -427,6 +472,8 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
             edge.setTransactionTime(new Tuple2<>((long) i, (long)i+i));
             edge.setValidTime(edge.getTransactionTime());
             edgeList.add(edge);
+            edge.setSourceId(vertexList.get(i%10).getId());
+            edge.setTargetId(vertexList.get(i%20).getId());
         }
 
         TemporalGraph graph = new TemporalGraphFactory(getConfig()).fromCollections(

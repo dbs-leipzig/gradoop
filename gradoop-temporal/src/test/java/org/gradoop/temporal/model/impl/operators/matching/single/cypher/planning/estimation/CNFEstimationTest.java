@@ -349,12 +349,22 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
      *                      = "y" (34 vertices)
      *          "numProp"   = 0,2,...,100 (50 vertices)
      *          "numProp2"  = 0,3,6,...,297 (100 vertices)
+     *          tx_from goes from 100L to 200L, val_from from 150L to 250L (100 vertices)
+     *          tx_to goes from 300L to 350L for half of the vertices, other half is unbounded
+     *          val_to goes from 350L to 450L for half of the vertices, other half is unbounded
+     *
      *      100 "v2" vertices:
      *          "catProp"   = "y" (20 vertices)
      *          "numProp"   = 0,10,...,90 (10 vertices)
      *          "gender"    = "m" (34 vertices)
      *                      = "f" (66 vertices)
-     * Edges: (not relevant)
+     *          tx_from goes from 1000L to 2000L, val_from from 3000L to 4000L (100 vertices)
+     *          tx_to goes from 1500L to 2500L (step 20) for half of the vertices, other half is unbounded
+     *          val_to goes from 3500L to 4500L for half of the vertices (step 20), other half is unbounded
+     *
+     * Edges: identical tx and val times, their length equally distributed
+     *          from 0 to 100L
+     *
      * @return dummy statistics
      */
     private BinningTemporalGraphStatistics getDummyStats(){

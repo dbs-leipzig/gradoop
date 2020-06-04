@@ -19,9 +19,4 @@ public abstract class TemporalComparable extends QueryComparableTPGM {
      */
     public static final PropertyValue INVALID_GLOBAL = PropertyValue.create("___INVALIDGLOBAL");
 
-    /**
-     * Returns the wrapped time point
-     * @return wrapped time point
-     */
-    public abstract TimePoint getWrappedComparable();
 }

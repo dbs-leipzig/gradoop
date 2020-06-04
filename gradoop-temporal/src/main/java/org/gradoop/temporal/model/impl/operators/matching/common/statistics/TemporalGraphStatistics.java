@@ -22,6 +22,60 @@ public abstract class TemporalGraphStatistics {
     public abstract TemporalGraphStatisticsFactory getFactory();
 
     /**
+     * Returns the number of vertices with a given label
+     * @param label label of the vertices to count
+     * @return number of vertices with a given label
+     */
+    public abstract long getVertexCount(String label);
+
+    /**
+     * Returns total number of vertices
+     * @return total number of vertices
+     */
+    public abstract long getVertexCount();
+
+    /**
+     * Returns the number of edges with a given label
+     * @param label label of the edges to count
+     * @return number of edges with a given label
+     */
+    public abstract long getEdgeCount(String label);
+
+    /**
+     * Returns total number of edges
+     * @return total number of edges
+     */
+    public abstract long getEdgeCount();
+
+    /**
+     * Counts or estimates the number of distinct source vertices for edges
+     * with a certain label
+     * @param edgeLabel label of the edge to count the vertices
+     * @return number of distinct source vertices for edges with given label
+     */
+    public abstract long getDistinctSourceVertexCount(String edgeLabel);
+
+    /**
+     * Counts or estimates the number of distinct source vertices
+     * @return number of distinct source vertices
+     */
+    public abstract long getDistinctSourceVertexCount();
+
+    /**
+     * Counts or estimates the number of distinct target vertices
+     * @return number of distinct target vertices
+     */
+    public abstract long getDistinctTargetVertexCount();
+
+    /**
+     * Counts or estimates the number of distinct target vertices for edges
+     * with a certain label
+     * @param edgeLabel label of the edge to count the target vertices
+     * @return number of distinct target vertices for edges with given label
+     */
+    public abstract long getDistinctTargetVertexCount(String edgeLabel);
+
+    /**
      * Describes the two types of graph elements
      */
     public enum ElementType {VERTEX, EDGE};

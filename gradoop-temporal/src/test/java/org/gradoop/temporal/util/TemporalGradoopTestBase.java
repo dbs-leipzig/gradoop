@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.util;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
@@ -25,6 +26,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 import static java.lang.Long.MAX_VALUE;
@@ -364,4 +367,55 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
       throw new IllegalArgumentException("Failed to parse date.", pe);
     }
   }
+
+  public TemporalGraph loadCitibikeSample() throws Exception {
+    String file = "src/test/resources/data/patternmatchingtest/citibikesample";
+
+    FlinkAsciiGraphLoader loader =
+            new FlinkAsciiGraphLoader(getConfig());
+    try {
+      loader.initDatabaseFromFile(file);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    LogicalGraph g = loader.getLogicalGraph();
+    //new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
+    return transformToTemporalGraph(g);
+  }
+
+
+  private TemporalGraph transformToTemporalGraph(LogicalGraph g) throws Exception {
+    TemporalGraph tg = toTemporalGraph(g);
+    List<TemporalEdge> newEdges = tg.getEdges().map(edgeTransform).collect();
+    List<TemporalVertex> newVertices = tg.getVertices().map(vertexTransform).collect();
+    return tg.getFactory().fromCollections(newVertices, newEdges);
+  }
+
+  private final MapFunction<TemporalEdge, TemporalEdge> edgeTransform = new
+          MapFunction<TemporalEdge, TemporalEdge>() {
+            @Override
+            public TemporalEdge map(TemporalEdge value) throws Exception {
+              long start = value.getPropertyValue("start").getLong();
+              long end = value.getPropertyValue("end").getLong();
+              value.setValidTime(new Tuple2<>(start, end));
+              value.setTransactionTime(value.getValidTime());
+              //value.removeProperty("start");
+              //value.removeProperty("end");
+              return value;
+            }
+          };
+
+  private final MapFunction<TemporalVertex, TemporalVertex> vertexTransform = new
+          MapFunction<TemporalVertex, TemporalVertex>() {
+            @Override
+            public TemporalVertex map(TemporalVertex value) throws Exception {
+              long start = value.getPropertyValue("start").getLong();
+              long end = value.getPropertyValue("end").getLong();
+              value.setValidTime(new Tuple2<>(start, end));
+              value.setTransactionTime(value.getValidTime());
+              //value.removeProperty("start");
+              //value.removeProperty("end");
+              return value;
+            }
+          };
 }

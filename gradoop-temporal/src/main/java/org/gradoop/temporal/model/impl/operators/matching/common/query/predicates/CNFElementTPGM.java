@@ -75,6 +75,31 @@ public class CNFElementTPGM extends TemporalPredicateCollection<ComparisonExpres
     }
 
     @Override
+    public boolean equals(Object o){
+        if(o==null || !(o instanceof CNFElementTPGM)){
+            return false;
+        } else{
+            CNFElementTPGM other = (CNFElementTPGM) o;
+            if(getPredicates().size() != other.getPredicates().size()){
+                return false;
+            }
+            for(QueryPredicateTPGM pred1 : getPredicates()){
+                boolean foundMatch = false;
+                for(QueryPredicateTPGM pred2 : ((CNFElementTPGM) o).getPredicates()){
+                    if(pred1.equals(pred2)){
+                        foundMatch = true;
+                        break;
+                    }
+                }
+                if(!foundMatch){
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    @Override
     public String operatorName() {
         return "OR";
     }

@@ -83,7 +83,6 @@ public class JoinTPGMEmbeddingsNode extends BinaryNode implements JoinNode {
                 getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),
                 getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),
                 joinHint);
-        op.setName(toString());
         return op.evaluate();
     }
 
@@ -115,14 +114,18 @@ public class JoinTPGMEmbeddingsNode extends BinaryNode implements JoinNode {
         }
 
         // append all time mappings from the right to the left side
-        int timeCount = leftInputMetaData.getTimeCount();
-        Set<String> rightTimeVariables = rightInputMetaData.getTimeDataMapping().keySet();
+        int countLeft = leftInputMetaData.getTimeCount();
+        /*Set<String> rightTimeVariables = rightInputMetaData.getTimeDataMapping().keySet();
         // not possible to iterate over rightTimeVariables, sequence of variables is important
         for (String var : rightInputMetaData.getVariables()){
             if(!rightTimeVariables.contains(var)){
                 continue;
             }
-            embeddingMetaData.setTimeColumn(var, timeCount++);
+            embeddingMetaData.setTimeColumn(var, countLeft++);
+        }*/
+        for(String var: rightInputMetaData.getTimeDataMapping().keySet()){
+            embeddingMetaData.setTimeColumn(var, countLeft +
+                    rightInputMetaData.getTimeDataMapping().get(var));
         }
         return embeddingMetaData;
     }

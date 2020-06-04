@@ -17,7 +17,7 @@ public class BinningTemporalGraphStatisticsFactory implements
         TemporalGraphStatisticsFactory<BinningTemporalGraphStatistics> {
     @Override
     public BinningTemporalGraphStatistics fromGraph(TemporalGraph g) {
-        return null;
+        return fromGraphWithSampling(g, 5000);
     }
 
     @Override

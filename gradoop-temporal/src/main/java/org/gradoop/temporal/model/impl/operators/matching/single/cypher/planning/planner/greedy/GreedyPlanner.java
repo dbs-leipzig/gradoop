@@ -4,14 +4,15 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.util.GradoopConstants;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
@@ -29,8 +30,6 @@ import org.s1ck.gdl.model.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
@@ -60,7 +59,7 @@ public class GreedyPlanner<
     /**
      * Statistics about the search graph.
      */
-    private final GraphStatistics graphStatistics;
+    private final TemporalGraphStatistics graphStatistics;
     /**
      * The morphism type for vertex mappings.
      */
@@ -79,7 +78,7 @@ public class GreedyPlanner<
      * @param edgeStrategy morphism type for edge mappings
      */
     public GreedyPlanner(LG graph, TemporalQueryHandler queryHandler,
-                         GraphStatistics graphStatistics, MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+                         TemporalGraphStatistics graphStatistics, MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
         this.graph = graph;
         this.queryHandler = queryHandler;
         this.graphStatistics = graphStatistics;
@@ -143,10 +142,10 @@ public class GreedyPlanner<
      *
      * @param planTable plan table
      */
-    private void createVertexPlans(PlanTable planTable) {
+    private void createVertexPlans(PlanTable planTable)  {
         for (Vertex vertex : queryHandler.getVertices()) {
             String vertexVariable = vertex.getVariable();
-            TemporalCNF allPredicates = queryHandler.getPredicates();
+            TemporalCNF allPredicates = queryHandler.getCNF();
 
             TemporalCNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
             Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
@@ -177,7 +176,7 @@ public class GreedyPlanner<
             String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
             String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
 
-            TemporalCNF allPredicates = queryHandler.getPredicates();
+            TemporalCNF allPredicates = queryHandler.getCNF();
 
             TemporalCNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
 

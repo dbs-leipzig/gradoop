@@ -5,11 +5,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterTemporalEmbeddingsNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.junit.Test;
@@ -39,7 +37,7 @@ public class FilterTemporalEmbeddingsNodeTest {
         String query = "MATCH (a)-->(b) WHERE a.age > b.age AND a.tx_from.before(b.tx_from)" +
                 " AND a.tx_to.before(2020-01-01)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-        TemporalCNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("a", "b"));
+        TemporalCNF filterPredicate = queryHandler.getCNF().getSubCNF(Sets.newHashSet("a", "b"));
 
         GradoopId vertexAId = GradoopId.get();
         GradoopId vertexBId = GradoopId.get();

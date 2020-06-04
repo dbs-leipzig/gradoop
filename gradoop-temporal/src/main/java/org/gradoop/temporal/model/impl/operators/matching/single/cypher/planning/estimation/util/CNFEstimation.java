@@ -1,7 +1,6 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.util;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
@@ -10,11 +9,8 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.*;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.*;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 
@@ -85,57 +81,14 @@ public class CNFEstimation {
         else{
             List<ComparisonExpressionTPGM> comparisons = element.getPredicates();
             double sum = 0.;
-            for(int i=1; i<=comparisons.size(); i++){
-                double sign = i%2==0 ? -1. : 1.;
-                Set<Set<Integer>> tupleIndexLists = getNTuples(i, comparisons.size()-1);
-                for(Set<Integer> tupleIndex : tupleIndexLists){
-                    ArrayList<ComparisonExpressionTPGM> subCNFComparisons =
-                            new ArrayList<>();
-                    for(int index: tupleIndex){
-                        subCNFComparisons.add(comparisons.get(index));
-                    }
-                    sum += sign * estimateCNF(cnfFrom(subCNFComparisons));
-                }
-            }
-            return sum;
+            double firstEst = estimateComparison(element.getPredicates().get(0));
+            CNFElementTPGM rest = new CNFElementTPGM(element.getPredicates().subList(
+                    1, element.getPredicates().size()));
+            double restEst = estimateCNF(new TemporalCNF(Arrays.asList(rest)));
+            return firstEst + restEst - (firstEst*restEst);
         }
     }
 
-    /**
-     * Creates all n-tuples from a range of integers.
-     * None of these tuples contains duplicates.
-     * If a tuple (x,y) is contained, (y,x) is not.
-     * E.g. a call {@code getNTuples(2, 2)} would yield
-     * {(0,1), (0,2), (1,2)}
-     *
-     * @param n size of the tuples
-     * @param max tuples are created from integers in range [0, {@code max}]
-     * @return list of n-tuples
-     */
-    private Set<Set<Integer>> getNTuples(int n, int max) {
-        if(n<=0){
-            throw new IllegalArgumentException("n must be > 0");
-        } else if(n==1){
-            Set<Set<Integer>> set = new HashSet<>();
-            for(int i=0; i<=max; i++){
-                set.add(new HashSet<>(Arrays.asList(i)));
-            }
-            return set;
-        } else{
-            Set<Set<Integer>> ls = getNTuples(n-1, max);
-            Set<Set<Integer>> result = new HashSet<>();
-            for(int i=0; i<= max; i++){
-                for(Set<Integer> tuple : ls){
-                    if(!tuple.contains(i)){
-                        Set<Integer> newTuple = new HashSet<>(tuple);
-                        newTuple.add(i);
-                        result.add(newTuple);
-                    }
-                }
-            }
-            return result;
-        }
-    }
 
     /**
      * Creates a CNF from a list of comparisons (conjunction of the comparisons)
@@ -159,6 +112,9 @@ public class CNFEstimation {
      * @return estimation of the probability that the comparison evaluates to true
      */
     private double estimateComparison(ComparisonExpressionTPGM comparisonExpression) {
+        if(isLabelComp(comparisonExpression)){
+            return 1.;
+        }
         if(comparisonExpression.getVariables().size() > 1){
             return estimateComparisonOnDifferent(comparisonExpression);
         }
@@ -167,6 +123,34 @@ public class CNFEstimation {
         }
     }
 
+    /**
+     * Checks if a comparison describes the label of an element
+     * @param comparison comparison to check
+     * @return true iff the comparison describes the label of an element
+     */
+    private boolean isLabelComp(ComparisonExpressionTPGM comparison){
+        if(comparison.getComparator()!=EQ){
+            return false;
+        }
+        if(comparison.getLhs() instanceof PropertySelectorComparable){
+            if(((PropertySelectorComparable) comparison.getLhs())
+                    .getPropertyKey().equals("__label__")){
+                return true;
+            }
+        } else if(comparison.getRhs() instanceof PropertySelectorComparable){
+            if(((PropertySelectorComparable) comparison.getRhs())
+                    .getPropertyKey().equals("__label__")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Estimates the probability that a comparison involving only one element holds.
+     * @param comparisonExpression comparison
+     * @return estimation of probability that the comparison holds
+     */
     private double estimateCompOnSameTPGM(ComparisonExpressionTPGM comparisonExpression) {
         QueryComparableTPGM lhs = comparisonExpression.getLhs();
         QueryComparableTPGM rhs = comparisonExpression.getRhs();
@@ -255,6 +239,11 @@ public class CNFEstimation {
         return stats.estimateDurationProb(type, label, comp, transaction, rhsValue);
     }
 
+    /**
+     * Estimates the probability that a comparison involving MIN or MAX holds.
+     * @param comparisonExpression comparison
+     * @return estimation of probability that the comparison holds
+     */
     private double MinMaxTemporalEstimation(ComparisonExpressionTPGM comparisonExpression) {
         // TODO implement if needed
         return 1.0;
@@ -341,7 +330,13 @@ public class CNFEstimation {
         return stats.estimatePropertyProb(type, label, property, comp, value);
     }
 
-
+    /**
+     * Used to switch lhs and rhs of a comparison. Switches the comparator.
+     * This is not the inversion function!
+     * E.g., for <, the return value is > (while the inverse of < is >=)
+     * @param comp comparator to switch
+     * @return switched comparator
+     */
     private Comparator switchComparator(Comparator comp) {
         if(comp==EQ || comp==NEQ){
             return comp;
@@ -356,6 +351,11 @@ public class CNFEstimation {
         }
     }
 
+    /**
+     * Estimates the probability that a comparison involving more than one element holds.
+     * @param comparisonExpression comparison
+     * @return estimation of probability that the comparison holds.
+     */
     private double estimateComparisonOnDifferent(ComparisonExpressionTPGM comparisonExpression) {
         // TODO implement maybe later
         return 1.;

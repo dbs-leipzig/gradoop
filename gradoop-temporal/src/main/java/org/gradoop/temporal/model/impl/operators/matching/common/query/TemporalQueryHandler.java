@@ -8,6 +8,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
@@ -99,30 +101,41 @@ public class TemporalQueryHandler{
     private Map<String, Vertex> vertexCache;
 
     /**
-     * Creates a new query handler that postprocesses the query, i.e. reduces it to simple comparisons.
+     * Transformations to apply to the query cnf
+     */
+    private CNFPostProcessing cnfPostProcessing;
+
+    /**
+     * The query CNF
+     */
+    private TemporalCNF cnf;
+
+    /**
+     * Creates a new query handler that postprocesses the CNF with a default
+     * {@link CNFPostProcessing}
      *
      * @param gdlString GDL query string
      */
-    public TemporalQueryHandler(String gdlString) {
-        this(gdlString, true);
+    public TemporalQueryHandler(String gdlString) throws QueryContradictoryException {
+        this(gdlString, new CNFPostProcessing());
     }
 
     /**
      * Creates a new query handler.
      *
      * @param gdlString GDL query string
-     * @param processQuery flag to indicate whether query should be postprocessed, i.e. reduced to simple
-     *                     comparisons
+     * @param postProcessing transformations to apply to the CNF
      */
-    public TemporalQueryHandler(String gdlString, boolean processQuery){
+    public TemporalQueryHandler(String gdlString, CNFPostProcessing postProcessing) throws QueryContradictoryException {
         now = new TimeLiteral("now");
         gdlHandler = new GDLHandler.Builder()
                 .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
                 .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
                 .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
                 .setErrorStrategy(new BailSyntaxErrorStrategy())
-                .setProcessQuery(processQuery)
                 .buildFromString(gdlString);
+        this.cnfPostProcessing = postProcessing;
+        initCNF();
         edgeCache = gdlHandler.getEdgeCache(true, true);
         vertexCache = gdlHandler.getVertexCache(true, true);
     }
@@ -178,14 +191,22 @@ public class TemporalQueryHandler{
      *
      * @return predicates
      */
-    public TemporalCNF getPredicates() {
-        System.out.println(gdlHandler.getPredicates());
+    public TemporalCNF getCNF() {
+        return cnf;
+    }
+
+    /**
+     * Initiates the query CNF from the query, including postprocessing
+     * @throws QueryContradictoryException if query is found to be contradictory
+     */
+    private void initCNF() throws QueryContradictoryException{
         if (gdlHandler.getPredicates().isPresent()) {
             Predicate predicate = gdlHandler.getPredicates().get();
             predicate = preprocessPredicate(predicate);
-            return QueryPredicateFactory.createFrom(predicate).asCNF();
+            TemporalCNF rawCNF = QueryPredicateFactory.createFrom(predicate).asCNF();
+            cnf = cnfPostProcessing.postprocess(rawCNF);
         } else {
-            return QueryPredicateFactory.createFrom(preprocessPredicate(null)).asCNF();
+            cnf =  QueryPredicateFactory.createFrom(preprocessPredicate(null)).asCNF();
         }
     }
 

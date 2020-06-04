@@ -62,6 +62,8 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
      */
     protected final String expectedCollection;
 
+
+
     /**
      * initializes a test with a data graph
      * @param testName name of the test
@@ -107,10 +109,10 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         TemporalGraphCollection expectedByData = transformExpectedToTemporal(
                 loader.getGraphCollectionByVariables(expectedGraphVariables));
 
-        System.out.println(result.getGraphHeads().count());
+        //System.out.println(result.getGraphHeads().count());
 
         List<TemporalGraphHead> graphHeads = result.getGraphHeads().collect();
-        System.out.println("expected: "+expectedCollection);
+        //System.out.println("expected: "+expectedCollection);
         printResult(result);
         // exists variable mapping?
         for (TemporalGraphHead graphHead : graphHeads) {
@@ -215,7 +217,7 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
         }
 
         // compare resulting global time data with expected
-        System.out.println("Number of graphs: "+graphIds.size());
+        //System.out.println("Number of graphs: "+graphIds.size());
         for(GradoopId graphId: graphIds){
             TemporalGraphHead head = null;
             // not every returned logical graph corresponds to a matching result
@@ -260,8 +262,8 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
                 .map(v -> v.getPropertyValue("edgeId").getInt())
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        System.out.println("Vertices "+vertices);
-        System.out.println("Edges "+edges);
+        //System.out.println("Vertices "+vertices);
+        //System.out.println("Edges "+edges);
     }
 
     /**

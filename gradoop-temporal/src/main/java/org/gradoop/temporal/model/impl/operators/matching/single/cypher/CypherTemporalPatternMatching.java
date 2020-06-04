@@ -8,9 +8,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.TemporalGraphCollectionFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.debug.PrintEmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbeddingTPGM;
@@ -28,6 +33,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import static com.google.common.collect.Sets.difference;
 import static com.google.common.collect.Sets.intersection;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.PostProcessor.extractGraphCollectionWithData;
@@ -58,7 +64,7 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
     /**
      * Statistics about the data graph
      */
-    private final GraphStatistics graphStatistics;
+    private final TemporalGraphStatistics graphStatistics;
 
     /**
      * Instantiates a new operator.
@@ -71,8 +77,8 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
      */
     public CypherTemporalPatternMatching(String query, boolean attachData,
                                          MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-                                         GraphStatistics graphStatistics) {
-        this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+                                         TemporalGraphStatistics graphStatistics, CNFPostProcessing postProcessing) {
+        this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics, postProcessing);
     }
 
     /**
@@ -86,8 +92,9 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
      * @param graphStatistics     statistics about the data graph
      */
     public CypherTemporalPatternMatching(String query, String constructionPattern, boolean attachData,
-                                 MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-        super(query, attachData, LOG);
+                                 MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+                                         TemporalGraphStatistics graphStatistics, CNFPostProcessing postprocessor) {
+        super(query, attachData, postprocessor, LOG);
         this.constructionPattern = constructionPattern;
         this.vertexStrategy = vertexStrategy;
         this.edgeStrategy = edgeStrategy;
@@ -109,6 +116,7 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
 
         // Query execution
         DataSet<EmbeddingTPGM> embeddings = plan.execute();
+
         EmbeddingTPGMMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();
 
         embeddings =
@@ -140,6 +148,11 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
         return graphCollection;
     }
 
+    @Override
+    protected TemporalGraphCollection emptyCollection(TemporalGraph graph) {
+        return graph.getCollectionFactory().createEmptyCollection();
+    }
+
     /**
      * Method to construct final embedded elements
      *
@@ -151,8 +164,15 @@ extends TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphC
     private DataSet<Element> constructFinalElements(TemporalGraph graph, DataSet<EmbeddingTPGM> embeddings,
                                                     EmbeddingTPGMMetaData embeddingMetaData) {
 
-        TemporalQueryHandler constructionPatternHandler = new TemporalQueryHandler(
-                this.constructionPattern);
+        TemporalQueryHandler constructionPatternHandler = null;
+        try {
+            // no postprocessing needed, construction pattern is not a query
+            constructionPatternHandler = new TemporalQueryHandler(
+                    this.constructionPattern, new CNFPostProcessing(new ArrayList<>()));
+            // will never happen, as the construction pattern does not contain conditions
+        } catch (QueryContradictoryException e) {
+            e.printStackTrace();
+        }
         constructionPatternHandler.updateGeneratedVariableNames(n -> "_" + n);
 
         Set<String> queryVars = Sets.newHashSet(embeddingMetaData.getVariables());

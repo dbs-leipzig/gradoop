@@ -25,9 +25,9 @@ public class TemporalElementStats implements Serializable {
     private long elementCount;
 
     /**
-     * Number of bins used for temporal estimations
+     * Default Number of bins used for temporal estimations
      */
-    public static final int NUM_BINS = 100;
+    public static final int DEFAULT_NUM_BINS = 100;
 
     /**
      * Bins to estimate distributions of tx_from, tx_to, val_from, val_to values
@@ -125,7 +125,7 @@ public class TemporalElementStats implements Serializable {
         valDurationStats = new double[]{};
         txFromValFromStats = new double[]{};
         txToValToStats = new double[]{};
-        sampler = new ReservoirSampler<>(reservoirSampleSize);
+        sampler = new ReservoirSampler<TemporalElement>(reservoirSampleSize);
     }
 
     /**
@@ -201,10 +201,12 @@ public class TemporalElementStats implements Serializable {
             return;
         }
 
+        int numBins = Math.min(DEFAULT_NUM_BINS, sampleSize);
+
         // sample size must be a multiple of the number of bins
-        if(sampleSize % NUM_BINS != 0){
+        if(sampleSize % numBins != 0){
             reservoirSample = reservoirSample.subList(0, (
-                    sampleSize - (sampleSize % NUM_BINS)
+                    sampleSize - (sampleSize % numBins)
                     ));
         }
 
@@ -249,7 +251,7 @@ public class TemporalElementStats implements Serializable {
                 valDurations.add(valTo - valFrom);
             }
 
-            if(valTo == Long.MAX_VALUE && txTo == Long.MAX_VALUE){
+            if(valTo == Long.MAX_VALUE  && txTo == Long.MAX_VALUE){
                 bothAsOfNowCount+=1;
             }
             if(valTo != Long.MAX_VALUE && txTo != Long.MAX_VALUE){
@@ -262,10 +264,10 @@ public class TemporalElementStats implements Serializable {
         validAsOfNowEstimation = (double) valAsOfNowCount / (double) sampleSize;
 
         estimatedTimeBins = new Binning[]{
-                new Binning(txFroms),
-                new Binning(txTos),
-                new Binning(valFroms),
-                new Binning(valTos)
+                new Binning(txFroms, numBins),
+                new Binning(txTos, numBins),
+                new Binning(valFroms, numBins),
+                new Binning(valTos, numBins)
         };
 
 
@@ -523,6 +525,10 @@ public class TemporalElementStats implements Serializable {
             computeTemporalEstimations();
         }
         return valDurationStats;
+    }
+
+    public List<TemporalElement> getSample(){
+        return sampler.getReservoirSample();
     }
 
     @Override

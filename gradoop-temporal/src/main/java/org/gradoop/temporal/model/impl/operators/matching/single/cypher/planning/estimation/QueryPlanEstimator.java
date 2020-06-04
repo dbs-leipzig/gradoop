@@ -5,6 +5,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphSt
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
@@ -37,7 +38,7 @@ public class QueryPlanEstimator {
      * @param graphStatistics graph statistics
      */
     public QueryPlanEstimator(QueryPlan queryPlan, TemporalQueryHandler queryHandler,
-                              GraphStatistics graphStatistics) {
+                              TemporalGraphStatistics graphStatistics) {
         this.queryPlan = queryPlan;
         this.joinEstimator = new JoinEstimator(queryHandler, graphStatistics);
         this.filterEstimator = new FilterEstimator(queryHandler, graphStatistics);

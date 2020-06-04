@@ -32,7 +32,6 @@ public class FilterAndProjectTemporalVertex extends
      * @param projectionPropertyKeys property keys that will be used for projection
      */
     public FilterAndProjectTemporalVertex(TemporalCNF predicates, List<String> projectionPropertyKeys) {
-        System.out.println("FilterAndProjectTemporalVertex predicates: "+predicates);
         this.predicates = predicates;
         this.projectionPropertyKeys = projectionPropertyKeys;
     }

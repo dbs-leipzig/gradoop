@@ -4,6 +4,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.*;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.util.RandomTestGenerator;
@@ -64,11 +67,20 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
 
     @Override
     public TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphCollection>
-    getImplementation(String queryGraph, boolean attachData) {
+    getImplementation(String queryGraph, boolean attachData){
         // dummy value for dummy GraphStatistics
-        int n = 42;
-        GraphStatistics stats = new GraphStatistics(n,n,n,n);
+        TemporalGraphStatistics stats = null;
+        TemporalGraph g = null;
+        try {
+            g = getTemporalGraphFromLoader(getLoader());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        stats = new BinningTemporalGraphStatisticsFactory()
+                    .fromGraph(g);
+
         return new CypherTemporalPatternMatching(queryGraph, attachData, MatchStrategy.HOMOMORPHISM,
-                MatchStrategy.HOMOMORPHISM, stats);
+                MatchStrategy.HOMOMORPHISM, stats, new CNFPostProcessing());
     }
 }

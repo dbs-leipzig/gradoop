@@ -8,7 +8,6 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
@@ -98,8 +97,8 @@ public class FilterAndProjectTemporalEdgesTest {
         String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 AND e.tx_to.after(1970-01-01T00:00:01)";
 
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-        TemporalCNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
-        Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
+        TemporalCNF filterPredicate = queryHandler.getCNF().getSubCNF(Sets.newHashSet("e"));
+        Set<String> projectionKeys = queryHandler.getCNF().getPropertyKeys("e");
 
         FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges, "a", "e", "b",
                 filterPredicate, projectionKeys, false);

@@ -56,5 +56,21 @@ public abstract class QueryComparableTPGM implements Serializable {
         return (this instanceof TemporalComparable);
     }
 
+    public abstract ComparableExpression getWrappedComparable();
+
+    @Override
+    public boolean equals(Object o){
+        if(o==null || !(o instanceof QueryComparableTPGM)){
+            return false;
+        }
+        return getWrappedComparable().equals(
+                ((QueryComparableTPGM)o).getWrappedComparable());
+    }
+
+    @Override
+    public String toString(){
+        return getWrappedComparable().toString();
+    }
+
 }
 

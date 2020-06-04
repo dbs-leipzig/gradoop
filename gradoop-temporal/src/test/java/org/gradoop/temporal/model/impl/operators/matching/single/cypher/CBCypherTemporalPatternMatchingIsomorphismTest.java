@@ -4,6 +4,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.*;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -62,8 +65,14 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     getImplementation(String queryGraph, boolean attachData) {
          //dummy value for dummy GraphStatistics
         int n = 42;
-        GraphStatistics stats = new GraphStatistics(n,n,n,n);
+        TemporalGraphStatistics stats = null;
+        try {
+            stats = new BinningTemporalGraphStatisticsFactory()
+                    .fromGraph(getTemporalGraphFromLoader(getLoader()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new CypherTemporalPatternMatching(queryGraph, attachData, MatchStrategy.ISOMORPHISM,
-                MatchStrategy.ISOMORPHISM, stats);
+                MatchStrategy.ISOMORPHISM, stats, new CNFPostProcessing());
     }
 }

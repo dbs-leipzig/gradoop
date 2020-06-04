@@ -1,37 +1,21 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.booleans.AndPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
 
 import static org.junit.Assert.*;
 
 public class FilterTemporalVertexTest {
 
     @Test
-    public void testFilterTemporalVertex(){
+    public void testFilterTemporalVertex() throws QueryContradictoryException {
         String query = "MATCH (a) WHERE (1970-01-01.before(a.tx_from)) AND a.prop=\"test\"";
-        TemporalCNF cnf  = new TemporalQueryHandler(query).getPredicates();
+        TemporalCNF cnf  = new TemporalQueryHandler(query).getCNF();
 
         FilterTemporalVertex filter = new FilterTemporalVertex(cnf);
 

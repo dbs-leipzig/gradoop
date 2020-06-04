@@ -14,7 +14,7 @@ public class IsomorphismAsOfData implements TemporalTestData {
          // 1.[(Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
          // 2.[(Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
         data.add(new String[]{
-                "Before_ISO_1_default_citibike",
+                "AsOf_ISO_1_default_citibike",
                 CBCypherTemporalPatternMatchingTest.defaultData,
                 "MATCH (a)-[e]->(b) WHERE e.asOf(2013-06-01T00:01:00)",
                 "expected1,expected2",

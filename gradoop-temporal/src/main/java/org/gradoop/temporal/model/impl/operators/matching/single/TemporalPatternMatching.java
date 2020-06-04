@@ -20,6 +20,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -53,7 +55,7 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
     /**
      * Query handler for queries including time data
      */
-    private final TemporalQueryHandler queryHandler;
+    private TemporalQueryHandler queryHandler;
     /**
      * If true, the original vertex and edge data gets attached to the resulting
      * vertices and edges.
@@ -67,6 +69,10 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
      * Edge mapping used for debug
      */
     private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
+    /**
+     * indicates that the query is contradictory
+     */
+    private boolean contradictoryQuery = false;
 
     /**
      * Constructor
@@ -76,10 +82,27 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
      * @param log         Logger of the concrete implementation
      */
     public TemporalPatternMatching(String query, boolean attachData, Logger log) {
+        this(query, attachData, new CNFPostProcessing(), log);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param query       GDL query graph
+     * @param attachData  true, if original data shall be attached to the result
+     * @param log         Logger of the concrete implementation
+     */
+    public TemporalPatternMatching(String query, boolean attachData, CNFPostProcessing cnfProcessor,
+                                   Logger log) {
         Preconditions.checkState(!Strings.isNullOrEmpty(query),
                 "Query must not be null or empty");
         this.query         = query;
-        this.queryHandler  = new TemporalQueryHandler(query, false);
+
+        try {
+            queryHandler  = new TemporalQueryHandler(query, cnfProcessor);
+        } catch (QueryContradictoryException e) {
+            contradictoryQuery = true;
+        }
         this.attachData    = attachData;
         this.log           = log;
     }
@@ -88,6 +111,10 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
     public GC execute(LG graph) {
         if (log.isDebugEnabled()) {
             initDebugMappings(graph);
+        }
+
+        if(contradictoryQuery){
+            return emptyCollection(graph);
         }
 
         GC result;
@@ -116,6 +143,13 @@ implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
      * @return result collection
      */
     protected abstract GC executeForPattern(LG graph);
+
+    /**
+     * Return an empty result
+     * @param graph data graph, possibly needed to create a GC factory in the subclass
+     * @return empty result collection
+     */
+    protected abstract GC emptyCollection(LG graph);
 
     /**
      * Returns the query handler.

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
@@ -35,7 +36,7 @@ public class JoinEstimator extends Estimator {
      * @param queryHandler query handler
      * @param graphStatistics graph statistics
      */
-    JoinEstimator(TemporalQueryHandler queryHandler, GraphStatistics graphStatistics) {
+    JoinEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics) {
         super(queryHandler, graphStatistics);
         this.cardinalities = new HashMap<>();
         this.distinctValues = new HashMap<>();
