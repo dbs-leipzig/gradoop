@@ -99,7 +99,7 @@ public class CNFEstimation {
         ArrayList<CNFElementTPGM> elements = new ArrayList<>();
         for(ComparisonExpressionTPGM comparison: comparisons){
             elements.add(new CNFElementTPGM(
-                    new ArrayList<ComparisonExpressionTPGM>(Arrays.asList(comparison))));
+                    new ArrayList<>(Arrays.asList(comparison))));
         }
         return new TemporalCNF(elements);
     }
@@ -113,6 +113,11 @@ public class CNFEstimation {
      */
     private double estimateComparison(ComparisonExpressionTPGM comparisonExpression) {
         if(isLabelComp(comparisonExpression)){
+            if(!labelMap.containsValue(getLabelFromLabelComp(comparisonExpression))){
+                return 0.001;
+            }
+            // if label is in the DB, the estimations for the rest of
+            // the CNF take care of the label's selectivity
             return 1.;
         }
         if(comparisonExpression.getVariables().size() > 1){
@@ -147,6 +152,28 @@ public class CNFEstimation {
     }
 
     /**
+     * Extracts the label assigned to an element by a comparison of the form
+     * a.__label__="label" or "label"==a.__label__
+     *
+     * @param comparison comparison of the form a.__label__="label" or "label"==a.__label__
+     * @return label assigned to the element
+     */
+    private String getLabelFromLabelComp(ComparisonExpressionTPGM comparison){
+        if(comparison.getLhs() instanceof PropertySelectorComparable){
+            if(((PropertySelectorComparable) comparison.getLhs())
+                    .getPropertyKey().equals("__label__")){
+                return (String)((LiteralComparable)comparison.getRhs()).getValue();
+            }
+        } else if(comparison.getRhs() instanceof PropertySelectorComparable){
+            if(((PropertySelectorComparable) comparison.getRhs())
+                    .getPropertyKey().equals("__label__")){
+                return (String)((LiteralComparable)comparison.getLhs()).getValue();
+            }
+        }
+        return "";
+    }
+
+    /**
      * Estimates the probability that a comparison involving only one element holds.
      * @param comparisonExpression comparison
      * @return estimation of probability that the comparison holds
@@ -163,15 +190,15 @@ public class CNFEstimation {
             }
             else if(lhs instanceof TimeSelectorComparable && rhs instanceof TimeLiteralComparable
                     || lhs instanceof TimeLiteralComparable && rhs instanceof TimeSelectorComparable){
-                return simpleTemporalEstimation((ComparisonExpressionTPGM) comparisonExpression);
+                return simpleTemporalEstimation(comparisonExpression);
             }
             else if(lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable
                     || rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable){
-                return MinMaxTemporalEstimation((ComparisonExpressionTPGM) comparisonExpression);
+                return MinMaxTemporalEstimation(comparisonExpression);
             }
             else if((lhs instanceof DurationComparable && rhs instanceof TimeConstantComparable)
                     || (lhs instanceof TimeConstantComparable && rhs instanceof DurationComparable)){
-                return simpleDurationEstimation((ComparisonExpressionTPGM) comparisonExpression);
+                return simpleDurationComparisonEstimation(comparisonExpression);
             } else{
                 return 1.;
             }
@@ -199,7 +226,7 @@ public class CNFEstimation {
      * @param comparisonExpression comparison
      * @return estimation of the probability that the comparison evaluates to true
      */
-    private double simpleDurationEstimation(ComparisonExpressionTPGM comparisonExpression) {
+    private double simpleDurationComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
         QueryComparableTPGM lhs = comparisonExpression.getLhs();
         QueryComparableTPGM rhs = comparisonExpression.getRhs();
         Comparator comp = comparisonExpression.getComparator();
@@ -215,16 +242,7 @@ public class CNFEstimation {
         }
         // only valid and tx durations can be estimated
         Duration duration = (Duration) ((DurationComparable)lhs).getWrappedComparable();
-        if(!(duration.getFrom() instanceof TimeSelector) || !(duration.getTo() instanceof TimeSelector)){
-            return 1.;
-        }
-        TimeSelector from = (TimeSelector) duration.getFrom();
-        TimeSelector to = (TimeSelector) duration.getTo();
-        if(!
-                ((from.getTimeProp()== TimeSelector.TimeField.VAL_FROM
-                && to.getTimeProp()== TimeSelector.TimeField.VAL_TO) ||
-                (from.getTimeProp()== TimeSelector.TimeField.TX_FROM
-                && to.getTimeProp()== TimeSelector.TimeField.TX_TO))){
+        if(!checkSimpleDuration(duration)){
             return 1.;
         }
 
@@ -232,11 +250,41 @@ public class CNFEstimation {
         TemporalGraphStatistics.ElementType type = typeMap.get(variable);
         Optional<String> label = labelMap.containsKey(variable) ?
                 Optional.of(labelMap.get(variable)) : Optional.empty();
+        TimeSelector from = (TimeSelector) duration.getFrom();
         boolean transaction = from.getTimeProp()== TimeSelector.TimeField.TX_FROM;
         long rhsValue = ((TimeConstant)((TimeConstantComparable) rhs)
                 .getWrappedComparable()).getMillis();
 
         return stats.estimateDurationProb(type, label, comp, transaction, rhsValue);
+    }
+
+    /**
+     * Checks if a duration is of the simple form [a.tx_from, a.tx_to] or
+     * [a.val_from, a.val_to]
+     *
+     * @param duration duration to check
+     * @return true iff the duration has this simple form
+     */
+    private boolean checkSimpleDuration(Duration duration){
+        // two time selectors?
+        if(!(duration.getFrom() instanceof TimeSelector) || !(duration.getTo() instanceof TimeSelector)){
+            return false;
+        }
+        TimeSelector from = (TimeSelector) duration.getFrom();
+        TimeSelector to = (TimeSelector) duration.getTo();
+        // val_from, val_to or tx_from, tx_to?
+        if(!
+                ((from.getTimeProp()== TimeSelector.TimeField.VAL_FROM
+                        && to.getTimeProp()== TimeSelector.TimeField.VAL_TO) ||
+                        (from.getTimeProp()== TimeSelector.TimeField.TX_FROM
+                                && to.getTimeProp()== TimeSelector.TimeField.TX_TO))){
+            return false;
+        }
+        // same variable for both selectors?
+        if(!from.getVariable().equals(to.getVariable())){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -357,7 +405,96 @@ public class CNFEstimation {
      * @return estimation of probability that the comparison holds.
      */
     private double estimateComparisonOnDifferent(ComparisonExpressionTPGM comparisonExpression) {
-        // TODO implement maybe later
-        return 1.;
+        QueryComparableTPGM lhs = comparisonExpression.getLhs();
+        QueryComparableTPGM rhs = comparisonExpression.getRhs();
+
+        if(comparisonExpression.isTemporal()){
+            if(lhs instanceof TimeSelectorComparable && rhs instanceof TimeSelectorComparable){
+                return timeSelectorComparisonEstimation(comparisonExpression);
+            }
+            else if(lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable
+                    || rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable){
+                return MinMaxTemporalEstimation(comparisonExpression);
+            }
+            else if((lhs instanceof DurationComparable && rhs instanceof DurationComparable)){
+                return durationComparisonEstimation(comparisonExpression);
+            } else{
+                return 1.;
+            }
+        }
+        else{
+            if(lhs instanceof PropertySelectorComparable &&
+                    rhs instanceof PropertySelectorComparable){
+                return complexPropertyEstimation(comparisonExpression);
+            }
+            else{
+                return 1.;
+            }
+        }
+    }
+
+    /**
+     * Computes the estimation of the probability that a comparison between two
+     * durations holds
+     * @param comparisonExpression comparison
+     * @return estimation of the probability that the comparison holds
+     */
+    private double durationComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
+        Duration lhs = (Duration) comparisonExpression.getLhs().getWrappedComparable();
+        Duration rhs = (Duration) comparisonExpression.getRhs().getWrappedComparable();
+        if(!(checkSimpleDuration(lhs) && checkSimpleDuration(rhs))){
+            return 1.;
+        }
+
+        TimeSelector from1 = (TimeSelector) lhs.getFrom();
+        String variable1 = from1.getVariable();
+        TemporalGraphStatistics.ElementType type1 = typeMap.get(variable1);
+        Optional<String> label1 = labelMap.containsKey(variable1) ?
+                Optional.of(labelMap.get(variable1)) : Optional.empty();
+        boolean transaction1 = from1.getTimeProp()== TimeSelector.TimeField.TX_FROM;
+
+        TimeSelector from2 = (TimeSelector) rhs.getFrom();
+        String variable2 = from2.getVariable();
+        TemporalGraphStatistics.ElementType type2 = typeMap.get(variable2);
+        Optional<String> label2 = labelMap.containsKey(variable2) ?
+                Optional.of(labelMap.get(variable2)) : Optional.empty();
+        boolean transaction2 = from2.getTimeProp()== TimeSelector.TimeField.TX_FROM;
+
+        Comparator comp = comparisonExpression.getComparator();
+
+        return stats.estimateDurationProb(type1, label1, transaction1, comp, type2,
+                label2, transaction2);
+    }
+
+    /**
+     * Computes the estimation of the probability that a comparison between two time
+     * selectors (of different elements) holds
+     * @param comparisonExpression comparison
+     * @return estimation of the probability that the comparison holds
+     */
+    private double timeSelectorComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
+        TimeSelectorComparable lhs = (TimeSelectorComparable) comparisonExpression.getLhs();
+        TimeSelectorComparable rhs = (TimeSelectorComparable) comparisonExpression.getRhs();
+        Comparator comp = comparisonExpression.getComparator();
+
+        String lhsVariable = lhs.getVariable();
+        TemporalGraphStatistics.ElementType type1 = typeMap.getOrDefault(lhsVariable, null);
+        if(type1 == null){
+            return 0.001;
+        }
+        Optional<String> label1 = labelMap.containsKey(lhsVariable) ?
+                Optional.of(labelMap.get(lhsVariable)) : Optional.empty();
+        TimeSelector.TimeField field1 = lhs.getTimeField();
+
+        String rhsVariable = rhs.getVariable();
+        TemporalGraphStatistics.ElementType type2 = typeMap.getOrDefault(rhsVariable, null);
+        if(type2 == null){
+            return 0.001;
+        }
+        Optional<String> label2 = labelMap.containsKey(rhsVariable) ?
+                Optional.of(labelMap.get(rhsVariable)) : Optional.empty();
+        TimeSelector.TimeField field2 = rhs.getTimeField();
+
+        return stats.estimateTemporalProb(type1, label1, field1, comp, type2, label2, field2);
     }
 }

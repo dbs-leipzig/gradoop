@@ -7,6 +7,8 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQ
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.util.CNFEstimation;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterTemporalEmbeddingsNode;
@@ -31,6 +33,9 @@ public class FilterEstimator extends Estimator {
      */
     private double selectivity;
 
+    /**
+     * Used to estimate filter selectivity
+     */
     private CNFEstimation cnfEstimator;
 
     /**
@@ -45,6 +50,9 @@ public class FilterEstimator extends Estimator {
         initCNFEstimator();
     }
 
+    /**
+     * Initializes the CNFEstimator
+     */
     private void initCNFEstimator(){
         TemporalQueryHandler handler = getQueryHandler();
 
@@ -123,7 +131,7 @@ public class FilterEstimator extends Estimator {
      * @param predicates query predicates
      */
     private void updateSelectivity(TemporalCNF predicates) {
-        selectivity = cnfEstimator.estimateCNF(predicates);
+        selectivity *= cnfEstimator.estimateCNF(predicates);
     }
 
     public CNFEstimation getCnfEstimator(){

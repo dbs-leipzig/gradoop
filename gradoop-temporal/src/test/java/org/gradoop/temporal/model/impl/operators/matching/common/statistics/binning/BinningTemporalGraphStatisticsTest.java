@@ -116,6 +116,40 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     }
 
     @Test
+    public void complexDurationTest(){
+        BinningTemporalGraphStatistics stats = getDummyStats();
+        //works for unbounded (values hard to estimate, as they aren't actually
+        // normally distributed here
+        // all lengths normally distributed from 0 to 100
+        double estimation1 = stats.estimateDurationProb(EDGE, Optional.empty(),
+                 false, EQ, EDGE, Optional.of("edge"), true);
+        assertEquals(estimation1, 0.01, 0.01);
+
+        double estimation2 = stats.estimateDurationProb(EDGE, Optional.of("edge"), true,
+                NEQ, EDGE, Optional.of("edge"), true);
+        assertEquals(estimation2, 1., 0.01);
+
+        double estimation3 = stats.estimateDurationProb(EDGE, Optional.empty(), false,
+                LT, EDGE, Optional.empty(), false);
+        assertEquals(estimation3, 0.5, 0.02);
+
+        double estimation4 = stats.estimateDurationProb(EDGE, Optional.of("edge"),
+                false, LTE, EDGE, Optional.empty(), false);
+        assertTrue(estimation4 > estimation3);
+        assertEquals(estimation4, 0.5, 0.2);
+
+        double estimation5 = stats.estimateDurationProb(EDGE, Optional.of("edge"),
+                false, GT, EDGE, Optional.of("edge"), true);
+        assertEquals(estimation5, 0.5, 0.02);
+
+        double estimation6 = stats.estimateDurationProb(EDGE, Optional.empty(), true,
+                GTE, EDGE, Optional.of("edge"), false);
+        assertTrue(estimation6 > estimation5);
+        assertEquals(estimation6, 0.5, 0.02);
+
+    }
+
+    @Test
     public void estimateCategoricalTest(){
         BinningTemporalGraphStatistics stats = getDummyStats();
         double estimation1 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"), "catProp1", EQ,
@@ -317,7 +351,71 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
                 EQ, VERTEX, Optional.empty(), "gender");
         assertEquals(estimation10, 0.1375, 0.001);
 
+    }
 
+    @Test
+    public void complexTemporalTest(){
+        // estimations are quite inaccurate
+        BinningTemporalGraphStatistics stats = getDummyStats();
+        double estimation1 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_FROM,
+                GTE, VERTEX, Optional.of("v2"), TX_TO);
+        assertEquals(estimation1, 0.05, 0.025);
+
+        double estimation2 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
+                LTE, VERTEX, Optional.of("v1"), VAL_TO);
+        assertEquals(estimation2, 0.5, 0.1);
+
+        double estimation3 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
+                LT, VERTEX, Optional.of("v1"), VAL_TO);
+        assertTrue(estimation3 <= estimation2);
+        assertEquals(estimation3, estimation2, 0.1);
+
+        double estimation4 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_FROM,
+                GT, VERTEX, Optional.of("v2"), TX_TO);
+        assertTrue(estimation4 <= estimation1);
+        assertEquals(estimation4, estimation1, 0.01);
+
+        double estimation5 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
+                GTE, VERTEX, Optional.empty(), TX_TO);
+        assertEquals(estimation5, 0.5, 0.1);
+
+        double estimation6 = stats.estimateTemporalProb(VERTEX, Optional.empty(), TX_TO,
+                LTE, VERTEX, Optional.of("v2"), TX_FROM);
+        assertEquals(estimation6, 0.25, 0.05);
+
+        double estimation7 = stats.estimateTemporalProb(VERTEX, Optional.empty(), TX_FROM,
+                LT, VERTEX, Optional.empty(), TX_FROM);
+        assertEquals(estimation7, 0.5, 0.05);
+
+        double estimation8 = stats.estimateTemporalProb(EDGE, Optional.empty(), TX_FROM,
+                GT, VERTEX, Optional.of("v1"), VAL_FROM);
+        assertEquals(estimation8, 0.01, 0.01);
+
+        double estimation9 = stats.estimateTemporalProb(EDGE, Optional.of("edge"), VAL_TO,
+                LTE, VERTEX, Optional.empty(), VAL_TO);
+        assertEquals(estimation9, 0.99, 0.05);
+
+        double estimation10 = stats.estimateTemporalProb(EDGE, Optional.of("edge"), VAL_TO,
+                GTE, EDGE, Optional.empty(), TX_TO);
+        assertEquals(estimation10, 0.5, 0.05);
+
+        // EQ and NEQ
+        double estimation11 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
+                EQ, EDGE, Optional.of("edge"), TX_TO);
+        assertEquals(estimation11, 0.001, 0.001);
+
+        double estimation12 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_FROM,
+                NEQ, VERTEX, Optional.of("v1"), VAL_FROM);
+        assertEquals(estimation12, 0.999, 0.01);
+
+        // label not there
+        double estimation13 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_FROM,
+                LTE, VERTEX, Optional.of("unknownLabel"), VAL_FROM);
+        assertEquals(estimation13, 0., 0.01);
+
+        double estimation14 = stats.estimateTemporalProb(VERTEX, Optional.of("notThere"), TX_FROM,
+                GT, EDGE, Optional.of("edge"), VAL_FROM);
+        assertEquals(estimation14, 0., 0.01);
     }
 
     @Test

@@ -96,6 +96,28 @@ public abstract class TemporalGraphStatistics {
                                                 Comparator comp, Long value);
 
     /**
+     * Estimates the probability that a comparison between two time selectors
+     * holds. The return value may only be reasonable, if the time selectors
+     * refer to distinct variables.
+     *
+     * @param type1 the type of the lhs element to compare (vertex or edge)
+     * @param label1 label of the lhs element to compare (if known)
+     * @param field1 time field (tx_from, tx_to, valid_from, valid_to) of the lhs
+     *               element to compare
+     * @param comp comparator
+     * @param type2 the type of the rhs element to compare (vertex or edge)
+     * @param label2 label of the rhs element to compare (if known)
+     * @param field2 time field (tx_from, tx_to, valid_from, valid_to) of the rhs
+     *               element to compare
+     * @return estimation of the probability that the condition holds
+     */
+    public abstract double estimateTemporalProb(ElementType type1, Optional<String> label1,
+                                                TimeSelector.TimeField field1,
+                                                Comparator comp,
+                                                ElementType type2, Optional<String> label2,
+                                                TimeSelector.TimeField field2);
+
+    /**
      * Estimates the probability that a comparison of the form
      * {@code variable.duration comparator constant}
      * holds.
@@ -109,6 +131,27 @@ public abstract class TemporalGraphStatistics {
      */
     public abstract double estimateDurationProb(ElementType type, Optional<String> label,
                                                 Comparator comp, boolean transaction, Long value);
+
+    /**
+     * Estimates the probability that a comparison of the form
+     * {@code variable.duration comparator variable.duration}
+     * holds.
+     *
+     * @param type1 type of the lhs element (vertex/edge)
+     * @param label1 label of the lhs element
+     * @param transaction1 indicates whether lhs transaction time should be compared (=>true)
+     *       or valid time (=> false)@param comp comparator of the comparison
+     * @param comp comparator of the comparison
+     * @param type2 type of the rhs element (vertex/edge)
+     * @param label2 label of the rhs element
+     * @param transaction2 indicates whether rhs transaction time should be compared (=>true)
+     *       or valid time (=> false)@param comp comparator of the comparison
+     * @return estimated probability that the comparison holds
+     */
+    public abstract double estimateDurationProb(ElementType type1, Optional<String> label1,
+                                                boolean transaction1, Comparator comp,
+                                                ElementType type2, Optional<String> label2,
+                                                boolean transaction2);
 
     /**
      * Estimates the probability that a comparison of a property value with a constant holds
