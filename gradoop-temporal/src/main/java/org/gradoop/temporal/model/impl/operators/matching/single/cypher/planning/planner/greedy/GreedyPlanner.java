@@ -14,6 +14,7 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.CNFEstimation;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
@@ -69,6 +70,15 @@ public class GreedyPlanner<
      */
     private final MatchStrategy edgeStrategy;
     /**
+     * Estimates the selectivity of predicates
+     */
+    private CNFEstimation cnfEstimation;
+    /**
+     * The conjunctive normal form for the predicates
+     */
+    TemporalCNF cnf;
+
+    /**
      * Creates a new greedy planner.
      *
      * @param graph search graph
@@ -84,6 +94,8 @@ public class GreedyPlanner<
         this.graphStatistics = graphStatistics;
         this.vertexStrategy = vertexStrategy;
         this.edgeStrategy = edgeStrategy;
+        this.cnfEstimation = new CNFEstimation(graphStatistics, queryHandler);
+        this.cnf = cnfEstimation.reorderCNF(queryHandler.getCNF());
     }
 
     /**
@@ -145,7 +157,7 @@ public class GreedyPlanner<
     private void createVertexPlans(PlanTable planTable)  {
         for (Vertex vertex : queryHandler.getVertices()) {
             String vertexVariable = vertex.getVariable();
-            TemporalCNF allPredicates = queryHandler.getCNF();
+            TemporalCNF allPredicates = this.cnf;
 
             TemporalCNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
             Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
@@ -159,7 +171,7 @@ public class GreedyPlanner<
                     vertex.getVariable(), vertexPredicates, projectionKeys);
 
             planTable.add(new PlanTableEntry(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,
-                    new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+                    new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
         }
     }
 
@@ -176,7 +188,7 @@ public class GreedyPlanner<
             String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();
             String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();
 
-            TemporalCNF allPredicates = queryHandler.getCNF();
+            TemporalCNF allPredicates = this.cnf;
 
             TemporalCNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);
 
@@ -194,7 +206,7 @@ public class GreedyPlanner<
             PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
 
             planTable.add(new PlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
-                    new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+                    new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
         }
     }
 
@@ -292,7 +304,7 @@ public class GreedyPlanner<
         TemporalCNF predicates = mergePredicates(leftEntry, rightEntry);
 
         return new PlanTableEntry(GRAPH, processedVariables, predicates,
-                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics));
+                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation));
     }
 
     /**
@@ -353,7 +365,7 @@ public class GreedyPlanner<
                 FilterTemporalEmbeddingsNode node = new FilterTemporalEmbeddingsNode(
                         entry.getQueryPlan().getRoot(), subCNF);
                 newTable.add(new PlanTableEntry(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),
-                        predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+                        predicates, new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
             } else {
                 newTable.add(entry);
             }
@@ -390,7 +402,7 @@ public class GreedyPlanner<
                         new ArrayList<>(updatedPropertyPairs));
                 newTable.add(new PlanTableEntry(GRAPH,
                         Sets.newHashSet(entry.getProcessedVariables()), entry.getPredicates(),
-                        new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)));
+                        new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
             } else {
                 newTable.add(entry);
             }
@@ -478,7 +490,7 @@ public class GreedyPlanner<
                 GRAPH,
                 processedVariables,
                 predicates,
-                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)
+                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)
         );
     }
 
@@ -556,7 +568,7 @@ public class GreedyPlanner<
                 GRAPH,
                 processedVariables,
                 predicates,
-                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics)
+                new QueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)
         );
     }
 

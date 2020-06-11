@@ -10,18 +10,13 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
-import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.util.CNFEstimation;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
-import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
-import org.junit.Assert;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
@@ -33,8 +28,6 @@ import org.s1ck.gdl.model.predicates.expressions.Comparison;
 
 import java.util.*;
 
-import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.EDGE;
-import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.VERTEX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.*;
@@ -80,6 +73,9 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
         TemporalCNF cnf1 = new TemporalCNF(Arrays.asList(e1));
         double estimation1 = estimator.estimateCNF(cnf1);
         assertEquals(estimation1, 0.24, 0.01);
+        // does the cache work?
+        double estimation1Cached = estimator.estimateCNF(cnf1);
+        assertEquals(estimation1Cached, estimation1, .0);
 
         // switch sides
         Comparison comp2 = new Comparison(new TimeLiteral(175L), LT, aTxFrom);
@@ -354,9 +350,18 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
 
         // conjunction of disjunctions
         // independence assumption, should thus be ~ 0.9125*0.925*1. = 0.844
-        TemporalCNF cnf4 = new TemporalCNF(Arrays.asList(e1, e2, e3));
+        TemporalCNF cnf4 = new TemporalCNF(Arrays.asList(e2, e1, e3));
         double estimation4 = estimator.estimateCNF(cnf4);
         assertEquals(estimation4, 0.84, 0.03);
+
+        // check reordering of cnf4: sequence should be e1, e2, e3
+        CNFElementTPGM e1Reordered = e1; // nothing to change here
+        CNFElementTPGM e2Reordered = new CNFElementTPGM(Arrays.asList(c1, c4, c2));
+        CNFElementTPGM e3Reordered = new CNFElementTPGM(Arrays.asList(c3, c1, c2));
+        TemporalCNF cnf4Reordered = new TemporalCNF(Arrays.asList(
+                e1Reordered, e2Reordered, e3Reordered));
+        assertEquals(estimator.reorderCNF(cnf4), cnf4Reordered);
+
     }
 
     /**

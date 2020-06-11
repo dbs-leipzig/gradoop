@@ -1,7 +1,8 @@
-package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.util;
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 import static org.s1ck.gdl.utils.Comparator.*;
 
+/**
+ * Class to estimate the selectivity of a CNF
+ */
 public class CNFEstimation {
 
     /**
@@ -37,9 +41,15 @@ public class CNFEstimation {
     private Map<String, String> labelMap;
 
     /**
-     * Creates a new object
+     * saves estimations so that they can be looked up, when they are checked more than once
+     */
+    private Map<ComparisonExpressionTPGM, Double> cache;
+
+    /**
+     * Creates a new instance
      * @param stats graph statistics on which estimations are based
      * @param typeMap map from variable name to type (vertex/edge)
+     * @param labelMap map from variable name to label
      */
     public CNFEstimation(TemporalGraphStatistics stats,
                          Map<String, TemporalGraphStatistics.ElementType> typeMap,
@@ -47,6 +57,48 @@ public class CNFEstimation {
         this.stats = stats;
         this.typeMap = typeMap;
         this.labelMap = labelMap;
+        this.cache = new HashMap<>();
+    }
+
+    /**
+     * Creates a new instance
+     * @param stats graph statistics on which estimations are based
+     * @param handler QueryHandler to create typeMap and labelMap from
+     */
+    public CNFEstimation(TemporalGraphStatistics stats, TemporalQueryHandler handler){
+        this.stats = stats;
+        initializeWithHandler(handler);
+    }
+
+    /**
+     * Initializes typeMap, labelMap and cache from a {@link TemporalQueryHandler}
+     *
+     * @param queryHandler QueryHandler to use for initialization
+     */
+    private void initializeWithHandler(TemporalQueryHandler queryHandler) {
+        typeMap = new HashMap<>();
+        for(String edgeVar: queryHandler.getEdgeVariables()){
+            typeMap.put(edgeVar, TemporalGraphStatistics.ElementType.EDGE);
+        }
+        for(String vertexVar: queryHandler.getVertexVariables()){
+            typeMap.put(vertexVar, TemporalGraphStatistics.ElementType.VERTEX);
+        }
+
+        labelMap = new HashMap<>();
+        queryHandler.getLabelsForVariables(
+                queryHandler.getAllVariables()).entrySet().forEach(
+                entry -> {
+                    if (entry.getValue().length() > 0) {
+                        labelMap.put(entry.getKey(), entry.getValue());
+                    }
+                });
+        // precompute all estimatons
+        cache = new HashMap<>();
+        for(CNFElementTPGM clause: queryHandler.getCNF()){
+            for(ComparisonExpressionTPGM comp: clause.getPredicates()){
+                cache.put(comp, estimateComparison(comp));
+            }
+        }
     }
 
     /**
@@ -112,20 +164,29 @@ public class CNFEstimation {
      * @return estimation of the probability that the comparison evaluates to true
      */
     private double estimateComparison(ComparisonExpressionTPGM comparisonExpression) {
+        if(cache.containsKey(comparisonExpression)){
+            return cache.get(comparisonExpression);
+        }
+        double result = 1.;
         if(isLabelComp(comparisonExpression)){
             if(!labelMap.containsValue(getLabelFromLabelComp(comparisonExpression))){
-                return 0.001;
+                result = 0.001;
             }
             // if label is in the DB, the estimations for the rest of
             // the CNF take care of the label's selectivity
-            return 1.;
+            else{
+                result = 1.;
+            }
+        } else{
+            if(comparisonExpression.getVariables().size() > 1){
+                result = estimateComparisonOnDifferent(comparisonExpression);
+            }
+            else{
+                result = estimateCompOnSameTPGM(comparisonExpression);
+            }
         }
-        if(comparisonExpression.getVariables().size() > 1){
-            return estimateComparisonOnDifferent(comparisonExpression);
-        }
-        else{
-            return estimateCompOnSameTPGM(comparisonExpression);
-        }
+        cache.put(comparisonExpression, result);
+        return result;
     }
 
     /**
@@ -496,5 +557,57 @@ public class CNFEstimation {
         TimeSelector.TimeField field2 = rhs.getTimeField();
 
         return stats.estimateTemporalProb(type1, label1, field1, comp, type2, label2, field2);
+    }
+
+    /**
+     * Reorders the clauses of the CNF: the most selective clauses are moved to the beginning
+     * of the CNF (exception: label constraint is always the first constraint).
+     * Within a clause, the least selective comparisons are moved to the beginning of the clause.
+     * The motivation is to minimize the number of comparisons to check when processing the CNF
+     *
+     * @param cnf the CNF to reorder
+     * @return reordered CNF
+     */
+    public TemporalCNF reorderCNF(TemporalCNF cnf){
+        ArrayList<CNFElementTPGM> clauses = new ArrayList<>(cnf.getPredicates());
+        // resort the clauses: labels and then selective clauses first
+        clauses.sort(new java.util.Comparator<CNFElementTPGM>() {
+            @Override
+            public int compare(CNFElementTPGM clause1, CNFElementTPGM clause2) {
+                if(clause1.getPredicates().size()==1 && isLabelComp(clause1.getPredicates().get(0))){
+                    return 100;
+                } else if(clause2.getPredicates().size()==1 &&
+                isLabelComp(clause2.getPredicates().get(0))){
+                    return -100;
+                } else{
+                    return (int)(100. *
+                            (estimateCNFElement(clause1) - estimateCNFElement(clause2)));
+                }
+            }
+        });
+
+        // resort comparisons within clauses: non-selective comparisons first
+        clauses = new ArrayList<>(
+                clauses.stream().map(clause -> {
+                    ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+                            clause.getPredicates());
+                    comps.sort(new java.util.Comparator<ComparisonExpressionTPGM>() {
+                        @Override
+                        public int compare(ComparisonExpressionTPGM c1, ComparisonExpressionTPGM c2) {
+                            if(isLabelComp(c1)){
+                                return 100;
+                            } else if(isLabelComp(c2)){
+                                return -100;
+                            } else{
+                                return (int)(100. *
+                                        (estimateComparison(c2) - estimateComparison(c1)));
+                            }
+                        }
+                    });
+                    return new CNFElementTPGM(comps);
+                }
+                ).collect(Collectors.toList()));
+
+        return new TemporalCNF(clauses);
     }
 }

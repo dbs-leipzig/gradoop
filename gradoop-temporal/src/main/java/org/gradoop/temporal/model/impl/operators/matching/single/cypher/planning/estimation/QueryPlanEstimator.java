@@ -1,7 +1,5 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
@@ -38,10 +36,10 @@ public class QueryPlanEstimator {
      * @param graphStatistics graph statistics
      */
     public QueryPlanEstimator(QueryPlan queryPlan, TemporalQueryHandler queryHandler,
-                              TemporalGraphStatistics graphStatistics) {
+                              TemporalGraphStatistics graphStatistics, CNFEstimation cnfEstimation) {
         this.queryPlan = queryPlan;
         this.joinEstimator = new JoinEstimator(queryHandler, graphStatistics);
-        this.filterEstimator = new FilterEstimator(queryHandler, graphStatistics);
+        this.filterEstimator = new FilterEstimator(queryHandler, graphStatistics, cnfEstimation);
     }
 
     /**
@@ -91,5 +89,14 @@ public class QueryPlanEstimator {
         if (node instanceof UnaryNode) {
             traversePlan(((UnaryNode) node).getChildNode());
         }
+    }
+
+    /**
+     * Returns the Estimator used for creating the query plan
+     *
+     * @return estimator of the filter estimator
+     */
+    public CNFEstimation getCNFEStimation(){
+        return filterEstimator.getCnfEstimation();
     }
 }

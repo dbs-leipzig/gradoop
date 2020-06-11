@@ -1,21 +1,14 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.util.CNFEstimation;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterTemporalEmbeddingsNode;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -36,7 +29,7 @@ public class FilterEstimator extends Estimator {
     /**
      * Used to estimate filter selectivity
      */
-    private CNFEstimation cnfEstimator;
+    private CNFEstimation cnfEstimation;
 
     /**
      * Creates a new estimator.
@@ -44,37 +37,12 @@ public class FilterEstimator extends Estimator {
      * @param queryHandler query handler
      * @param graphStatistics graph statistics
      */
-    FilterEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics) {
+    FilterEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics,
+                    CNFEstimation cnfEstimation) {
         super(queryHandler, graphStatistics);
         this.selectivity = 1f;
-        initCNFEstimator();
-    }
-
-    /**
-     * Initializes the CNFEstimator
-     */
-    private void initCNFEstimator(){
-        TemporalQueryHandler handler = getQueryHandler();
-
-        HashMap<String, TemporalGraphStatistics.ElementType> typeMap = new HashMap<>();
-        for(String edgeVar: handler.getEdgeVariables()){
-            typeMap.put(edgeVar, TemporalGraphStatistics.ElementType.EDGE);
-        }
-        for(String vertexVar: handler.getVertexVariables()){
-            typeMap.put(vertexVar, TemporalGraphStatistics.ElementType.VERTEX);
-        }
-
-        HashMap<String, String> labelMap = new HashMap<>();
-        handler.getLabelsForVariables(
-                handler.getAllVariables()).entrySet().forEach(
-                entry -> {
-                    if (entry.getValue().length() > 0) {
-                        labelMap.put(entry.getKey(), entry.getValue());
-                    }
-                });
-
-
-        this.cnfEstimator = new CNFEstimation(getGraphStatistics(), typeMap, labelMap);
+        //initCNFEstimator();
+        this.cnfEstimation = cnfEstimation;
     }
 
     /**
@@ -131,10 +99,10 @@ public class FilterEstimator extends Estimator {
      * @param predicates query predicates
      */
     private void updateSelectivity(TemporalCNF predicates) {
-        selectivity *= cnfEstimator.estimateCNF(predicates);
+        selectivity *= cnfEstimation.estimateCNF(predicates);
     }
 
-    public CNFEstimation getCnfEstimator(){
-        return cnfEstimator;
+    public CNFEstimation getCnfEstimation(){
+        return cnfEstimation;
     }
 }

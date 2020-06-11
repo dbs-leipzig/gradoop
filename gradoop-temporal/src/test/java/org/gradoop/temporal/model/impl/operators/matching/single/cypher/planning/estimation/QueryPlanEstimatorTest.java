@@ -34,6 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
 
     TemporalGraphStatistics STATS;
+    CNFEstimation EST;
 
     @Before
     public void setUp() throws Exception {
@@ -46,6 +47,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
         String query = "MATCH (n)-->(m:station) WHERE n.tx_from.before(m.tx_to)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query, 
                 new CNFPostProcessing(new ArrayList<>()));
+        EST = new CNFEstimation(STATS, queryHandler);
 
         LeafNode nNode = new FilterAndProjectTemporalVerticesNode(null, "n",
                 queryHandler.getCNF().getSubCNF("n"), Sets.newHashSet());
@@ -55,11 +57,11 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
 
         QueryPlan queryPlan = new QueryPlan(nNode);
         // 30 stations
-        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS, EST);
         assertThat(estimator.getCardinality(), is(30L));
 
         queryPlan = new QueryPlan(mNode);
-        estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS, EST);
         // 30 stations
         assertThat(estimator.getCardinality(), is(30L));
     }
@@ -69,6 +71,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
         String query = "MATCH (n)-[e]->(m)-[f:trip]->(o) WHERE n.tx.overlaps(o.val)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query, 
                 new CNFPostProcessing(new ArrayList<>()));
+        EST = new CNFEstimation(STATS, queryHandler);
 
         LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null,
                 "n", "e", "m",
@@ -78,13 +81,15 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 "m", "f", "o",
                 queryHandler.getCNF().getSubCNF("f"), Sets.newHashSet(), false);
 
+
+
         QueryPlan queryPlan = new QueryPlan(eNode);
-        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS, EST);
         // 20 edges
         assertThat(estimator.getCardinality(), is(20L));
 
         queryPlan = new QueryPlan(fNode);
-        estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS, EST);
         assertThat(estimator.getCardinality(), is(20L));
     }
 
@@ -94,7 +99,8 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
         String query = "MATCH (n)-[e]->(m)-[f]->(o) WHERE n.tx_to>1970-01-01";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query, 
                 new CNFPostProcessing(new ArrayList<>()));
-
+        EST = new CNFEstimation(STATS, queryHandler);
+        
         LeafNode nNode = new FilterAndProjectTemporalVerticesNode(null, "n",
                 queryHandler.getCNF().getSubCNF("n"), Sets.newHashSet());
         LeafNode mNode = new FilterAndProjectTemporalVerticesNode(null, "m",
@@ -109,14 +115,14 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 queryHandler.getCNF().getSubCNF("f"), Sets.newHashSet(), false);
 
         QueryPlan plan = new QueryPlan(nNode);
-        QueryPlanEstimator estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
+        QueryPlanEstimator estimator = new QueryPlanEstimator(plan, queryHandler, STATS, EST);
 
         // (n)-[e]->
         JoinTPGMEmbeddingsNode neJoin = new JoinTPGMEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
                 MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
         plan = new QueryPlan(neJoin);
-        estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(plan, queryHandler, STATS, EST);
 
         assertTrue(18 <= estimator.getCardinality() && estimator.getCardinality() <= 20);
 
@@ -125,7 +131,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
         plan = new QueryPlan(nemJoin);
-        estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(plan, queryHandler, STATS, EST);
 
         assert(18 <= estimator.getCardinality() && estimator.getCardinality() <= 20);
 
@@ -134,7 +140,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
         plan = new QueryPlan(nemfJoin);
-        estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(plan, queryHandler, STATS, EST);
 
         // 20*30*20*30 / (30*17*30)  rather inaccurate,...
         assertTrue(22 <= estimator.getCardinality() && estimator.getCardinality() <= 24);
@@ -144,7 +150,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
         plan = new QueryPlan(nemfoJoin);
-        estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
+        estimator = new QueryPlanEstimator(plan, queryHandler, STATS, EST);
 
         assertTrue(20 <= estimator.getCardinality() && estimator.getCardinality() <= 30);
     }
@@ -156,6 +162,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
         String query = "MATCH (a) (b) WHERE a.tx_to>1970-01-01";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query, 
                 new CNFPostProcessing(new ArrayList<>()));
+        EST = new CNFEstimation(STATS, queryHandler);
 
         LeafNode aNode = new FilterAndProjectTemporalVerticesNode(null, "a",
                 queryHandler.getCNF().getSubCNF("a"), Sets.newHashSet());
@@ -166,7 +173,7 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
 
         QueryPlan queryPlan = new QueryPlan(crossNode);
 
-        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
+        QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS, EST);
 
         assertTrue(850 <= estimator.getCardinality() && estimator.getCardinality() <= 900);
     }
@@ -178,48 +185,49 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 "WHERE a.tx_from > c.val_from AND a.tx_to>1970-01-01";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query, 
                 new CNFPostProcessing(new ArrayList<>()));
+        EST = new CNFEstimation(STATS, queryHandler);
 
         LeafNode aNode = new FilterAndProjectTemporalVerticesNode(null, "a",
                 queryHandler.getCNF().getSubCNF("a"), Sets.newHashSet());
-        QueryPlanEstimator aEstimator = new QueryPlanEstimator(new QueryPlan(aNode), queryHandler, STATS);
+        QueryPlanEstimator aEstimator = new QueryPlanEstimator(new QueryPlan(aNode), queryHandler, STATS, EST);
         assertTrue(28 <= aEstimator.getCardinality() && aEstimator.getCardinality() <= 30);
 
         LeafNode bNode = new FilterAndProjectTemporalVerticesNode(null, "b",
                 queryHandler.getCNF().getSubCNF("b"), Sets.newHashSet());
-        QueryPlanEstimator bEstimator = new QueryPlanEstimator(new QueryPlan(bNode), queryHandler, STATS);
+        QueryPlanEstimator bEstimator = new QueryPlanEstimator(new QueryPlan(bNode), queryHandler, STATS, EST);
         assertEquals(bEstimator.getCardinality(), 30);
 
         LeafNode cNode = new FilterAndProjectTemporalVerticesNode(null, "c",
                 queryHandler.getCNF().getSubCNF("c"), Sets.newHashSet());
-        QueryPlanEstimator cEstimator = new QueryPlanEstimator(new QueryPlan(cNode), queryHandler, STATS);
+        QueryPlanEstimator cEstimator = new QueryPlanEstimator(new QueryPlan(cNode), queryHandler, STATS, EST);
         assertEquals(cEstimator.getCardinality(), 30);
 
         LeafNode dNode = new FilterAndProjectTemporalVerticesNode(null, "d",
                 queryHandler.getCNF().getSubCNF("d"), Sets.newHashSet());
-        QueryPlanEstimator dEstimator = new QueryPlanEstimator(new QueryPlan(dNode), queryHandler, STATS);
+        QueryPlanEstimator dEstimator = new QueryPlanEstimator(new QueryPlan(dNode), queryHandler, STATS, EST);
         assertEquals(dEstimator.getCardinality(), 30);
 
         LeafNode e1Node = new FilterAndProjectTemporalEdgesNode(null, "a", "e1", "b",
                 queryHandler.getCNF().getSubCNF("e1"), Sets.newHashSet(), false);
-        QueryPlanEstimator e1Estimator = new QueryPlanEstimator(new QueryPlan(e1Node), queryHandler, STATS);
+        QueryPlanEstimator e1Estimator = new QueryPlanEstimator(new QueryPlan(e1Node), queryHandler, STATS, EST);
         assertTrue(18 <= e1Estimator.getCardinality() &&
                 e1Estimator.getCardinality() <= 20);
 
         LeafNode e2Node = new FilterAndProjectTemporalEdgesNode(null, "c", "e2", "d",
                 queryHandler.getCNF().getSubCNF("e2"), Sets.newHashSet(), false);
-        QueryPlanEstimator e2Estimator = new QueryPlanEstimator(new QueryPlan(e2Node), queryHandler, STATS);
+        QueryPlanEstimator e2Estimator = new QueryPlanEstimator(new QueryPlan(e2Node), queryHandler, STATS, EST);
         assertTrue(18 <= e2Estimator.getCardinality() &&
                 e2Estimator.getCardinality() <= 20);
 
         BinaryNode ae1 = new JoinTPGMEmbeddingsNode(aNode, e1Node, Lists.newArrayList("a"),
                 MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
-        QueryPlanEstimator ae1Estimator = new QueryPlanEstimator(new QueryPlan(ae1), queryHandler, STATS);
+        QueryPlanEstimator ae1Estimator = new QueryPlanEstimator(new QueryPlan(ae1), queryHandler, STATS, EST);
         assertTrue(18 <= ae1Estimator.getCardinality() &&
                 ae1Estimator.getCardinality() <= 20);
 
         BinaryNode ae1b = new JoinTPGMEmbeddingsNode(ae1, bNode, Lists.newArrayList("b"),
                 MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
-        QueryPlanEstimator ae1bEstimator = new QueryPlanEstimator(new QueryPlan(ae1b), queryHandler, STATS);
+        QueryPlanEstimator ae1bEstimator = new QueryPlanEstimator(new QueryPlan(ae1b), queryHandler, STATS, EST);
         assertTrue(18 <= ae1bEstimator.getCardinality() &&
                 ae1bEstimator.getCardinality() <= 20);
 
@@ -232,12 +240,12 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
                 .HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
         QueryPlan ce2dPlan = new QueryPlan(ce2d);
-        QueryPlanEstimator ce2dEstimator = new QueryPlanEstimator(ce2dPlan, queryHandler, STATS);
+        QueryPlanEstimator ce2dEstimator = new QueryPlanEstimator(ce2dPlan, queryHandler, STATS, EST);
         assertTrue(18 <= ce2dEstimator.getCardinality() &&
                 ce2dEstimator.getCardinality() <= 20);
 
         QueryPlan crossPlan = new QueryPlan(crossNode);
-        QueryPlanEstimator crossEstimator = new QueryPlanEstimator(crossPlan, queryHandler, STATS);
+        QueryPlanEstimator crossEstimator = new QueryPlanEstimator(crossPlan, queryHandler, STATS, EST);
 
         // join predicate "a.tx_from > c.val_from" has selectivity ~50%
         long withoutPredicate = ce2dEstimator.getCardinality() * ae1bEstimator.getCardinality();
@@ -252,30 +260,31 @@ public class QueryPlanEstimatorTest extends TemporalGradoopTestBase {
         String query = "MATCH (a)-[e:trip]->(b:unknown)";
         TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
                 new CNFPostProcessing(new ArrayList<>()));
+        EST = new CNFEstimation(STATS, queryHandler);
 
         LeafNode aNode = new FilterAndProjectTemporalVerticesNode(null, "a",
                 queryHandler.getCNF().getSubCNF("a"), Sets.newHashSet());
-        assertTrue(new QueryPlanEstimator(new QueryPlan(aNode), queryHandler, STATS)
+        assertTrue(new QueryPlanEstimator(new QueryPlan(aNode), queryHandler, STATS, EST)
                 .getCardinality() > 0);
 
         LeafNode bNode = new FilterAndProjectTemporalVerticesNode(null, "b",
                 queryHandler.getCNF().getSubCNF("b"), Sets.newHashSet());
-        assertEquals(new QueryPlanEstimator(new QueryPlan(bNode), queryHandler, STATS)
+        assertEquals(new QueryPlanEstimator(new QueryPlan(bNode), queryHandler, STATS, EST)
                 .getCardinality(), 0);
 
         LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null, "a","e",
                 "b", queryHandler.getCNF().getSubCNF("e"), Sets.newHashSet(), false);
-        assertTrue(new QueryPlanEstimator(new QueryPlan(eNode), queryHandler, STATS)
+        assertTrue(new QueryPlanEstimator(new QueryPlan(eNode), queryHandler, STATS, EST)
                 .getCardinality() > 0);
 
         CartesianProductNode crossNode1 = new CartesianProductNode(aNode, bNode, MatchStrategy
                 .HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
-        assertEquals(new QueryPlanEstimator(new QueryPlan(crossNode1), queryHandler, STATS)
+        assertEquals(new QueryPlanEstimator(new QueryPlan(crossNode1), queryHandler, STATS, EST)
                 .getCardinality(), 0);
 
         CartesianProductNode crossNode2 = new CartesianProductNode(crossNode1, eNode, MatchStrategy
                 .HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
-        assertEquals(new QueryPlanEstimator(new QueryPlan(crossNode2), queryHandler, STATS)
+        assertEquals(new QueryPlanEstimator(new QueryPlan(crossNode2), queryHandler, STATS, EST)
                 .getCardinality(), 0);
     }
 
