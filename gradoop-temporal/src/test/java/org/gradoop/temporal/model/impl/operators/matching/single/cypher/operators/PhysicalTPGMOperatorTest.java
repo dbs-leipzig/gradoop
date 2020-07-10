@@ -1,5 +1,3 @@
-package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators;
-
 /*
  * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
@@ -15,7 +13,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
@@ -32,62 +30,62 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
 import java.util.List;
+
 public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
 
-    protected DataSet<TemporalVertex> createVerticesWithProperties(List<String> propertyNames) {
-        Properties properties = getProperties(propertyNames);
-        TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
+  protected DataSet<TemporalVertex> createVerticesWithProperties(List<String> propertyNames) {
+    Properties properties = getProperties(propertyNames);
+    TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
 
-        List<TemporalVertex> vertices = Lists.newArrayList(
-                vertexFactory.createVertex("Label1", properties),
-                vertexFactory.createVertex("Label2", properties)
-        );
+    List<TemporalVertex> vertices = Lists.newArrayList(
+      vertexFactory.createVertex("Label1", properties),
+      vertexFactory.createVertex("Label2", properties)
+    );
 
-        return getExecutionEnvironment().fromCollection(vertices);
+    return getExecutionEnvironment().fromCollection(vertices);
+  }
+
+  protected DataSet<TemporalEdge> createEdgesWithProperties(List<String> propertyNames) {
+    Properties properties = getProperties(propertyNames);
+    TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
+
+    List<TemporalEdge> edges = Lists.newArrayList(
+      edgeFactory.createEdge("Label1", GradoopId.get(), GradoopId.get(), properties),
+      edgeFactory.createEdge("Label2", GradoopId.get(), GradoopId.get(), properties)
+    );
+
+    return getExecutionEnvironment().fromCollection(edges);
+  }
+
+  protected PropertyValue[] getPropertyValues(List<String> propertyNames) {
+    PropertyValue[] propertyValues = new PropertyValue[propertyNames.size()];
+
+    int i = 0;
+    for (String propertyName : propertyNames) {
+      propertyValues[i++] = PropertyValue.create(propertyName);
     }
 
-    protected DataSet<TemporalEdge> createEdgesWithProperties(List<String> propertyNames) {
-        Properties properties = getProperties(propertyNames);
-        TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
+    return propertyValues;
+  }
 
-        List<TemporalEdge> edges = Lists.newArrayList(
-                edgeFactory.createEdge("Label1", GradoopId.get(), GradoopId.get(), properties),
-                edgeFactory.createEdge("Label2", GradoopId.get(), GradoopId.get(), properties)
-        );
+  protected Properties getProperties(List<String> propertyNames) {
+    Properties properties = new Properties();
 
-        return getExecutionEnvironment().fromCollection(edges);
+    for (String propertyName : propertyNames) {
+      properties.set(propertyName, propertyName);
     }
 
-    protected PropertyValue[] getPropertyValues(List<String> propertyNames) {
-        PropertyValue[] propertyValues = new PropertyValue[propertyNames.size()];
+    return properties;
+  }
 
-        int i = 0;
-        for (String propertyName : propertyNames) {
-            propertyValues[i++] = PropertyValue.create(propertyName);
-        }
-
-        return propertyValues;
+  protected TemporalCNF predicateFromQuery(String query) throws QueryContradictoryException {
+    // no default asOf-predicates:
+    if (!query.contains("WHERE")) {
+      query += " WHERE tx_to.after(1970-01-01T00:00:00)";
+    } else {
+      query += " AND tx_to.after(1970-01-01T00:00:00)";
     }
-
-    protected Properties getProperties(List<String> propertyNames) {
-        Properties properties = new Properties();
-
-        for (String propertyName : propertyNames) {
-            properties.set(propertyName, propertyName);
-        }
-
-        return properties;
-    }
-
-    protected TemporalCNF predicateFromQuery(String query) throws QueryContradictoryException {
-        // no default asOf-predicates:
-        if(!query.contains("WHERE")){
-            query+= " WHERE tx_to.after(1970-01-01T00:00:00)";
-        }
-        else {
-            query += " AND tx_to.after(1970-01-01T00:00:00)";
-        }
-        return new TemporalQueryHandler(query).getCNF();
-    }
+    return new TemporalQueryHandler(query).getCNF();
+  }
 }
 

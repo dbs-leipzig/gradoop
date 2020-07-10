@@ -1,10 +1,25 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.Literal;
@@ -26,64 +41,72 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  * !!! This class assumes input CNFs to be normalized, i.e. not to contain < or <= !!!
  */
 public class TrivialContradictions implements QueryTransformation {
-    @Override
-    public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
-        ArrayList<CNFElementTPGM> newClauses = new ArrayList<>();
-        for(CNFElementTPGM clause: cnf.getPredicates()){
-            CNFElementTPGM newClause = transformDisjunction(clause);
-            newClauses.add(newClause);
-        }
-        return new TemporalCNF(newClauses);
+  @Override
+  public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
+    ArrayList<CNFElementTPGM> newClauses = new ArrayList<>();
+    for (CNFElementTPGM clause : cnf.getPredicates()) {
+      CNFElementTPGM newClause = transformDisjunction(clause);
+      newClauses.add(newClause);
     }
+    return new TemporalCNF(newClauses);
+  }
 
-    private CNFElementTPGM transformDisjunction(CNFElementTPGM clause) throws QueryContradictoryException {
-        List<ComparisonExpressionTPGM> oldComparisons = clause.getPredicates();
-        ArrayList<ComparisonExpressionTPGM> newComparisons = new ArrayList<>();
-        boolean contradiction = true;
-        for(ComparisonExpressionTPGM comparison: oldComparisons){
-            if(!isContradictory(comparison)){
-                newComparisons.add(comparison);
-                contradiction = false;
-            }
-        }
-        if(contradiction){
-            throw new QueryContradictoryException();
-        }
-        else{
-            return new CNFElementTPGM(newComparisons);
-        }
+  /**
+   * Checks a disjunctive clause for trivial contradictions
+   * @param clause clause to check
+   * @return the clause iff it does not contain a trivial contradiction
+   * @throws QueryContradictoryException iff the clause contains a trivial contradiction
+   */
+  private CNFElementTPGM transformDisjunction(CNFElementTPGM clause) throws QueryContradictoryException {
+    List<ComparisonExpressionTPGM> oldComparisons = clause.getPredicates();
+    ArrayList<ComparisonExpressionTPGM> newComparisons = new ArrayList<>();
+    boolean contradiction = true;
+    for (ComparisonExpressionTPGM comparison : oldComparisons) {
+      if (!isContradictory(comparison)) {
+        newComparisons.add(comparison);
+        contradiction = false;
+      }
     }
-
-
-    private boolean isContradictory(ComparisonExpressionTPGM comp) {
-        ComparableExpression lhs = comp.getLhs().getWrappedComparable();
-        Comparator comparator = comp.getComparator();
-        ComparableExpression rhs = comp.getRhs().getWrappedComparable();
-
-        // x<x, x!=x
-        if(lhs.equals(rhs)){
-            if(!(comparator.equals(Comparator.EQ) || comparator.equals(LTE))){
-                return true;
-            }
-        }
-        // a.tx_from > a.tx_to
-        if(lhs instanceof TimeSelector && rhs instanceof TimeSelector &&
-                lhs.getVariable().equals(rhs.getVariable())){
-            if(((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.TX_FROM) &&
-                    ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.TX_TO) ||
-                    ((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.VAL_FROM) &&
-                            ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.VAL_TO)){
-                if(comparator.equals(GT)){
-                    return true;
-                }
-            }
-        }
-        // comparison of two (time) literals is tautological iff the comparison holds
-        else if((lhs instanceof TimeLiteral && rhs instanceof TimeLiteral) ||
-                (lhs instanceof Literal && rhs instanceof Literal)){
-            // true iff the comparison holds
-            return !comp.evaluate(new TemporalVertex());
-        }
-        return false;
+    if (contradiction) {
+      throw new QueryContradictoryException();
+    } else {
+      return new CNFElementTPGM(newComparisons);
     }
+  }
+
+
+  /**
+   * checks whether a comparison is a trivial contradiction (x < x, x!=x, !(a.tx_from <= a.tx_to,
+   *  contradictory comparison between two time literals)
+   * @param comp comparison to check
+   * @return true iff comparison is a trivial contradiction
+   */
+  private boolean isContradictory(ComparisonExpressionTPGM comp) {
+    ComparableExpression lhs = comp.getLhs().getWrappedComparable();
+    Comparator comparator = comp.getComparator();
+    ComparableExpression rhs = comp.getRhs().getWrappedComparable();
+
+    // x<x, x!=x
+    if (lhs.equals(rhs)) {
+      if (!(comparator.equals(Comparator.EQ) || comparator.equals(LTE))) {
+        return true;
+      }
+    }
+    // a.tx_from > a.tx_to
+    if (lhs instanceof TimeSelector && rhs instanceof TimeSelector &&
+      lhs.getVariable().equals(rhs.getVariable())) {
+      if (((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.TX_FROM) &&
+        ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.TX_TO) ||
+        ((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.VAL_FROM) &&
+          ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.VAL_TO)) {
+        return comparator.equals(GT);
+      }
+    } else if ((lhs instanceof TimeLiteral && rhs instanceof TimeLiteral) ||
+      (lhs instanceof Literal && rhs instanceof Literal)) {
+      // comparison of two (time) literals is tautological iff the comparison holds
+      // true iff the comparison holds
+      return !comp.evaluate(new TemporalVertex());
+    }
+    return false;
+  }
 }

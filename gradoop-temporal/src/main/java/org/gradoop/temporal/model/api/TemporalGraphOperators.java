@@ -17,6 +17,8 @@ package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -28,6 +30,10 @@ import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.dummy.DummyTemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.CypherTemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -87,7 +93,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code FROM fromTimestamp TO toTimestamp} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see FromTo
@@ -101,7 +107,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code BETWEEN fromTimestamp AND toTimestamp} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see Between
@@ -115,7 +121,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code CONTAINED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see ContainedIn
@@ -129,7 +135,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code VALID DURING (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see ValidDuring
@@ -143,7 +149,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code CREATED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see CreatedIn
@@ -157,7 +163,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * {@code DELETED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see DeletedIn
@@ -216,16 +222,130 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
    * {@code verify()} operator to validate the graph. The graph head is preserved.
    *
-   * @param firstSnapshot The predicate used to determine the first snapshot.
+   * @param firstSnapshot  The predicate used to determine the first snapshot.
    * @param secondSnapshot The predicate used to determine the second snapshot.
-   * @param dimension The time dimension that will be considered by the predicates.
+   * @param dimension      The time dimension that will be considered by the predicates.
    * @return A temporal graph containing the union of vertex and edge sets of both snapshots, defined by the
    * given two predicate functions. A property with key {@link Diff#PROPERTY_KEY} is set on each graph
    * element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
-    TimeDimension dimension) {
+                             TimeDimension dimension) {
     return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, GraphStatistics)} to provide statistics for the query planner.
+   *
+   * @param query Cypher query
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection query(String query) {
+    return query(query, new DummyTemporalGraphStatistics());
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #query(String, String, GraphStatistics)} to provide statistics for the query planner.
+   * <p>
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * <br>
+   * {@code graph.query(
+   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   * "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query string
+   * @param constructionPattern Construction pattern
+   * @return graph collection containing the output of the construct pattern
+   */
+  default TemporalGraphCollection query(String query, String constructionPattern) {
+    return query(query, constructionPattern, new DummyTemporalGraphStatistics());
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   *
+   * @param query           Cypher query
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection query(String query, TemporalGraphStatistics graphStatistics) {
+    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
+      graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
+   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
+   * is attached to the resulting vertices.
+   * <p>
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * <br>
+   * {@code graph.query(
+   * "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
+   * "(a)-[:CO_AUTHOR]->(b)")}
+   * <p>
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param graphStatistics     statistics about the data graph
+   * @return graph collection containing the output of the construct pattern
+   */
+  default TemporalGraphCollection query(String query, String constructionPattern,
+                                        TemporalGraphStatistics graphStatistics) {
+    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
+      MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query           Cypher query
+   * @param attachData      attach original vertex and edge data to the result
+   * @param vertexStrategy  morphism setting for vertex mapping
+   * @param edgeStrategy    morphism setting for edge mapping
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
+                                        MatchStrategy edgeStrategy, TemporalGraphStatistics graphStatistics) {
+    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Cypher query engine.
+   *
+   * @param query               Cypher query
+   * @param constructionPattern Construction pattern
+   * @param attachData          attach original vertex and edge data to the result
+   * @param vertexStrategy      morphism setting for vertex mapping
+   * @param edgeStrategy        morphism setting for edge mapping
+   * @param stats               statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection query(String query, String constructionPattern, boolean attachData,
+                                        MatchStrategy vertexStrategy,
+                                        MatchStrategy edgeStrategy, TemporalGraphStatistics stats) {
+    return callForCollection(new CypherTemporalPatternMatching(query, constructionPattern, attachData,
+      vertexStrategy, edgeStrategy, stats, new CNFPostProcessing()));
   }
 
   //----------------------------------------------------------------------------

@@ -1,10 +1,28 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.*;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractEdgeStartID;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractEmbeddingEndID;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.FilterPreviousExpandEmbeddingTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddingsTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpandEmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.pojos.ExpansionCriteria;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
@@ -17,108 +35,117 @@ import java.util.List;
  * edge, vertex, ..., edge), the second one the end vertex
  * Furthermore, temporal data of the end vertex is appended.
  * Temporal conditions for expanding the path can be provided by {@link ExpansionCriteria}
- *
+ * <p>
  * Iteration is done with {@code BulkIteration}
  */
-public class ExpandEmbeddingsTPGMBulk extends ExpandEmbeddingsTPGM{
+public class ExpandEmbeddingsTPGMBulk extends ExpandEmbeddingsTPGM {
 
-    /**
-     * New Expand One Operator
-     *
-     * @param input the embedding which should be expanded
-     * @param candidateEdges candidate edges along which we expand
-     * @param expandColumn specifies the input column that represents the vertex from which we expand
-     * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
-     * @param lowerBound specifies the minimum hops we want to expand
-     * @param upperBound specifies the maximum hops we want to expand
-     * @param direction direction of the expansion (see {@link ExpandDirection})
-     * @param distinctVertexColumns indices of distinct input vertex columns
-     * @param distinctEdgeColumns indices of distinct input edge columns
-     * @param closingColumn defines the column which should be equal with the paths end
-     * @param joinHint join strategy
-     * @param criteria temporal expansion conditions
-     */
-    public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
-                                    int expandColumn, int expandVertexTimeColumn, int lowerBound, int upperBound, ExpandDirection direction,
-                                    List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
-                                    JoinOperatorBase.JoinHint joinHint, ExpansionCriteria criteria) {
+  /**
+   * New Expand One Operator
+   *
+   * @param input                  the embedding which should be expanded
+   * @param candidateEdges         candidate edges along which we expand
+   * @param expandColumn           specifies the input column that represents the vertex from which we expand
+   * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
+   * @param lowerBound             specifies the minimum hops we want to expand
+   * @param upperBound             specifies the maximum hops we want to expand
+   * @param direction              direction of the expansion (see {@link ExpandDirection})
+   * @param distinctVertexColumns  indices of distinct input vertex columns
+   * @param distinctEdgeColumns    indices of distinct input edge columns
+   * @param closingColumn          defines the column which should be equal with the paths end
+   * @param joinHint               join strategy
+   * @param criteria               temporal expansion conditions
+   */
+  public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
+                                  int expandColumn, int expandVertexTimeColumn, int lowerBound,
+                                  int upperBound, ExpandDirection direction,
+                                  List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
+                                  int closingColumn,
+                                  JoinOperatorBase.JoinHint joinHint, ExpansionCriteria criteria) {
 
-        super(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, upperBound, direction,
-                distinctVertexColumns, distinctEdgeColumns, closingColumn, joinHint, criteria);
-    }
+    super(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, upperBound, direction,
+      distinctVertexColumns, distinctEdgeColumns, closingColumn, joinHint, criteria);
+  }
 
-    /**
-     * New Expand One Operator with default join strategy
-     *
-     * @param input the embedding which should be expanded
-     * @param candidateEdges candidate edges along which we expand
-     * @param expandColumn specifies the column that represents the vertex from which we expand
-     * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
-     * @param lowerBound specifies the minimum hops we want to expand
-     * @param upperBound specifies the maximum hops we want to expand
-     * @param direction direction of the expansion (see {@link ExpandDirection})
-     * @param distinctVertexColumns indices of distinct vertex columns
-     * @param distinctEdgeColumns indices of distinct edge columns
-     * @param closingColumn defines the column which should be equal with the paths end
-     */
-    public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
-                                int expandColumn, int expandVertexTimeColumn, int lowerBound, int upperBound, ExpandDirection direction,
-                                List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
-                                ExpansionCriteria criteria) {
+  /**
+   * New Expand One Operator with default join strategy
+   *
+   * @param input                  the embedding which should be expanded
+   * @param candidateEdges         candidate edges along which we expand
+   * @param expandColumn           specifies the column that represents the vertex from which we expand
+   * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
+   * @param lowerBound             specifies the minimum hops we want to expand
+   * @param upperBound             specifies the maximum hops we want to expand
+   * @param direction              direction of the expansion (see {@link ExpandDirection})
+   * @param distinctVertexColumns  indices of distinct vertex columns
+   * @param distinctEdgeColumns    indices of distinct edge columns
+   * @param closingColumn          defines the column which should be equal with the paths end
+   * @param criteria               temporal expansion conditions
+   */
+  public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
+                                  int expandColumn, int expandVertexTimeColumn, int lowerBound,
+                                  int upperBound, ExpandDirection direction,
+                                  List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
+                                  int closingColumn,
+                                  ExpansionCriteria criteria) {
 
-        this(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, upperBound, direction,
-                distinctVertexColumns, distinctEdgeColumns, closingColumn,
-                JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, criteria);
-    }
+    this(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, upperBound, direction,
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, criteria);
+  }
 
-    /**
-     * New Expand One Operator with no upper bound
-     *
-     * @param input the embedding which should be expanded
-     * @param candidateEdges candidate edges along which we expand
-     * @param expandColumn specifies the column that represents the vertex from which we expand
-     * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
-     * @param lowerBound specifies the minimum hops we want to expand
-     * @param direction direction of the expansion (see {@link ExpandDirection})
-     * @param distinctVertexColumns indices of distinct vertex columns
-     * @param distinctEdgeColumns indices of distinct edge columns
-     * @param closingColumn defines the column which should be equal with the paths end
-     */
-    public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
-                                int expandColumn, int expandVertexTimeColumn, int lowerBound, ExpandDirection direction,
-                                List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns, int closingColumn,
-                                ExpansionCriteria criteria) {
+  /**
+   * New Expand One Operator with no upper bound
+   *
+   * @param input                  the embedding which should be expanded
+   * @param candidateEdges         candidate edges along which we expand
+   * @param expandColumn           specifies the column that represents the vertex from which we expand
+   * @param expandVertexTimeColumn time column where the expand vertex's time data is stored
+   * @param lowerBound             specifies the minimum hops we want to expand
+   * @param direction              direction of the expansion (see {@link ExpandDirection})
+   * @param distinctVertexColumns  indices of distinct vertex columns
+   * @param distinctEdgeColumns    indices of distinct edge columns
+   * @param closingColumn          defines the column which should be equal with the paths end
+   * @param criteria               temporal expansion conditions
+   */
+  public ExpandEmbeddingsTPGMBulk(DataSet<EmbeddingTPGM> input, DataSet<EmbeddingTPGM> candidateEdges,
+                                  int expandColumn, int expandVertexTimeColumn, int lowerBound,
+                                  ExpandDirection direction,
+                                  List<Integer> distinctVertexColumns, List<Integer> distinctEdgeColumns,
+                                  int closingColumn,
+                                  ExpansionCriteria criteria) {
 
-        this(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, Integer.MAX_VALUE, direction,
-                distinctVertexColumns, distinctEdgeColumns, closingColumn,
-                JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, criteria);
-    }
+    this(input, candidateEdges, expandColumn, expandVertexTimeColumn, lowerBound, Integer.MAX_VALUE,
+      direction,
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, criteria);
+  }
 
-    @Override
-    protected DataSet<ExpandEmbeddingTPGM> iterate(DataSet<ExpandEmbeddingTPGM> initialWorkingSet) {
+  @Override
+  protected DataSet<ExpandEmbeddingTPGM> iterate(DataSet<ExpandEmbeddingTPGM> initialWorkingSet) {
 
-        IterativeDataSet<ExpandEmbeddingTPGM> iteration = initialWorkingSet
-                .iterate(upperBound - 1)
-                .name(getName());
+    IterativeDataSet<ExpandEmbeddingTPGM> iteration = initialWorkingSet
+      .iterate(upperBound - 1)
+      .name(getName());
 
-        DataSet<ExpandEmbeddingTPGM> nextWorkingSet = iteration
-                .filter(new FilterPreviousExpandEmbeddingTPGM())
-                .name(getName() + " - FilterRecent")
-                .join(candidateEdgeTuples, joinHint)
-                .where(new ExtractEmbeddingEndID())
-                .equalTo(new ExtractEdgeStartID())
-                .with(new MergeExpandEmbeddingsTPGM(
-                        distinctVertexColumns,
-                        distinctEdgeColumns,
-                        closingColumn,
-                        criteria
-                ))
-                .name(getName() + " - Expansion");
+    DataSet<ExpandEmbeddingTPGM> nextWorkingSet = iteration
+      .filter(new FilterPreviousExpandEmbeddingTPGM())
+      .name(getName() + " - FilterRecent")
+      .join(candidateEdgeTuples, joinHint)
+      .where(new ExtractEmbeddingEndID())
+      .equalTo(new ExtractEdgeStartID())
+      .with(new MergeExpandEmbeddingsTPGM(
+        distinctVertexColumns,
+        distinctEdgeColumns,
+        closingColumn,
+        criteria
+      ))
+      .name(getName() + " - Expansion");
 
-        DataSet<ExpandEmbeddingTPGM> solutionSet = nextWorkingSet.union(iteration);
+    DataSet<ExpandEmbeddingTPGM> solutionSet = nextWorkingSet.union(iteration);
 
-        return iteration.closeWith(solutionSet, nextWorkingSet);
-    }
+    return iteration.closeWith(solutionSet, nextWorkingSet);
+  }
 
 
 }

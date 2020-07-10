@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -26,8 +41,9 @@ import org.s1ck.gdl.utils.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
@@ -37,186 +53,185 @@ import static org.s1ck.gdl.utils.Comparator.LT;
 
 public class TemporalQueryHandlerTest {
 
-    @Test
-    public void testGetPredicatesWithoutDefaultAsOf(){
-        String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.tx_to)";
-        TemporalQueryHandler handler = null;
-        try {
-            handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
-        } catch (QueryContradictoryException e) {
-            e.printStackTrace();
+  /**
+   * copied from QueryHandlerTest (changed to TemporalQueryHandler). Ensure that this still works
+   */
+  static final String ECC_PROPERTY_KEY = "ecc";
+  static final String TEST_QUERY = "" +
+    "(v1:A {ecc : 2})" +
+    "(v2:B {ecc : 1})" +
+    "(v3:B {ecc : 2})" +
+    "(v1)-[e1:a]->(v2)" +
+    "(v2)-[e2:b]->(v3)" +
+    "(v2)-[e3:a]->(v1)" +
+    "(v3)-[e4:c]->(v3)";
+  private static final GDLHandler GDL_HANDLER = new GDLHandler.Builder().buildFromString(TEST_QUERY);
+  static TemporalQueryHandler QUERY_HANDLER;
+
+  static {
+    try {
+      QUERY_HANDLER = new TemporalQueryHandler(TEST_QUERY);
+    } catch (QueryContradictoryException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static <EL extends Element> boolean elementsEqual(List<EL> list, List<EL> expected) {
+    boolean equal = list.size() == expected.size();
+
+    if (equal) {
+      list.sort(java.util.Comparator.comparingLong(Element::getId));
+      expected.sort(java.util.Comparator.comparingLong(Element::getId));
+      for (int i = 0; i < list.size(); i++) {
+        if (!list.get(i).equals(expected.get(i))) {
+          equal = false;
+          break;
         }
+      }
+    }
+    return equal;
+  }
 
-        Predicate and = new And(
-                new Comparison(new TimeSelector("v2", "tx_to"),
-                        GT,
-                        new TimeSelector("v1", "tx_from")),
-                new Comparison(new PropertySelector("e1", "__label__"),
-                        Comparator.EQ,
-                        new Literal("test"))
-        );
-        assertPredicateEquals(and, handler.getCNF());
+  @Test
+  public void testGetPredicatesWithoutDefaultAsOf() {
+    String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.tx_to)";
+    TemporalQueryHandler handler = null;
+    try {
+      handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
+    } catch (QueryContradictoryException e) {
+      e.printStackTrace();
     }
 
-    @Test
-    public void testGetPredicatesWithDefaultAsOf() throws QueryContradictoryException {
-        String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.val_to)";
-        TemporalQueryHandler handler = new TemporalQueryHandler(testquery, new CNFPostProcessing());
-        TimeLiteral now = handler.getNow();
-        Predicate and = new And(
-                new Comparison(new TimeSelector("v2", "val_to"),
-                        GT,
-                        new TimeSelector("v1", "tx_from")),
-                new Comparison(new PropertySelector("e1", "__label__"),
-                        Comparator.EQ,
-                        new Literal("test"))
-        );
-        And defaultAsOfV1 = getAsOf("v1", now);
-        And defaultAsOfE1 = getAsOf("e1", now);
-        And defaultAsOfV2 = getAsOf("v2", now);
+    Predicate and = new And(
+      new Comparison(new TimeSelector("v2", "tx_to"),
+        GT,
+        new TimeSelector("v1", "tx_from")),
+      new Comparison(new PropertySelector("e1", "__label__"),
+        Comparator.EQ,
+        new Literal("test"))
+    );
+    assertPredicateEquals(and, handler.getCNF());
+  }
 
-        Predicate expectedGDLPredicate = new And(and, defaultAsOfE1);
-        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV2);
-        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
+  @Test
+  public void testGetPredicatesWithDefaultAsOf() throws QueryContradictoryException {
+    String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.val_to)";
+    TemporalQueryHandler handler = new TemporalQueryHandler(testquery, new CNFPostProcessing());
+    TimeLiteral now = handler.getNow();
+    Predicate and = new And(
+      new Comparison(new TimeSelector("v2", "val_to"),
+        GT,
+        new TimeSelector("v1", "tx_from")),
+      new Comparison(new PropertySelector("e1", "__label__"),
+        Comparator.EQ,
+        new Literal("test"))
+    );
+    And defaultAsOfV1 = getAsOf("v1", now);
+    And defaultAsOfE1 = getAsOf("e1", now);
+    And defaultAsOfV2 = getAsOf("v2", now);
 
-        assertPredicateEquals(expectedGDLPredicate, handler.getCNF());
+    Predicate expectedGDLPredicate = new And(and, defaultAsOfE1);
+    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV2);
+    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
 
-        //without any other predicates
-        testquery = "MATCH (v1)-[e1]->(v2)";
-        handler = new TemporalQueryHandler(testquery);
-        now = handler.getNow();
-        defaultAsOfV1 = getAsOf("v1", now);
-        defaultAsOfE1 = getAsOf("e1", now);
-        defaultAsOfV2 = getAsOf("v2", now);
-        expectedGDLPredicate = new And(defaultAsOfE1, defaultAsOfV2);
-        expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
-        assertPredicateEquals(expectedGDLPredicate, handler.getCNF());
+    assertPredicateEquals(expectedGDLPredicate, handler.getCNF());
 
-    }
+    //without any other predicates
+    testquery = "MATCH (v1)-[e1]->(v2)";
+    handler = new TemporalQueryHandler(testquery);
+    now = handler.getNow();
+    defaultAsOfV1 = getAsOf("v1", now);
+    defaultAsOfE1 = getAsOf("e1", now);
+    defaultAsOfV2 = getAsOf("v2", now);
+    expectedGDLPredicate = new And(defaultAsOfE1, defaultAsOfV2);
+    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
+    assertPredicateEquals(expectedGDLPredicate, handler.getCNF());
 
-    @Test
-    public void testGlobalPredicates() throws QueryContradictoryException {
-        // no global predicates
-        String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_to.before(b.val_to)";
-        TimeSelector aTxTo = new TimeSelector("a", TX_TO);
-        TimeSelector bTxTo = new TimeSelector("b", TX_TO);
-        TimeSelector e1TxTo = new TimeSelector("e1", TX_TO);
-        TimeSelector aValTo = new TimeSelector("a", VAL_TO);
-        TimeSelector bValTo = new TimeSelector("b", VAL_TO);
-        TimeSelector e1ValTo = new TimeSelector("e1", VAL_TO);
-        TemporalQueryHandler handler = new TemporalQueryHandler(testquery,
-                new CNFPostProcessing(new ArrayList<>()));
-        Predicate expectedPredicate = new And(
-                new Comparison(aTxTo, LT, bValTo),
-                new Comparison(new PropertySelector("e1", "__label__"),
-                        Comparator.EQ,
-                        new Literal("test"))
-        );
-        assertPredicateEquals(expectedPredicate, handler.getCNF());
+  }
 
-        // global and non-global predicates
-        testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) OR a.val_to.after(b.val_to)";
-        handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
-        MinTimePoint globalTxTo = new MinTimePoint(e1TxTo, aTxTo, bTxTo);
+  @Test
+  public void testGlobalPredicates() throws QueryContradictoryException {
+    // no global predicates
+    String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_to.before(b.val_to)";
+    TimeSelector aTxTo = new TimeSelector("a", TX_TO);
+    TimeSelector bTxTo = new TimeSelector("b", TX_TO);
+    TimeSelector e1TxTo = new TimeSelector("e1", TX_TO);
+    TimeSelector aValTo = new TimeSelector("a", VAL_TO);
+    TimeSelector bValTo = new TimeSelector("b", VAL_TO);
+    TimeSelector e1ValTo = new TimeSelector("e1", VAL_TO);
+    TemporalQueryHandler handler = new TemporalQueryHandler(testquery,
+      new CNFPostProcessing(new ArrayList<>()));
+    Predicate expectedPredicate = new And(
+      new Comparison(aTxTo, LT, bValTo),
+      new Comparison(new PropertySelector("e1", "__label__"),
+        Comparator.EQ,
+        new Literal("test"))
+    );
+    assertPredicateEquals(expectedPredicate, handler.getCNF());
 
-        expectedPredicate = new And(
-                new Or(
-                       new Comparison(globalTxTo, LT, bValTo),
-                       new Comparison(aValTo, GT, bValTo)
-                ),
-                new Comparison(new PropertySelector("e1", "__label__"),
-                        Comparator.EQ,
-                        new Literal("test"))
-        );
-        Predicate expectedGlobal = new Or(
-                new Comparison(globalTxTo, LT, bValTo),
-                new Comparison(aValTo, GT, bValTo)
-        );
-        Predicate expectedNonGlobal = new Comparison(
-                new PropertySelector("e1", "__label__"),
-                Comparator.EQ,
-                new Literal("test"));
+    // global and non-global predicates
+    testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) OR a.val_to.after(b.val_to)";
+    handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
+    MinTimePoint globalTxTo = new MinTimePoint(e1TxTo, aTxTo, bTxTo);
 
-        assertPredicateEquals(expectedPredicate, handler.getCNF());
+    expectedPredicate = new And(
+      new Or(
+        new Comparison(globalTxTo, LT, bValTo),
+        new Comparison(aValTo, GT, bValTo)
+      ),
+      new Comparison(new PropertySelector("e1", "__label__"),
+        Comparator.EQ,
+        new Literal("test"))
+    );
+    Predicate expectedGlobal = new Or(
+      new Comparison(globalTxTo, LT, bValTo),
+      new Comparison(aValTo, GT, bValTo)
+    );
+    Predicate expectedNonGlobal = new Comparison(
+      new PropertySelector("e1", "__label__"),
+      Comparator.EQ,
+      new Literal("test"));
 
-        // only global
-        testquery = "MATCH (a)-[e1]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
-        handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
-        System.out.println(handler.getCNF());
-        MinTimePoint globalValTo = new MinTimePoint(e1ValTo, aValTo, bValTo);
-        expectedPredicate = new And(
-                new Comparison(globalTxTo, LT, bValTo),
-                new Comparison(aValTo, GT, globalValTo)
-        );
+    assertPredicateEquals(expectedPredicate, handler.getCNF());
 
-        assertPredicateEquals(expectedPredicate, handler.getCNF());
-    }
+    // only global
+    testquery = "MATCH (a)-[e1]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
+    handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
+    System.out.println(handler.getCNF());
+    MinTimePoint globalValTo = new MinTimePoint(e1ValTo, aValTo, bValTo);
+    expectedPredicate = new And(
+      new Comparison(globalTxTo, LT, bValTo),
+      new Comparison(aValTo, GT, globalValTo)
+    );
 
-    private void assertPredicateEquals(Predicate expectedGDL, TemporalCNF result){
-        TemporalCNF expected = QueryPredicateFactory.createFrom(expectedGDL).asCNF();
-        equalCNFs(expected, result);
-    }
+    assertPredicateEquals(expectedPredicate, handler.getCNF());
+  }
 
-    private void equalCNFs(TemporalCNF a, TemporalCNF b){
-        assertEquals(a.getPredicates().size(), b.getPredicates().size());
-        for(CNFElementTPGM aElement: a.getPredicates()){
-            ComparisonExpressionTPGM aComp = aElement.getPredicates().get(0);
-            boolean foundA = false;
-            for(CNFElementTPGM bElement: b.getPredicates()){
-                ComparisonExpressionTPGM bComp = bElement.getPredicates().get(0);
-                if(comparisonEqual(aComp, bComp)){
-                    foundA= true;
-                }
-            }
-            assertTrue(foundA);
+  private void assertPredicateEquals(Predicate expectedGDL, TemporalCNF result) {
+    TemporalCNF expected = QueryPredicateFactory.createFrom(expectedGDL).asCNF();
+    equalCNFs(expected, result);
+  }
+
+  private void equalCNFs(TemporalCNF a, TemporalCNF b) {
+    assertEquals(a.getPredicates().size(), b.getPredicates().size());
+    for (CNFElementTPGM aElement : a.getPredicates()) {
+      ComparisonExpressionTPGM aComp = aElement.getPredicates().get(0);
+      boolean foundA = false;
+      for (CNFElementTPGM bElement : b.getPredicates()) {
+        ComparisonExpressionTPGM bComp = bElement.getPredicates().get(0);
+        if (comparisonEqual(aComp, bComp)) {
+          foundA = true;
         }
+      }
+      assertTrue(foundA);
     }
+  }
 
-    private boolean comparisonEqual(ComparisonExpressionTPGM a, ComparisonExpressionTPGM b){
-        Comparison aComp = ((ComparisonExpressionTPGM)a).getGDLComparison();
-        Comparison bComp = ((ComparisonExpressionTPGM)b).getGDLComparison();
-        return (aComp.equals(bComp)||aComp.switchSides().equals(bComp));
-    }
-
-
-    private And getAsOf(String var, TimeLiteral now){
-        return new And(
-                new Comparison(
-                        new TimeSelector(var, TimeSelector.TimeField.TX_FROM),
-                        Comparator.LTE, now
-                ),
-                new Comparison(
-                        new TimeSelector(var, TX_TO),
-                        Comparator.GTE, now
-                )
-        );
-    }
-
-
-    /**
-     * copied from QueryHandlerTest (changed to TemporalQueryHandler). Ensure that this still works
-     */
-    static final String ECC_PROPERTY_KEY = "ecc";
-
-    static final String TEST_QUERY = "" +
-            "(v1:A {ecc : 2})" +
-            "(v2:B {ecc : 1})" +
-            "(v3:B {ecc : 2})" +
-            "(v1)-[e1:a]->(v2)" +
-            "(v2)-[e2:b]->(v3)" +
-            "(v2)-[e3:a]->(v1)" +
-            "(v3)-[e4:c]->(v3)";
-
-    private static GDLHandler GDL_HANDLER = new GDLHandler.Builder().buildFromString(TEST_QUERY);
-    static TemporalQueryHandler QUERY_HANDLER;
-
-    static {
-        try {
-            QUERY_HANDLER = new TemporalQueryHandler(TEST_QUERY);
-        } catch (QueryContradictoryException e) {
-            e.printStackTrace();
-        }
-    }
+  private boolean comparisonEqual(ComparisonExpressionTPGM a, ComparisonExpressionTPGM b) {
+    Comparison aComp = a.getGDLComparison();
+    Comparison bComp = b.getGDLComparison();
+    return aComp.equals(bComp) || aComp.switchSides().equals(bComp);
+  }
 
     /*@Test
     public void testGetTriples() throws Exception {
@@ -235,21 +250,28 @@ public class TemporalQueryHandlerTest {
         assertTrue(expected.containsAll(triples));
     }*/
 
-    @Test
-    public void testGetVertexCount() {
-        assertEquals(3, QUERY_HANDLER.getVertexCount());
-    }
+  private And getAsOf(String var, TimeLiteral now) {
+    return new And(
+      new Comparison(
+        new TimeSelector(var, TimeSelector.TimeField.TX_FROM),
+        Comparator.LTE, now
+      ),
+      new Comparison(
+        new TimeSelector(var, TX_TO),
+        Comparator.GTE, now
+      )
+    );
+  }
 
-    @Test
-    public void testGetEdgeCount() {
-        assertEquals(4, QUERY_HANDLER.getEdgeCount());
-    }
+  @Test
+  public void testGetVertexCount() {
+    assertEquals(3, QUERY_HANDLER.getVertexCount());
+  }
 
-    @Test
-    public void testIsSingleVertexGraph() {
-        assertFalse(QUERY_HANDLER.isSingleVertexGraph());
-        assertTrue(new QueryHandler("(v0)").isSingleVertexGraph());
-    }
+  @Test
+  public void testGetEdgeCount() {
+    assertEquals(4, QUERY_HANDLER.getEdgeCount());
+  }
 
     /*@Test
     public void testGetDiameter() {
@@ -263,43 +285,42 @@ public class TemporalQueryHandlerTest {
         assertEquals(0, new QueryHandler("(v0)").getRadius());
     }*/
 
-    @Test
-    public void testIsVertex() {
-        assertTrue(QUERY_HANDLER.isVertex("v1"));
-        assertFalse(QUERY_HANDLER.isVertex("e1"));
-    }
+  @Test
+  public void testIsSingleVertexGraph() {
+    assertFalse(QUERY_HANDLER.isSingleVertexGraph());
+    assertTrue(new QueryHandler("(v0)").isSingleVertexGraph());
+  }
 
-    @Test
-    public void testIsEdge() {
-        assertTrue(QUERY_HANDLER.isEdge("e1"));
-        assertFalse(QUERY_HANDLER.isEdge("v1"));
-    }
+  @Test
+  public void testIsVertex() {
+    assertTrue(QUERY_HANDLER.isVertex("v1"));
+    assertFalse(QUERY_HANDLER.isVertex("e1"));
+  }
 
-    @Test
-    public void testGetVertexById() throws Exception {
-        Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
-        assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
-    }
+  @Test
+  public void testIsEdge() {
+    assertTrue(QUERY_HANDLER.isEdge("e1"));
+    assertFalse(QUERY_HANDLER.isEdge("v1"));
+  }
 
-    @Test
-    public void testGetEdgeById() throws Exception {
-        Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
-        assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
-    }
+  @Test
+  public void testGetVertexById() throws Exception {
+    Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
+    assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
+  }
 
-    @Test
-    public void testGetVertexByVariable() throws Exception {
-        Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
-        assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
-        assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
-    }
+  @Test
+  public void testGetEdgeById() throws Exception {
+    Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
+    assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
+  }
 
-    @Test
-    public void testGetEdgeByVariable() throws Exception {
-        Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
-        assertEquals(QUERY_HANDLER.getEdgeByVariable("e1"), expected);
-        assertNotEquals(QUERY_HANDLER.getEdgeByVariable("e2"), expected);
-    }
+  @Test
+  public void testGetVertexByVariable() throws Exception {
+    Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
+    assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
+    assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
+  }
 
 //    @Test
 //    public void testGetVerticesByLabel() throws Exception {
@@ -412,19 +433,10 @@ public class TemporalQueryHandlerTest {
 //        assertTrue(elementsEqual(centerVertices, expected));
 //    }
 
-    private static <EL extends Element> boolean elementsEqual(List<EL> list, List<EL> expected) {
-        boolean equal = list.size() == expected.size();
-
-        if (equal) {
-            list.sort(java.util.Comparator.comparingLong(Element::getId));
-            expected.sort(java.util.Comparator.comparingLong(Element::getId));
-            for (int i = 0; i < list.size(); i++) {
-                if (!list.get(i).equals(expected.get(i))) {
-                    equal = false;
-                    break;
-                }
-            }
-        }
-        return equal;
-    }
+  @Test
+  public void testGetEdgeByVariable() throws Exception {
+    Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
+    assertEquals(QUERY_HANDLER.getEdgeByVariable("e1"), expected);
+    assertNotEquals(QUERY_HANDLER.getEdgeByVariable("e2"), expected);
+  }
 }
