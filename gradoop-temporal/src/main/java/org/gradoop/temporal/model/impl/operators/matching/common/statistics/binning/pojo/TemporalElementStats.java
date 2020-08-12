@@ -21,9 +21,13 @@ import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -79,6 +83,14 @@ public class TemporalElementStats implements Serializable {
    */
   private double validAsOfNowEstimation;
   /**
+   * list of numerical properties
+   */
+  private Set<String> numericalProperties;
+  /**
+   * list of categorical properties
+   */
+  private Set<String> categoricalProperties;
+  /**
    * estimations of the probability that a vertex has a certain property with a
    * certain PropertyValue.
    * This only refers to categorical, i.e. non-numeric properties.
@@ -106,10 +118,26 @@ public class TemporalElementStats implements Serializable {
    */
   private boolean recomputePropertyDataFlag;
 
+  /**
+   * Creates a element statistics object and set the size of the reservoir sample to compute
+   * the statistics. The numerical and categorical properties are set by the user.
+   * Omitted properties are ignored, always assigned the probability 0.5
+   * @param reservoirSampleSize size of reservoir sample
+   * @param numericalProperties list of numerical properties to consider
+   * @param categoricalProperties list of categorical properties to consider
+   */
+  public TemporalElementStats(int reservoirSampleSize, Set<String> numericalProperties,
+                              Set<String> categoricalProperties){
+    this(reservoirSampleSize);
+    this.numericalProperties = numericalProperties;
+    this.categoricalProperties = categoricalProperties;
+  }
 
   /**
    * Creates a element statistics object and set the size of the reservoir sample to compute
-   * the statistics
+   * the statistics. The numerical and categorical properties are determined
+   * automatically later (possibly not working very good), all properties are
+   * considered.
    *
    * @param reservoirSampleSize size of reservoir sample
    */
@@ -134,10 +162,23 @@ public class TemporalElementStats implements Serializable {
   /**
    * Creates a element statistics object that uses a reservoir sample of default size
    * {@code SimpleElementStats.DEFAULT_SAMPLE_SIZE} to compute the statistics
+   * All properties will be considered, their type (numerical/categorical) detected
+   * automatically (may not work very good).
    */
   public TemporalElementStats() {
     this(ReservoirSampler.DEFAULT_SAMPLE_SIZE);
   }
+
+  /**
+   * Creates an element statistics object that uses a reservoir sample of default size.
+   * Numerical and categorical properties to consider are given explicitly
+   * @param numericalProperties numerical properties to consider
+   * @param categoricalProperties categorical properties to consider
+   */
+  public TemporalElementStats(Set<String> numericalProperties, Set<String> categoricalProperties){
+    this(ReservoirSampler.DEFAULT_SAMPLE_SIZE, numericalProperties, categoricalProperties);
+  }
+
 
   /**
    * Updates the statistics by adding a new element's data
@@ -352,30 +393,90 @@ public class TemporalElementStats implements Serializable {
       return;
     }
 
-    // classify and collect all property values
+    // classify all property values, if not already done
+    if(categoricalProperties==null || numericalProperties==null){
+      detectPropertyTypes(reservoirSample);
+    }
+    // these maps collect all property values in the sample
     HashMap<String, List<PropertyValue>> categoricalData = new HashMap<>();
     HashMap<String, List<PropertyValue>> numericalData = new HashMap<>();
+    System.out.println("Numerical keys: "+numericalProperties);
 
+    // add element data to the corresponding map
     for (TemporalElement element : reservoirSample) {
       if (element.getPropertyKeys() == null) {
         continue;
       }
       for (String key : element.getPropertyKeys()) {
         PropertyValue value = element.getPropertyValue(key);
+        HashMap<String, List<PropertyValue>> data;
+        // no outlier, i.e. NULL, NaN etc.?
+        if(numericalProperties.contains(key) && isNumerical(value)){
+          data = numericalData;
+        } else if(categoricalProperties.contains(key)){
+          data = categoricalData;
+        } else{
+          continue;
+        }
+/*        // original
         HashMap<String, List<PropertyValue>> data =
-          categoricalData.containsKey(key) ? categoricalData :
             numericalData.containsKey(key) ? numericalData :
-              isNumerical(value) ? numericalData : categoricalData;
+              isNumerical(value) ? numericalData : categoricalData;*/
+
         if (!data.containsKey(key)) {
           data.put(key, new ArrayList<>());
         }
         data.get(key).add(value);
       }
     }
-
     computeCategoricalEstimations(categoricalData, sampleSize);
     computeNumericalEstimations(numericalData, sampleSize);
     recomputePropertyDataFlag = false;
+  }
+
+  /**
+   * Tries to automatically detect which properties are numerical and categorical.
+   * Sets {@code numericalProperties} and {@code categoricalProperties} accordingly.
+   * @param reservoirSample the list of elements to use for the detection
+   */
+  private void detectPropertyTypes(List<TemporalElement> reservoirSample) {
+    numericalProperties = new HashSet<>();
+    categoricalProperties = new HashSet<>();
+    // maps count which property is considered numerical/categorical how often
+    HashMap<String, Integer> numerical = new HashMap<>();
+    HashMap<String, Integer> categorical = new HashMap<>();
+    for (TemporalElement element : reservoirSample) {
+      if (element.getPropertyKeys() == null) {
+        continue;
+      }
+      for (String key : element.getPropertyKeys()) {
+        PropertyValue value = element.getPropertyValue(key);
+        if (isNumerical(value)){
+          int count = numerical.getOrDefault(key, 0) +1;
+          numerical.put(key, count);
+        } else {
+          int count = categorical.getOrDefault(key, 0) +1;
+          categorical.put(key, count);
+        }
+      }
+    }
+    // check which property is of what type using a threshold
+    double thresh = 0.9;
+    HashSet<String> allProperties = new HashSet<>();
+    allProperties.addAll(numerical.keySet());
+    allProperties.addAll(categorical.keySet());
+    for(String property : allProperties){
+      int countNumerical = numerical.getOrDefault(property, 0);
+      int countCategorical = categorical.getOrDefault(property, 0);
+      int countOverall = countCategorical + countNumerical;
+      // which type?
+      if((double)countNumerical / (double)countOverall >= thresh){
+        numericalProperties.add(property);
+      } else if((double)countCategorical / (double)countOverall >= thresh){
+        categoricalProperties.add(property);
+      }
+      // else, the property is too ambiguous and simply ignored
+    }
   }
 
   /**
@@ -564,5 +665,44 @@ public class TemporalElementStats implements Serializable {
   @Override
   public int hashCode() {
     return sampler.hashCode();
+  }
+
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder();
+    sb.append("----------------------------------------------------\n");
+    sb.append("Label: "+label+", sample size: "+ sampler.getSampleSize()+"\n");
+    sb.append("------------------------\n");
+    sb.append(".....Temporal Bins......: \n");
+    sb.append("TX-FROM: "+ Arrays.toString(getEstimatedTimeBins()[0].getBins())+"\n");
+    sb.append("TX-TO: "+Arrays.toString(getEstimatedTimeBins()[1].getBins())+"\n");
+    sb.append("VAL-FROM: "+Arrays.toString(getEstimatedTimeBins()[2].getBins())+"\n");
+    sb.append("VAL-TO: "+Arrays.toString(getEstimatedTimeBins()[3].getBins())+"\n");
+    sb.append("------------------------\n");
+    sb.append(".....Duration Statistics.....\n");
+    sb.append("TX: mean="+getTxDurationStats()[0]+", " +
+      "variance="+getTxDurationStats()[1]+"\n");
+    sb.append("VAL: mean="+getValDurationStats()[0]+", variance="
+      +getValDurationStats()[1]+"\n");
+    sb.append("------------------------\n");
+    sb.append(".....Categorical Properties.....\n");
+    for(String key: getCategoricalSelectivityEstimation().keySet()){
+      sb.append(key +": \n");
+      for(PropertyValue v: getCategoricalSelectivityEstimation().get(key).keySet()){
+        sb.append("   "+v.toString()+": "+
+          getCategoricalSelectivityEstimation().get(key).get(v)+"\n");
+
+      }
+    }
+    sb.append("------------------------\n");
+    sb.append(".....Numerical Properties.....\n");
+    for(String key: getNumericalOccurrenceEstimation().keySet()){
+      sb.append(key+": \n");
+      sb.append("occurence: "+getNumericalOccurrenceEstimation().get(key)+
+        ", mean: "+getNumericalPropertyStatsEstimation().get(key)[0] +
+        ", variance: "+getNumericalPropertyStatsEstimation().get(key)[0]+"\n");
+    }
+    sb.append("----------------------------------------------------\n");
+    return new String(sb);
   }
 }

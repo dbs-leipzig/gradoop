@@ -28,6 +28,7 @@ import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
@@ -53,7 +55,7 @@ import static org.s1ck.gdl.utils.Comparator.NEQ;
  * the wrapped statistics.
  */
 @SuppressWarnings("CanBeFinal")
-public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
+public class BinningTemporalGraphStatistics extends TemporalGraphStatistics implements Serializable {
 
   /**
    * Statistics for every vertex label
@@ -88,13 +90,20 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
   private Map<String, Long> distinctTargetCount;
 
   /**
+   * Set of properties to consider in the estimations.
+   * If null, all properties are considered.
+   */
+  private Set<String> relevantProperties;
+
+  /**
    * Creates new graph statistics
    *
    * @param vertexStats list of vertex statistics (one element for each label)
    * @param edgeStats   list of edge statistics (one element for each label)
    */
   protected BinningTemporalGraphStatistics(List<TemporalElementStats> vertexStats,
-                                           List<TemporalElementStats> edgeStats) {
+                                           List<TemporalElementStats> edgeStats,
+                                           Set<String> relevantProperties) {
     this.vertexStats = new HashMap<>();
     this.edgeStats = new HashMap<>();
     this.vertexCount = 0L;
@@ -107,6 +116,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
       this.vertexStats.put(vertexStat.getLabel(), vertexStat);
       this.vertexCount += vertexStat.getElementCount();
     }
+    this.relevantProperties = relevantProperties;
     initDistinctVertices();
   }
 
@@ -617,8 +627,13 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
         numerical2 = true;
       }
     }
-    // numerical properties can not be compared to categorical
+
+    if(isPropertyRelevant(property1)!=isPropertyRelevant(property2)){
+      return 0.5;
+    }
+
     if (numerical1 != numerical2) {
+      // numerical properties can not be compared to categorical.
       return 0.;
     } else if (!numerical1) {
       return estimateCategoricalPropertyProb(relevantStats1, property1, comp,
@@ -740,6 +755,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
       .reduce(0L, Long::sum);
     long totalCount = count1 * count2;
 
+
     double outerSum = 0.;
     for (TemporalElementStats s1 : relevantStats1) {
       double innerSum = 0.;
@@ -774,8 +790,16 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
       stats2.getCategoricalSelectivityEstimation();
     Map<PropertyValue, Double> propStats1 = map1.getOrDefault(property1, null);
     Map<PropertyValue, Double> propStats2 = map2.getOrDefault(property2, null);
+    // property not sampled or not considered
     if (propStats1 == null || propStats2 == null) {
-      return 0.0001;
+      // property not considered => return 0.5
+      if(!isPropertyRelevant(property1) && !isPropertyRelevant(property2)){
+        return 0.5;
+      }
+      // property not sampled => very rare => return very small value
+      else{
+        return 0.0001;
+      }
     }
     if (comp == EQ || comp == NEQ) {
       double sum = 0.;
@@ -831,20 +855,32 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
         found = true;
       }
     }
-
+    // property not sampled or not considered
     if (!found) {
-      return 0.0001;
+      // not relevant/considered => simply return 0.5
+      if(!isPropertyRelevant(property)){
+        return 0.5;
+      } else{
+        // not sampled => very rare or not even there => return very small value
+        return 0.0001;
+      }
     }
 
     double prob = 0.;
     for (TemporalElementStats stat : relevantStats) {
       if (!stat.getCategoricalSelectivityEstimation().containsKey(property)) {
-        prob += 0.0001 * ((double) stat.getElementCount() / overallCount);
+        // not sampled ? ....
+        double factor = 0.0001;
+        // ...or just excluded/not relevant?
+        if(!isPropertyRelevant(property)){
+          factor = 0.5;
+        }
+        prob += factor * ((double) stat.getElementCount() / overallCount);
         continue;
       }
       prob += stat.getCategoricalSelectivityEstimation()
         .get(property)
-        .getOrDefault(value, 0.0000001) *
+        .getOrDefault(value, 0.0001) *
         ((double) stat.getElementCount() / overallCount);
     }
     if (comp == EQ) {
@@ -892,8 +928,11 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
    */
   private double estimateNumericalPropertyProb(TemporalElementStats stat, String property,
                                                Comparator comp, PropertyValue value) {
+    // property not sampled or not considered
     if (!stat.getNumericalPropertyStatsEstimation().containsKey(property)) {
-      return 0.001;
+      // if property not excluded, return very small value
+      // if excluded, it is irrelevant, return 0.5
+      return isPropertyRelevant(property) ? 0.0001 : 0.5;
     }
     Double[] propertyStats = stat.getNumericalPropertyStatsEstimation().get(property);
     NormalDistribution dist = new NormalDistribution(propertyStats[0],
@@ -965,6 +1004,18 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
       // 1- LT estimation for GTE
       return 1 - ((double) valueBins[0]) / ((double) numBins);
     }
+  }
+
+  /**
+   * Checks whether a property key should be considered.
+   * This is the case iff no property keys to consider are specified
+   * (then all are relevant) or the set of specified relevant key contains
+   * the property
+   * @param property property to check for relevance
+   * @return true iff property should be considered for estimations
+   */
+  private boolean isPropertyRelevant(String property){
+    return relevantProperties==null || relevantProperties.contains(property);
   }
 
   /**
@@ -1042,6 +1093,28 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics {
     } else {
       return elementStats.getEstimatedTimeBins()[3];
     }
+  }
+
+  @Override
+  public String toString(){
+    StringBuilder sb= new StringBuilder();
+    sb.append("\n\n");
+    sb.append("______________________________________________");
+    sb.append("----------------------------------------------");
+    sb.append("....................VERTICES..................");
+    for(String vLabel: vertexStats.keySet()){
+      sb.append(vertexStats.get(vLabel).toString());
+    }
+    sb.append("\n");
+    sb.append("......................EDGES....................");
+    for(String eLabel: edgeStats.keySet()){
+      sb.append(edgeStats.get(eLabel).toString());
+    }
+    sb.append("\n");
+    sb.append("______________________________________________");
+    sb.append("----------------------------------------------");
+    sb.append("\n\n");
+    return new String(sb);
   }
 
 }

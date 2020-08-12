@@ -22,6 +22,7 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.postproce
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismSelfLoopData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismAfterData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismAsOfData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismBeforeData;
@@ -91,7 +92,8 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     data.addAll(new IsomorphismLengthAtLeastData().getData());
     data.addAll(new IsomorphismLengthAtMostData().getData());
     data.addAll(new IsomorphismMergeAndJoinData().getData());
-    //data.addAll(new IsomorphismComplexQueryData().getData());
+    data.addAll(new IsomorphismComplexQueryData().getData());
+    data.addAll(new HomomorphismSelfLoopData().getData());
     return data;
   }
 

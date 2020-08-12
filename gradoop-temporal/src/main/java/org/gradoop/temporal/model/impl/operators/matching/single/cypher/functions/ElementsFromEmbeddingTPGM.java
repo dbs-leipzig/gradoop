@@ -255,8 +255,8 @@ public class ElementsFromEmbeddingTPGM<
     }
 
     graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
-    graphHead.setTransactionTime(new Tuple2<>(globalTime[0], globalTime[1]));
-    graphHead.setValidTime(new Tuple2<>(globalTime[2], globalTime[3]));
+    //graphHead.setTransactionTime(new Tuple2<>(globalTime[0], globalTime[1]));
+    //graphHead.setValidTime(new Tuple2<>(globalTime[2], globalTime[3]));
     out.collect(graphHead);
 
 

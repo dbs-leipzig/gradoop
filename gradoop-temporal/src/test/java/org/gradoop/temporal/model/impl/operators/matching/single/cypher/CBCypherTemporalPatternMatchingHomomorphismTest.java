@@ -39,6 +39,7 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismMinMaxTest;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismOverlapsData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismPrecedesData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismSelfLoopData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismShorterThanData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.homomorphism.HomomorphismSucceedsData;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -86,6 +87,7 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
     data.addAll(new HomomorphismShorterThanData().getData());
     data.addAll(new HomomorphismLengthAtLeastData().getData());
     data.addAll(new HomomorphismLengthAtMostData().getData());
+    data.addAll(new HomomorphismSelfLoopData().getData());
 //        System.out.println(data.size());
 //        try {
 //            data.addAll(new RandomTestGenerator(data).createRandomTestCases(20));

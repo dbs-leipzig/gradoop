@@ -285,7 +285,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * @return graph collection containing matching subgraphs
    */
   default TemporalGraphCollection query(String query, TemporalGraphStatistics graphStatistics) {
-    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
+    return query(query, true, MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM,
       graphStatistics);
   }
 
@@ -311,7 +311,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    */
   default TemporalGraphCollection query(String query, String constructionPattern,
                                         TemporalGraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
+    return query(query, constructionPattern, true, MatchStrategy.ISOMORPHISM,
       MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 

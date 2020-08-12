@@ -19,10 +19,14 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatisticsFactory;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Factory for {@link DummyTemporalGraphStatistics}
  */
 public class DummyTemporalGraphStatisticsFactory implements TemporalGraphStatisticsFactory {
+
   @Override
   public TemporalGraphStatistics fromGraph(TemporalGraph g) {
     return new DummyTemporalGraphStatistics();
@@ -30,6 +34,18 @@ public class DummyTemporalGraphStatisticsFactory implements TemporalGraphStatist
 
   @Override
   public TemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize) {
+    return new DummyTemporalGraphStatistics();
+  }
+
+  @Override
+  public TemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize,
+                                                       Set numericalProperties, Set categoricalProperties) {
+    return new DummyTemporalGraphStatistics();
+  }
+
+  @Override
+  public TemporalGraphStatistics fromGraph(TemporalGraph g, Set numericalProperties,
+                                           Set categoricalProperties) {
     return new DummyTemporalGraphStatistics();
   }
 }

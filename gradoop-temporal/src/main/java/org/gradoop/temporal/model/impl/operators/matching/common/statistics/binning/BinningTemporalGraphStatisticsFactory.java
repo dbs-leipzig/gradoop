@@ -23,7 +23,9 @@ import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binn
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BinningTemporalGraphStatisticsFactory implements
   TemporalGraphStatisticsFactory<BinningTemporalGraphStatistics> {
@@ -33,22 +35,48 @@ public class BinningTemporalGraphStatisticsFactory implements
   }
 
   @Override
+  public BinningTemporalGraphStatistics fromGraph(TemporalGraph g, Set<String> numericalProperties,
+                                                  Set<String> categoricalProperties) {
+    return fromGraphWithSampling(g, 5000, numericalProperties, categoricalProperties);
+  }
+
+  @Override
   public BinningTemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize) {
+    return fromGraphWithSampling(g, sampleSize, null, null);
+  }
+
+  @Override
+  public BinningTemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize,
+                                                              Set<String> numericalProperties,
+                                                              Set<String> categoricalProperties) {
     try {
       List<TemporalElementStats> vertexStats = g.getVertices()
         .groupBy(EPGMElement::getLabel)
-        .reduceGroup(new ElementsToStats<TemporalVertex>())
+        .reduceGroup(new ElementsToStats<TemporalVertex>(numericalProperties, categoricalProperties))
         .collect();
+      System.out.println("collected vertex Stats");
       List<TemporalElementStats> edgeStats = g.getEdges()
         // do not replace this with the method reference!!!
         .groupBy(edge -> edge.getLabel())
-        .reduceGroup(new ElementsToStats<TemporalEdge>())
+        .reduceGroup(new ElementsToStats<TemporalEdge>(numericalProperties, categoricalProperties))
         .collect();
-      return new BinningTemporalGraphStatistics(vertexStats, edgeStats);
+      System.out.println("collected edge stats");
+
+      HashSet<String> relevantProperties=null;
+      if(numericalProperties!=null && categoricalProperties!=null){
+        relevantProperties = new HashSet<>();
+        relevantProperties.addAll(numericalProperties);
+        relevantProperties.addAll(categoricalProperties);
+      }
+
+      return new BinningTemporalGraphStatistics(vertexStats, edgeStats, relevantProperties);
 
     } catch(Exception e) {
       System.out.println(e.getMessage());
+      e.printStackTrace();
     }
     return null;
   }
+
+
 }

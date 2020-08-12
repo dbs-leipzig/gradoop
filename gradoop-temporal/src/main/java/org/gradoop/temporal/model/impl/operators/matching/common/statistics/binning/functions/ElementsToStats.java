@@ -20,6 +20,9 @@ import org.apache.flink.util.Collector;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Reduces a set of {@link TemporalElement} to a {@link TemporalElementStats} about this set.
  * It is assumed that all elements have the same label.
@@ -28,9 +31,27 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 public class ElementsToStats<T extends TemporalElement> implements
   GroupReduceFunction<T, TemporalElementStats> {
 
+  /**
+   * List of numerical properties to consider
+   */
+  private Set<String> numericalProperties;
+  /**
+   * List of categorical properties to consider
+   */
+  private Set<String> categoricalProperties;
+
+  public ElementsToStats(Set<String> numericalProperties, Set<String> categoricalProperties){
+    this.numericalProperties = numericalProperties;
+    this.categoricalProperties = categoricalProperties;
+  }
+
+  public ElementsToStats(){
+    this(null, null);
+  }
+
   @Override
   public void reduce(Iterable<T> values, Collector<TemporalElementStats> out) throws Exception {
-    TemporalElementStats stats = new TemporalElementStats();
+    TemporalElementStats stats = new TemporalElementStats(numericalProperties, categoricalProperties);
     for (TemporalElement element : values) {
       stats.addElement(element);
       stats.setLabel(element.getLabel());

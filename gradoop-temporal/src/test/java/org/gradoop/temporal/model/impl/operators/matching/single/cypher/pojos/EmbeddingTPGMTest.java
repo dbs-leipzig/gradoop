@@ -160,14 +160,6 @@ public class EmbeddingTPGMTest {
     assertArrayEquals(embedding.getTimeData(), test2);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testSetInvalidTimeData() {
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    byte[] test = new byte[] {123, -97, 83, 98, 1, 3, 5, -9, 24, 55, 99, -101, 111, 67, 89, 89,
-      123, 97, -83, 98, 1, -3, -5};
-    embedding.setTimeData(test);
-  }
-
   @Test
   public void testSizeAfterInsertingTime() {
     EmbeddingTPGM embedding = new EmbeddingTPGM();

@@ -208,7 +208,7 @@ public class CNFEstimation {
       // if label is in the DB, the estimations for the rest of
       // the CNF take care of the label's selectivity
       else {
-        result = 1.;
+        result = 0.01;
       }
     } else {
       if (comparisonExpression.getVariables().size() > 1) {

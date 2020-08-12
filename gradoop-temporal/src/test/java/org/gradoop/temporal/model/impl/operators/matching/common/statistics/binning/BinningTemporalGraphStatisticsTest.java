@@ -29,7 +29,12 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.EDGE;
 import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.VERTEX;
@@ -202,16 +207,41 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     // unknown property and/or value
     double estimation7 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       EQ, PropertyValue.create("nonsense"));
-    assertEquals(estimation7, 0., 0.0001);
+    assertEquals(estimation7, 0.0001, 0.0001);
     double estimation8 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       NEQ, PropertyValue.create("nonsense"));
-    assertEquals(estimation8, 1., 0.0001);
+    assertEquals(estimation8, 0.9999, 0.0001);
     double estimation9 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
       EQ, PropertyValue.create("nonsense"));
-    assertEquals(estimation9, 0., 0.0001);
+    assertEquals(estimation9, 0.0001, 0.0001);
     double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
       NEQ, PropertyValue.create("nonsense"));
-    assertEquals(estimation10, 0., 0.0001);
+    assertEquals(estimation10, 0.0001, 0.0001);
+
+  }
+
+  @Test
+  public void categoricalWithExclusionTest(){
+    // test with exclusion of properties
+    BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
+    // should all be 0.5, regardless if actually there
+    double estimation6 = stats.estimatePropertyProb(VERTEX, Optional.empty(), "catProp1", EQ,
+      PropertyValue.create("y"));
+    double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
+      NEQ, PropertyValue.create("nonsense"));
+    assertEquals(estimation6, 0.5, 0.00001);
+    assertEquals(estimation10, 0.5, 0.0001);
+
+    // with partial exclusion
+    ArrayList<String> includeCategorical = new ArrayList<>(Collections.singletonList("catProp1"));
+    BinningTemporalGraphStatistics stats2 = getDummyStats(new HashSet<>(),
+      new HashSet<>(includeCategorical));
+    estimation6 = stats2.estimatePropertyProb(VERTEX, Optional.empty(), "catProp1", EQ,
+      PropertyValue.create("y"));
+    assertEquals(estimation6, 0.27, 0.001);
+     estimation10 = stats2.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
+      NEQ, PropertyValue.create("nonsense"));
+    assertEquals(estimation10, 0.5, 0.0001);
   }
 
   @Test
@@ -260,10 +290,33 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     assertTrue(estimation9 <= 0.025);
     assertTrue(estimation9 > estimation8);
 
-    // unknown property -> estimation close to 0
+    // unknown property -> estimation 0.0001
     double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.empty(),
       "unknown", GTE, PropertyValue.create(20));
-    assertEquals(estimation10, 0., 0.001);
+    assertEquals(estimation10, 0.0001, 0.001);
+  }
+
+  @Test
+  public void numericalWithExclusion(){
+    BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
+    // should all be 0.5
+    double estimation6 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
+      "numProp", GT, PropertyValue.create(20));
+    assertEquals(estimation6, 0.5, 0.0001);
+    double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.empty(),
+      "unknown", GTE, PropertyValue.create(20));
+    assertEquals(estimation10, 0.5, 0.001);
+
+    // with partial exclusion
+    ArrayList<String> includeNumerical = new ArrayList<>(Collections.singletonList("numProp"));
+    BinningTemporalGraphStatistics stats2 = getDummyStats(new HashSet<>(includeNumerical),
+      new HashSet<>());
+    estimation6 = stats2.estimatePropertyProb(VERTEX, Optional.of("v1"),
+      "numProp", GT, PropertyValue.create(20));
+    assertTrue(0.375 <= estimation6 && estimation6 <= 0.425);
+    estimation10 = stats2.estimatePropertyProb(VERTEX, Optional.empty(),
+      "unknown", GTE, PropertyValue.create(20));
+    assertEquals(estimation10, 0.5, 0.001);
   }
 
   @Test
@@ -315,20 +368,50 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       NEQ, VERTEX, Optional.of("v2"), "numProp");
     assertEquals(estimation7, 0.05, 0.01);
 
-    // estimation close to 0 for unknown properties
+
     double estimation8 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
       "unknown",
       GTE, VERTEX, Optional.of("v2"), "test");
-    assertEquals(estimation8, 0., 0.001);
+    assertEquals(estimation8, 0.0001, 0.001);
     double estimation9 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
       "unknown",
       LTE, VERTEX, Optional.of("v2"), "numProp");
-    assertEquals(estimation9, 0., 0.001);
+    assertEquals(estimation9, 0.0001, 0.001);
     double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
       "numProp",
       LT, VERTEX, Optional.of("v2"), "unknown");
-    assertEquals(estimation10, 0., 0.001);
+    assertEquals(estimation10, 0.0001, 0.001);
 
+  }
+
+  @Test
+  public void complexNumericalWithExclusion(){
+    BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
+    double estimation4 = stats.estimatePropertyProb(VERTEX, Optional.empty(),
+      "numProp",
+      LTE, VERTEX, Optional.empty(), "numProp2");
+    assertEquals(estimation4, 0.5, 0.01);
+    double estimation8 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
+      "unknown",
+      GTE, VERTEX, Optional.of("v2"), "test");
+    assertEquals(estimation8, 0.5, 0.001);
+
+    // partial exclusion
+    ArrayList<String> includeNumerical = new ArrayList<>(Collections.singletonList("numProp"));
+    BinningTemporalGraphStatistics stats2 = getDummyStats(new HashSet<>(includeNumerical),
+      new HashSet<>());
+    estimation4 = stats2.estimatePropertyProb(VERTEX, Optional.empty(),
+      "numProp",
+      LTE, VERTEX, Optional.empty(), "numProp2");
+    assertEquals(estimation4, 0.5, 0.01);
+    estimation8 = stats2.estimatePropertyProb(VERTEX, Optional.of("v1"),
+      "unknown",
+      GTE, VERTEX, Optional.of("v2"), "test");
+    assertEquals(estimation8, 0.5, 0.001);
+    double estimation7 = stats2.estimatePropertyProb(VERTEX, Optional.of("v1"),
+      "numProp",
+      NEQ, VERTEX, Optional.of("v2"), "numProp");
+    assertEquals(estimation7, 0.05, 0.01);
   }
 
   @Test
@@ -351,13 +434,13 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     assertEquals(estimation3, 0., 0.001);
     double estimation4 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       LTE, VERTEX, Optional.of("v2"), "gender");
-    assertEquals(estimation3, 0., 0.001);
+    assertEquals(estimation4, 0., 0.001);
     double estimation5 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       GT, VERTEX, Optional.of("v2"), "gender");
-    assertEquals(estimation3, 0., 0.001);
+    assertEquals(estimation5, 0., 0.001);
     double estimation6 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       GTE, VERTEX, Optional.of("v2"), "gender");
-    assertEquals(estimation3, 0., 0.001);
+    assertEquals(estimation6, 0., 0.001);
 
     // property gender is only in v2
     double estimation7 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
@@ -374,6 +457,28 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       EQ, VERTEX, Optional.empty(), "gender");
     assertEquals(estimation10, 0.1375, 0.001);
 
+  }
+
+  @Test
+  public void complexCategoricalWithExclusion(){
+    BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
+    double estimation2 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
+      NEQ, VERTEX, Optional.of("v2"), "gender");
+    double estimation9 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
+      EQ, VERTEX, Optional.empty(), "gender");
+    assertEquals(estimation9, 0.5, 0.001);
+    assertEquals(estimation2, 0.5, 0.01);
+
+    // with partial exclusion
+    ArrayList<String> includeCategorical = new ArrayList<>(Collections.singletonList("gender"));
+    BinningTemporalGraphStatistics stats2 = getDummyStats(new HashSet<>(),
+      new HashSet<>(includeCategorical));
+    estimation2 = stats2.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
+      NEQ, VERTEX, Optional.of("v2"), "gender");
+    assertEquals(estimation2, 0.45, 0.01);
+    double estimation1 = stats2.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
+      EQ, VERTEX, Optional.empty(), "catProp1");
+    assertEquals(estimation1, 0.5, 0.01);
   }
 
   @Test
@@ -502,7 +607,8 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
    *
    * @return dummy statistics
    */
-  private BinningTemporalGraphStatistics getDummyStats() {
+  private BinningTemporalGraphStatistics getDummyStats(Set<String> relevantNumerical,
+                                                       Set<String> relevantCategorical) {
     ArrayList<TemporalVertex> vertexList = new ArrayList<>();
 
     // first type of vertex has label1
@@ -601,7 +707,12 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     );
 
     return new BinningTemporalGraphStatisticsFactory()
-      .fromGraphWithSampling(graph, 100);
+      .fromGraphWithSampling(graph, 100, relevantNumerical, relevantCategorical);
 
+  }
+
+  // without explicitly stating the categories
+  private BinningTemporalGraphStatistics getDummyStats(){
+    return getDummyStats(null, null);
   }
 }

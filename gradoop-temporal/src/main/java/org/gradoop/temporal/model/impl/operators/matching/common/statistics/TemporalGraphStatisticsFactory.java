@@ -17,6 +17,9 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics;
 
 import org.gradoop.temporal.model.impl.TemporalGraph;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Abstract base class for factories for {@link TemporalGraphStatistics}
  * @param <T> the type of {@link TemporalGraphStatistics}
@@ -31,10 +34,33 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
   T fromGraph(TemporalGraph g);
 
   /**
+   * Create statistics from a temporal graph, specifying numerical and categorical
+   * properties to consider explicitly
+   * @param g graph to create statistics for
+   * @param numericalProperties list of numerical properties to consider
+   * @param categoricalProperties list of categorical properties to consider
+   * @return graph statistiscs
+   */
+  T fromGraph(TemporalGraph g, Set<String> numericalProperties,
+              Set<String> categoricalProperties);
+
+  /**
    * Create statistics from a temporal graph based only on a sample of it
    * @param g graph to create statistics for
    * @param sampleSize size of sample to be used
    * @return graph statistics
    */
   T fromGraphWithSampling(TemporalGraph g, int sampleSize);
+
+  /**
+   * Create statistics from a temporal graph based only on a sample of it.
+   * Numerical and categorical properties to be considered are specified explicitly.
+   * @param g graph to create statistics for
+   * @param numericalProperties list of numerical properties to consider
+   * @param categoricalProperties list of categorical properties to consider
+   * @param sampleSize size of sample to be used
+   * @return graph statistics
+   */
+  T fromGraphWithSampling(TemporalGraph g, int sampleSize, Set<String> numericalProperties,
+                          Set<String> categoricalProperties);
 }

@@ -243,11 +243,6 @@ public class EmbeddingTPGM
    * @return Embedding (TPGM!) with the projected property list
    */
   public EmbeddingTPGM project(List<Integer> propertyWhiteList) {
-        /*//could be implemented like:
-        Embedding e = new Embedding(getIdData(), getPropertyData(), getIdListData())
-                .project(propertyWhiteList);
-        return new EmbeddingTPGM(e.getIdData(), e.getPropertyData(), e.getIdListData(), timeData);
-        // but more efficient to copy the implementation in Embedding:*/
     byte[] newPropertyData = new byte[0];
     for (int index : propertyWhiteList) {
       newPropertyData = ArrayUtils.addAll(newPropertyData, getRawProperty(index));

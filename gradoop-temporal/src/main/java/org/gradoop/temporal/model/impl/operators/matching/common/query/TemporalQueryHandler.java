@@ -209,10 +209,12 @@ public class TemporalQueryHandler {
       Predicate predicate = gdlHandler.getPredicates().get();
       predicate = preprocessPredicate(predicate);
       TemporalCNF rawCNF = QueryPredicateFactory.createFrom(predicate).asCNF();
+      System.out.println("Initial CNF: "+rawCNF);
       cnf = cnfPostProcessing.postprocess(rawCNF);
     } else {
       cnf = QueryPredicateFactory.createFrom(preprocessPredicate(null)).asCNF();
     }
+    System.out.println("Effective CNF: "+cnf);
   }
 
   /**

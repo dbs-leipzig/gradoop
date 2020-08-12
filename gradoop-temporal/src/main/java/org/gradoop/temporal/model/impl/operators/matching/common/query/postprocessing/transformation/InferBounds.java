@@ -15,10 +15,14 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
@@ -112,9 +116,22 @@ public class InferBounds implements QueryTransformation {
   private List<ComparisonExpressionTPGM> getRelevantComparisons() {
     return query.getPredicates().stream()
       .filter(clause -> clause.size() == 1 &&
-        clause.getPredicates().get(0).isTemporal())
+        clause.getPredicates().get(0).isTemporal() &&
+        !isMinMax(clause.getPredicates().get(0)))
       .map(clause -> clause.getPredicates().get(0))
       .collect(Collectors.toList());
+  }
+
+  /**
+   * Checks whether a comparison involves a MIN or MAX timestamp
+   * @param comparisonExpressionTPGM comparison to check
+   * @return true iff the comparison involves a MIN or MAX timestamp
+   */
+  private boolean isMinMax(ComparisonExpressionTPGM comparisonExpressionTPGM) {
+    QueryComparableTPGM lhs = comparisonExpressionTPGM.getLhs();
+    QueryComparableTPGM rhs = comparisonExpressionTPGM.getRhs();
+    return (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||
+      rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable);
   }
 
   /**

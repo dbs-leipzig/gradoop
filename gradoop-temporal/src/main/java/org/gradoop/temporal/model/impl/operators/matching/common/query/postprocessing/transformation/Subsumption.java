@@ -103,7 +103,7 @@ public abstract class Subsumption implements QueryTransformation {
         continue;
       }
       CNFElementTPGM c1 = oldClauses.get(i);
-      for (int j = i + 1; j < oldClauses.size(); j++) {
+      for (int j = i+1; j < oldClauses.size(); j++) {
         // clause j is already subsumed, i.e. actually not there anymore
         if (subsumed.contains(j)) {
           continue;
