@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -50,7 +50,7 @@ public class SyntacticSubsumptionTest {
 
   @Test
   public void syntacticSubsumtionTest() {
-    TemporalCNF cnf1 = Util.cnfFromLists(
+    CNF cnf1 = Util.cnfFromLists(
       //subsumed by (eq)
       Arrays.asList(lte1, eq, lt2),
       Collections.singletonList(eq),
@@ -58,7 +58,7 @@ public class SyntacticSubsumptionTest {
       Arrays.asList(lt1, eq),
       Arrays.asList(lte1, lt2)
     );
-    TemporalCNF expected1 = Util.cnfFromLists(
+    CNF expected1 = Util.cnfFromLists(
       Collections.singletonList(eq),
       Arrays.asList(lte1, lt2)
     );
@@ -68,12 +68,12 @@ public class SyntacticSubsumptionTest {
   @Test
   public void syntacticSubsumtionTest2() {
 
-    TemporalCNF cnf2 = Util.cnfFromLists(
+    CNF cnf2 = Util.cnfFromLists(
       //subsumed by (eq, lt2)
       Arrays.asList(lte1, eq, lt2),
       Arrays.asList(eq, lt2)
     );
-    TemporalCNF expected2 = Util.cnfFromLists(
+    CNF expected2 = Util.cnfFromLists(
       Arrays.asList(eq, lt2)
     );
     assertEquals(subsumer.transformCNF(cnf2), expected2);
@@ -82,12 +82,12 @@ public class SyntacticSubsumptionTest {
   @Test
   public void syntacticSubsumtionsTest3() {
     // no subsumtions here
-    TemporalCNF cnf3 = Util.cnfFromLists(
+    CNF cnf3 = Util.cnfFromLists(
       Arrays.asList(lte1, eq, lt2),
       Arrays.asList(lt1, eq)
     );
     // gets resorted...
-    TemporalCNF expected3 = Util.cnfFromLists(
+    CNF expected3 = Util.cnfFromLists(
       Arrays.asList(lt1, eq),
       Arrays.asList(lte1, eq, lt2)
     );
@@ -97,12 +97,12 @@ public class SyntacticSubsumptionTest {
   @Test
   public void syntacticSubsumtionTest4() {
 
-    TemporalCNF cnf4 = Util.cnfFromLists(
+    CNF cnf4 = Util.cnfFromLists(
       //subsumed by (eq, lt2)
       Arrays.asList(lte1, eq, lt2, lte1),
       Arrays.asList(eq, lt2, eq)
     );
-    TemporalCNF expected4 = Util.cnfFromLists(
+    CNF expected4 = Util.cnfFromLists(
       Arrays.asList(eq, lt2)
     );
     assertEquals(subsumer.transformCNF(cnf4), expected4);
@@ -111,12 +111,12 @@ public class SyntacticSubsumptionTest {
   @Test
   public void syntacticSubsumtionTest5() {
 
-    TemporalCNF cnf5 = Util.cnfFromLists(
+    CNF cnf5 = Util.cnfFromLists(
       //subsumed by (eq, lt2)
       Collections.singletonList(withLiteral),
       Collections.singletonList(withLiteral)
     );
-    TemporalCNF expected5 = Util.cnfFromLists(
+    CNF expected5 = Util.cnfFromLists(
       Collections.singletonList(withLiteral)
     );
     assertEquals(subsumer.transformCNF(cnf5), expected5);

@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -38,11 +38,11 @@ public class DeduplicationTest {
 
   @Test
   public void deduplicationTest() throws QueryContradictoryException {
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(ts1, LT, l1)),
       Collections.singletonList(new Comparison(ts2, LT, l2))
     );
-    TemporalCNF expected = Util.cnfFromLists(
+    CNF expected = Util.cnfFromLists(
       Collections.singletonList(new Comparison(ts1, LT, l1))
     );
 

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter;
 
 import com.google.common.collect.Lists;
@@ -21,9 +22,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest {
   @Test
   public void testFilterWithNoPredicates() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->()");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->()");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     Properties properties = Properties.create();
@@ -47,7 +48,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
     e1.setValidTime(new Tuple2<>(5678L, 56789L));
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalEdges(edges, predicates, new ArrayList<>(), false)
         .evaluate()
         .collect();
@@ -58,7 +59,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testFilterEdgesByProperties() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     Properties properties = Properties.create();
@@ -75,7 +76,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalEdges(edges, predicates, new ArrayList<>(), false)
         .evaluate()
         .collect();
@@ -86,7 +87,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testFilterEdgesByLabel() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
+    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     TemporalEdge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
@@ -97,7 +98,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
     e2.setValidTime(new Tuple2<>(5432L, 54321L));
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalEdges(edges, predicates, new ArrayList<>(), false)
         .evaluate()
         .collect();
@@ -108,7 +109,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testFilterEdgesByTime() throws Exception {
-    TemporalCNF predicates = predicateFromQuery(
+    CNF predicates = predicateFromQuery(
       "MATCH ()-[a]->() WHERE a.val_from.before(1970-01-01T00:00:01)");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
@@ -122,7 +123,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
     e2.setValidTime(new Tuple2<>(123L, 54321L));
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalEdges(edges, predicates, new ArrayList<>(), false)
         .evaluate()
         .collect();
@@ -133,7 +134,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testResultingEntryList() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -146,7 +147,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(edge);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalEdges(edges, predicates, new ArrayList<>(), false)
         .evaluate()
         .collect();
@@ -160,7 +161,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testProjectionOfAvailableValues() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -173,7 +174,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    EmbeddingTPGM result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
+    Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
     assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
@@ -181,7 +182,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testProjectionOfMissingValues() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -194,7 +195,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "since");
 
-    EmbeddingTPGM result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
+    Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
     assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
@@ -203,7 +204,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testProjectLoop() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
+    CNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
 
     GradoopId a = GradoopId.get();
     TemporalEdge edge = new TemporalEdgeFactory().createEdge(a, a);
@@ -212,7 +213,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(edge);
 
-    EmbeddingTPGM result = new FilterAndProjectTemporalEdges(edges, predicates, Collections.emptyList(), true)
+    Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, Collections.emptyList(), true)
       .evaluate().collect().get(0);
 
     assertEquals(result.size(), 2);
@@ -220,3 +221,4 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
     assertEquals(edge.getId(), result.getId(1));
   }
 }
+

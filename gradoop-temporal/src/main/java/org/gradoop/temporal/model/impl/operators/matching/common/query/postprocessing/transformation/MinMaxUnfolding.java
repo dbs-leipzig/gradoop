@@ -15,10 +15,12 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
@@ -50,18 +52,19 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  */
 public class MinMaxUnfolding implements QueryTransformation {
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) {
+  public CNF transformCNF(CNF cnf) {
     if (cnf.getPredicates().size() == 0) {
       return cnf;
     } else {
-      TemporalCNF oldCNF = cnf;
-      TemporalCNF newCNF = cnf.getPredicates().stream()
-        .map(this::unfoldNext).reduce(TemporalCNF::and).get();
+      CNF oldCNF = cnf;
+      CNF newCNF = cnf.getPredicates().stream()
+        .map(this::unfoldNext)
+        .reduce(CNF::and).get();
       while (!newCNF.equals(oldCNF)) {
         oldCNF = newCNF;
         newCNF = newCNF.getPredicates().stream()
           .map(this::unfoldNext)
-          .reduce(TemporalCNF::and).get();
+          .reduce(CNF::and).get();
       }
       return newCNF;
     }
@@ -73,12 +76,12 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param clause clause to apply the rules to
    * @return transformed clause
    */
-  private TemporalCNF unfoldNext(CNFElementTPGM clause) {
+  private CNF unfoldNext(CNFElement clause) {
     if (clause.getPredicates().size() > 1) {
-      return new TemporalCNF(
+      return new CNF(
         clause.getPredicates().stream()
           .map(comp -> unfoldNext(comp, false))
-          .reduce(TemporalCNF::or)
+          .reduce(CNF::or)
           .get()
       );
     } else {
@@ -93,7 +96,7 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param allowConjunctions true iff the result is allowed to be a n-ary CNF (n > 1)
    * @return transformed comparison
    */
-  private TemporalCNF unfoldNext(ComparisonExpressionTPGM comp, boolean allowConjunctions) {
+  private CNF unfoldNext(ComparisonExpression comp, boolean allowConjunctions) {
     ComparableExpression lhs = comp.getLhs().getWrappedComparable();
     Comparator comparator = comp.getComparator();
     ComparableExpression rhs = comp.getRhs().getWrappedComparable();
@@ -120,8 +123,8 @@ public class MinMaxUnfolding implements QueryTransformation {
       }
     }
 
-    return new TemporalCNF(new ArrayList(
-      Collections.singletonList(new CNFElementTPGM(new ArrayList(Collections.singletonList(comp))))));
+    return new CNF(new ArrayList(
+      Collections.singletonList(new CNFElement(new ArrayList(Collections.singletonList(comp))))));
 
   }
 
@@ -135,13 +138,13 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param rhs        right hand side
    * @return "exists" predicate as CNF
    */
-  private TemporalCNF exists(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
-    List<ComparisonExpressionTPGM> comparisons = new ArrayList<>();
+  private CNF exists(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
+    List<ComparisonExpression> comparisons = new ArrayList<>();
     for (TimePoint arg : args) {
-      comparisons.add(new ComparisonExpressionTPGM(new Comparison(arg, comparator, rhs)));
+      comparisons.add(new ComparisonExpression(new Comparison(arg, comparator, rhs), new ComparableTPGMFactory()));
     }
-    CNFElementTPGM singleClause = new CNFElementTPGM(comparisons);
-    return new TemporalCNF(new ArrayList(Collections.singletonList(singleClause)));
+    CNFElement singleClause = new CNFElement(comparisons);
+    return new CNF(new ArrayList(Collections.singletonList(singleClause)));
   }
 
   /**
@@ -154,12 +157,12 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param args       right hand side, domain of the "exists"
    * @return "exists" predicate as CNF
    */
-  private TemporalCNF exists(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
-    List<ComparisonExpressionTPGM> comparisons = new ArrayList<>();
+  private CNF exists(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
+    List<ComparisonExpression> comparisons = new ArrayList<>();
     for (TimePoint arg : args) {
-      comparisons.add(new ComparisonExpressionTPGM(new Comparison(lhs, comparator, arg)));
+      comparisons.add(new ComparisonExpression(new Comparison(lhs, comparator, arg), new ComparableTPGMFactory()));
     }
-    return new TemporalCNF(new ArrayList(Collections.singletonList(new CNFElementTPGM(comparisons))));
+    return new CNF(new ArrayList(Collections.singletonList(new CNFElement(comparisons))));
   }
 
   /**
@@ -172,14 +175,15 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param rhs        right hand side
    * @return "forall" predicate as CNF
    */
-  private TemporalCNF forAll(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
-    List<CNFElementTPGM> clauses = new ArrayList<>();
+  private CNF forAll(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
+    List<CNFElement> clauses = new ArrayList<>();
     for (TimePoint arg : args) {
-      clauses.add(new CNFElementTPGM(new ArrayList(Collections.singletonList(new ComparisonExpressionTPGM(
-        new Comparison(arg, comparator, rhs)
+      clauses.add(new CNFElement(new ArrayList(Collections.singletonList(new ComparisonExpression(
+        new Comparison(arg, comparator, rhs),
+        new ComparableTPGMFactory()
       )))));
     }
-    return new TemporalCNF(clauses);
+    return new CNF(clauses);
   }
 
   /**
@@ -192,13 +196,14 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @param args       right hand side, domain of the "forall"
    * @return "forall" predicate as CNF
    */
-  private TemporalCNF forAll(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
-    List<CNFElementTPGM> clauses = new ArrayList<>();
+  private CNF forAll(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
+    List<CNFElement> clauses = new ArrayList<>();
     for (TimePoint arg : args) {
-      clauses.add(new CNFElementTPGM(new ArrayList(Collections.singletonList(new ComparisonExpressionTPGM(
-        new Comparison(lhs, comparator, arg)
+      clauses.add(new CNFElement(new ArrayList(Collections.singletonList(new ComparisonExpression(
+        new Comparison(lhs, comparator, arg),
+        new ComparableTPGMFactory()
       )))));
     }
-    return new TemporalCNF(clauses);
+    return new CNF(clauses);
   }
 }

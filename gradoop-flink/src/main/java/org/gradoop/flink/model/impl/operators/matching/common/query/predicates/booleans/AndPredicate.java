@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 
@@ -31,11 +32,26 @@ public class AndPredicate extends QueryPredicate {
   private final And and;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  QueryComparableFactory comparableFactory;
+
+  /**
    * Returns a new AndPredicate
    * @param and the predicate
    */
   public AndPredicate(And and) {
+    this(and, null);
+  }
+
+  /**
+   * Returns a new AndPredicate
+   * @param and the predicate
+   * @param comparableFactory factory for query comparables
+   */
+  public AndPredicate(And and, QueryComparableFactory comparableFactory) {
     this.and = and;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
@@ -52,7 +68,7 @@ public class AndPredicate extends QueryPredicate {
    * @return the left hand side
    */
   public QueryPredicate getLhs() {
-    return QueryPredicate.createFrom(and.getArguments()[0]);
+    return QueryPredicate.createFrom(and.getArguments()[0], comparableFactory);
   }
 
   /**
@@ -60,7 +76,7 @@ public class AndPredicate extends QueryPredicate {
    * @return the right hand side
    */
   public QueryPredicate getRhs() {
-    return QueryPredicate.createFrom(and.getArguments()[1]);
+    return QueryPredicate.createFrom(and.getArguments()[1], comparableFactory);
   }
 
   @Override

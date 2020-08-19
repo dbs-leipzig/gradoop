@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.relationgraph;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.cycle.JohnsonSimpleCycles;
 import org.jgrapht.graph.GraphWalk;
@@ -54,10 +54,10 @@ public class RelationGraph {
    *                    It is assumed that they are normalized, i.e. no comparison
    *                    with comparator < or <= is contained
    */
-  public RelationGraph(Set<ComparisonExpressionTPGM> comparisons) {
+  public RelationGraph(Set<ComparisonExpression> comparisons) {
     this.relationsGraph = new SimpleDirectedGraph<>(ComparatorEdge.class);
 
-    for (ComparisonExpressionTPGM comparison : comparisons) {
+    for (ComparisonExpression comparison : comparisons) {
       ComparableExpression lhs = comparison.getLhs().getWrappedComparable();
       ComparableExpression rhs = comparison.getRhs().getWrappedComparable();
       Comparator comparator = comparison.getComparator();

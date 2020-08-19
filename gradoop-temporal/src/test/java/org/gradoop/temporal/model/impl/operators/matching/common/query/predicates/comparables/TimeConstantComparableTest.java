@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
 
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TimeConstantComparableTest {
     TimeConstantComparable wrapper = new TimeConstantComparable(c);
 
     // evaluate on embedding
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    Embedding embedding = new Embedding();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
 
     assertEquals(1000L, wrapper.evaluate(embedding, metaData).getLong());
 

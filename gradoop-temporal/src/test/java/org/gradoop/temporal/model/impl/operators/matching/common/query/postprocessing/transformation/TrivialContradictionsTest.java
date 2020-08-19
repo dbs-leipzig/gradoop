@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
@@ -70,7 +70,7 @@ public class TrivialContradictionsTest {
 
   @Test
   public void trivialContradictionsTest() throws QueryContradictoryException {
-    TemporalCNF cnf1 = Util.cnfFromLists(
+    CNF cnf1 = Util.cnfFromLists(
       Arrays.asList(tsCont1, lNonCont1, tsNonCont2),
       Collections.singletonList(lNonCont2),
       Arrays.asList(lCont1, lCont4, lNonCont2),
@@ -87,7 +87,7 @@ public class TrivialContradictionsTest {
       Arrays.asList(tlNonCont1, lCont3, lNonCont2)
     );
 
-    TemporalCNF expected1 = Util.cnfFromLists(
+    CNF expected1 = Util.cnfFromLists(
       Arrays.asList(lNonCont1, tsNonCont2),
       Collections.singletonList(lNonCont2),
       Collections.singletonList(lNonCont2),
@@ -110,7 +110,7 @@ public class TrivialContradictionsTest {
   @Test(expected = QueryContradictoryException.class)
   public void trivialContradictionsTest2() throws QueryContradictoryException {
     // contradictory clause here -> should be null, as the whole formula is then contradictory
-    TemporalCNF cnf2 = Util.cnfFromLists(
+    CNF cnf2 = Util.cnfFromLists(
       Arrays.asList(tsCont1, lCont3),
       Collections.singletonList(tlNonCont1)
     );

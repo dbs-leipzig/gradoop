@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
@@ -96,7 +97,10 @@ public class DurationComparable extends TemporalComparable {
 
   @Override
   public Set<String> getPropertyKeys(String variable) {
-    return new HashSet<>();
+    HashSet<String> keys = new HashSet<>();
+    keys.addAll(from.getPropertyKeys(variable));
+    keys.addAll(to.getPropertyKeys(variable));
+    return keys;
   }
 
   @Override

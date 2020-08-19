@@ -18,9 +18,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -45,10 +44,12 @@ public class MaxTimePointComparableTest {
     String timeString1 = "1972-02-12T13:25:03";
     Long t1 = dateStringToLong(timeString1);
     TimeSelector s1 = new TimeSelector("a", TX_TO);
+    PropertyValue t1prop = PropertyValue.create(t1);
 
     String timeString2 = "2020-05-05T00:00:00";
     Long t2 = dateStringToLong(timeString2);
     TimeSelector s2 = new TimeSelector("b", TX_TO);
+    PropertyValue t2prop = PropertyValue.create(t2);
 
     String timeString3 = "1970-01-03T03:04:05";
     Long t3 = dateStringToLong(timeString3);
@@ -60,15 +61,17 @@ public class MaxTimePointComparableTest {
     //-----------------------------------------
     // evaluate on an embedding
     //-----------------------------------------
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    embedding.add(GradoopId.get(), new PropertyValue[] {}, 0, t1, 0, t1);
-    embedding.add(GradoopId.get(), new PropertyValue[] {}, 0, t2, 0, t2);
+    Embedding embedding = new Embedding();
+    GradoopId aId = GradoopId.get();
+    GradoopId bId = GradoopId.get();
+    embedding.add(aId, new PropertyValue[] {t1prop});
+    embedding.add(bId, new PropertyValue[] {t2prop});
 
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EmbeddingMetaData.EntryType.VERTEX, 0);
-    metaData.setTimeColumn("a", 0);
+    metaData.setPropertyColumn("a", TX_TO.toString(), 0);
     metaData.setEntryColumn("b", EmbeddingMetaData.EntryType.VERTEX, 1);
-    metaData.setTimeColumn("b", 1);
+    metaData.setPropertyColumn("b", TX_TO.toString(), 1);
 
     assertEquals(reference, maxTimePoint.evaluate(embedding, metaData));
     //----------------------------------------------------

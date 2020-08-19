@@ -110,4 +110,9 @@ public class DummyTemporalGraphStatistics extends TemporalGraphStatistics {
                                      String property2) {
     return 1;
   }
+
+  @Override
+  public double estimateLabelProb(ElementType type, String label) {
+    return 1;
+  }
 }

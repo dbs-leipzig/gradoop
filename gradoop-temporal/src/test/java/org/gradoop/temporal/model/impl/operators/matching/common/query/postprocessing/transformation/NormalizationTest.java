@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
@@ -49,25 +49,25 @@ public class NormalizationTest {
   @Test
   public void singleClauseTest() {
     // for GT or GTE, sides should be switched
-    TemporalCNF gteCNF = Util.cnfFromLists(Collections.singletonList(gte));
-    TemporalCNF gteExpected = Util.cnfFromLists(Collections.singletonList(gte.switchSides()));
+    CNF gteCNF = Util.cnfFromLists(Collections.singletonList(gte));
+    CNF gteExpected = Util.cnfFromLists(Collections.singletonList(gte.switchSides()));
     assertEquals(normalization.transformCNF(gteCNF), gteExpected);
 
-    TemporalCNF gtCNF = Util.cnfFromLists(Collections.singletonList(gt));
-    TemporalCNF gtExpected = Util.cnfFromLists(Collections.singletonList(gt.switchSides()));
+    CNF gtCNF = Util.cnfFromLists(Collections.singletonList(gt));
+    CNF gtExpected = Util.cnfFromLists(Collections.singletonList(gt.switchSides()));
     assertEquals(normalization.transformCNF(gtCNF), gtExpected);
 
     // all other comparisons should be left unchanged
-    TemporalCNF eqCNF = Util.cnfFromLists(Collections.singletonList(eq));
+    CNF eqCNF = Util.cnfFromLists(Collections.singletonList(eq));
     assertEquals(normalization.transformCNF(eqCNF), eqCNF);
 
-    TemporalCNF neqCNF = Util.cnfFromLists(Collections.singletonList(neq));
+    CNF neqCNF = Util.cnfFromLists(Collections.singletonList(neq));
     assertEquals(normalization.transformCNF(neqCNF), neqCNF);
 
-    TemporalCNF ltCNF = Util.cnfFromLists(Collections.singletonList(lt));
+    CNF ltCNF = Util.cnfFromLists(Collections.singletonList(lt));
     assertEquals(normalization.transformCNF(ltCNF), ltCNF);
 
-    TemporalCNF lteCNF = Util.cnfFromLists(Collections.singletonList(lte));
+    CNF lteCNF = Util.cnfFromLists(Collections.singletonList(lte));
     assertEquals(normalization.transformCNF(lteCNF), lteCNF);
   }
 
@@ -83,7 +83,7 @@ public class NormalizationTest {
     ArrayList<Comparison> clause3 = new ArrayList<>(Collections.singletonList(
       gte
     ));
-    TemporalCNF input = Util.cnfFromLists(clause1, clause2, clause3);
+    CNF input = Util.cnfFromLists(clause1, clause2, clause3);
 
     // expected
     ArrayList<Comparison> expectedClause1 = new ArrayList<>(Arrays.asList(
@@ -95,7 +95,7 @@ public class NormalizationTest {
     ArrayList<Comparison> expectedClause3 = new ArrayList<>(Collections.singletonList(
       gte.switchSides()
     ));
-    TemporalCNF expected = Util.cnfFromLists(expectedClause1, expectedClause2, expectedClause3);
+    CNF expected = Util.cnfFromLists(expectedClause1, expectedClause2, expectedClause3);
 
     assertEquals(normalization.transformCNF(input), expected);
   }

@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
@@ -31,11 +32,27 @@ public class OrPredicate extends QueryPredicate {
   private final Or or;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  QueryComparableFactory comparableFactory;
+
+  /**
    * Creates a new or wrapper
    * @param or the wrapped or predicate
+   *
    */
   public OrPredicate(Or or) {
+    this(or, null);
+  }
+
+  /**
+   * Creates a new or wrapper
+   * @param or the wrapped or predicate
+   * @param comparableFactory factory for query comparables
+   */
+  public OrPredicate(Or or, QueryComparableFactory comparableFactory) {
     this.or = or;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
@@ -51,7 +68,7 @@ public class OrPredicate extends QueryPredicate {
    * @return the left hand side predicate
    */
   public QueryPredicate getLhs() {
-    return QueryPredicate.createFrom(or.getArguments()[0]);
+    return QueryPredicate.createFrom(or.getArguments()[0], comparableFactory);
   }
 
   /**
@@ -59,7 +76,7 @@ public class OrPredicate extends QueryPredicate {
    * @return the right hand side predicate
    */
   public QueryPredicate getRhs() {
-    return QueryPredicate.createFrom(or.getArguments()[1]);
+    return QueryPredicate.createFrom(or.getArguments()[1], comparableFactory);
   }
 
   @Override

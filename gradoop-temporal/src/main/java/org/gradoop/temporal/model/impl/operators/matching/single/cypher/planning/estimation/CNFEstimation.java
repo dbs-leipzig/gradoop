@@ -16,21 +16,22 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.s1ck.gdl.model.comparables.time.Duration;
 import org.s1ck.gdl.model.comparables.time.TimeConstant;
@@ -75,7 +76,7 @@ public class CNFEstimation {
   /**
    * saves estimations so that they can be looked up, when they are checked more than once
    */
-  private Map<ComparisonExpressionTPGM, Double> cache;
+  private Map<ComparisonExpression, Double> cache;
 
   /**
    * Creates a new instance
@@ -128,8 +129,8 @@ public class CNFEstimation {
       });
     // pre-compute all estimations
     cache = new HashMap<>();
-    for (CNFElementTPGM clause : queryHandler.getCNF()) {
-      for (ComparisonExpressionTPGM comp : clause.getPredicates()) {
+    for (CNFElement clause : queryHandler.getPredicates()) {
+      for (ComparisonExpression comp : clause.getPredicates()) {
         cache.put(comp, estimateComparison(comp));
       }
     }
@@ -142,7 +143,7 @@ public class CNFEstimation {
    * @param cnf cnf
    * @return estimation of the probability that the CNF evaluates to true
    */
-  public double estimateCNF(TemporalCNF cnf) {
+  public double estimateCNF(CNF cnf) {
     if (cnf.getPredicates().isEmpty()) {
       return 1.;
     }
@@ -160,15 +161,15 @@ public class CNFEstimation {
    * @param element CNFElement
    * @return estimation of probability that the CNFElement evaluates to true
    */
-  private double estimateCNFElement(CNFElementTPGM element) {
+  private double estimateCNFElement(CNFElement element) {
     if (element.getPredicates().size() == 1) {
       return estimateComparison(element.getPredicates().get(0));
     } else {
-      List<ComparisonExpressionTPGM> comparisons = element.getPredicates();
+      List<ComparisonExpression> comparisons = element.getPredicates();
       double firstEst = estimateComparison(comparisons.get(0));
-      CNFElementTPGM rest = new CNFElementTPGM(comparisons.subList(
+      CNFElement rest = new CNFElement(comparisons.subList(
         1, comparisons.size()));
-      double restEst = estimateCNF(new TemporalCNF(Collections.singletonList(rest)));
+      double restEst = estimateCNF(new CNF(Collections.singletonList(rest)));
       return firstEst + restEst - (firstEst * restEst);
     }
   }
@@ -180,13 +181,13 @@ public class CNFEstimation {
    * @param comparisons list of comparisons
    * @return CNF (conjunction) from a list of comparisons
    */
-  private TemporalCNF cnfFrom(List<ComparisonExpressionTPGM> comparisons) {
-    ArrayList<CNFElementTPGM> elements = new ArrayList<>();
-    for (ComparisonExpressionTPGM comparison : comparisons) {
-      elements.add(new CNFElementTPGM(
+  private CNF cnfFrom(List<ComparisonExpression> comparisons) {
+    ArrayList<CNFElement> elements = new ArrayList<>();
+    for (ComparisonExpression comparison : comparisons) {
+      elements.add(new CNFElement(
         new ArrayList<>(Collections.singletonList(comparison))));
     }
-    return new TemporalCNF(elements);
+    return new CNF(elements);
   }
 
   /**
@@ -196,20 +197,16 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison evaluates to true
    */
-  private double estimateComparison(ComparisonExpressionTPGM comparisonExpression) {
+  private double estimateComparison(ComparisonExpression comparisonExpression) {
     if (cache.containsKey(comparisonExpression)) {
       return cache.get(comparisonExpression);
     }
     double result = 1.;
     if (isLabelComp(comparisonExpression)) {
-      if (!labelMap.containsValue(getLabelFromLabelComp(comparisonExpression))) {
-        result = 0.001;
-      }
-      // if label is in the DB, the estimations for the rest of
-      // the CNF take care of the label's selectivity
-      else {
-        result = 0.01;
-      }
+      String label = getLabelFromLabelComp(comparisonExpression);
+      String variable = getVariableFromLabelComp(comparisonExpression);
+      TemporalGraphStatistics.ElementType type = typeMap.get(variable);
+      result = stats.estimateLabelProb(type, label);
     } else {
       if (comparisonExpression.getVariables().size() > 1) {
         result = estimateComparisonOnDifferent(comparisonExpression);
@@ -222,12 +219,22 @@ public class CNFEstimation {
   }
 
   /**
+   * Extracts the variable from a label comparison, i.e. a comparison of the form
+   * "a.__label__=label"
+   * @param comparisonExpression the label comparison
+   * @return variable of the label comparison
+   */
+  private String getVariableFromLabelComp(ComparisonExpression comparisonExpression) {
+    return new ArrayList<>(comparisonExpression.getVariables()).get(0);
+  }
+
+  /**
    * Checks if a comparison describes the label of an element
    *
    * @param comparison comparison to check
    * @return true iff the comparison describes the label of an element
    */
-  private boolean isLabelComp(ComparisonExpressionTPGM comparison) {
+  private boolean isLabelComp(ComparisonExpression comparison) {
     if (comparison.getComparator() != EQ) {
       return false;
     }
@@ -248,11 +255,12 @@ public class CNFEstimation {
    * @param comparison comparison of the form a.__label__="label" or "label"==a.__label__
    * @return label assigned to the element
    */
-  private String getLabelFromLabelComp(ComparisonExpressionTPGM comparison) {
+  private String getLabelFromLabelComp(ComparisonExpression comparison) {
     if (comparison.getLhs() instanceof PropertySelectorComparable) {
       if (((PropertySelectorComparable) comparison.getLhs())
         .getPropertyKey().equals("__label__")) {
-        return (String) ((LiteralComparable) comparison.getRhs()).getValue();
+        String value = (String) ((LiteralComparable) comparison.getRhs()).getValue();
+        return value;
       }
     } else if (comparison.getRhs() instanceof PropertySelectorComparable) {
       if (((PropertySelectorComparable) comparison.getRhs())
@@ -269,11 +277,11 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of probability that the comparison holds
    */
-  private double estimateCompOnSameTPGM(ComparisonExpressionTPGM comparisonExpression) {
-    QueryComparableTPGM lhs = comparisonExpression.getLhs();
-    QueryComparableTPGM rhs = comparisonExpression.getRhs();
+  private double estimateCompOnSameTPGM(ComparisonExpression comparisonExpression) {
+    QueryComparable lhs = comparisonExpression.getLhs();
+    QueryComparable rhs = comparisonExpression.getRhs();
 
-    if (comparisonExpression.isTemporal()) {
+    if (ComparisonUtil.isTemporal(comparisonExpression)) {
       if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeSelectorComparable) {
         // TODO implement?
         return 1.;
@@ -312,13 +320,13 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison evaluates to true
    */
-  private double simpleDurationComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
-    QueryComparableTPGM lhs = comparisonExpression.getLhs();
-    QueryComparableTPGM rhs = comparisonExpression.getRhs();
+  private double simpleDurationComparisonEstimation(ComparisonExpression comparisonExpression) {
+    QueryComparable lhs = comparisonExpression.getLhs();
+    QueryComparable rhs = comparisonExpression.getRhs();
     Comparator comp = comparisonExpression.getComparator();
     // ensure that the duration is always on the left side
     if (rhs instanceof DurationComparable) {
-      QueryComparableTPGM t = lhs;
+      QueryComparable t = lhs;
       lhs = rhs;
       rhs = t;
       comp = switchComparator(comp);
@@ -376,7 +384,7 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of probability that the comparison holds
    */
-  private double MinMaxTemporalEstimation(ComparisonExpressionTPGM comparisonExpression) {
+  private double MinMaxTemporalEstimation(ComparisonExpression comparisonExpression) {
     // TODO implement if needed
     return 1.0;
   }
@@ -389,7 +397,7 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison holds
    */
-  private double simpleTemporalEstimation(ComparisonExpressionTPGM comparisonExpression) {
+  private double simpleTemporalEstimation(ComparisonExpression comparisonExpression) {
     TemporalComparable lhs = (TemporalComparable) comparisonExpression.getLhs();
     TemporalComparable rhs = (TemporalComparable) comparisonExpression.getRhs();
     Comparator comp = comparisonExpression.getComparator();
@@ -417,9 +425,9 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison holds
    */
-  private double complexPropertyEstimation(ComparisonExpressionTPGM comparisonExpression) {
-    QueryComparableTPGM lhs = comparisonExpression.getLhs();
-    QueryComparableTPGM rhs = comparisonExpression.getRhs();
+  private double complexPropertyEstimation(ComparisonExpression comparisonExpression) {
+    QueryComparable lhs = comparisonExpression.getLhs();
+    QueryComparable rhs = comparisonExpression.getRhs();
     Comparator comp = comparisonExpression.getComparator();
 
     String variable1 = ((PropertySelectorComparable) lhs).getVariable();
@@ -445,13 +453,13 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison holds
    */
-  private double simplePropertyEstimation(ComparisonExpressionTPGM comparisonExpression) {
-    QueryComparableTPGM lhs = comparisonExpression.getLhs();
-    QueryComparableTPGM rhs = comparisonExpression.getRhs();
+  private double simplePropertyEstimation(ComparisonExpression comparisonExpression) {
+    QueryComparable lhs = comparisonExpression.getLhs();
+    QueryComparable rhs = comparisonExpression.getRhs();
     Comparator comp = comparisonExpression.getComparator();
     // "normalize" the comparison so that the selector is on the left side
     if (rhs instanceof PropertySelectorComparable) {
-      QueryComparableTPGM t = lhs;
+      QueryComparable t = lhs;
       lhs = rhs;
       rhs = t;
       comp = switchComparator(comp);
@@ -493,11 +501,11 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of probability that the comparison holds.
    */
-  private double estimateComparisonOnDifferent(ComparisonExpressionTPGM comparisonExpression) {
-    QueryComparableTPGM lhs = comparisonExpression.getLhs();
-    QueryComparableTPGM rhs = comparisonExpression.getRhs();
+  private double estimateComparisonOnDifferent(ComparisonExpression comparisonExpression) {
+    QueryComparable lhs = comparisonExpression.getLhs();
+    QueryComparable rhs = comparisonExpression.getRhs();
 
-    if (comparisonExpression.isTemporal()) {
+    if (ComparisonUtil.isTemporal(comparisonExpression)) {
       if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeSelectorComparable) {
         return timeSelectorComparisonEstimation(comparisonExpression);
       } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable
@@ -525,7 +533,7 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison holds
    */
-  private double durationComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
+  private double durationComparisonEstimation(ComparisonExpression comparisonExpression) {
     Duration lhs = (Duration) comparisonExpression.getLhs().getWrappedComparable();
     Duration rhs = (Duration) comparisonExpression.getRhs().getWrappedComparable();
     if (!(checkSimpleDuration(lhs) && checkSimpleDuration(rhs))) {
@@ -559,7 +567,7 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of the probability that the comparison holds
    */
-  private double timeSelectorComparisonEstimation(ComparisonExpressionTPGM comparisonExpression) {
+  private double timeSelectorComparisonEstimation(ComparisonExpression comparisonExpression) {
     TimeSelectorComparable lhs = (TimeSelectorComparable) comparisonExpression.getLhs();
     TimeSelectorComparable rhs = (TimeSelectorComparable) comparisonExpression.getRhs();
     Comparator comp = comparisonExpression.getComparator();
@@ -594,12 +602,12 @@ public class CNFEstimation {
    * @param cnf the CNF to reorder
    * @return reordered CNF
    */
-  public TemporalCNF reorderCNF(TemporalCNF cnf) {
-    ArrayList<CNFElementTPGM> clauses = new ArrayList<>(cnf.getPredicates());
+  public CNF reorderCNF(CNF cnf) {
+    ArrayList<CNFElement> clauses = new ArrayList<>(cnf.getPredicates());
     // resort the clauses: labels and then selective clauses first
-    clauses.sort(new java.util.Comparator<CNFElementTPGM>() {
+    clauses.sort(new java.util.Comparator<CNFElement>() {
       @Override
-      public int compare(CNFElementTPGM clause1, CNFElementTPGM clause2) {
+      public int compare(CNFElement clause1, CNFElement clause2) {
         if (clause1.getPredicates().size() == 1 && isLabelComp(clause1.getPredicates().get(0))) {
           return 100;
         } else if (clause2.getPredicates().size() == 1 &&
@@ -614,11 +622,11 @@ public class CNFEstimation {
 
     // resort comparisons within clauses: non-selective comparisons first
     clauses = clauses.stream().map(clause -> {
-        ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+        ArrayList<ComparisonExpression> comps = new ArrayList<>(
           clause.getPredicates());
-        comps.sort(new java.util.Comparator<ComparisonExpressionTPGM>() {
+        comps.sort(new java.util.Comparator<ComparisonExpression>() {
           @Override
-          public int compare(ComparisonExpressionTPGM c1, ComparisonExpressionTPGM c2) {
+          public int compare(ComparisonExpression c1, ComparisonExpression c2) {
             if (isLabelComp(c1)) {
               return 100;
             } else if (isLabelComp(c2)) {
@@ -629,10 +637,10 @@ public class CNFEstimation {
             }
           }
         });
-        return new CNFElementTPGM(comps);
+        return new CNFElement(comps);
       }
     ).collect(Collectors.toCollection(ArrayList::new));
 
-    return new TemporalCNF(clauses);
+    return new CNF(clauses);
   }
 }

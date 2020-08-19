@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddings;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.junit.Test;
@@ -42,7 +44,7 @@ public class ProjectTemporalEmbeddingsTest extends PhysicalTPGMOperatorTest {
 
     List<Integer> extractedPropertyKeys = Lists.newArrayList(0, 2);
 
-    ProjectTemporalEmbeddings operator = new ProjectTemporalEmbeddings(embeddings, extractedPropertyKeys);
+    ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
     DataSet<EmbeddingTPGM> results = operator.evaluate();
     assertEquals(2, results.count());
@@ -55,3 +57,4 @@ public class ProjectTemporalEmbeddingsTest extends PhysicalTPGMOperatorTest {
     });
   }
 }
+*/

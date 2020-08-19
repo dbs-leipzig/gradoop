@@ -20,13 +20,14 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
+import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,19 +39,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectTemporalVerticesTest {
 
   public void testMetaDataInitialization() throws Exception {
     String variable = "a";
     FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(
-      null, variable, new TemporalCNF(), Sets.newHashSet());
+      null, variable, new CNF(), Sets.newHashSet());
 
-    EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(variable), is(0));
     assertThat(node.getEmbeddingMetaData().getPropertyKeys(variable).size(), is(0));
-    assertThat(node.getEmbeddingMetaData().getTimeColumn(variable), is(0));
-    assertThat(node.getEmbeddingMetaData().getTimeDataMapping().keySet().size(), is(1));
   }
 
   @Test
@@ -92,21 +92,24 @@ public class FilterAndProjectTemporalVerticesTest {
     String query = "MATCH (n) WHERE n.foo = 23 AND n.tx_from.before(1970-01-01T00:00:01) " +
       "AND n.tx_to.before(2020-01-01)";
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-    TemporalCNF filterPredicate = queryHandler.getCNF().getSubCNF(Sets.newHashSet("n"));
-    Set<String> projectionKeys = queryHandler.getCNF().getPropertyKeys("n");
+    CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("n"));
+    Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("n");
 
     FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(
       vertices, "n", filterPredicate, projectionKeys);
-    List<EmbeddingTPGM> filteredVertices = node.execute().collect();
+    List<Embedding> filteredVertices = node.execute().collect();
 
     assertThat(filteredVertices.size(), is(1));
     assertThat(filteredVertices.get(0).getId(0).equals(vertex1Id), is(true));
-    assertEquals(filteredVertices.get(0).getTimeData().length, 4 * Long.BYTES);
-    assertArrayEquals(filteredVertices.get(0).getTimes(0), vertex1Time);
 
-    EmbeddingTPGMMetaData metaData = node.getEmbeddingMetaData();
+
+    EmbeddingMetaData metaData = node.getEmbeddingMetaData();
     assertEquals(metaData.getEntryColumn("n"), 0);
-    assertEquals(metaData.getPropertyColumn("n", "foo"), 0);
-    assertEquals(metaData.getTimeColumn("n"), 0);
+    System.out.println(metaData.getPropertyKeys("n"));
+
+    int fooColumn = metaData.getPropertyColumn("n", "foo");
+    int fromColumn = metaData.getPropertyColumn("n", TimeSelector.TimeField.TX_FROM.toString());
+    int toColumn = metaData.getPropertyColumn("n", TimeSelector.TimeField.TX_TO.toString());
+    assertTrue(fooColumn != fromColumn && fromColumn!=toColumn && fooColumn!=toColumn);
   }
 }

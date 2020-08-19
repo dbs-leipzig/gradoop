@@ -21,14 +21,16 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
@@ -78,14 +80,15 @@ public abstract class PhysicalTPGMOperatorTest extends GradoopFlinkTestBase {
     return properties;
   }
 
-  protected TemporalCNF predicateFromQuery(String query) throws QueryContradictoryException {
+  protected CNF predicateFromQuery(String query) throws QueryContradictoryException {
     // no default asOf-predicates:
-    if (!query.contains("WHERE")) {
+    /*if (!query.contains("WHERE")) {
       query += " WHERE tx_to.after(1970-01-01T00:00:00)";
     } else {
       query += " AND tx_to.after(1970-01-01T00:00:00)";
-    }
-    return new TemporalQueryHandler(query).getCNF();
+    }*/
+    return new TemporalQueryHandler(query, new CNFPostProcessing(new ArrayList<>()))
+      .getPredicates();
   }
 }
 

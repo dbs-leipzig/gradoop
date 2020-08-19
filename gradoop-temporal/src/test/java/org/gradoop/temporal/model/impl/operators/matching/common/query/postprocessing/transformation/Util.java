@@ -15,9 +15,10 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 
 import java.util.ArrayList;
@@ -29,20 +30,20 @@ import java.util.List;
 public class Util {
 
   /**
-   * Builds a TemporalCNF from a set of lists of comparisons
+   * Builds a CNF from a set of lists of comparisons
    *
    * @param clauses set of lists of comparisons
-   * @return TemporalCNF from clauses
+   * @return CNF from clauses
    */
-  public static TemporalCNF cnfFromLists(List<Comparison>... clauses) {
-    List<CNFElementTPGM> cnfClauses = new ArrayList<>();
+  public static CNF cnfFromLists(List<Comparison>... clauses) {
+    List<CNFElement> cnfClauses = new ArrayList<>();
     for (List<Comparison> comparisons : clauses) {
-      ArrayList<ComparisonExpressionTPGM> wrappedComparisons = new ArrayList<>();
+      ArrayList<ComparisonExpression> wrappedComparisons = new ArrayList<>();
       for (Comparison comparison : comparisons) {
-        wrappedComparisons.add(new ComparisonExpressionTPGM(comparison));
+        wrappedComparisons.add(new ComparisonExpression(comparison, new ComparableTPGMFactory()));
       }
-      cnfClauses.add(new CNFElementTPGM(wrappedComparisons));
+      cnfClauses.add(new CNFElement(wrappedComparisons));
     }
-    return new TemporalCNF(cnfClauses);
+    return new CNF(cnfClauses);
   }
 }

@@ -15,14 +15,18 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
+import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
@@ -45,7 +49,7 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  */
 public class AddTrivialConstraints implements QueryTransformation {
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     List<Set<String>> variableSets = getNecessaryFields(cnf);
     Set<String> txVars = variableSets.get(0);
     Set<String> valVars = variableSets.get(1);
@@ -89,10 +93,10 @@ public class AddTrivialConstraints implements QueryTransformation {
    * @param comparison comparison that makes up the single clause to add
    * @return CNF with singleton clause appended
    */
-  private TemporalCNF addSingletonClause(TemporalCNF cnf, Comparison comparison) {
-    return cnf.and(new TemporalCNF(Collections.singletonList(
-      new CNFElementTPGM(Collections.singletonList(
-        new ComparisonExpressionTPGM(comparison)))
+  private CNF addSingletonClause(CNF cnf, Comparison comparison) {
+    return cnf.and(new CNF(Collections.singletonList(
+      new CNFElement(Collections.singletonList(
+        new ComparisonExpression(comparison, new ComparableTPGMFactory())))
     )));
   }
 
@@ -106,22 +110,22 @@ public class AddTrivialConstraints implements QueryTransformation {
    * @return list containing set of tx variables at index 0, set of
    * val variables at index 1
    */
-  private List<Set<String>> getNecessaryFields(TemporalCNF cnf) {
+  private List<Set<String>> getNecessaryFields(CNF cnf) {
     HashSet<String> txSet = new HashSet<>();
     HashSet<String> valSet = new HashSet<>();
-    for (CNFElementTPGM clause : cnf.getPredicates()) {
-      if (clause.size() != 1 || !clause.getPredicates().get(0).isTemporal()) {
+    for (CNFElement clause : cnf.getPredicates()) {
+      if (clause.size() != 1 || !ComparisonUtil.isTemporal(clause.getPredicates().get(0))) {
         continue;
       } else {
 
-        QueryComparableTPGM[] comparables = new QueryComparableTPGM[] {
+        QueryComparable[] comparables = new QueryComparable[] {
           clause.getPredicates().get(0).getLhs(),
           clause.getPredicates().get(0).getRhs()
         };
-        for (QueryComparableTPGM comparable : comparables) {
+        for (QueryComparable comparable : comparables) {
           if (comparable instanceof TimeSelectorComparable) {
             TimeSelector selector = (TimeSelector)
-              comparable.getWrappedComparable();
+              (comparable).getWrappedComparable();
             String variable = selector.getVariable();
             TimeSelector.TimeField field = selector.getTimeProp();
             if (field == TimeSelector.TimeField.TX_FROM ||
@@ -144,18 +148,18 @@ public class AddTrivialConstraints implements QueryTransformation {
    * @param cnf CNF to search for necessary time literals
    * @return list of time literals that are included in necessary comparisons
    */
-  private ArrayList<TimeLiteral> getNecessaryLiterals(TemporalCNF cnf) {
+  private ArrayList<TimeLiteral> getNecessaryLiterals(CNF cnf) {
     HashSet<TimeLiteral> literals = new HashSet<>();
-    for (CNFElementTPGM clause : cnf.getPredicates()) {
-      if (clause.size() != 1 || !clause.getPredicates().get(0).isTemporal()) {
+    for (CNFElement clause : cnf.getPredicates()) {
+      if (clause.size() != 1 || !(ComparisonUtil.isTemporal(clause.getPredicates().get(0)))) {
         continue;
       } else {
-        ComparisonExpressionTPGM comparison = clause.getPredicates().get(0);
+        ComparisonExpression comparison = clause.getPredicates().get(0);
         if (comparison.getLhs() instanceof TimeLiteralComparable) {
-          literals.add((TimeLiteral) comparison.getLhs().getWrappedComparable());
+          literals.add((TimeLiteral) (comparison.getLhs()).getWrappedComparable());
         }
         if (comparison.getRhs() instanceof TimeLiteralComparable) {
-          literals.add((TimeLiteral) comparison.getRhs().getWrappedComparable());
+          literals.add((TimeLiteral) (comparison.getRhs()).getWrappedComparable());
         }
       }
     }

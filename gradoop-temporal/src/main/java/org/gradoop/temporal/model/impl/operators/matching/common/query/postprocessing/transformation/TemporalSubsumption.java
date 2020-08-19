@@ -15,9 +15,10 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
@@ -31,33 +32,33 @@ import static org.s1ck.gdl.utils.Comparator.NEQ;
  * Uses temporal information to subsume constraints that compare a time selector to a time literal.
  * Here, a temporal comparison c1 subsumes a temporal comparison c2 iff
  * c1 logically implies c2 and c1 is not equal to c2.
- * !!! This class assumes the input to be normalized, i.e. not to contain < or <= !!!
+ * !!! This class assumes the input to be normalized, i.e. not to contain > or >= !!!
  */
 public class TemporalSubsumption extends Subsumption {
   @Override
-  public boolean subsumes(ComparisonExpressionTPGM c1, ComparisonExpressionTPGM c2) {
+  public boolean subsumes(ComparisonExpression c1, ComparisonExpression c2) {
     if (!structureMatches(c1, c2)) {
       return false;
     }
     boolean selectorIsLeft = c1.getLhs() instanceof TimeSelectorComparable;
     if (!selectorIsLeft) {
-      c1 = new ComparisonExpressionTPGM(c1.getGDLComparison().switchSides());
-      c2 = new ComparisonExpressionTPGM(c2.getGDLComparison().switchSides());
+      c1 = c1.switchSides();
+      c2 = c2.switchSides();
     }
-    String var1 = c1.getLhs().getWrappedComparable().getVariable();
-    String var2 = c2.getLhs().getWrappedComparable().getVariable();
+    String var1 = ((TimeSelectorComparable)(c1.getLhs())).getWrappedComparable().getVariable();
+    String var2 = ((TimeSelectorComparable)(c2.getLhs())).getWrappedComparable().getVariable();
     if (!var1.equals(var2)) {
       return false;
     }
-    TimeSelector.TimeField field1 = ((TimeSelector) c1.getLhs().getWrappedComparable()).getTimeProp();
-    TimeSelector.TimeField field2 = ((TimeSelector) c2.getLhs().getWrappedComparable()).getTimeProp();
+    TimeSelector.TimeField field1 = ((TimeSelector) ((TimeSelectorComparable) (c1.getLhs())).getWrappedComparable()).getTimeProp();
+    TimeSelector.TimeField field2 = ((TimeSelector) ((TimeSelectorComparable) (c2.getLhs())).getWrappedComparable()).getTimeProp();
     if (!field1.equals(field2)) {
       return false;
     }
     Comparator comparator1 = c1.getComparator();
     Comparator comparator2 = c2.getComparator();
-    Long literal1 = ((TimeLiteral) c1.getRhs().getWrappedComparable()).getMilliseconds();
-    Long literal2 = ((TimeLiteral) c2.getRhs().getWrappedComparable()).getMilliseconds();
+    Long literal1 = ((TimeLiteral) ((TimeLiteralComparable)c1.getRhs()).getWrappedComparable()).getMilliseconds();
+    Long literal2 = ((TimeLiteral) ((TimeLiteralComparable)c2.getRhs()).getWrappedComparable()).getMilliseconds();
     return implies(comparator1, literal1, comparator2, literal2) && !c1.equals(c2);
   }
 
@@ -120,7 +121,7 @@ public class TemporalSubsumption extends Subsumption {
    * @return true iff the structures of c1 and c2 match
    * according to the criteria defined above
    */
-  private boolean structureMatches(ComparisonExpressionTPGM c1, ComparisonExpressionTPGM c2) {
+  private boolean structureMatches(ComparisonExpression c1, ComparisonExpression c2) {
     return (c1.getLhs() instanceof TimeSelectorComparable &&
       c2.getLhs() instanceof TimeSelectorComparable &&
       c1.getRhs() instanceof TimeLiteralComparable &&

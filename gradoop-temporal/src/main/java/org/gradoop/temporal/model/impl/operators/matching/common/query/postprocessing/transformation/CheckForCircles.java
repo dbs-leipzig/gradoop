@@ -15,11 +15,12 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.relationgraph.RelationGraph;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.Collections;
@@ -42,7 +43,7 @@ import static org.s1ck.gdl.utils.Comparator.NEQ;
 public class CheckForCircles implements QueryTransformation {
 
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     List<List<Comparator>> cyclicPaths =
       new RelationGraph(
         getNecessaryTemporalComparisons(cnf)
@@ -78,11 +79,11 @@ public class CheckForCircles implements QueryTransformation {
    * @param cnf CNF
    * @return set of necessary comparisons
    */
-  private Set<ComparisonExpressionTPGM> getNecessaryTemporalComparisons(TemporalCNF cnf) {
+  private Set<ComparisonExpression> getNecessaryTemporalComparisons(CNF cnf) {
     return cnf.getPredicates().stream()
       .filter(clause -> clause.size() == 1)
       .map(clause -> clause.getPredicates().get(0))
-      .filter(comparison -> comparison.isTemporal())
+      .filter(ComparisonUtil::isTemporal)
       .collect(Collectors.toSet());
   }
 }

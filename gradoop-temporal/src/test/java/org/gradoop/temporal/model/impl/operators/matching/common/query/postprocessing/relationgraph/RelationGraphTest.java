@@ -15,7 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.relationgraph;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -46,14 +47,14 @@ public class RelationGraphTest {
 
   @Test
   public void cycleTest1() {
-    ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+    ArrayList<ComparisonExpression> comps = new ArrayList<>(
       Arrays.asList(
-        new ComparisonExpressionTPGM(
-          new Comparison(sel1, LTE, sel2)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel2, LT, sel3)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel3, EQ, sel1))
+        new ComparisonExpression(
+          new Comparison(sel1, LTE, sel2), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel2, LT, sel3), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel3, EQ, sel1), new ComparableTPGMFactory())
       )
     );
     RelationGraph graph = new RelationGraph(new HashSet<>(comps));
@@ -71,14 +72,14 @@ public class RelationGraphTest {
 
   @Test
   public void cycleTest2() {
-    ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+    ArrayList<ComparisonExpression> comps = new ArrayList<>(
       Arrays.asList(
-        new ComparisonExpressionTPGM(
-          new Comparison(sel1, LTE, literal1)),
-        new ComparisonExpressionTPGM(
-          new Comparison(literal1, EQ, sel3)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel3, EQ, literal2))
+        new ComparisonExpression(
+          new Comparison(sel1, LTE, literal1), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(literal1, EQ, sel3), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel3, EQ, literal2), new ComparableTPGMFactory())
       )
     );
     RelationGraph graph = new RelationGraph(new HashSet<>(comps));
@@ -92,14 +93,14 @@ public class RelationGraphTest {
 
   @Test
   public void cycleTest3() {
-    ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+    ArrayList<ComparisonExpression> comps = new ArrayList<>(
       Arrays.asList(
-        new ComparisonExpressionTPGM(
-          new Comparison(sel1, LT, literal1)),
-        new ComparisonExpressionTPGM(
-          new Comparison(literal1, LT, sel3)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel3, LTE, literal2))
+        new ComparisonExpression(
+          new Comparison(sel1, LT, literal1), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(literal1, LT, sel3), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel3, LTE, literal2), new ComparableTPGMFactory())
       )
     );
     RelationGraph graph = new RelationGraph(new HashSet<>(comps));
@@ -109,22 +110,22 @@ public class RelationGraphTest {
 
   @Test
   public void cycleTest4() {
-    ArrayList<ComparisonExpressionTPGM> comps = new ArrayList<>(
+    ArrayList<ComparisonExpression> comps = new ArrayList<>(
       // 3 cycles:
       // sel1 < literal1 < sel3 < sel1
       // sel1 < literal1 < sel3 != sel2 < sel1
       // sel3 != sel2 != sel3
       Arrays.asList(
-        new ComparisonExpressionTPGM(
-          new Comparison(sel1, LT, literal1)),
-        new ComparisonExpressionTPGM(
-          new Comparison(literal1, LT, sel3)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel3, LT, sel1)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel3, NEQ, sel2)),
-        new ComparisonExpressionTPGM(
-          new Comparison(sel2, LT, sel1))
+        new ComparisonExpression(
+          new Comparison(sel1, LT, literal1), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(literal1, LT, sel3), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel3, LT, sel1), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel3, NEQ, sel2), new ComparableTPGMFactory()),
+        new ComparisonExpression(
+          new Comparison(sel2, LT, sel1), new ComparableTPGMFactory())
       )
     );
     RelationGraph graph = new RelationGraph(new HashSet<>(comps));

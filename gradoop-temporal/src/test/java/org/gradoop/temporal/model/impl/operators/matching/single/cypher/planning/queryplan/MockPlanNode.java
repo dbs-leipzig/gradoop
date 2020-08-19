@@ -16,18 +16,19 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 public class MockPlanNode extends PlanNode {
   /**
    * Data set to be returned by the node
    */
-  private final DataSet<EmbeddingTPGM> mockOutput;
+  private final DataSet<Embedding> mockOutput;
   /**
    * Meta data to be returned by the node
    */
-  private final EmbeddingTPGMMetaData mockMetaData;
+  private final EmbeddingMetaData mockMetaData;
 
   /**
    * Creates a new mock plan node
@@ -35,23 +36,23 @@ public class MockPlanNode extends PlanNode {
    * @param mockOutput   result of {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode#execute()}
    * @param mockMetaData result of {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode#getEmbeddingMetaData()}
    */
-  public MockPlanNode(DataSet<EmbeddingTPGM> mockOutput, EmbeddingTPGMMetaData mockMetaData) {
+  public MockPlanNode(DataSet<Embedding> mockOutput, EmbeddingMetaData mockMetaData) {
     this.mockOutput = mockOutput;
     this.mockMetaData = mockMetaData;
   }
 
   @Override
-  public DataSet<EmbeddingTPGM> execute() {
+  public DataSet<Embedding> execute() {
     return mockOutput;
   }
 
   @Override
-  public EmbeddingTPGMMetaData getEmbeddingMetaData() {
+  public EmbeddingMetaData getEmbeddingMetaData() {
     return mockMetaData;
   }
 
   @Override
-  protected EmbeddingTPGMMetaData computeEmbeddingMetaData() {
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
     return mockMetaData;
   }
 

@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
@@ -66,7 +66,7 @@ public class TrivialTautologiesTest {
 
   @Test
   public void trivialTautologiesTest() {
-    TemporalCNF cnf1 = Util.cnfFromLists(
+    CNF cnf1 = Util.cnfFromLists(
       Arrays.asList(tsTaut1, lNonTaut1, tsNonTaut2),
       Collections.singletonList(lNonTaut2),
       Arrays.asList(lTaut1, lTaut4),
@@ -83,7 +83,7 @@ public class TrivialTautologiesTest {
       Collections.singletonList(lTaut3)
     );
 
-    TemporalCNF expected1 = Util.cnfFromLists(
+    CNF expected1 = Util.cnfFromLists(
       Collections.singletonList(lNonTaut2),
       Arrays.asList(tlNonTaut2, lNonTaut2)
     );
@@ -91,10 +91,10 @@ public class TrivialTautologiesTest {
     assertEquals(tautologyDetector.transformCNF(cnf1), expected1);
 
     // only tautologies here
-    TemporalCNF cnf2 = Util.cnfFromLists(
+    CNF cnf2 = Util.cnfFromLists(
       Arrays.asList(tsTaut1, lTaut3)
     );
-    TemporalCNF expected2 = new TemporalCNF();
+    CNF expected2 = new CNF();
     assertEquals(tautologyDetector.transformCNF(cnf2), expected2);
 
 

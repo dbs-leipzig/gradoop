@@ -21,6 +21,10 @@ import org.apache.log4j.Logger;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.add.AddEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
@@ -28,14 +32,11 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.postproce
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.debug.PrintEmbeddingTPGM;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.add.AddEmbeddingsTPGMElements;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.project.ProjectTemporalEmbeddingsElements;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -126,12 +127,12 @@ public class CypherTemporalPatternMatching
         .getQueryPlan();
 
     // Query execution
-    DataSet<EmbeddingTPGM> embeddings = plan.execute();
+    DataSet<Embedding> embeddings = plan.execute();
 
-    EmbeddingTPGMMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();
+    EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();
 
     embeddings =
-      log(embeddings, new PrintEmbeddingTPGM(embeddingMetaData),
+      log(embeddings, new PrintEmbedding(embeddingMetaData),
         getVertexMapping(), getEdgeMapping());
 
     // Pattern construction (if necessary)
@@ -147,10 +148,12 @@ public class CypherTemporalPatternMatching
 
     // Post processing
     TemporalGraphCollection graphCollection = doAttachData() ?
-      PostProcessor.
+      PostProcessor.<TemporalGraphHead,
+        TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
         extractGraphCollectionWithData(
           finalElements, graph, true) :
-      PostProcessor.
+      PostProcessor.<TemporalGraphHead,
+        TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
         extractGraphCollection(finalElements, graph.getCollectionFactory(),
           true);
 
@@ -170,8 +173,8 @@ public class CypherTemporalPatternMatching
    * @param embeddingMetaData Meta information
    * @return New set of EmbeddingElements
    */
-  private DataSet<Element> constructFinalElements(TemporalGraph graph, DataSet<EmbeddingTPGM> embeddings,
-                                                  EmbeddingTPGMMetaData embeddingMetaData) {
+  private DataSet<Element> constructFinalElements(TemporalGraph graph, DataSet<Embedding> embeddings,
+                                                  EmbeddingMetaData embeddingMetaData) {
 
     TemporalQueryHandler constructionPatternHandler = null;
     try {
@@ -189,15 +192,15 @@ public class CypherTemporalPatternMatching
     Set<String> existingVars = intersection(queryVars, constructionVars).immutableCopy();
     Set<String> newVars = difference(constructionVars, queryVars).immutableCopy();
 
-    EmbeddingTPGMMetaData newMetaData = computeNewMetaData(
+    EmbeddingMetaData newMetaData = computeNewMetaData(
       embeddingMetaData, constructionPatternHandler, existingVars, newVars);
 
     // project existing embedding elements to new embeddings
-    ProjectTemporalEmbeddingsElements projectedEmbeddings =
-      new ProjectTemporalEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
+    ProjectEmbeddingsElements projectedEmbeddings =
+      new ProjectEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
     // add new embedding elements
-    AddEmbeddingsTPGMElements addEmbeddingsElements =
-      new AddEmbeddingsTPGMElements(projectedEmbeddings.evaluate(), newVars.size());
+    AddEmbeddingsElements addEmbeddingsElements =
+      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());
 
     return addEmbeddingsElements.evaluate().flatMap(
       new ElementsFromEmbeddingTPGM(
@@ -218,11 +221,11 @@ public class CypherTemporalPatternMatching
    * @param newVariables         new variables
    * @return new EmbeddingMetaData
    */
-  private EmbeddingTPGMMetaData computeNewMetaData(EmbeddingTPGMMetaData metaData,
+  private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
                                                    TemporalQueryHandler returnPatternHandler,
                                                    Set<String> existingVariables, Set<String> newVariables) {
     // update meta data
-    EmbeddingTPGMMetaData newMetaData = new EmbeddingTPGMMetaData();
+    EmbeddingMetaData newMetaData = new EmbeddingMetaData();
 
     // case 1: Filter existing embeddings based on return pattern
     for (String var : existingVariables) {
@@ -231,9 +234,9 @@ public class CypherTemporalPatternMatching
 
     // case 2: Add new vertices and edges
     for (String var : newVariables) {
-      EmbeddingTPGMMetaData.EntryType type = returnPatternHandler.isEdge(var) ?
-        EmbeddingTPGMMetaData.EntryType.EDGE :
-        EmbeddingTPGMMetaData.EntryType.VERTEX;
+      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?
+        EmbeddingMetaData.EntryType.EDGE :
+        EmbeddingMetaData.EntryType.VERTEX;
 
       newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());
     }

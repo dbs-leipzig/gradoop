@@ -17,9 +17,10 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
@@ -40,7 +41,7 @@ public class MinTimePointComparable extends TemporalComparable {
   /**
    * Wrappers for the arguments
    */
-  private ArrayList<QueryComparableTPGM> args;
+  private ArrayList<QueryComparable> args;
 
   /**
    * Creates a new wrapper.
@@ -55,12 +56,12 @@ public class MinTimePointComparable extends TemporalComparable {
     }
   }
 
-  public ArrayList<QueryComparableTPGM> getArgs() {
+  public ArrayList<QueryComparable> getArgs() {
     return args;
   }
 
   public void setArgs(
-    ArrayList<QueryComparableTPGM> args) {
+    ArrayList<QueryComparable> args) {
     this.args = args;
   }
 
@@ -75,7 +76,7 @@ public class MinTimePointComparable extends TemporalComparable {
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
     long min = Long.MAX_VALUE;
-    for (QueryComparableTPGM arg : args) {
+    for (QueryComparable arg : args) {
       long argValue = arg.evaluate(embedding, metaData).getLong();
       if (argValue < min) {
         min = argValue;
@@ -91,7 +92,7 @@ public class MinTimePointComparable extends TemporalComparable {
         " a single GraphElement!");
     }
     long min = Long.MAX_VALUE;
-    for (QueryComparableTPGM arg : args) {
+    for (QueryComparable arg : args) {
       long argValue = arg.evaluate(element).getLong();
       if (argValue < min) {
         min = argValue;
@@ -102,7 +103,11 @@ public class MinTimePointComparable extends TemporalComparable {
 
   @Override
   public Set<String> getPropertyKeys(String variable) {
-    return new HashSet<>();
+    HashSet<String> keys = new HashSet<>();
+    for(QueryComparable comp: getArgs()){
+      keys.addAll(comp.getPropertyKeys(variable));
+    }
+    return keys;
   }
 
   @Override
@@ -119,9 +124,9 @@ public class MinTimePointComparable extends TemporalComparable {
       return false;
     }
 
-    for (QueryComparableTPGM arg : args) {
+    for (QueryComparable arg : args) {
       boolean foundMatch = false;
-      for (QueryComparableTPGM candidate : that.args) {
+      for (QueryComparable candidate : that.args) {
         if (arg.equals(candidate)) {
           foundMatch = true;
           break;

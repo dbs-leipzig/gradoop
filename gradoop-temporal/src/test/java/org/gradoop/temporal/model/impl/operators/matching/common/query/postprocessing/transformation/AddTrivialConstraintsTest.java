@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -51,14 +51,14 @@ public class AddTrivialConstraintsTest {
 
   @Test
   public void addTrivialTest1() throws QueryContradictoryException {
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, NEQ, bTxTo)),
       Collections.singletonList(new Comparison(aTxTo, LTE, bValFrom)),
       Collections.singletonList(new Comparison(aTxTo, LTE, lit3)),
       Collections.singletonList(new Comparison(lit1, LTE, bValFrom)),
       Collections.singletonList(new Comparison(lit2, LTE, bValFrom))
     );
-    TemporalCNF expected = new TemporalCNF(cnf).and(Util.cnfFromLists(
+    CNF expected = new CNF(cnf).and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, LTE, aTxTo)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo)),
       Collections.singletonList(new Comparison(bValFrom, LTE, bValTo)),
@@ -72,10 +72,10 @@ public class AddTrivialConstraintsTest {
 
   @Test
   public void addTrivialTest2() throws QueryContradictoryException {
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, EQ, bTxTo))
     );
-    TemporalCNF expected = new TemporalCNF(cnf).and(Util.cnfFromLists(
+    CNF expected = new CNF(cnf).and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo))
     ));
     System.out.println(constraintAdder.transformCNF(cnf));
@@ -84,7 +84,7 @@ public class AddTrivialConstraintsTest {
 
   @Test
   public void addTrivialTest3() throws QueryContradictoryException {
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, lit3))
     );
@@ -94,7 +94,7 @@ public class AddTrivialConstraintsTest {
 
   @Test
   public void addTrivialTest4() throws QueryContradictoryException {
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, NEQ, bTxTo)),
       Collections.singletonList(new Comparison(aTxFrom, EQ, lit1)),
       // should be ignored...
@@ -102,7 +102,7 @@ public class AddTrivialConstraintsTest {
         new Comparison(bTxTo, GTE, bValFrom),
         new Comparison(bTxTo, LT, lit3))
     );
-    TemporalCNF expected = new TemporalCNF(cnf).and(Util.cnfFromLists(
+    CNF expected = new CNF(cnf).and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, LTE, aTxTo)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo))
     ));

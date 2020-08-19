@@ -17,8 +17,9 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
@@ -29,11 +30,11 @@ import java.util.List;
  * and projects specified property values to the output embedding.
  */
 public class FilterAndProjectTemporalVertex extends
-  RichFlatMapFunction<TemporalVertex, EmbeddingTPGM> {
+  RichFlatMapFunction<TemporalVertex, Embedding> {
   /**
    * Predicates used for filtering
    */
-  private final TemporalCNF predicates;
+  private final CNF predicates;
   /**
    * Property keys used for value projection
    */
@@ -45,13 +46,13 @@ public class FilterAndProjectTemporalVertex extends
    * @param predicates             predicates used for filtering
    * @param projectionPropertyKeys property keys that will be used for projection
    */
-  public FilterAndProjectTemporalVertex(TemporalCNF predicates, List<String> projectionPropertyKeys) {
+  public FilterAndProjectTemporalVertex(CNF predicates, List<String> projectionPropertyKeys) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
   }
 
   @Override
-  public void flatMap(TemporalVertex vertex, Collector<EmbeddingTPGM> out) throws Exception {
+  public void flatMap(TemporalVertex vertex, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(vertex)) {
       out.collect(EmbeddingTPGMFactory.fromVertex(vertex, projectionPropertyKeys));
     }

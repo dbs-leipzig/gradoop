@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 
 /**
  * Common interface for all query transformations
@@ -31,5 +31,5 @@ public interface QueryTransformation {
    * @throws QueryContradictoryException if a contradiction in the query is encountered
    * during the transformation
    */
-  TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException;
+  CNF transformCNF(CNF cnf) throws QueryContradictoryException;
 }

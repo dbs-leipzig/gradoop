@@ -17,25 +17,24 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.expand.functions.util.SerializableFunction;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Applies a given predicate on a {@link TemporalEdge} and projects specified property
  * values to the output embedding.
  */
-public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEdge, EmbeddingTPGM> {
+public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEdge, Embedding> {
 
   /**
    * Predicates used for filtering
    */
-  private final TemporalCNF predicates;
+  private final CNF predicates;
   /**
    * Property Keys used for the projection
    */
@@ -53,7 +52,7 @@ public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEd
    * @param projectionPropertyKeys property keys that will be used for projection
    * @param isLoop                 is the edge a loop
    */
-  public FilterAndProjectTemporalEdge(TemporalCNF predicates, List<String> projectionPropertyKeys,
+  public FilterAndProjectTemporalEdge(CNF predicates, List<String> projectionPropertyKeys,
                                       boolean isLoop) {
     this.predicates = predicates;
     this.projectionPropertyKeys = projectionPropertyKeys;
@@ -61,7 +60,7 @@ public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEd
   }
 
   @Override
-  public void flatMap(TemporalEdge edge, Collector<EmbeddingTPGM> out) throws Exception {
+  public void flatMap(TemporalEdge edge, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(edge)) {
       if(isLoop){
         if(!edge.getSourceId().equals(edge.getTargetId())){

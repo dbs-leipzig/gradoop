@@ -6,7 +6,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.gradoop.examples.matching.TemporalQueries;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 
 import java.io.FileOutputStream;
 
@@ -72,7 +71,7 @@ public class QueryTranslation {
     readCMDArguments(cmd);
 
     TemporalQueryHandler handler = new TemporalQueryHandler(QUERY);
-    String processed = handler.getCNF().toString();
+    String processed = handler.getPredicates().toString();
 
     writeToFile(processed);
   }

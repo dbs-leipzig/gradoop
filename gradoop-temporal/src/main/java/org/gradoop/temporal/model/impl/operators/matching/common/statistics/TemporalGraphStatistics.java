@@ -199,6 +199,8 @@ public abstract class TemporalGraphStatistics {
                                               ElementType type2, Optional<String> label2,
                                               String property2);
 
+  public abstract double estimateLabelProb(ElementType type, String label);
+
   /**
    * Describes the two types of graph elements
    */

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter;
 
 import com.google.common.collect.Lists;
@@ -21,9 +22,10 @@ import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectVertices;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -37,7 +39,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testFilterWithNoPredicates() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a)");
+    CNF predicates = predicateFromQuery("MATCH (a)");
 
     Properties properties = Properties.create();
     properties.set("name", "Anton");
@@ -54,7 +56,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testFilterVerticesByProperties() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
     TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
     Properties properties = Properties.create();
@@ -71,7 +73,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
@@ -82,7 +84,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testFilterVerticesByLabel() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a:Person)");
+    CNF predicates = predicateFromQuery("MATCH (a:Person)");
 
     TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
     TemporalVertex v1 = vertexFactory.createVertex("Person");
@@ -93,7 +95,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
     v2.setValidTime(new Tuple2<>(678L, 6789L));
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
@@ -104,7 +106,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testFilterVerticesByTime() throws Exception {
-    TemporalCNF predicates = predicateFromQuery(
+    CNF predicates = predicateFromQuery(
       "MATCH (a:Person) WHERE a.tx_to.after(1970-01-01T00:01:00)");
 
     TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
@@ -118,7 +120,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
     v2.setValidTime(new Tuple2<>(678L, 6789L));
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    List<EmbeddingTPGM> result =
+    List<Embedding> result =
       new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
         .evaluate()
         .collect();
@@ -129,7 +131,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testProjectionOfAvailableValues() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a:Person) WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH (a:Person) WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -140,7 +142,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    EmbeddingTPGM result =
+    Embedding result =
       new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys)
         .evaluate()
         .collect()
@@ -153,7 +155,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
   @Test
   public void testProjectionOfMissingValues() throws Exception {
-    TemporalCNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH (a) WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -164,7 +166,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 
-    EmbeddingTPGM result =
+    Embedding result =
       new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys)
         .evaluate()
         .collect()

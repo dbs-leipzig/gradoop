@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
@@ -55,10 +55,10 @@ public class MinMaxUnfoldingTest {
   @Test
   public void minMaxUnfoldingTest() {
     Comparison c1 = new Comparison(min1, Comparator.LT, l1);
-    TemporalCNF cnf1 = Util.cnfFromLists(
+    CNF cnf1 = Util.cnfFromLists(
       Collections.singletonList(c1)
     );
-    TemporalCNF expected1 = Util.cnfFromLists(
+    CNF expected1 = Util.cnfFromLists(
       Arrays.asList(
         new Comparison(min1.getArgs().get(0), Comparator.LT, l1),
         new Comparison(min1.getArgs().get(1), Comparator.LT, l1),
@@ -69,10 +69,10 @@ public class MinMaxUnfoldingTest {
 
 
     Comparison c2 = new Comparison(max1, LTE, l1);
-    TemporalCNF cnf2 = Util.cnfFromLists(
+    CNF cnf2 = Util.cnfFromLists(
       Collections.singletonList(c2)
     );
-    TemporalCNF expected2 = Util.cnfFromLists(
+    CNF expected2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(max1.getArgs().get(0), LTE, l1)),
       Collections.singletonList(new Comparison(max1.getArgs().get(1), LTE, l1)),
       Collections.singletonList(new Comparison(max1.getArgs().get(2), LTE, l1))
@@ -82,19 +82,19 @@ public class MinMaxUnfoldingTest {
 
 
     Comparison c3 = new Comparison(max1, Comparator.EQ, l1);
-    TemporalCNF cnf3 = Util.cnfFromLists(
+    CNF cnf3 = Util.cnfFromLists(
       Collections.singletonList(c3)
     );
-    TemporalCNF expected3 = Util.cnfFromLists(
+    CNF expected3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(max1, EQ, l1)));
     assertEquals(unfolder.transformCNF(cnf3), expected3);
 
 
     Comparison c4 = new Comparison(l1, LTE, min1);
-    TemporalCNF cnf4 = Util.cnfFromLists(
+    CNF cnf4 = Util.cnfFromLists(
       Collections.singletonList(c4)
     );
-    TemporalCNF expected4 = Util.cnfFromLists(
+    CNF expected4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(l1, LTE, min1.getArgs().get(0))),
       Collections.singletonList(new Comparison(l1, LTE, min1.getArgs().get(1))),
       Collections.singletonList(new Comparison(l1, LTE, min1.getArgs().get(2)))
@@ -103,10 +103,10 @@ public class MinMaxUnfoldingTest {
 
 
     Comparison c5 = new Comparison(l1, Comparator.LT, max1);
-    TemporalCNF cnf5 = Util.cnfFromLists(
+    CNF cnf5 = Util.cnfFromLists(
       Collections.singletonList(c5)
     );
-    TemporalCNF expected5 = Util.cnfFromLists(
+    CNF expected5 = Util.cnfFromLists(
       Arrays.asList(
         new Comparison(l1, Comparator.LT, max1.getArgs().get(0)),
         new Comparison(l1, Comparator.LT, max1.getArgs().get(1)),
@@ -117,20 +117,20 @@ public class MinMaxUnfoldingTest {
 
 
     Comparison c6 = new Comparison(l1, NEQ, min1);
-    TemporalCNF cnf6 = Util.cnfFromLists(
+    CNF cnf6 = Util.cnfFromLists(
       Collections.singletonList(c6)
     );
-    TemporalCNF expected6 = Util.cnfFromLists(
+    CNF expected6 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(l1, NEQ, min1)));
     assertEquals(unfolder.transformCNF(cnf6), expected6);
 
 
     // MIN < MIN is only unfolded once, rhs stays untouched (to ensure a CNF result)
     Comparison c7 = new Comparison(min2, Comparator.LT, min2);
-    TemporalCNF cnf7 = Util.cnfFromLists(
+    CNF cnf7 = Util.cnfFromLists(
       Collections.singletonList(c7)
     );
-    TemporalCNF expected7 = Util.cnfFromLists(
+    CNF expected7 = Util.cnfFromLists(
       Arrays.asList(
         new Comparison(min2.getArgs().get(0), Comparator.LT, min2),
         new Comparison(min2.getArgs().get(1), Comparator.LT, min2)
@@ -139,10 +139,10 @@ public class MinMaxUnfoldingTest {
 
     // MIN < MAX
     Comparison c8 = new Comparison(min2, LTE, max2);
-    TemporalCNF cnf8 = Util.cnfFromLists(
+    CNF cnf8 = Util.cnfFromLists(
       Collections.singletonList(c8)
     );
-    TemporalCNF expected8 = Util.cnfFromLists(
+    CNF expected8 = Util.cnfFromLists(
       Arrays.asList(
         new Comparison(min2.getArgs().get(0), LTE, max2.getArgs().get(0)),
         new Comparison(min2.getArgs().get(0), LTE, max2.getArgs().get(1)),
@@ -153,10 +153,10 @@ public class MinMaxUnfoldingTest {
 
     // MAX < MIN
     Comparison c9 = new Comparison(max2, LTE, min2);
-    TemporalCNF cnf9 = Util.cnfFromLists(
+    CNF cnf9 = Util.cnfFromLists(
       Collections.singletonList(c9)
     );
-    TemporalCNF expected9 = Util.cnfFromLists(
+    CNF expected9 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(max2.getArgs().get(0), LTE, min2.getArgs().get(0))),
       Collections.singletonList(new Comparison(max2.getArgs().get(0), LTE, min2.getArgs().get(1))),
       Collections.singletonList(new Comparison(max2.getArgs().get(1), LTE, min2.getArgs().get(0))),
@@ -166,10 +166,10 @@ public class MinMaxUnfoldingTest {
 
     // MAX < MAX
     Comparison c10 = new Comparison(max2, LTE, max2);
-    TemporalCNF cnf10 = Util.cnfFromLists(
+    CNF cnf10 = Util.cnfFromLists(
       Collections.singletonList(c10)
     );
-    TemporalCNF expected10 = Util.cnfFromLists(
+    CNF expected10 = Util.cnfFromLists(
       Arrays.asList(new Comparison(max2.getArgs().get(0), LTE, max2.getArgs().get(0)),
         new Comparison(max2.getArgs().get(0), LTE, max2.getArgs().get(1))),
       Arrays.asList(new Comparison(max2.getArgs().get(1), LTE, max2.getArgs().get(0)),
@@ -178,16 +178,16 @@ public class MinMaxUnfoldingTest {
     assertEquals(unfolder.transformCNF(cnf10), expected10);
 
     Comparison c11 = new Comparison(max2, NEQ, min2);
-    TemporalCNF cnf11 = Util.cnfFromLists(
+    CNF cnf11 = Util.cnfFromLists(
       Collections.singletonList(c11)
     );
-    TemporalCNF expected11 = Util.cnfFromLists(
+    CNF expected11 = Util.cnfFromLists(
       Collections.singletonList(c11)
     );
     assertEquals(unfolder.transformCNF(cnf11), expected11);
 
     // more complex
-    TemporalCNF noMinMax = Util.cnfFromLists(
+    CNF noMinMax = Util.cnfFromLists(
       Arrays.asList(
         new Comparison(l1, LTE, l2),
         new Comparison(l1, GTE, l2)
@@ -196,16 +196,16 @@ public class MinMaxUnfoldingTest {
         new Comparison(ts1, NEQ, ts2)
       )
     );
-    TemporalCNF complex = cnf1.and(cnf2)
+    CNF complex = cnf1.and(cnf2)
       .and(cnf3).and(cnf4).and(noMinMax)
       .and(cnf5).and(cnf6).and(cnf7).and(cnf8)
       .and(cnf9).and(cnf10).and(cnf11);
-    TemporalCNF expectedComplex = expected1.and(expected2).and(expected3)
+    CNF expectedComplex = expected1.and(expected2).and(expected3)
       .and(expected4).and(noMinMax).and(expected5).and(expected6).and(expected7)
       .and(expected8).and(expected9).and(expected10).and(expected11);
     assertEquals(unfolder.transformCNF(complex), expectedComplex);
 
-    TemporalCNF empty = new TemporalCNF();
+    CNF empty = new CNF();
     assertEquals(unfolder.transformCNF(empty), empty);
   }
 }

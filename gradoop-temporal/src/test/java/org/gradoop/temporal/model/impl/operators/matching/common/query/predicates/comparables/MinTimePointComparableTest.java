@@ -18,9 +18,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -59,15 +58,15 @@ public class MinTimePointComparableTest {
     //-----------------------------------------
     // evaluate on an embedding
     //-----------------------------------------
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    embedding.add(GradoopId.get(), new PropertyValue[] {}, 0, t1, 0, t1);
-    embedding.add(GradoopId.get(), new PropertyValue[] {}, 0, t2, 0, t2);
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get(), new PropertyValue[]{PropertyValue.create(t1)});
+    embedding.add(GradoopId.get(), new PropertyValue[]{PropertyValue.create(t2)});
 
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EmbeddingMetaData.EntryType.VERTEX, 0);
-    metaData.setTimeColumn("a", 0);
+    metaData.setPropertyColumn("a", TX_TO.toString(), 0);
     metaData.setEntryColumn("b", EmbeddingMetaData.EntryType.VERTEX, 1);
-    metaData.setTimeColumn("b", 1);
+    metaData.setPropertyColumn("b", TX_TO.toString(), 1);
 
     assertEquals(reference, minTimePoint.evaluate(embedding, metaData));
     //----------------------------------------------------

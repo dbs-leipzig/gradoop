@@ -16,13 +16,13 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalVertices;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalVertices;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
   /**
    * Filter predicate that is applied on the input data set
    */
-  private final TemporalCNF filterPredicate;
+  private final CNF filterPredicate;
   /**
    * Property keys used for projection
    */
@@ -58,7 +58,7 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
    * @param projectionKeys  property keys whose associated values are projected to the output
    */
   public FilterAndProjectTemporalVerticesNode(DataSet<TemporalVertex> vertices, String vertexVariable,
-                                              TemporalCNF filterPredicate, Set<String> projectionKeys) {
+                                              CNF filterPredicate, Set<String> projectionKeys) {
     this.vertices = vertices;
     this.vertexVariable = vertexVariable;
     this.filterPredicate = filterPredicate;
@@ -66,7 +66,7 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
   }
 
   @Override
-  public DataSet<EmbeddingTPGM> execute() {
+  public DataSet<Embedding> execute() {
     FilterAndProjectTemporalVertices op =
       new FilterAndProjectTemporalVertices(vertices, filterPredicate, projectionKeys);
     op.setName(toString());
@@ -78,8 +78,8 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
    *
    * @return filter predicate
    */
-  public TemporalCNF getFilterPredicate() {
-    return new TemporalCNF(filterPredicate);
+  public CNF getFilterPredicate() {
+    return new CNF(filterPredicate);
   }
 
   /**
@@ -92,11 +92,10 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
   }
 
   @Override
-  protected EmbeddingTPGMMetaData computeEmbeddingMetaData() {
-    EmbeddingTPGMMetaData embeddingMetaData = new EmbeddingTPGMMetaData();
-    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingTPGMMetaData.EntryType.VERTEX, 0);
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
+    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
     embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, projectionKeys);
-    embeddingMetaData.setTimeColumn(vertexVariable, 0);
 
     return embeddingMetaData;
   }

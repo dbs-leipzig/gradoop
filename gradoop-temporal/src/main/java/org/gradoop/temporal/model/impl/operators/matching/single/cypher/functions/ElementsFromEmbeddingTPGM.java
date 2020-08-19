@@ -18,7 +18,6 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.functio
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Element;
@@ -27,9 +26,9 @@ import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -43,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Extracts elements from an {@link EmbeddingTPGM}.
+ * Extracts elements from an {@link Embedding}.
  * Is almost identical to
  * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbedding}
  * extends it for TPGM embeddings
@@ -55,7 +54,7 @@ import java.util.Set;
 public class ElementsFromEmbeddingTPGM<
   G extends TemporalGraphHead,
   V extends TemporalVertex,
-  E extends TemporalEdge> implements FlatMapFunction<EmbeddingTPGM, Element> {
+  E extends TemporalEdge> implements FlatMapFunction<Embedding, Element> {
   /**
    * Constructs temporal graph heads
    */
@@ -71,7 +70,7 @@ public class ElementsFromEmbeddingTPGM<
   /**
    * Describes the embedding content
    */
-  private final EmbeddingTPGMMetaData metaData;
+  private final EmbeddingMetaData metaData;
   /**
    * Source vertex variables by edge id
    */
@@ -101,7 +100,7 @@ public class ElementsFromEmbeddingTPGM<
    */
   public ElementsFromEmbeddingTPGM(GraphHeadFactory<G> graphHeadFactory,
                                    VertexFactory<V> vertexFactory, EdgeFactory<E> edgeFactory,
-                                   EmbeddingTPGMMetaData embeddingMetaData,
+                                   EmbeddingMetaData embeddingMetaData,
                                    Map<String, Pair<String, String>> sourceTargetVariables) {
     this(graphHeadFactory, vertexFactory, edgeFactory, embeddingMetaData,
       sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));
@@ -120,7 +119,7 @@ public class ElementsFromEmbeddingTPGM<
   public ElementsFromEmbeddingTPGM(GraphHeadFactory<G> graphHeadFactory,
                                    VertexFactory<V> vertexFactory,
                                    EdgeFactory<E> edgeFactory,
-                                   EmbeddingTPGMMetaData embeddingMetaData,
+                                   EmbeddingMetaData embeddingMetaData,
                                    Map<String, Pair<String, String>> sourceTargetVariables,
                                    Map<String, String> labelMapping) {
     this.graphHeadFactory = graphHeadFactory;
@@ -134,7 +133,7 @@ public class ElementsFromEmbeddingTPGM<
   }
 
   @Override
-  public void flatMap(EmbeddingTPGM embedding, Collector<Element> out) throws Exception {
+  public void flatMap(Embedding embedding, Collector<Element> out) throws Exception {
     // clear for each embedding
     processedIds.clear();
 
@@ -142,20 +141,20 @@ public class ElementsFromEmbeddingTPGM<
     TemporalGraphHead graphHead = graphHeadFactory.createGraphHead();
 
     // used to determine global time
-    Long[] globalTime = new Long[] {TemporalElement.DEFAULT_TIME_FROM,
+    /*Long[] globalTime = new Long[] {TemporalElement.DEFAULT_TIME_FROM,
       TemporalElement.DEFAULT_TIME_TO, TemporalElement.DEFAULT_TIME_FROM, TemporalElement.DEFAULT_TIME_TO};
-
+*/
     // vertices
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
-      Long[] tempData = embedding.getTimes(metaData.getTimeColumn(vertexVariable));
+      /*Long[] tempData = embedding.getTimes(metaData.getTimeColumn(vertexVariable));
       globalTime = updateGlobalTime(globalTime, tempData);
-
+*/
       if (labelMapping.containsKey(vertexVariable)) {
         String label = labelMapping.get(vertexVariable);
-        initVertexWithData(out, graphHead, id, label, tempData);
+        initVertexWithData(out, graphHead, id, label);
       } else {
-        initVertex(out, graphHead, id, tempData);
+        initVertex(out, graphHead, id);
       }
       variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));
     }
@@ -164,7 +163,7 @@ public class ElementsFromEmbeddingTPGM<
     GradoopId edgeId;
     GradoopId sourceId;
     GradoopId targetId;
-    Long[] timeData;
+    // Long[] timeData;
     for (String edgeVariable : metaData.getEdgeVariables()) {
       edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));
       sourceId = embedding.getId(
@@ -172,14 +171,14 @@ public class ElementsFromEmbeddingTPGM<
       targetId = embedding.getId(
         metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
 
-      timeData = embedding.getTimes(metaData.getTimeColumn(edgeVariable));
-      globalTime = updateGlobalTime(globalTime, timeData);
+      //timeData = embedding.getTimes(metaData.getTimeColumn(edgeVariable));
+      //globalTime = updateGlobalTime(globalTime, timeData);
 
       if (labelMapping.containsKey(edgeVariable)) {
         String label = labelMapping.get(edgeVariable);
-        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label, timeData);
+        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);
       } else {
-        initEdge(out, graphHead, edgeId, sourceId, targetId, timeData);
+        initEdge(out, graphHead, edgeId, sourceId, targetId);
       }
       variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
     }
@@ -227,14 +226,14 @@ public class ElementsFromEmbeddingTPGM<
           }
         }
 
-        initVertex(out, graphHead, sourceId, defaultTime);
-        initVertex(out, graphHead, targetId, defaultTime);
-        initEdge(out, graphHead, edgeId, sourceId, targetId, defaultTime);
+        initVertex(out, graphHead, sourceId);
+        initVertex(out, graphHead, targetId);
+        initEdge(out, graphHead, edgeId, sourceId, targetId);
       }
       variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));
     }
 
-    if (globalTime[0] > globalTime[1]) {
+    /*if (globalTime[0] > globalTime[1]) {
       globalTime[0] = Long.MIN_VALUE;
       globalTime[1] = Long.MIN_VALUE;
       graphHead.setProperty("hasTxLifetime", PropertyValue.create(false));
@@ -252,7 +251,7 @@ public class ElementsFromEmbeddingTPGM<
     } else {
       graphHead.setProperty("hasValidLifetime", PropertyValue.create(true));
       graphHead.setProperty("validLifetime", PropertyValue.create(globalTime[3] - globalTime[2]));
-    }
+    }*/
 
     graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
     //graphHead.setTransactionTime(new Tuple2<>(globalTime[0], globalTime[1]));
@@ -263,33 +262,15 @@ public class ElementsFromEmbeddingTPGM<
   }
 
   /**
-   * Updates existing global time data (tx_from, tx_to, val_from, val_to) with time data
-   * from an element.
-   *
-   * @param global global time data
-   * @param local  time data of an element
-   * @return updated global time data
-   */
-  private Long[] updateGlobalTime(Long[] global, Long[] local) {
-    return new Long[] {
-      Math.max(global[0], local[0]),
-      Math.min(global[1], local[1]),
-      Math.max(global[2], local[2]),
-      Math.min(global[3], local[3])
-    };
-  }
-
-  /**
    * Initializes an vertex using the specified parameters
    *
    * @param out       flat map collector
    * @param graphHead temporal graph head to assign vertex to
    * @param vertexId  vertex identifier
-   * @param timeData  temporal data (cf. @link{EmbeddingTPGM} )
    */
   private void initVertex(Collector<Element> out, TemporalGraphHead graphHead,
-                          GradoopId vertexId, Long[] timeData) {
-    initVertexWithData(out, graphHead, vertexId, null, timeData);
+                          GradoopId vertexId) {
+    initVertexWithData(out, graphHead, vertexId, null);
   }
 
   /**
@@ -300,19 +281,14 @@ public class ElementsFromEmbeddingTPGM<
    * @param graphHead temporal graph head to assign vertex to
    * @param vertexId  vertex identifier
    * @param label     label associated with vertex
-   * @param timeData  temporal data (cf. @link{EmbeddingTPGM} )
    */
   private void initVertexWithData(Collector<Element> out, TemporalGraphHead graphHead,
                                   GradoopId vertexId,
-                                  String label, Long[] timeData) {
+                                  String label) {
     if (!processedIds.contains(vertexId)) {
       TemporalVertex v = vertexFactory.initVertex(vertexId);
       v.addGraphId(graphHead.getId());
       v.setLabel(label);
-      v.setTxFrom(timeData[0]);
-      v.setTxTo(timeData[1]);
-      v.setValidFrom(timeData[2]);
-      v.setValidTo(timeData[3]);
       out.collect(v);
       processedIds.add(vertexId);
     }
@@ -326,11 +302,10 @@ public class ElementsFromEmbeddingTPGM<
    * @param edgeId    edge identifier
    * @param sourceId  source vertex identifier
    * @param targetId  target vertex identifier
-   * @param timeData  temporal data (cf. @link{EmbeddingTPGM} )
    */
   private void initEdge(Collector<Element> out, TemporalGraphHead graphHead,
-                        GradoopId edgeId, GradoopId sourceId, GradoopId targetId, Long[] timeData) {
-    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null, timeData);
+                        GradoopId edgeId, GradoopId sourceId, GradoopId targetId) {
+    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);
   }
 
   /**
@@ -343,19 +318,14 @@ public class ElementsFromEmbeddingTPGM<
    * @param sourceId  source vertex identifier
    * @param targetId  target vertex identifier
    * @param label     label associated with edge
-   * @param timeData  temporal data (cf. @link{EmbeddingTPGM} )
    */
   private void initEdgeWithData(Collector<Element> out, TemporalGraphHead graphHead,
                                 GradoopId edgeId, GradoopId sourceId, GradoopId targetId,
-                                String label, Long[] timeData) {
+                                String label) {
     if (!processedIds.contains(edgeId)) {
       TemporalEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
       e.addGraphId(graphHead.getId());
       e.setLabel(label);
-      e.setTxFrom(timeData[0]);
-      e.setTxTo(timeData[1]);
-      e.setValidFrom(timeData[2]);
-      e.setValidTo(timeData[3]);
       out.collect(e);
       processedIds.add(edgeId);
     }

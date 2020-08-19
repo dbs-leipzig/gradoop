@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
@@ -39,6 +40,11 @@ public class ComparisonExpression extends QueryPredicate {
   private final Comparison comparison;
 
   /**
+   * Optional factory for query comparables
+   */
+  private QueryComparableFactory comparableFactory = null;
+
+  /**
    * Creates a new comparison wrapped
    * @param comparison the wrapped comparison
    */
@@ -47,11 +53,23 @@ public class ComparisonExpression extends QueryPredicate {
   }
 
   /**
+   * Creates a new wrapped comparison and sets the query comparable factory
+   * @param comparison the wrapped comparison
+   * @param comparableFactory QueryComparableFactory to use
+   */
+  public ComparisonExpression(Comparison comparison, QueryComparableFactory comparableFactory) {
+    this(comparison);
+    this.comparableFactory = comparableFactory;
+  }
+
+  /**
    * Returns the wrapped left hand side of the comparison
    * @return wrapped left hand side
    */
   public QueryComparable getLhs() {
-    return QueryComparable.createFrom(comparison.getComparableExpressions()[0]);
+    return comparableFactory==null ?
+      QueryComparable.createFrom(comparison.getComparableExpressions()[0]):
+      comparableFactory.createFrom(comparison.getComparableExpressions()[0]);
   }
 
   /**
@@ -59,7 +77,9 @@ public class ComparisonExpression extends QueryPredicate {
    * @return wrapped left hand side
    */
   public QueryComparable getRhs() {
-    return QueryComparable.createFrom(comparison.getComparableExpressions()[1]);
+    return comparableFactory==null ?
+      QueryComparable.createFrom(comparison.getComparableExpressions()[1]):
+      comparableFactory.createFrom(comparison.getComparableExpressions()[1]);
   }
 
   public Comparator getComparator() {
@@ -135,6 +155,16 @@ public class ComparisonExpression extends QueryPredicate {
     properties.addAll(getRhs().getPropertyKeys(variable));
 
     return properties;
+  }
+
+  /**
+   * Returns a ComparisonExpression that wraps the same comparison, but with lhs and
+   * rhs switched
+   * @return ComparisonExpression wrapping comparison with lhs and rhs switched
+   */
+  public ComparisonExpression switchSides(){
+    Comparison switchedComp = comparison.switchSides();
+    return new ComparisonExpression(switchedComp, comparableFactory);
   }
 
   /**

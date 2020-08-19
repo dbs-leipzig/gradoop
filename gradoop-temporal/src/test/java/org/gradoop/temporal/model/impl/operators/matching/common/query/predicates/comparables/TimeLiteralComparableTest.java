@@ -16,6 +16,8 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -42,7 +44,7 @@ public class TimeLiteralComparableTest {
     //------------------------------------------------
     // test on embeddings
     //------------------------------------------------
-    assertEquals(reference, wrapper.evaluate(null, null));
+    assertEquals(reference, wrapper.evaluate(new Embedding(), new EmbeddingMetaData()));
     assertNotEquals(PropertyValue.create(timeString1),
       wrapper.evaluate(null, null));
     //---------------------------------------------------

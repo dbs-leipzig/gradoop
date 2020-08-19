@@ -16,13 +16,13 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalEdges;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalEdges;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
   /**
    * Filter predicate that is applied on the input data set
    */
-  private final TemporalCNF filterPredicate;
+  private final CNF filterPredicate;
   /**
    * Property keys used for projection
    */
@@ -76,7 +76,7 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
    */
   public FilterAndProjectTemporalEdgesNode(DataSet<TemporalEdge> edges,
                                            String sourceVariable, String edgeVariable, String targetVariable,
-                                           TemporalCNF filterPredicate, Set<String> projectionKeys,
+                                           CNF filterPredicate, Set<String> projectionKeys,
                                            boolean isPath) {
     this.edges = edges;
     this.sourceVariable = sourceVariable;
@@ -88,7 +88,7 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
   }
 
   @Override
-  public DataSet<EmbeddingTPGM> execute() {
+  public DataSet<Embedding> execute() {
     FilterAndProjectTemporalEdges op = new FilterAndProjectTemporalEdges(
       edges,
       filterPredicate,
@@ -104,8 +104,8 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
    *
    * @return filter predicate
    */
-  public TemporalCNF getFilterPredicate() {
-    return new TemporalCNF(filterPredicate);
+  public CNF getFilterPredicate() {
+    return new CNF(filterPredicate);
   }
 
   /**
@@ -136,16 +136,15 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
   }
 
   @Override
-  protected EmbeddingTPGMMetaData computeEmbeddingMetaData() {
-    EmbeddingTPGMMetaData embeddingMetaData = new EmbeddingTPGMMetaData();
-    embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingTPGMMetaData.EntryType.VERTEX, 0);
-    embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingTPGMMetaData.EntryType.EDGE, 1);
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();
+    embeddingMetaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);
+    embeddingMetaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);
     if (!isLoop()) {
-      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingTPGMMetaData.EntryType.VERTEX, 2);
+      embeddingMetaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);
     }
 
     embeddingMetaData = setPropertyColumns(embeddingMetaData, edgeVariable, projectionKeys);
-    embeddingMetaData.setTimeColumn(edgeVariable, 0);
     return embeddingMetaData;
   }
 

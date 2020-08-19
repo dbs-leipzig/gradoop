@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
@@ -49,7 +50,7 @@ public class ProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest {
     DataSet<TemporalEdge> edgeDataSet = getExecutionEnvironment().fromElements(e1, e2);
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
 
-    ProjectTemporalEdges operator = new ProjectTemporalEdges(edgeDataSet, extractedPropertyKeys, false);
+    ProjectEdges operator = new ProjectEdges(edgeDataSet, extractedPropertyKeys, false);
     DataSet<EmbeddingTPGM> results = operator.evaluate();
 
     assertEquals(2, results.count());
@@ -80,3 +81,4 @@ public class ProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest {
     assertArrayEquals(result.getTimes(0), new Long[] {5L, 6L, 7L, 8L});
   }
 }
+*/

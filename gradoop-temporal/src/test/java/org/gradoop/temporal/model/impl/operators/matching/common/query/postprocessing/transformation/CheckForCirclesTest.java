@@ -15,10 +15,11 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -48,7 +49,7 @@ public class CheckForCirclesTest {
   @Test(expected = QueryContradictoryException.class)
   public void checkForCirclesTest1() throws QueryContradictoryException {
     // circle with EQ and LT
-    TemporalCNF cnf = cnfFromComparisons(Arrays.asList(
+    CNF cnf = cnfFromComparisons(Arrays.asList(
       Collections.singletonList(
         new Comparison(sel1, LTE, sel2)),
       Collections.singletonList(
@@ -63,7 +64,7 @@ public class CheckForCirclesTest {
   @Test
   public void checkForCirclesTest2() throws QueryContradictoryException {
     // only EQ-circles
-    TemporalCNF cnf = cnfFromComparisons(Arrays.asList(
+    CNF cnf = cnfFromComparisons(Arrays.asList(
       Collections.singletonList(
         new Comparison(sel1, LTE, literal1)),
       Collections.singletonList(
@@ -78,7 +79,7 @@ public class CheckForCirclesTest {
   @Test
   public void checkForCirclesTest3() throws QueryContradictoryException {
     // no circles
-    TemporalCNF cnf = cnfFromComparisons(Arrays.asList(
+    CNF cnf = cnfFromComparisons(Arrays.asList(
       Collections.singletonList(
         new Comparison(sel1, LT, literal1)),
       Collections.singletonList(
@@ -93,7 +94,7 @@ public class CheckForCirclesTest {
   @Test(expected = QueryContradictoryException.class)
   public void checkForCirclesTest5() throws QueryContradictoryException {
     // more than one circle
-    TemporalCNF cnf = cnfFromComparisons(Arrays.asList(
+    CNF cnf = cnfFromComparisons(Arrays.asList(
       Collections.singletonList(
         new Comparison(sel1, LT, literal1)),
       Collections.singletonList(
@@ -112,7 +113,7 @@ public class CheckForCirclesTest {
 
   @Test
   public void checkForCirclesTest6() throws QueryContradictoryException {
-    TemporalCNF cnf = cnfFromComparisons(Arrays.asList(
+    CNF cnf = cnfFromComparisons(Arrays.asList(
       Collections.singletonList(
         new Comparison(sel1, LT, literal1)),
       Collections.singletonList(
@@ -128,15 +129,15 @@ public class CheckForCirclesTest {
     assertEquals(circleCheck.transformCNF(cnf), cnf);
   }
 
-  private TemporalCNF cnfFromComparisons(List<List<Comparison>> comparisons) {
-    TemporalCNF cnf = new TemporalCNF();
+  private CNF cnfFromComparisons(List<List<Comparison>> comparisons) {
+    CNF cnf = new CNF();
     for (List<Comparison> clause : comparisons) {
-      ArrayList<ComparisonExpressionTPGM> wrappedClause = new ArrayList<>();
+      ArrayList<ComparisonExpression> wrappedClause = new ArrayList<>();
       for (Comparison comparison : clause) {
-        wrappedClause.add(new ComparisonExpressionTPGM(comparison));
+        wrappedClause.add(new ComparisonExpression(comparison, new ComparableTPGMFactory()));
       }
-      CNFElementTPGM cnfClause = new CNFElementTPGM(wrappedClause);
-      cnf = cnf.and(new TemporalCNF(Collections.singletonList(cnfClause)));
+      CNFElement cnfClause = new CNFElement(wrappedClause);
+      cnf = cnf.and(new CNF(Collections.singletonList(cnfClause)));
     }
     return cnf;
   }

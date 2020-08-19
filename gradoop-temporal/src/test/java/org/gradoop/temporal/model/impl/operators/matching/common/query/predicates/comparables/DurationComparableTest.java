@@ -16,8 +16,9 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -30,22 +31,23 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import static org.junit.Assert.assertEquals;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 
 public class DurationComparableTest {
 
   @Test
   public void testOnEmbedding() {
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    Embedding embedding = new Embedding();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
 
-    embedding.addTimeData(1L, 100L, 5L, 50L);
-    embedding.addTimeData(10L, 42L, 2L, 42L);
-    metaData.setTimeColumn("a", 0);
-    metaData.setTimeColumn("b", 1);
+    embedding.addPropertyValues(PropertyValue.create(5L), PropertyValue.create(50L),
+      PropertyValue.create("foo"), PropertyValue.create(42L));
+    metaData.setPropertyColumn("a", VAL_FROM.toString(), 0);
+    metaData.setPropertyColumn("a", VAL_TO.toString(), 1);
+    metaData.setPropertyColumn("b", VAL_TO.toString(), 3);
 
     TimeSelector aValFrom = new TimeSelector("a", TimeSelector.TimeField.VAL_FROM);
-    TimeSelector bValFrom = new TimeSelector("b", TimeSelector.TimeField.VAL_FROM);
     TimeSelector aValTo = new TimeSelector("a", VAL_TO);
     TimeSelector bValTo = new TimeSelector("b", VAL_TO);
     TimeLiteral l1 = new TimeLiteral("1970-01-01T00:00:00");

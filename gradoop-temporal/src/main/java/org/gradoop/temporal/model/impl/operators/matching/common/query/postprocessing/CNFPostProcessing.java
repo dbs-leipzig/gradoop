@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.AddTrivialConstraints;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.CheckForCircles;
@@ -25,7 +26,6 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.postproce
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TemporalSubsumption;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TrivialContradictions;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TrivialTautologies;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 
 import java.util.Arrays;
 import java.util.List;
@@ -86,9 +86,10 @@ public class CNFPostProcessing {
    * @throws QueryContradictoryException if the CNF is found to be contradictory
    *                                     during the postprocessing
    */
-  public TemporalCNF postprocess(TemporalCNF cnf) throws QueryContradictoryException {
+  public CNF postprocess(CNF cnf) throws QueryContradictoryException {
     for (int i = 0; i < transformations.size(); i++) {
       cnf = transformations.get(i).transformCNF(cnf);
+      System.out.println(cnf);
     }
     return cnf;
   }

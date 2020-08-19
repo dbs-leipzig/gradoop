@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 
 /**
- * Simplifies a CNF by subsuming clauses syntactically.
- * The transformation does not consider semantic information, but only syntax
- * !!! This class assumes input CNFs to be normalized, i.e. not to contain < or <= !!!
+ * Utility methods for handling objects of type {@link ComparisonExpression}
  */
-public class SyntacticSubsumption extends Subsumption {
+public class ComparisonUtil {
 
-  @Override
-  public boolean subsumes(ComparisonExpression c1, ComparisonExpression c2) {
-    return c1.equals(c2);
+  /**
+   * Checks whether a comparison expression compares temporal elements
+   * @param comparison comparison expression to check
+   * @return true iff expression wraps a well-formed temporal comparison
+   */
+  public static boolean isTemporal(ComparisonExpression comparison){
+    return comparison.getLhs() instanceof TemporalComparable
+      && comparison.getRhs() instanceof TemporalComparable;
   }
 }

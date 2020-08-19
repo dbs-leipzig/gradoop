@@ -31,6 +31,7 @@ import org.s1ck.gdl.utils.Comparator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -580,7 +581,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     Map<String, TemporalElementStats> statsMap = type == ElementType.VERTEX ?
       vertexStats : edgeStats;
 
-    List<TemporalElementStats> relevantStats = null;
+    List<TemporalElementStats> relevantStats;
     if (label.isPresent()) {
       if (statsMap.containsKey(label.get())) {
         relevantStats = new ArrayList<>(Collections.singletonList(statsMap.get(label.get())));
@@ -642,6 +643,16 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       return estimateNumericalPropertyProb(relevantStats1, property1, comp,
         relevantStats2, property2);
     }
+  }
+
+  @Override
+  public double estimateLabelProb(ElementType type, String label) {
+    TemporalElementStats relevantStats = type == ElementType.VERTEX ?
+      vertexStats.getOrDefault(label, null) : edgeStats.getOrDefault(label, null);
+    long labelCount = relevantStats == null ? 0 : relevantStats.getElementCount();
+    long elementCount = type == ElementType.VERTEX ?
+      vertexCount : edgeCount;
+    return ((double)labelCount)/((double)elementCount);
   }
 
   /**

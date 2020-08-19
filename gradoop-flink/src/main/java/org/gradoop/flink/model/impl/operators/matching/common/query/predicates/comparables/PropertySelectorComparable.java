@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.util.HashSet;
@@ -91,6 +92,11 @@ public class PropertySelectorComparable extends QueryComparable {
   public Set<String> getPropertyKeys(String variable) {
     return variable.equals(propertySelector.getVariable()) ?
       Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet<>(0);
+  }
+
+  @Override
+  public ComparableExpression getWrappedComparable() {
+    return propertySelector;
   }
 
   @Override

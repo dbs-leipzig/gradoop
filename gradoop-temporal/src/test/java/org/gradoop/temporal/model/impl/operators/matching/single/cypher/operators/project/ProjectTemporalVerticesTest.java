@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.project;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectVertices;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -47,7 +49,7 @@ public class ProjectTemporalVerticesTest extends PhysicalTPGMOperatorTest {
 
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "baz");
 
-    ProjectTemporalVertices operator = new ProjectTemporalVertices(edgeDataSet, extractedPropertyKeys);
+    ProjectVertices operator = new ProjectVertices(edgeDataSet, extractedPropertyKeys);
     DataSet<EmbeddingTPGM> results = operator.evaluate();
 
     assertEquals(2, results.count());
@@ -61,3 +63,4 @@ public class ProjectTemporalVerticesTest extends PhysicalTPGMOperatorTest {
     assertArrayEquals(results.collect().get(1).getTimes(0), new Long[] {5L, 6L, 7L, 8L});
   }
 }
+*/

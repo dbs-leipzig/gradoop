@@ -79,4 +79,5 @@ public abstract class QueryComparable implements Serializable {
    */
   public abstract Set<String> getPropertyKeys(String variable);
 
+  public abstract ComparableExpression getWrappedComparable();
 }

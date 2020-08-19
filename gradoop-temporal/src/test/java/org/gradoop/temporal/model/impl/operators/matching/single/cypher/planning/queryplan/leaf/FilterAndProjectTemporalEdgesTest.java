@@ -20,13 +20,14 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.junit.Test;
+import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,15 +50,13 @@ public class FilterAndProjectTemporalEdgesTest {
     String edgeVariable = "e";
     String targetVariable = "b";
     FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new TemporalCNF(), new HashSet<>(), false);
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
-    EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
     assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
     assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(2));
     assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
-    assertThat(embeddingMetaData.getTimeColumn(edgeVariable), is(0));
-    assertThat(embeddingMetaData.getTimeDataMapping().keySet().size(), is(1));
   }
 
   @Test
@@ -66,15 +65,13 @@ public class FilterAndProjectTemporalEdgesTest {
     String edgeVariable = "e";
     String targetVariable = "a";
     FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new TemporalCNF(), new HashSet<>(), false);
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
-    EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
+    EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
     assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
     assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(0));
     assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
-    assertThat(embeddingMetaData.getTimeColumn(edgeVariable), is(0));
-    assertThat(embeddingMetaData.getTimeDataMapping().keySet().size(), is(1));
   }
 
   @Test
@@ -116,30 +113,32 @@ public class FilterAndProjectTemporalEdgesTest {
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3);
 
     //only matched by e1
-    String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 AND e.tx_to.after(1970-01-01T00:00:01)";
+    String query = "MATCH (a)-[e]->(b) WHERE e.foo = 23 " +
+      "AND a.val_from <= e.val_from";
 
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
-    TemporalCNF filterPredicate = queryHandler.getCNF().getSubCNF(Sets.newHashSet("e"));
-    Set<String> projectionKeys = queryHandler.getCNF().getPropertyKeys("e");
+    CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
+    Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
+    System.out.println(projectionKeys);
 
     FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges, "a", "e", "b",
       filterPredicate, projectionKeys, false);
 
-    List<EmbeddingTPGM> filteredEdges = node.execute().collect();
+    List<Embedding> filteredEdges = node.execute().collect();
 
     assertThat(filteredEdges.size(), is(1));
     assertThat(filteredEdges.get(0).getId(0).equals(sourceId), is(true));
     assertThat(filteredEdges.get(0).getId(1).equals(edge1Id), is(true));
     assertThat(filteredEdges.get(0).getId(2).equals(targetId), is(true));
-    assertArrayEquals(filteredEdges.get(0).getTimes(0), edge1TimeData);
-    assertEquals(filteredEdges.get(0).getTimeData().length, 4 * Long.BYTES);
 
-    EmbeddingTPGMMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn("a"), is(0));
-    assertThat(embeddingMetaData.getEntryColumn("e"), is(1));
-    assertThat(embeddingMetaData.getEntryColumn("b"), is(2));
-    assertThat(embeddingMetaData.getPropertyKeys("e").size(), is(1));
-    assertThat(embeddingMetaData.getTimeColumn("e"), is(0));
-    assertThat(embeddingMetaData.getTimeDataMapping().keySet().size(), is(1));
+
+    EmbeddingMetaData metaData = node.getEmbeddingMetaData();
+    assertThat(metaData.getEntryColumn("a"), is(0));
+    assertThat(metaData.getEntryColumn("e"), is(1));
+    assertThat(metaData.getEntryColumn("b"), is(2));
+    assertThat(metaData.getPropertyKeys("e").size(), is(2));
+
+    assertEquals(metaData.getPropertyColumn("e", "foo"), 0);
+    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_FROM.toString()), 1);
   }
 }

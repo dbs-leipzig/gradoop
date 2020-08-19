@@ -18,9 +18,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -30,6 +29,10 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 
 public class TimeSelectorComparableTest {
 
@@ -57,16 +60,23 @@ public class TimeSelectorComparableTest {
     //-----------------------------------------
     // evaluate on an embedding
     //-----------------------------------------
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
+    Embedding embedding = new Embedding();
     Long txFrom = 1234L;
+    PropertyValue txFromValue = PropertyValue.create(txFrom);
     Long txTo = 1234567L;
+    PropertyValue txToValue = PropertyValue.create(txTo);
     Long validFrom = 987L;
+    PropertyValue valFromValue = PropertyValue.create(validFrom);
     Long validTo = 98765L;
-    embedding.add(GradoopId.get(), new PropertyValue[] {}, txFrom, txTo, validFrom, validTo);
+    PropertyValue valToValue = PropertyValue.create(validTo);
+    embedding.add(GradoopId.get(), new PropertyValue[] {txFromValue, txToValue, valFromValue, valToValue});
 
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EmbeddingMetaData.EntryType.VERTEX, 0);
-    metaData.setTimeColumn("a", 0);
+    metaData.setPropertyColumn("a", TX_FROM.toString(), 0);
+    metaData.setPropertyColumn("a", TX_TO.toString(), 1);
+    metaData.setPropertyColumn("a", VAL_FROM.toString(), 2);
+    metaData.setPropertyColumn("a", VAL_TO.toString(), 3);
 
     assertEquals(PropertyValue.create(txFrom), wrapper1.evaluate(embedding, metaData));
     assertNotEquals(PropertyValue.create(String.valueOf(txFrom)),
@@ -94,15 +104,17 @@ public class TimeSelectorComparableTest {
     TimeSelector selector = new TimeSelector("a", "val_from");
     TimeSelectorComparable wrapper = new TimeSelectorComparable(selector);
 
-    EmbeddingTPGM embedding = new EmbeddingTPGM();
-    embedding.add(GradoopId.get(), new PropertyValue[] {},
-      1234L, 12345L, 567L, 56789L);
+    Embedding embedding = new Embedding();
+    embedding.add(GradoopId.get(), new PropertyValue[]{
+      PropertyValue.create(1234L),
+      PropertyValue.create(4321L),
+      PropertyValue.create(6789L),});
 
-    EmbeddingTPGMMetaData metaData = new EmbeddingTPGMMetaData();
+    EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("b", EmbeddingMetaData.EntryType.VERTEX, 0);
-    metaData.setTimeColumn("b", 0);
+    metaData.setPropertyColumn("b", VAL_FROM.toString(), 1);
 
-    wrapper.evaluate(embedding, metaData);
+    wrapper.evaluate(embedding, metaData).getLong();
   }
 
 }

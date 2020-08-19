@@ -15,10 +15,10 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.Literal;
@@ -37,11 +37,11 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  */
 public class TrivialTautologies implements QueryTransformation {
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) {
+  public CNF transformCNF(CNF cnf) {
     if (cnf.getPredicates().size() == 0) {
       return cnf;
     }
-    return new TemporalCNF(
+    return new CNF(
       cnf.getPredicates().stream()
         .filter(this::notTautological)
         .collect(Collectors.toList())
@@ -54,8 +54,8 @@ public class TrivialTautologies implements QueryTransformation {
    * @param clause clause to check for tautologies
    * @return true iff the clause is not tautological
    */
-  private boolean notTautological(CNFElementTPGM clause) {
-    for (ComparisonExpressionTPGM comparison : clause.getPredicates()) {
+  private boolean notTautological(CNFElement clause) {
+    for (ComparisonExpression comparison : clause.getPredicates()) {
       if (isTautological(comparison)) {
         return false;
       }
@@ -75,7 +75,7 @@ public class TrivialTautologies implements QueryTransformation {
    * @param comp comparison to check for tautology
    * @return true iff the comparison is tautological according to the criteria listed above.
    */
-  private boolean isTautological(ComparisonExpressionTPGM comp) {
+  private boolean isTautological(ComparisonExpression comp) {
     ComparableExpression lhs = comp.getLhs().getWrappedComparable();
     Comparator comparator = comp.getComparator();
     ComparableExpression rhs = comp.getRhs().getWrappedComparable();

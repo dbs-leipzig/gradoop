@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
@@ -40,11 +41,25 @@ public class NotPredicate extends QueryPredicate {
   private final Not not;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  QueryComparableFactory comparableFactory;
+
+  /**
    * Create a new wrapper
    * @param not the wrapped not predicate
    */
   public NotPredicate(Not not) {
+    this(not, null);
+  }
+
+  /**
+   * Create a new wrapper
+   * @param not the wrapped not predicate
+   */
+  public NotPredicate(Not not, QueryComparableFactory comparableFactory) {
     this.not = not;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
@@ -58,12 +73,13 @@ public class NotPredicate extends QueryPredicate {
     if (expression.getClass() == Comparison.class) {
       CNF cnf = new CNF();
       CNFElement cnfElement = new CNFElement();
-      cnfElement.addPredicate(new ComparisonExpression(invertComparison((Comparison) expression)));
+      cnfElement.addPredicate(new ComparisonExpression(
+        invertComparison((Comparison) expression), comparableFactory));
       cnf.addPredicate(cnfElement);
       return cnf;
 
     } else if (expression.getClass() == Not.class) {
-      return QueryPredicate.createFrom(expression.getArguments()[0]).asCNF();
+      return QueryPredicate.createFrom(expression.getArguments()[0], comparableFactory).asCNF();
 
     } else if (expression.getClass() == And.class) {
       Predicate[] otherArguments = expression.getArguments();
@@ -71,7 +87,7 @@ public class NotPredicate extends QueryPredicate {
         new Not(otherArguments[0]),
         new Not(otherArguments[1])
       );
-      return QueryPredicate.createFrom(or).asCNF();
+      return QueryPredicate.createFrom(or, comparableFactory).asCNF();
 
     } else if (expression.getClass() == Or.class) {
       Predicate[] otherArguments = expression.getArguments();
@@ -80,7 +96,7 @@ public class NotPredicate extends QueryPredicate {
         new Not(otherArguments[1])
       );
 
-      return QueryPredicate.createFrom(and).asCNF();
+      return QueryPredicate.createFrom(and, comparableFactory).asCNF();
 
     } else {
       Predicate[] otherArguments = expression.getArguments();
@@ -93,7 +109,7 @@ public class NotPredicate extends QueryPredicate {
           new Not(otherArguments[1]))
       );
 
-      return QueryPredicate.createFrom(or).asCNF();
+      return QueryPredicate.createFrom(or, comparableFactory).asCNF();
     }
   }
 

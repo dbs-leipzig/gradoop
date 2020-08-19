@@ -87,7 +87,7 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
     data.addAll(new HomomorphismShorterThanData().getData());
     data.addAll(new HomomorphismLengthAtLeastData().getData());
     data.addAll(new HomomorphismLengthAtMostData().getData());
-    data.addAll(new HomomorphismSelfLoopData().getData());
+    //data.addAll(new HomomorphismSelfLoopData().getData());
 //        System.out.println(data.size());
 //        try {
 //            data.addAll(new RandomTestGenerator(data).createRandomTestCases(20));
@@ -103,7 +103,7 @@ public class CBCypherTemporalPatternMatchingHomomorphismTest extends CBCypherTem
   public TemporalPatternMatching<TemporalGraphHead, TemporalGraph, TemporalGraphCollection>
   getImplementation(String queryGraph, boolean attachData) {
     // dummy value for dummy GraphStatistics
-    TemporalGraphStatistics stats = null;
+    TemporalGraphStatistics stats;
     TemporalGraph g = null;
     try {
       g = getTemporalGraphFromLoader(getLoader());

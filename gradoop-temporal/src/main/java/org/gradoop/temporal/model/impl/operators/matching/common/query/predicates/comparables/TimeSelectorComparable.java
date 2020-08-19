@@ -19,12 +19,11 @@ import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,28 +66,11 @@ public class TimeSelectorComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    if (embedding instanceof EmbeddingTPGM && metaData instanceof EmbeddingTPGMMetaData) {
-      Long[] timeValues = ((EmbeddingTPGM) embedding).getTimes(
-        ((EmbeddingTPGMMetaData) metaData).getTimeColumn(timeSelector.getVariable())
-      );
+    String selectorString = timeSelector.getTimeProp().toString();
+    int column = metaData
+      .getPropertyColumn(timeSelector.getVariable(), selectorString);
 
-      TimeSelector.TimeField field = timeSelector.getTimeProp();
-
-      Long time = -1L;
-
-      if (field.equals(TimeSelector.TimeField.TX_FROM)) {
-        time = timeValues[0];
-      } else if (field == TimeSelector.TimeField.TX_TO) {
-        time = timeValues[1];
-      } else if (field == TimeSelector.TimeField.VAL_FROM) {
-        time = timeValues[2];
-      } else if (field == TimeSelector.TimeField.VAL_TO) {
-        time = timeValues[3];
-      }
-
-      return PropertyValue.create(time);
-    }
-    return null;
+    return embedding.getProperty(column);
   }
 
   @Override
@@ -110,7 +92,9 @@ public class TimeSelectorComparable extends TemporalComparable {
 
   @Override
   public Set<String> getPropertyKeys(String variable) {
-    return new HashSet<>(0);
+    return getVariable().equals(variable) ?
+      new HashSet<>(Collections.singletonList(getTimeField().toString())) :
+      new HashSet<>();
   }
 
   @Override

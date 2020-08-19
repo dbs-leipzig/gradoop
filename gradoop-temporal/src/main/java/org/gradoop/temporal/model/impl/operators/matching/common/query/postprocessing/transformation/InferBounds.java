@@ -15,15 +15,17 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -65,12 +67,12 @@ public class InferBounds implements QueryTransformation {
   /**
    * The processed query
    */
-  private TemporalCNF query;
+  private CNF query;
 
   /**
    * All comparisons that make up a single clause in the CNF
    */
-  private List<ComparisonExpressionTPGM> relevantComparisons;
+  private List<ComparisonExpression> relevantComparisons;
 
   /**
    * All variables in relevant comparisons
@@ -113,10 +115,10 @@ public class InferBounds implements QueryTransformation {
    *
    * @return list of all necessary temporal comparisons in the CNF
    */
-  private List<ComparisonExpressionTPGM> getRelevantComparisons() {
+  private List<ComparisonExpression> getRelevantComparisons() {
     return query.getPredicates().stream()
       .filter(clause -> clause.size() == 1 &&
-        clause.getPredicates().get(0).isTemporal() &&
+        ComparisonUtil.isTemporal(clause.getPredicates().get(0)) &&
         !isMinMax(clause.getPredicates().get(0)))
       .map(clause -> clause.getPredicates().get(0))
       .collect(Collectors.toList());
@@ -127,9 +129,9 @@ public class InferBounds implements QueryTransformation {
    * @param comparisonExpressionTPGM comparison to check
    * @return true iff the comparison involves a MIN or MAX timestamp
    */
-  private boolean isMinMax(ComparisonExpressionTPGM comparisonExpressionTPGM) {
-    QueryComparableTPGM lhs = comparisonExpressionTPGM.getLhs();
-    QueryComparableTPGM rhs = comparisonExpressionTPGM.getRhs();
+  private boolean isMinMax(ComparisonExpression comparisonExpressionTPGM) {
+    QueryComparable lhs = comparisonExpressionTPGM.getLhs();
+    QueryComparable rhs = comparisonExpressionTPGM.getRhs();
     return (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||
       rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable);
   }
@@ -143,7 +145,7 @@ public class InferBounds implements QueryTransformation {
   private Set<String> getRelevantVariables() {
     Optional<Set<String>> vars =
       relevantComparisons.stream()
-        .map(ComparisonExpressionTPGM::getVariables)
+        .map(ComparisonExpression::getVariables)
         .reduce((vars1, vars2) -> {
           vars1.addAll(vars2);
           return vars1;
@@ -152,7 +154,7 @@ public class InferBounds implements QueryTransformation {
   }
 
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     query = cnf;
     relevantComparisons = getRelevantComparisons();
     relevantVariables = getRelevantVariables();
@@ -170,8 +172,8 @@ public class InferBounds implements QueryTransformation {
    * @return original cnf with comparisons corresponding to the inferred bounds
    * appended.
    */
-  private TemporalCNF augmentCNF() {
-    List<CNFElementTPGM> inferedConstraints = new ArrayList();
+  private CNF augmentCNF() {
+    List<CNFElement> inferedConstraints = new ArrayList();
     for (String variable : relevantVariables) {
       HashMap<TimeSelector.TimeField, Long[]> newBounds =
         bounds.get(variable);
@@ -228,7 +230,7 @@ public class InferBounds implements QueryTransformation {
 
       }
     }
-    return query.and(new TemporalCNF(inferedConstraints));
+    return query.and(new CNF(inferedConstraints));
   }
 
   /**
@@ -239,11 +241,12 @@ public class InferBounds implements QueryTransformation {
    * @param rhs        right hand side of the comparison
    * @return single CNF constraint containing the comparison
    */
-  CNFElementTPGM singletonConstraint(ComparableExpression lhs, Comparator comparator,
+  CNFElement singletonConstraint(ComparableExpression lhs, Comparator comparator,
                                      ComparableExpression rhs) {
-    return new CNFElementTPGM(
-      Collections.singletonList(new ComparisonExpressionTPGM(
-        new Comparison(lhs, comparator, rhs)
+    return new CNFElement(
+      Collections.singletonList(new ComparisonExpression(
+        new Comparison(lhs, comparator, rhs),
+        new ComparableTPGMFactory()
       )));
   }
 
@@ -256,8 +259,8 @@ public class InferBounds implements QueryTransformation {
   private boolean updateBounds() throws QueryContradictoryException {
     boolean changed = false;
     for (String variable : relevantVariables) {
-      List<ComparisonExpressionTPGM> necessaryConditions = getNecessaryConditions(variable);
-      for (ComparisonExpressionTPGM comp : necessaryConditions) {
+      List<ComparisonExpression> necessaryConditions = getNecessaryConditions(variable);
+      for (ComparisonExpression comp : necessaryConditions) {
         changed = updateBounds(variable, comp) || changed;
       }
     }
@@ -270,7 +273,7 @@ public class InferBounds implements QueryTransformation {
    * @param variable variable to look for in the necessary comparisons
    * @return list of all necessary comparisons containing the variable
    */
-  private List<ComparisonExpressionTPGM> getNecessaryConditions(String variable) {
+  private List<ComparisonExpression> getNecessaryConditions(String variable) {
     return relevantComparisons.stream()
       .filter(comparison ->
         comparison.getVariables().contains(variable))
@@ -285,17 +288,17 @@ public class InferBounds implements QueryTransformation {
    * @return true iff bounds changed
    * @throws QueryContradictoryException if a contradiction in the query is detected
    */
-  private boolean updateBounds(String variable, ComparisonExpressionTPGM comparison)
+  private boolean updateBounds(String variable, ComparisonExpression comparison)
     throws QueryContradictoryException {
-    ComparableExpression lhs = comparison.getLhs().getWrappedComparable();
+    ComparableExpression lhs = ((QueryComparableTPGM)comparison.getLhs()).getWrappedComparable();
     Comparator comparator = comparison.getComparator();
-    ComparableExpression rhs = comparison.getRhs().getWrappedComparable();
+    ComparableExpression rhs = ((QueryComparableTPGM)comparison.getRhs()).getWrappedComparable();
     boolean changed = false;
     if (lhs instanceof TimeSelector) {
-      changed = updateBounds((TimeSelector) lhs, comparator, rhs) || changed;
+      changed = updateBounds((TimeSelector) lhs, comparator, rhs);
     } else if (rhs instanceof TimeSelector) {
       // comparisons of two time selectors are handled in the case above
-      changed = updateBounds((TimeSelector) rhs, switchComparator(comparator), lhs) || changed;
+      changed = updateBounds((TimeSelector) rhs, switchComparator(comparator), lhs);
     }
     return changed;
   }
@@ -460,16 +463,16 @@ public class InferBounds implements QueryTransformation {
     return changed;
   }
 
-  public TemporalCNF getQuery() {
+  public CNF getQuery() {
     return query;
   }
 
-  public void setQuery(TemporalCNF query) {
+  public void setQuery(CNF query) {
     this.query = query;
   }
 
   public void setRelevantComparisons(
-    List<ComparisonExpressionTPGM> relevantComparisons) {
+    List<ComparisonExpression> relevantComparisons) {
     this.relevantComparisons = relevantComparisons;
   }
 

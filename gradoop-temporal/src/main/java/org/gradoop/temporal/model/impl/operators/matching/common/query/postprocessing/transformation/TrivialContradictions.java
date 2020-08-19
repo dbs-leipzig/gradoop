@@ -15,11 +15,11 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.CNFElementTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTPGM;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.Literal;
@@ -42,13 +42,13 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  */
 public class TrivialContradictions implements QueryTransformation {
   @Override
-  public TemporalCNF transformCNF(TemporalCNF cnf) throws QueryContradictoryException {
-    ArrayList<CNFElementTPGM> newClauses = new ArrayList<>();
-    for (CNFElementTPGM clause : cnf.getPredicates()) {
-      CNFElementTPGM newClause = transformDisjunction(clause);
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
+    ArrayList<CNFElement> newClauses = new ArrayList<>();
+    for (CNFElement clause : cnf.getPredicates()) {
+      CNFElement newClause = transformDisjunction(clause);
       newClauses.add(newClause);
     }
-    return new TemporalCNF(newClauses);
+    return new CNF(newClauses);
   }
 
   /**
@@ -57,11 +57,11 @@ public class TrivialContradictions implements QueryTransformation {
    * @return the clause iff it does not contain a trivial contradiction
    * @throws QueryContradictoryException iff the clause contains a trivial contradiction
    */
-  private CNFElementTPGM transformDisjunction(CNFElementTPGM clause) throws QueryContradictoryException {
-    List<ComparisonExpressionTPGM> oldComparisons = clause.getPredicates();
-    ArrayList<ComparisonExpressionTPGM> newComparisons = new ArrayList<>();
+  private CNFElement transformDisjunction(CNFElement clause) throws QueryContradictoryException {
+    List<ComparisonExpression> oldComparisons = clause.getPredicates();
+    ArrayList<ComparisonExpression> newComparisons = new ArrayList<>();
     boolean contradiction = true;
-    for (ComparisonExpressionTPGM comparison : oldComparisons) {
+    for (ComparisonExpression comparison : oldComparisons) {
       if (!isContradictory(comparison)) {
         newComparisons.add(comparison);
         contradiction = false;
@@ -70,7 +70,7 @@ public class TrivialContradictions implements QueryTransformation {
     if (contradiction) {
       throw new QueryContradictoryException();
     } else {
-      return new CNFElementTPGM(newComparisons);
+      return new CNFElement(newComparisons);
     }
   }
 
@@ -81,7 +81,7 @@ public class TrivialContradictions implements QueryTransformation {
    * @param comp comparison to check
    * @return true iff comparison is a trivial contradiction
    */
-  private boolean isContradictory(ComparisonExpressionTPGM comp) {
+  private boolean isContradictory(ComparisonExpression comp) {
     ComparableExpression lhs = comp.getLhs().getWrappedComparable();
     Comparator comparator = comp.getComparator();
     ComparableExpression rhs = comp.getRhs().getWrappedComparable();

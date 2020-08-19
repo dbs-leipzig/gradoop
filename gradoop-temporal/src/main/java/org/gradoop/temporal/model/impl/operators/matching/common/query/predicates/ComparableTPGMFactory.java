@@ -1,28 +1,13 @@
-/*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util;
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
@@ -37,19 +22,11 @@ import org.s1ck.gdl.model.comparables.time.TimeConstant;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
-/**
- * Class for creating a {@link QueryComparableTPGM} wrapper for a GDL {@link ComparableExpression}
- */
-public class ComparableFactory {
+import java.io.Serializable;
 
-  /**
-   * Create a wrapper for a GDL comparable
-   *
-   * @param expression the GDL element to wrap
-   * @return wrapper for expression
-   * @throws IllegalArgumentException if expression is no GDL ComparableExpression
-   */
-  public static QueryComparable createComparableFrom(ComparableExpression expression) {
+public class ComparableTPGMFactory extends QueryComparableFactory {
+  @Override
+  public QueryComparable createFrom(ComparableExpression expression) {
     if (expression.getClass() == Literal.class) {
       return new LiteralComparable((Literal) expression);
     } else if (expression.getClass() == PropertySelector.class) {
@@ -70,7 +47,7 @@ public class ComparableFactory {
       return new DurationComparable((Duration) expression);
     } else {
       throw new IllegalArgumentException(
-        expression.getClass() + " is not a GDL ComparableExpression"
+        expression.getClass() + " is not a temporal GDL ComparableExpression"
       );
     }
   }

@@ -15,8 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.TemporalCNF;
 import org.junit.Test;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -51,18 +51,18 @@ public class InferBoundsTest {
     // => lower(b.tx_from) = 1L, upper(b.tx_from) = ms(2020-05-25)-2
     // => lower(a.val_from) = 2L, upper(a.val_from) = ms(2020-05-25)-1
 
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, LT, aValFrom)),
       Collections.singletonList(new Comparison(cValTo, LTE, bTxFrom)),
       Collections.singletonList(new Comparison(literal1970, LT, cValTo)),
       Collections.singletonList(new Comparison(aValFrom, LT, literal2020))
     );
     InferBounds prep = new InferBounds();
-    TemporalCNF processedCNF = prep.transformCNF(cnf);
+    CNF processedCNF = prep.transformCNF(cnf);
 
     long l2020 = literal2020.getMilliseconds();
 
-    TemporalCNF expectedCNF = cnf.and(Util.cnfFromLists(
+    CNF expectedCNF = cnf.and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(
         new TimeLiteral(2), LTE, aValFrom)),
       Collections.singletonList(new Comparison(
@@ -85,15 +85,15 @@ public class InferBoundsTest {
     // a.tx_from = b.tx_from = 1970-01-01
     // => lower(a.tx_from) = upper(a.tx_from) = lower(b.tx_from)
     //      = lower(b.tx_to) = 0L
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxTo, EQ, bTxFrom)),
       Collections.singletonList(new Comparison(bTxFrom, EQ, literal1970))
     );
     InferBounds prep = new InferBounds();
 
-    TemporalCNF processedCNF = prep.transformCNF(cnf);
+    CNF processedCNF = prep.transformCNF(cnf);
 
-    TemporalCNF expectedCNF = cnf.and(Util.cnfFromLists(
+    CNF expectedCNF = cnf.and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxTo, EQ, literal1970)),
       Collections.singletonList(new Comparison(bTxFrom, EQ, literal1970))
     ));
@@ -106,18 +106,18 @@ public class InferBoundsTest {
   public void preprocessingTest3() throws QueryContradictoryException {
     // a.tx_from < b.tx_from, 1970-01-01 <= b.tx_from, b.tx_from <= 2020-05-25
     // => lower(b.tx_from) = 1970-01-01
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, LT, bTxFrom)),
       Collections.singletonList(new Comparison(literal1970, LTE, bTxFrom)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, literal2020))
     );
 
     InferBounds prep = new InferBounds();
-    TemporalCNF processedCNF = prep.transformCNF(cnf);
+    CNF processedCNF = prep.transformCNF(cnf);
 
     long l2020 = literal2020.getMilliseconds();
 
-    TemporalCNF expectedCNF = cnf.and(Util.cnfFromLists(
+    CNF expectedCNF = cnf.and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(
         aTxFrom, LTE, new TimeLiteral(l2020 - 1))),
       Collections.singletonList(new Comparison(
@@ -133,7 +133,7 @@ public class InferBoundsTest {
   public void preprocessingTest4() throws QueryContradictoryException {
     // obvious contradiction (should not occur in reality, as
     // a CheckForCircles is done before this processing step)
-    TemporalCNF cnf = Util.cnfFromLists(
+    CNF cnf = Util.cnfFromLists(
       Collections.singletonList(new Comparison(aTxFrom, LT, literal1970)),
       Collections.singletonList(new Comparison(literal2020, LTE, aTxFrom))
     );
