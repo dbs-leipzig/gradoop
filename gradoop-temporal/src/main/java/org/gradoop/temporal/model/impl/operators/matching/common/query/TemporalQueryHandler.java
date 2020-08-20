@@ -31,6 +31,8 @@ import org.s1ck.gdl.GDLHandler;
 import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
+import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
+import org.s1ck.gdl.model.comparables.time.MinTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.Predicate;
@@ -46,6 +48,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.s1ck.gdl.utils.Comparator.LTE;
 
 /**
  * Wraps a {@link GDLHandler} and adds functionality needed for query
@@ -111,7 +115,7 @@ public class TemporalQueryHandler extends QueryHandler {
   private void initCNF() throws QueryContradictoryException {
     if (getGdlHandler().getPredicates().isPresent()) {
       Predicate predicate = getGdlHandler().getPredicates().get();
-      //predicate = preprocessPredicate(predicate);
+      predicate = preprocessPredicate(predicate);
       CNF rawCNF = QueryPredicate.createFrom(predicate, new ComparableTPGMFactory()).asCNF();
       System.out.println("Initial CNF: "+rawCNF);
       cnf = cnfPostProcessing.postprocess(rawCNF);
@@ -130,7 +134,53 @@ public class TemporalQueryHandler extends QueryHandler {
    * @return preprocessed predicate
    */
   private Predicate preprocessPredicate(Predicate predicate) {
-    return defaultAsOfExpansion(predicate);
+    return addEdgeOverlapPredicates(predicate);
+  }
+
+  /**
+   * Augments a predicate by constraints ensuring that valid times of
+   * edges and their adjacent nodes overlap
+   * @param predicate the predicate to augment
+   * @return predicate augmented by edge overlaps constraints for every edge
+   */
+  private Predicate addEdgeOverlapPredicates(Predicate predicate) {
+    GDLHandler handler = getGdlHandler();
+    Map<String, Edge> edgeCache = handler.getEdgeCache();
+    // maps vertex ids to vertex variables
+    Map<Long, String> vertexMap = new HashMap<>();
+    for(Vertex vertex : handler.getVertexCache().values()){
+      vertexMap.put(vertex.getId(), vertex.getVariable());
+    }
+
+    // determine all (vertex, edge, vertex) triples
+    for(String edgeVar: handler.getEdgeCache().keySet()){
+      Edge edge = edgeCache.get(edgeVar);
+      String sourceVar = vertexMap.get(edge.getSourceVertexId());
+      String targetVar = vertexMap.get(edge.getTargetVertexId());
+       // add predicates edgeVar.val.overlaps(sourceVar.val) AND
+      // edgeVar.val.overlaps(targetVar.val)
+
+      TimeSelector eFrom = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_FROM);
+      TimeSelector eTo = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_TO);
+
+      TimeSelector sFrom = new TimeSelector(sourceVar, TimeSelector.TimeField.VAL_FROM);
+      TimeSelector sTo = new TimeSelector(sourceVar, TimeSelector.TimeField.VAL_TO);
+
+      TimeSelector tFrom = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_FROM);
+      TimeSelector tTo = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_TO);
+
+      Predicate overlaps = new And(
+        new Comparison(
+          new MaxTimePoint(eFrom, sFrom), LTE, new MinTimePoint(eTo, sTo)
+        ),
+        new Comparison(
+          new MaxTimePoint(eFrom, tFrom), LTE, new MinTimePoint(eTo, tTo)
+        )
+      );
+
+      predicate = new And(predicate, overlaps);
+    }
+    return predicate;
   }
 
   /**
@@ -155,7 +205,7 @@ public class TemporalQueryHandler extends QueryHandler {
       And asOf0 = new And(
         new Comparison(
           new TimeSelector(vars.get(0), TimeSelector.TimeField.TX_FROM),
-          Comparator.LTE, now),
+          LTE, now),
         new Comparison(
           new TimeSelector(vars.get(0), TimeSelector.TimeField.TX_TO),
           Comparator.GTE, now)
@@ -170,7 +220,7 @@ public class TemporalQueryHandler extends QueryHandler {
         And asOf = new And(
           new Comparison(
             new TimeSelector(v, TimeSelector.TimeField.TX_FROM),
-            Comparator.LTE, now),
+            LTE, now),
           new Comparison(
             new TimeSelector(v, TimeSelector.TimeField.TX_TO),
             Comparator.GTE, now)

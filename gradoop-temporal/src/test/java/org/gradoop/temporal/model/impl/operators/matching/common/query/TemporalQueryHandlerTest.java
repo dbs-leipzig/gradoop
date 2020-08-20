@@ -31,6 +31,7 @@ import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Vertex;
 import org.s1ck.gdl.model.comparables.Literal;
 import org.s1ck.gdl.model.comparables.PropertySelector;
+import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -51,6 +52,7 @@ import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 import static org.s1ck.gdl.utils.Comparator.GT;
 import static org.s1ck.gdl.utils.Comparator.LT;
+import static org.s1ck.gdl.utils.Comparator.LTE;
 
 
 public class TemporalQueryHandlerTest {
@@ -96,7 +98,7 @@ public class TemporalQueryHandlerTest {
 
   @Test
   public void testGetPredicatesWithoutDefaultAsOf() {
-    String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.tx_to)";
+    String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_from.before(b.tx_to)";
     TemporalQueryHandler handler = null;
     try {
       handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
@@ -105,13 +107,14 @@ public class TemporalQueryHandlerTest {
     }
 
     Predicate and = new And(
-      new Comparison(new TimeSelector("v2", "tx_to"),
+      new Comparison(new TimeSelector("b", "tx_to"),
         GT,
-        new TimeSelector("v1", "tx_from")),
+        new TimeSelector("a", "tx_from")),
       new Comparison(new PropertySelector("e1", "__label__"),
         Comparator.EQ,
         new Literal("test"))
     );
+    and = new And(and, getOverlapsPredicate());
     assertPredicateEquals(and, handler.getPredicates());
   }
 
@@ -169,6 +172,7 @@ public class TemporalQueryHandlerTest {
         Comparator.EQ,
         new Literal("test"))
     );
+    expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
 
     System.out.println("Here");
@@ -196,6 +200,7 @@ public class TemporalQueryHandlerTest {
       Comparator.EQ,
       new Literal("test"));
 
+    expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
 
     // only global
@@ -207,13 +212,15 @@ public class TemporalQueryHandlerTest {
       new Comparison(globalTxTo, LT, bValTo),
       new Comparison(aValTo, GT, globalValTo)
     );
-
+    expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
   }
 
   private void assertPredicateEquals(Predicate expectedGDL, CNF result) {
-    System.out.println(expectedGDL);
+    //System.out.println(expectedGDL);
     CNF expected = QueryPredicate.createFrom(expectedGDL, new ComparableTPGMFactory()).asCNF();
+    System.out.println(expected);
+    System.out.println(result);
     equalCNFs(expected, result);
   }
 
@@ -251,6 +258,28 @@ public class TemporalQueryHandlerTest {
     return false;
   }
 
+
+  // returns the overlaps predicate for the edge (a)-[e]->(b)
+  private And getOverlapsPredicate(){
+    TimeSelector eFrom = new TimeSelector("e1", TimeSelector.TimeField.VAL_FROM);
+    TimeSelector eTo = new TimeSelector("e1", TimeSelector.TimeField.VAL_TO);
+
+    TimeSelector sFrom = new TimeSelector("a", TimeSelector.TimeField.VAL_FROM);
+    TimeSelector sTo = new TimeSelector("a", TimeSelector.TimeField.VAL_TO);
+
+    TimeSelector tFrom = new TimeSelector("b", TimeSelector.TimeField.VAL_FROM);
+    TimeSelector tTo = new TimeSelector("b", TimeSelector.TimeField.VAL_TO);
+
+    And overlaps = new And(
+      new Comparison(
+        new MaxTimePoint(eFrom, sFrom), LTE, new MinTimePoint(eTo, sTo)
+      ),
+      new Comparison(
+        new MaxTimePoint(eFrom, tFrom), LTE, new MinTimePoint(eTo, tTo)
+      )
+    );
+    return overlaps;
+  }
 
   private And getAsOf(String var, TimeLiteral now) {
     return new And(
