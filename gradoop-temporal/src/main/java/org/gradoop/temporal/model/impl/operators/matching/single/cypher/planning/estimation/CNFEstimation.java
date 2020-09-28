@@ -165,6 +165,7 @@ public class CNFEstimation {
     if (element.getPredicates().size() == 1) {
       return estimateComparison(element.getPredicates().get(0));
     } else {
+      // recursively estimate P(a or b or c or...) as P(a) + P(b or c or...) - P(a)*P(b or c or...)
       List<ComparisonExpression> comparisons = element.getPredicates();
       double firstEst = estimateComparison(comparisons.get(0));
       CNFElement rest = new CNFElement(comparisons.subList(
@@ -172,22 +173,6 @@ public class CNFEstimation {
       double restEst = estimateCNF(new CNF(Collections.singletonList(rest)));
       return firstEst + restEst - (firstEst * restEst);
     }
-  }
-
-
-  /**
-   * Creates a CNF from a list of comparisons (conjunction of the comparisons)
-   *
-   * @param comparisons list of comparisons
-   * @return CNF (conjunction) from a list of comparisons
-   */
-  private CNF cnfFrom(List<ComparisonExpression> comparisons) {
-    ArrayList<CNFElement> elements = new ArrayList<>();
-    for (ComparisonExpression comparison : comparisons) {
-      elements.add(new CNFElement(
-        new ArrayList<>(Collections.singletonList(comparison))));
-    }
-    return new CNF(elements);
   }
 
   /**
@@ -202,30 +187,20 @@ public class CNFEstimation {
       return cache.get(comparisonExpression);
     }
     double result = 1.;
+    // probability of labels is not estimated here, belongs to the structural estimations
     if (isLabelComp(comparisonExpression)) {
-      String label = getLabelFromLabelComp(comparisonExpression);
-      String variable = getVariableFromLabelComp(comparisonExpression);
-      TemporalGraphStatistics.ElementType type = typeMap.get(variable);
-      result = stats.estimateLabelProb(type, label);
+      return 1.;
     } else {
+      // more than one element in the comparison?
       if (comparisonExpression.getVariables().size() > 1) {
         result = estimateComparisonOnDifferent(comparisonExpression);
       } else {
+        // exactly one element in the comparison
         result = estimateCompOnSameTPGM(comparisonExpression);
       }
     }
     cache.put(comparisonExpression, result);
     return result;
-  }
-
-  /**
-   * Extracts the variable from a label comparison, i.e. a comparison of the form
-   * "a.__label__=label"
-   * @param comparisonExpression the label comparison
-   * @return variable of the label comparison
-   */
-  private String getVariableFromLabelComp(ComparisonExpression comparisonExpression) {
-    return new ArrayList<>(comparisonExpression.getVariables()).get(0);
   }
 
   /**
@@ -246,29 +221,6 @@ public class CNFEstimation {
         .getPropertyKey().equals("__label__");
     }
     return false;
-  }
-
-  /**
-   * Extracts the label assigned to an element by a comparison of the form
-   * a.__label__="label" or "label"==a.__label__
-   *
-   * @param comparison comparison of the form a.__label__="label" or "label"==a.__label__
-   * @return label assigned to the element
-   */
-  private String getLabelFromLabelComp(ComparisonExpression comparison) {
-    if (comparison.getLhs() instanceof PropertySelectorComparable) {
-      if (((PropertySelectorComparable) comparison.getLhs())
-        .getPropertyKey().equals("__label__")) {
-        String value = (String) ((LiteralComparable) comparison.getRhs()).getValue();
-        return value;
-      }
-    } else if (comparison.getRhs() instanceof PropertySelectorComparable) {
-      if (((PropertySelectorComparable) comparison.getRhs())
-        .getPropertyKey().equals("__label__")) {
-        return (String) ((LiteralComparable) comparison.getLhs()).getValue();
-      }
-    }
-    return "";
   }
 
   /**
@@ -336,6 +288,7 @@ public class CNFEstimation {
     }
     // only valid and tx durations can be estimated
     Duration duration = (Duration) ((DurationComparable) lhs).getWrappedComparable();
+    // complex durations not supported yet, only transaction and valid interval durations
     if (!checkSimpleDuration(duration)) {
       return 1.;
     }
@@ -345,6 +298,7 @@ public class CNFEstimation {
     Optional<String> label = labelMap.containsKey(variable) ?
       Optional.of(labelMap.get(variable)) : Optional.empty();
     TimeSelector from = (TimeSelector) duration.getFrom();
+    // tx or valid interval?
     boolean transaction = from.getTimeProp() == TimeSelector.TimeField.TX_FROM;
     long rhsValue = ((TimeConstant) ((TimeConstantComparable) rhs)
       .getWrappedComparable()).getMillis();
@@ -545,6 +499,7 @@ public class CNFEstimation {
     TemporalGraphStatistics.ElementType type1 = typeMap.get(variable1);
     Optional<String> label1 = labelMap.containsKey(variable1) ?
       Optional.of(labelMap.get(variable1)) : Optional.empty();
+    // transaction or valid interval
     boolean transaction1 = from1.getTimeProp() == TimeSelector.TimeField.TX_FROM;
 
     TimeSelector from2 = (TimeSelector) rhs.getFrom();
@@ -620,7 +575,7 @@ public class CNFEstimation {
       }
     });
 
-    // resort comparisons within clauses: non-selective comparisons first
+    // resort comparisons within clauses: labels and then non-selective comparisons first
     clauses = clauses.stream().map(clause -> {
         ArrayList<ComparisonExpression> comps = new ArrayList<>(
           clause.getPredicates());

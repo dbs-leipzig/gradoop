@@ -54,15 +54,16 @@ public class BinningTemporalGraphStatisticsFactory implements
         .groupBy(EPGMElement::getLabel)
         .reduceGroup(new ElementsToStats<TemporalVertex>(numericalProperties, categoricalProperties))
         .collect();
-      System.out.println("collected vertex Stats");
+
       List<TemporalElementStats> edgeStats = g.getEdges()
         // do not replace this with the method reference!!!
         .groupBy(edge -> edge.getLabel())
         .reduceGroup(new ElementsToStats<TemporalEdge>(numericalProperties, categoricalProperties))
         .collect();
-      System.out.println("collected edge stats");
 
       HashSet<String> relevantProperties=null;
+      // both only null, if all properties should be considered
+      // (use empty lists to ignore all properties)
       if(numericalProperties!=null && categoricalProperties!=null){
         relevantProperties = new HashSet<>();
         relevantProperties.addAll(numericalProperties);
@@ -77,6 +78,5 @@ public class BinningTemporalGraphStatisticsFactory implements
     }
     return null;
   }
-
 
 }

@@ -37,7 +37,7 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.postproce
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 
 /**
- * Base class for temporal pattern matching implementations.
+ * Base class for temporal pattern matching implementations. Analogous to {@link org.gradoop.flink.model.impl.operators.matching.single.PatternMatching}
  *
  * @param <G>  The graph head type.
  * @param <LG> The graph type.
@@ -87,7 +87,7 @@ public abstract class TemporalPatternMatching<
   /**
    * Constructor
    *
-   * @param query      GDL query graph
+   * @param query      GDL query
    * @param attachData true, if original data shall be attached to the result
    * @param log        Logger of the concrete implementation
    */
@@ -98,7 +98,7 @@ public abstract class TemporalPatternMatching<
   /**
    * Constructor
    *
-   * @param query      GDL query graph
+   * @param query      GDL query
    * @param attachData true, if original data shall be attached to the result
    * @param cnfProcessor query transformations
    * @param log        Logger of the concrete implementation

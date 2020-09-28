@@ -45,7 +45,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
               Set<String> categoricalProperties);
 
   /**
-   * Create statistics from a temporal graph based only on a sample of it
+   * Create statistics from a temporal graph based on a sample of given size
    * @param g graph to create statistics for
    * @param sampleSize size of sample to be used
    * @return graph statistics
@@ -53,7 +53,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
   T fromGraphWithSampling(TemporalGraph g, int sampleSize);
 
   /**
-   * Create statistics from a temporal graph based only on a sample of it.
+   * Create statistics from a temporal graph based on a sample of given size.
    * Numerical and categorical properties to be considered are specified explicitly.
    * @param g graph to create statistics for
    * @param numericalProperties list of numerical properties to consider

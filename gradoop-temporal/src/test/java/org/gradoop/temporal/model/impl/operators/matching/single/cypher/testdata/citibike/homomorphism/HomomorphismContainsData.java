@@ -30,7 +30,7 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE e1!=e2 AND e1.val.contains(e2.val)"
       ),
       "expected1,expected2",
@@ -42,9 +42,9 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE e.val.contains(2013-06-01T00:35:35) AND " +
-          "NOT b.tx.contains(2013-07-17)"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE e.val.contains(Timestamp(2013-06-01T00:35:35)) AND " +
+          "NOT b.tx.contains(Timestamp(2013-07-17))"
       ),
       "expected1,expected2",
       "expected1[(s8)-[e6]->(s9)], expected2[(s7)-[e5]->(s2)]"
@@ -54,9 +54,9 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).contains(Interval(" +
-          "2013-05-12,2013-07-28))"
+          "Timestamp(2013-05-12), Timestamp(2013-07-28)))"
       ),
       "expected1",
       "expected1[(s24)-[e15]->(s25)]"
@@ -66,7 +66,7 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) WHERE NOT a.tx.contains(a.tx)"
       ),
       "",
@@ -79,7 +79,7 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(a.tx)"
       ),
       "expected1,expected2,expected3",
@@ -93,10 +93,10 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.merge(b.tx).contains(" +
-          "Interval(MIN(a.tx_from, 2020-01-01, e.tx_from), " +
-          "MAX(a.tx_to, e.tx_to, 1970-01-01)))"
+          "Interval(MIN(a.tx_from, Timestamp(2020-01-01), e.tx_from), " +
+          "MAX(a.tx_to, e.tx_to, Timestamp(1970-01-01))))"
       ),
       "expected1,expected2,expected3",
       "expected1[(s2)-[e2]->(s2)], expected2[(s27)-[e17]->(s27)], " +

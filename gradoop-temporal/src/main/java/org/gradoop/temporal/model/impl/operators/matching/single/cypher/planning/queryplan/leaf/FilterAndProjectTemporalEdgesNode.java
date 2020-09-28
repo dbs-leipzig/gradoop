@@ -150,7 +150,7 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
 
   @Override
   public String toString() {
-    return String.format("FilterAndProjectEdgesNode{" +
+    return String.format("FilterAndProjectTemporalEdgesNode{" +
         "sourceVariable='%s', " +
         "edgeVariable='%s', " +
         "targetVariable='%s', " +

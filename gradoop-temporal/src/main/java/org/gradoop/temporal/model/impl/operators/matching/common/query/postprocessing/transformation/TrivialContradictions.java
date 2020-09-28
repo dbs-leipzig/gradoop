@@ -37,13 +37,15 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  * Looks for trivial contradictions like {@code a.tx_from > a.tx_to} or (b.prop!=b.prop).
  * Every contradictory comparison is removed from its disjunctive clause.
  * If every comparison in a clause is contradictory, the whole CNF is a contradiction.
- * In this case, the transformation returns {@code null}
+ * In this case, the transformation throws a {@link QueryContradictoryException}
  * !!! This class assumes input CNFs to be normalized, i.e. not to contain < or <= !!!
  */
 public class TrivialContradictions implements QueryTransformation {
+
   @Override
   public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     ArrayList<CNFElement> newClauses = new ArrayList<>();
+    // check every clause for contradictions
     for (CNFElement clause : cnf.getPredicates()) {
       CNFElement newClause = transformDisjunction(clause);
       newClauses.add(newClause);
@@ -52,7 +54,8 @@ public class TrivialContradictions implements QueryTransformation {
   }
 
   /**
-   * Checks a disjunctive clause for trivial contradictions
+   * Checks a disjunctive clause for trivial contradictions and removes them.
+   * If all comparisons are contradictory, an exception is thrown.
    * @param clause clause to check
    * @return the clause iff it does not contain a trivial contradiction
    * @throws QueryContradictoryException iff the clause contains a trivial contradiction
@@ -63,10 +66,12 @@ public class TrivialContradictions implements QueryTransformation {
     boolean contradiction = true;
     for (ComparisonExpression comparison : oldComparisons) {
       if (!isContradictory(comparison)) {
+        // contradictory comparisons are omitted in the resulting clause
         newComparisons.add(comparison);
         contradiction = false;
       }
     }
+    // all comparisons contradictory?
     if (contradiction) {
       throw new QueryContradictoryException();
     } else {
@@ -82,6 +87,7 @@ public class TrivialContradictions implements QueryTransformation {
    * @return true iff comparison is a trivial contradiction
    */
   private boolean isContradictory(ComparisonExpression comp) {
+    // unwrap the comparison
     ComparableExpression lhs = comp.getLhs().getWrappedComparable();
     Comparator comparator = comp.getComparator();
     ComparableExpression rhs = comp.getRhs().getWrappedComparable();

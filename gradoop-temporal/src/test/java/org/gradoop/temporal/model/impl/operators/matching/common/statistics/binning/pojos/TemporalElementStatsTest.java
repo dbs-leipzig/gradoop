@@ -49,21 +49,6 @@ public class TemporalElementStatsTest {
         assertEquals((long) bins[k], startValues[i] + (50 * k) - 1);
       }
     }
-
-    assertEquals(stats.getTxAsOfNowEstimation(), 0.0, 0.0001);
-    assertEquals(stats.getValidAsOfNowEstimation(), 0.0, 0.0001);
-
-        /*Long[] txDurationBins = stats.getTxDurationBins().getBins();
-        Long[] valDurationBins = stats.getValidDurationBins().getBins();
-
-        assertEquals((long) txDurationBins[0], Long.MIN_VALUE);
-        assertEquals((long) valDurationBins[0], Long.MIN_VALUE);
-
-        for(int i=1; i<100; i++){
-            assertEquals((long) txDurationBins[i], 10000L);
-            assertEquals((long) valDurationBins[i], 1000000L);
-        }*/
-
   }
 
   @Test
@@ -123,32 +108,6 @@ public class TemporalElementStatsTest {
     for (TemporalVertex vertex : input) {
       stats.addElement(vertex);
     }
-    double[] txToValToStats = stats.getTxToValToStats();
-    assertEquals(txToValToStats.length, 3);
-    assertEquals(txToValToStats[0], 4., 0.001);
-    assertEquals(txToValToStats[1], 16., 0.001);
-    assertEquals(txToValToStats[2], 0.8, 0.001);
-  }
-
-  @Test
-  public void asOfNowEstimationsTest() {
-    ArrayList<TemporalVertex> input = getInputVertices();
-    // set half of the vertices to fulfill tx.asOf(now)
-    for (int i = 0; i < input.size() / 2; i++) {
-      input.get(i).setTxTo(Long.MAX_VALUE);
-    }
-    // set every fourth of the vertices to fulfill val.asOf(now)
-    for (int k = 0; k < input.size(); k = k + 4) {
-      input.get(k).setValidTo(Long.MAX_VALUE);
-    }
-
-    TemporalElementStats stats = new TemporalElementStats();
-    for (TemporalVertex vertex : input) {
-      stats.addElement(vertex);
-    }
-
-    assertEquals(stats.getTxAsOfNowEstimation(), 0.5, 0.0001);
-    assertEquals(stats.getValidAsOfNowEstimation(), 0.25, 0.0001);
   }
 
   @Test

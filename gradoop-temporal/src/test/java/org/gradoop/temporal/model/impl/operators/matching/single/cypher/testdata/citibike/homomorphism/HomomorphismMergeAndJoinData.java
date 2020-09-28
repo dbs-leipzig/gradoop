@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) (b) WHERE a.id>b.id AND a.val.merge(b.val).overlaps(" +
-          "Interval(2013-07-28T12:00, 2013-07-30))"),
+          "Interval(Timestamp(2013-07-28T12:00), Timestamp(2013-07-30)))"),
       "expected1",
       "expected1[(s20)(s25)]"
     });
@@ -42,7 +42,7 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) WHERE NOT a.val.merge(a.val).contains(a.val.join(a.val))"
       ),
       "",
@@ -53,9 +53,9 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.join(b.tx).contains(Interval(" +
-          " 2013-05-12,2013-07-28))"
+          " Timestamp(2013-05-12),Timestamp(2013-07-28)))"
       ),
       "expected1",
       "expected1[(s24)-[e15]->(s25)]"
@@ -66,9 +66,9 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE a.id=444 AND Interval(1970-01-01,1970-01-02).precedes(" +
-          "e.val.join(Interval(2013-06-01T00:11:40,2017-01-01)))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE a.id=444 AND Interval(Timestamp(1970-01-01),Timestamp(1970-01-02)).precedes(" +
+          "e.val.join(Interval(Timestamp(2013-06-01T00:11:40),Timestamp(2017-01-01))))"
       ),
       "expected1",
       "expected1[(s0)-[e1]->(s1)]"
@@ -78,9 +78,9 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE a.id=444 AND Interval(1970-01-01,1970-01-02).precedes(" +
-          "e.val.merge(Interval(2013-06-01T00:11:40,2017-01-01)))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE a.id=444 AND Interval(Timestamp(1970-01-01),Timestamp(1970-01-02)).precedes(" +
+          "e.val.merge(Interval(Timestamp(2013-06-01T00:11:40),Timestamp(2017-01-01))))"
       ),
       "expected1",
       "expected1[(s0)-[e1]->(s1)]"
@@ -91,8 +91,8 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE val.join(a.val).overlaps(Interval(2013-05-01, 2013-05-11))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE val.join(a.val).overlaps(Interval(Timestamp(2013-05-01), Timestamp(2013-05-11)))"
       ),
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)],expected2[(s0)-[e1]->(s1)]"
@@ -102,10 +102,10 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.join(" +
           "Interval(MIN(b.tx_from, e.tx_from), MAX(b.tx_to, e.tx_to)))" +
-          ".contains(Interval(2013-05-12,2013-07-28))"
+          ".contains(Interval(Timestamp(2013-05-12),Timestamp(2013-07-28)))"
       ),
       "expected1",
       "expected1[(s24)-[e15]->(s25)]"

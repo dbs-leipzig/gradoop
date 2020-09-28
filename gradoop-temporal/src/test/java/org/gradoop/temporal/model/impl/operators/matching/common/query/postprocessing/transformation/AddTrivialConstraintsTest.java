@@ -62,9 +62,9 @@ public class AddTrivialConstraintsTest {
       Collections.singletonList(new Comparison(aTxFrom, LTE, aTxTo)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo)),
       Collections.singletonList(new Comparison(bValFrom, LTE, bValTo)),
-      Collections.singletonList(new Comparison(lit1, LTE, lit2)),
-      Collections.singletonList(new Comparison(lit1, LTE, lit3)),
-      Collections.singletonList(new Comparison(lit2, LTE, lit3))
+      Collections.singletonList(new Comparison(lit1, LT, lit2)),
+      Collections.singletonList(new Comparison(lit1, LT, lit3)),
+      Collections.singletonList(new Comparison(lit2, LT, lit3))
     ));
 
     assertEquals(constraintAdder.transformCNF(cnf), expected);

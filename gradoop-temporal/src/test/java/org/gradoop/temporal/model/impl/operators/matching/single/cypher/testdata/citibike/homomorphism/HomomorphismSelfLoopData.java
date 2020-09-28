@@ -11,12 +11,12 @@ public class HomomorphismSelfLoopData implements TemporalTestData {
   public Collection<String[]> getData() {
     ArrayList<String []> data = new ArrayList<>();
     data.add(new String[]{
-      "ImmPrecedes_HOM_6_default_citibike",
+      "SelfLoop_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(a)"
       ),
-      "",""
+      "expected1,expected2","expected1[(s2)-[e2]->(s2)],expected2[(s27)-[e17]->(s27)]"
     });
     return data;
   }

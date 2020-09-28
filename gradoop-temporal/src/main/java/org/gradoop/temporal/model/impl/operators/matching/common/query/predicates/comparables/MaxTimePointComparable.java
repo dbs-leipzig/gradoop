@@ -69,7 +69,6 @@ public class MaxTimePointComparable extends TemporalComparable {
     return PropertyValue.create(max);
   }
 
-  // not implemented, as it is never needed
   @Override
   public PropertyValue evaluate(GraphElement element) {
     if (maxTimePoint.getVariables().size() > 1) {
@@ -129,10 +128,6 @@ public class MaxTimePointComparable extends TemporalComparable {
     return maxTimePoint != null ? maxTimePoint.hashCode() : 0;
   }
 
-  @Override
-  public boolean isGlobal() {
-    return maxTimePoint.isGlobal();
-  }
 
   @Override
   public TimePoint getWrappedComparable() {

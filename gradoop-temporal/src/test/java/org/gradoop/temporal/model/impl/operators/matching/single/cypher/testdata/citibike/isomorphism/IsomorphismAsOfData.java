@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class IsomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE e.asOf(2013-06-01T00:01:00)",
+      "MATCH (a)-[e]->(b) WHERE e.tx.asOf(Timestamp(2013-06-01T00:01:00))",
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
     });
@@ -40,7 +40,7 @@ public class IsomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.asOf(e1.val_from)",
+      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.val.asOf(e1.val_from)",
       "expected1",
       "expected1[(s26)<-[e16]-(s24)-[e15]->(s25)]"
     });
@@ -52,7 +52,7 @@ public class IsomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_ISO3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE NOT e.asOf(2013-06-01T00:08:00)",
+      "MATCH (a)-[e]->(b) WHERE NOT e.tx.asOf(Timestamp(2013-06-01T00:08:00))",
       "expected1,expected2,expected3",
       "expected1[(s21)-[e19]->(s11)], expected2[(s3)-[e3]->(s4)]," +
         " expected3[(s28)-[e18]->(s29)]"
@@ -63,8 +63,8 @@ public class IsomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_ISO4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE NOT e.asOf(2013-06-01T00:08:00) AND " +
-        "b.asOf(2013-05-20)",
+      "MATCH (a)-[e]->(b) WHERE NOT e.tx.asOf(Timestamp(2013-06-01T00:08:00)) AND " +
+        "b.tx.asOf(Timestamp(2013-05-20))",
       "expected1",
       "expected1[(s28)-[e18]->(s29)]"
     });
@@ -73,7 +73,7 @@ public class IsomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.asOf(MAX(e1.val_from, a.val_from))",
+      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.tx.asOf(MAX(e1.val_from, a.val_from))",
       "expected1",
       "expected1[(s26)<-[e16]-(s24)-[e15]->(s25)]"
     });

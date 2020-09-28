@@ -59,7 +59,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testFilterEdgesByProperties() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013").getSubCNF("a");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     Properties properties = Properties.create();
@@ -87,7 +87,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testFilterEdgesByLabel() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
+    CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()").getSubCNF("a");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     TemporalEdge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
@@ -110,7 +110,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
   @Test
   public void testFilterEdgesByTime() throws Exception {
     CNF predicates = predicateFromQuery(
-      "MATCH ()-[a]->() WHERE a.val_from.before(1970-01-01T00:00:01)");
+      "MATCH ()-[a]->() WHERE a.val_from.before(Timestamp(1970-01-01T00:00:01))").getSubCNF("a");
 
     TemporalEdgeFactory edgeFactory = new TemporalEdgeFactory();
     // e1 does not fulfill the predicate
@@ -134,7 +134,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testResultingEntryList() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"").getSubCNF("a");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -161,7 +161,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testProjectionOfAvailableValues() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"").getSubCNF("a");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
@@ -182,7 +182,7 @@ public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest 
 
   @Test
   public void testProjectionOfMissingValues() throws Exception {
-    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
+    CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"").getSubCNF("a");
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");

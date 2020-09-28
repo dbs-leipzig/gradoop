@@ -220,8 +220,7 @@ public class TemporalSubsumtionTest {
         new Comparison(selector1, LTE, lit2020b))
     );
     CNF expected = Util.cnfFromLists(
-      Collections.singletonList(new Comparison(selector1, LT, lit1970a)),
-      Collections.singletonList(new Comparison(selector1, NEQ, lit1970a))
+      Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
     assertEquals(subsumption.transformCNF(cnf), expected);
 
@@ -235,7 +234,6 @@ public class TemporalSubsumtionTest {
     );
     CNF expected2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a)),
-      Collections.singletonList(new Comparison(selector1, NEQ, lit1970a)),
       Arrays.asList(new Comparison(selector2, NEQ, lit2020a),
         new Comparison(selector2, LT, lit2020b))
     );

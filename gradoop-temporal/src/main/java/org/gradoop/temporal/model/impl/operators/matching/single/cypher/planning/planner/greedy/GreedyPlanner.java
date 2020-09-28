@@ -219,17 +219,22 @@ public class GreedyPlanner<
 
       boolean isPath = edge.getUpperBound() != 1;
 
-      DataSet<TemporalEdge> edges =
-        edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
-          graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
 
-      FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges,
-        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
+        DataSet<TemporalEdge> edges =
+          edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
+            graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
 
-      TemporalPlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
+        FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges,
+          sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
 
-      planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
-        new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+        PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
+
+        planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
+          new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+
+
+
+
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - Timestamp(2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "FromTo_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE e.val.fromTo(" +
-          "2013-06-01T00:35:00, 2013-06-01T00:40:00)"),
+          "Timestamp(2013-06-01T00:35:00), Timestamp(2013-06-01T00:40:00))"),
       "expected1,expected2,expected3",
       "expected1[(s7)-[e5]->(s2)]," +
         "expected2[(s8)-[e6]->(s9)], expected3[(s28)-[e18]->(s29)]"
@@ -48,9 +48,9 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "FromTo_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT e.val" +
-          ".fromTo(2013-06-01T00:04:00, 2013-06-01T00:08:00)"),
+          ".fromTo(Timestamp(2013-06-01T00:04:00), Timestamp(2013-06-01T00:08:00))"),
       "expected1,expected2,expected3",
       "expected1[(s3)-[e3]->(s4)], expected2[(s21)-[e19]->(s11)], " +
         "expected3[(s28)-[e18]->(s29)]"
@@ -62,7 +62,7 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "From_ISO_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b)<-[e2]-(a) WHERE a.id=486 AND " +
           "e1.val.fromTo(e2.val_from, e2.val_to)"),
       "expected1,expected2",
@@ -78,8 +78,8 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "From_ISO_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:34:00,2013-06-01T00:35:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(2013-06-01T00:34:00),Timestamp(2013-06-01T00:35:00))" +
           ".fromTo(e.val_from, e.val_to)"),
       "expected1,expected2,expected3,expected4",
       "expected1[(s7)-[e5]->(s2)]," +
@@ -93,9 +93,9 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "From_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.id=444 AND e.val.fromTo(" +
-          "2013-06-01T00:00:01,2013-06-01T00:00:08)"),
+          "Timestamp(2013-06-01T00:00:01),Timestamp(2013-06-01T00:00:08))"),
       "expected1",
       "expected1[(s0)-[e0]->(s1)]"
     });
@@ -106,9 +106,9 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "FromTo_ISO_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT e.val" +
-          ".fromTo(2013-06-01T00:04:00, 2013-06-01T00:08:00) " +
+          ".fromTo(Timestamp(2013-06-01T00:04:00), Timestamp(2013-06-01T00:08:00)) " +
           "AND e.val.fromTo(a.tx_from, a.tx_to)"),
       "expected1,expected2,expected3",
       "expected1[(s3)-[e3]->(s4)], expected2[(s21)-[e19]->(s11)], " +
@@ -121,10 +121,10 @@ public class IsomorphismFromToData implements TemporalTestData {
     data.add(new String[] {
       "FromTo_ISO_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE val.fromTo(" +
-          "MAX(2013-06-01T00:35:00, a.val_from, e.val_from), " +
-          "MIN(2013-06-01T00:40:00, 2020-01-01, b.val_to))"),
+          "MAX(Timestamp(2013-06-01T00:35:00), a.val_from, e.val_from), " +
+          "MIN(Timestamp(2013-06-01T00:40:00), Timestamp(2020-01-01), b.val_to))"),
       "expected1,expected2,expected3",
       "expected1[(s7)-[e5]->(s2)]," +
         "expected2[(s8)-[e6]->(s9)], expected3[(s28)-[e18]->(s29)]"

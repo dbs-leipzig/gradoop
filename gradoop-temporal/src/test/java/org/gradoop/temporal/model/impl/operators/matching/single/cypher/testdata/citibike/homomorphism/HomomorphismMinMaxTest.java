@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) " +
-          "WHERE e1.tx_from!=e2.tx_from AND MIN(a.tx_from, b.tx_from, c.tx_from)=2013-05-10"
+          "WHERE e1.tx_from!=e2.tx_from AND MIN(a.tx_from, b.tx_from, c.tx_from)=Timestamp(2013-05-10)"
       ),
       "expected1,expected2",
       "expected1[(s1)<-[e0]-(s0)-[e1]->(s1)],expected2[(s1)<-[e1]-(s0)-[e0]->(s1)]"
@@ -45,9 +45,9 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) " +
-          "WHERE e1.tx_from!=e2.tx_from AND MAX(a.tx_to, b.tx_to, c.tx_to)=2013-07-18"
+          "WHERE e1.tx_from!=e2.tx_from AND MAX(a.tx_to, b.tx_to, c.tx_to)=Timestamp(2013-07-18)"
       ),
       "expected1,expected2",
       "expected1[(s1)<-[e0]-(s0)-[e1]->(s1)],expected2[(s1)<-[e1]-(s0)-[e0]->(s1)]"
@@ -57,7 +57,7 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE val_from!=MAX(a.val_from,e.val_from) OR " +
           "val_to!=MIN(b.val_to,e.val_to)"
       ),
@@ -69,7 +69,7 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT a.tx.join(b.tx).equals(" +
           "Interval(MIN(a.tx_from, b.tx_from), MAX(a.tx_to, b.tx_to)))"
       ),
@@ -83,8 +83,8 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE MIN(a.tx_from, b.tx_from, e.tx_from)>=2013-05-26"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE MIN(a.tx_from, b.tx_from, e.tx_from)>=Timestamp(2013-05-26)"
       ),
       "expected1,expected2,expected3",
       "expected1[(s8)-[e6]->(s9)],expected2[(s27)-[e17]->(s27)],expected3[(s3)-[e3]->(s4)]"
@@ -96,7 +96,7 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
     data.add(new String[] {
       "MinMax_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE e1.val_from!=e2.val_from AND " +
           "e1.val_from = MIN(e1.val_from, e2.val_from, a.tx_to, b.tx_to, c.tx_to)"
       ),

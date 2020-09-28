@@ -88,10 +88,6 @@ public class TimeLiteralComparable extends TemporalComparable {
     return timeLiteral != null ? timeLiteral.hashCode() : 0;
   }
 
-  @Override
-  public boolean isGlobal() {
-    return false;
-  }
 
   @Override
   public TimePoint getWrappedComparable() {

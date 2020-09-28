@@ -106,12 +106,4 @@ public class TemporalQueryPlanEstimator {
     }
   }
 
-  /**
-   * Returns the Estimator used for creating the query plan
-   *
-   * @return estimator of the filter estimator
-   */
-  public CNFEstimation getCNFEstimation() {
-    return filterEstimator.getCnfEstimation();
-  }
 }

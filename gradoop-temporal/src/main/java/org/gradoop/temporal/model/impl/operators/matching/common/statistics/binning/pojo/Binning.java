@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implements equal frequency binning of long values.
+ * Implements equal frequency binning of Long values.
  */
 public class Binning implements Serializable {
 
@@ -71,10 +71,12 @@ public class Binning implements Serializable {
 
     values.sort((aLong, t1) -> Long.compare(aLong, t1));
 
+    // there can not be more bins than values
     if (values.size() < numberOfBins) {
       numberOfBins = values.size();
     }
 
+    // size of a bin is the number of elements contained
     int binSize = (int) Math.ceil((double) values.size() / (double) numberOfBins);
 
 

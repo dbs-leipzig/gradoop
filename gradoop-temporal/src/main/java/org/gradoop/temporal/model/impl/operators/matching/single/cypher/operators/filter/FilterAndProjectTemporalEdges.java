@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Filters a set of {@link TemporalEdge} objects based on a specified predicate. Additionally, the
- * operator projects all property values to the output {@link Embedding} that are specified in the
+ * operator projects all property and temporal values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  * <p>
  * {@code Edge -> Embedding(

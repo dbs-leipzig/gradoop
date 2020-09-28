@@ -46,7 +46,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Wraps a {@link ComparableExpression}
+ * Wraps a {@link ComparableExpression}, that may be temporal
  */
 public abstract class QueryComparableTPGM extends QueryComparable implements Serializable {
 

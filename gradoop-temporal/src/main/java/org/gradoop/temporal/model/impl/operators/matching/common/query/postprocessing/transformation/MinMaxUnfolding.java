@@ -36,14 +36,14 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
 
 /**
  * Reformulates certain expressions involving MIN and MAX elements, according to the following rules:
- * - a unary clause [MAX(a,b,c) < / <= x] is reformulated to
- * [a < / <= x] AND b [< / <= x] AND [c< / <= x]
- * - a n-ary disjunctive clause [comp_1,...,comp_i, MIN(a,b,c) < / <= x, comp_(i+1),...,comp_n]
+ * - a singleton clause [MAX(a,b,c) < / <= x] is reformulated to
+ * [a < / <= x] AND [b < / <= x] AND [c < / <= x]
+ * - a n-ary disjunctive clause [comp_1,...,comp_(i-1), MIN(a,b,c) < / <= x, comp_(i+1),...,comp_n]
  * is reformulated to
- * [comp_1,...,comp_i, a < / <= x, b < / <= x, c < / <= x, comp_(i+1),...,comp_n]
- * - a n-ary disjunctive clause [comp_1,...,comp_i, x < / <= MAX(a,b,c), comp_(i+1),...,comp_n]
+ * [comp_1,...,comp_(i-1), a < / <= x, b < / <= x, c < / <= x, comp_(i+1),...,comp_n]
+ * - a n-ary disjunctive clause [comp_1,...,comp_(i-1), x < / <= MAX(a,b,c), comp_(i+1),...,comp_n]
  * is reformulated to
- * [comp_1,...,comp_i, x < / <= a, x </<= b, x < / <= c, comp_(i+1),...,comp_n]
+ * [comp_1,...,comp_(i-1), x < / <= a, x </<= b, x < / <= c, comp_(i+1),...,comp_n]
  * - a unary clause [x < / <= MIN(a,b,c)] is reformulated to
  * [x < / <= a] AND [x < / <= b] AND [x < / <= c]
  *
@@ -56,6 +56,7 @@ public class MinMaxUnfolding implements QueryTransformation {
     if (cnf.getPredicates().size() == 0) {
       return cnf;
     } else {
+      // apply transformations exhaustively
       CNF oldCNF = cnf;
       CNF newCNF = cnf.getPredicates().stream()
         .map(this::unfoldNext)
@@ -77,9 +78,11 @@ public class MinMaxUnfolding implements QueryTransformation {
    * @return transformed clause
    */
   private CNF unfoldNext(CNFElement clause) {
+    // determine whether clause is singleton or not and and trigger the corresponding rule applications
     if (clause.getPredicates().size() > 1) {
       return new CNF(
         clause.getPredicates().stream()
+          // no conjunctions within a disjunctive clause
           .map(comp -> unfoldNext(comp, false))
           .reduce(CNF::or)
           .get()
@@ -90,17 +93,20 @@ public class MinMaxUnfolding implements QueryTransformation {
   }
 
   /**
-   * Applies the rules to a single comparison (not necessarily exhaustive)
+   * Applies the rules to a single comparison (not necessarily exhaustive), depending
+   * on whether the comparison is part of a singleton clause or a n-ary one (n>1).
    *
    * @param comp              comparison to apply the rules to
-   * @param allowConjunctions true iff the result is allowed to be a n-ary CNF (n > 1)
-   * @return transformed comparison
+   * @param allowConjunctions true iff the result is allowed to be a n-ary conjunction (n > 1)
+   * @return transformed comparison as a CNF
    */
   private CNF unfoldNext(ComparisonExpression comp, boolean allowConjunctions) {
+    // unwrap comparison
     ComparableExpression lhs = comp.getLhs().getWrappedComparable();
     Comparator comparator = comp.getComparator();
     ComparableExpression rhs = comp.getRhs().getWrappedComparable();
 
+    // apply rules to comparison
     if (lhs instanceof MinTimePoint) {
       if (comparator == Comparator.LT || comparator == LTE) {
         return exists(((MinTimePoint) lhs).getArgs(), comparator, rhs);
@@ -167,8 +173,8 @@ public class MinMaxUnfolding implements QueryTransformation {
 
   /**
    * Realizes a "forall" predicate as CNF.
-   * E.g., {@code forAll(x, <= (a,b,c)} would yield
-   * x <= a AND x <= b AND x <= c
+   * E.g., {@code forAll((a,b,c), <= x)} would yield
+   * a <= x AND b <= x AND c <= x
    *
    * @param args       left hand side, domain of the "forall"
    * @param comparator comparator
@@ -188,8 +194,8 @@ public class MinMaxUnfolding implements QueryTransformation {
 
   /**
    * Realizes a "forall" predicate as CNF.
-   * E.g., {@code forAll((a,b,c), <= x)} would yield
-   * a <= x AND b <= x AND c <= x
+   * E.g., {@code forAll(x, <=, (a,b,c))} would yield
+   * x <= a AND x <= b AND x <= c
    *
    * @param lhs        left hand side
    * @param comparator comparator

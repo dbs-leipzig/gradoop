@@ -72,7 +72,7 @@ public class Util {
     testCase[1] = CBCypherTemporalPatternMatchingTest.defaultData;
 
     String query = "MATCH " + pattern + " WHERE " + where;
-    testCase[2] = CBCypherTemporalPatternMatchingTest.noDefaultAsOf(query);
+    testCase[2] = CBCypherTemporalPatternMatchingTest.prepareQueryString(query);
 
     String[] res = results.split(",");
     if (res[0].equals("---")) {
@@ -94,18 +94,4 @@ public class Util {
     return testCase;
   }
 
-  @Test
-  public void test() {
-    ArrayList<String[]> data = getDataFromFile(
-      "src/test/resources/data/patternmatchingtest/complex/complex_queries_homomorphism");
-    System.out.println(data.size());
-    for (int i = 0; i < data.size(); i++) {
-      System.out.println(data.get(i)[0]);
-      System.out.println(data.get(i)[1]);
-      System.out.println(data.get(i)[2]);
-      System.out.println(data.get(i)[3]);
-      System.out.println(data.get(i)[4]);
-      System.out.println();
-    }
-  }
 }

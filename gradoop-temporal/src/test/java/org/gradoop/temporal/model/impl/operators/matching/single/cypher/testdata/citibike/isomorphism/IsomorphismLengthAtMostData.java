@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01T00:00:00, 1970-01-01T00:30:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(1970-01-01T00:00:00), Timestamp(1970-01-01T00:30:00))" +
           ".lengthAtMost(val)"
       ),
       "expected1,expected2,expected3,expected4",
@@ -49,8 +49,8 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(2013-05-10, 2013-07-24)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(2013-05-10), Timestamp(2013-07-24))" +
           ".lengthAtMost(a.val.join(b.val))"
       ),
       "expected1,expected2,expected3,expected4",
@@ -62,8 +62,8 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01, 1970-01-01T01:00:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(1970-01-01), Timestamp(1970-01-01T01:00:00))" +
           ".lengthAtMost(e.tx)"
       ),
       "",
@@ -74,7 +74,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
           "val.lengthAtMost(Minutes(5))"
       ),
@@ -89,9 +89,9 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
-          "Interval(1970-01-01, 1970-01-01T00:30:00).lengthAtMost(val)"
+          "Interval(Timestamp(1970-01-01), Timestamp(1970-01-01T00:30:00)).lengthAtMost(val)"
       ),
       "expected1,expected2,expected3,expected4",
       "expected1[(s8)-[e6]->(s9)], expected2[(s12)-[e8]->(s13)], " +
@@ -102,7 +102,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT val.lengthAtMost(b.tx)"
       ),
       "",
@@ -115,7 +115,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) (b) WHERE a.vertexId=18 AND a.val.lengthAtMost(b.val)"
       ),
       "expected1,expected2",
@@ -126,7 +126,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_8_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE NOT e2.tx.lengthAtMost(e1.tx)"
       ),
       "expected1",
@@ -137,7 +137,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_9_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT a.val.merge(b.val).lengthAtMost(Days(65))"
       ),
       "expected1",
@@ -148,7 +148,7 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtMost_ISO_10_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
           "Interval(MAX(a.tx_from, e.tx_from), " +
           "MIN(e.val_to, b.tx_to))" +

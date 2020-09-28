@@ -24,7 +24,7 @@ import org.s1ck.gdl.utils.Comparator;
 import java.util.Optional;
 
 /**
- * Creates dummy graph statistics where every relevant value is set to 1
+ * A dummy graph statistics where every relevant value is set to 1
  */
 public class DummyTemporalGraphStatistics extends TemporalGraphStatistics {
   @Override
@@ -111,8 +111,4 @@ public class DummyTemporalGraphStatistics extends TemporalGraphStatistics {
     return 1;
   }
 
-  @Override
-  public double estimateLabelProb(ElementType type, String label) {
-    return 1;
-  }
 }

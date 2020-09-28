@@ -45,7 +45,7 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
 
   @Test
   public void testVertex() throws Exception {
-    String query = "MATCH (n) WHERE n.tx_to.after(2013-07-20)";
+    String query = "MATCH (n) WHERE n.tx_to.after(Timestamp(2013-07-20))";
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
       new CNFPostProcessing(new ArrayList<>()));
     est = new CNFEstimation(stats, queryHandler);
@@ -75,7 +75,8 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(0L));
-    assertEquals(elementEstimator.getSelectivity(), 0.001, 0.001);
+    // selectivity for any label is 1.
+    assertEquals(elementEstimator.getSelectivity(), 1., 0.001);
   }
 
   @Test
@@ -114,6 +115,7 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     elementEstimator.visit(node);
 
     assertThat(elementEstimator.getCardinality(), is(0L));
-    assertEquals(elementEstimator.getSelectivity(), 0.0001, 0.0001);
+    // selectivity for any label is 1
+    assertEquals(elementEstimator.getSelectivity(), 1., 0.0001);
   }
 }

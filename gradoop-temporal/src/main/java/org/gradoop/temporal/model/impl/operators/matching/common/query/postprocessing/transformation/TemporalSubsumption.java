@@ -24,6 +24,8 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
 import static org.s1ck.gdl.utils.Comparator.EQ;
+import static org.s1ck.gdl.utils.Comparator.GT;
+import static org.s1ck.gdl.utils.Comparator.GTE;
 import static org.s1ck.gdl.utils.Comparator.LT;
 import static org.s1ck.gdl.utils.Comparator.LTE;
 import static org.s1ck.gdl.utils.Comparator.NEQ;
@@ -37,24 +39,29 @@ import static org.s1ck.gdl.utils.Comparator.NEQ;
 public class TemporalSubsumption extends Subsumption {
   @Override
   public boolean subsumes(ComparisonExpression c1, ComparisonExpression c2) {
+    // check if comparisons are both of the desired form and could thus be - potentially - subsumed
     if (!structureMatches(c1, c2)) {
       return false;
     }
+    // ensure that selectors in both comparisons are always on the left hand side
     boolean selectorIsLeft = c1.getLhs() instanceof TimeSelectorComparable;
     if (!selectorIsLeft) {
       c1 = c1.switchSides();
       c2 = c2.switchSides();
     }
+    // check if both comparisons' variables are equal (otherwise, no subsumption is possible)
     String var1 = ((TimeSelectorComparable)(c1.getLhs())).getWrappedComparable().getVariable();
     String var2 = ((TimeSelectorComparable)(c2.getLhs())).getWrappedComparable().getVariable();
     if (!var1.equals(var2)) {
       return false;
     }
+    // check if both comparisons' time properties (tx_from, tx_to,...) are equal (otherwise, no subsumption is possible)
     TimeSelector.TimeField field1 = ((TimeSelector) ((TimeSelectorComparable) (c1.getLhs())).getWrappedComparable()).getTimeProp();
     TimeSelector.TimeField field2 = ((TimeSelector) ((TimeSelectorComparable) (c2.getLhs())).getWrappedComparable()).getTimeProp();
     if (!field1.equals(field2)) {
       return false;
     }
+    // unwrap the rest of the comparisons and check whether c1 implies c2
     Comparator comparator1 = c1.getComparator();
     Comparator comparator2 = c2.getComparator();
     Long literal1 = ((TimeLiteral) ((TimeLiteralComparable)c1.getRhs()).getWrappedComparable()).getMilliseconds();
@@ -82,6 +89,10 @@ public class TemporalSubsumption extends Subsumption {
         return literal1 <= literal2;
       } else if (comparator2 == LT) {
         return literal1 < literal2;
+      } else if(comparator2 == GTE){
+        return literal1 >= literal2;
+      } else if(comparator2 == GT){
+        return literal1 > literal2;
       }
     } else if (comparator1 == NEQ) {
       return false;
@@ -89,21 +100,49 @@ public class TemporalSubsumption extends Subsumption {
       if (comparator2 == Comparator.EQ) {
         return false;
       } else if (comparator2 == Comparator.NEQ) {
-        return literal1 <= literal2;
+        return literal1 < literal2;
       } else if (comparator2 == LTE) {
         return literal1 <= literal2;
       } else if (comparator2 == LT) {
         return literal1 < literal2;
+      } else if (comparator2 == GTE || comparator2 == GT){
+        return false;
       }
     } else if (comparator1 == LT) {
       if (comparator2 == EQ) {
         return false;
       } else if (comparator2 == NEQ) {
-        return literal1 < literal2;
-      } else if (comparator2 == LTE) {
         return literal1 <= literal2;
+      } else if (comparator2 == LTE) {
+        return literal1-1 <= literal2;
       } else if (comparator2 == LT) {
-        return literal1 < literal2;
+        return literal1 <= literal2;
+      } else if (comparator2 == GTE || comparator2 == GT){
+        return false;
+      }
+    } else if(comparator1 == GTE){
+      if (comparator2 == EQ) {
+        return false;
+      } else if (comparator2 == NEQ) {
+        return literal1 > literal2;
+      } else if (comparator2 == LTE || comparator2==LT) {
+        return false;
+      }  else if(comparator2 == GTE){
+        return literal1 >= literal2;
+      } else if(comparator2 == GT){
+        return literal1 > literal2;
+      }
+    } else if(comparator1 == GT){
+      if (comparator2 == EQ) {
+        return false;
+      } else if (comparator2 == NEQ) {
+        return literal1 >= literal2;
+      } else if (comparator2 == LTE || comparator2==LT) {
+        return false;
+      }  else if(comparator2 == GTE){
+        return literal1 +1 >= literal2;
+      } else if(comparator2 == GT){
+        return literal1 >= literal2;
       }
     }
     return false;

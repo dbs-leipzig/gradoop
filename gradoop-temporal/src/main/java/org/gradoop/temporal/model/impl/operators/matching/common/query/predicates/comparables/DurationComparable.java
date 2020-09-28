@@ -46,9 +46,8 @@ public class DurationComparable extends TemporalComparable {
    */
   private final TemporalComparable to;
   /**
-   * Long describing the current system time
+   * Long describing the system time of the query
    */
-  // TODO set it from the outside
   private final Long now;
 
   /**
@@ -57,10 +56,20 @@ public class DurationComparable extends TemporalComparable {
    * @param duration the Duration to be wrapped
    */
   public DurationComparable(Duration duration) {
+    this(duration, new TimeLiteral("now"));
+  }
+
+  /**
+   * Creates a new wrapper
+   *
+   * @param duration the duration to be wrapped
+   * @param now system time of the query
+   */
+  public DurationComparable(Duration duration, TimeLiteral now){
     this.duration = duration;
     this.from = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getFrom());
     this.to = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getTo());
-    this.now = new TimeLiteral("now").getMilliseconds();
+    this.now = now.getMilliseconds();
   }
 
   public Duration getDuration() {
@@ -103,10 +112,6 @@ public class DurationComparable extends TemporalComparable {
     return keys;
   }
 
-  @Override
-  public boolean isGlobal() {
-    return from.isGlobal() || to.isGlobal();
-  }
 
   @Override
   public TimePoint getWrappedComparable() {

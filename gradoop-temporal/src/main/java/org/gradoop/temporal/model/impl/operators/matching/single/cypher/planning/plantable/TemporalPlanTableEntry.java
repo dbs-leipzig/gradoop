@@ -89,4 +89,5 @@ public class TemporalPlanTableEntry extends PlanTableEntry {
     return estimator.getQueryPlan();
   }
 
+
 }

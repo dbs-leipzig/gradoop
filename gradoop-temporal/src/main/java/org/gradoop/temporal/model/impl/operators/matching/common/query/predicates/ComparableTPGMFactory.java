@@ -24,7 +24,31 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.io.Serializable;
 
+/**
+ * Factory for temporal comparables
+ */
 public class ComparableTPGMFactory extends QueryComparableFactory {
+
+  /**
+   * Holds the system time stamp when the query was issued
+   */
+  TimeLiteral now;
+
+  /**
+   * Create a new instance
+   * @param now system time of the query
+   */
+  public ComparableTPGMFactory(TimeLiteral now){
+    this.now = now;
+  }
+
+  /**
+   * Create a new instance
+   */
+  public ComparableTPGMFactory(){
+    this(new TimeLiteral("now"));
+  }
+
   @Override
   public QueryComparable createFrom(ComparableExpression expression) {
     if (expression.getClass() == Literal.class) {
@@ -44,7 +68,7 @@ public class ComparableTPGMFactory extends QueryComparableFactory {
     } else if (expression.getClass() == TimeConstant.class) {
       return new TimeConstantComparable((TimeConstant) expression);
     } else if (expression.getClass() == Duration.class) {
-      return new DurationComparable((Duration) expression);
+      return new DurationComparable((Duration) expression, now);
     } else {
       throw new IllegalArgumentException(
         expression.getClass() + " is not a temporal GDL ComparableExpression"

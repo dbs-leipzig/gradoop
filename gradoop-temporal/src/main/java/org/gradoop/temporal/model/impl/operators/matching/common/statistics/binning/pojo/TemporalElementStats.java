@@ -18,11 +18,11 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics.bin
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
+import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,19 +42,15 @@ public class TemporalElementStats implements Serializable {
    */
   public static final int DEFAULT_NUM_BINS = 100;
   /**
-   * Holds mean and variance of (tx_from - val_from)
-   */
-  private final double[] txFromValFromStats;
-  /**
    * Samples vertices
    */
   private final ReservoirSampler<TemporalElement> sampler;
   /**
-   * The label of the vertices
+   * The label of the vertices/edges
    */
   private String label;
   /**
-   * Frequency distribution for element labels
+   * number of elements in the sample
    */
   private long elementCount;
   /**
@@ -70,18 +66,21 @@ public class TemporalElementStats implements Serializable {
    */
   private double[] valDurationStats;
   /**
-   * Holds mean and variance of (tx_to - val_to). 3rd element is probability that
-   * both tx and val are not as of now
+   * Holds mean, variance and prob. that val_from=Long.MIN_VALUE
    */
-  private double[] txToValToStats;
+  private double[] valFromStats;
   /**
-   * estimation of the probability that tx.asOf(now) holds for a element
+   * Holds mean, variance and prob. that tx_from=Long.MIN_VALUE
    */
-  private double txAsOfNowEstimation;
+  private double[] txFromStats;
   /**
-   * estimation of the probability that valid.asOf(now) holds for a element
+   * Holds mean, variance and prob. that val_to=Long.MAX_VALUE
    */
-  private double validAsOfNowEstimation;
+  private double[] valToStats;
+  /**
+   * Holds mean, variance and prob. that tx_to=Long.MAX_VALUE
+   */
+  private double[] txToStats;
   /**
    * list of numerical properties
    */
@@ -145,17 +144,17 @@ public class TemporalElementStats implements Serializable {
     label = "";
     elementCount = 0;
     estimatedTimeBins = new Binning[] {};
-    txAsOfNowEstimation = 0.;
-    validAsOfNowEstimation = 0.;
     categoricalSelectivityEstimation = new HashMap<>();
     numericalPropertyStatsEstimation = new HashMap<>();
     numericalOccurrenceEstimation = new HashMap<>();
     recomputeTemporalDataFlag = false;
     recomputePropertyDataFlag = false;
+    valFromStats = new double[]{};
+    txFromStats = new double[]{};
+    valToStats = new double[]{};
+    txToStats = new double[]{};
     txDurationStats = new double[] {};
     valDurationStats = new double[] {};
-    txFromValFromStats = new double[] {};
-    txToValToStats = new double[] {};
     sampler = new ReservoirSampler<TemporalElement>(reservoirSampleSize);
   }
 
@@ -190,6 +189,7 @@ public class TemporalElementStats implements Serializable {
     elementCount++;
 
     boolean changed = sampler.updateSample(element);
+    // set recompute flags, if the element was actually added
     recomputeTemporalDataFlag = recomputeTemporalDataFlag || changed;
     recomputePropertyDataFlag = recomputePropertyDataFlag || changed;
     return changed;
@@ -208,32 +208,6 @@ public class TemporalElementStats implements Serializable {
       computeTemporalEstimations();
     }
     return estimatedTimeBins.clone();
-  }
-
-  /**
-   * Returns the estimation of the probability that tx.asOf(now) holds for a element,
-   * computed from the current reservoir sample
-   *
-   * @return estimation of the probability that tx.asOf(now) holds for a element
-   */
-  public double getTxAsOfNowEstimation() {
-    if (recomputeTemporalDataFlag) {
-      computeTemporalEstimations();
-    }
-    return txAsOfNowEstimation;
-  }
-
-  /**
-   * Returns the estimation of the probability that valid.asOf(now) holds for a element,
-   * computed from the current reservoir sample
-   *
-   * @return estimation of the probability that valid.asOf(now) holds for a element
-   */
-  public double getValidAsOfNowEstimation() {
-    if (recomputeTemporalDataFlag) {
-      computeTemporalEstimations();
-    }
-    return validAsOfNowEstimation;
   }
 
   /**
@@ -258,85 +232,107 @@ public class TemporalElementStats implements Serializable {
       ));
     }
 
+    // lists collecting all values for each time property, i.e. Long.MIN_VALUE/MAX_VALUE, too
+    ArrayList<Long> allTxFroms = new ArrayList<Long>();
+    ArrayList<Long> allTxTos = new ArrayList<Long>();
+    ArrayList<Long> allValFroms = new ArrayList<Long>();
+    ArrayList<Long> allValTos = new ArrayList<Long>();
+
+    // lists collecting only those values for each time property unequal to Long.MIN_VALUE/MAX_VALUE, too
     ArrayList<Long> txFroms = new ArrayList<Long>();
     ArrayList<Long> txTos = new ArrayList<Long>();
-    List<Long> txDurations = new ArrayList<Long>();
     ArrayList<Long> valFroms = new ArrayList<Long>();
     ArrayList<Long> valTos = new ArrayList<Long>();
+
     List<Long> valDurations = new ArrayList<Long>();
+    List<Long> txDurations = new ArrayList<Long>();
+/*    // holds differences between tx and val to values, if they both aren't as of now
+    ArrayList<Long> txToValTos = new ArrayList<>();*/
 
-    // holds differences between tx and val to values, if they both aren't as of now
-    ArrayList<Long> txToValTos = new ArrayList<>();
-
-    int txAsOfNowCount = 0;
-    int valAsOfNowCount = 0;
-    int bothAsOfNowCount = 0;
+    // count, how often to values are Long.MAX_VALUE
+    int txToMaxCount = 0;
+    int valToMaxCount = 0;
+    // count, how often from values are Long.MIN_VALUE
+    int txFromMinCount = 0;
+    int valFromMinCount = 0;
 
     for (TemporalElement element : reservoirSample) {
-
+      // collect all relevant temporal properties from the reservoir
       long txFrom = element.getTxFrom();
       long txTo = element.getTxTo();
-      txFroms.add(txFrom);
-      txTos.add(txTo);
+      allTxFroms.add(txFrom);
+      allTxTos.add(txTo);
+      if(txFrom > Long.MIN_VALUE){
+        txFroms.add(txFrom);
+      } else{
+        txFromMinCount++;
+      }
       if (txTo == Long.MAX_VALUE) {
-        txAsOfNowCount += 1;
+        txToMaxCount += 1;
         txDurations.add(now - txFrom);
       } else {
+        txTos.add(txTo);
         txDurations.add(txTo - txFrom);
       }
 
       long valFrom = element.getValidFrom();
       long valTo = element.getValidTo();
-      valFroms.add(valFrom);
-      valTos.add(valTo);
+      allValFroms.add(valFrom);
+      allValTos.add(valTo);
+      if(valFrom > Long.MIN_VALUE){
+        valFroms.add(valFrom);
+      } else{
+        valFromMinCount++;
+      }
       if (valTo == Long.MAX_VALUE) {
-        valAsOfNowCount += 1;
+        valToMaxCount += 1;
         valDurations.add(now - valFrom);
       } else {
+        valTos.add(valTo);
         valDurations.add(valTo - valFrom);
       }
 
-      if (valTo == Long.MAX_VALUE && txTo == Long.MAX_VALUE) {
-        bothAsOfNowCount += 1;
-      }
-      if (valTo != Long.MAX_VALUE && txTo != Long.MAX_VALUE) {
-        txToValTos.add(txTo - valTo);
-      }
     }
 
+    // statistics for temporal properties (without binning)
+    double txFromMean = mean(txFroms);
+    double txFromVariance = variance(txFroms, txFromMean);
+    double txFromMinEstimation = (double) txFromMinCount / (double) sampleSize;
+    txFromStats = new double[]{txFromMean, txFromVariance, txFromMinEstimation};
 
-    txAsOfNowEstimation = (double) txAsOfNowCount / (double) sampleSize;
-    validAsOfNowEstimation = (double) valAsOfNowCount / (double) sampleSize;
+    double valFromMean = mean(valFroms);
+    double valFromVariance = variance(valFroms, valFromMean);
+    double valFromMinEstimation = (double) valFromMinCount / (double) sampleSize;
+    valFromStats = new double[]{valFromMean, valFromVariance, valFromMinEstimation};
 
+    double txToMean = mean(txTos);
+    double txToVariance = variance(txTos, txToMean);
+    double txToMaxEstimation = (double) txToMaxCount / (double) sampleSize;
+    txToStats = new double[]{txToMean, txToVariance, txToMaxEstimation};
+
+    double valToMean = mean(valTos);
+    double valToVariance = variance(valTos, valToMean);
+    double valToMaxEstimation = (double) valToMaxCount / (double) sampleSize;
+    valToStats = new double[]{valToMean, valToVariance, valToMaxEstimation};
+
+    // create binnings for the temporal properties
     estimatedTimeBins = new Binning[] {
-      new Binning(txFroms, numBins),
-      new Binning(txTos, numBins),
-      new Binning(valFroms, numBins),
-      new Binning(valTos, numBins)
+      new Binning(allTxFroms, numBins),
+      new Binning(allTxTos, numBins),
+      new Binning(allValFroms, numBins),
+      new Binning(allValTos, numBins)
     };
 
 
+    // determine means and variances of the durations
     double txDurationMean = mean(txDurations);
     double txDurationVar = variance(txDurations, txDurationMean);
     txDurationStats = new double[] {txDurationMean, txDurationVar};
-
-    // drop some durations if necessary
-        /*txDurations = txDurations.subList(0,
-                txDurations.size()- txDurations.size()%10);*/
 
     double valDurationMean = mean(valDurations);
     double valDurationVar = variance(valDurations, valDurationMean);
     valDurationStats = new double[] {valDurationMean, valDurationVar};
 
-        /*txDurationBins = new Binning(txDurations, txDurations.size()/10);
-        valDurations = valDurations.subList(0,
-                valDurations.size()- valDurations.size()%10);
-        validDurationBins = new Binning(valDurations, valDurations.size()/10);*/
-
-    double txToValToMean = mean(txToValTos);
-    double txToValToVar = variance(txToValTos, txToValToMean);
-    double txToValToRatio = (double) txToValTos.size() / sampleSize;
-    txToValToStats = new double[] {txToValToMean, txToValToVar, txToValToRatio};
 
     recomputeTemporalDataFlag = false;
   }
@@ -370,17 +366,6 @@ public class TemporalElementStats implements Serializable {
     return var;
   }
 
-  /**
-   * Return the statistics for relation between tx-to and val-to stamps.
-   * Recomputes all temporal estimations if necessary.
-   * @return statistics for valid time durations in the form {mean, variance}
-   */
-  public double[] getTxToValToStats() {
-    if (recomputeTemporalDataFlag) {
-      computeTemporalEstimations();
-    }
-    return txToValToStats.clone();
-  }
 
   /**
    * Initializes or updates all property related estimations (dependent on the current reservoir
@@ -400,7 +385,6 @@ public class TemporalElementStats implements Serializable {
     // these maps collect all property values in the sample
     HashMap<String, List<PropertyValue>> categoricalData = new HashMap<>();
     HashMap<String, List<PropertyValue>> numericalData = new HashMap<>();
-    System.out.println("Numerical keys: "+numericalProperties);
 
     // add element data to the corresponding map
     for (TemporalElement element : reservoirSample) {
@@ -422,10 +406,7 @@ public class TemporalElementStats implements Serializable {
         HashMap<String, List<PropertyValue>> data =
             numericalData.containsKey(key) ? numericalData :
               isNumerical(value) ? numericalData : categoricalData;*/
-
-        if (!data.containsKey(key)) {
-          data.put(key, new ArrayList<>());
-        }
+        data.putIfAbsent(key, new ArrayList<>());
         data.get(key).add(value);
       }
     }
@@ -452,11 +433,9 @@ public class TemporalElementStats implements Serializable {
       for (String key : element.getPropertyKeys()) {
         PropertyValue value = element.getPropertyValue(key);
         if (isNumerical(value)){
-          int count = numerical.getOrDefault(key, 0) +1;
-          numerical.put(key, count);
+          numerical.put(key, numerical.getOrDefault(key, 0)+1);
         } else {
-          int count = categorical.getOrDefault(key, 0) +1;
-          categorical.put(key, count);
+          categorical.put(key, categorical.getOrDefault(key, 0)+1);
         }
       }
     }
@@ -535,6 +514,7 @@ public class TemporalElementStats implements Serializable {
 
   /**
    * Initializes or updates the estimations for numerical properties
+   * All of them are considered to be normally distributed
    *
    * @param data       map from numerical property names to a list of their respective
    *                   values in the sample
@@ -547,14 +527,17 @@ public class TemporalElementStats implements Serializable {
     for (Map.Entry<String, List<PropertyValue>> entry : data.entrySet()) {
       List<PropertyValue> values = data.get(entry.getKey());
 
+      // estimate how often the property occurs
       numericalOccurrenceEstimation.put(entry.getKey(),
         (double) values.size() / sampleSize);
 
+      // cast all values to doubles
       Class cls = values.get(0).getType();
       List<Double> doubleValues = values.stream()
         .map(val -> propertyValueToDouble(val, cls))
         .collect(Collectors.toList());
 
+      // compute mean and variance for the property
       Double sum = doubleValues.stream().reduce(0., Double::sum);
       Double mean = sum / values.size();
       Double variance = doubleValues.stream().reduce(0.,
@@ -667,42 +650,25 @@ public class TemporalElementStats implements Serializable {
     return sampler.hashCode();
   }
 
-  @Override
-  public String toString(){
-    StringBuilder sb = new StringBuilder();
-    sb.append("----------------------------------------------------\n");
-    sb.append("Label: "+label+", sample size: "+ sampler.getSampleSize()+"\n");
-    sb.append("------------------------\n");
-    sb.append(".....Temporal Bins......: \n");
-    sb.append("TX-FROM: "+ Arrays.toString(getEstimatedTimeBins()[0].getBins())+"\n");
-    sb.append("TX-TO: "+Arrays.toString(getEstimatedTimeBins()[1].getBins())+"\n");
-    sb.append("VAL-FROM: "+Arrays.toString(getEstimatedTimeBins()[2].getBins())+"\n");
-    sb.append("VAL-TO: "+Arrays.toString(getEstimatedTimeBins()[3].getBins())+"\n");
-    sb.append("------------------------\n");
-    sb.append(".....Duration Statistics.....\n");
-    sb.append("TX: mean="+getTxDurationStats()[0]+", " +
-      "variance="+getTxDurationStats()[1]+"\n");
-    sb.append("VAL: mean="+getValDurationStats()[0]+", variance="
-      +getValDurationStats()[1]+"\n");
-    sb.append("------------------------\n");
-    sb.append(".....Categorical Properties.....\n");
-    for(String key: getCategoricalSelectivityEstimation().keySet()){
-      sb.append(key +": \n");
-      for(PropertyValue v: getCategoricalSelectivityEstimation().get(key).keySet()){
-        sb.append("   "+v.toString()+": "+
-          getCategoricalSelectivityEstimation().get(key).get(v)+"\n");
 
-      }
+  /**
+   * Returns the (not binning-based) statistics for temporal properties.
+   * They are arrays of the form {mean, variance, prob. that from=Long.MIN_VALUE / to=Long.MAX_VALUE}
+   * @param property temporal property
+   * @return statistics array for the property
+   */
+  public double[] getTemporalPropertyStats(TimeSelector.TimeField property) {
+    if (recomputeTemporalDataFlag) {
+      computeTemporalEstimations();
     }
-    sb.append("------------------------\n");
-    sb.append(".....Numerical Properties.....\n");
-    for(String key: getNumericalOccurrenceEstimation().keySet()){
-      sb.append(key+": \n");
-      sb.append("occurence: "+getNumericalOccurrenceEstimation().get(key)+
-        ", mean: "+getNumericalPropertyStatsEstimation().get(key)[0] +
-        ", variance: "+getNumericalPropertyStatsEstimation().get(key)[0]+"\n");
+    if(property== TimeSelector.TimeField.TX_FROM){
+      return txFromStats;
+    } else if(property == TimeSelector.TimeField.TX_TO){
+      return txToStats;
+    } else if(property == TimeSelector.TimeField.VAL_FROM){
+      return valFromStats;
+    } else{
+      return valToStats;
     }
-    sb.append("----------------------------------------------------\n");
-    return new String(sb);
   }
 }

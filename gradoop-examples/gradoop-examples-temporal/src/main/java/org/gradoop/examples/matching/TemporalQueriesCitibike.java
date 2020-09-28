@@ -3,7 +3,7 @@ package org.gradoop.examples.matching;
 /**
  * Provides temporal queries for citibike
  */
-public class TemporalQueries {
+public class TemporalQueriesCitibike {
 
   static String defaultLower = "2017-08-01";
 

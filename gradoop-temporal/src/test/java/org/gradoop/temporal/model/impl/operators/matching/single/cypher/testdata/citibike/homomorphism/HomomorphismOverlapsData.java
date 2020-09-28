@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2024 - Timestamp(2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE e1.edgeId=8 " +
           "AND NOT e1.val.overlaps(e2.val)"),
       "expected1",
@@ -50,7 +50,7 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (a)-[e2]->(b) WHERE a.id=486 AND " +
           "e1.val.overlaps(e2.val)"),
       "expected1,expected2,expected3,expected4",
@@ -65,7 +65,7 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(b) WHERE b.id=406 " +
           "AND e1.val_from.before(e2.val_from) " +
           "AND e2.val.overlaps(e1.val)"),
@@ -81,11 +81,11 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
-          "e.val.overlaps(Interval(2013-06-01T00:00:00, 2013-06-01T00:01:00)) OR " +
-          "e.val.overlaps(Interval(2013-06-01T00:36:00, " +
-          "2013-06-01T00:37:00))"),
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:01:00))) OR " +
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:36:00), " +
+          "Timestamp(2013-06-01T00:37:00)))"),
       "expected1,expected2,expected3,expected4,expected5",
       "expected1[(s2)-[e2]->(s2)], expected2[(s8)-[e6]->(s9)], expected3[(s0)-[e0]->(s1)]," +
         "expected4[(s0)-[e1]->(s1)], expected5[(s28)-[e18]->(s29)]"
@@ -99,9 +99,9 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a) WHERE a.val.overlaps(Interval(2013-04-30, 2013-05-11T00:00:01)) " +
-          " OR a.val.overlaps(Interval(2013-07-28T00:59:59, 2013-08-01))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a) WHERE a.val.overlaps(Interval(Timestamp(2013-04-30), Timestamp(2013-05-11T00:00:01))) " +
+          " OR a.val.overlaps(Interval(Timestamp(2013-07-28T00:59:59), Timestamp(2013-08-01)))"
       ),
       "expected1,expected2,expected3,expected4",
       "expected1[(s0)], expected2[(s25)], expected3[(s5)], expected4[(s20)]"
@@ -113,11 +113,11 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
-          "(e.val.overlaps(Interval(2013-06-01T00:00:00, 2013-06-01T00:01:00)) OR " +
-          "e.val.overlaps(Interval(2013-06-01T00:36:00, 2013-06-01T00:37:00)))" +
-          " AND a.val.overlaps(Interval(2013-05-09T23:50,2013-05-10T00:10:00))"),
+          "(e.val.overlaps(Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:01:00))) OR " +
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:36:00), Timestamp(2013-06-01T00:37:00))))" +
+          " AND a.val.overlaps(Interval(Timestamp(2013-05-09T23:50),Timestamp(2013-05-10T00:10:00)))"),
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
     });
@@ -126,7 +126,7 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT(a.val.overlaps(e.val) AND " +
           "a.val.overlaps(b.val) AND b.val.overlaps(e.val))"
       ),
@@ -138,9 +138,9 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_8_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) (b) WHERE a.Id=309 AND (b.id=300 OR b.id=347) " +
-          "AND val.overlaps(Interval(2013-05-20, 2013-05-21))"
+          "AND val.overlaps(Interval(Timestamp(2013-05-20), Timestamp(2013-05-21)))"
       ),
       "expected1",
       "[(s24) (s25)]"
@@ -151,9 +151,9 @@ public class HomomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_HOM_9_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE e1.edgeId=8 " +
-          "AND NOT Interval(e1.val_from, MIN(e1.val_to, 2020-05-01))" +
+          "AND NOT Interval(e1.val_from, MIN(e1.val_to, Timestamp(2020-05-01)))" +
           ".overlaps(e2.val)"),
       "expected1",
       "expected1[(s12)-[e8]->(s13) (s3)-[e3]->(s4)]"

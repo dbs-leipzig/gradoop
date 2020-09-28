@@ -96,14 +96,14 @@ public abstract class TemporalGraphStatistics {
   public abstract long getDistinctTargetVertexCount(String edgeLabel);
 
   /**
-   * Estimates the probability that a time value (tx_from, tx_to, valid_from, valid_to)
-   * of an element with a certain label satisfies a constraint comparing it to a constant
+   * Estimates the probability that a temporal property (tx_from, tx_to, valid_from, valid_to)
+   * of an element with a certain label satisfies a constraint comparing it to a literal
    *
    * @param type1  the type of the element to compare (vertex or edge)
    * @param label1 label of the element to compare (if known)
    * @param field1 time field (tx_from, tx_to, valid_from, valid_to) of the element to compare
    * @param comp   comparator
-   * @param value  long constant to compare the element with
+   * @param value  long constant (i.e. literal) to compare the element with
    * @return estimation of the probability that the condition holds
    */
   public abstract double estimateTemporalProb(ElementType type1, Optional<String> label1,
@@ -117,12 +117,12 @@ public abstract class TemporalGraphStatistics {
    *
    * @param type1  the type of the lhs element to compare (vertex or edge)
    * @param label1 label of the lhs element to compare (if known)
-   * @param field1 time field (tx_from, tx_to, valid_from, valid_to) of the lhs
+   * @param field1 time property (tx_from, tx_to, valid_from, valid_to) of the lhs
    *               element to compare
    * @param comp   comparator
    * @param type2  the type of the rhs element to compare (vertex or edge)
    * @param label2 label of the rhs element to compare (if known)
-   * @param field2 time field (tx_from, tx_to, valid_from, valid_to) of the rhs
+   * @param field2 time property (tx_from, tx_to, val_from, val_to) of the rhs
    *               element to compare
    * @return estimation of the probability that the condition holds
    */
@@ -134,7 +134,7 @@ public abstract class TemporalGraphStatistics {
 
   /**
    * Estimates the probability that a comparison of the form
-   * {@code variable.duration comparator constant}
+   * {@code variable.interval comparator constant}
    * holds.
    *
    * @param type        type of the lhs element (vertex/edge)
@@ -156,7 +156,7 @@ public abstract class TemporalGraphStatistics {
    * @param type1        type of the lhs element (vertex/edge)
    * @param label1       label of the lhs element
    * @param transaction1 indicates whether lhs transaction time should be compared (=>true)
-   *                     or valid time (=> false)@param comp comparator of the comparison
+   *                     or valid time (=> false)
    * @param comp         comparator of the comparison
    * @param type2        type of the rhs element (vertex/edge)
    * @param label2       label of the rhs element
@@ -199,7 +199,13 @@ public abstract class TemporalGraphStatistics {
                                               ElementType type2, Optional<String> label2,
                                               String property2);
 
-  public abstract double estimateLabelProb(ElementType type, String label);
+  /**
+   * Estimates the probability that a vertex or edge has a certain label
+   * @param type type of the element in question (vertex or edge)
+   * @param label label in question
+   * @return estimated probability that the given type has the given label
+   */
+  //public abstract double estimateLabelProb(ElementType type, String label);
 
   /**
    * Describes the two types of graph elements

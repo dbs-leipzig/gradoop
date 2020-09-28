@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class IsomorphismAfterData implements TemporalTestData {
     data.add(new String[] {
       "After_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE " +
           "e1.val_from.after(e2.val_from) AND a.id=475"),
       "expected1,expected2",
@@ -46,7 +46,7 @@ public class IsomorphismAfterData implements TemporalTestData {
     data.add(new String[] {
       "After_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE b.id=532 AND e1.tx_from.after(e2.tx_from) " +
           "AND e2.tx_to.after(e1.tx_to)"),
       "expected1",
@@ -58,7 +58,7 @@ public class IsomorphismAfterData implements TemporalTestData {
     data.add(new String[] {
       "After_ISO_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE b.id=521 AND e1.bikeID=16100 " +
           "AND e2.val_from.after(e1.val_from)"),
       "expected1,expected2",
@@ -71,8 +71,8 @@ public class IsomorphismAfterData implements TemporalTestData {
     data.add(new String[] {
       "After_ISO_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from)"),
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Timestamp(2013-06-01T00:01:00).after(e.tx_from)"),
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
     });
@@ -81,7 +81,7 @@ public class IsomorphismAfterData implements TemporalTestData {
     data.add(new String[] {
       "After_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE " +
           "e1.val_from.after(e2.val_from) AND a.id=475 " +
           "AND c.tx_from.after(b.tx_from)"),

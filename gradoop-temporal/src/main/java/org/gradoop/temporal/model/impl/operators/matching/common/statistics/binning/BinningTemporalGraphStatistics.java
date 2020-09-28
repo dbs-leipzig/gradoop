@@ -41,7 +41,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 import static org.s1ck.gdl.utils.Comparator.EQ;
 import static org.s1ck.gdl.utils.Comparator.GT;
 import static org.s1ck.gdl.utils.Comparator.GTE;
@@ -128,16 +131,19 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     this.distinctSourceCount = new HashMap<>();
     this.distinctTargetCount = new HashMap<>();
 
+    // for every type of edge...
     for (Map.Entry<String, TemporalElementStats> entries : edgeStats.entrySet()) {
       TemporalElementStats stats = edgeStats.get(entries.getKey());
       List<TemporalElement> sample = stats.getSample();
       int sampleSize = sample.size();
+      // ...extract source and target vertex IDs of the edges...
       HashSet<GradoopId> sourceIds = new HashSet<>();
       HashSet<GradoopId> targetIds = new HashSet<>();
       for (TemporalElement edge : sample) {
         sourceIds.add(((TemporalEdge) edge).getSourceId());
         targetIds.add(((TemporalEdge) edge).getTargetId());
       }
+      // ... and estimate distinct source and target vertices naively
       long sourceEstimation = sourceIds.size() *
         (stats.getElementCount() / sampleSize);
       long targetEstimation = targetIds.size() *
@@ -314,7 +320,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
                                                 TimeSelector.TimeField fieldLhs,
                                                 Comparator comparator, List<TemporalElementStats> statsRhs,
                                                 TimeSelector.TimeField fieldRhs) {
-
+    // count overall number of elements for both sides
     long lhsOverallCount = statsLhs.stream()
       .map(TemporalElementStats::getElementCount)
       .reduce(Long::sum)
@@ -324,6 +330,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       .reduce(Long::sum)
       .orElse(0L);
     double sum = 0.;
+
     for (TemporalElementStats lhs : statsLhs) {
       double lhsWeight = (double) lhs.getElementCount() / lhsOverallCount;
       for (TemporalElementStats rhs : statsRhs) {
@@ -351,122 +358,102 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
                                                 TimeSelector.TimeField fieldLhs,
                                                 Comparator comparator, TemporalElementStats statsRhs,
                                                 TimeSelector.TimeField fieldRhs) {
-    Long[] lhsBins = getBins(statsLhs, fieldLhs).getBins();
-    Long[] rhsBins = getBins(statsRhs, fieldRhs).getBins();
-
-
-    ArrayList<ArrayList<NormalDistribution>> distributions = new ArrayList<>();
-    int countDistributions = 0;
-    for (int i = 0; i < lhsBins.length; i += 10) {
-      ArrayList<NormalDistribution> iDists = new ArrayList<>();
-      for (int j = 0; j < rhsBins.length; j += 10) {
-        iDists.add(createSubtractionDistribution(lhsBins, i, Math.min(lhsBins.length, i + 10),
-          rhsBins, j, Math.min(rhsBins.length, j + 10)));
-      }
-      distributions.add(iDists);
-      countDistributions += iDists.size();
-    }
 
     double sum = 0.;
-    double weight = (double) 1 / countDistributions;
 
-    Function<NormalDistribution, Double> probability;
-    if (comparator == LTE) {
-      probability = dist -> dist.cumulativeProbability(0);
-    } else if (comparator == LT) {
-      probability = dist -> dist.cumulativeProbability(-1);
-    } else if (comparator == GTE) {
-      probability = dist -> 1 - dist.cumulativeProbability(-1);
-    } else if (comparator == GT) {
-      probability = dist -> 1 - dist.cumulativeProbability(0);
-    } else {
-      return 1.;
+    // first, compare without considering Long.MIN values, Long.MAX_VALUE values
+
+    double[] lhs = statsLhs.getTemporalPropertyStats(fieldLhs);
+    double[] rhs = statsRhs.getTemporalPropertyStats(fieldRhs);
+    double lhsMean = lhs[0];
+    double lhsVariance = lhs[1];
+    double lhsExtreme = lhs[2];
+    double rhsMean = rhs[0];
+    double rhsVariance = rhs[1];
+    double rhsExtreme = rhs[2];
+    // probability that both lhs and rhs not Long.MIN_VALUE or Long.MAX_VALUE
+    double probBothNotExtreme = (1 - lhsExtreme)*(1-rhsExtreme);
+    // distribution for difference between lhs and rhs values
+    NormalDistribution diffDist = new NormalDistribution(lhsMean-rhsMean,
+      Math.max(lhsVariance+ rhsVariance, 0.001));
+
+    // P(lhs < rhs)
+    double probNotExtremeLTE = diffDist.cumulativeProbability(0.);
+    // P(lhs = rhs)
+    double probNotExtremeEQ = diffDist.probability(0.);
+    // P(lhs comp rhs)
+    double probCompNotExtreme = 0.;
+
+    if(comparator == LTE){
+      probCompNotExtreme = probNotExtremeLTE;
+    } else if(comparator==LT) {
+      probCompNotExtreme = probNotExtremeLTE - probNotExtremeEQ;
+    } else if(comparator == EQ){
+      probCompNotExtreme = probNotExtremeEQ;
+    } else if(comparator == NEQ){
+      probCompNotExtreme = 1. - probNotExtremeEQ;
+    } else if(comparator == GTE){
+      probCompNotExtreme = 1. - (probNotExtremeLTE - probNotExtremeEQ);
+    } else if(comparator == GT){
+      probCompNotExtreme = 1. - probNotExtremeLTE;
     }
 
-    for (int i = 0; i < distributions.size(); i++) {
-      ArrayList<NormalDistribution> iDists = distributions.get(i);
-      for (int j = 0; j < iDists.size(); j++) {
-        sum += weight * probability.apply(iDists.get(j));
+    sum += probBothNotExtreme * probCompNotExtreme;
+
+    // also consider cases in which one or both sides have extreme values
+    double probCompExtreme = 0.;
+    // lhs from
+    if(fieldLhs==TX_FROM || fieldLhs==VAL_FROM){
+      // rhs from
+      if(fieldRhs==TX_FROM || fieldRhs==VAL_FROM){
+        if(comparator==EQ){
+          probCompExtreme = lhsExtreme * rhsExtreme;
+        } else if(comparator==NEQ){
+          probCompExtreme = (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+        } else if(comparator==LTE){
+          probCompExtreme = lhsExtreme;
+        } else if(comparator==LT){
+          probCompExtreme = lhsExtreme*(1-rhsExtreme);
+        } else if(comparator==GTE){
+          probCompExtreme = rhsExtreme;
+        } else if(comparator==GT){
+          probCompExtreme = (1-lhsExtreme)*rhsExtreme;
+        }
+      } else{
+        // rhs to
+        if(comparator==NEQ || comparator==LT || comparator==LTE){
+          probCompExtreme = lhsExtreme*rhsExtreme + (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+        } //for all other comparators 0, if lhs and/or rhs extreme
+      }
+    } else {// lhs to
+      // rhs from
+      if(fieldRhs==TX_FROM || fieldRhs==VAL_FROM){
+        if(comparator==NEQ || comparator==GT || comparator==GTE){
+          probCompExtreme = lhsExtreme*rhsExtreme + (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+        } // for all other comparators 0, if lhs and/or rhs extreme
+      } else{
+        // rhs to
+        if(comparator==EQ){
+          probCompExtreme = lhsExtreme * rhsExtreme;
+        } else if(comparator==NEQ){
+          probCompExtreme = (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+        } else if(comparator==LTE){
+          probCompExtreme = rhsExtreme;
+        } else if(comparator==LT){
+          probCompExtreme = (1-lhsExtreme)*rhsExtreme;
+        } else if(comparator==GTE){
+          probCompExtreme = lhsExtreme;
+        } else if(comparator==GT){
+          probCompExtreme = lhsExtreme * (1-rhsExtreme);
+        }
       }
     }
+
+    sum += probCompExtreme;
 
     return sum;
   }
 
-  /**
-   * Creates a normal distribution given two sets of bins.
-   * It models the distribution of X - Y, where X and Y are random variables:
-   * X picks random values from the lhs bins, Y from the rhs bins.
-   * Both sets of bins are treated as if their values were normally distributed.
-   * Thus, X - Y is also a normal distribution.
-   * The method assumes that there are not many bins defined by extreme values like
-   * Long.MIN_VALUE (they are treated like 0)
-   *
-   * @param lhsBins  set of bins for the lhs (all bins, only a subset is relevant)
-   * @param lhsLower denotes the beginning of the subset relevant for lhs
-   * @param lhsUpper denotes the end (exclusive) of the subset relevant for lhs
-   * @param rhsBins  set of bins for the rhs (all bins, only a subset is relevant)
-   * @param rhsLower denotes the beginning of the subset relevant for rhs
-   * @param rhsUpper denotes the end (exclusive) of the subset relevant for rhs
-   * @return normal distribution for the subtraction
-   */
-  private NormalDistribution createSubtractionDistribution(Long[] lhsBins, int lhsLower, int lhsUpper,
-                                                           Long[] rhsBins, int rhsLower, int rhsUpper) {
-    // needed to handle unbounded intervals
-    Long now = new TimeLiteral("now").getMilliseconds();
-    // mean and variance for lhs bins
-    long sumLeft = 0;
-    for (int i = lhsLower; i < lhsUpper; i++) {
-      if (lhsBins[i].equals(Long.MIN_VALUE)) {
-        continue;
-      } else if (lhsBins[i].equals(Long.MAX_VALUE)) {
-        sumLeft += now;
-      } else {
-        sumLeft += lhsBins[i];
-      }
-    }
-    double meanLeft = (double) sumLeft / (lhsUpper - lhsLower);
-
-    double varianceLeft = 0.;
-    for (int i = lhsLower; i < lhsUpper; i++) {
-      if (lhsBins[i].equals(Long.MIN_VALUE)) {
-        varianceLeft += (0 - meanLeft) * (0 - meanLeft);
-      } else if (lhsBins[i].equals(Long.MAX_VALUE)) {
-        varianceLeft += (now - meanLeft) * (now - meanLeft);
-      }
-    }
-    varianceLeft = varianceLeft / (lhsUpper - lhsLower);
-
-    // mean and variance for rhs bins
-    long sumRight = 0;
-    for (int i = rhsLower; i < rhsUpper; i++) {
-      if (rhsBins[i].equals(Long.MIN_VALUE)) {
-        continue;
-      } else if (rhsBins[i].equals(Long.MAX_VALUE)) {
-        sumRight += now;
-      } else {
-        sumRight += rhsBins[i];
-      }
-    }
-    double meanRight = (double) sumRight / (rhsUpper - rhsLower);
-
-    double varianceRight = 0.;
-    for (int i = rhsLower; i < rhsUpper; i++) {
-      if (rhsBins[i].equals(Long.MIN_VALUE)) {
-        varianceRight += (0 - meanRight) * (0 - meanRight);
-      } else if (rhsBins[i].equals(Long.MAX_VALUE)) {
-        varianceRight += (now - meanRight) * (now - meanRight);
-      } else {
-        varianceRight += (rhsBins[i] - meanRight) * (rhsBins[i] - meanRight);
-      }
-    }
-    varianceRight = varianceRight / (rhsUpper - rhsLower);
-
-    double variance = varianceLeft + varianceRight;
-    variance = (variance != 0) ? variance : 0.001;
-    // normal distribution of subtraction of two normal distributions
-    return new NormalDistribution(meanLeft - meanRight, Math.sqrt(variance));
-  }
 
   @Override
   public double estimateDurationProb(ElementType type, Optional<String> label, Comparator comp,
@@ -615,7 +602,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     List<TemporalElementStats> relevantStats2 = label2.isPresent() ?
       new ArrayList<>(Collections.singletonList(statsMap2.get(label2.get()))) :
       new ArrayList<>(statsMap1.values());
-    // check if numerical or not
+
+    // check if numerical or categorical
     boolean numerical1 = false;
     boolean numerical2 = false;
     for (TemporalElementStats s : relevantStats1) {
@@ -643,16 +631,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       return estimateNumericalPropertyProb(relevantStats1, property1, comp,
         relevantStats2, property2);
     }
-  }
-
-  @Override
-  public double estimateLabelProb(ElementType type, String label) {
-    TemporalElementStats relevantStats = type == ElementType.VERTEX ?
-      vertexStats.getOrDefault(label, null) : edgeStats.getOrDefault(label, null);
-    long labelCount = relevantStats == null ? 0 : relevantStats.getElementCount();
-    long elementCount = type == ElementType.VERTEX ?
-      vertexCount : edgeCount;
-    return ((double)labelCount)/((double)elementCount);
   }
 
   /**
@@ -1104,28 +1082,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     } else {
       return elementStats.getEstimatedTimeBins()[3];
     }
-  }
-
-  @Override
-  public String toString(){
-    StringBuilder sb= new StringBuilder();
-    sb.append("\n\n");
-    sb.append("______________________________________________");
-    sb.append("----------------------------------------------");
-    sb.append("....................VERTICES..................");
-    for(String vLabel: vertexStats.keySet()){
-      sb.append(vertexStats.get(vLabel).toString());
-    }
-    sb.append("\n");
-    sb.append("......................EDGES....................");
-    for(String eLabel: edgeStats.keySet()){
-      sb.append(edgeStats.get(eLabel).toString());
-    }
-    sb.append("\n");
-    sb.append("______________________________________________");
-    sb.append("----------------------------------------------");
-    sb.append("\n\n");
-    return new String(sb);
   }
 
 }

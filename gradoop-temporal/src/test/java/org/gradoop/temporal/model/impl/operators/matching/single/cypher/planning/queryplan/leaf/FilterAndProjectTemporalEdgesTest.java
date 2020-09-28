@@ -136,9 +136,10 @@ public class FilterAndProjectTemporalEdgesTest {
     assertThat(metaData.getEntryColumn("a"), is(0));
     assertThat(metaData.getEntryColumn("e"), is(1));
     assertThat(metaData.getEntryColumn("b"), is(2));
-    assertThat(metaData.getPropertyKeys("e").size(), is(2));
+    assertThat(metaData.getPropertyKeys("e").size(), is(3));
 
-    assertEquals(metaData.getPropertyColumn("e", "foo"), 0);
-    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_FROM.toString()), 1);
+    assertEquals(metaData.getPropertyColumn("e", "foo"), 1);
+    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_FROM.toString()), 2);
+    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_TO.toString()), 0);
   }
 }

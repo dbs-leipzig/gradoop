@@ -41,6 +41,7 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismMinMaxTest;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismOverlapsData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismPrecedesData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismSelectedData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismShorterThanData;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.isomorphism.IsomorphismSucceedsData;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
@@ -72,7 +73,9 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     ArrayList<String[]> data = new ArrayList<>();
-    data.addAll(new IsomorphismBeforeData().getData());
+    data.addAll(new IsomorphismSelectedData().getData());
+    // uncomment for more tests (take ~10 min)
+    /*data.addAll(new IsomorphismBeforeData().getData());
     data.addAll(new IsomorphismOverlapsData().getData());
     data.addAll(new IsomorphismAfterData().getData());
     data.addAll(new IsomorphismFromToData().getData());
@@ -92,7 +95,7 @@ public class CBCypherTemporalPatternMatchingIsomorphismTest extends CBCypherTemp
     data.addAll(new IsomorphismLengthAtLeastData().getData());
     data.addAll(new IsomorphismLengthAtMostData().getData());
     data.addAll(new IsomorphismMergeAndJoinData().getData());
-    data.addAll(new IsomorphismComplexQueryData().getData());
+    data.addAll(new IsomorphismComplexQueryData().getData());*/
     return data;
   }
 

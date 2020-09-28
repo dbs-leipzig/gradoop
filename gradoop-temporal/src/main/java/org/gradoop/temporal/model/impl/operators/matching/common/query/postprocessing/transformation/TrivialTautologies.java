@@ -87,6 +87,8 @@ public class TrivialTautologies implements QueryTransformation {
       }
     }
     // a.tx_from <= a.tx_to, a.val_from <= a.val_to
+    System.out.println(lhs);
+    System.out.println(rhs);
     if (lhs instanceof TimeSelector && rhs instanceof TimeSelector &&
       lhs.getVariable().equals(rhs.getVariable())) {
       if (((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.TX_FROM) &&

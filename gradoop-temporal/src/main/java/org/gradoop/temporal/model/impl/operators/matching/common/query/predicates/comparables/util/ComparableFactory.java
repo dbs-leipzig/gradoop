@@ -38,7 +38,7 @@ import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 /**
- * Class for creating a {@link QueryComparableTPGM} wrapper for a GDL {@link ComparableExpression}
+ * Class for creating a {@link QueryComparable} wrapper for a GDL {@link ComparableExpression}
  */
 public class ComparableFactory {
 

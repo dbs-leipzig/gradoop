@@ -271,12 +271,12 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     Comparison comp1 = new Comparison(aValFrom, GTE, bTxTo);
     CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     double estimation1 = estimator.estimateCNF(new CNF(Collections.singletonList(e1)));
-    assertEquals(estimation1, 0.05, 0.025);
+    assertEquals(estimation1, 0.25, 0.025);
 
     Comparison comp2 = new Comparison(aValTo, LT, cTxTo);
     CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     double estimation2 = estimator.estimateCNF(new CNF(Collections.singletonList(e2)));
-    assertEquals(estimation2, 0.5, 0.1);
+    assertEquals(estimation2, 0.375, 0.1);
 
     Comparison comp3 = new Comparison(cTxTo, LTE, bTxFrom);
     CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
@@ -406,21 +406,6 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     typeMap.put("e", TemporalGraphStatistics.ElementType.EDGE);
 
     return new CNFEstimation(stats, typeMap, labelMap);
-  }
-
-  /**
-   * Creates a CNF from a list of comparisons (conjunction of the comparisons)
-   *
-   * @param comparisons list of comparisons
-   * @return CNF (conjunction) from a list of comparisons
-   */
-  private CNF cnfFrom(List<ComparisonExpression> comparisons) {
-    ArrayList<CNFElement> elements = new ArrayList<>();
-    for (ComparisonExpression comparison : comparisons) {
-      elements.add(new CNFElement(
-        new ArrayList<>(Collections.singletonList(comparison))));
-    }
-    return new CNF(elements);
   }
 
   /**

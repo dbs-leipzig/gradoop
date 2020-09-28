@@ -485,56 +485,98 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   public void complexTemporalTest() {
     // estimations are quite inaccurate
     BinningTemporalGraphStatistics stats = getDummyStats();
+    // about 0.25, as differences between bound values are small, but half of v2.tx_to unbound
     double estimation1 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_FROM,
       GTE, VERTEX, Optional.of("v2"), TX_TO);
-    assertEquals(estimation1, 0.05, 0.025);
+    assertEquals(estimation1, 0.25, 0.025);
 
+    // P(both unbound) = 0.25
+    // P(both bound) = 0.25
+    // P(lhs bound, rhs unbound) = 0.25
+    // P(lhs unbound, rhs bound) = 0.25
+    // P(lhs <= rhs | both bound) = 0.5
+    // P(lhs <= rhs | both unbound) = 1.
+    // P(lhs <= rhs | lhs bound, rhs unbound) = 1.
+    // P(lhs <= rhs | lhs unbound, rhs bound) = 0
+    // => P(lhs <= rhs) = 0.625
     double estimation2 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
       LTE, VERTEX, Optional.of("v1"), VAL_TO);
-    assertEquals(estimation2, 0.5, 0.1);
+    assertEquals(estimation2, 0.625, 0.01);
 
+    // nearly same as above, but P(lhs< rhs | both unbound) = 0
+    // => P(lhs < rhs) = P(lhs <= rhs) - 0.25 = 0.375
     double estimation3 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
       LT, VERTEX, Optional.of("v1"), VAL_TO);
     assertTrue(estimation3 <= estimation2);
-    assertEquals(estimation3, estimation2, 0.1);
+    assertEquals(estimation3, estimation2 - 0.25, 0.01);
 
+    // should be very similar to estimation 1 (where <= instead of < was used)
     double estimation4 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_FROM,
       GT, VERTEX, Optional.of("v2"), TX_TO);
     assertTrue(estimation4 <= estimation1);
     assertEquals(estimation4, estimation1, 0.01);
 
+    // for both types of vertices, half of the to-values are unbound
+    // differences between bound values are neglectable, both types of vertices can be treated the same
+    // P(both unbound) = P(both bound) = P(lhs bound, rhs not) = P(lhs unbound, rhs bound) = 0.25
+    // P(lhs >= rhs | both bound) = 0.5
+    // P(lhs >= rhs | both unbound) = 1.
+    // P(lhs >= rhs | lhs, bound, rhs not) = 0.
+    // P(lhs >= rhs | lhs unbound, rhs bound) = 1.
+    // => P(lhs >= rhs) = 0.625
     double estimation5 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
       GTE, VERTEX, Optional.empty(), TX_TO);
-    assertEquals(estimation5, 0.5, 0.1);
+    assertEquals(estimation5, 0.625, 0.02);
 
+    // P(lhs <= rhs) > 0, only if both bound (P(both bound) = 0.5)
+    // => P(lhs <= rhs) = 0.5^2 = 0.25
     double estimation6 = stats.estimateTemporalProb(VERTEX, Optional.empty(), TX_TO,
       LTE, VERTEX, Optional.of("v2"), TX_FROM);
-    assertEquals(estimation6, 0.25, 0.05);
+    assertEquals(estimation6, 0.25, 0.01);
 
+    // both bound => differences between bound values neglectable
+    // P(lhs < rhs) = 0.5
     double estimation7 = stats.estimateTemporalProb(VERTEX, Optional.empty(), TX_FROM,
       LT, VERTEX, Optional.empty(), TX_FROM);
-    assertEquals(estimation7, 0.5, 0.05);
+    assertEquals(estimation7, 0.5, 0.01);
 
+    // all unbound => should be slightly below 0.5
     double estimation8 = stats.estimateTemporalProb(EDGE, Optional.empty(), TX_FROM,
       GT, VERTEX, Optional.of("v1"), VAL_FROM);
-    assertEquals(estimation8, 0.01, 0.01);
+    assertEquals(estimation8, 0.5, 0.05);
 
+    // only not the case, if both bound ((P(both bound) = 0.5). In this case, P(lhs <= rhs)=0.5
+    // => P(lhs <= rhs) = 0.75
     double estimation9 = stats.estimateTemporalProb(EDGE, Optional.of("edge"), VAL_TO,
       LTE, VERTEX, Optional.empty(), VAL_TO);
-    assertEquals(estimation9, 0.99, 0.05);
+    assertEquals(estimation9, 0.75, 0.01);
 
+    // both identical, thus P(lhs <= rhs) = 0.5
     double estimation10 = stats.estimateTemporalProb(EDGE, Optional.of("edge"), VAL_TO,
       GTE, EDGE, Optional.empty(), TX_TO);
     assertEquals(estimation10, 0.5, 0.05);
 
     // EQ and NEQ
+    // EQ should be very small here, as edges are never unbound
     double estimation11 = stats.estimateTemporalProb(VERTEX, Optional.of("v1"), VAL_TO,
       EQ, EDGE, Optional.of("edge"), TX_TO);
     assertEquals(estimation11, 0.001, 0.001);
 
+    // NEQ should be very high, as all val-froms are never Long.MIN_VALUE
     double estimation12 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_FROM,
       NEQ, VERTEX, Optional.of("v1"), VAL_FROM);
     assertEquals(estimation12, 0.999, 0.01);
+
+/*    // lhs=rhs, if both unbound (have value Long.MAX_VALUE)
+    // P(both unbound) = 0.25
+    double estimation13 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_TO,
+      EQ, VERTEX, Optional.of("v1"), VAL_TO);
+    assertEquals(estimation12, 0.25, 0.01);
+
+    // inverse of above case
+    double estimation14 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_TO,
+      NEQ, VERTEX, Optional.of("v1"), VAL_TO);
+    assertEquals(estimation12, 0.75, 0.01);*/
 
     // label not there
     double estimation13 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_FROM,

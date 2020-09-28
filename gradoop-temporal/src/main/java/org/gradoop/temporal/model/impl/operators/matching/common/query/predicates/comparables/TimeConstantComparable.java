@@ -53,10 +53,6 @@ public class TimeConstantComparable extends TemporalComparable {
     return constant;
   }
 
-  @Override
-  public boolean isGlobal() {
-    return false;
-  }
 
   @Override
   public TimePoint getWrappedComparable() {

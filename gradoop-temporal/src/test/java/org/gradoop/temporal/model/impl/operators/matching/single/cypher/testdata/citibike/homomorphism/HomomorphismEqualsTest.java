@@ -31,7 +31,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.equals(b.tx)"
       ),
       "expected1,expected2",
@@ -42,9 +42,9 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE e.val.equals(Interval(2013-06-01T00:04:22," +
-          " 2013-06-01T00:18:11))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE e.val.equals(Interval(Timestamp(2013-06-01T00:04:22)," +
+          " Timestamp(2013-06-01T00:18:11)))"
       ),
       "expected1",
       "expected1[(s14)-[e9]->(s15)]"
@@ -54,9 +54,9 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE a.val.equals(Interval(2013-05-15," +
-          " 2013-07-23)) AND Interval(2013-05-20,2013-07-18).equals(b.val)"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE a.val.equals(Interval(Timestamp(2013-05-15)," +
+          " Timestamp(2013-07-23))) AND Interval(Timestamp(2013-05-20),Timestamp(2013-07-18)).equals(b.val)"
       ),
       "expected1",
       "expected1[(s14)-[e9]->(s15)]"
@@ -66,7 +66,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.tx.equals(e.tx) OR e.tx.equals(b.tx)"
       ),
       "",
@@ -77,9 +77,9 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.val.merge(b.val).equals(Interval(" +
-          "2013-05-20, 2013-07-18))"
+          "Timestamp(2013-05-20), Timestamp(2013-07-18)))"
       ),
       "expected1",
       "expected1[(s14)-[e9]->(s15)]"
@@ -89,9 +89,9 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).equals(Interval(" +
-          "2013-05-15, 2013-07-23))"
+          "Timestamp(2013-05-15), Timestamp(2013-07-23)))"
       ),
       "expected1",
       "expected1[(s14)-[e9]->(s15)]"
@@ -101,9 +101,9 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE val.equals(Interval(" +
-          "2013-06-01T00:04:22, 2013-06-01T00:18:11))"
+          "Timestamp(2013-06-01T00:04:22), Timestamp(2013-06-01T00:18:11)))"
       ),
       "expected1",
       "expected1[(s14)-[e9]->(s15)]"
@@ -113,7 +113,7 @@ public class HomomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_HOM_8_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b)<-[e2]-(c) WHERE NOT tx.equals(e1.tx.merge(e2.tx))"
       ),
       "",

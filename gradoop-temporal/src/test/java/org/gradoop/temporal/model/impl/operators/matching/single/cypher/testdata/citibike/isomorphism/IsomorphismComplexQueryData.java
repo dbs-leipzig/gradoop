@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ public class IsomorphismComplexQueryData implements TemporalTestData {
     data.add(new String[] {
       "Complex_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:01:00.after(e.tx_from) " +
-          "AND e.asOf(2013-06-01T00:01:00)"),
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Timestamp(2013-06-01T00:01:00).after(e.tx_from) " +
+          "AND e.val.asOf(Timestamp(2013-06-01T00:01:00))"),
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)], expected2[(s0)-[e1]->(s1)]"
     });
@@ -48,11 +48,11 @@ public class IsomorphismComplexQueryData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:00:00, 2013-06-01T00:07:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:07:00))" +
           ".precedes(e.tx) OR (NOT " +
-          "e.val.between(2013-06-01T00:04:00, 2013-06-01T00:08:00) AND " +
-          " b.val.between(2013-07-22T00:00:00, 2013-07-30))"),
+          "e.val.between(Timestamp(2013-06-01T00:04:00), Timestamp(2013-06-01T00:08:00)) AND " +
+          " b.val.between(Timestamp(2013-07-22T00:00:00), Timestamp(2013-07-30)))"),
       "expected1,expected2,expected3",
       "expected1[(s21)-[e19]->(s11)]," +
         "expected2[(s28)-[e18]->(s29)],expected3[(s3)-[e3]->(s4)]"
@@ -63,11 +63,11 @@ public class IsomorphismComplexQueryData implements TemporalTestData {
     data.add(new String[] {
       "Succeeds_ISO_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:07:00.precedes(e.tx)" +
-          " AND 2013-05-12.succeeds(" +
-          "Interval(1970-01-01,a.val_from)) AND e.val.fromTo(" +
-          " 2013-06-01T00:35:00, 2013-06-01T00:40:00)"),
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Timestamp(2013-06-01T00:07:00).precedes(e.tx)" +
+          " AND Timestamp(2013-05-12).succeeds(" +
+          "Interval(Timestamp(1970-01-01),a.val_from)) AND e.val.fromTo(" +
+          " Timestamp(2013-06-01T00:35:00), Timestamp(2013-06-01T00:40:00))"),
       "expected1",
       "expected1[(s28)-[e18]->(s29)]"
     });

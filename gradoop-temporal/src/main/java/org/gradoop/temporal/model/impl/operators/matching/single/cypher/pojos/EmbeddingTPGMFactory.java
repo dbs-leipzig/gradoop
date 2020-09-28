@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Utility class to convert an element ({@link TemporalVertex} and {@link TemporalEdge} into an
  * {@link Embedding}.
- * Practically identical to
+ * Analogous to
  * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory}
  * but creating TPGMEmbeddings from TPGM elements
  */
@@ -41,7 +41,7 @@ public class EmbeddingTPGMFactory {
    * value associated with the specified property keys (ordered by list order). Note that missing
    * property values are represented by a {@link PropertyValue#NULL_VALUE}.
    * Furthermore, the time data of each element ({tx_from, tx_to, valid_from, valid_to}) is stored
-   * in the embedding
+   * in the embedding, just like normal properties
    *
    * @param vertex       vertex to create embedding from
    * @param propertyKeys properties that will be stored in the embedding
@@ -61,7 +61,7 @@ public class EmbeddingTPGMFactory {
    * with the specified property keys (ordered by list order). Note that missing property values are
    * represented by a {@link PropertyValue#NULL_VALUE}.
    * Additionally, the time data of the edge ({tx_from, tx_to, valid_from, valid_to}) are stored
-   * in the embedding.
+   * in the embedding, just like properties
    *
    * @param edge         edge to create embedding from
    * @param propertyKeys properties that will be stored in the embedding
@@ -83,8 +83,7 @@ public class EmbeddingTPGMFactory {
    * Projects the elements properties into a list of property values. Only those properties
    * specified by their key will be kept. Properties that are specified but not present at the
    * element will be adopted as {@link PropertyValue#NULL_VALUE}.
-   * Copied from
-   * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory}
+   * Temporal properties are stored just like "normal" ones
    *
    * @param element      element of which the properties will be projected
    * @param propertyKeys properties that will be projected from the specified element

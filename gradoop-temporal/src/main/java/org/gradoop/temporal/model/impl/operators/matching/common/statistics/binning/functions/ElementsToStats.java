@@ -40,11 +40,19 @@ public class ElementsToStats<T extends TemporalElement> implements
    */
   private Set<String> categoricalProperties;
 
+  /**
+   * Creates a new ElementsToStats function considering only specified properties
+   * @param numericalProperties numerical properties to consider
+   * @param categoricalProperties categorical propberties to consider
+   */
   public ElementsToStats(Set<String> numericalProperties, Set<String> categoricalProperties){
     this.numericalProperties = numericalProperties;
     this.categoricalProperties = categoricalProperties;
   }
 
+  /**
+   * Creates a new ElementsToStats function considering all properties
+   */
   public ElementsToStats(){
     this(null, null);
   }
@@ -52,6 +60,7 @@ public class ElementsToStats<T extends TemporalElement> implements
   @Override
   public void reduce(Iterable<T> values, Collector<TemporalElementStats> out) throws Exception {
     TemporalElementStats stats = new TemporalElementStats(numericalProperties, categoricalProperties);
+    // Reduce the collection by offering all elements to the reservoir-sample-based statistics
     for (TemporalElement element : values) {
       stats.addElement(element);
       stats.setLabel(element.getLabel());

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH ()-[e1]->() ()-[e2]->(a) WHERE a.id=532 AND e1.edgeId=3" +
           " AND e1.val.precedes(e2.val)"),
       "expected1",
@@ -43,8 +43,8 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:00:00, 2013-06-01T00:07:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:07:00))" +
           ".precedes(e.tx)"),
       "expected1,expected2",
       "expected1[(s21)-[e19]->(s11)]," +
@@ -57,8 +57,8 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:07:00.precedes(e.tx)"),
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Timestamp(2013-06-01T00:07:00).precedes(e.tx)"),
       "expected1,expected2",
       "expected1[(s21)-[e19]->(s11)]," +
         "expected2[(s28)-[e18]->(s29)]"
@@ -69,9 +69,9 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE e.val_from.precedes(" +
-          "Interval(2013-06-01T00:01:00, 2013-06-01T00:01:01))"),
+          "Interval(Timestamp(2013-06-01T00:01:00), Timestamp(2013-06-01T00:01:01)))"),
       "expected1,expected2",
       "expected1[(s0)-[e0]->(s1)], " +
         "expected2[(s0)-[e1]->(s1)]"
@@ -81,9 +81,9 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE 2013-06-01T00:07:00.precedes(e.tx)" +
-          " AND a.val_from.precedes(Interval(2013-05-12,2013-08-01))"),
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Timestamp(2013-06-01T00:07:00).precedes(e.tx)" +
+          " AND a.val_from.precedes(Interval(Timestamp(2013-05-12),Timestamp(2013-08-01)))"),
       "expected1",
       "expected1[(s28)-[e18]->(s29)]"
     });
@@ -93,10 +93,10 @@ public class IsomorphismPrecedesData implements TemporalTestData {
     data.add(new String[] {
       "Precedes_ISO_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(2013-06-01T00:00:00, " +
-          "2013-06-01T00:07:00).precedes(Interval(" +
-          "MAX(1970-01-01, e.tx_from, a.val_from),tx_to))"
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(2013-06-01T00:00:00), " +
+          "Timestamp(2013-06-01T00:07:00)).precedes(Interval(" +
+          "MAX(Timestamp(1970-01-01), e.tx_from, a.val_from),tx_to))"
       ),
       "expected1,expected2",
       "expected1[(s21)-[e19]->(s11)],  " +

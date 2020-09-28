@@ -33,7 +33,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE e.asOf(2013-06-01T00:01:00)",
+      "MATCH (a)-[e]->(b) WHERE e.tx.asOf(Timestamp(2013-06-01T00:01:00))",
       "expected1,expected2,expected3",
       "expected1[(s2)-[e2]->(s2)], expected2[(s0)-[e0]->(s1)]," +
         "expected3[(s0)-[e1]->(s1)]"
@@ -46,7 +46,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.asOf(e1.val_from)",
+      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.val.asOf(e1.val_from)",
       "expected1,expected2,expected3",
       "expected1[(s26)<-[e16]-(s24)-[e15]->(s25)], expected2[(s25)<-[e15]-(s24)-[e15]->(s25)]," +
         "expected3[(s26)<-[e16]-(s24)-[e16]->(s26)]"
@@ -59,7 +59,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE NOT e.asOf(2013-06-01T00:08:00)",
+      "MATCH (a)-[e]->(b) WHERE NOT e.tx.asOf(Timestamp(2013-06-01T00:08:00))",
       "expected1,expected2,expected3",
       "expected1[(s21)-[e19]->(s11)], expected2[(s3)-[e3]->(s4)]," +
         " expected3[(s28)-[e18]->(s29)]"
@@ -72,7 +72,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a) WHERE a.asOf(2013-07-27T12:23:23)",
+      "MATCH (a) WHERE a.tx.asOf(Timestamp(2013-07-27T12:23:23))",
       "expected1,expected2,expected3",
       "expected1[(s12)], expected2[(s25)], expected3[(s20)]"
     });
@@ -82,8 +82,8 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE NOT e.asOf(2013-06-01T00:08:00) AND " +
-        "a.asOf(2013-05-15)",
+      "MATCH (a)-[e]->(b) WHERE NOT e.tx.asOf(Timestamp(2013-06-01T00:08:00)) AND " +
+        "a.val.asOf(Timestamp(2013-05-15))",
       "expected1",
       "expected1[(s28)-[e18]->(s29)]"
     });
@@ -92,7 +92,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)-[e]->(b) WHERE a.asOf(2020-04-28) OR b.asOf(2012-12-12)",
+      "MATCH (a)-[e]->(b) WHERE a.tx.asOf(Timestamp(2020-04-28)) OR b.tx.asOf(Timestamp(2012-12-12))",
       "",
       ""
     });
@@ -103,7 +103,7 @@ public class HomomorphismAsOfData implements TemporalTestData {
     data.add(new String[] {
       "AsOf_HOM_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.asOf(MAX(e1.val_from, a.val_from))",
+      "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 AND e2.val.asOf(MAX(e1.val_from, a.val_from))",
       "expected1,expected2,expected3",
       "expected1[(s26)<-[e16]-(s24)-[e15]->(s25)], expected2[(s25)<-[e15]-(s24)-[e15]->(s25)]," +
         "expected3[(s26)<-[e16]-(s24)-[e16]->(s26)]"

@@ -45,7 +45,8 @@ import java.util.Set;
  * Extracts elements from an {@link Embedding}.
  * Is almost identical to
  * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbedding}
- * extends it for TPGM embeddings
+ * extends it for TPGM embeddings.
+ * Could be further extended to specify temporal properties like global val/tx in the graph head
  *
  * @param <G> The graph head type.
  * @param <V> The vertex type.
@@ -140,16 +141,10 @@ public class ElementsFromEmbeddingTPGM<
     // create graph head for this embedding
     TemporalGraphHead graphHead = graphHeadFactory.createGraphHead();
 
-    // used to determine global time
-    /*Long[] globalTime = new Long[] {TemporalElement.DEFAULT_TIME_FROM,
-      TemporalElement.DEFAULT_TIME_TO, TemporalElement.DEFAULT_TIME_FROM, TemporalElement.DEFAULT_TIME_TO};
-*/
     // vertices
     for (String vertexVariable : metaData.getVertexVariables()) {
       GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));
-      /*Long[] tempData = embedding.getTimes(metaData.getTimeColumn(vertexVariable));
-      globalTime = updateGlobalTime(globalTime, tempData);
-*/
+
       if (labelMapping.containsKey(vertexVariable)) {
         String label = labelMapping.get(vertexVariable);
         initVertexWithData(out, graphHead, id, label);
@@ -171,9 +166,6 @@ public class ElementsFromEmbeddingTPGM<
       targetId = embedding.getId(
         metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));
 
-      //timeData = embedding.getTimes(metaData.getTimeColumn(edgeVariable));
-      //globalTime = updateGlobalTime(globalTime, timeData);
-
       if (labelMapping.containsKey(edgeVariable)) {
         String label = labelMapping.get(edgeVariable);
         initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);
@@ -183,9 +175,7 @@ public class ElementsFromEmbeddingTPGM<
       variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));
     }
 
-    // paths
-    Long[] defaultTime = new Long[] {TemporalElement.DEFAULT_TIME_FROM, TemporalElement.DEFAULT_TIME_TO,
-      TemporalElement.DEFAULT_TIME_FROM, TemporalElement.DEFAULT_TIME_TO};
+    // paths (copied from EPGM)
 
     for (String pathVariable : metaData.getPathVariables()) {
       ExpandDirection direction = metaData.getDirection(pathVariable);
@@ -233,29 +223,8 @@ public class ElementsFromEmbeddingTPGM<
       variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));
     }
 
-    /*if (globalTime[0] > globalTime[1]) {
-      globalTime[0] = Long.MIN_VALUE;
-      globalTime[1] = Long.MIN_VALUE;
-      graphHead.setProperty("hasTxLifetime", PropertyValue.create(false));
-      graphHead.setProperty("txLifetime", PropertyValue.create(0L));
-    } else {
-      graphHead.setProperty("hasTxLifetime", PropertyValue.create(true));
-      graphHead.setProperty("txLifetime", PropertyValue.create(globalTime[1] - globalTime[0]));
-    }
-
-    if (globalTime[2] > globalTime[3]) {
-      globalTime[2] = Long.MIN_VALUE;
-      globalTime[3] = Long.MIN_VALUE;
-      graphHead.setProperty("hasValidLifetime", PropertyValue.create(false));
-      graphHead.setProperty("validLifetime", PropertyValue.create(0L));
-    } else {
-      graphHead.setProperty("hasValidLifetime", PropertyValue.create(true));
-      graphHead.setProperty("validLifetime", PropertyValue.create(globalTime[3] - globalTime[2]));
-    }*/
 
     graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);
-    //graphHead.setTransactionTime(new Tuple2<>(globalTime[0], globalTime[1]));
-    //graphHead.setValidTime(new Tuple2<>(globalTime[2], globalTime[3]));
     out.collect(graphHead);
 
 

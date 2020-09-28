@@ -18,8 +18,7 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.postproc
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.AddTrivialConstraints;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.CheckForCircles;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.InferBounds;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.BoundsInference;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.MinMaxUnfolding;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.Normalization;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.SyntacticSubsumption;
@@ -32,7 +31,7 @@ import java.util.List;
 
 /**
  * Postprocessing pipeline for CNFs.
- * Wraps a list of {@link QueryTransformation} objects, that are applied to a CNF
+ * Contains a list of {@link QueryTransformation} objects, that are applied to a CNF
  */
 public class CNFPostProcessing {
 
@@ -71,8 +70,8 @@ public class CNFPostProcessing {
       new TrivialTautologies(),
       new TrivialContradictions(),
       new AddTrivialConstraints(),
-      new CheckForCircles(),
-      new InferBounds(),
+      //new CheckForCircles(),
+      new BoundsInference(),
       new TemporalSubsumption(),
       new TrivialTautologies()
     ));

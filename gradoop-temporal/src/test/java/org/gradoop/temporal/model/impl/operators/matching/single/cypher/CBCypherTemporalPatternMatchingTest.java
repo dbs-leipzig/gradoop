@@ -103,8 +103,8 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
    * @return query with practically same semantics but changed so that no default
    * asOfs are added
    */
-  public static String noDefaultAsOf(String query) {
-    boolean hasWhereClause = query.contains("WHERE");
+  public static String prepareQueryString(String query) {
+    /*boolean hasWhereClause = query.contains("WHERE");
     String middle = hasWhereClause? " AND " : " WHERE ";
     if (query.contains("[e]")) {
       return query + middle + " e.tx_to.after(1970-01-01)";
@@ -113,7 +113,8 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
     } else if (query.contains("(a)")) {
       return query + middle + " a.tx_to.after(1970-01-01)";
     }
-    throw new IllegalArgumentException("Query must contain 'e', 'e1' or 'a'");
+    throw new IllegalArgumentException("Query must contain 'e', 'e1' or 'a'");*/
+    return query;
   }
 
   @Override

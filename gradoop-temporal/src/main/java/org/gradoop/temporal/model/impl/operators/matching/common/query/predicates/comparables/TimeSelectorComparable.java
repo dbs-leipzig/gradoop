@@ -116,10 +116,6 @@ public class TimeSelectorComparable extends TemporalComparable {
     return timeSelector != null ? timeSelector.hashCode() : 0;
   }
 
-  @Override
-  public boolean isGlobal() {
-    return timeSelector.isGlobal();
-  }
 
   @Override
   public TimePoint getWrappedComparable() {

@@ -77,13 +77,16 @@ public class ReservoirSampler<T> implements Serializable {
   public boolean updateSample(T element) {
     count++;
     if (count <= reservoirSampleSize) {
+      // sample every element until reservoir sample is full
       reservoirSample.add(element);
       return true;
     } else {
+      // sample with probability size/count if reservoir sample is full
       double randomDouble = random.nextDouble();
       double ratio = (double) reservoirSampleSize / (double) count;
       // include vertex?
       if (randomDouble <= ratio) {
+        // replace a random element, probability of replacement is 1/size for each element in the reservoir
         int randomIndex = random.nextInt(reservoirSampleSize);
         reservoirSample.set(randomIndex, element);
         return true;

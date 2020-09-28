@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 
 
-public class TemporalCypherLDBC {
+public class TemporalLDBCBenchmark {
   /**
    * Command line options for the runner.
    */
@@ -145,24 +145,12 @@ public class TemporalCypherLDBC {
 
     TemporalGraph graph = source.getTemporalGraph();
 
-    /*System.out.println("Number of vertices: ");
-    System.out.println(graph.getVertices().count());
-    long vertCountTime = env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS);
-
-    System.out.println("vertex count time " + vertCountTime);
-    System.out.println(graph.getEdges().count());
-    long edgeCountTime = env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS);
-    System.out.println("edge count time " + edgeCountTime);*/
-
     // prepare collection
     TemporalGraphCollection collection;
 
     // get cypher query
     String query = QUERY;
 
-
-    //long statsTime = env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS);
-    //System.out.println("stats time " + statsTime);
 
     // execute cypher with or without statistics
 
@@ -197,37 +185,6 @@ public class TemporalCypherLDBC {
   }
 
   /**
-   * Creates the temporal graph
-   * @param source DataSource for an EPGM graph
-   * @return temporal graph
-  private static TemporalGraph getGraph(DataSource source){
-  try {
-  return toTemporal(source.getLogicalGraph());
-  } catch (Exception e) {
-  e.printStackTrace();
-  }
-  return null;
-  }*/
-
-  /**
-   * Convertes an EPGM graph to a temporal graph
-   * @param logicalGraph EPGM graph to convert
-   * @return temporal graph
-   * @throws Exception if transformation goes wrong
-   *//*
-  private static TemporalGraph toTemporal(LogicalGraph logicalGraph) throws Exception {
-    TemporalGraph tg = TemporalGraph.fromGraph(logicalGraph);
-    System.out.println(tg);
-    if(GRAPHTYPE.equals("LDBC")){
-      tg = tg.transformEdges(new LDBCEdges());
-      tg = tg.transformVertices(new LDBCVertices());
-      return tg;
-    } else{
-      return null;
-    }
-  }*/
-
-  /**
    * Computes or retrieves the statistics for a TPGM graph
    * @param config temporal configuration
    * @return statistics
@@ -244,6 +201,11 @@ public class TemporalCypherLDBC {
     return new BinningTemporalGraphStatisticsFactory().fromGraph(g);
   }
 
+  /**
+   * Deserialize previously serialized statistics
+   * @param file serialized statistics
+   * @return deserialized statistics
+   */
   private static BinningTemporalGraphStatistics deserializeStats(String file){
     try{
       FileInputStream fs = new FileInputStream(file);

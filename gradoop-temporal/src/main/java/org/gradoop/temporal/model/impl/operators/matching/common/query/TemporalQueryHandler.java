@@ -54,7 +54,7 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
 /**
  * Wraps a {@link GDLHandler} and adds functionality needed for query
  * processing during graph pattern matching.
- * Extension for temporal queries
+ * Extension of the flink QueryHandler for temporal queries
  */
 public class TemporalQueryHandler extends QueryHandler {
   /**
@@ -98,7 +98,7 @@ public class TemporalQueryHandler extends QueryHandler {
 
   /**
    * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
-   * predicated defined in the query, a CNF containing zero predicates is returned.
+   * predicates defined in the query, a CNF containing zero predicates is returned.
    *
    * @return predicates
    */
@@ -115,23 +115,22 @@ public class TemporalQueryHandler extends QueryHandler {
   private void initCNF() throws QueryContradictoryException {
     if (getGdlHandler().getPredicates().isPresent()) {
       Predicate predicate = getGdlHandler().getPredicates().get();
+      // some transformations on the GDL query before conversion to CNF
       predicate = preprocessPredicate(predicate);
-      CNF rawCNF = QueryPredicate.createFrom(predicate, new ComparableTPGMFactory()).asCNF();
-      System.out.println("Initial CNF: "+rawCNF);
+      CNF rawCNF = QueryPredicate.createFrom(predicate, new ComparableTPGMFactory(now)).asCNF();
       cnf = cnfPostProcessing.postprocess(rawCNF);
-      // TODO add edge joins
     } else {
+      // empty CNF
       cnf = new CNF();
     }
-    System.out.println("Effective CNF: "+cnf);
   }
 
   /**
-   * Pipeline for preprocessing query predicates. Currently, only a {@link #defaultAsOfExpansion}
-   * is done.
+   * Pipeline for preprocessing GDL query predicates. Currently, only predicates for
+   * valid interval overlap of edges and their vertices are added.
    *
-   * @param predicate hte predicate to preprocess
-   * @return preprocessed predicate
+   * @param predicate the GDL predicate to preprocess
+   * @return preprocessed GDL predicate
    */
   private Predicate preprocessPredicate(Predicate predicate) {
     return addEdgeOverlapPredicates(predicate);
@@ -146,20 +145,25 @@ public class TemporalQueryHandler extends QueryHandler {
   private Predicate addEdgeOverlapPredicates(Predicate predicate) {
     GDLHandler handler = getGdlHandler();
     Map<String, Edge> edgeCache = handler.getEdgeCache();
+
     // maps vertex ids to vertex variables
     Map<Long, String> vertexMap = new HashMap<>();
-    for(Vertex vertex : handler.getVertexCache().values()){
+    for(Vertex vertex : handler.getVertexCache(true, true).values()){
       vertexMap.put(vertex.getId(), vertex.getVariable());
     }
 
     // determine all (vertex, edge, vertex) triples
     for(String edgeVar: handler.getEdgeCache().keySet()){
       Edge edge = edgeCache.get(edgeVar);
+      // no temporal predicates for paths
+      if(edge.hasVariableLength()){
+        continue;
+      }
       String sourceVar = vertexMap.get(edge.getSourceVertexId());
       String targetVar = vertexMap.get(edge.getTargetVertexId());
-       // add predicates edgeVar.val.overlaps(sourceVar.val) AND
-      // edgeVar.val.overlaps(targetVar.val)
 
+
+      // all relevant val-selectors
       TimeSelector eFrom = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_FROM);
       TimeSelector eTo = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_TO);
 
@@ -169,66 +173,15 @@ public class TemporalQueryHandler extends QueryHandler {
       TimeSelector tFrom = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_FROM);
       TimeSelector tTo = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_TO);
 
-      Predicate overlaps = new And(
-        new Comparison(
-          new MaxTimePoint(eFrom, sFrom), LTE, new MinTimePoint(eTo, sTo)
-        ),
-        new Comparison(
-          new MaxTimePoint(eFrom, tFrom), LTE, new MinTimePoint(eTo, tTo)
-        )
-      );
-
+      // create predicates edgeVar.val.overlaps(sourceVar.val) AND
+      // edgeVar.val.overlaps(targetVar.val)...
+      Predicate overlaps = new Comparison(
+          new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
+        );
+      // ...and add them to the resulting predicate
       predicate = new And(predicate, overlaps);
     }
     return predicate;
-  }
-
-  /**
-   * Preprocessing function for predicates. Adds v.asOf(now) constraints for every
-   * query graph element v iff no constraint on any tx_to value is contained in the
-   * predicate.
-   *
-   * @param predicate predicate to augment with asOf(now) predicates
-   * @return predicate with v.asOf(now) constraints for every
-   * query graph element v iff no constraint on any tx_to value is contained in the
-   * predicate (else input predicate is returned).
-   */
-  private Predicate defaultAsOfExpansion(Predicate predicate) {
-    GDLHandler gdlHandler = getGdlHandler();
-    if (predicate != null && predicate.containsSelectorType(TimeSelector.TimeField.TX_TO)) {
-      // no default asOfs if a constraint on any tx_to value is contained
-      return predicate;
-    } else {
-      // add v.asOf(now) for every element in the query
-      ArrayList<String> vars = new ArrayList<>(gdlHandler.getEdgeCache(true, true).keySet());
-      vars.addAll(gdlHandler.getVertexCache(true, true).keySet());
-      And asOf0 = new And(
-        new Comparison(
-          new TimeSelector(vars.get(0), TimeSelector.TimeField.TX_FROM),
-          LTE, now),
-        new Comparison(
-          new TimeSelector(vars.get(0), TimeSelector.TimeField.TX_TO),
-          Comparator.GTE, now)
-      );
-      if (predicate == null) {
-        predicate = asOf0;
-      } else {
-        predicate = new And(predicate, asOf0);
-      }
-      for (int i = 1; i < vars.size(); i++) {
-        String v = vars.get(i);
-        And asOf = new And(
-          new Comparison(
-            new TimeSelector(v, TimeSelector.TimeField.TX_FROM),
-            LTE, now),
-          new Comparison(
-            new TimeSelector(v, TimeSelector.TimeField.TX_TO),
-            Comparator.GTE, now)
-        );
-        predicate = new And(predicate, asOf);
-      }
-      return predicate;
-    }
   }
 
   /**

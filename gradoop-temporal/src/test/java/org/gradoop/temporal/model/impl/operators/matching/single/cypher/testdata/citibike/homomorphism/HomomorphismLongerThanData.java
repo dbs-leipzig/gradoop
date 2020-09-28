@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE val.longerThan(Minutes(30))"
       ),
       "expected1,expected2,expected3,expected4,expected5",
@@ -49,7 +49,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE a.val.join(b.val).longerThan(Days(75))"
       ),
       "expected1,expected2,expected3",
@@ -60,7 +60,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(Hours(1))"
       ),
       "",
@@ -71,8 +71,8 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
-        "MATCH (a)-[e]->(b) WHERE Interval(1970-01-01T00:00:00, 1970-01-01T00:05:00)" +
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
+        "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(1970-01-01T00:00:00), Timestamp(1970-01-01T00:05:00))" +
           ".longerThan(val)"
       ),
       "expected1",
@@ -87,9 +87,9 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE val.longerThan(Interval(" +
-          "1970-01-01, 1970-01-01T00:30:00))"
+          "Timestamp(1970-01-01), Timestamp(1970-01-01T00:30:00)))"
       ),
       "expected1,expected2,expected3,expected4,expected5",
       "expected1[(s8)-[e6]->(s9)], expected2[(s12)-[e8]->(s13)], " +
@@ -101,7 +101,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE NOT b.tx.longerThan(val)"
       ),
       "",
@@ -113,7 +113,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_7_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) (b) WHERE a.vertexId=18 AND b.val.longerThan(a.val)"
       ),
       "expected1,expected2",
@@ -126,7 +126,7 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_8_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE e1.tx.longerThan(e2.tx)"
       ),
       "expected1,expected2,expected3",
@@ -139,9 +139,9 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_9_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(" +
-          "Interval(2013-06-01T00:01:47, 2013-06-01T00:35:35))"
+          "Interval(Timestamp(2013-06-01T00:01:47), Timestamp(2013-06-01T00:35:35)))"
       ),
       "expected1,expected2",
       "expected1[(s8)-[e6]->(s9)], expected2[(s2)-[e2]->(s2)]"
@@ -151,9 +151,9 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_10_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE Interval(" +
-          "MIN(1970-01-01T00:00:00, tx_to), 1970-01-01T00:05:00)" +
+          "MIN(Timestamp(1970-01-01T00:00:00), tx_to), Timestamp(1970-01-01T00:05:00))" +
           ".longerThan(val)"
       ),
       "expected1",

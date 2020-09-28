@@ -105,7 +105,7 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
   @Test
   public void testFixedPattern() throws Exception {
     // 2 matches for ISO
-    String query = "MATCH (n)-[e]->(m)-[f]->(o) WHERE n.tx_to>1970-01-01";
+    String query = "MATCH (n)-[e]->(m)-[f]->(o) WHERE n.tx_to>Timestamp(1970-01-01)";
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
       new CNFPostProcessing(new ArrayList<>()));
     est = new CNFEstimation(stats, queryHandler);
@@ -168,7 +168,7 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
   @Test
   public void testCartesianProductVertices() throws Exception {
     // prohibit asOf(now)
-    String query = "MATCH (a) (b) WHERE a.tx_to>1970-01-01";
+    String query = "MATCH (a) (b) WHERE a.tx_to>Timestamp(1970-01-01)";
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
       new CNFPostProcessing(new ArrayList<>()));
     est = new CNFEstimation(stats, queryHandler);
@@ -191,7 +191,7 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
   @Test
   public void testComplexCartesianProduct() throws Exception {
     String query = "MATCH (a)-[e1:trip]->(b:station),(c:station)-[e2:trip]->(d:station)" +
-      "WHERE a.tx_from > c.val_from AND a.tx_to>1970-01-01";
+      "WHERE a.tx_from > c.val_from AND a.tx_to>Timestamp(1970-01-01)";
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
       new CNFPostProcessing(new ArrayList<>()));
     est = new CNFEstimation(stats, queryHandler);
@@ -270,41 +270,6 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     long withoutPredicate = ce2dEstimator.getCardinality() * ae1bEstimator.getCardinality();
     assertTrue(0.45 * withoutPredicate <= crossEstimator.getCardinality() &&
       crossEstimator.getCardinality() <= 0.55 * withoutPredicate);
-  }
-
-  @Test
-  public void testUnknownLabels() throws QueryContradictoryException {
-    // unknown labels should yield to estimation near 0 (exactly 0 in this case,
-    // as there are very few vertices in the DB)
-    String query = "MATCH (a)-[e:trip]->(b:unknown)";
-    TemporalQueryHandler queryHandler = new TemporalQueryHandler(query,
-      new CNFPostProcessing(new ArrayList<>()));
-    est = new CNFEstimation(stats, queryHandler);
-
-    LeafNode aNode = new FilterAndProjectTemporalVerticesNode(null, "a",
-      queryHandler.getPredicates().getSubCNF("a"), Sets.newHashSet());
-    assertTrue(new TemporalQueryPlanEstimator(new QueryPlan(aNode), queryHandler, stats, est)
-      .getCardinality() > 0);
-
-    LeafNode bNode = new FilterAndProjectTemporalVerticesNode(null, "b",
-      queryHandler.getPredicates().getSubCNF("b"), Sets.newHashSet());
-    assertEquals(new TemporalQueryPlanEstimator(new QueryPlan(bNode), queryHandler, stats, est)
-      .getCardinality(), 0);
-
-    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null, "a", "e",
-      "b", queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
-    assertTrue(new TemporalQueryPlanEstimator(new QueryPlan(eNode), queryHandler, stats, est)
-      .getCardinality() > 0);
-
-    CartesianProductNode crossNode1 = new CartesianProductNode(aNode, bNode, MatchStrategy
-      .HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
-    assertEquals(new TemporalQueryPlanEstimator(new QueryPlan(crossNode1), queryHandler, stats, est)
-      .getCardinality(), 0);
-
-    CartesianProductNode crossNode2 = new CartesianProductNode(crossNode1, eNode, MatchStrategy
-      .HOMOMORPHISM, MatchStrategy.ISOMORPHISM);
-    assertEquals(new TemporalQueryPlanEstimator(new QueryPlan(crossNode2), queryHandler, stats, est)
-      .getCardinality(), 0);
   }
 
 }

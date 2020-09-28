@@ -29,20 +29,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Abstract base class for subsumptions
+ * Abstract base class for subsumptions of clauses.
+ * A simplifying assumption is made: smaller clauses are not subsumed by larger ones.
+ * It is not guaranteed that all subsumptions or the optimal sequence of subsumptions are applied
  */
 public abstract class Subsumption implements QueryTransformation {
   @Override
   public CNF transformCNF(CNF cnf) {
+    // separate singleton clauses from disjunctive clauses
     ArrayList<CNFElement> necessaryClauses = cnf.getPredicates().stream()
       .filter(clause -> clause.size() == 1).collect(Collectors.toCollection(ArrayList::new));
     List<CNFElement> disjunctiveClauses = cnf.getPredicates().stream()
       .filter(clause -> clause.size() > 1)
       .collect(Collectors.toList());
+    // apply subsumption within disjunctive clauses while keeping the singletons and ...
     cnf = new CNF(necessaryClauses).and(
       subsumeDisjunctiveClauses(disjunctiveClauses));
     List<CNFElement> oldClauses = cnf.getPredicates();
-    // clause size ascending
+    // ... apply subsumption to the result
     return new CNF(subsumeClauses(oldClauses));
   }
 
@@ -55,18 +59,18 @@ public abstract class Subsumption implements QueryTransformation {
    */
   protected ArrayList<CNFElement> sortClauses(List<CNFElement> clauses) {
     // count for every clause how much clauses it subsumes
-    HashMap<CNFElement, Integer> countSubsumedBy = new HashMap<>();
+    HashMap<CNFElement, Integer> countSubsumes = new HashMap<>();
     for (int i = 0; i < clauses.size(); i++) {
       CNFElement clause1 = clauses.get(i);
-      countSubsumedBy.putIfAbsent(clause1, 0);
+      countSubsumes.putIfAbsent(clause1, 0);
       for (int j = i; j < clauses.size(); j++) {
         CNFElement clause2 = clauses.get(j);
         if (subsumes(clause1, clause2)) {
-          countSubsumedBy.put(clause1, countSubsumedBy.get(clause1) + 1);
+          countSubsumes.put(clause1, countSubsumes.get(clause1) + 1);
         }
         if (subsumes(clause2, clause1)) {
-          countSubsumedBy.putIfAbsent(clause2, 0);
-          countSubsumedBy.put(clause2, countSubsumedBy.get(clause2) + 1);
+          countSubsumes.putIfAbsent(clause2, 0);
+          countSubsumes.put(clause2, countSubsumes.get(clause2) + 1);
         }
       }
     }
@@ -76,8 +80,8 @@ public abstract class Subsumption implements QueryTransformation {
     clausesSorted.sort(new Comparator<CNFElement>() {
       @Override
       public int compare(CNFElement t1, CNFElement t2) {
-        int subsumedDifference = countSubsumedBy.get(t2) -
-          countSubsumedBy.get(t1);
+        int subsumedDifference = countSubsumes.get(t2) -
+          countSubsumes.get(t1);
         return subsumedDifference != 0 ? subsumedDifference :
           t1.size() - t2.size();
       }
@@ -98,16 +102,18 @@ public abstract class Subsumption implements QueryTransformation {
 
     // check for every clause if it subsumes other clauses
     for (int i = 0; i < oldClauses.size(); i++) {
-      // clause i is already subsumed, i.e. actually not there anymore
+      // clause c_i is already subsumed, i.e. actually not there anymore
       if (subsumed.contains(i)) {
         continue;
       }
+      // clause c_i is not subsumed yet, i.e. may subsume other clauses
       CNFElement c1 = oldClauses.get(i);
       for (int j = i+1; j < oldClauses.size(); j++) {
-        // clause j is already subsumed, i.e. actually not there anymore
+        // clause c_j is already subsumed, i.e. actually not there anymore
         if (subsumed.contains(j)) {
           continue;
         }
+        // clause c_j is not subsumed yet, i.e. may be subsumed
         CNFElement c2 = oldClauses.get(j);
         if (subsumes(c1, c2)) {
           subsumed.add(j);

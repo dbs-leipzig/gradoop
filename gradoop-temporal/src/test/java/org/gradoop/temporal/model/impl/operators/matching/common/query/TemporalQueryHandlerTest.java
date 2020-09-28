@@ -48,7 +48,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 import static org.s1ck.gdl.utils.Comparator.GT;
 import static org.s1ck.gdl.utils.Comparator.LT;
@@ -97,7 +99,7 @@ public class TemporalQueryHandlerTest {
   }
 
   @Test
-  public void testGetPredicatesWithoutDefaultAsOf() {
+  public void testSimplePredicates() {
     String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_from.before(b.tx_to)";
     TemporalQueryHandler handler = null;
     try {
@@ -118,49 +120,19 @@ public class TemporalQueryHandlerTest {
     assertPredicateEquals(and, handler.getPredicates());
   }
 
-  /*@Test
-  public void testGetPredicatesWithDefaultAsOf() throws QueryContradictoryException {
-    String testquery = "MATCH (v1)-[e1:test]->(v2) WHERE v1.tx_from.before(v2.val_to)";
-    TemporalQueryHandler handler = new TemporalQueryHandler(testquery, new CNFPostProcessing());
-    TimeLiteral now = handler.getNow();
-    Predicate and = new And(
-      new Comparison(new TimeSelector("v2", "val_to"),
-        GT,
-        new TimeSelector("v1", "tx_from")),
-      new Comparison(new PropertySelector("e1", "__label__"),
-        Comparator.EQ,
-        new Literal("test"))
-    );
-    And defaultAsOfV1 = getAsOf("v1", now);
-    And defaultAsOfE1 = getAsOf("e1", now);
-    And defaultAsOfV2 = getAsOf("v2", now);
-
-    Predicate expectedGDLPredicate = new And(and, defaultAsOfE1);
-    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV2);
-    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
-
-    assertPredicateEquals(expectedGDLPredicate, handler.getPredicates());
-
-    //without any other predicates
-    testquery = "MATCH (v1)-[e1]->(v2)";
-    handler = new TemporalQueryHandler(testquery);
-    now = handler.getNow();
-    defaultAsOfV1 = getAsOf("v1", now);
-    defaultAsOfE1 = getAsOf("e1", now);
-    defaultAsOfV2 = getAsOf("v2", now);
-    expectedGDLPredicate = new And(defaultAsOfE1, defaultAsOfV2);
-    expectedGDLPredicate = new And(expectedGDLPredicate, defaultAsOfV1);
-    assertPredicateEquals(expectedGDLPredicate, handler.getPredicates());
-
-  }*/
-
   @Test
   public void testGlobalPredicates() throws QueryContradictoryException {
     // no global predicates
     String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_to.before(b.val_to)";
+    TimeSelector e1TxFrom = new TimeSelector("e1", TX_FROM);
+    TimeSelector aTxFrom = new TimeSelector("a", TX_FROM);
+    TimeSelector bTxFrom = new TimeSelector("b", TX_FROM);
     TimeSelector aTxTo = new TimeSelector("a", TX_TO);
     TimeSelector bTxTo = new TimeSelector("b", TX_TO);
     TimeSelector e1TxTo = new TimeSelector("e1", TX_TO);
+    TimeSelector aValFrom = new TimeSelector("a", VAL_FROM);
+    TimeSelector bValFrom = new TimeSelector("b", VAL_FROM);
+    TimeSelector e1ValFrom = new TimeSelector("e1", VAL_FROM);
     TimeSelector aValTo = new TimeSelector("a", VAL_TO);
     TimeSelector bValTo = new TimeSelector("b", VAL_TO);
     TimeSelector e1ValTo = new TimeSelector("e1", VAL_TO);
@@ -178,29 +150,27 @@ public class TemporalQueryHandlerTest {
     System.out.println("Here");
 
     // global and non-global predicates
-    testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) OR a.val_to.after(b.val_to)";
+    testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(b.val_to)";
     handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
     MinTimePoint globalTxTo = new MinTimePoint(e1TxTo, aTxTo, bTxTo);
+    MaxTimePoint globalTxFrom = new MaxTimePoint(e1TxFrom, aTxFrom, bTxFrom);
+    MaxTimePoint globalValFrom = new MaxTimePoint(e1ValFrom, aValFrom, bValFrom);
 
     expectedPredicate = new And(
-      new Or(
+      new And(
+      new And(
         new Comparison(globalTxTo, LT, bValTo),
+        new Comparison(globalTxFrom, LTE, globalTxTo)),
+
         new Comparison(aValTo, GT, bValTo)
       ),
       new Comparison(new PropertySelector("e1", "__label__"),
         Comparator.EQ,
         new Literal("test"))
     );
-    Predicate expectedGlobal = new Or(
-      new Comparison(globalTxTo, LT, bValTo),
-      new Comparison(aValTo, GT, bValTo)
-    );
-    Predicate expectedNonGlobal = new Comparison(
-      new PropertySelector("e1", "__label__"),
-      Comparator.EQ,
-      new Literal("test"));
 
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
+    System.out.println("handlerPredicates: \n"+handler.getPredicates()+"\n");
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
 
     // only global
@@ -208,10 +178,16 @@ public class TemporalQueryHandlerTest {
     handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
     System.out.println(handler.getPredicates());
     MinTimePoint globalValTo = new MinTimePoint(e1ValTo, aValTo, bValTo);
+
     expectedPredicate = new And(
+      new And(
       new Comparison(globalTxTo, LT, bValTo),
-      new Comparison(aValTo, GT, globalValTo)
+      new Comparison(globalTxFrom, LTE, globalTxTo)),
+      new And(
+      new Comparison(aValTo, GT, globalValTo),
+        new Comparison(globalValFrom, LTE, globalValTo))
     );
+    System.out.println("expected: \n"+ handler.getPredicates()+"\n");
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
   }
@@ -260,39 +236,24 @@ public class TemporalQueryHandlerTest {
 
 
   // returns the overlaps predicate for the edge (a)-[e]->(b)
-  private And getOverlapsPredicate(){
-    TimeSelector eFrom = new TimeSelector("e1", TimeSelector.TimeField.VAL_FROM);
+  private Predicate getOverlapsPredicate(){
+    TimeSelector eFrom = new TimeSelector("e1", VAL_FROM);
     TimeSelector eTo = new TimeSelector("e1", TimeSelector.TimeField.VAL_TO);
 
-    TimeSelector sFrom = new TimeSelector("a", TimeSelector.TimeField.VAL_FROM);
+    TimeSelector sFrom = new TimeSelector("a", VAL_FROM);
     TimeSelector sTo = new TimeSelector("a", TimeSelector.TimeField.VAL_TO);
 
-    TimeSelector tFrom = new TimeSelector("b", TimeSelector.TimeField.VAL_FROM);
+    TimeSelector tFrom = new TimeSelector("b", VAL_FROM);
     TimeSelector tTo = new TimeSelector("b", TimeSelector.TimeField.VAL_TO);
 
-    And overlaps = new And(
-      new Comparison(
-        new MaxTimePoint(eFrom, sFrom), LTE, new MinTimePoint(eTo, sTo)
-      ),
-      new Comparison(
-        new MaxTimePoint(eFrom, tFrom), LTE, new MinTimePoint(eTo, tTo)
-      )
-    );
+    Predicate overlaps = new Comparison(
+        new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
+      );
     return overlaps;
   }
 
-  private And getAsOf(String var, TimeLiteral now) {
-    return new And(
-      new Comparison(
-        new TimeSelector(var, TimeSelector.TimeField.TX_FROM),
-        Comparator.LTE, now
-      ),
-      new Comparison(
-        new TimeSelector(var, TX_TO),
-        Comparator.GTE, now
-      )
-    );
-  }
+
+  // also copied from EPGM tests
 
   @Test
   public void testGetVertexCount() {
@@ -304,17 +265,6 @@ public class TemporalQueryHandlerTest {
     assertEquals(4, QUERY_HANDLER.getEdgeCount());
   }
 
-    /*@Test
-    public void testGetDiameter() {
-        assertEquals(2, QUERY_HANDLER.getDiameter());
-        assertEquals(0, new QueryHandler("(v0)").getDiameter());
-    }
-
-    @Test
-    public void testGetRadius() {
-        assertEquals(1, QUERY_HANDLER.getRadius());
-        assertEquals(0, new QueryHandler("(v0)").getRadius());
-    }*/
 
   @Test
   public void testIsSingleVertexGraph() {
@@ -352,117 +302,6 @@ public class TemporalQueryHandlerTest {
     assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
     assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
   }
-
-//    @Test
-//    public void testGetVerticesByLabel() throws Exception {
-//        List<Vertex> bVertices = Lists.newArrayList(
-//                QUERY_HANDLER.getVerticesByLabel("B"));
-//        List<Vertex> expected = Lists.newArrayList(
-//                GDL_HANDLER.getVertexCache().get("v2"),
-//                GDL_HANDLER.getVertexCache().get("v3"));
-//        assertTrue(elementsEqual(bVertices, expected));
-//    }
-//
-//    @Test
-//    public void testGetNeighbors() throws Exception {
-//        List<Vertex> neighbors = Lists.newArrayList(QUERY_HANDLER
-//                .getNeighbors(GDL_HANDLER.getVertexCache().get("v2").getId()));
-//        List<Vertex> expected = Lists.newArrayList(
-//                GDL_HANDLER.getVertexCache().get("v1"),
-//                GDL_HANDLER.getVertexCache().get("v3"));
-//        assertTrue(elementsEqual(neighbors, expected));
-//    }
-//
-//    @Test
-//    public void testGetEdgesByLabel() throws Exception {
-//        List<Edge> aEdges = Lists.newArrayList(QUERY_HANDLER.getEdgesByLabel("a"));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e1"),
-//                GDL_HANDLER.getEdgeCache().get("e3"));
-//        assertTrue(elementsEqual(aEdges, expected));
-//    }
-//
-//    @Test
-//    public void testGetEdgesByVertexId() throws Exception {
-//        Vertex v2 = GDL_HANDLER.getVertexCache().get("v2");
-//        List<Edge> edges = Lists.newArrayList(
-//                QUERY_HANDLER.getEdgesByVertexId(v2.getId()));
-//
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e1"),
-//                GDL_HANDLER.getEdgeCache().get("e2"),
-//                GDL_HANDLER.getEdgeCache().get("e3"));
-//        assertTrue(elementsEqual(edges, expected));
-//    }
-//
-//    @Test
-//    public void testGetEdgesBySourceVertexId() throws Exception {
-//        Vertex v2 = GDL_HANDLER.getVertexCache().get("v2");
-//        List<Edge> outE = Lists.newArrayList(
-//                QUERY_HANDLER.getEdgesBySourceVertexId(v2.getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e2"),
-//                GDL_HANDLER.getEdgeCache().get("e3"));
-//        assertTrue(elementsEqual(outE, expected));
-//    }
-//
-//    @Test
-//    public void testGetEdgesByTargetVertexId() throws Exception {
-//        Vertex v3 = GDL_HANDLER.getVertexCache().get("v3");
-//        List<Edge> inE = Lists.newArrayList(
-//                QUERY_HANDLER.getEdgesByTargetVertexId(v3.getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e2"),
-//                GDL_HANDLER.getEdgeCache().get("e4"));
-//        assertTrue(elementsEqual(inE, expected));
-//    }
-//
-//    @Test
-//    public void testGetPredecessors() throws Exception {
-//        List<Edge> predecessors = Lists.newArrayList(QUERY_HANDLER.getPredecessors(
-//                GDL_HANDLER.getEdgeCache().get("e2").getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e1"));
-//        assertTrue(elementsEqual(predecessors, expected));
-//    }
-//
-//    @Test
-//    public void testGetPredecessorsWithLoop() throws Exception {
-//        List<Edge> predecessors = Lists.newArrayList(QUERY_HANDLER.getPredecessors(
-//                GDL_HANDLER.getEdgeCache().get("e4").getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e2"),
-//                GDL_HANDLER.getEdgeCache().get("e4"));
-//        assertTrue(elementsEqual(predecessors, expected));
-//    }
-//
-//    @Test
-//    public void testGetSuccessors() throws Exception {
-//        List<Edge> successors = Lists.newArrayList(QUERY_HANDLER.getSuccessors(
-//                GDL_HANDLER.getEdgeCache().get("e1").getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e2"),
-//                GDL_HANDLER.getEdgeCache().get("e3"));
-//        assertTrue(elementsEqual(successors, expected));
-//    }
-//
-//    @Test
-//    public void testGetSuccessorsWithLoop() throws Exception {
-//        List<Edge> successors = Lists.newArrayList(QUERY_HANDLER.getSuccessors(
-//                GDL_HANDLER.getEdgeCache().get("e4").getId()));
-//        List<Edge> expected = Lists.newArrayList(
-//                GDL_HANDLER.getEdgeCache().get("e4"));
-//        assertTrue(elementsEqual(successors, expected));
-//    }
-//
-//    @Test
-//    public void testGetCenterVertices() throws Exception {
-//        List<Vertex> centerVertices = Lists.newArrayList(
-//                QUERY_HANDLER.getCenterVertices());
-//        List<Vertex> expected = Lists.newArrayList(
-//                GDL_HANDLER.getVertexCache().get("v2"));
-//        assertTrue(elementsEqual(centerVertices, expected));
-//    }
 
   @Test
   public void testGetEdgeByVariable() throws Exception {

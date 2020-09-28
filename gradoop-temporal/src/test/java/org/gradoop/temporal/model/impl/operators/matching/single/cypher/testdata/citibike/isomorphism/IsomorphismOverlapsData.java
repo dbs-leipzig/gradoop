@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © Timestamp(2014 - Timestamp(2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_1_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 " +
           "AND e1.val.overlaps(e2.val) AND e2.val_from.before(e1.val_from)"),
       "expected1",
@@ -43,7 +43,7 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_2_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)<-[e1]-(b)-[e2]->(c) WHERE b.id=309 " +
           "AND e1.val.overlaps(e2.val) AND e1.val_from.before(e2.val_from)"),
       "expected1",
@@ -55,7 +55,7 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_3_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE e1.edgeId=8 " +
           "AND NOT e1.val.overlaps(e2.val)"),
       "expected1",
@@ -69,10 +69,10 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_4_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
-          "e.val.overlaps(Interval(2013-06-01T00:00:00, 2013-06-01T00:01:00)) OR " +
-          "e.val.overlaps(Interval(2013-06-01T00:36:00, 2013-06-01T00:37:00))"),
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:01:00))) OR " +
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:36:00), Timestamp(2013-06-01T00:37:00)))"),
       "expected1,expected2,expected3,expected4",
       "expected1[(s8)-[e6]->(s9)], expected2[(s0)-[e0]->(s1)]," +
         "expected3[(s0)-[e1]->(s1)], expected4[(s28)-[e18]->(s29)]"
@@ -84,11 +84,11 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_5_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE " +
-          "e.val.overlaps(Interval(2013-06-01T00:00:00, 2013-06-01T00:01:00)) OR " +
-          "e.val.overlaps(Interval(2013-06-01T00:36:00, 2013-06-01T00:37:00)) AND " +
-          "a.tx.overlaps(Interval(2013-05-01, 2013-05-13))"),
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:00:00), Timestamp(2013-06-01T00:01:00))) OR " +
+          "e.val.overlaps(Interval(Timestamp(2013-06-01T00:36:00), Timestamp(2013-06-01T00:37:00))) AND " +
+          "a.tx.overlaps(Interval(Timestamp(2013-05-01), Timestamp(2013-05-13)))"),
       "expected1,expected2,expected3",
       "expected1[(s0)-[e0]->(s1)]," +
         "expected2[(s0)-[e1]->(s1)], expected3[(s28)-[e18]->(s29)]"
@@ -99,9 +99,9 @@ public class IsomorphismOverlapsData implements TemporalTestData {
     data.add(new String[] {
       "Overlaps_ISO_6_default_citibike",
       CBCypherTemporalPatternMatchingTest.defaultData,
-      CBCypherTemporalPatternMatchingTest.noDefaultAsOf(
+      CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e1]->(b) (c)-[e2]->(d) WHERE e1.edgeId=8 " +
-          "AND NOT Interval(e1.val_from, MIN(e1.val_to, 2020-05-01))" +
+          "AND NOT Interval(e1.val_from, MIN(e1.val_to, Timestamp(2020-05-01)))" +
           ".overlaps(e2.val)"),
       "expected1",
       "expected1[(s12)-[e8]->(s13) (s3)-[e3]->(s4)]"

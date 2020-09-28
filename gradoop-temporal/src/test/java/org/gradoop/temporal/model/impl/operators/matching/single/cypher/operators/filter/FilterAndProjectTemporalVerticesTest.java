@@ -107,7 +107,7 @@ public class FilterAndProjectTemporalVerticesTest extends PhysicalTPGMOperatorTe
   @Test
   public void testFilterVerticesByTime() throws Exception {
     CNF predicates = predicateFromQuery(
-      "MATCH (a:Person) WHERE a.tx_to.after(1970-01-01T00:01:00)");
+      "MATCH (a:Person) WHERE a.tx_to.after(Timestamp(1970-01-01T00:01:00))").getSubCNF("a");
 
     TemporalVertexFactory vertexFactory = new TemporalVertexFactory();
     // v1 fulfills the predicate
