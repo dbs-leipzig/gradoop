@@ -18,16 +18,15 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
-import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
@@ -67,7 +66,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
 
     QueryPlan queryPlan = new QueryPlan(nNode);
     // 30 stations
-    TemporalQueryPlanEstimator estimator = new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
+    TemporalQueryPlanEstimator estimator =
+      new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
     assertThat(estimator.getCardinality(), is(30L));
 
     queryPlan = new QueryPlan(mNode);
@@ -93,7 +93,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
 
 
     QueryPlan queryPlan = new QueryPlan(eNode);
-    TemporalQueryPlanEstimator estimator = new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
+    TemporalQueryPlanEstimator estimator =
+      new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
     // 20 edges
     assertThat(estimator.getCardinality(), is(20L));
 
@@ -182,7 +183,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
 
     QueryPlan queryPlan = new QueryPlan(crossNode);
 
-    TemporalQueryPlanEstimator estimator = new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
+    TemporalQueryPlanEstimator estimator =
+      new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
 
     assertTrue(850 <= estimator.getCardinality() && estimator.getCardinality() <= 900);
   }

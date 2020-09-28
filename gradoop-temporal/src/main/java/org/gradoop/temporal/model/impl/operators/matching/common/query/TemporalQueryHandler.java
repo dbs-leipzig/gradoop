@@ -15,20 +15,13 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
-import com.google.common.collect.Sets;
-import org.apache.commons.lang3.tuple.Pair;
-import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
@@ -38,16 +31,9 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.Predicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.s1ck.gdl.utils.Comparator.LTE;
 
@@ -76,6 +62,7 @@ public class TemporalQueryHandler extends QueryHandler {
    * {@link CNFPostProcessing}
    *
    * @param gdlString GDL query string
+   * @throws QueryContradictoryException if a contradiction in the query is encountered
    */
   public TemporalQueryHandler(String gdlString) throws QueryContradictoryException {
     this(gdlString, new CNFPostProcessing());
@@ -148,15 +135,15 @@ public class TemporalQueryHandler extends QueryHandler {
 
     // maps vertex ids to vertex variables
     Map<Long, String> vertexMap = new HashMap<>();
-    for(Vertex vertex : handler.getVertexCache(true, true).values()){
+    for (Vertex vertex : handler.getVertexCache(true, true).values()) {
       vertexMap.put(vertex.getId(), vertex.getVariable());
     }
 
     // determine all (vertex, edge, vertex) triples
-    for(String edgeVar: handler.getEdgeCache().keySet()){
+    for (String edgeVar: handler.getEdgeCache().keySet()) {
       Edge edge = edgeCache.get(edgeVar);
       // no temporal predicates for paths
-      if(edge.hasVariableLength()){
+      if (edge.hasVariableLength()) {
         continue;
       }
       String sourceVar = vertexMap.get(edge.getSourceVertexId());

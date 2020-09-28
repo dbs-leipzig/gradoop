@@ -20,7 +20,6 @@ import org.apache.flink.util.Collector;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,7 +44,7 @@ public class ElementsToStats<T extends TemporalElement> implements
    * @param numericalProperties numerical properties to consider
    * @param categoricalProperties categorical propberties to consider
    */
-  public ElementsToStats(Set<String> numericalProperties, Set<String> categoricalProperties){
+  public ElementsToStats(Set<String> numericalProperties, Set<String> categoricalProperties) {
     this.numericalProperties = numericalProperties;
     this.categoricalProperties = categoricalProperties;
   }
@@ -53,7 +52,7 @@ public class ElementsToStats<T extends TemporalElement> implements
   /**
    * Creates a new ElementsToStats function considering all properties
    */
-  public ElementsToStats(){
+  public ElementsToStats() {
     this(null, null);
   }
 

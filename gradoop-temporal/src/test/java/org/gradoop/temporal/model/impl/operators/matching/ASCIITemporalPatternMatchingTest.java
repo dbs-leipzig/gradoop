@@ -16,31 +16,22 @@
 package org.gradoop.temporal.model.impl.operators.matching;
 
 
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
-import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
-import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
-import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -125,7 +116,7 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
 
     List<TemporalGraphHead> graphHeads = result.getGraphHeads().collect();
-    System.out.println("expected: "+expectedCollection);
+    System.out.println("expected: " + expectedCollection);
     printResult(result);
     //testGraphHeads(result);
     // exists variable mapping?
@@ -150,8 +141,8 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
       .map(v -> v.getPropertyValue("edgeId").getInt())
       .collect(Collectors.toCollection(ArrayList::new));
 
-    System.out.println("Vertices "+vertices);
-    System.out.println("Edges "+edges);
+    System.out.println("Vertices " + vertices);
+    System.out.println("Edges " + edges);
     System.out.println();
   }
 

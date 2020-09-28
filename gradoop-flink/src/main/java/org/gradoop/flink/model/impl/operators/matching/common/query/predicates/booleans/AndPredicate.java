@@ -34,7 +34,7 @@ public class AndPredicate extends QueryPredicate {
   /**
    * Optional factory for creating QueryComparables
    */
-  QueryComparableFactory comparableFactory;
+  private final QueryComparableFactory comparableFactory;
 
   /**
    * Returns a new AndPredicate

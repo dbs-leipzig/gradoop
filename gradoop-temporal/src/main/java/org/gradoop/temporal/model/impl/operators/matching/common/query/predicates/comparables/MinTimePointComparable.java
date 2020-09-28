@@ -20,7 +20,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
@@ -104,7 +103,7 @@ public class MinTimePointComparable extends TemporalComparable {
   @Override
   public Set<String> getPropertyKeys(String variable) {
     HashSet<String> keys = new HashSet<>();
-    for(QueryComparable comp: getArgs()){
+    for (QueryComparable comp: getArgs()) {
       keys.addAll(comp.getPropertyKeys(variable));
     }
     return keys;

@@ -21,11 +21,12 @@ import org.apache.log4j.Logger;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
-import org.gradoop.flink.model.impl.operators.matching.common.functions.ElementsFromEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.add.AddEmbeddingsElements;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddingsElements;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
@@ -33,11 +34,8 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.postproce
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbeddingTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -85,12 +83,13 @@ public class CypherTemporalPatternMatching
    * @param vertexStrategy  morphism strategy for vertex mappings
    * @param edgeStrategy    morphism strategy for edge mappings
    * @param graphStatistics statistics about the data graph
+   * @param postprocessor   postprocessing pipeline for the query CNF
    */
   public CypherTemporalPatternMatching(String query, boolean attachData,
                                        MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
                                        TemporalGraphStatistics graphStatistics,
-                                       CNFPostProcessing postProcessing) {
-    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics, postProcessing);
+                                       CNFPostProcessing postprocessor) {
+    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics, postprocessor);
   }
 
   /**
@@ -102,6 +101,7 @@ public class CypherTemporalPatternMatching
    * @param vertexStrategy      morphism strategy for vertex mappings
    * @param edgeStrategy        morphism strategy for edge mappings
    * @param graphStatistics     statistics about the data graph
+   * @param postprocessor       postprocessing pipeline for the query CNF
    */
   public CypherTemporalPatternMatching(String query, String constructionPattern, boolean attachData,
                                        MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,

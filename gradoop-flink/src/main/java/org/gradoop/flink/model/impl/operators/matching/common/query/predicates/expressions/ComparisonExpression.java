@@ -67,8 +67,8 @@ public class ComparisonExpression extends QueryPredicate {
    * @return wrapped left hand side
    */
   public QueryComparable getLhs() {
-    return comparableFactory==null ?
-      QueryComparable.createFrom(comparison.getComparableExpressions()[0]):
+    return comparableFactory == null ?
+      QueryComparable.createFrom(comparison.getComparableExpressions()[0]) :
       comparableFactory.createFrom(comparison.getComparableExpressions()[0]);
   }
 
@@ -77,8 +77,8 @@ public class ComparisonExpression extends QueryPredicate {
    * @return wrapped left hand side
    */
   public QueryComparable getRhs() {
-    return comparableFactory==null ?
-      QueryComparable.createFrom(comparison.getComparableExpressions()[1]):
+    return comparableFactory == null ?
+      QueryComparable.createFrom(comparison.getComparableExpressions()[1]) :
       comparableFactory.createFrom(comparison.getComparableExpressions()[1]);
   }
 
@@ -162,7 +162,7 @@ public class ComparisonExpression extends QueryPredicate {
    * rhs switched
    * @return ComparisonExpression wrapping comparison with lhs and rhs switched
    */
-  public ComparisonExpression switchSides(){
+  public ComparisonExpression switchSides() {
     Comparison switchedComp = comparison.switchSides();
     return new ComparisonExpression(switchedComp, comparableFactory);
   }

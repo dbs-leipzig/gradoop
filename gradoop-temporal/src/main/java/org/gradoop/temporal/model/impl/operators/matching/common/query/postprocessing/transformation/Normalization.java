@@ -19,13 +19,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.stream.Collectors;
-
-import static org.s1ck.gdl.utils.Comparator.LT;
-import static org.s1ck.gdl.utils.Comparator.LTE;
 
 /**
  * Normalizes a {@link CNF}. Ensures that all comparisons are =, !=, < or <=
@@ -65,7 +61,7 @@ public class Normalization implements QueryTransformation {
    */
   private ComparisonExpression transformComparison(ComparisonExpression comparison) {
     Comparator comparator = comparison.getComparator();
-    if (comparator == Comparator.GT || comparator == Comparator.GTE){
+    if (comparator == Comparator.GT || comparator == Comparator.GTE) {
       return comparison.switchSides();
     } else {
       return comparison;

@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -82,14 +81,15 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     new TimeSelector("c", TX_TO));
 
   @Test
-  public void timeSelectorComparisonTest() {
+  public void timeSelectorComparisonTest() throws Exception {
     CNFEstimation estimator = getEstimator();
 
     //tx_from of v1 equally distributed from 100L to 200L
     // => 175L is part of the 76th bin
     // => 24 bins are greater => should yield 0.24
     Comparison comp1 = new Comparison(aTxFrom, GT, new TimeLiteral(175L));
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     assertEquals(estimation1, 0.24, 0.01);
@@ -99,7 +99,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
 
     // switch sides
     Comparison comp2 = new Comparison(new TimeLiteral(175L), LT, aTxFrom);
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
     assertEquals(estimation2, estimation1, 0.);
@@ -107,26 +108,29 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     // comparisons where lhs and rhs are both selectors are estimated to 1.
     // (no matter how much sense they make)
     Comparison comp3 = new Comparison(aTxTo, EQ, aTxFrom);
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
     assertEquals(estimation3, 1., 0.00001);
   }
 
   @Test
-  public void durationComparisonTest() {
+  public void durationComparisonTest() throws Exception {
     CNFEstimation estimator = getEstimator();
 
     // durations are equally distributed from 0 to 100
     Comparison comp1 = new Comparison(eTxDuration, GT, new TimeConstant(10));
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     assertEquals(estimation1, 0.9, 0.03);
 
     // switch sides
     Comparison comp2 = new Comparison(new TimeConstant(10), LT, eValDuration);
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
     assertEquals(estimation2, estimation1, 0.);
@@ -134,7 +138,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     // durations that do not compare tx_from / val_duration with a constant
     // are evaluated to, i.e. neglected in the estimation
     Comparison comp3 = new Comparison(eTxDuration, LT, eValDuration);
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
     assertEquals(estimation3, 1., 0.0001);
@@ -143,30 +148,34 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new TimeSelector("e", TX_FROM),
       new TimeLiteral("2020-05-01")),
       LT, new TimeConstant(20L));
-    CNFElement e4 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
+    CNFElement e4 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
     CNF cnf4 = new CNF(Collections.singletonList(e4));
     double estimation4 = estimator.estimateCNF(cnf4);
     assertEquals(estimation4, 1., 0.0001);
   }
 
   @Test
-  public void complexDurationComparisonTest() {
+  public void complexDurationComparisonTest() throws Exception {
     CNFEstimation estimator = getEstimator();
 
     Comparison comp1 = new Comparison(eTxDuration, LTE, fValDuration);
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     assertEquals(estimation1, 0.5, 0.02);
 
     Comparison comp2 = new Comparison(eTxDuration, EQ, fValDuration);
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
     assertEquals(estimation2, 0., 0.01);
 
     Comparison comp3 = new Comparison(eTxDuration, LT, fValDuration);
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
     assertEquals(estimation3, 0.5, 0.02);
@@ -174,7 +183,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
   }
 
   @Test
-  public void propertyComparisonTest() {
+  public void propertyComparisonTest() throws Exception {
     CNFEstimation estimator = getEstimator();
 
     // categorical
@@ -183,7 +192,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       EQ,
       new Literal("x")
     );
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     assertEquals(estimation1, 0.06, 0.001);
@@ -193,7 +203,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       EQ,
       new PropertySelector("a", "catProp1")
     );
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
     assertEquals(estimation2, 0.06, 0.001);
@@ -204,7 +215,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       LTE,
       new Literal(50)
     );
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
     assertEquals(estimation3, 0.15, 0.02);
@@ -214,14 +226,15 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       GTE,
       new PropertySelector("c", "numProp")
     );
-    CNFElement e4 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
+    CNFElement e4 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
     CNF cnf4 = new CNF(Collections.singletonList(e4));
     double estimation4 = estimator.estimateCNF(cnf4);
     assertEquals(estimation4, estimation3, 0.);
   }
 
   @Test
-  public void complexPropertyComparisonTest() {
+  public void complexPropertyComparisonTest() throws Exception {
     // property selector vs property selector
     CNFEstimation estimator = getEstimator();
 
@@ -231,7 +244,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       EQ,
       new PropertySelector("b", "gender")
     );
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     // (2/3)² * (1/3)²
@@ -244,7 +258,8 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       GTE,
       new PropertySelector("b", "numProp")
     );
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
     // occurrences of numProp * prob(a.numProb >= b.numProb)
@@ -256,57 +271,65 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       LT,
       new PropertySelector("a", "numProp")
     );
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
     assertEquals(estimation3, estimation2, 0.01);
   }
 
   @Test
-  public void complexLiteralComparisonTest() {
+  public void complexLiteralComparisonTest() throws Exception {
     CNFEstimation estimator = getEstimator();
 
     // cf. BinningTemporalGraphStatisticsTest
 
     Comparison comp1 = new Comparison(aValFrom, GTE, bTxTo);
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     double estimation1 = estimator.estimateCNF(new CNF(Collections.singletonList(e1)));
     assertEquals(estimation1, 0.25, 0.025);
 
     Comparison comp2 = new Comparison(aValTo, LT, cTxTo);
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     double estimation2 = estimator.estimateCNF(new CNF(Collections.singletonList(e2)));
     assertEquals(estimation2, 0.375, 0.1);
 
     Comparison comp3 = new Comparison(cTxTo, LTE, bTxFrom);
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     double estimation3 = estimator.estimateCNF(new CNF(Collections.singletonList(e3)));
     assertEquals(estimation3, 0.25, 0.05);
   }
 
   @Test
-  public void conjunctionTest() {
+  public void conjunctionTest() throws Exception {
     CNFEstimation estimator = getEstimator();
     // ~0.9
     Comparison comp1 = new Comparison(eTxDuration, GT, new TimeConstant(10));
-    CNFElement e1 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
+    CNFElement e1 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     // ~0.125
     Comparison comp2 = new Comparison(
       new PropertySelector("a", "numProp"),
       GTE,
       new PropertySelector("a", "numProp")
     );
-    CNFElement e2 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
+    CNFElement e2 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     // 1.
     Comparison comp3 = new Comparison(eTxDuration, LT, eValDuration);
-    CNFElement e3 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
+    CNFElement e3 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     // ~0.15
     Comparison comp4 = new Comparison(
       new Literal(50),
       GTE,
       new PropertySelector("c", "numProp")
     );
-    CNFElement e4 = new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
+    CNFElement e4 =
+      new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
 
     //0.9*0.125*0.15
     CNF cnf1 = new CNF(Arrays.asList(e1, e2, e4));
@@ -324,7 +347,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
   }
 
   @Test
-  public void disjunctionTest() {
+  public void disjunctionTest() throws Exception {
     CNFEstimation estimator = getEstimator();
     // ~0.9     (a)
     Comparison comp1 = new Comparison(eTxDuration, GT, new TimeConstant(10));
@@ -391,7 +414,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
    *
    * @return CNFEstimation object
    */
-  private CNFEstimation getEstimator() {
+  private CNFEstimation getEstimator() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
 
     HashMap<String, String> labelMap = new HashMap<>();
@@ -433,8 +456,9 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
    * from 0 to 100L
    *
    * @return dummy statistics
+   * @throws Exception if anything flink-related goes wrong
    */
-  private BinningTemporalGraphStatistics getDummyStats() {
+  private BinningTemporalGraphStatistics getDummyStats() throws Exception {
     ArrayList<TemporalVertex> vertexList = new ArrayList<>();
 
     // first type of vertex has label1
@@ -532,7 +556,6 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
 
     return new BinningTemporalGraphStatisticsFactory()
       .fromGraphWithSampling(graph, 100);
-
   }
 
 }

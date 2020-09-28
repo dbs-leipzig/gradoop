@@ -15,7 +15,6 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
 
-import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -95,19 +94,19 @@ public class EmbeddingTPGMFactory {
     for (String propertyKey : propertyKeys) {
       if (propertyKey.equals("__label__")) {
         propertyValues[i++] = PropertyValue.create(element.getLabel());
-      } else if(isProperty(propertyKey)) {
+      } else if (isProperty(propertyKey)) {
         propertyValues[i++] = element.hasProperty(propertyKey) ?
           element.getPropertyValue(propertyKey) : PropertyValue.NULL_VALUE;
       } else {
-        if(propertyKey.equals(TimeSelector.TimeField.VAL_FROM.toString())){
+        if (propertyKey.equals(TimeSelector.TimeField.VAL_FROM.toString())) {
           propertyValues[i++] = PropertyValue.create(element.getValidFrom());
-        } else if(propertyKey.equals(TimeSelector.TimeField.VAL_TO.toString())){
+        } else if (propertyKey.equals(TimeSelector.TimeField.VAL_TO.toString())) {
           propertyValues[i++] = PropertyValue.create(element.getValidTo());
-        } else if(propertyKey.equals(TimeSelector.TimeField.TX_FROM.toString())){
+        } else if (propertyKey.equals(TimeSelector.TimeField.TX_FROM.toString())) {
           propertyValues[i++] = PropertyValue.create(element.getTxFrom());
-        } else if(propertyKey.equals(TimeSelector.TimeField.TX_TO.toString())){
+        } else if (propertyKey.equals(TimeSelector.TimeField.TX_TO.toString())) {
           propertyValues[i++] = PropertyValue.create(element.getTxTo());
-        } else{
+        } else {
           propertyValues[i++] = PropertyValue.NULL_VALUE;
         }
       }
@@ -120,7 +119,7 @@ public class EmbeddingTPGMFactory {
    * @param key string to check
    * @return true iff key refers to an actual property
    */
-  private static boolean isProperty(String key){
+  private static boolean isProperty(String key) {
     return !key.equals(TimeSelector.TimeField.VAL_FROM.toString()) &&
       !key.equals(TimeSelector.TimeField.VAL_TO.toString()) &&
       !key.equals(TimeSelector.TimeField.TX_FROM.toString()) &&

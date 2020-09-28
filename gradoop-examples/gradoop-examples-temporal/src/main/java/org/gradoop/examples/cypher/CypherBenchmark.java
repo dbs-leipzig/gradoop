@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.examples.cypher;
 
 
@@ -10,7 +25,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -24,27 +38,14 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 
+/**
+ * Program to execute cypher queries
+ */
 public class CypherBenchmark {
   /**
-   * Option to declare path to indexed input graph
-   */
-  private static final String OPTION_INPUT_PATH = "i";
-  /**
-   * Option do declare path to statistics
-   */
-  private static final String OPTION_STATISTICS_PATH = "s";
-  /**
-   * Option to declare output path to statistics csv file
-   */
-  private static final String OPTION_CSV_PATH = "c";
-  /**
-   * Option to declare verification
-   */
-  private static final String OPTION_QUERY = "q";
-  /**
-   * Option for used first name in query.
-   */
-  private static final String OPTION_FIRST_NAME = "n";
+  * Command line options for the runner.
+  */
+  protected static final Options OPTIONS = new Options();
   /**
    * Used input path
    */
@@ -69,11 +70,27 @@ public class CypherBenchmark {
    * Used first name for query (q1,q2,q3)
    */
   private static String FIRST_NAME;
-
   /**
-   * Command line options for the runner.
+   * Option to declare path to indexed input graph
    */
-  protected static final Options OPTIONS = new Options();
+  private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option do declare path to statistics
+   */
+  private static final String OPTION_STATISTICS_PATH = "s";
+  /**
+   * Option to declare output path to statistics csv file
+   */
+  private static final String OPTION_CSV_PATH = "c";
+  /**
+   * Option to declare verification
+   */
+  private static final String OPTION_QUERY = "q";
+  /**
+   * Option for used first name in query.
+   */
+  private static final String OPTION_FIRST_NAME = "n";
+
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
@@ -155,6 +172,12 @@ public class CypherBenchmark {
     }
   }
 
+  /**
+   * Parses the command line arguments
+   * @param args command line arguments
+   * @return parsed arguments
+   * @throws ParseException if parsing goes wrong
+   */
   protected static CommandLine parseArguments(String[] args)
     throws ParseException {
     return new DefaultParser().parse(OPTIONS, args);

@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 
 import java.io.Serializable;
 

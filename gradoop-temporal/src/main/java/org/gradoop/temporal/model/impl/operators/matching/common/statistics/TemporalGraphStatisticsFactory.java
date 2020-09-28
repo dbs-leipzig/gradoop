@@ -17,7 +17,6 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics;
 
 import org.gradoop.temporal.model.impl.TemporalGraph;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,8 +29,9 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
    * Create statistics from a temporal graph
    * @param g graph to create statistics for
    * @return graph statistics
+   * @throws Exception if anything flink-related goes wrong
    */
-  T fromGraph(TemporalGraph g);
+  T fromGraph(TemporalGraph g) throws Exception;
 
   /**
    * Create statistics from a temporal graph, specifying numerical and categorical
@@ -40,17 +40,19 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
    * @param numericalProperties list of numerical properties to consider
    * @param categoricalProperties list of categorical properties to consider
    * @return graph statistiscs
+   * @throws Exception if anything flink-related goes wrong
    */
   T fromGraph(TemporalGraph g, Set<String> numericalProperties,
-              Set<String> categoricalProperties);
+              Set<String> categoricalProperties) throws Exception;
 
   /**
    * Create statistics from a temporal graph based on a sample of given size
    * @param g graph to create statistics for
    * @param sampleSize size of sample to be used
    * @return graph statistics
+   * @throws Exception if anything flink-related goes wrong
    */
-  T fromGraphWithSampling(TemporalGraph g, int sampleSize);
+  T fromGraphWithSampling(TemporalGraph g, int sampleSize) throws Exception;
 
   /**
    * Create statistics from a temporal graph based on a sample of given size.
@@ -60,7 +62,8 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
    * @param categoricalProperties list of categorical properties to consider
    * @param sampleSize size of sample to be used
    * @return graph statistics
+   * @throws Exception if anything flink-related goes wrong
    */
   T fromGraphWithSampling(TemporalGraph g, int sampleSize, Set<String> numericalProperties,
-                          Set<String> categoricalProperties);
+                          Set<String> categoricalProperties) throws Exception;
 }

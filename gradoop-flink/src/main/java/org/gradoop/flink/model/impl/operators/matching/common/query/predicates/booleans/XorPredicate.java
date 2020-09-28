@@ -38,7 +38,7 @@ public class XorPredicate extends QueryPredicate {
   /**
    * Optional factory for creating QueryComparables
    */
-  QueryComparableFactory comparableFactory;
+  private final QueryComparableFactory comparableFactory;
 
   /**
    * Creates a new Wrapper
@@ -53,6 +53,7 @@ public class XorPredicate extends QueryPredicate {
    * Creates a new Wrapper
    *
    * @param xor The wrapped xor predicate
+   * @param comparableFactory factory for comparables
    */
   public XorPredicate(Xor xor, QueryComparableFactory comparableFactory) {
     this.xor = xor;

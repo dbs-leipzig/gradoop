@@ -105,10 +105,10 @@ public class TimeSelectorComparableTest {
     TimeSelectorComparable wrapper = new TimeSelectorComparable(selector);
 
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), new PropertyValue[]{
+    embedding.add(GradoopId.get(), new PropertyValue[] {
       PropertyValue.create(1234L),
       PropertyValue.create(4321L),
-      PropertyValue.create(6789L),});
+      PropertyValue.create(6789L) });
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("b", EmbeddingMetaData.EntryType.VERTEX, 0);

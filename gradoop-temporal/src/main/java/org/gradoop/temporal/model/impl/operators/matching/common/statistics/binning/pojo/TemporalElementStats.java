@@ -22,7 +22,6 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -126,7 +125,7 @@ public class TemporalElementStats implements Serializable {
    * @param categoricalProperties list of categorical properties to consider
    */
   public TemporalElementStats(int reservoirSampleSize, Set<String> numericalProperties,
-                              Set<String> categoricalProperties){
+                              Set<String> categoricalProperties) {
     this(reservoirSampleSize);
     this.numericalProperties = numericalProperties;
     this.categoricalProperties = categoricalProperties;
@@ -149,10 +148,10 @@ public class TemporalElementStats implements Serializable {
     numericalOccurrenceEstimation = new HashMap<>();
     recomputeTemporalDataFlag = false;
     recomputePropertyDataFlag = false;
-    valFromStats = new double[]{};
-    txFromStats = new double[]{};
-    valToStats = new double[]{};
-    txToStats = new double[]{};
+    valFromStats = new double[] {};
+    txFromStats = new double[] {};
+    valToStats = new double[] {};
+    txToStats = new double[] {};
     txDurationStats = new double[] {};
     valDurationStats = new double[] {};
     sampler = new ReservoirSampler<TemporalElement>(reservoirSampleSize);
@@ -174,7 +173,7 @@ public class TemporalElementStats implements Serializable {
    * @param numericalProperties numerical properties to consider
    * @param categoricalProperties categorical properties to consider
    */
-  public TemporalElementStats(Set<String> numericalProperties, Set<String> categoricalProperties){
+  public TemporalElementStats(Set<String> numericalProperties, Set<String> categoricalProperties) {
     this(ReservoirSampler.DEFAULT_SAMPLE_SIZE, numericalProperties, categoricalProperties);
   }
 
@@ -227,9 +226,8 @@ public class TemporalElementStats implements Serializable {
 
     // sample size must be a multiple of the number of bins
     if (sampleSize % numBins != 0) {
-      reservoirSample = reservoirSample.subList(0, (
-        sampleSize - sampleSize % numBins
-      ));
+      reservoirSample = reservoirSample.subList(0,
+        sampleSize - sampleSize % numBins);
     }
 
     // lists collecting all values for each time property, i.e. Long.MIN_VALUE/MAX_VALUE, too
@@ -262,13 +260,13 @@ public class TemporalElementStats implements Serializable {
       long txTo = element.getTxTo();
       allTxFroms.add(txFrom);
       allTxTos.add(txTo);
-      if(txFrom > Long.MIN_VALUE){
+      if (txFrom > Long.MIN_VALUE) {
         txFroms.add(txFrom);
-      } else{
+      } else {
         txFromMinCount++;
       }
       if (txTo == Long.MAX_VALUE) {
-        txToMaxCount += 1;
+        txToMaxCount  += 1;
         txDurations.add(now - txFrom);
       } else {
         txTos.add(txTo);
@@ -279,13 +277,13 @@ public class TemporalElementStats implements Serializable {
       long valTo = element.getValidTo();
       allValFroms.add(valFrom);
       allValTos.add(valTo);
-      if(valFrom > Long.MIN_VALUE){
+      if (valFrom > Long.MIN_VALUE) {
         valFroms.add(valFrom);
-      } else{
+      } else {
         valFromMinCount++;
       }
       if (valTo == Long.MAX_VALUE) {
-        valToMaxCount += 1;
+        valToMaxCount  += 1;
         valDurations.add(now - valFrom);
       } else {
         valTos.add(valTo);
@@ -298,22 +296,22 @@ public class TemporalElementStats implements Serializable {
     double txFromMean = mean(txFroms);
     double txFromVariance = variance(txFroms, txFromMean);
     double txFromMinEstimation = (double) txFromMinCount / (double) sampleSize;
-    txFromStats = new double[]{txFromMean, txFromVariance, txFromMinEstimation};
+    txFromStats = new double[] {txFromMean, txFromVariance, txFromMinEstimation};
 
     double valFromMean = mean(valFroms);
     double valFromVariance = variance(valFroms, valFromMean);
     double valFromMinEstimation = (double) valFromMinCount / (double) sampleSize;
-    valFromStats = new double[]{valFromMean, valFromVariance, valFromMinEstimation};
+    valFromStats = new double[] {valFromMean, valFromVariance, valFromMinEstimation};
 
     double txToMean = mean(txTos);
     double txToVariance = variance(txTos, txToMean);
     double txToMaxEstimation = (double) txToMaxCount / (double) sampleSize;
-    txToStats = new double[]{txToMean, txToVariance, txToMaxEstimation};
+    txToStats = new double[] {txToMean, txToVariance, txToMaxEstimation};
 
     double valToMean = mean(valTos);
     double valToVariance = variance(valTos, valToMean);
     double valToMaxEstimation = (double) valToMaxCount / (double) sampleSize;
-    valToStats = new double[]{valToMean, valToVariance, valToMaxEstimation};
+    valToStats = new double[] {valToMean, valToVariance, valToMaxEstimation};
 
     // create binnings for the temporal properties
     estimatedTimeBins = new Binning[] {
@@ -346,7 +344,7 @@ public class TemporalElementStats implements Serializable {
   private double mean(List<Long> ls) {
     double mean = 0.;
     for (Long l : ls) {
-      mean += (double) l / ls.size();
+      mean  += (double) l / ls.size();
     }
     return mean;
   }
@@ -361,7 +359,7 @@ public class TemporalElementStats implements Serializable {
   private double variance(List<Long> ls, double mean) {
     double var = 0.;
     for (Long l : ls) {
-      var += (l - mean) * (l - mean) * (1. / ls.size());
+      var  += (l - mean) * (l - mean) * (1. / ls.size());
     }
     return var;
   }
@@ -379,7 +377,7 @@ public class TemporalElementStats implements Serializable {
     }
 
     // classify all property values, if not already done
-    if(categoricalProperties==null || numericalProperties==null){
+    if (categoricalProperties == null || numericalProperties == null) {
       detectPropertyTypes(reservoirSample);
     }
     // these maps collect all property values in the sample
@@ -395,11 +393,11 @@ public class TemporalElementStats implements Serializable {
         PropertyValue value = element.getPropertyValue(key);
         HashMap<String, List<PropertyValue>> data;
         // no outlier, i.e. NULL, NaN etc.?
-        if(numericalProperties.contains(key) && isNumerical(value)){
+        if (numericalProperties.contains(key) && isNumerical(value)) {
           data = numericalData;
-        } else if(categoricalProperties.contains(key)){
+        } else if (categoricalProperties.contains(key)) {
           data = categoricalData;
-        } else{
+        } else {
           continue;
         }
 /*        // original
@@ -432,10 +430,10 @@ public class TemporalElementStats implements Serializable {
       }
       for (String key : element.getPropertyKeys()) {
         PropertyValue value = element.getPropertyValue(key);
-        if (isNumerical(value)){
-          numerical.put(key, numerical.getOrDefault(key, 0)+1);
+        if (isNumerical(value)) {
+          numerical.put(key, numerical.getOrDefault(key, 0) + 1);
         } else {
-          categorical.put(key, categorical.getOrDefault(key, 0)+1);
+          categorical.put(key, categorical.getOrDefault(key, 0) + 1);
         }
       }
     }
@@ -444,14 +442,14 @@ public class TemporalElementStats implements Serializable {
     HashSet<String> allProperties = new HashSet<>();
     allProperties.addAll(numerical.keySet());
     allProperties.addAll(categorical.keySet());
-    for(String property : allProperties){
+    for (String property : allProperties) {
       int countNumerical = numerical.getOrDefault(property, 0);
       int countCategorical = categorical.getOrDefault(property, 0);
-      int countOverall = countCategorical + countNumerical;
+      int countOverall = countCategorical  +  countNumerical;
       // which type?
-      if((double)countNumerical / (double)countOverall >= thresh){
+      if ((double) countNumerical / (double) countOverall >= thresh) {
         numericalProperties.add(property);
-      } else if((double)countCategorical / (double)countOverall >= thresh){
+      } else if ((double) countCategorical / (double) countOverall >= thresh) {
         categoricalProperties.add(property);
       }
       // else, the property is too ambiguous and simply ignored
@@ -504,7 +502,7 @@ public class TemporalElementStats implements Serializable {
 
       for (PropertyValue value : entry.getValue()) {
         selectivityMap.put(value,
-          selectivityMap.getOrDefault(value, 0.) + 1. / sampleSize);
+          selectivityMap.getOrDefault(value, 0.)  +  1. / sampleSize);
       }
 
       categoricalSelectivityEstimation.put(entry.getKey(), selectivityMap);
@@ -541,7 +539,7 @@ public class TemporalElementStats implements Serializable {
       Double sum = doubleValues.stream().reduce(0., Double::sum);
       Double mean = sum / values.size();
       Double variance = doubleValues.stream().reduce(0.,
-        (i, j) -> i + ((j - mean) * (j - mean) * (1. / values.size())));
+        (i, j) -> i  +  ((j - mean) * (j - mean) * (1. / values.size())));
 
       numericalPropertyStatsEstimation.put(entry.getKey(), new Double[] {mean, variance});
 
@@ -661,14 +659,14 @@ public class TemporalElementStats implements Serializable {
     if (recomputeTemporalDataFlag) {
       computeTemporalEstimations();
     }
-    if(property== TimeSelector.TimeField.TX_FROM){
-      return txFromStats;
-    } else if(property == TimeSelector.TimeField.TX_TO){
-      return txToStats;
-    } else if(property == TimeSelector.TimeField.VAL_FROM){
-      return valFromStats;
-    } else{
-      return valToStats;
+    if (property == TimeSelector.TimeField.TX_FROM) {
+      return txFromStats.clone();
+    } else if (property == TimeSelector.TimeField.TX_TO) {
+      return txToStats.clone();
+    } else if (property == TimeSelector.TimeField.VAL_FROM) {
+      return valFromStats.clone();
+    } else {
+      return valToStats.clone();
     }
   }
 }

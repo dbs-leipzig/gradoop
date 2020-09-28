@@ -19,7 +19,6 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos.EmbeddingTPGMFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 
@@ -62,8 +61,8 @@ public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEd
   @Override
   public void flatMap(TemporalEdge edge, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(edge)) {
-      if(isLoop){
-        if(!edge.getSourceId().equals(edge.getTargetId())){
+      if (isLoop) {
+        if (!edge.getSourceId().equals(edge.getTargetId())) {
           return;
         }
       }

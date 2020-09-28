@@ -27,24 +27,23 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.ProjectEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.CNFEstimation;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.TemporalQueryPlanEstimator;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.plantable.TemporalPlanTableEntry;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -65,7 +64,12 @@ import static org.gradoop.flink.model.impl.operators.matching.single.cypher.plan
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.PATH;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.VERTEX;
 
-
+/**
+ * Greedy query planning for temporal queries
+ * @param <G> a temporal graph head type
+ * @param <LG> a logical graph type for temporal elements
+ * @param <GC> a graph collection type for temporal elements
+ */
 public class GreedyPlanner<
   G extends TemporalGraphHead,
   LG extends BaseGraph<G, TemporalVertex, TemporalEdge, LG, GC>,
@@ -98,7 +102,7 @@ public class GreedyPlanner<
   /**
    * The conjunctive normal form for the predicates
    */
-  CNF cnf;
+  private final CNF cnf;
 
   /**
    * Creates a new greedy planner.
@@ -220,19 +224,17 @@ public class GreedyPlanner<
       boolean isPath = edge.getUpperBound() != 1;
 
 
-        DataSet<TemporalEdge> edges =
-          edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
-            graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
+      DataSet<TemporalEdge> edges =
+        edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
+          graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
 
-        FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges,
-          sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
+      FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges,
+        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
 
-        PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
+      PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;
 
-        planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
-          new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
-
-
+      planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
+        new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
 
 
     }
@@ -533,40 +535,36 @@ public class GreedyPlanner<
     List<Pair<String, String>> leftProperties = new ArrayList<>();
     List<Pair<String, String>> rightProperties = new ArrayList<>();
 
-    List<Pair<String, String>> leftTimes = new ArrayList<>();
-    List<Pair<String, String>> rightTimes = new ArrayList<>();
+    //List<Pair<String, String>> leftTimes = new ArrayList<>();
+    //List<Pair<String, String>> rightTimes = new ArrayList<>();
 
     for (CNFElement e : joinPredicate.getPredicates()) {
       ComparisonExpression comparison = e.getPredicates().get(0);
 
       Pair<String, String> joinExpression = extractJoinExpression(comparison.getLhs());
       if (leftEntry.getAllVariables().contains(joinExpression.getKey())) {
-        if (!isTemporal(joinExpression)) {
+        /*if (!isTemporal(joinExpression)) {
           leftProperties.add(joinExpression);
-        } else {
-          leftTimes.add(joinExpression);
-        }
+        }*/
+        leftProperties.add(joinExpression);
       } else {
-        if (!isTemporal(joinExpression)) {
+        /*if (!isTemporal(joinExpression)) {
           rightProperties.add(joinExpression);
-        } else {
-          rightTimes.add(joinExpression);
-        }
+        }*/
+        rightProperties.add(joinExpression);
       }
 
       joinExpression = extractJoinExpression(comparison.getRhs());
       if (leftEntry.getAllVariables().contains(joinExpression.getKey())) {
-        if (!isTemporal(joinExpression)) {
+        /*if (!isTemporal(joinExpression)) {
           leftProperties.add(joinExpression);
-        } else {
-          leftTimes.add(joinExpression);
-        }
+        }*/
+        leftProperties.add(joinExpression);
       } else {
-        if (!isTemporal(joinExpression)) {
+        /*if (!isTemporal(joinExpression)) {
           rightProperties.add(joinExpression);
-        } else {
-          leftTimes.add(joinExpression);
-        }
+        }*/
+        rightProperties.add(joinExpression);
       }
     }
 
@@ -598,11 +596,11 @@ public class GreedyPlanner<
    * @param joinExpression the join expression (variable, selector) to check
    * @return true iff joinExpression is temporal
    */
-  private boolean isTemporal(Pair<String, String> joinExpression) {
+  /*private boolean isTemporal(Pair<String, String> joinExpression) {
     String s = joinExpression.getRight().trim().toLowerCase();
     return s.equals("tx_from") || s.equals("tx_to") || s.equals("val_from") ||
       s.equals("val_to") || s.equals("valid_from") || s.equals("valid_to");
-  }
+  }*/
 
   /**
    * Turns a QueryComparable into a {@code Pair<Variable, PropertyKey>}

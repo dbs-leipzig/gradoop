@@ -16,7 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.citibike.util;
 
 import org.gradoop.temporal.model.impl.operators.matching.single.cypher.CBCypherTemporalPatternMatchingTest;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;

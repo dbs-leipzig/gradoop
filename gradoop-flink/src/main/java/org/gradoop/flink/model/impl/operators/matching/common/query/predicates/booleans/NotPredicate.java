@@ -43,7 +43,7 @@ public class NotPredicate extends QueryPredicate {
   /**
    * Optional factory for creating QueryComparables
    */
-  QueryComparableFactory comparableFactory;
+  private final QueryComparableFactory comparableFactory;
 
   /**
    * Create a new wrapper
@@ -56,6 +56,7 @@ public class NotPredicate extends QueryPredicate {
   /**
    * Create a new wrapper
    * @param not the wrapped not predicate
+   * @param comparableFactory factory for comparables
    */
   public NotPredicate(Not not, QueryComparableFactory comparableFactory) {
     this.not = not;

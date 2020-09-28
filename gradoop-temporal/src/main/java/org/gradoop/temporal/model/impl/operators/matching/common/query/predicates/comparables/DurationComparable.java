@@ -17,7 +17,6 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
@@ -65,7 +64,7 @@ public class DurationComparable extends TemporalComparable {
    * @param duration the duration to be wrapped
    * @param now system time of the query
    */
-  public DurationComparable(Duration duration, TimeLiteral now){
+  public DurationComparable(Duration duration, TimeLiteral now) {
     this.duration = duration;
     this.from = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getFrom());
     this.to = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getTo());

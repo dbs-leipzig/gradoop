@@ -29,7 +29,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
@@ -91,19 +90,19 @@ public class BoundsInferenceTest {
 
   private void compareCNFs(CNF expectedCNF, CNF processedCNF) {
     assertEquals(expectedCNF.size(), processedCNF.size());
-    for(CNFElement c1 : expectedCNF.getPredicates()){
+    for (CNFElement c1 : expectedCNF.getPredicates()) {
       List<ComparisonExpression> c1Comps = c1.getPredicates();
       c1Comps.sort(Comparator.comparingInt(ComparisonExpression::hashCode));
       boolean found = false;
-      for(CNFElement c2: processedCNF.getPredicates()){
+      for (CNFElement c2 : processedCNF.getPredicates()) {
         List<ComparisonExpression> c2Comps = c2.getPredicates();
         c2Comps.sort(Comparator.comparingInt(ComparisonExpression::hashCode));
-        if(c2Comps.equals(c1Comps)){
+        if (c2Comps.equals(c1Comps)) {
           found = true;
           break;
         }
       }
-      if(!found){
+      if (!found) {
         fail();
       }
     }

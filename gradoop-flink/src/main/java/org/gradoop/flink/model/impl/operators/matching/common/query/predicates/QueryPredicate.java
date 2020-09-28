@@ -46,6 +46,7 @@ public abstract class QueryPredicate implements Serializable {
   /**
    * Generic wrapper function to createFrom a given predicate
    * @param predicate the predicate to be warpped
+   * @param comparableFactory factory for comparables
    * @return the wrapped predicate
    */
   public static QueryPredicate createFrom(Predicate predicate, QueryComparableFactory comparableFactory) {

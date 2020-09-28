@@ -16,7 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
@@ -50,22 +49,27 @@ public class TemporalSubsumption extends Subsumption {
       c2 = c2.switchSides();
     }
     // check if both comparisons' variables are equal (otherwise, no subsumption is possible)
-    String var1 = ((TimeSelectorComparable)(c1.getLhs())).getWrappedComparable().getVariable();
-    String var2 = ((TimeSelectorComparable)(c2.getLhs())).getWrappedComparable().getVariable();
+    String var1 = ((TimeSelectorComparable) (c1.getLhs())).getWrappedComparable().getVariable();
+    String var2 = ((TimeSelectorComparable) (c2.getLhs())).getWrappedComparable().getVariable();
     if (!var1.equals(var2)) {
       return false;
     }
-    // check if both comparisons' time properties (tx_from, tx_to,...) are equal (otherwise, no subsumption is possible)
-    TimeSelector.TimeField field1 = ((TimeSelector) ((TimeSelectorComparable) (c1.getLhs())).getWrappedComparable()).getTimeProp();
-    TimeSelector.TimeField field2 = ((TimeSelector) ((TimeSelectorComparable) (c2.getLhs())).getWrappedComparable()).getTimeProp();
+    // check if both comparisons' time properties (tx_from, tx_to,...) are equal
+    // (otherwise, no subsumption is possible)
+    TimeSelector.TimeField field1 = ((TimeSelector) ((TimeSelectorComparable)
+      (c1.getLhs())).getWrappedComparable()).getTimeProp();
+    TimeSelector.TimeField field2 = ((TimeSelector) ((TimeSelectorComparable) (c2.getLhs()))
+      .getWrappedComparable()).getTimeProp();
     if (!field1.equals(field2)) {
       return false;
     }
     // unwrap the rest of the comparisons and check whether c1 implies c2
     Comparator comparator1 = c1.getComparator();
     Comparator comparator2 = c2.getComparator();
-    Long literal1 = ((TimeLiteral) ((TimeLiteralComparable)c1.getRhs()).getWrappedComparable()).getMilliseconds();
-    Long literal2 = ((TimeLiteral) ((TimeLiteralComparable)c2.getRhs()).getWrappedComparable()).getMilliseconds();
+    Long literal1 = ((TimeLiteral) ((TimeLiteralComparable) c1.getRhs()).getWrappedComparable())
+      .getMilliseconds();
+    Long literal2 = ((TimeLiteral) ((TimeLiteralComparable) c2.getRhs()).getWrappedComparable())
+      .getMilliseconds();
     return implies(comparator1, literal1, comparator2, literal2) && !c1.equals(c2);
   }
 
@@ -89,9 +93,9 @@ public class TemporalSubsumption extends Subsumption {
         return literal1 <= literal2;
       } else if (comparator2 == LT) {
         return literal1 < literal2;
-      } else if(comparator2 == GTE){
+      } else if (comparator2 == GTE) {
         return literal1 >= literal2;
-      } else if(comparator2 == GT){
+      } else if (comparator2 == GT) {
         return literal1 > literal2;
       }
     } else if (comparator1 == NEQ) {
@@ -105,7 +109,7 @@ public class TemporalSubsumption extends Subsumption {
         return literal1 <= literal2;
       } else if (comparator2 == LT) {
         return literal1 < literal2;
-      } else if (comparator2 == GTE || comparator2 == GT){
+      } else if (comparator2 == GTE || comparator2 == GT) {
         return false;
       }
     } else if (comparator1 == LT) {
@@ -114,34 +118,34 @@ public class TemporalSubsumption extends Subsumption {
       } else if (comparator2 == NEQ) {
         return literal1 <= literal2;
       } else if (comparator2 == LTE) {
-        return literal1-1 <= literal2;
+        return literal1 - 1 <= literal2;
       } else if (comparator2 == LT) {
         return literal1 <= literal2;
-      } else if (comparator2 == GTE || comparator2 == GT){
+      } else if (comparator2 == GTE || comparator2 == GT) {
         return false;
       }
-    } else if(comparator1 == GTE){
+    } else if (comparator1 == GTE) {
       if (comparator2 == EQ) {
         return false;
       } else if (comparator2 == NEQ) {
         return literal1 > literal2;
-      } else if (comparator2 == LTE || comparator2==LT) {
+      } else if (comparator2 == LTE || comparator2 == LT) {
         return false;
-      }  else if(comparator2 == GTE){
+      }  else if (comparator2 == GTE) {
         return literal1 >= literal2;
-      } else if(comparator2 == GT){
+      } else if (comparator2 == GT) {
         return literal1 > literal2;
       }
-    } else if(comparator1 == GT){
+    } else if (comparator1 == GT) {
       if (comparator2 == EQ) {
         return false;
       } else if (comparator2 == NEQ) {
         return literal1 >= literal2;
-      } else if (comparator2 == LTE || comparator2==LT) {
+      } else if (comparator2 == LTE || comparator2 == LT) {
         return false;
-      }  else if(comparator2 == GTE){
-        return literal1 +1 >= literal2;
-      } else if(comparator2 == GT){
+      }  else if (comparator2 == GTE) {
+        return literal1 + 1 >= literal2;
+      } else if (comparator2 == GT) {
         return literal1 >= literal2;
       }
     }

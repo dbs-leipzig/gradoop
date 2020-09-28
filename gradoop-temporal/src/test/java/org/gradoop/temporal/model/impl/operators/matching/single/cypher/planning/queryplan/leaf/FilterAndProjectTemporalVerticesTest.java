@@ -21,9 +21,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
@@ -37,7 +37,6 @@ import java.util.Set;
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -110,6 +109,6 @@ public class FilterAndProjectTemporalVerticesTest {
     int fooColumn = metaData.getPropertyColumn("n", "foo");
     int fromColumn = metaData.getPropertyColumn("n", TimeSelector.TimeField.TX_FROM.toString());
     int toColumn = metaData.getPropertyColumn("n", TimeSelector.TimeField.TX_TO.toString());
-    assertTrue(fooColumn != fromColumn && fromColumn!=toColumn && fooColumn!=toColumn);
+    assertTrue(fooColumn != fromColumn && fromColumn != toColumn && fooColumn != toColumn);
   }
 }

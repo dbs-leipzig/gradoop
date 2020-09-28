@@ -18,15 +18,14 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
@@ -237,23 +236,23 @@ public class CNFEstimation {
       if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeSelectorComparable) {
         // TODO implement?
         return 1.;
-      } else if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeLiteralComparable
-        || lhs instanceof TimeLiteralComparable && rhs instanceof TimeSelectorComparable) {
+      } else if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeLiteralComparable ||
+        lhs instanceof TimeLiteralComparable && rhs instanceof TimeSelectorComparable) {
         return simpleTemporalEstimation(comparisonExpression);
-      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable
-        || rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
-        return MinMaxTemporalEstimation(comparisonExpression);
-      } else if ((lhs instanceof DurationComparable && rhs instanceof TimeConstantComparable)
-        || (lhs instanceof TimeConstantComparable && rhs instanceof DurationComparable)) {
+      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||
+        rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
+        return minMaxTemporalEstimation(comparisonExpression);
+      } else if ((lhs instanceof DurationComparable && rhs instanceof TimeConstantComparable) ||
+        (lhs instanceof TimeConstantComparable && rhs instanceof DurationComparable)) {
         return simpleDurationComparisonEstimation(comparisonExpression);
       } else {
         return 1.;
       }
     } else {
-      if ((lhs instanceof PropertySelectorComparable
-        && rhs instanceof LiteralComparable)
-        || (lhs instanceof LiteralComparable
-        && rhs instanceof PropertySelectorComparable)) {
+      if ((lhs instanceof PropertySelectorComparable &&
+        rhs instanceof LiteralComparable) ||
+        (lhs instanceof LiteralComparable &&
+        rhs instanceof PropertySelectorComparable)) {
         return simplePropertyEstimation(comparisonExpression);
       } else if (lhs instanceof PropertySelectorComparable &&
         rhs instanceof PropertySelectorComparable) {
@@ -322,10 +321,10 @@ public class CNFEstimation {
     TimeSelector to = (TimeSelector) duration.getTo();
     // val_from, val_to or tx_from, tx_to?
     if (!
-      ((from.getTimeProp() == TimeSelector.TimeField.VAL_FROM
-        && to.getTimeProp() == TimeSelector.TimeField.VAL_TO) ||
-        (from.getTimeProp() == TimeSelector.TimeField.TX_FROM
-          && to.getTimeProp() == TimeSelector.TimeField.TX_TO))) {
+      ((from.getTimeProp() == TimeSelector.TimeField.VAL_FROM &&
+        to.getTimeProp() == TimeSelector.TimeField.VAL_TO) ||
+        (from.getTimeProp() == TimeSelector.TimeField.TX_FROM &&
+          to.getTimeProp() == TimeSelector.TimeField.TX_TO))) {
       return false;
     }
     // same variable for both selectors?
@@ -338,7 +337,7 @@ public class CNFEstimation {
    * @param comparisonExpression comparison
    * @return estimation of probability that the comparison holds
    */
-  private double MinMaxTemporalEstimation(ComparisonExpression comparisonExpression) {
+  private double minMaxTemporalEstimation(ComparisonExpression comparisonExpression) {
     // TODO implement if needed
     return 1.0;
   }
@@ -462,10 +461,10 @@ public class CNFEstimation {
     if (ComparisonUtil.isTemporal(comparisonExpression)) {
       if (lhs instanceof TimeSelectorComparable && rhs instanceof TimeSelectorComparable) {
         return timeSelectorComparisonEstimation(comparisonExpression);
-      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable
-        || rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
-        return MinMaxTemporalEstimation(comparisonExpression);
-      } else if ((lhs instanceof DurationComparable && rhs instanceof DurationComparable)) {
+      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||
+        rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
+        return minMaxTemporalEstimation(comparisonExpression);
+      } else if (lhs instanceof DurationComparable && rhs instanceof DurationComparable) {
         return durationComparisonEstimation(comparisonExpression);
       } else {
         return 1.;
@@ -577,24 +576,23 @@ public class CNFEstimation {
 
     // resort comparisons within clauses: labels and then non-selective comparisons first
     clauses = clauses.stream().map(clause -> {
-        ArrayList<ComparisonExpression> comps = new ArrayList<>(
-          clause.getPredicates());
-        comps.sort(new java.util.Comparator<ComparisonExpression>() {
-          @Override
-          public int compare(ComparisonExpression c1, ComparisonExpression c2) {
-            if (isLabelComp(c1)) {
-              return 100;
-            } else if (isLabelComp(c2)) {
-              return -100;
-            } else {
-              return (int) (100. *
-                (estimateComparison(c2) - estimateComparison(c1)));
-            }
+      ArrayList<ComparisonExpression> comps = new ArrayList<>(
+        clause.getPredicates());
+      comps.sort(new java.util.Comparator<ComparisonExpression>() {
+        @Override
+        public int compare(ComparisonExpression c1, ComparisonExpression c2) {
+          if (isLabelComp(c1)) {
+            return 100;
+          } else if (isLabelComp(c2)) {
+            return -100;
+          } else {
+            return (int) (100. *
+              (estimateComparison(c2) - estimateComparison(c1)));
           }
-        });
-        return new CNFElement(comps);
-      }
-    ).collect(Collectors.toCollection(ArrayList::new));
+        }
+      });
+      return new CNFElement(comps);
+    }).collect(Collectors.toCollection(ArrayList::new));
 
     return new CNF(clauses);
   }

@@ -28,8 +28,8 @@ public class ComparisonUtil {
    * @param comparison comparison expression to check
    * @return true iff expression wraps a well-formed temporal comparison
    */
-  public static boolean isTemporal(ComparisonExpression comparison){
-    return comparison.getLhs() instanceof TemporalComparable
-      && comparison.getRhs() instanceof TemporalComparable;
+  public static boolean isTemporal(ComparisonExpression comparison) {
+    return comparison.getLhs() instanceof TemporalComparable &&
+      comparison.getRhs() instanceof TemporalComparable;
   }
 }

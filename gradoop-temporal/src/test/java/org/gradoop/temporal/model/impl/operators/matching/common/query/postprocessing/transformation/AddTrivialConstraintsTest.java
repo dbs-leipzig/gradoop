@@ -78,7 +78,6 @@ public class AddTrivialConstraintsTest {
     CNF expected = new CNF(cnf).and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo))
     ));
-    System.out.println(constraintAdder.transformCNF(cnf));
     assertEquals(constraintAdder.transformCNF(cnf), expected);
   }
 

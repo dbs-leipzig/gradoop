@@ -108,7 +108,7 @@ public abstract class Subsumption implements QueryTransformation {
       }
       // clause c_i is not subsumed yet, i.e. may subsume other clauses
       CNFElement c1 = oldClauses.get(i);
-      for (int j = i+1; j < oldClauses.size(); j++) {
+      for (int j = i + 1; j < oldClauses.size(); j++) {
         // clause c_j is already subsumed, i.e. actually not there anymore
         if (subsumed.contains(j)) {
           continue;

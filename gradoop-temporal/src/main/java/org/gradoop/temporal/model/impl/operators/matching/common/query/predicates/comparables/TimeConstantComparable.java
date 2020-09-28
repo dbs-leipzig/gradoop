@@ -33,7 +33,7 @@ public class TimeConstantComparable extends TemporalComparable {
   /**
    * The wrapped constant
    */
-  TimeConstant constant;
+  private final TimeConstant constant;
 
   /**
    * Creates a new wrapper for a TimeConstant.
@@ -90,7 +90,7 @@ public class TimeConstantComparable extends TemporalComparable {
   }
 
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return constant.hashCode();
   }
 
@@ -98,7 +98,4 @@ public class TimeConstantComparable extends TemporalComparable {
     return constant;
   }
 
-  public void setConstant(TimeConstant constant) {
-    this.constant = constant;
-  }
 }

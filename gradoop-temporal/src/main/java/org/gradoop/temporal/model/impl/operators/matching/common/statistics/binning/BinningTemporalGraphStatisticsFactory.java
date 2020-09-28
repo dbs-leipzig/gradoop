@@ -27,56 +27,58 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Factory for {@link BinningTemporalGraphStatistics}
+ */
 public class BinningTemporalGraphStatisticsFactory implements
   TemporalGraphStatisticsFactory<BinningTemporalGraphStatistics> {
+
   @Override
-  public BinningTemporalGraphStatistics fromGraph(TemporalGraph g) {
+  public BinningTemporalGraphStatistics fromGraph(TemporalGraph g) throws Exception {
     return fromGraphWithSampling(g, 5000);
   }
 
   @Override
   public BinningTemporalGraphStatistics fromGraph(TemporalGraph g, Set<String> numericalProperties,
-                                                  Set<String> categoricalProperties) {
+                                                  Set<String> categoricalProperties) throws Exception {
     return fromGraphWithSampling(g, 5000, numericalProperties, categoricalProperties);
   }
 
   @Override
-  public BinningTemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize) {
+  public BinningTemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize)
+    throws Exception {
     return fromGraphWithSampling(g, sampleSize, null, null);
   }
 
   @Override
   public BinningTemporalGraphStatistics fromGraphWithSampling(TemporalGraph g, int sampleSize,
                                                               Set<String> numericalProperties,
-                                                              Set<String> categoricalProperties) {
-    try {
-      List<TemporalElementStats> vertexStats = g.getVertices()
-        .groupBy(EPGMElement::getLabel)
-        .reduceGroup(new ElementsToStats<TemporalVertex>(numericalProperties, categoricalProperties))
-        .collect();
+                                                              Set<String> categoricalProperties)
+    throws Exception {
 
-      List<TemporalElementStats> edgeStats = g.getEdges()
-        // do not replace this with the method reference!!!
-        .groupBy(edge -> edge.getLabel())
-        .reduceGroup(new ElementsToStats<TemporalEdge>(numericalProperties, categoricalProperties))
-        .collect();
+    List<TemporalElementStats> vertexStats = g.getVertices()
+      .groupBy(EPGMElement::getLabel)
+      .reduceGroup(new ElementsToStats<TemporalVertex>(numericalProperties, categoricalProperties))
+      .collect();
 
-      HashSet<String> relevantProperties=null;
-      // both only null, if all properties should be considered
-      // (use empty lists to ignore all properties)
-      if(numericalProperties!=null && categoricalProperties!=null){
-        relevantProperties = new HashSet<>();
-        relevantProperties.addAll(numericalProperties);
-        relevantProperties.addAll(categoricalProperties);
-      }
+    List<TemporalElementStats> edgeStats = g.getEdges()
+      // do not replace this with the method reference!!!
+      .groupBy(edge -> edge.getLabel())
+      .reduceGroup(new ElementsToStats<TemporalEdge>(numericalProperties, categoricalProperties))
+      .collect();
 
-      return new BinningTemporalGraphStatistics(vertexStats, edgeStats, relevantProperties);
-
-    } catch(Exception e) {
-      System.out.println(e.getMessage());
-      e.printStackTrace();
+    HashSet<String> relevantProperties = null;
+    // both only null, if all properties should be considered
+    // (use empty lists to ignore all properties)
+    if (numericalProperties != null && categoricalProperties != null) {
+      relevantProperties = new HashSet<>();
+      relevantProperties.addAll(numericalProperties);
+      relevantProperties.addAll(categoricalProperties);
     }
-    return null;
+
+    return new BinningTemporalGraphStatistics(vertexStats, edgeStats, relevantProperties);
+
+
   }
 
 }

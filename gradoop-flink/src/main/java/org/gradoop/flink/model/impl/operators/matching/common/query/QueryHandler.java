@@ -670,7 +670,7 @@ public class QueryHandler {
    * Returns the GDL handler
    * @return GDL handler
    */
-  public GDLHandler getGdlHandler(){
+  public GDLHandler getGdlHandler() {
     return gdlHandler;
   }
 }

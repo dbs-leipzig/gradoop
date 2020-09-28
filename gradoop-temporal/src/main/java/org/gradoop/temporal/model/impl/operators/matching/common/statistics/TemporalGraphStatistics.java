@@ -157,11 +157,11 @@ public abstract class TemporalGraphStatistics {
    * @param label1       label of the lhs element
    * @param transaction1 indicates whether lhs transaction time should be compared (=>true)
    *                     or valid time (=> false)
-   * @param comp         comparator of the comparison
-   * @param type2        type of the rhs element (vertex/edge)
-   * @param label2       label of the rhs element
-   * @param transaction2 indicates whether rhs transaction time should be compared (=>true)
-   *                     or valid time (=> false)@param comp comparator of the comparison
+   * @param comp comparator of the comparison
+   * @param type2 type of the rhs element (vertex/edge)
+   * @param label2 label of the rhs element
+   * @param transaction2 indicates whether rhs transaction time should be compared (=>true) or valid time
+   *                     (=> false)
    * @return estimated probability that the comparison holds
    */
   public abstract double estimateDurationProb(ElementType type1, Optional<String> label1,

@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
@@ -22,30 +37,30 @@ import org.s1ck.gdl.model.comparables.time.TimeConstant;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 
-import java.io.Serializable;
-
 /**
  * Factory for temporal comparables
  */
 public class ComparableTPGMFactory extends QueryComparableFactory {
 
+
+
   /**
    * Holds the system time stamp when the query was issued
    */
-  TimeLiteral now;
+  private TimeLiteral now;
 
   /**
    * Create a new instance
    * @param now system time of the query
    */
-  public ComparableTPGMFactory(TimeLiteral now){
+  public ComparableTPGMFactory(TimeLiteral now) {
     this.now = now;
   }
 
   /**
    * Create a new instance
    */
-  public ComparableTPGMFactory(){
+  public ComparableTPGMFactory() {
     this(new TimeLiteral("now"));
   }
 
@@ -74,5 +89,13 @@ public class ComparableTPGMFactory extends QueryComparableFactory {
         expression.getClass() + " is not a temporal GDL ComparableExpression"
       );
     }
+  }
+
+  public TimeLiteral getNow() {
+    return now;
+  }
+
+  public void setNow(TimeLiteral now) {
+    this.now = now;
   }
 }

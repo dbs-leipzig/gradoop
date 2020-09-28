@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.examples.matching;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -25,7 +40,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
 
-
+/**
+ * Program used for evaluation on LDBC
+ */
 public class TemporalLDBCBenchmark {
   /**
    * Command line options for the runner.
@@ -158,12 +175,10 @@ public class TemporalLDBCBenchmark {
 
     // write and execute
     TemporalCSVDataSink sink = new TemporalCSVDataSink(OUTPUT_PATH, config);
-    try {
-      collection.writeTo(sink);
-      env.execute();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+
+    collection.writeTo(sink);
+    env.execute();
+
 
     long processTime = env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS);
 
@@ -172,11 +187,12 @@ public class TemporalLDBCBenchmark {
     //System.out.println(collection.getGraphHeads().count());
 
     // execute and write job statistics
-    if(COUNT){
+    if (COUNT) {
       long count = collection.getGraphHeads().count();
-      System.out.println("count time: "+env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS));
+      System.out.println("count time: " + env.getLastJobExecutionResult()
+        .getNetRuntime(TimeUnit.SECONDS));
       writeCSV(env, processTime, count);
-    } else{
+    } else {
       writeCSV(env, processTime);
     }
 
@@ -188,11 +204,12 @@ public class TemporalLDBCBenchmark {
    * Computes or retrieves the statistics for a TPGM graph
    * @param config temporal configuration
    * @return statistics
+   * @throws Exception if computation of statistics goes wrong
    */
-  private static TemporalGraphStatistics getStats(TemporalGradoopConfig config){
-    if(!BINNING_PATH.isEmpty()){
+  private static TemporalGraphStatistics getStats(TemporalGradoopConfig config) throws Exception {
+    if (!BINNING_PATH.isEmpty()) {
       BinningTemporalGraphStatistics stats = deserializeStats(BINNING_PATH);
-      if(stats!= null){
+      if (stats != null) {
         return stats;
       }
     }
@@ -206,17 +223,21 @@ public class TemporalLDBCBenchmark {
    * @param file serialized statistics
    * @return deserialized statistics
    */
-  private static BinningTemporalGraphStatistics deserializeStats(String file){
-    try{
+  private static BinningTemporalGraphStatistics deserializeStats(String file) {
+    try {
       FileInputStream fs = new FileInputStream(file);
       ObjectInput in = new ObjectInputStream(fs);
-      return (BinningTemporalGraphStatistics) in.readObject();
-    } catch(IOException ioe){
-      System.out.println("Deserialization failure for "+file);
+      BinningTemporalGraphStatistics stats =
+        (BinningTemporalGraphStatistics) in.readObject();
+      in.close();
+      return stats;
+    } catch (IOException ioe) {
+      System.out.println("Deserialization failure for " + file);
       System.out.println("Generating stats from graph");
-    } catch (ClassNotFoundException e){
+    } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
+
     return null;
   }
 
@@ -228,56 +249,56 @@ public class TemporalLDBCBenchmark {
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH = cmd.getOptionValue(OPTION_OUTPUT_PATH, "output");
-    System.out.println("output path: "+OUTPUT_PATH);
+    System.out.println("output path: " + OUTPUT_PATH);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
 
     String queryOption = cmd.getOptionValue(OPTION_QUERY);
     LOWER = cmd.getOptionValue(OPTION_LOWER, null);
     UPPER = cmd.getOptionValue(OPTION_UPPER);
 
-    if(queryOption.equals("q1")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q1(LOWER, UPPER) : TemporalQueriesLDBC.q1();
-    } else if(queryOption.equals("q2")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q2(LOWER, UPPER) : TemporalQueriesLDBC.q2();
-    } else if(queryOption.equals("q3")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q3(LOWER, UPPER) : TemporalQueriesLDBC.q3();
-    } else if(queryOption.equals("q5")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q4(LOWER, UPPER) : TemporalQueriesLDBC.q4();
-    } else if(queryOption.equals("q6")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q5(LOWER, UPPER) : TemporalQueriesLDBC.q5();
-    } else if(queryOption.equals("q7")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q6(LOWER, UPPER) : TemporalQueriesLDBC.q6();
-    } else if(queryOption.equals("q8")){
-      QUERY = LOWER!=null ? TemporalQueriesLDBC.q7(LOWER, UPPER) : TemporalQueriesLDBC.q7();
-    } else if(queryOption.equals("q5_a_low")){
-      QUERY = TemporalQueriesLDBC.q4_a_low();
-    } else if(queryOption.equals("q5_a_middle")){
-      QUERY = TemporalQueriesLDBC.q4_a_middle();
-    } else if(queryOption.equals("q5_a_high")){
-      QUERY = TemporalQueriesLDBC.q4_a_high();
-    } else if(queryOption.equals("q5_b_low")){
-      QUERY = TemporalQueriesLDBC.q4_b_low();
-    } else if(queryOption.equals("q5_b_middle")){
-      QUERY = TemporalQueriesLDBC.q4_b_middle();
-    } else if(queryOption.equals("q5_b_high")){
-      QUERY = TemporalQueriesLDBC.q4_b_high();
-    } else if(queryOption.equals("q5_c_low")){
-      QUERY = TemporalQueriesLDBC.q4_c_low();
-    } else if(queryOption.equals("q5_c_middle")){
-      QUERY = TemporalQueriesLDBC.q4_c_middle();
-    } else if(queryOption.equals("q5_c_high")){
-      QUERY = TemporalQueriesLDBC.q4_c_high();
-    } else if(queryOption.equals("q9")){
+    if (queryOption.equals("q1")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q1(LOWER, UPPER) : TemporalQueriesLDBC.q1();
+    } else if (queryOption.equals("q2")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q2(LOWER, UPPER) : TemporalQueriesLDBC.q2();
+    } else if (queryOption.equals("q3")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q3(LOWER, UPPER) : TemporalQueriesLDBC.q3();
+    } else if (queryOption.equals("q5")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q4(LOWER, UPPER) : TemporalQueriesLDBC.q4();
+    } else if (queryOption.equals("q6")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q5(LOWER, UPPER) : TemporalQueriesLDBC.q5();
+    } else if (queryOption.equals("q7")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q6(LOWER, UPPER) : TemporalQueriesLDBC.q6();
+    } else if (queryOption.equals("q8")) {
+      QUERY = LOWER != null ? TemporalQueriesLDBC.q7(LOWER, UPPER) : TemporalQueriesLDBC.q7();
+    } else if (queryOption.equals("q5_a_low")) {
+      QUERY = TemporalQueriesLDBC.q4alow();
+    } else if (queryOption.equals("q5_a_middle")) {
+      QUERY = TemporalQueriesLDBC.q4amiddle();
+    } else if (queryOption.equals("q5_a_high")) {
+      QUERY = TemporalQueriesLDBC.q4ahigh();
+    } else if (queryOption.equals("q5_b_low")) {
+      QUERY = TemporalQueriesLDBC.q4blow();
+    } else if (queryOption.equals("q5_b_middle")) {
+      QUERY = TemporalQueriesLDBC.q4bmiddle();
+    } else if (queryOption.equals("q5_b_high")) {
+      QUERY = TemporalQueriesLDBC.q4bhigh();
+    } else if (queryOption.equals("q5_c_low")) {
+      QUERY = TemporalQueriesLDBC.q4clow();
+    } else if (queryOption.equals("q5_c_middle")) {
+      QUERY = TemporalQueriesLDBC.q4cmiddle();
+    } else if (queryOption.equals("q5_c_high")) {
+      QUERY = TemporalQueriesLDBC.q4chigh();
+    } else if (queryOption.equals("q9")) {
       QUERY = TemporalQueriesLDBC.q8();
-    } else if(queryOption.equals("q10")){
+    } else if (queryOption.equals("q10")) {
       QUERY = TemporalQueriesLDBC.q0();
     }
     COUNT = cmd.hasOption("s");
-    System.out.println("Query: "+QUERY);
+    System.out.println("Query: " + QUERY);
 
-    if(cmd.hasOption(OPTION_BINNING_PATH)){
+    if (cmd.hasOption(OPTION_BINNING_PATH)) {
       BINNING_PATH = cmd.getOptionValue(OPTION_BINNING_PATH);
-    } else{
+    } else {
       BINNING_PATH = "";
     }
 
@@ -298,11 +319,17 @@ public class TemporalLDBCBenchmark {
     if (!cmd.hasOption(OPTION_QUERY)) {
       throw new IllegalArgumentException("Define a query");
     }
-    if (cmd.hasOption(OPTION_LOWER) ^ cmd.hasOption(OPTION_UPPER)){
+    if (cmd.hasOption(OPTION_LOWER) ^ cmd.hasOption(OPTION_UPPER)) {
       throw new IllegalArgumentException("Define both lower and upper bound or omit both!");
     }
   }
 
+  /**
+   * Parses the command line arguments
+   * @param args command line arguments
+   * @return parsed command line arguments
+   * @throws ParseException if parsing goes wrong
+   */
   protected static CommandLine parseArguments(String[] args)
     throws ParseException {
     return new DefaultParser().parse(OPTIONS, args);
@@ -335,6 +362,12 @@ public class TemporalLDBCBenchmark {
     writeToCSV(head, tail);
   }
 
+  /**
+   * Writes the results to CSV
+   * @param env execution environment
+   * @param runtime runtime of the job
+   * @throws IOException I/O error during writing
+   */
   private static void writeCSV(ExecutionEnvironment env, long runtime) throws IOException {
     String head = String.format("%s|%s|%s|%s|%s%n",
       "Parallelism",
@@ -353,6 +386,12 @@ public class TemporalLDBCBenchmark {
     writeToCSV(head, tail);
   }
 
+  /**
+   * writes a head (first row) and a tail (rest) to the file
+   * @param head first row, if not already there
+   * @param tail rest of the file
+   * @throws IOException if I/O problems occur
+   */
   private static void writeToCSV(String head, String tail) throws IOException {
     File f = new File(CSV_PATH);
     if (f.exists() && !f.isDirectory()) {

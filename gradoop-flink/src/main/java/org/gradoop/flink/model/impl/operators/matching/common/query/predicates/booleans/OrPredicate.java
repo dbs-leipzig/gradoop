@@ -34,7 +34,7 @@ public class OrPredicate extends QueryPredicate {
   /**
    * Optional factory for creating QueryComparables
    */
-  QueryComparableFactory comparableFactory;
+  private final QueryComparableFactory comparableFactory;
 
   /**
    * Creates a new or wrapper

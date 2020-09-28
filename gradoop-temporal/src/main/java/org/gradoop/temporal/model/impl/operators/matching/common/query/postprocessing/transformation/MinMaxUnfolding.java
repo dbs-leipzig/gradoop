@@ -20,7 +20,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.MinTimePoint;
@@ -43,7 +42,7 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  * [comp_1,...,comp_(i-1), a < / <= x, b < / <= x, c < / <= x, comp_(i+1),...,comp_n]
  * - a n-ary disjunctive clause [comp_1,...,comp_(i-1), x < / <= MAX(a,b,c), comp_(i+1),...,comp_n]
  * is reformulated to
- * [comp_1,...,comp_(i-1), x < / <= a, x </<= b, x < / <= c, comp_(i+1),...,comp_n]
+ * [comp_1,...,comp_(i-1), x < / <= a, x < / <= b, x < / <= c, comp_(i+1),...,comp_n]
  * - a unary clause [x < / <= MIN(a,b,c)] is reformulated to
  * [x < / <= a] AND [x < / <= b] AND [x < / <= c]
  *
@@ -147,7 +146,8 @@ public class MinMaxUnfolding implements QueryTransformation {
   private CNF exists(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
     List<ComparisonExpression> comparisons = new ArrayList<>();
     for (TimePoint arg : args) {
-      comparisons.add(new ComparisonExpression(new Comparison(arg, comparator, rhs), new ComparableTPGMFactory()));
+      comparisons.add(new ComparisonExpression(new Comparison(arg, comparator, rhs),
+        new ComparableTPGMFactory()));
     }
     CNFElement singleClause = new CNFElement(comparisons);
     return new CNF(new ArrayList(Collections.singletonList(singleClause)));
@@ -166,7 +166,8 @@ public class MinMaxUnfolding implements QueryTransformation {
   private CNF exists(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
     List<ComparisonExpression> comparisons = new ArrayList<>();
     for (TimePoint arg : args) {
-      comparisons.add(new ComparisonExpression(new Comparison(lhs, comparator, arg), new ComparableTPGMFactory()));
+      comparisons.add(new ComparisonExpression(new Comparison(lhs, comparator, arg),
+        new ComparableTPGMFactory()));
     }
     return new CNF(new ArrayList(Collections.singletonList(new CNFElement(comparisons))));
   }

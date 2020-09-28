@@ -46,6 +46,7 @@ public class FilterTemporalEstimator extends TemporalEstimator {
    *
    * @param queryHandler    query handler
    * @param graphStatistics graph statistics
+   * @param cnfEstimation estimation of CNF predicates
    */
   FilterTemporalEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics,
                           CNFEstimation cnfEstimation) {

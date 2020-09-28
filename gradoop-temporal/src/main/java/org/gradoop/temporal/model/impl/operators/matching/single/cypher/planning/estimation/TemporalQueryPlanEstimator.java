@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
@@ -22,7 +23,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.UnaryNode;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 
 /**
  * Estimates a given query plan by traversing its nodes and updating the state of specific
@@ -49,6 +49,7 @@ public class TemporalQueryPlanEstimator {
    * @param queryPlan       query plan
    * @param queryHandler    query handler
    * @param graphStatistics graph statistics
+   * @param cnfEstimation estimation of CNF predicates
    */
   public TemporalQueryPlanEstimator(QueryPlan queryPlan, TemporalQueryHandler queryHandler,
                                     TemporalGraphStatistics graphStatistics, CNFEstimation cnfEstimation) {

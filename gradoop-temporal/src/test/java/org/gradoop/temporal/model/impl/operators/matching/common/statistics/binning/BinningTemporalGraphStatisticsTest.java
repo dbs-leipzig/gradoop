@@ -29,10 +29,8 @@ import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,7 +53,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
 
 
   @Test
-  public void simpleComparisonTest() {
+  public void simpleComparisonTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
     //tx_from of v1 equally distributed from 100L to 200L
     // => 175L is part of the 76th bin
@@ -85,7 +83,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void comparisonWithoutLabelTest() {
+  public void comparisonWithoutLabelTest() throws Exception {
     // same comparisons as above, but without label specified
     BinningTemporalGraphStatistics stats = getDummyStats();
     // all v2 tx_froms are greater than 175L, thus the condition holds for about 5/8 of all vertices
@@ -115,7 +113,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void durationComparisonTest() {
+  public void durationComparisonTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
 
     //works for unbounded (values hard to estimate, as they aren't actually
@@ -144,7 +142,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void complexDurationTest() {
+  public void complexDurationTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
     //works for unbounded (values hard to estimate, as they aren't actually
     // normally distributed here
@@ -178,7 +176,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void estimateCategoricalTest() {
+  public void estimateCategoricalTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
     double estimation1 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"), "catProp1", EQ,
       PropertyValue.create("x"));
@@ -221,7 +219,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void categoricalWithExclusionTest(){
+  public void categoricalWithExclusionTest() throws Exception {
     // test with exclusion of properties
     BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
     // should all be 0.5, regardless if actually there
@@ -239,13 +237,13 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     estimation6 = stats2.estimatePropertyProb(VERTEX, Optional.empty(), "catProp1", EQ,
       PropertyValue.create("y"));
     assertEquals(estimation6, 0.27, 0.001);
-     estimation10 = stats2.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
+    estimation10 = stats2.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
       NEQ, PropertyValue.create("nonsense"));
     assertEquals(estimation10, 0.5, 0.0001);
   }
 
   @Test
-  public void estimateNumericalTest() {
+  public void estimateNumericalTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
     // no exact estimations, as the values aren't actually normally distributed here
     // <=
@@ -297,7 +295,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void numericalWithExclusion(){
+  public void numericalWithExclusion() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
     // should all be 0.5
     double estimation6 = stats.estimatePropertyProb(VERTEX, Optional.of("v1"),
@@ -320,7 +318,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void estimateComplexNumericalTest() {
+  public void estimateComplexNumericalTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
 
     // should yield about 1/8:
@@ -385,7 +383,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void complexNumericalWithExclusion(){
+  public void complexNumericalWithExclusion() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
     double estimation4 = stats.estimatePropertyProb(VERTEX, Optional.empty(),
       "numProp",
@@ -415,7 +413,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void complexCategoricalTest() {
+  public void complexCategoricalTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
 
     // 34% of the v2 nodes are set to m, rest to f
@@ -460,7 +458,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void complexCategoricalWithExclusion(){
+  public void complexCategoricalWithExclusion() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats(new HashSet<>(), new HashSet<>());
     double estimation2 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "gender",
       NEQ, VERTEX, Optional.of("v2"), "gender");
@@ -482,7 +480,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void complexTemporalTest() {
+  public void complexTemporalTest() throws Exception {
     // estimations are quite inaccurate
     BinningTemporalGraphStatistics stats = getDummyStats();
     // about 0.25, as differences between bound values are small, but half of v2.tx_to unbound
@@ -589,7 +587,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   @Test
-  public void countTest() {
+  public void countTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
     long count1 = stats.getEdgeCount();
     assertEquals(count1, 100);
@@ -650,7 +648,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
    * @return dummy statistics
    */
   private BinningTemporalGraphStatistics getDummyStats(Set<String> relevantNumerical,
-                                                       Set<String> relevantCategorical) {
+                                                       Set<String> relevantCategorical) throws Exception {
     ArrayList<TemporalVertex> vertexList = new ArrayList<>();
 
     // first type of vertex has label1
@@ -754,7 +752,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
   }
 
   // without explicitly stating the categories
-  private BinningTemporalGraphStatistics getDummyStats(){
+  private BinningTemporalGraphStatistics getDummyStats() throws Exception {
     return getDummyStats(null, null);
   }
 }

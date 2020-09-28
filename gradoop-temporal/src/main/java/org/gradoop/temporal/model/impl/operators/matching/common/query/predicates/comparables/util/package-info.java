@@ -17,3 +17,4 @@
  * Includes auxiliary methods for comparable expressions
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util;
+

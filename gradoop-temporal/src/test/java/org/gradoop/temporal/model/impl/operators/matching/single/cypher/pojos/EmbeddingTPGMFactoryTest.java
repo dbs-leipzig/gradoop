@@ -28,10 +28,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
@@ -83,7 +80,7 @@ public class EmbeddingTPGMFactoryTest {
 
     Embedding embedding =
       EmbeddingTPGMFactory.fromEdge(edge, Lists.newArrayList(
-        TX_FROM.toString(), "foo", VAL_TO.toString(),  "bar"), false);
+        TX_FROM.toString(), "foo", VAL_TO.toString(), "bar"), false);
 
     assertEquals(3, embedding.size());
     assertEquals(edge.getSourceId(), embedding.getId(0));

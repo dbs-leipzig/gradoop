@@ -59,8 +59,8 @@ public class MinTimePointComparableTest {
     // evaluate on an embedding
     //-----------------------------------------
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), new PropertyValue[]{PropertyValue.create(t1)});
-    embedding.add(GradoopId.get(), new PropertyValue[]{PropertyValue.create(t2)});
+    embedding.add(GradoopId.get(), new PropertyValue[] {PropertyValue.create(t1)});
+    embedding.add(GradoopId.get(), new PropertyValue[] {PropertyValue.create(t2)});
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EmbeddingMetaData.EntryType.VERTEX, 0);

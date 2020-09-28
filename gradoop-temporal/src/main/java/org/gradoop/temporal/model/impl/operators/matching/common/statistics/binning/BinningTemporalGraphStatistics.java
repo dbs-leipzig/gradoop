@@ -24,14 +24,12 @@ import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binn
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.util.Util;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,12 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 import static org.s1ck.gdl.utils.Comparator.EQ;
 import static org.s1ck.gdl.utils.Comparator.GT;
 import static org.s1ck.gdl.utils.Comparator.GTE;
@@ -104,6 +100,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
    *
    * @param vertexStats list of vertex statistics (one element for each label)
    * @param edgeStats   list of edge statistics (one element for each label)
+   * @param relevantProperties properties to consider
    */
   protected BinningTemporalGraphStatistics(List<TemporalElementStats> vertexStats,
                                            List<TemporalElementStats> edgeStats,
@@ -372,10 +369,10 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     double rhsVariance = rhs[1];
     double rhsExtreme = rhs[2];
     // probability that both lhs and rhs not Long.MIN_VALUE or Long.MAX_VALUE
-    double probBothNotExtreme = (1 - lhsExtreme)*(1-rhsExtreme);
+    double probBothNotExtreme = (1 - lhsExtreme) * (1 - rhsExtreme);
     // distribution for difference between lhs and rhs values
-    NormalDistribution diffDist = new NormalDistribution(lhsMean-rhsMean,
-      Math.max(lhsVariance+ rhsVariance, 0.001));
+    NormalDistribution diffDist = new NormalDistribution(lhsMean - rhsMean,
+      Math.max(lhsVariance + rhsVariance, 0.001));
 
     // P(lhs < rhs)
     double probNotExtremeLTE = diffDist.cumulativeProbability(0.);
@@ -384,17 +381,17 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     // P(lhs comp rhs)
     double probCompNotExtreme = 0.;
 
-    if(comparator == LTE){
+    if (comparator == LTE) {
       probCompNotExtreme = probNotExtremeLTE;
-    } else if(comparator==LT) {
+    } else if (comparator == LT) {
       probCompNotExtreme = probNotExtremeLTE - probNotExtremeEQ;
-    } else if(comparator == EQ){
+    } else if (comparator == EQ) {
       probCompNotExtreme = probNotExtremeEQ;
-    } else if(comparator == NEQ){
+    } else if (comparator == NEQ) {
       probCompNotExtreme = 1. - probNotExtremeEQ;
-    } else if(comparator == GTE){
+    } else if (comparator == GTE) {
       probCompNotExtreme = 1. - (probNotExtremeLTE - probNotExtremeEQ);
-    } else if(comparator == GT){
+    } else if (comparator == GT) {
       probCompNotExtreme = 1. - probNotExtremeLTE;
     }
 
@@ -403,48 +400,50 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     // also consider cases in which one or both sides have extreme values
     double probCompExtreme = 0.;
     // lhs from
-    if(fieldLhs==TX_FROM || fieldLhs==VAL_FROM){
+    if (fieldLhs == TX_FROM || fieldLhs == VAL_FROM) {
       // rhs from
-      if(fieldRhs==TX_FROM || fieldRhs==VAL_FROM){
-        if(comparator==EQ){
+      if (fieldRhs == TX_FROM || fieldRhs == VAL_FROM) {
+        if (comparator == EQ) {
           probCompExtreme = lhsExtreme * rhsExtreme;
-        } else if(comparator==NEQ){
-          probCompExtreme = (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
-        } else if(comparator==LTE){
+        } else if (comparator == NEQ) {
+          probCompExtreme = (1 - lhsExtreme) * rhsExtreme + lhsExtreme * (1 - rhsExtreme);
+        } else if (comparator == LTE) {
           probCompExtreme = lhsExtreme;
-        } else if(comparator==LT){
-          probCompExtreme = lhsExtreme*(1-rhsExtreme);
-        } else if(comparator==GTE){
+        } else if (comparator == LT) {
+          probCompExtreme = lhsExtreme * (1 - rhsExtreme);
+        } else if (comparator == GTE) {
           probCompExtreme = rhsExtreme;
-        } else if(comparator==GT){
-          probCompExtreme = (1-lhsExtreme)*rhsExtreme;
+        } else if (comparator == GT) {
+          probCompExtreme = (1 - lhsExtreme) * rhsExtreme;
         }
-      } else{
+      } else {
         // rhs to
-        if(comparator==NEQ || comparator==LT || comparator==LTE){
-          probCompExtreme = lhsExtreme*rhsExtreme + (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+        if (comparator == NEQ || comparator == LT || comparator == LTE) {
+          probCompExtreme = lhsExtreme * rhsExtreme + (1 - lhsExtreme) * rhsExtreme +
+            lhsExtreme * (1 - rhsExtreme);
         } //for all other comparators 0, if lhs and/or rhs extreme
       }
-    } else {// lhs to
+    } else { // lhs to
       // rhs from
-      if(fieldRhs==TX_FROM || fieldRhs==VAL_FROM){
-        if(comparator==NEQ || comparator==GT || comparator==GTE){
-          probCompExtreme = lhsExtreme*rhsExtreme + (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
+      if (fieldRhs == TX_FROM || fieldRhs == VAL_FROM) {
+        if (comparator == NEQ || comparator == GT || comparator == GTE) {
+          probCompExtreme = lhsExtreme * rhsExtreme + (1 - lhsExtreme) * rhsExtreme +
+            lhsExtreme * (1 - rhsExtreme);
         } // for all other comparators 0, if lhs and/or rhs extreme
-      } else{
+      } else {
         // rhs to
-        if(comparator==EQ){
+        if (comparator == EQ) {
           probCompExtreme = lhsExtreme * rhsExtreme;
-        } else if(comparator==NEQ){
-          probCompExtreme = (1-lhsExtreme)*rhsExtreme + lhsExtreme*(1-rhsExtreme);
-        } else if(comparator==LTE){
+        } else if (comparator == NEQ) {
+          probCompExtreme = (1 - lhsExtreme) * rhsExtreme + lhsExtreme * (1 - rhsExtreme);
+        } else if (comparator == LTE) {
           probCompExtreme = rhsExtreme;
-        } else if(comparator==LT){
-          probCompExtreme = (1-lhsExtreme)*rhsExtreme;
-        } else if(comparator==GTE){
+        } else if (comparator == LT) {
+          probCompExtreme = (1 - lhsExtreme) * rhsExtreme;
+        } else if (comparator == GTE) {
           probCompExtreme = lhsExtreme;
-        } else if(comparator==GT){
-          probCompExtreme = lhsExtreme * (1-rhsExtreme);
+        } else if (comparator == GT) {
+          probCompExtreme = lhsExtreme * (1 - rhsExtreme);
         }
       }
     }
@@ -617,7 +616,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       }
     }
 
-    if(isPropertyRelevant(property1)!=isPropertyRelevant(property2)){
+    if (isPropertyRelevant(property1) != isPropertyRelevant(property2)) {
       return 0.5;
     }
 
@@ -782,11 +781,10 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     // property not sampled or not considered
     if (propStats1 == null || propStats2 == null) {
       // property not considered => return 0.5
-      if(!isPropertyRelevant(property1) && !isPropertyRelevant(property2)){
+      if (!isPropertyRelevant(property1) && !isPropertyRelevant(property2)) {
         return 0.5;
-      }
-      // property not sampled => very rare => return very small value
-      else{
+      } else {
+        // property not sampled => very rare => return very small value
         return 0.0001;
       }
     }
@@ -847,9 +845,9 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     // property not sampled or not considered
     if (!found) {
       // not relevant/considered => simply return 0.5
-      if(!isPropertyRelevant(property)){
+      if (!isPropertyRelevant(property)) {
         return 0.5;
-      } else{
+      } else {
         // not sampled => very rare or not even there => return very small value
         return 0.0001;
       }
@@ -861,7 +859,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
         // not sampled ? ....
         double factor = 0.0001;
         // ...or just excluded/not relevant?
-        if(!isPropertyRelevant(property)){
+        if (!isPropertyRelevant(property)) {
           factor = 0.5;
         }
         prob += factor * ((double) stat.getElementCount() / overallCount);
@@ -1003,8 +1001,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
    * @param property property to check for relevance
    * @return true iff property should be considered for estimations
    */
-  private boolean isPropertyRelevant(String property){
-    return relevantProperties==null || relevantProperties.contains(property);
+  private boolean isPropertyRelevant(String property) {
+    return relevantProperties == null || relevantProperties.contains(property);
   }
 
   /**

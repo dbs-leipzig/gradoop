@@ -20,7 +20,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
@@ -37,12 +36,12 @@ public class MaxTimePointComparable extends TemporalComparable {
   /**
    * The wrapped MaxTimePoint
    */
-  MaxTimePoint maxTimePoint;
+  private final MaxTimePoint maxTimePoint;
 
   /**
    * Wrappers for the arguments
    */
-  ArrayList<QueryComparable> args;
+  private final ArrayList<QueryComparable> args;
 
   /**
    * Creates a new wrapper.
@@ -88,7 +87,7 @@ public class MaxTimePointComparable extends TemporalComparable {
   @Override
   public Set<String> getPropertyKeys(String variable) {
     HashSet<String> keys = new HashSet<>();
-    for(QueryComparable comp: getArgs()){
+    for (QueryComparable comp: getArgs()) {
       keys.addAll(comp.getPropertyKeys(variable));
     }
     return keys;
@@ -138,17 +137,9 @@ public class MaxTimePointComparable extends TemporalComparable {
     return maxTimePoint;
   }
 
-  public void setMaxTimePoint(MaxTimePoint maxTimePoint) {
-    this.maxTimePoint = maxTimePoint;
-  }
-
   public ArrayList<QueryComparable> getArgs() {
     return args;
   }
 
-  public void setArgs(
-    ArrayList<QueryComparable> args) {
-    this.args = args;
-  }
 }
 

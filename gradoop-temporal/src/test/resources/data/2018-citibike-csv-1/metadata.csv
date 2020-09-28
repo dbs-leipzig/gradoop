@@ -1,0 +1,3 @@
+g;;
+v;Station;capacity:int,id:string,lat:string,long:string,name:string,regionId:short,rentalUrl:string
+e;Trip;bike_id:string,gender:string,starttime:string,stoptime:string,tripduration:string,user_type:string,year_birth:string

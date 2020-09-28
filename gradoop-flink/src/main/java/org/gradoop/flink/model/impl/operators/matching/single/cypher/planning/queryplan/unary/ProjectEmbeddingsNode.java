@@ -82,7 +82,7 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
       embeddingMetaData.setPropertyColumn(
         projectionKeys.get(i).getLeft(), projectionKeys.get(i).getRight(), i));
 
-    for(String var: childMetaData.getDirectionMapping().keySet()) {
+    for (String var: childMetaData.getDirectionMapping().keySet()) {
       embeddingMetaData.setDirection(var, childMetaData.getDirection(var));
     }
     return embeddingMetaData;

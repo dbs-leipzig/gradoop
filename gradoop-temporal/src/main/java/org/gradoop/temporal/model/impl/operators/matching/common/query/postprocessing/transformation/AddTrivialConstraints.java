@@ -17,16 +17,14 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.postproc
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
@@ -136,7 +134,7 @@ public class AddTrivialConstraints implements QueryTransformation {
           // ...and check it for time selectors
           if (comparable instanceof TimeSelectorComparable) {
             TimeSelector selector = (TimeSelector)
-              (comparable).getWrappedComparable();
+              comparable.getWrappedComparable();
             String variable = selector.getVariable();
             // add the variable to the corresponding set(s)
             TimeSelector.TimeField field = selector.getTimeProp();
