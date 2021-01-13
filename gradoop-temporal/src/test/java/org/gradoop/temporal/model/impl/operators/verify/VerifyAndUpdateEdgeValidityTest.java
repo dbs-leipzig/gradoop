@@ -34,9 +34,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 /**
- * Test for the {@link VerifyTemporal} operator.
+ * Test for the {@link VerifyAndUpdateEdgeValidity} operator.
  */
-public class VerifyTemporalTest extends TemporalGradoopTestBase {
+public class VerifyAndUpdateEdgeValidityTest extends TemporalGradoopTestBase {
 
   /**
    * Test the operator on a graph.
@@ -73,7 +73,7 @@ public class VerifyTemporalTest extends TemporalGradoopTestBase {
     DataSet<TemporalVertex> vertexSet = getExecutionEnvironment().fromElements(v1, v2);
     DataSet<TemporalEdge> edgeSet = getExecutionEnvironment().fromElements(e1, e2, e3, ed1, ed2, ed3);
     TemporalGraph graph = getConfig().getTemporalGraphFactory().fromDataSets(vertexSet, edgeSet);
-    TemporalGraph result = graph.callForGraph(new VerifyTemporal());
+    TemporalGraph result = graph.callForGraph(new VerifyAndUpdateEdgeValidity());
 
     // Get result.
     List<TemporalVertex> resultVertices = new ArrayList<>();

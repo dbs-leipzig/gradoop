@@ -30,7 +30,7 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
  * {@link org.gradoop.flink.model.impl.operators.verify.Verify} would) and updates the remaining edges so that
  * the edge is only valid when both its source- and target-vertex are valid.
  */
-public class VerifyTemporal implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
+public class VerifyAndUpdateEdgeValidity implements UnaryBaseGraphToBaseGraphOperator<TemporalGraph> {
 
   @Override
   public TemporalGraph execute(TemporalGraph graph) {
