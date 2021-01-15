@@ -26,6 +26,11 @@ public interface Max extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
+    // If both values are of either type date or datetime, use the corresponding utility class.
+    if (PropertyValueUtils.Date.isDateOrDateTime(aggregate) &&
+      PropertyValueUtils.Date.isDateOrDateTime(increment)) {
+      return PropertyValueUtils.Date.max(aggregate, increment);
+    }
     return PropertyValueUtils.Numeric.max(aggregate, increment);
   }
 }

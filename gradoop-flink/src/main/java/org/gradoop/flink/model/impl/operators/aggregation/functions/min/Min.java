@@ -23,9 +23,13 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
  * Interface of aggregate functions that determine a minimal value.
  */
 public interface Min extends AggregateFunction {
-
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
+    // If both values are of either type date or datetime, use the corresponding utility class.
+    if (PropertyValueUtils.Date.isDateOrDateTime(aggregate) &&
+      PropertyValueUtils.Date.isDateOrDateTime(increment)) {
+      return PropertyValueUtils.Date.min(aggregate, increment);
+    }
     return PropertyValueUtils.Numeric.min(aggregate, increment);
   }
 }

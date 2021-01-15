@@ -18,6 +18,8 @@ package org.gradoop.common.model.impl.properties;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -416,8 +418,7 @@ public class PropertyValueUtils {
      *
      * @return a < b
      */
-    private static boolean isLessOrEqualThan(
-      PropertyValue aValue, PropertyValue bValue) {
+    private static boolean isLessOrEqualThan(PropertyValue aValue, PropertyValue bValue) {
 
       int aType = checkNumericalAndGetType(aValue);
       int bType = checkNumericalAndGetType(bValue);
@@ -610,6 +611,79 @@ public class PropertyValueUtils {
       default:
         return value.getLong();
       }
+    }
+  }
+
+  /**
+   * Date and DateTime utilities.
+   */
+  public static class Date {
+    /**
+     * Compares two time property values and returns the chronological first one.
+     * <p>
+     * Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime}
+     * instance, but just for the comparison. The return value is not casted.
+     *
+     * @param a first value
+     * @param b second value
+     *
+     * @return the time property value that is the chronological first
+     */
+    public static PropertyValue min(PropertyValue a, PropertyValue b) {
+      return isLessOrEqualThan(a, b) ? a : b;
+    }
+
+    /**
+     * Compares two time property values and returns the chronological last one.
+     * <p>
+     * Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime}
+     * instance, but just for the comparison. The return value is not casted.
+     *
+     * @param a first value
+     * @param b second value
+     *
+     * @return the time property value that is the chronological last
+     */
+    public static PropertyValue max(PropertyValue a, PropertyValue b) {
+      return isLessOrEqualThan(a, b) ? b : a;
+    }
+
+    /**
+     * Compares two date or datetime property values and returns true, if the first one is earlier or equal to
+     * the second one. Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime} instance.
+     *
+     * @param aValue first value
+     * @param bValue second value
+     *
+     * @return true, iff the first time is earlier or equal to the second one
+     */
+    private static boolean isLessOrEqualThan(PropertyValue aValue, PropertyValue bValue) {
+      if (aValue.isDateTime() && bValue.isDateTime()) {
+        return aValue.getDateTime().compareTo(bValue.getDateTime()) <= 0;
+      } else if (aValue.isDate() && bValue.isDate()) {
+        return aValue.getDate().compareTo(bValue.getDate()) <= 0;
+      } else if (aValue.isDate() && bValue.isDateTime()) {
+        // cast a to DateTime
+        return LocalDateTime.of(aValue.getDate(), LocalTime.MIN).compareTo(bValue.getDateTime()) <= 0;
+      } else if (aValue.isDateTime() && bValue.isDate()) {
+        // cast b to DateTime
+        return aValue.getDateTime().compareTo(LocalDateTime.of(bValue.getDate(), LocalTime.MIN)) <= 0;
+      } else {
+        throw new IllegalArgumentException("Arguments to compare are not of type Date or DateTime.");
+      }
+    }
+
+    /**
+     * Checks the property value type for Date or DateTime.
+     *
+     * @param value the property value to check
+     * @return true, iff the value is a Date or DateTime type
+     */
+    public static boolean isDateOrDateTime(PropertyValue value) {
+      return value.isDate() || value.isDateTime();
     }
   }
 
