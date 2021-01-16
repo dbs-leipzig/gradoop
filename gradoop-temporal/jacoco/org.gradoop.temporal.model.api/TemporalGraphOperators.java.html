@@ -29,6 +29,7 @@ import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
+import org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValidity;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -53,7 +54,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate) {
-<span class="fc" id="L56">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L57">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -66,7 +67,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-<span class="fc" id="L69">    return callForGraph(new Snapshot(predicate, dimension));</span>
+<span class="fc" id="L70">    return callForGraph(new Snapshot(predicate, dimension));</span>
   }
 
   /**
@@ -79,7 +80,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see AsOf
    */
   default TemporalGraph asOf(long timestamp) {
-<span class="fc" id="L82">    return snapshot(new AsOf(timestamp));</span>
+<span class="fc" id="L83">    return snapshot(new AsOf(timestamp));</span>
   }
 
   /**
@@ -93,7 +94,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see FromTo
    */
   default TemporalGraph fromTo(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L96">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L97">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -107,7 +108,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see Between
    */
   default TemporalGraph between(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L110">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L111">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -121,7 +122,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ContainedIn
    */
   default TemporalGraph containedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L124">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L125">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -135,7 +136,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ValidDuring
    */
   default TemporalGraph validDuring(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L138">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L139">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -149,7 +150,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see CreatedIn
    */
   default TemporalGraph createdIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L152">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L153">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -163,7 +164,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see DeletedIn
    */
   default TemporalGraph deletedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L166">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L167">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -194,7 +195,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot) {
-<span class="fc" id="L197">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L198">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -225,7 +226,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
     TimeDimension dimension) {
-<span class="fc" id="L228">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
+<span class="fc" id="L229">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
   }
 
   //----------------------------------------------------------------------------
@@ -240,6 +241,18 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the logical graph instance
    */
   LogicalGraph toLogicalGraph();
+
+  /**
+   * Updates edges of this graph to set their validity such that an edge is only valid if both of
+   * its adjacent vertices are valid at that time. Edges that can never be valid since the
+   * validity of both vertices does not overlap, are discarded.&lt;p&gt;
+   * Note that this will also remove dangling edges, in the same way {@link #verify()} would.
+   *
+   * @return This graph with invalid or dangling edges removed.
+   */
+  default TemporalGraph updateEdgeValidity() {
+<span class="nc" id="L254">    return callForGraph(new VerifyAndUpdateEdgeValidity());</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

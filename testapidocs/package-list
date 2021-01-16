@@ -128,5 +128,7 @@ org.gradoop.temporal.model.impl.operators.keyedgrouping
 org.gradoop.temporal.model.impl.operators.keyedgrouping.keys
 org.gradoop.temporal.model.impl.operators.snapshot
 org.gradoop.temporal.model.impl.operators.tostring
+org.gradoop.temporal.model.impl.operators.verify
+org.gradoop.temporal.model.impl.operators.verify.functions
 org.gradoop.temporal.model.impl.pojo
 org.gradoop.temporal.util

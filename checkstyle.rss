@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2020 - 2021 University of Leipzig</copyright>
     <item>
-      <title>File: 1863,
+      <title>File: 1869,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -299,6 +299,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.fsm.TransactionalFSM.java">org/gradoop/flink/algorithms/fsm/TransactionalFSM.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValidityTest.java">org/gradoop/temporal/model/impl/operators/verify/VerifyAndUpdateEdgeValidityTest.java</a>
                 </td>
                 <td>
                   0
@@ -1894,6 +1908,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.functions.UpdateEdgeValidityTest.java">org/gradoop/temporal/model/impl/operators/verify/functions/UpdateEdgeValidityTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds.java">org/gradoop/flink/model/impl/operators/equality/CollectionEqualityByGraphIds.java</a>
                 </td>
                 <td>
@@ -2987,6 +3015,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.common.model.impl.id.GradoopIdSet.java">org/gradoop/common/model/impl/id/GradoopIdSet.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.functions.package-info.java">org/gradoop/temporal/model/impl/operators/verify/functions/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -13136,6 +13178,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.package-info.java">org/gradoop/temporal/model/impl/operators/verify/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceVertexTuples.java">org/gradoop/flink/model/impl/operators/keyedgrouping/functions/ReduceVertexTuples.java</a>
                 </td>
                 <td>
@@ -22124,6 +22180,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.functions.UpdateEdgeValidity.java">org/gradoop/temporal/model/impl/operators/verify/functions/UpdateEdgeValidity.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.functions.TemporalPredicateTests.java">org/gradoop/temporal/model/impl/functions/TemporalPredicateTests.java</a>
                 </td>
                 <td>
@@ -24225,6 +24295,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.distinction.functions.GraphHeadGroup.java">org/gradoop/flink/model/impl/operators/distinction/functions/GraphHeadGroup.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValidity.java">org/gradoop/temporal/model/impl/operators/verify/VerifyAndUpdateEdgeValidity.java</a>
                 </td>
                 <td>
                   0
