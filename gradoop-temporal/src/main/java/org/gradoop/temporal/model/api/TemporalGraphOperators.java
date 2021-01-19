@@ -29,6 +29,7 @@ import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
+import org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValidity;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -240,5 +241,17 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * @return the logical graph instance
    */
   LogicalGraph toLogicalGraph();
+
+  /**
+   * Updates edges of this graph to set their validity such that an edge is only valid if both of
+   * its adjacent vertices are valid at that time. Edges that can never be valid since the
+   * validity of both vertices does not overlap, are discarded.<p>
+   * Note that this will also remove dangling edges, in the same way {@link #verify()} would.
+   *
+   * @return This graph with invalid or dangling edges removed.
+   */
+  default TemporalGraph updateEdgeValidity() {
+    return callForGraph(new VerifyAndUpdateEdgeValidity());
+  }
 
 }
