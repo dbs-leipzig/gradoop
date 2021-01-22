@@ -37,6 +37,7 @@ import static org.junit.Assert.assertThrows;
  */
 @RunWith(Parameterized.class)
 public class MaxTest extends GradoopFlinkTestBase {
+
   /**
    * An instance of the interface to test.
    */
