@@ -79,7 +79,7 @@ public class LEdge extends Tuple4&lt;GradoopId, GradoopId, GradoopId, List&lt;Gr
    * @return value of id
    */
   public GradoopId getId() {
-<span class="nc" id="L82">    return f0;</span>
+<span class="fc" id="L82">    return f0;</span>
   }
 
   /**
@@ -124,8 +124,8 @@ public class LEdge extends Tuple4&lt;GradoopId, GradoopId, GradoopId, List&lt;Gr
    * @param targetId the new value
    */
   public void setTargetId(GradoopId targetId) {
-<span class="nc" id="L127">    this.f2 = targetId;</span>
-<span class="nc" id="L128">  }</span>
+<span class="fc" id="L127">    this.f2 = targetId;</span>
+<span class="fc" id="L128">  }</span>
 
   /**
    * Get amount of edges that this edge represents. As this edge counts as sub-edge the returned
@@ -141,7 +141,7 @@ public class LEdge extends Tuple4&lt;GradoopId, GradoopId, GradoopId, List&lt;Gr
    * @return A list of ids
    */
   public List&lt;GradoopId&gt; getSubEdges() {
-<span class="nc" id="L144">    return f3;</span>
+<span class="fc" id="L144">    return f3;</span>
   }
 
   /**
@@ -157,17 +157,17 @@ public class LEdge extends Tuple4&lt;GradoopId, GradoopId, GradoopId, List&lt;Gr
    * @param edge The sub-edge to add
    */
   public void addSubEdge(GradoopId edge) {
-<span class="nc" id="L160">    f3.add(edge);</span>
-<span class="nc" id="L161">  }</span>
+<span class="fc" id="L160">    f3.add(edge);</span>
+<span class="fc" id="L161">  }</span>
 
   /**
    * Add amultiple sub-edges to this edge
    * @param edges The sub-edges to add
    */
   public void addSubEdges(List&lt;GradoopId&gt; edges) {
-<span class="nc bnc" id="L168" title="All 2 branches missed.">    if (edges != null) {</span>
-<span class="nc" id="L169">      f3.addAll(edges);</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">    if (edges != null) {</span>
+<span class="fc" id="L169">      f3.addAll(edges);</span>
     }
-<span class="nc" id="L171">  }</span>
+<span class="fc" id="L171">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
