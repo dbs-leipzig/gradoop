@@ -44,7 +44,7 @@ public class CSVLineToVertex extends CSVLineToElement<EPGMVertex> {
     this.vertexFactory = epgmVertexFactory;
   }
 
-   @Override
+  @Override
   public EPGMVertex map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 4);
     String label = StringEscaper.unescape(tokens[2]);

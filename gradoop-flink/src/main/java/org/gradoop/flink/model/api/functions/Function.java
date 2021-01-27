@@ -23,8 +23,7 @@ import java.io.Serializable;
  * @param <T> the type of the input to the function
  * @param <R> the type of the result of the function
  */
-public interface Function<T, R>
-  extends Serializable {
+public interface Function<T, R> extends Serializable {
   /**
    * Creates output from given input.
    *

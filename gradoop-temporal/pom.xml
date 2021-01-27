@@ -109,14 +109,6 @@
             <artifactId>flink-java</artifactId>
         </dependency>
 
-        <!-- needed for transformations -->
-        <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-
         <!-- Test dependencies -->
 
         <!-- Gradoop -->
