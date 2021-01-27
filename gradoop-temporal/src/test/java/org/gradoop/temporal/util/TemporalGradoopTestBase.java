@@ -142,15 +142,15 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   /**
    * Convert some graph to a {@link TemporalGraph}.
    *
+   * @see org.gradoop.temporal.model.impl.TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    * @param graph The graph.
    * @return The resulting temporal graph.
-   * @see org.gradoop.temporal.model.impl.TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    */
   protected TemporalGraph toTemporalGraph(BaseGraph<?, ?, ?, ?, ?> graph) {
     return getConfig().getTemporalGraphFactory().fromNonTemporalGraph(graph);
   }
 
-  /**
+/**
    * Convert a graph to a {@link TemporalGraph} and set temporal attributes using
    * {@link TimeIntervalExtractor} functions.
    *
@@ -158,9 +158,9 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.
    * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.
    * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.
-   * @param <G>                    The graph head type.
-   * @param <V>                    The vertex type.
-   * @param <E>                    The edge type.
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
    * @return A temporal graph with temporal attributes extracted from the original graph.
    */
   protected <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraph toTemporalGraph(
@@ -208,9 +208,9 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    * @param graphHeadTimeExtractor The function used to extract temporal attributes for graph heads.
    * @param vertexTimeExtractor    The function used to extract temporal attributes for vertices.
    * @param edgeTimeExtractor      The function used to extract temporal attributes for edges.
-   * @param <G>                    The graph head type.
-   * @param <V>                    The vertex type.
-   * @param <E>                    The edge type.
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
    * @return A temporal graph with temporal attributes extracted from the original graph.
    */
   protected <G extends GraphHead, V extends Vertex, E extends Edge> TemporalGraphCollection
