@@ -44,16 +44,16 @@ public class CSVLineToVertex extends CSVLineToElement<EPGMVertex> {
     this.vertexFactory = epgmVertexFactory;
   }
 
-  @Override
+   @Override
   public EPGMVertex map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 4);
     String label = StringEscaper.unescape(tokens[2]);
     return vertexFactory.initVertex(
-        GradoopId.fromString(tokens[0]),
-        label,
-        parseProperties(MetaDataSource.VERTEX_TYPE, label, tokens[3]),
-        parseGradoopIds(tokens[1])
-      );
+      GradoopId.fromString(tokens[0]),
+      label,
+      parseProperties(MetaDataSource.VERTEX_TYPE, label, tokens[3]),
+      parseGradoopIds(tokens[1])
+    );
 
   }
 }

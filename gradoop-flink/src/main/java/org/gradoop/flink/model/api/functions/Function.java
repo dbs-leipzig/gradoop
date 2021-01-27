@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-
 import java.io.Serializable;
 
 /**

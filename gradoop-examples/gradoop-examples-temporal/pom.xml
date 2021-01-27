@@ -104,7 +104,6 @@
                                     <!-- others -->
                                     <include>org.apache.hbase:hbase-common</include>
                                     <include>com.github.s1ck:gdl</include>
-                                    <include>org.jgrapht:*</include>
                                     <include>org.antlr:antlr4-runtime</include>
                                     <include>me.lemire.integercompression:*</include>
                                     <include>com.google.guava:*</include>
