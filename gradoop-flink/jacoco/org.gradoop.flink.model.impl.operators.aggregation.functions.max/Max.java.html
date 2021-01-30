@@ -20,13 +20,20 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Interface of aggregate functions that determine a maximal value.
+ * Interface of aggregate functions that determine a maximal value.&lt;br&gt;
+ * This aggregation supports numerical property value types (short, int, long, float, double, big decimal) and
+ * date and datetime types.
  */
 public interface Max extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
-<span class="fc" id="L29">    return PropertyValueUtils.Numeric.max(aggregate, increment);</span>
+    // If both values are of either type date or datetime, use the corresponding utility class.
+<span class="fc bfc" id="L32" title="All 2 branches covered.">    if (PropertyValueUtils.Date.isDateOrDateTime(aggregate) &amp;&amp;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">      PropertyValueUtils.Date.isDateOrDateTime(increment)) {</span>
+<span class="fc" id="L34">      return PropertyValueUtils.Date.max(aggregate, increment);</span>
+    }
+<span class="fc" id="L36">    return PropertyValueUtils.Numeric.max(aggregate, increment);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

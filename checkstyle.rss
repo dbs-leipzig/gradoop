@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2020 - 2021 University of Leipzig</copyright>
     <item>
-      <title>File: 1869,
+      <title>File: 1871,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -6207,6 +6207,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.functions.utils.Superstep.java">org/gradoop/flink/model/impl/functions/utils/Superstep.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxTest.java">org/gradoop/flink/model/impl/operators/aggregation/functions/max/MaxTest.java</a>
                 </td>
                 <td>
                   0
@@ -13851,6 +13865,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.storage.accumulo.impl.predicate.filter.impl.AccumuloPropReg.java">org/gradoop/storage/accumulo/impl/predicate/filter/impl/AccumuloPropReg.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinTest.java">org/gradoop/flink/model/impl/operators/aggregation/functions/min/MinTest.java</a>
                 </td>
                 <td>
                   0

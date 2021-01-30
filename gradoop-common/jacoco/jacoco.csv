@@ -1,5 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils,3,0,0,0,1,0,1,0,1,0
+Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils.Date,3,83,1,23,1,12,2,15,1,4
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValue,9,436,2,24,2,110,3,79,1,68
 Gradoop Common,org.gradoop.common.model.impl.properties,Properties,13,260,6,16,4,62,6,29,0,24
 Gradoop Common,org.gradoop.common.model.impl.properties,Property,2,172,2,14,1,37,2,20,0,14

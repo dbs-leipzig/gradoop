@@ -46,6 +46,8 @@ org.gradoop.flink.model.impl.layouts.transactional
 org.gradoop.flink.model.impl.operators.aggregation
 org.gradoop.flink.model.impl.operators.aggregation.functions
 org.gradoop.flink.model.impl.operators.aggregation.functions.average
+org.gradoop.flink.model.impl.operators.aggregation.functions.max
+org.gradoop.flink.model.impl.operators.aggregation.functions.min
 org.gradoop.flink.model.impl.operators.base
 org.gradoop.flink.model.impl.operators.cloning
 org.gradoop.flink.model.impl.operators.combination
