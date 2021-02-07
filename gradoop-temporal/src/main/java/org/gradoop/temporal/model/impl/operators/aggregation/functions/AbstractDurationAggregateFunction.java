@@ -21,7 +21,12 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for functions aggregating the duration of temporal elements for a certain {@link TimeDimension}.
@@ -29,19 +34,44 @@ import java.util.Objects;
 public abstract class AbstractDurationAggregateFunction extends BaseAggregateFunction {
 
   /**
+   * The default temporal unit.
+   */
+  public static final TemporalUnit DEFAULT_UNIT = ChronoUnit.MILLIS;
+
+  /**
    * Selects which time dimension is considered by this aggregate function.
    */
   protected final TimeDimension dimension;
 
   /**
+   * The unit to parse the duration after the aggregation.
+   */
+  protected final TemporalUnit timeUnit;
+
+  /**
+   * A list of supported temporal units.
+   */
+  protected final List<TemporalUnit> supportedUnits = Arrays.asList(ChronoUnit.MILLIS, ChronoUnit.SECONDS,
+    ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS);
+
+  /**
    * Creates a new instance of this base aggregate function.
    *
-   * @param aggregatePropertyKey aggregate property key
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the given TimeDimension
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#supportedUnits}.
    */
-  AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension) {
+  AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
     super(aggregatePropertyKey);
     this.dimension = Objects.requireNonNull(dimension);
+    Objects.requireNonNull(unit);
+    if (!supportedUnits.contains(unit)) {
+      throw new IllegalArgumentException("The given unit [" + unit +
+        "] is not supported. Supported temporal units are [" +
+        supportedUnits.stream().map(TemporalUnit::toString).collect(Collectors.joining(",")) + "]");
+    }
+    this.timeUnit = unit;
   }
 
   /**

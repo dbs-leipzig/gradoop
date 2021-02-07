@@ -15,11 +15,15 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.Max;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+import java.time.temporal.TemporalUnit;
 
 /**
  * Calculates the maximum duration of a {@link TimeDimension} of temporal elements.
@@ -29,13 +33,39 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 public class MaxDuration extends AbstractDurationAggregateFunction implements Max, TemporalAggregateFunction {
 
   /**
-   * Creates a new instance of this base aggregate function.
+   * Creates a new instance of this aggregate function.
    *
-   * @param aggregatePropertyKey the given aggregate property key
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#supportedUnits}.
+   */
+  public MaxDuration(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
+    super(aggregatePropertyKey, dimension, unit);
+  }
+
+  /**
+   * Creates a new instance of this aggregate function.
+   *
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the time dimension to consider
    */
   public MaxDuration(String aggregatePropertyKey, TimeDimension dimension) {
-    super(aggregatePropertyKey, dimension);
+    super(aggregatePropertyKey, dimension, AbstractDurationAggregateFunction.DEFAULT_UNIT);
+  }
+
+  /**
+   * Creates a new instance of this aggregate function. The the property key of the new property, where the
+   * aggregated value is stored, will be defined as "maxDuration_" + {dimension} + "_" + {unit}. Use
+   * constructor {@link MaxDuration#MaxDuration(String, TimeDimension, TemporalUnit)} to specify a
+   * user-defined key.
+   *
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#supportedUnits}.
+   */
+  public MaxDuration(TimeDimension dimension, TemporalUnit unit) {
+    this("maxDuration_" + dimension + "_" + unit, dimension, unit);
   }
 
   /**
@@ -55,16 +85,31 @@ public class MaxDuration extends AbstractDurationAggregateFunction implements Ma
   }
 
   /**
-   * Method to check whether all aggregated durations had been default values.
+   * Method to check whether all aggregated durations had been default values or need to be transformed to
+   * another unit.
    *
-   * @param result the result of the MaxDuration Aggregation
-   * @return the unchanged result or {@link PropertyValue#NULL_VALUE}, if the maximum duration is
-   *         {@link TemporalElement#DEFAULT_TIME_FROM}
+   * @param result the result of the MaxDuration aggregation as {@link Long} in milliseconds
+   * @return By default (no time unit or the default unit [millis] is specified), the result of the
+   *         MaxDuration Aggregation as {@link Long} in milliseconds is returned. If a different time unit is
+   *         given in {@link AbstractDurationAggregateFunction#timeUnit}, a {@link Double} of
+   *         the desired unit is returned. If the maximum duration is
+   *         {@link TemporalElement#DEFAULT_TIME_FROM}, the value {@link PropertyValue#NULL_VALUE}is returned.
+   * @throws UnsupportedTypeException if the type of the given property value is different from {@link Long}.
    */
   @Override
-  public PropertyValue postAggregate(PropertyValue result) {
+  public PropertyValue postAggregate(PropertyValue result) throws UnsupportedTypeException {
+    // First check if the aggregated result is of type long.
+    if (!result.isLong()) {
+      throw new UnsupportedTypeException("The result type of the max duration aggregation must be [" +
+        Type.LONG + "], but is [" + result.getType() + "].");
+    }
+    // If the result is a default value, set it as null.
     if (result.getLong() == TemporalElement.DEFAULT_TIME_FROM) {
       return PropertyValue.NULL_VALUE;
+    }
+    // If a time unit is specified, convert it.
+    if (timeUnit != AbstractDurationAggregateFunction.DEFAULT_UNIT) {
+      result.setDouble((double) result.getLong() / timeUnit.getDuration().toMillis());
     }
     return result;
   }
