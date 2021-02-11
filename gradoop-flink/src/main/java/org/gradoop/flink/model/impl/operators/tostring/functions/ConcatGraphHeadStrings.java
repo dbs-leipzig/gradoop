@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR;
+
 /**
  * concatenates the sorted string representations of graph heads to represent a
  * collection
@@ -33,19 +35,19 @@ public class ConcatGraphHeadStrings
 
   @Override
   public void reduce(Iterable<GraphHeadString> graphHeadLabels,
-    Collector<String> collector) throws Exception {
+                     Collector<String> collector) throws Exception {
 
     List<String> graphLabels = new ArrayList<>();
 
     for (GraphHeadString graphHeadString : graphHeadLabels) {
       String graphLabel = graphHeadString.getLabel();
-      if (! graphLabel.equals("")) {
+      if (!graphLabel.equals("")) {
         graphLabels.add(graphLabel);
       }
     }
 
     Collections.sort(graphLabels);
 
-    collector.collect(StringUtils.join(graphLabels, System.lineSeparator()));
+    collector.collect(StringUtils.join(graphLabels, LINE_SEPARATOR));
   }
 }
