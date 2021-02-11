@@ -38,7 +38,7 @@ public class MinDuration extends AbstractDurationAggregateFunction implements Mi
    * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the time dimension to consider
    * @param unit the temporal unit into which the result is converted. The supported units are specified in
-   *             {@link AbstractDurationAggregateFunction#supportedUnits}.
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
    */
   public MinDuration(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
     super(aggregatePropertyKey, dimension, unit);
@@ -62,7 +62,7 @@ public class MinDuration extends AbstractDurationAggregateFunction implements Mi
    *
    * @param dimension the time dimension to consider
    * @param unit the temporal unit into which the result is converted. The supported units are specified in
-   *             {@link AbstractDurationAggregateFunction#supportedUnits}.
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
    */
   public MinDuration(TimeDimension dimension, TemporalUnit unit) {
     this("minDuration_" + dimension + "_" + unit, dimension, unit);
