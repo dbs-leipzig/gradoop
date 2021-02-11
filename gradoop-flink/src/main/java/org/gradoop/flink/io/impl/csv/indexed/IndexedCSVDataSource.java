@@ -56,7 +56,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
   /**
    * HDFS Configuration.
    */
-  private final Configuration hdfsConfig;
+  protected final Configuration hdfsConfig;
 
   /**
    * Creates a new data source. The constructor creates a default HDFS configuration.

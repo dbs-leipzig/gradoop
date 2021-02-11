@@ -87,16 +87,18 @@ public class TemporalGraphLayoutFactory extends TemporalBaseLayoutFactory
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a graph layout from the given datasets indexed by label.
    *
-   * Creating a temporal graph layout from an indexed dataset is not supported yet.
+   * @param graphHeads 1-element Mapping from label to GraphHead DataSet
+   * @param vertices Mapping from label to vertex dataset
+   * @param edges Mapping from label to edge dataset
+   * @return a temporal indexed graph layout
    */
   @Override
   public LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> fromIndexedDataSets(
     Map<String, DataSet<TemporalGraphHead>> graphHeads,
     Map<String, DataSet<TemporalVertex>> vertices, Map<String, DataSet<TemporalEdge>> edges) {
-    throw new UnsupportedOperationException(
-      "Creating a temporal graph layout from an indexed dataset is not supported yet.");
+    return new TemporalIndexedLayout(graphHeads, vertices, edges);
   }
 
   @Override
