@@ -28,7 +28,10 @@ import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
@@ -86,20 +89,23 @@ public abstract class CSVLineToElement<E extends Element> extends RichMapFunctio
 
   /**
    * Parses the CSV string that contains EPGMGraphHead ids.
+   * The csv string is formatted as an array: {@code "[id0,id1,id3,...]"}
    *
    * @param gradoopIdsString The csv token string.
    * @return gradoop ids contained in the string
    */
   protected GradoopIdSet parseGradoopIds(String gradoopIdsString) {
-    String[] gradoopIds = gradoopIdsString
-      .substring(1, gradoopIdsString.length() - 1)
-      .split(CSVConstants.LIST_DELIMITER);
+    // Check for empty id array string and return empty list
+    // Splitting the empty string would result in 1 empty string instead
+    // If string is not empty, parse to GradoopIds
+    List<GradoopId> gradoopIds = gradoopIdsString.equals("[]") ? Collections.emptyList() : Arrays
+      .stream(gradoopIdsString
+        .substring(1, gradoopIdsString.length() - 1)
+        .split(CSVConstants.LIST_DELIMITER))
+      .map(GradoopId::fromString)
+      .collect(Collectors.toList());
 
-    GradoopIdSet gradoopIdSet = new GradoopIdSet();
-    for (String g : gradoopIds) {
-      gradoopIdSet.add(GradoopId.fromString(g.trim()));
-    }
-    return gradoopIdSet;
+    return GradoopIdSet.fromExisting(gradoopIds);
   }
 
   /**
