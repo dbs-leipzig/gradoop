@@ -281,6 +281,20 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     }
   }
 
+  @Test
+  public void testQuotedFields() throws Exception {
+    String csvPath = MinimalCSVImporterTest.class.getResource("/csv/inputQuoted.csv").getPath();
+    String gdlPath = MinimalCSVImporterTest.class.getResource("/csv/expectedQuoted.gdl").getPath();
+
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true)
+      .parseQuotedStrings().quoteCharacter('"');
+    LogicalGraph resultGraph = importVertexImporter.getLogicalGraph();
+    LogicalGraph expectedGraph = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(expectedGraph.equalsByElementData(resultGraph));
+  }
+
   /**
    * Checks if the csv file import is equals to the assert import.
    *

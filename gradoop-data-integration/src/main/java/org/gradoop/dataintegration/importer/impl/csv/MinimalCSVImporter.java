@@ -16,6 +16,11 @@
 package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.Utils;
+import org.apache.flink.api.java.io.TupleCsvInputFormat;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,6 +39,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
@@ -43,17 +49,17 @@ public class MinimalCSVImporter implements DataSource {
   /**
    * Token delimiter of the CSV file.
    */
-  private String tokenSeparator;
+  private final String tokenSeparator;
 
   /**
    * Path to the csv file.
    */
-  private String path;
+  private final String path;
 
   /**
    * The charset used in the csv file, e.g., "UTF-8".
    */
-  private String charset;
+  private final String charset;
 
   /**
    * The property names for all columns in the file. If {@code null}, the first line will be
@@ -68,9 +74,19 @@ public class MinimalCSVImporter implements DataSource {
   private boolean checkReoccurringHeader;
 
   /**
+   * Flag to specify if quoted strings should be considered. Will escape delimiters inside quoted strings.
+   */
+  private boolean parseQuotedStrings = false;
+
+  /**
+   * Character used to quote strings.
+   */
+  private char quoteCharacter = '"';
+
+  /**
    * Gradoop Flink configuration.
    */
-  private GradoopFlinkConfig config;
+  private final GradoopFlinkConfig config;
 
   /**
    * Create a new MinimalCSVImporter instance by the given parameters.
@@ -125,6 +141,37 @@ public class MinimalCSVImporter implements DataSource {
   }
 
   /**
+   * Set checkReoccurringHeader flag.
+   *
+   * @return this
+   */
+  public MinimalCSVImporter checkReoccurringHeader() {
+    this.checkReoccurringHeader = true;
+    return this;
+  }
+
+  /**
+   * Set parseQuotedStrings flag. Delimiters in quoted fields will be escaped.
+   *
+   * @return this
+   */
+  public MinimalCSVImporter parseQuotedStrings() {
+    this.parseQuotedStrings = true;
+    return this;
+  }
+
+  /**
+   * Set quoteCharacter.
+   *
+   * @param quoteCharacter character used to quote fields
+   * @return this
+   */
+  public MinimalCSVImporter quoteCharacter(char quoteCharacter) {
+    this.quoteCharacter = quoteCharacter;
+    return this;
+  }
+
+  /**
    * Import each row of the file as a vertex and create a logical graph from it.
    * If no column property names are set, read the first line of the file as header and set this
    * values as column names.
@@ -161,11 +208,39 @@ public class MinimalCSVImporter implements DataSource {
    * @return a {@link DataSet} of all vertices from one specific file
    */
   private DataSet<EPGMVertex> readCSVFile(List<String> propertyNames, boolean checkReoccurringHeader) {
-    return config.getExecutionEnvironment()
-      .readTextFile(path)
-      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))
+    Class<String>[] types = IntStream.range(0, propertyNames.size())
+      .mapToObj(i -> String.class)
+      .<Class<String>>toArray(Class[]::new);
+
+    return getCSVReader(config.getExecutionEnvironment(), path, types)
+      .flatMap(new CsvRowToProperties<>(propertyNames, checkReoccurringHeader))
+      .filter(p -> !p.isEmpty())
       .map(new PropertiesToVertex<>(config.getLogicalGraphFactory().getVertexFactory()))
       .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
+  }
+
+  /**
+   * Create CSVReader for the provided types.
+   * Flinks CSVReader builder does not support tuples of dynamic length.
+   *
+   * @param env execution environment
+   * @param filename path of csv file
+   * @param fieldTypes array of types
+   * @return csv reader returning a tuple of fieldTypes
+   */
+  private org.apache.flink.api.java.operators.DataSource<Tuple> getCSVReader(ExecutionEnvironment env,
+    String filename, Class<?>[] fieldTypes) {
+    TupleTypeInfo<Tuple> typeInfo = TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(fieldTypes);
+    TupleCsvInputFormat<Tuple> inputFormat = new TupleCsvInputFormat<>(
+      new org.apache.flink.core.fs.Path(filename), typeInfo);
+    inputFormat.setCharset(this.charset);
+    inputFormat.setFieldDelimiter(this.tokenSeparator);
+    inputFormat.setSkipFirstLineAsHeader(false);
+    if (this.parseQuotedStrings) {
+      inputFormat.enableQuotedStringParsing(this.quoteCharacter);
+    }
+    return new org.apache.flink.api.java.operators.DataSource<>(env, inputFormat, typeInfo,
+      Utils.getCallLocationName());
   }
 
   /**
