@@ -48,10 +48,19 @@ import java.util.stream.Collectors;
  * The datasource expects files separated by label, e.g. in the following directory structure:
  * <p>
  * csvRoot
- * |- Person.csv     # contains all vertices with label 'Person'
- * |- University.csv # contains all vertices with label 'University'
- * |- knows.csv      # contains all edges with label 'knows'
- * |- studyAt.csv    # contains all edges with label 'studyAt'
+ * |- vertices
+ *   |- person
+ *     |- data.csv    # contains all vertices with label 'Person'
+ *   |- university
+ *     |- data.csv    # contains all vertices with label 'University'
+ * |- edges
+ *   |- knows
+ *     |- data.csv    # contains all edges with label 'knows'
+ *   |- studyAt
+ *     |- data.csv    # contains all edges with label 'studyAt'
+ * |- graphs
+ *   |- myGraph
+ *     |- data.csv
  * |- metadata.csv   # Meta data for all data contained in the graph
  */
 public class TemporalIndexedCSVDataSource extends IndexedCSVDataSource implements TemporalDataSource {
@@ -67,16 +76,27 @@ public class TemporalIndexedCSVDataSource extends IndexedCSVDataSource implement
   }
 
   /**
-   * Will use a single graph head of the collection as final graph head for the graph.
-   * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.
+   * Reads a {@link TemporalGraph} and converts it to a {@link LogicalGraph} via function
+   * {@link TemporalGraph##getLogicalGraph()}.
    *
-   * {@inheritDoc}
+   * @return a logical graph instance
+   * @throws IOException in case of an error while reading the graph
    */
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    GraphCollection collection = getGraphCollection();
-    return collection.getGraphFactory()
-      .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
+    return getTemporalGraph().toLogicalGraph();
+  }
+
+  /**
+   * Reads a {@link TemporalGraphCollection} and converts it to a {@link GraphCollection} via function
+   * {@link TemporalGraphCollection##getGraphCollection()}.
+   *
+   * @return a graph collection instance
+   * @throws IOException in case of an error while reading the graph collection
+   */
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+    return getTemporalGraphCollection().toGraphCollection();
   }
 
   @Override
