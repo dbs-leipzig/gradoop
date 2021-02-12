@@ -44,6 +44,14 @@ public class CSVConstants {
    */
   public static final String MAP_SEPARATOR = "=";
   /**
+   * Template for lists in CSV files.
+   */
+  public static final String LIST_TEMPLATE = "[%s]";
+  /**
+   * Template for maps in CSV files
+   */
+  public static final String MAP_TEMPLATE = "{%s}";
+  /**
    * System constant file separator.
    */
   public static final String DIRECTORY_SEPARATOR = System.getProperty("file.separator");
