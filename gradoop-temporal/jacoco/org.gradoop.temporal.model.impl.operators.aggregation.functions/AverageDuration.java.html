@@ -15,14 +15,16 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Average;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Calculate the average duration of a time dimension of one given {@link TimeDimension} of temporal elements.
@@ -34,23 +36,43 @@ public class AverageDuration extends AbstractDurationAggregateFunction
   /**
    * A property value containing the number {@code 1}, as a {@link Long}.
    */
-<span class="fc" id="L37">  private static final PropertyValue ONE = PropertyValue.create(1L);</span>
+<span class="fc" id="L39">  private static final PropertyValue ONE = PropertyValue.create(1L);</span>
 
   /**
-   * Selects which time dimension is considered by this aggregate function.
+   * Creates a new instance of this aggregate function.
+   *
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
    */
-  private final TimeDimension dimension;
+  public AverageDuration(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
+<span class="fc" id="L50">    super(aggregatePropertyKey, dimension, unit);</span>
+<span class="fc" id="L51">  }</span>
 
   /**
    * Create an instance of the {@link AverageDuration} aggregate function.
    *
-   * @param aggregatePropertyKey The aggregate property key.
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the time dimension to consider
    */
   public AverageDuration(String aggregatePropertyKey, TimeDimension dimension) {
-<span class="fc" id="L51">    super(aggregatePropertyKey, dimension);</span>
-<span class="fc" id="L52">    this.dimension = Objects.requireNonNull(dimension);</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L60">    this(aggregatePropertyKey, dimension, AbstractDurationAggregateFunction.DEFAULT_UNIT);</span>
+<span class="fc" id="L61">  }</span>
+
+  /**
+   * Creates a new instance of this aggregate function. The the property key of the new property, where the
+   * aggregated value is stored, will be defined as &quot;avgDuration_&quot; + {dimension} + &quot;_&quot; + {unit}. Use
+   * constructor {@link AverageDuration#AverageDuration(String, TimeDimension, TemporalUnit)} to specify a
+   * user-defined key.
+   *
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
+   */
+  public AverageDuration(TimeDimension dimension, TemporalUnit unit) {
+<span class="fc" id="L74">    this(&quot;avgDuration_&quot; + dimension + &quot;_&quot; + unit, dimension, unit);</span>
+<span class="fc" id="L75">  }</span>
 
   /**
    * Get the duration of a time dimension as the aggregate value from a temporal element.
@@ -63,16 +85,46 @@ public class AverageDuration extends AbstractDurationAggregateFunction
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-<span class="fc" id="L66">    PropertyValue duration = getDuration(element);</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (duration.getLong() == -1L) {</span>
-<span class="fc" id="L68">      return Average.IGNORED_VALUE;</span>
+<span class="fc" id="L88">    PropertyValue duration = getDuration(element);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    if (duration.getLong() == -1L) {</span>
+<span class="fc" id="L90">      return Average.IGNORED_VALUE;</span>
     }
-<span class="fc" id="L70">    return PropertyValue.create(Arrays.asList(duration, ONE));</span>
+<span class="fc" id="L92">    return PropertyValue.create(Arrays.asList(duration, ONE));</span>
+  }
+
+  /**
+   * After calling {@link Average#postAggregate(PropertyValue)}, this function transforms the resulting
+   * aggregate value to the specified temporal unit.
+   *
+   * @param result the result of the AverageDuration aggregation as {@link Double} in milliseconds, or null if
+   *              nothing was aggregated.
+   * @return By default (no time unit or the default unit [millis] is specified), the result of the
+   *         AverageDuration aggregation as {@link Double} in milliseconds is returned. If a different
+   *         temporal unit is given in {@link AbstractDurationAggregateFunction#timeUnit}, a {@link Double} of
+   *         the desired unit is returned.
+   * @throws UnsupportedTypeException if the type of the given property value is different from {@link Double}
+   *                                  or null.
+   * @see Average#postAggregate(PropertyValue)
+   */
+  @Override
+  public PropertyValue postAggregate(PropertyValue result) throws UnsupportedTypeException {
+    // First call the postAggregate of the interface to calculate the average aggregate
+<span class="fc" id="L112">    result = Average.super.postAggregate(result);</span>
+    // Check if the aggregate value is of type null or double.
+<span class="pc bpc" id="L114" title="2 of 4 branches missed.">    if (!result.isNull() &amp;&amp; !result.isDouble()) {</span>
+<span class="nc" id="L115">      throw new UnsupportedTypeException(&quot;The result type of the average duration aggregation must be &quot; +</span>
+<span class="nc" id="L116">        &quot;one of [&quot; + Type.NULL + &quot;, &quot; + Type.DOUBLE + &quot;], but is [&quot; + result.getType() + &quot;].&quot;);</span>
+    }
+<span class="pc bpc" id="L118" title="1 of 4 branches missed.">    if (timeUnit != AbstractDurationAggregateFunction.DEFAULT_UNIT &amp;&amp; result.isDouble()) {</span>
+      // It is not a default unit, so we have to map the result value to the desired unit.
+<span class="fc" id="L120">      result.setDouble(result.getDouble() / timeUnit.getDuration().toMillis());</span>
+    }
+<span class="fc" id="L122">    return result;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L75">    return String.format(&quot;%s(%s)&quot;, getClass().getSimpleName(), dimension);</span>
+<span class="nc" id="L127">    return String.format(&quot;%s(%s)&quot;, getClass().getSimpleName(), dimension);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

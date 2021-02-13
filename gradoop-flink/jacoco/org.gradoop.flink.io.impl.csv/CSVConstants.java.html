@@ -44,9 +44,17 @@ import java.util.Set;
    */
   public static final String MAP_SEPARATOR = &quot;=&quot;;
   /**
+   * Template for lists in CSV files.
+   */
+  public static final String LIST_TEMPLATE = &quot;[%s]&quot;;
+  /**
+   * Template for maps in CSV files
+   */
+  public static final String MAP_TEMPLATE = &quot;{%s}&quot;;
+  /**
    * System constant file separator.
    */
-<span class="fc" id="L49">  public static final String DIRECTORY_SEPARATOR = System.getProperty(&quot;file.separator&quot;);</span>
+<span class="fc" id="L57">  public static final String DIRECTORY_SEPARATOR = System.getProperty(&quot;file.separator&quot;);</span>
   /**
    * File name for indexed data.
    */
@@ -58,7 +66,7 @@ import java.util.Set;
   /**
    * Characters to be escaped in csv strings.
    */
-<span class="fc" id="L61">  public static final Set&lt;Character&gt; ESCAPED_CHARACTERS = ImmutableSet</span>
-<span class="fc" id="L62">    .of('\\', ';', ',', '|', ':', '\n', '=');</span>
+<span class="fc" id="L69">  public static final Set&lt;Character&gt; ESCAPED_CHARACTERS = ImmutableSet</span>
+<span class="fc" id="L70">    .of('\\', ';', ',', '|', ':', '\n', '=');</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

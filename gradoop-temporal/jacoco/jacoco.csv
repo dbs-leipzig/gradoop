@@ -45,9 +45,9 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,TemporalEdgeToEd
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,VertexToTemporalVertex,0,49,0,2,0,13,0,4,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,TemporalGraphHeadToGraphHead,0,28,0,0,0,7,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.verify.functions,UpdateEdgeValidity,0,46,0,8,0,11,0,6,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction,15,69,5,10,1,15,5,5,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinDuration,0,29,0,4,0,9,0,5,0,3
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageDuration,16,39,0,2,1,8,1,4,1,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction,15,131,5,12,1,22,5,7,0,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinDuration,17,73,0,8,2,16,1,8,1,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageDuration,39,87,3,7,3,16,4,8,1,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinVertexTime,0,6,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxVertexTime,0,6,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
@@ -58,7 +58,7 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinVertexDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction,53,96,4,18,4,20,5,12,1,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxTime,0,12,0,0,0,3,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxDuration,0,29,0,4,0,9,0,5,0,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxDuration,17,73,0,8,2,16,1,8,1,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction.new Object() {...},4,33,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinTime,0,12,0,0,0,3,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxVertexDuration,0,5,0,0,0,2,0,1,0,1

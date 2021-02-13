@@ -15,11 +15,15 @@
  */
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.Max;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+import java.time.temporal.TemporalUnit;
 
 /**
  * Calculates the maximum duration of a {@link TimeDimension} of temporal elements.
@@ -29,14 +33,40 @@ import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 public class MaxDuration extends AbstractDurationAggregateFunction implements Max, TemporalAggregateFunction {
 
   /**
-   * Creates a new instance of this base aggregate function.
+   * Creates a new instance of this aggregate function.
    *
-   * @param aggregatePropertyKey the given aggregate property key
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
+   */
+  public MaxDuration(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
+<span class="fc" id="L44">    super(aggregatePropertyKey, dimension, unit);</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Creates a new instance of this aggregate function.
+   *
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the time dimension to consider
    */
   public MaxDuration(String aggregatePropertyKey, TimeDimension dimension) {
-<span class="fc" id="L38">    super(aggregatePropertyKey, dimension);</span>
-<span class="fc" id="L39">  }</span>
+<span class="fc" id="L54">    super(aggregatePropertyKey, dimension, AbstractDurationAggregateFunction.DEFAULT_UNIT);</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Creates a new instance of this aggregate function. The the property key of the new property, where the
+   * aggregated value is stored, will be defined as &quot;maxDuration_&quot; + {dimension} + &quot;_&quot; + {unit}. Use
+   * constructor {@link MaxDuration#MaxDuration(String, TimeDimension, TemporalUnit)} to specify a
+   * user-defined key.
+   *
+   * @param dimension the time dimension to consider
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
+   */
+  public MaxDuration(TimeDimension dimension, TemporalUnit unit) {
+<span class="nc" id="L68">    this(&quot;maxDuration_&quot; + dimension + &quot;_&quot; + unit, dimension, unit);</span>
+<span class="nc" id="L69">  }</span>
 
   /**
    * Calculates the duration of a given element depending on the given {@link TimeDimension}.
@@ -47,26 +77,41 @@ public class MaxDuration extends AbstractDurationAggregateFunction implements Ma
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-<span class="fc" id="L50">    PropertyValue duration = getDuration(element);</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    if (duration.getLong() == -1L) {</span>
-<span class="fc" id="L52">      return PropertyValue.create(TemporalElement.DEFAULT_TIME_FROM);</span>
+<span class="fc" id="L80">    PropertyValue duration = getDuration(element);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (duration.getLong() == -1L) {</span>
+<span class="fc" id="L82">      return PropertyValue.create(TemporalElement.DEFAULT_TIME_FROM);</span>
     }
-<span class="fc" id="L54">    return duration;</span>
+<span class="fc" id="L84">    return duration;</span>
   }
 
   /**
-   * Method to check whether all aggregated durations had been default values.
+   * Method to check whether all aggregated durations had been default values or need to be transformed to
+   * another unit.
    *
-   * @param result the result of the MaxDuration Aggregation
-   * @return the unchanged result or {@link PropertyValue#NULL_VALUE}, if the maximum duration is
-   *         {@link TemporalElement#DEFAULT_TIME_FROM}
+   * @param result the result of the MaxDuration aggregation as {@link Long} in milliseconds
+   * @return By default (no time unit or the default unit [millis] is specified), the result of the
+   *         MaxDuration Aggregation as {@link Long} in milliseconds is returned. If a different time unit is
+   *         given in {@link AbstractDurationAggregateFunction#timeUnit}, a {@link Double} of
+   *         the desired unit is returned. If the maximum duration is
+   *         {@link TemporalElement#DEFAULT_TIME_FROM}, the value {@link PropertyValue#NULL_VALUE}is returned.
+   * @throws UnsupportedTypeException if the type of the given property value is different from {@link Long}.
    */
   @Override
-  public PropertyValue postAggregate(PropertyValue result) {
-<span class="fc bfc" id="L66" title="All 2 branches covered.">    if (result.getLong() == TemporalElement.DEFAULT_TIME_FROM) {</span>
-<span class="fc" id="L67">      return PropertyValue.NULL_VALUE;</span>
+  public PropertyValue postAggregate(PropertyValue result) throws UnsupportedTypeException {
+    // First check if the aggregated result is of type long.
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    if (!result.isLong()) {</span>
+<span class="fc" id="L103">      throw new UnsupportedTypeException(&quot;The result type of the max duration aggregation must be [&quot; +</span>
+<span class="fc" id="L104">        Type.LONG + &quot;], but is [&quot; + result.getType() + &quot;].&quot;);</span>
     }
-<span class="fc" id="L69">    return result;</span>
+    // If the result is a default value, set it as null.
+<span class="fc bfc" id="L107" title="All 2 branches covered.">    if (result.getLong() == TemporalElement.DEFAULT_TIME_FROM) {</span>
+<span class="fc" id="L108">      return PropertyValue.NULL_VALUE;</span>
+    }
+    // If a time unit is specified, convert it.
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (timeUnit != AbstractDurationAggregateFunction.DEFAULT_UNIT) {</span>
+<span class="fc" id="L112">      result.setDouble((double) result.getLong() / timeUnit.getDuration().toMillis());</span>
+    }
+<span class="fc" id="L114">    return result;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

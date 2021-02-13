@@ -21,7 +21,12 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for functions aggregating the duration of temporal elements for a certain {@link TimeDimension}.
@@ -29,20 +34,45 @@ import java.util.Objects;
 public abstract class AbstractDurationAggregateFunction extends BaseAggregateFunction {
 
   /**
+   * The default temporal unit.
+   */
+<span class="fc" id="L39">  public static final TemporalUnit DEFAULT_UNIT = ChronoUnit.MILLIS;</span>
+
+  /**
+   * A list of supported temporal units.
+   */
+<span class="fc" id="L44">  static final List&lt;TemporalUnit&gt; SUPPORTED_UNITS = Arrays.asList(ChronoUnit.MILLIS, ChronoUnit.SECONDS,</span>
+    ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS);
+
+  /**
    * Selects which time dimension is considered by this aggregate function.
    */
   protected final TimeDimension dimension;
 
   /**
+   * The unit to parse the duration after the aggregation.
+   */
+  protected final TemporalUnit timeUnit;
+
+  /**
    * Creates a new instance of this base aggregate function.
    *
-   * @param aggregatePropertyKey aggregate property key
+   * @param aggregatePropertyKey the property key of the new property where the aggregated value is stored
    * @param dimension the given TimeDimension
+   * @param unit the temporal unit into which the result is converted. The supported units are specified in
+   *             {@link AbstractDurationAggregateFunction#SUPPORTED_UNITS}.
    */
-  AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension) {
-<span class="fc" id="L43">    super(aggregatePropertyKey);</span>
-<span class="fc" id="L44">    this.dimension = Objects.requireNonNull(dimension);</span>
-<span class="fc" id="L45">  }</span>
+  AbstractDurationAggregateFunction(String aggregatePropertyKey, TimeDimension dimension, TemporalUnit unit) {
+<span class="fc" id="L66">    super(aggregatePropertyKey);</span>
+<span class="fc" id="L67">    this.dimension = Objects.requireNonNull(dimension);</span>
+<span class="fc" id="L68">    Objects.requireNonNull(unit);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (!SUPPORTED_UNITS.contains(unit)) {</span>
+<span class="fc" id="L70">      throw new IllegalArgumentException(&quot;The given unit [&quot; + unit +</span>
+        &quot;] is not supported. Supported temporal units are [&quot; +
+<span class="fc" id="L72">        SUPPORTED_UNITS.stream().map(TemporalUnit::toString).collect(Collectors.joining(&quot;,&quot;)) + &quot;]&quot;);</span>
+    }
+<span class="fc" id="L74">    this.timeUnit = unit;</span>
+<span class="fc" id="L75">  }</span>
 
   /**
    * Returns the duration of an element based on the given {@link TimeDimension}.
@@ -53,24 +83,24 @@ public abstract class AbstractDurationAggregateFunction extends BaseAggregateFun
    */
   PropertyValue getDuration(TemporalElement element) {
     Tuple2&lt;Long, Long&gt; timeInterval;
-<span class="pc bpc" id="L56" title="1 of 3 branches missed.">    switch (dimension) {</span>
+<span class="pc bpc" id="L86" title="1 of 3 branches missed.">    switch (dimension) {</span>
     case TRANSACTION_TIME:
-<span class="fc" id="L58">      timeInterval = element.getTransactionTime();</span>
-<span class="fc" id="L59">      break;</span>
+<span class="fc" id="L88">      timeInterval = element.getTransactionTime();</span>
+<span class="fc" id="L89">      break;</span>
     case VALID_TIME:
-<span class="fc" id="L61">      timeInterval = element.getValidTime();</span>
-<span class="fc" id="L62">      break;</span>
+<span class="fc" id="L91">      timeInterval = element.getValidTime();</span>
+<span class="fc" id="L92">      break;</span>
     default:
-<span class="nc" id="L64">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + dimension + &quot;].&quot;);</span>
+<span class="nc" id="L94">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + dimension + &quot;].&quot;);</span>
     }
-<span class="pc bpc" id="L66" title="2 of 4 branches missed.">    if (timeInterval.f0 == null || timeInterval.f1 == null ||</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_TO) ||</span>
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_TO)) {</span>
-<span class="fc" id="L71">      return PropertyValue.create(-1L);</span>
+<span class="pc bpc" id="L96" title="2 of 4 branches missed.">    if (timeInterval.f0 == null || timeInterval.f1 == null ||</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">      timeInterval.f0.equals(TemporalElement.DEFAULT_TIME_TO) ||</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_FROM) ||</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      timeInterval.f1.equals(TemporalElement.DEFAULT_TIME_TO)) {</span>
+<span class="fc" id="L101">      return PropertyValue.create(-1L);</span>
     } else {
-<span class="fc" id="L73">      return PropertyValue.create(timeInterval.f1 - timeInterval.f0);</span>
+<span class="fc" id="L103">      return PropertyValue.create(timeInterval.f1 - timeInterval.f0);</span>
     }
   }
 }
