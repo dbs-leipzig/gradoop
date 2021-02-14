@@ -35,16 +35,18 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
 
 /**
  * Reformulates certain expressions involving MIN and MAX elements, according to the following rules:
- * - a singleton clause [MAX(a,b,c) < / <= x] is reformulated to
- * [a < / <= x] AND [b < / <= x] AND [c < / <= x]
- * - a n-ary disjunctive clause [comp_1,...,comp_(i-1), MIN(a,b,c) < / <= x, comp_(i+1),...,comp_n]
+ * <ul>
+ * <li> a singleton clause [MAX(a,b,c) < / <= x] is reformulated to
+ * [a < / <= x] AND [b < / <= x] AND [c < / <= x] </li>
+ * <li> a n-ary disjunctive clause [comp_1,...,comp_(i-1), MIN(a,b,c) < / <= x, comp_(i+1),...,comp_n]
  * is reformulated to
- * [comp_1,...,comp_(i-1), a < / <= x, b < / <= x, c < / <= x, comp_(i+1),...,comp_n]
- * - a n-ary disjunctive clause [comp_1,...,comp_(i-1), x < / <= MAX(a,b,c), comp_(i+1),...,comp_n]
+ * [comp_1,...,comp_(i-1), a < / <= x, b < / <= x, c < / <= x, comp_(i+1),...,comp_n] </li>
+ * <li> a n-ary disjunctive clause [comp_1,...,comp_(i-1), x < / <= MAX(a,b,c), comp_(i+1),...,comp_n]
  * is reformulated to
- * [comp_1,...,comp_(i-1), x < / <= a, x < / <= b, x < / <= c, comp_(i+1),...,comp_n]
- * - a unary clause [x < / <= MIN(a,b,c)] is reformulated to
- * [x < / <= a] AND [x < / <= b] AND [x < / <= c]
+ * [comp_1,...,comp_(i-1), x < / <= a, x < / <= b, x < / <= c, comp_(i+1),...,comp_n] </li>
+ * <li> a unary clause [x < / <= MIN(a,b,c)] is reformulated to
+ * [x < / <= a] AND [x < / <= b] AND [x < / <= c] </li>
+ * </ul>
  *
  * These rules are applied exhaustively.
  * !!! This class assumes input CNFs to be normalized, i.e. not to contain > or >= !!!
@@ -56,16 +58,14 @@ public class MinMaxUnfolding implements QueryTransformation {
       return cnf;
     } else {
       // apply transformations exhaustively
-      CNF oldCNF = cnf;
-      CNF newCNF = cnf.getPredicates().stream()
-        .map(this::unfoldNext)
-        .reduce(CNF::and).get();
-      while (!newCNF.equals(oldCNF)) {
+      CNF oldCNF;
+      CNF newCNF = cnf;
+      do {
         oldCNF = newCNF;
         newCNF = newCNF.getPredicates().stream()
           .map(this::unfoldNext)
           .reduce(CNF::and).get();
-      }
+      } while (!newCNF.equals(oldCNF));
       return newCNF;
     }
   }

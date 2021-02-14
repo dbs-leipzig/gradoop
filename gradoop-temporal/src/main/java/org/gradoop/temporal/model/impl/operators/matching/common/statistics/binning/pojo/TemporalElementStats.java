@@ -65,19 +65,19 @@ public class TemporalElementStats implements Serializable {
    */
   private double[] valDurationStats;
   /**
-   * Holds mean, variance and prob. that val_from=Long.MIN_VALUE
+   * Holds mean, variance and prob. that val_from=TemporalElement.DEFAULT_TIME_FROM
    */
   private double[] valFromStats;
   /**
-   * Holds mean, variance and prob. that tx_from=Long.MIN_VALUE
+   * Holds mean, variance and prob. that tx_from=TemporalElement.DEFAULT_TIME_FROM
    */
   private double[] txFromStats;
   /**
-   * Holds mean, variance and prob. that val_to=Long.MAX_VALUE
+   * Holds mean, variance and prob. that val_to=TemporalElement.DEFAULT_TIME_TO
    */
   private double[] valToStats;
   /**
-   * Holds mean, variance and prob. that tx_to=Long.MAX_VALUE
+   * Holds mean, variance and prob. that tx_to=TemporalElement.DEFAULT_TIME_TO
    */
   private double[] txToStats;
   /**
@@ -230,13 +230,13 @@ public class TemporalElementStats implements Serializable {
         sampleSize - sampleSize % numBins);
     }
 
-    // lists collecting all values for each time property, i.e. Long.MIN_VALUE/MAX_VALUE, too
+    // lists collecting all values for each time property, i.e. TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
     ArrayList<Long> allTxFroms = new ArrayList<Long>();
     ArrayList<Long> allTxTos = new ArrayList<Long>();
     ArrayList<Long> allValFroms = new ArrayList<Long>();
     ArrayList<Long> allValTos = new ArrayList<Long>();
 
-    // lists collecting only those values for each time property unequal to Long.MIN_VALUE/MAX_VALUE, too
+    // lists collecting only those values for each time property unequal to TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
     ArrayList<Long> txFroms = new ArrayList<Long>();
     ArrayList<Long> txTos = new ArrayList<Long>();
     ArrayList<Long> valFroms = new ArrayList<Long>();
@@ -244,13 +244,11 @@ public class TemporalElementStats implements Serializable {
 
     List<Long> valDurations = new ArrayList<Long>();
     List<Long> txDurations = new ArrayList<Long>();
-/*    // holds differences between tx and val to values, if they both aren't as of now
-    ArrayList<Long> txToValTos = new ArrayList<>();*/
 
-    // count, how often to values are Long.MAX_VALUE
+    // count, how often to values are TemporalElement.DEFAULT_TIME_TO
     int txToMaxCount = 0;
     int valToMaxCount = 0;
-    // count, how often from values are Long.MIN_VALUE
+    // count, how often from values are TemporalElement.DEFAULT_TIME_FROM
     int txFromMinCount = 0;
     int valFromMinCount = 0;
 
@@ -260,12 +258,12 @@ public class TemporalElementStats implements Serializable {
       long txTo = element.getTxTo();
       allTxFroms.add(txFrom);
       allTxTos.add(txTo);
-      if (txFrom > Long.MIN_VALUE) {
+      if (txFrom > TemporalElement.DEFAULT_TIME_FROM) {
         txFroms.add(txFrom);
       } else {
         txFromMinCount++;
       }
-      if (txTo == Long.MAX_VALUE) {
+      if (txTo == TemporalElement.DEFAULT_TIME_TO) {
         txToMaxCount  += 1;
         txDurations.add(now - txFrom);
       } else {
@@ -277,12 +275,12 @@ public class TemporalElementStats implements Serializable {
       long valTo = element.getValidTo();
       allValFroms.add(valFrom);
       allValTos.add(valTo);
-      if (valFrom > Long.MIN_VALUE) {
+      if (valFrom > TemporalElement.DEFAULT_TIME_FROM) {
         valFroms.add(valFrom);
       } else {
         valFromMinCount++;
       }
-      if (valTo == Long.MAX_VALUE) {
+      if (valTo == TemporalElement.DEFAULT_TIME_TO) {
         valToMaxCount  += 1;
         valDurations.add(now - valFrom);
       } else {
@@ -400,10 +398,7 @@ public class TemporalElementStats implements Serializable {
         } else {
           continue;
         }
-/*        // original
-        HashMap<String, List<PropertyValue>> data =
-            numericalData.containsKey(key) ? numericalData :
-              isNumerical(value) ? numericalData : categoricalData;*/
+
         data.putIfAbsent(key, new ArrayList<>());
         data.get(key).add(value);
       }
@@ -416,6 +411,7 @@ public class TemporalElementStats implements Serializable {
   /**
    * Tries to automatically detect which properties are numerical and categorical.
    * Sets {@code numericalProperties} and {@code categoricalProperties} accordingly.
+   *
    * @param reservoirSample the list of elements to use for the detection
    */
   private void detectPropertyTypes(List<TemporalElement> reservoirSample) {
@@ -481,9 +477,7 @@ public class TemporalElementStats implements Serializable {
    * @return true iff value is of numerical type
    */
   private boolean isNumerical(PropertyValue value) {
-    Class cls = value.getType();
-    return cls.equals(Integer.class) || cls.equals(Long.class) || cls.equals(Double.class) ||
-      cls.equals(Float.class);
+    return value.isNumber();
   }
 
   /**
@@ -554,17 +548,8 @@ public class TemporalElementStats implements Serializable {
    * @return double representation of value
    */
   private double propertyValueToDouble(PropertyValue value, Class cls) {
-    if (cls.equals(Integer.class)) {
-      return value.getInt();
-    }
-    if (cls.equals(Double.class)) {
-      return value.getDouble();
-    }
-    if (cls.equals(Long.class)) {
-      return (double) value.getLong();
-    }
-    if (cls.equals(Float.class)) {
-      return Double.parseDouble(value.toString());
+    if (value.isNumber()){
+      return ((Number) value.getObject()).doubleValue();
     }
     return 0.;
   }
@@ -611,6 +596,11 @@ public class TemporalElementStats implements Serializable {
     return categoricalSelectivityEstimation;
   }
 
+  /**
+   * Returns the number of elements in the sample
+   *
+   * @return number of elements in the sample
+   */
   public Long getElementCount() {
     return elementCount;
   }
@@ -618,6 +608,7 @@ public class TemporalElementStats implements Serializable {
   /**
    * Return the statistics for tx time durations. Recomputes all temporal estimations if
    * necessary.
+   *
    * @return statistics for tx time durations in the form {mean, variance}
    */
   public double[] getTxDurationStats() {
@@ -630,6 +621,7 @@ public class TemporalElementStats implements Serializable {
   /**
    * Return the statistics for valid time durations. Recomputes all temporal estimations if
    * necessary.
+   *
    * @return statistics for valid time durations in the form {mean, variance}
    */
   public double[] getValDurationStats() {
@@ -639,6 +631,11 @@ public class TemporalElementStats implements Serializable {
     return valDurationStats.clone();
   }
 
+  /**
+   * Returns the sample
+   *
+   * @return sample
+   */
   public List<TemporalElement> getSample() {
     return sampler.getReservoirSample();
   }
@@ -651,7 +648,7 @@ public class TemporalElementStats implements Serializable {
 
   /**
    * Returns the (not binning-based) statistics for temporal properties.
-   * They are arrays of the form {mean, variance, prob. that from=Long.MIN_VALUE / to=Long.MAX_VALUE}
+   * They are arrays of the form {mean, variance, prob. that from=TemporalElement.DEFAULT_TIME_FROM / to=TemporalElement.DEFAULT_TIME_TO}
    * @param property temporal property
    * @return statistics array for the property
    */

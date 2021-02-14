@@ -40,8 +40,10 @@ import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import static org.gradoop.temporal.model.impl.operators.matching.common.query.Util.equalCNFs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -191,45 +193,8 @@ public class TemporalQueryHandlerTest {
   }
 
   private void assertPredicateEquals(Predicate expectedGDL, CNF result) {
-    //// System.out.println(expectedGDL);
     CNF expected = QueryPredicate.createFrom(expectedGDL, new ComparableTPGMFactory()).asCNF();
-    // System.out.println(expected);
-    // System.out.println(result);
     equalCNFs(expected, result);
-  }
-
-  private void equalCNFs(CNF a, CNF b) {
-    assertEquals(a.getPredicates().size(), b.getPredicates().size());
-    for (CNFElement aElement : a.getPredicates()) {
-      ComparisonExpression aComp = aElement.getPredicates().get(0);
-      boolean foundA = false;
-      for (CNFElement bElement : b.getPredicates()) {
-        ComparisonExpression bComp = bElement.getPredicates().get(0);
-        if (comparisonEqual(aComp, bComp)) {
-          foundA = true;
-        }
-      }
-      assertTrue(foundA);
-    }
-  }
-
-  private boolean comparisonEqual(ComparisonExpression a, ComparisonExpression b) {
-    QueryComparable lhsA = a.getLhs();
-    QueryComparable rhsA = a.getRhs();
-    QueryComparable lhsB = b.getLhs();
-    QueryComparable rhsB = b.getRhs();
-    Comparator compA = a.getComparator();
-    Comparator compB = b.getComparator();
-
-    if (lhsA.equals(lhsB) && (compA.equals(compB)) && lhsA.equals(lhsB)) {
-      return true;
-    }
-
-    Comparator compASwitched = a.switchSides().getComparator();
-    if (lhsA.equals(rhsB) && (compASwitched.equals(compB)) && rhsA.equals(lhsB)) {
-      return true;
-    }
-    return false;
   }
 
 

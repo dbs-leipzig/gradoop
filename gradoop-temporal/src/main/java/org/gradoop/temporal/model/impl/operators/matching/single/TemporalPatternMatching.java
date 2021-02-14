@@ -19,7 +19,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
@@ -125,6 +127,7 @@ public abstract class TemporalPatternMatching<
     }
 
     if (contradictoryQuery) {
+      log.log(Level.toLevel(Priority.WARN_INT), "Query contradictory, empty result");
       return emptyCollection(graph);
     }
 

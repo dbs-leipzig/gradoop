@@ -535,9 +535,6 @@ public class GreedyPlanner<
     List<Pair<String, String>> leftProperties = new ArrayList<>();
     List<Pair<String, String>> rightProperties = new ArrayList<>();
 
-    //List<Pair<String, String>> leftTimes = new ArrayList<>();
-    //List<Pair<String, String>> rightTimes = new ArrayList<>();
-
     for (CNFElement e : joinPredicate.getPredicates()) {
       ComparisonExpression comparison = e.getPredicates().get(0);
 
@@ -587,20 +584,6 @@ public class GreedyPlanner<
       new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)
     );
   }
-
-  /**
-   * Checks whether a join of the form a=b is a join over time selectors, e.g.
-   * <p>
-   * {@code x.val_to = y.val_from}
-   *
-   * @param joinExpression the join expression (variable, selector) to check
-   * @return true iff joinExpression is temporal
-   */
-  /*private boolean isTemporal(Pair<String, String> joinExpression) {
-    String s = joinExpression.getRight().trim().toLowerCase();
-    return s.equals("tx_from") || s.equals("tx_to") || s.equals("val_from") ||
-      s.equals("val_to") || s.equals("valid_from") || s.equals("valid_to");
-  }*/
 
   /**
    * Turns a QueryComparable into a {@code Pair<Variable, PropertyKey>}

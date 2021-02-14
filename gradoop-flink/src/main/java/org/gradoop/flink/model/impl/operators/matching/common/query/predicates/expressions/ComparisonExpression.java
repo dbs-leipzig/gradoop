@@ -49,7 +49,7 @@ public class ComparisonExpression extends QueryPredicate {
    * @param comparison the wrapped comparison
    */
   public ComparisonExpression(Comparison comparison) {
-    this.comparison = comparison;
+    this(comparison, null);
   }
 
   /**
@@ -58,7 +58,7 @@ public class ComparisonExpression extends QueryPredicate {
    * @param comparableFactory QueryComparableFactory to use
    */
   public ComparisonExpression(Comparison comparison, QueryComparableFactory comparableFactory) {
-    this(comparison);
+    this.comparison = comparison;
     this.comparableFactory = comparableFactory;
   }
 

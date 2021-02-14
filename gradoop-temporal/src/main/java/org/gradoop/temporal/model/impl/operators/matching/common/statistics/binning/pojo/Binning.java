@@ -15,6 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo;
 
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -77,11 +79,11 @@ public class Binning implements Serializable {
     }
 
     // size of a bin is the number of elements contained
-    int binSize = (int) Math.ceil((double) values.size() / (double) numberOfBins);
+    int binSize = values.size() / numberOfBins;
 
 
     bins = new Long[numberOfBins];
-    bins[0] = Long.MIN_VALUE;
+    bins[0] = TemporalElement.DEFAULT_TIME_FROM;
 
     for (int i = 1; i < numberOfBins; i++) {
       long maxPreviousBin = values.get((i * binSize) - 1);

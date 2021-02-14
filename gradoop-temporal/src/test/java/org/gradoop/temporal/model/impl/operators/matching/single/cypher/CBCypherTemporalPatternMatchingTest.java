@@ -104,16 +104,6 @@ public abstract class CBCypherTemporalPatternMatchingTest extends ASCIITemporalP
    * asOfs are added
    */
   public static String prepareQueryString(String query) {
-    /*boolean hasWhereClause = query.contains("WHERE");
-    String middle = hasWhereClause? " AND " : " WHERE ";
-    if (query.contains("[e]")) {
-      return query + middle + " e.tx_to.after(1970-01-01)";
-    } else if (query.contains("[e1]")) {
-      return query + middle + " e1.tx_to.after(1970-01-01)";
-    } else if (query.contains("(a)")) {
-      return query + middle + " a.tx_to.after(1970-01-01)";
-    }
-    throw new IllegalArgumentException("Query must contain 'e', 'e1' or 'a'");*/
     return query;
   }
 

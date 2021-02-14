@@ -21,7 +21,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.Binning;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
-import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.util.Util;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -94,6 +93,16 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
    * If null, all properties are considered.
    */
   private Set<String> relevantProperties;
+
+  /**
+   * A value to return for a probability close to 0
+   */
+  static final double VERY_LOW_PROB = 0.001;
+
+  /**
+   * A value to return for a probability close to 1
+   */
+  static final double VERY_HIGH_PROB = 0.999;
 
   /**
    * Creates new graph statistics
@@ -231,9 +240,9 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
                                      TimeSelector.TimeField field1, Comparator comp, Long value) {
     // no further estimations for = and !=
     if (comp == EQ) {
-      return 0.001;
+      return VERY_LOW_PROB;
     } else if (comp == Comparator.NEQ) {
-      return 0.999;
+      return VERY_HIGH_PROB;
     }
     // <, <=, >=, >
     if (!(label1.isPresent())) {
@@ -244,7 +253,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
         edgeStats.getOrDefault(label1.get(), null);
       // label not in keys
       if (elementStats == null) {
-        return 0.001;
+        return VERY_LOW_PROB;
       }
       Binning bins = getBins(elementStats, field1);
       return estimateFromBins(bins, comp, value);
@@ -257,9 +266,9 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
                                      Optional<String> label2, TimeSelector.TimeField field2) {
     // no further estimations for = and !=
     if (comp == EQ) {
-      return 0.001;
+      return VERY_LOW_PROB;
     } else if (comp == Comparator.NEQ) {
-      return 0.999;
+      return VERY_HIGH_PROB;
     }
     // stats for lhs (can be more than one, if no label is specified)
     List<TemporalElementStats> statsLhs;
@@ -358,7 +367,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
 
     double sum = 0.;
 
-    // first, compare without considering Long.MIN values, Long.MAX_VALUE values
+    // first, compare without considering Long.MIN values, TemporalElement.DEFAULT_TIME_TO values
 
     double[] lhs = statsLhs.getTemporalPropertyStats(fieldLhs);
     double[] rhs = statsRhs.getTemporalPropertyStats(fieldRhs);
@@ -368,11 +377,11 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     double rhsMean = rhs[0];
     double rhsVariance = rhs[1];
     double rhsExtreme = rhs[2];
-    // probability that both lhs and rhs not Long.MIN_VALUE or Long.MAX_VALUE
+    // probability that both lhs and rhs not TemporalElement.DEFAULT_TIME_FROM or TemporalElement.DEFAULT_TIME_TO
     double probBothNotExtreme = (1 - lhsExtreme) * (1 - rhsExtreme);
     // distribution for difference between lhs and rhs values
     NormalDistribution diffDist = new NormalDistribution(lhsMean - rhsMean,
-      Math.max(lhsVariance + rhsVariance, 0.001));
+      Math.max(lhsVariance + rhsVariance, VERY_LOW_PROB));
 
     // P(lhs < rhs)
     double probNotExtremeLTE = diffDist.cumulativeProbability(0.);
@@ -474,7 +483,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       double[] durationStats = transaction ?
         stat.getTxDurationStats() : stat.getValDurationStats();
       NormalDistribution durationDist = new NormalDistribution(
-        durationStats[0], Math.max(Math.sqrt(durationStats[1]), 0.001));
+        durationStats[0], Math.max(Math.sqrt(durationStats[1]), VERY_LOW_PROB));
       double estimation = 0.;
 
       if (comp == EQ) {
@@ -535,7 +544,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
         // distribution of differences (LHS - RHS)
         NormalDistribution diffDist = new NormalDistribution(
           durationStatsLhs[0] - durationStatsRhs[0],
-          Math.max(Math.sqrt(durationStatsLhs[1] + durationStatsRhs[1]), 0.001));
+          Math.max(Math.sqrt(durationStatsLhs[1] + durationStatsRhs[1]), VERY_LOW_PROB));
 
         double estimation = 0.;
 
@@ -572,7 +581,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       if (statsMap.containsKey(label.get())) {
         relevantStats = new ArrayList<>(Collections.singletonList(statsMap.get(label.get())));
       } else {
-        return 0.001;
+        return VERY_LOW_PROB;
       }
     } else {
       relevantStats = new ArrayList<>(statsMap.values());
@@ -700,7 +709,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     // their difference is also normally distributed
     NormalDistribution differenceDist = new NormalDistribution(
       propStats1[0] - propStats2[0],
-      Math.max(Math.sqrt(propStats1[1] + propStats2[1]), 0.001));
+      Math.max(Math.sqrt(propStats1[1] + propStats2[1]), VERY_LOW_PROB));
 
     if (comp == EQ) {
       return occurrence * differenceDist.density(0.);
@@ -923,20 +932,20 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     }
     Double[] propertyStats = stat.getNumericalPropertyStatsEstimation().get(property);
     NormalDistribution dist = new NormalDistribution(propertyStats[0],
-      Math.max(Math.sqrt(propertyStats[1]), 0.001));
-    double doubleValue = Util.propertyValueToDouble(value);
+      Math.max(Math.sqrt(propertyStats[1]), VERY_LOW_PROB));
+    double doubleValue = ((Number) value.getObject()).doubleValue();
     double occurenceProb = stat.getNumericalOccurrenceEstimation().get(property);
     if (comp == EQ) {
-      return 0.001 * occurenceProb;
+      return VERY_LOW_PROB * occurenceProb;
     } else if (comp == NEQ) {
-      return (1. - 0.001) * occurenceProb;
+      return (1. - VERY_LOW_PROB) * occurenceProb;
     } else if (comp == LTE) {
       return dist.cumulativeProbability(doubleValue) * occurenceProb;
     } else if (comp == LT) {
-      return occurenceProb * (dist.cumulativeProbability(doubleValue) - 0.001);
+      return occurenceProb * (dist.cumulativeProbability(doubleValue) - VERY_LOW_PROB);
     } else if (comp == GTE) {
       return occurenceProb *
-        (1. - dist.cumulativeProbability(doubleValue) + 0.001);
+        (1. - dist.cumulativeProbability(doubleValue) + VERY_LOW_PROB);
     } else {
       //GT
       return occurenceProb * (1. - dist.cumulativeProbability(doubleValue));
@@ -1056,7 +1065,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       return value < arr[index + 1];
     } else {
       boolean lowerCond = value >= arr[index];
-      boolean upperCond = value == Long.MAX_VALUE ? value <= arr[index + 1] :
+      boolean upperCond = value == TemporalElement.DEFAULT_TIME_TO ? value <= arr[index + 1] :
         value < arr[index + 1];
       return lowerCond && upperCond;
     }

@@ -84,70 +84,109 @@ public class TemporalSubsumption extends Subsumption {
    * @return true iff (a comparator1 literal1) implies (a comparator2 literal2)
    */
   private boolean implies(Comparator comparator1, Long literal1, Comparator comparator2, Long literal2) {
-    if (comparator1 == Comparator.EQ) {
-      if (comparator2 == Comparator.EQ) {
+    switch(comparator1){
+    case EQ: {
+      switch(comparator2) {
+      case EQ: {
         return literal1.equals(literal2);
-      } else if (comparator2 == NEQ) {
+      } case NEQ: {
         return !literal1.equals(literal2);
-      } else if (comparator2 == LTE) {
+      } case LTE: {
         return literal1 <= literal2;
-      } else if (comparator2 == LT) {
+      } case LT: {
         return literal1 < literal2;
-      } else if (comparator2 == GTE) {
+      } case GTE: {
         return literal1 >= literal2;
-      } else if (comparator2 == GT) {
+      } case GT: {
         return literal1 > literal2;
       }
-    } else if (comparator1 == NEQ) {
+      }
+    }
+    case NEQ: {
       return false;
-    } else if (comparator1 == LTE) {
-      if (comparator2 == Comparator.EQ) {
-        return false;
-      } else if (comparator2 == Comparator.NEQ) {
-        return literal1 < literal2;
-      } else if (comparator2 == LTE) {
-        return literal1 <= literal2;
-      } else if (comparator2 == LT) {
-        return literal1 < literal2;
-      } else if (comparator2 == GTE || comparator2 == GT) {
+    }
+    case LTE: {
+      switch(comparator2){
+      case EQ: {
+          return false;
+        }
+      case NEQ: {
+          return literal1 < literal2;
+        }
+      case LTE: {
+          return literal1 <= literal2;
+        }
+      case LT: {
+          return literal1 < literal2;
+        }
+      default: {
+          return false;
+        }
+      }
+    }
+    case LT: {
+      switch(comparator2) {
+      case EQ: {
         return false;
       }
-    } else if (comparator1 == LT) {
-      if (comparator2 == EQ) {
-        return false;
-      } else if (comparator2 == NEQ) {
+      case NEQ: {
         return literal1 <= literal2;
-      } else if (comparator2 == LTE) {
+      }
+      case LTE: {
         return literal1 - 1 <= literal2;
-      } else if (comparator2 == LT) {
+      }
+      case LT: {
         return literal1 <= literal2;
-      } else if (comparator2 == GTE || comparator2 == GT) {
+      }
+      default: {
         return false;
       }
-    } else if (comparator1 == GTE) {
-      if (comparator2 == EQ) {
-        return false;
-      } else if (comparator2 == NEQ) {
-        return literal1 > literal2;
-      } else if (comparator2 == LTE || comparator2 == LT) {
-        return false;
-      }  else if (comparator2 == GTE) {
-        return literal1 >= literal2;
-      } else if (comparator2 == GT) {
-        return literal1 > literal2;
       }
-    } else if (comparator1 == GT) {
-      if (comparator2 == EQ) {
+    }
+    case GTE: {
+      switch(comparator2) {
+      case EQ: {
+          return false;
+        }
+        case NEQ: {
+          return literal1 > literal2;
+        }
+        case LTE: {
+          return false;
+        }
+        case LT: {
+         return false;
+        }
+      case GTE: {
+          return literal1 >= literal2;
+        }
+      case GT: {
+          return literal1 > literal2;
+        }
+      }
+    }
+    case GT: {
+      switch(comparator2) {
+      case EQ: {
         return false;
-      } else if (comparator2 == NEQ) {
+      }
+      case NEQ: {
         return literal1 >= literal2;
-      } else if (comparator2 == LTE || comparator2 == LT) {
+      }
+      case LTE: {
         return false;
-      }  else if (comparator2 == GTE) {
+      }
+      case LT: {
+        return false;
+      }
+      case GTE: {
         return literal1 + 1 >= literal2;
-      } else if (comparator2 == GT) {
+      }
+      case GT: {
         return literal1 >= literal2;
       }
+      }
+    }
     }
     return false;
   }

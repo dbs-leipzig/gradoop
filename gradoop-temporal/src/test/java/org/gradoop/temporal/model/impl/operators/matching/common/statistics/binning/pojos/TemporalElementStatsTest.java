@@ -174,6 +174,26 @@ public class TemporalElementStatsTest {
     double varianceInteger = 2.;
 
     //----------------------------------------------------
+    // Short values
+    //----------------------------------------------------
+
+    //10% with integer property
+    int numShorts = 500;
+    String shortKey = "short";
+    int[] shortValues = new int[numIntegers];
+
+    // mean = 3, variance = 0.4*(2^2) + 0.4*(1^2) = 2
+    for (int i = 0; i < numShorts; i = i + 5) {
+      input.get(i).setProperty(shortKey, 1);
+      input.get(i + 1).setProperty(shortKey, 2);
+      input.get(i + 2).setProperty(shortKey, 3);
+      input.get(i + 3).setProperty(shortKey, 4);
+      input.get(i + 4).setProperty(shortKey, 5);
+    }
+    double meanShort = 3.;
+    double varianceShort = 2.;
+
+    //----------------------------------------------------
     // Long values
     //----------------------------------------------------
     // 20% with long property
@@ -212,6 +232,10 @@ public class TemporalElementStatsTest {
     assertEquals(occurence.get(integerKey), 0.1, 0.);
     assertEquals(meanAndVariance.get(integerKey)[0], meanInteger, 0.);
     assertEquals(meanAndVariance.get(integerKey)[1], varianceInteger, 0.000001);
+
+    assertEquals(occurence.get(shortKey), 0.1, 0.);
+    assertEquals(meanAndVariance.get(shortKey)[0], meanShort, 0.);
+    assertEquals(meanAndVariance.get(shortKey)[1], varianceShort, 0.000001);
 
     assertEquals(occurence.get(longKey), 0.2, 0.);
     assertEquals(meanAndVariance.get(longKey)[0], meanLong, 0.);

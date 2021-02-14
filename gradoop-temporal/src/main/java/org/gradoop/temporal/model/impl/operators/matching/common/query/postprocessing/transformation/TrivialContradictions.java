@@ -63,16 +63,14 @@ public class TrivialContradictions implements QueryTransformation {
   private CNFElement transformDisjunction(CNFElement clause) throws QueryContradictoryException {
     List<ComparisonExpression> oldComparisons = clause.getPredicates();
     ArrayList<ComparisonExpression> newComparisons = new ArrayList<>();
-    boolean contradiction = true;
     for (ComparisonExpression comparison : oldComparisons) {
       if (!isContradictory(comparison)) {
         // contradictory comparisons are omitted in the resulting clause
         newComparisons.add(comparison);
-        contradiction = false;
       }
     }
     // all comparisons contradictory?
-    if (contradiction) {
+    if (newComparisons.isEmpty()) {
       throw new QueryContradictoryException();
     } else {
       return new CNFElement(newComparisons);

@@ -21,6 +21,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
 
@@ -58,7 +59,7 @@ public class MaxTimePointComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    long max = Long.MIN_VALUE;
+    long max = TemporalElement.DEFAULT_TIME_FROM;
     for (QueryComparable arg : args) {
       long argValue = arg.evaluate(embedding, metaData).getLong();
       if (argValue > max) {
@@ -74,7 +75,7 @@ public class MaxTimePointComparable extends TemporalComparable {
       throw new UnsupportedOperationException("can not evaluate an expression with >1 variable on" +
         " a single GraphElement!");
     }
-    long max = Long.MIN_VALUE;
+    long max = TemporalElement.DEFAULT_TIME_FROM;
     for (QueryComparable arg : args) {
       long argValue = arg.evaluate(element).getLong();
       if (argValue > max) {

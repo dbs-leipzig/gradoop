@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.gradoop.temporal.model.impl.operators.matching.common.query.Util.equalCNFs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
@@ -85,27 +86,7 @@ public class BoundsInferenceTest {
         aValFrom, LTE, new TimeLiteral(l2020 - 1)))
     );
 
-    compareCNFs(expectedCNF, processedCNF);
-  }
-
-  private void compareCNFs(CNF expectedCNF, CNF processedCNF) {
-    assertEquals(expectedCNF.size(), processedCNF.size());
-    for (CNFElement c1 : expectedCNF.getPredicates()) {
-      List<ComparisonExpression> c1Comps = c1.getPredicates();
-      c1Comps.sort(Comparator.comparingInt(ComparisonExpression::hashCode));
-      boolean found = false;
-      for (CNFElement c2 : processedCNF.getPredicates()) {
-        List<ComparisonExpression> c2Comps = c2.getPredicates();
-        c2Comps.sort(Comparator.comparingInt(ComparisonExpression::hashCode));
-        if (c2Comps.equals(c1Comps)) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        fail();
-      }
-    }
+    equalCNFs(expectedCNF, processedCNF);
   }
 
   @Test
@@ -127,7 +108,7 @@ public class BoundsInferenceTest {
       Collections.singletonList(new Comparison(bTxFrom, EQ, literal1970))
     );
 
-    compareCNFs(processedCNF, expectedCNF);
+    equalCNFs(processedCNF, expectedCNF);
 
   }
 
@@ -157,7 +138,7 @@ public class BoundsInferenceTest {
         bTxFrom, LTE, new TimeLiteral(l2020)))
     );
 
-    compareCNFs(expectedCNF, processedCNF);
+    equalCNFs(expectedCNF, processedCNF);
   }
 
   @Test(expected = QueryContradictoryException.class)
@@ -222,7 +203,7 @@ public class BoundsInferenceTest {
       Collections.singletonList(new Comparison(bTxFrom, LTE, literal2020))
     );
 
-    compareCNFs(expectedCNF, processedCNF);
+    equalCNFs(expectedCNF, processedCNF);
   }
 
   // redundancies
@@ -246,7 +227,7 @@ public class BoundsInferenceTest {
       Collections.singletonList(new Comparison(aTxFrom, LTE, bTxFrom))
     );
 
-    compareCNFs(expectedCNF, processedCNF);
+    equalCNFs(expectedCNF, processedCNF);
   }
 
   // NEQ contradictions

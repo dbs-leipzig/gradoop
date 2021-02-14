@@ -33,15 +33,20 @@ import java.util.Set;
 public class BinningTemporalGraphStatisticsFactory implements
   TemporalGraphStatisticsFactory<BinningTemporalGraphStatistics> {
 
+  /**
+   * Default size for a sample
+   */
+  static final int DEFAULT_SAMPLE_SIZE = 5000;
+
   @Override
   public BinningTemporalGraphStatistics fromGraph(TemporalGraph g) throws Exception {
-    return fromGraphWithSampling(g, 5000);
+    return fromGraphWithSampling(g, DEFAULT_SAMPLE_SIZE);
   }
 
   @Override
   public BinningTemporalGraphStatistics fromGraph(TemporalGraph g, Set<String> numericalProperties,
                                                   Set<String> categoricalProperties) throws Exception {
-    return fromGraphWithSampling(g, 5000, numericalProperties, categoricalProperties);
+    return fromGraphWithSampling(g, DEFAULT_SAMPLE_SIZE, numericalProperties, categoricalProperties);
   }
 
   @Override

@@ -29,6 +29,7 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.ComparableExpression;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimeSelector;
@@ -56,8 +57,7 @@ import static org.s1ck.gdl.utils.Comparator.LTE;
  * Furthermore, contradictions are detected.
  */
 public class BoundsInference implements QueryTransformation {
-
-
+  
   @Override
   public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     /*
@@ -85,7 +85,7 @@ public class BoundsInference implements QueryTransformation {
     HashMap<ComparableExpression, HashSet<ComparableExpression>> cLeq = new HashMap<>();
     // stores all tuples (a,b) with a<b in relevant comparisons
     HashMap<ComparableExpression, HashSet<ComparableExpression>> cLt = new HashMap<>();
-    // stores all tuples (a,b) with a<b in relevant comparisons
+    // stores all tuples (a,b) with a!=b in relevant comparisons
     HashMap<ComparableExpression, HashSet<ComparableExpression>> cNeq = new HashMap<>();
 
 
@@ -95,12 +95,12 @@ public class BoundsInference implements QueryTransformation {
       ComparableExpression rhs = comp.getRhs().getWrappedComparable();
       Comparator comparator = comp.getComparator();
       if (comp.getLhs() instanceof TimeSelectorComparable) {
-        lowerBounds.put((TimeSelector) lhs, Long.MIN_VALUE);
-        upperBounds.put((TimeSelector) lhs, Long.MAX_VALUE);
+        lowerBounds.put((TimeSelector) lhs, TemporalElement.DEFAULT_TIME_FROM);
+        upperBounds.put((TimeSelector) lhs, TemporalElement.DEFAULT_TIME_TO);
       }
       if (comp.getRhs() instanceof TimeSelectorComparable) {
-        lowerBounds.put((TimeSelector) rhs, Long.MIN_VALUE);
-        upperBounds.put((TimeSelector) rhs, Long.MAX_VALUE);
+        lowerBounds.put((TimeSelector) rhs, TemporalElement.DEFAULT_TIME_FROM);
+        upperBounds.put((TimeSelector) rhs, TemporalElement.DEFAULT_TIME_TO);
       }
       // init c-relations
       if (comparator.equals(EQ)) {
@@ -172,16 +172,16 @@ public class BoundsInference implements QueryTransformation {
           new Comparison(selector, EQ, new TimeLiteral(lower)),
           new ComparableTPGMFactory()));
       } else {
-        if (lower > Long.MIN_VALUE) {
+        if (lower > TemporalElement.DEFAULT_TIME_FROM) {
           // check if informative: lower bound of from is trivial lower bound of to
           if (selector.getTimeProp().equals(TX_TO)) {
             TimeSelector txFromSel = new TimeSelector(selector.getVariable(), TX_FROM);
-            if (lowerBounds.getOrDefault(txFromSel, Long.MIN_VALUE).equals(lower)) {
+            if (lowerBounds.getOrDefault(txFromSel, TemporalElement.DEFAULT_TIME_FROM).equals(lower)) {
               continue;
             }
           } else if (selector.getTimeProp().equals(VAL_TO)) {
             TimeSelector valFromSel = new TimeSelector(selector.getVariable(), VAL_FROM);
-            if (lowerBounds.getOrDefault(valFromSel, Long.MIN_VALUE).equals(lower)) {
+            if (lowerBounds.getOrDefault(valFromSel, TemporalElement.DEFAULT_TIME_FROM).equals(lower)) {
               continue;
             }
           }
@@ -190,17 +190,17 @@ public class BoundsInference implements QueryTransformation {
             new Comparison(new TimeLiteral(lower), LTE, selector),
             new ComparableTPGMFactory()));
         }
-        if (upper < Long.MAX_VALUE) {
+        if (upper < TemporalElement.DEFAULT_TIME_TO) {
           // analagously as for lower bounds
           // upper bound of to is trivial upper of from
           if (selector.getTimeProp().equals(TimeSelector.TimeField.TX_FROM)) {
             TimeSelector txToSel = new TimeSelector(selector.getVariable(), TX_TO);
-            if (upperBounds.getOrDefault(txToSel, Long.MAX_VALUE).equals(upper)) {
+            if (upperBounds.getOrDefault(txToSel, TemporalElement.DEFAULT_TIME_TO).equals(upper)) {
               continue;
             }
           } else if (selector.getTimeProp().equals(TimeSelector.TimeField.VAL_FROM)) {
             TimeSelector valToSel = new TimeSelector(selector.getVariable(), VAL_TO);
-            if (upperBounds.getOrDefault(valToSel, Long.MAX_VALUE).equals(upper)) {
+            if (upperBounds.getOrDefault(valToSel, TemporalElement.DEFAULT_TIME_TO).equals(upper)) {
               continue;
             }
           }

@@ -105,8 +105,6 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
 
     TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
-    System.out.println(result.getGraphHeads().count());
-    printResult(result);
 
     TemporalGraphCollection expectedByID = toTemporalGraphCollection(
       loader.getGraphCollectionByVariables(expectedGraphVariables));
@@ -116,10 +114,6 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
 
     List<TemporalGraphHead> graphHeads = result.getGraphHeads().collect();
-    System.out.println("expected: " + expectedCollection);
-    printResult(result);
-    //testGraphHeads(result);
-    // exists variable mapping?
     for (TemporalGraphHead graphHead : graphHeads) {
       assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
     }

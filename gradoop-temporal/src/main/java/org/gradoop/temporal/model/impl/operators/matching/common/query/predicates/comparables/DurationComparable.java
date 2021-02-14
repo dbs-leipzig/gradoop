@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 import org.s1ck.gdl.model.comparables.time.Duration;
 import org.s1ck.gdl.model.comparables.time.TimeLiteral;
 import org.s1ck.gdl.model.comparables.time.TimePoint;
@@ -89,7 +90,7 @@ public class DurationComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    Long toLong = to.evaluate(embedding, metaData).getLong() == Long.MAX_VALUE ?
+    Long toLong = to.evaluate(embedding, metaData).getLong() == TemporalElement.DEFAULT_TIME_TO ?
       now : to.evaluate(embedding, metaData).getLong();
     return PropertyValue.create(toLong -
       from.evaluate(embedding, metaData).getLong());
@@ -97,7 +98,7 @@ public class DurationComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(GraphElement element) {
-    Long toLong = to.evaluate(element).getLong() == Long.MAX_VALUE ?
+    Long toLong = to.evaluate(element).getLong() == TemporalElement.DEFAULT_TIME_TO ?
       now : to.evaluate(element).getLong();
     return PropertyValue.create(toLong -
       from.evaluate(element).getLong());

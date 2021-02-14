@@ -200,14 +200,6 @@ public abstract class TemporalGraphStatistics {
                                               String property2);
 
   /**
-   * Estimates the probability that a vertex or edge has a certain label
-   * @param type type of the element in question (vertex or edge)
-   * @param label label in question
-   * @return estimated probability that the given type has the given label
-   */
-  //public abstract double estimateLabelProb(ElementType type, String label);
-
-  /**
    * Describes the two types of graph elements
    */
   public enum ElementType { VERTEX, EDGE }

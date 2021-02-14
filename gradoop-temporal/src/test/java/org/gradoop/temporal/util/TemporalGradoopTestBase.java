@@ -150,7 +150,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     return getConfig().getTemporalGraphFactory().fromNonTemporalGraph(graph);
   }
 
-/**
+  /**
    * Convert a graph to a {@link TemporalGraph} and set temporal attributes using
    * {@link TimeIntervalExtractor} functions.
    *
@@ -379,7 +379,6 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
       e.printStackTrace();
     }
     LogicalGraph g = loader.getLogicalGraph();
-    //new DOTDataSink("src/test/resources/data/patternmatchingtest/citibikesample.dot",true).write(g, true);
     return transformToTemporalGraph(g);
   }
 
