@@ -99,7 +99,7 @@ public class IndexedGVELayoutTest extends BaseGVELayoutTest {
   }
 
   @Test
-  public void isIndexedGVELayout() {
+  public void testIsIndexedGVELayout() {
     assertTrue(createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).isIndexedGVELayout());
   }
 
