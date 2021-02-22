@@ -56,7 +56,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
   /**
    * HDFS Configuration.
    */
-  protected final Configuration hdfsConfig;
+  private final Configuration hdfsConfig;
 
   /**
    * Creates a new data source. The constructor creates a default HDFS configuration.
@@ -77,8 +77,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf) {
     super(csvPath, conf);
-    Objects.requireNonNull(hdfsConf);
-    this.hdfsConfig = hdfsConf;
+    this.hdfsConfig = Objects.requireNonNull(hdfsConf);
   }
 
   /**

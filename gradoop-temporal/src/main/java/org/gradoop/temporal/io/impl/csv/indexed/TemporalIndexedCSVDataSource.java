@@ -20,7 +20,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
-import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -31,8 +32,7 @@ import org.gradoop.temporal.io.impl.csv.functions.CSVLineToTemporalGraphHead;
 import org.gradoop.temporal.io.impl.csv.functions.CSVLineToTemporalVertex;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
-import org.gradoop.temporal.model.impl.TemporalGraphCollectionFactory;
-import org.gradoop.temporal.model.impl.TemporalGraphFactory;
+import org.gradoop.temporal.model.impl.layout.TemporalIndexedLayout;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
  * <p>
  * The datasource expects files separated by label, e.g. in the following directory structure:
  * <p>
+ * {@code
  * csvRoot
  * |- vertices
  *   |- person
@@ -62,8 +63,14 @@ import java.util.stream.Collectors;
  *   |- myGraph
  *     |- data.csv
  * |- metadata.csv   # Meta data for all data contained in the graph
+ * }
  */
-public class TemporalIndexedCSVDataSource extends IndexedCSVDataSource implements TemporalDataSource {
+public class TemporalIndexedCSVDataSource extends CSVBase implements TemporalDataSource, DataSource {
+
+  /**
+   * HDFS Configuration.
+   */
+  private Configuration hdfsConfig = new Configuration();
 
   /**
    * Creates a new data source. The constructor creates a default HDFS configuration.
@@ -72,7 +79,7 @@ public class TemporalIndexedCSVDataSource extends IndexedCSVDataSource implement
    * @param config  gradoop configuration
    */
   public TemporalIndexedCSVDataSource(String csvPath, TemporalGradoopConfig config) {
-    super(csvPath, config, new Configuration());
+    super(csvPath, config);
   }
 
   /**
@@ -101,71 +108,59 @@ public class TemporalIndexedCSVDataSource extends IndexedCSVDataSource implement
 
   @Override
   public TemporalGraph getTemporalGraph() throws IOException {
-
-    CSVMetaDataSource source = new CSVMetaDataSource();
-    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);
-    DataSet<Tuple3<String, String, String>> metaDataBroadcast =
-      source.readDistributed(getMetaDataPath(), getConfig());
-
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    TemporalGraphFactory factory = getConfig().getTemporalGraphFactory();
-
-    Map<String, DataSet<TemporalGraphHead>> graphHeads = metaData.getGraphLabels().stream()
-      .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
-        .map(new CSVLineToTemporalGraphHead(factory.getGraphHeadFactory()))
-        .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-        .filter(graphHead -> graphHead.getLabel().equals(label))))
-      .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
-
-    Map<String, DataSet<TemporalVertex>> vertices = metaData.getVertexLabels().stream()
-      .map(label -> Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
-        .map(new CSVLineToTemporalVertex(factory.getVertexFactory()))
-        .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-        .filter(vertex -> vertex.getLabel().equals(label))))
-      .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
-
-    Map<String, DataSet<TemporalEdge>> edges = metaData.getEdgeLabels().stream()
-      .map(label -> Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
-        .map(new CSVLineToTemporalEdge(factory.getEdgeFactory()))
-        .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-        .filter(edge -> edge.getLabel().equals(label))))
-      .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
-
-    return factory.fromIndexedDataSets(graphHeads, vertices, edges);
+    return getConfig().getTemporalGraphFactory().fromLayout(readIndexedCSV());
   }
 
   @Override
   public TemporalGraphCollection getTemporalGraphCollection() throws IOException {
+    return getConfig().getTemporalGraphCollectionFactory().fromLayout(readIndexedCSV());
+  }
+
+  /**
+   * Reads the graph data from (distributed) file system.
+   *
+   * @return a temporal indexed layout containing the graph/collection data
+   * @throws IOException in case of an error while reading
+   */
+  private TemporalIndexedLayout readIndexedCSV() throws IOException {
     CSVMetaDataSource source = new CSVMetaDataSource();
     CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);
     DataSet<Tuple3<String, String, String>> metaDataBroadcast =
       source.readDistributed(getMetaDataPath(), getConfig());
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    TemporalGraphCollectionFactory factory = getConfig().getTemporalGraphCollectionFactory();
 
     Map<String, DataSet<TemporalGraphHead>> graphHeads = metaData.getGraphLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
-        .map(new CSVLineToTemporalGraphHead(factory.getGraphHeadFactory()))
+        .map(new CSVLineToTemporalGraphHead(getConfig().getTemporalGraphFactory().getGraphHeadFactory()))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
         .filter(graphHead -> graphHead.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     Map<String, DataSet<TemporalVertex>> vertices = metaData.getVertexLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
-        .map(new CSVLineToTemporalVertex(factory.getVertexFactory()))
+        .map(new CSVLineToTemporalVertex(getConfig().getTemporalGraphFactory().getVertexFactory()))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
         .filter(vertex -> vertex.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     Map<String, DataSet<TemporalEdge>> edges = metaData.getEdgeLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
-        .map(new CSVLineToTemporalEdge(factory.getEdgeFactory()))
+        .map(new CSVLineToTemporalEdge(getConfig().getTemporalGraphFactory().getEdgeFactory()))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
         .filter(edge -> edge.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    return factory.fromIndexedDataSets(graphHeads, vertices, edges);
+    return new TemporalIndexedLayout(graphHeads, vertices, edges);
+  }
+
+  /**
+   * Sets a hdfs config used for reading metadata.
+   *
+   * @param hdfsConfig the config file
+   */
+  public void setHdfsConfig(Configuration hdfsConfig) {
+    this.hdfsConfig = hdfsConfig;
   }
 
   @Override

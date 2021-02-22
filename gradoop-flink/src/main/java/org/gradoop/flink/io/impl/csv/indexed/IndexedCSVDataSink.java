@@ -44,7 +44,7 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
   /**
    * Path to meta data file that is used to write the output.
    */
-  protected final String metaDataPath;
+  private final String metaDataPath;
 
   /**
    * Creates a new indexed CSV data sink. Computes the meta data based on the given graph.

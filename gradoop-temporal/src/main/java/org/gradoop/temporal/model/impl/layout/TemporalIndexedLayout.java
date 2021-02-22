@@ -18,11 +18,13 @@ package org.gradoop.temporal.model.impl.layout;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a temporal graph or graph collection using one dataset per label and graph instance:
@@ -32,7 +34,7 @@ import java.util.Map;
  *   <li>a Map<L, E> containing the edge label L as key and a edge dataset E as value</li>
  * </ol>
  */
-public class TemporalIndexedLayout extends TemporalGVELayout implements
+public class TemporalIndexedLayout implements
   LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>,
   GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> {
 
@@ -56,20 +58,16 @@ public class TemporalIndexedLayout extends TemporalGVELayout implements
    * @param vertices mapping from label to vertices
    * @param edges mapping from label to edges
    */
-  TemporalIndexedLayout(Map<String, DataSet<TemporalGraphHead>> graphHeads,
-    Map<String, DataSet<TemporalVertex>> vertices,
-    Map<String, DataSet<TemporalEdge>> edges) {
-    super(
-      graphHeads.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during graph head union")),
-      vertices.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during vertex union")),
-      edges.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during edge union"))
-    );
-    this.graphHeads = graphHeads;
-    this.vertices = vertices;
-    this.edges = edges;
+  public TemporalIndexedLayout(Map<String, DataSet<TemporalGraphHead>> graphHeads,
+    Map<String, DataSet<TemporalVertex>> vertices, Map<String, DataSet<TemporalEdge>> edges) {
+    this.graphHeads = Objects.requireNonNull(graphHeads);
+    this.vertices = Objects.requireNonNull(vertices);
+    this.edges = Objects.requireNonNull(edges);
+  }
+
+  @Override
+  public boolean isGVELayout() {
+    return false;
   }
 
   @Override
@@ -78,29 +76,28 @@ public class TemporalIndexedLayout extends TemporalGVELayout implements
   }
 
   @Override
+  public boolean isTransactionalLayout() {
+    return false;
+  }
+
+  @Override
   public DataSet<TemporalGraphHead> getGraphHeadsByLabel(String label) {
-    if (!graphHeads.containsKey(label)) {
-      throw new IllegalArgumentException("The given graph label [" + label +
-        "] is not available in the (indexed) graph layout.");
-    }
     return graphHeads.get(label);
   }
 
   @Override
+  public DataSet<GraphTransaction> getGraphTransactions() {
+    throw new UnsupportedOperationException(
+      "Converting a indexed graph to graph transactions is not supported yet.");
+  }
+
+  @Override
   public DataSet<TemporalVertex> getVerticesByLabel(String label) {
-    if (!vertices.containsKey(label)) {
-      throw new IllegalArgumentException("The given vertex label [" + label +
-        "] is not available in the (indexed) graph layout.");
-    }
     return vertices.get(label);
   }
 
   @Override
   public DataSet<TemporalEdge> getEdgesByLabel(String label) {
-    if (!edges.containsKey(label)) {
-      throw new IllegalArgumentException("The given edge label [" + label +
-        "] is not available in the (indexed) graph layout.");
-    }
     return edges.get(label);
   }
 
@@ -118,7 +115,7 @@ public class TemporalIndexedLayout extends TemporalGVELayout implements
   @Override
   public DataSet<TemporalGraphHead> getGraphHeads() {
     return graphHeads.values().stream().reduce(DataSet::union)
-      .orElseThrow(() -> new RuntimeException("Error during graph head union"));
+      .orElseThrow(() -> new RuntimeException("Error during graph head union."));
   }
 
   /**
@@ -130,7 +127,7 @@ public class TemporalIndexedLayout extends TemporalGVELayout implements
   @Override
   public DataSet<TemporalVertex> getVertices() {
     return vertices.values().stream().reduce(DataSet::union)
-      .orElseThrow(() -> new RuntimeException("Error during vertex union"));
+      .orElseThrow(() -> new RuntimeException("Error during vertex union."));
   }
 
   /**

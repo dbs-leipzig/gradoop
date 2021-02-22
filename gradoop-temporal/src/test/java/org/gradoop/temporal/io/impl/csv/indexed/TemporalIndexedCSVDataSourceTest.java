@@ -94,14 +94,14 @@ public class TemporalIndexedCSVDataSourceTest extends TemporalGradoopTestBase {
     getExecutionEnvironment().execute();
     TemporalIndexedCSVDataSource source = new TemporalIndexedCSVDataSource(testFolder.getRoot().getPath(),
       getConfig());
-    collectAndAssertTrue(source.getTemporalGraphCollection().equalsByGraphElementData(testGraphCollection));
+    collectAndAssertTrue(source.getTemporalGraphCollection().equalsByGraphData(testGraphCollection));
   }
 
   /**
    * Tests the function {@link TemporalIndexedCSVDataSource#getConfig()}.
    */
   @Test
-  public void testTestGetConfig() {
+  public void testGetConfig() {
     TemporalIndexedCSVDataSource source = new TemporalIndexedCSVDataSource(testFolder.getRoot().getPath(),
       getConfig());
     assertEquals(getConfig(), source.getConfig());

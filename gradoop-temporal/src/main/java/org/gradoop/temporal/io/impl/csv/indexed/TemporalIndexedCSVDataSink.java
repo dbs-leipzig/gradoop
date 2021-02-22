@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.core.fs.Path;
+import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.functions.IndexedCSVFileFormat;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSink;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
@@ -40,7 +40,11 @@ import java.io.IOException;
 /**
  * A temporal graph data sink for CSV files indexed by label.
  */
-public class TemporalIndexedCSVDataSink extends IndexedCSVDataSink implements TemporalDataSink {
+public class TemporalIndexedCSVDataSink extends CSVBase implements TemporalDataSink {
+  /**
+   * Path to meta data file that is used to write the output.
+   */
+  private final String metaDataPath;
 
   /**
    * Creates a new indexed CSV data sink. Computes the meta data based on the given graph.
@@ -60,7 +64,8 @@ public class TemporalIndexedCSVDataSink extends IndexedCSVDataSink implements Te
    * @param config       Gradoop Flink configuration
    */
   public TemporalIndexedCSVDataSink(String csvPath, String metaDataPath, GradoopFlinkConfig config) {
-    super(csvPath, metaDataPath, config);
+    super(csvPath, config);
+    this.metaDataPath = metaDataPath;
   }
 
   @Override

@@ -98,12 +98,6 @@ public class LogicalGraphFactory
   }
 
   @Override
-  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<EPGMVertex>> vertices,
-    Map<String, DataSet<EPGMEdge>> edges) {
-    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
-  }
-
-  @Override
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<EPGMGraphHead>> graphHead,
     Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
     return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);

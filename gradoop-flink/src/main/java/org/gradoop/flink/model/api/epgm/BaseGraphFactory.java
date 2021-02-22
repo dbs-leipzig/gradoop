@@ -90,17 +90,6 @@ public interface BaseGraphFactory<
   LG fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
 
   /**
-   * Creates a logical graph from the given datasets. A new graph head is created and all vertices
-   * and edges are assigned to that graph head.
-   *
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return Logical graph
-   */
-  LG fromIndexedDataSets(Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
-
-  /**
    * Creates a logical graph from the given datasets. The method assumes that all vertices and
    * edges are already assigned to the specified graph head.
    *
