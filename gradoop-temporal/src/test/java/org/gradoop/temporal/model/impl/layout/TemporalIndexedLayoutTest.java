@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.layouts.gve.indexed;
+package org.gradoop.temporal.model.impl.layout;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.layouts.gve.BaseGVELayoutTest;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -33,11 +34,10 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 /**
- * Test class {@link IndexedGVELayout}.
+ * Tests class {@link TemporalIndexedLayout}.
  */
-public class IndexedGVELayoutTest extends BaseGVELayoutTest {
+public class TemporalIndexedLayoutTest extends BaseTemporalGVELayoutTest {
 
   @Test
   public void testIsGVELayout() {
@@ -51,22 +51,22 @@ public class IndexedGVELayoutTest extends BaseGVELayoutTest {
 
   @Test
   public void testGetGraphHead() throws Exception {
-    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
+    GradoopTestUtils.validateElementCollections(singletonList(g0),
       createLayout(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphHead().collect());
   }
 
   @Test
   public void testGetGraphHeads() throws Exception {
-    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0, g1),
+    GradoopTestUtils.validateElementCollections(asList(g0, g1),
       createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeads().collect());
   }
 
   @Test
   public void testGetGraphHeadsByLabel() throws Exception {
-    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
-      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("A").collect());
-    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g1),
-      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("B").collect());
+    GradoopTestUtils.validateElementCollections(singletonList(g0),
+      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("G").collect());
+    GradoopTestUtils.validateElementCollections(singletonList(g1),
+      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("Q").collect());
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -76,55 +76,56 @@ public class IndexedGVELayoutTest extends BaseGVELayoutTest {
 
   @Test
   public void testGetVertices() throws Exception {
-    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0, v1, v2),
+    GradoopTestUtils.validateGraphElementCollections(asList(v0, v1, v2),
       createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVertices().collect());
   }
 
   @Test
   public void testGetVerticesByLabel() throws Exception {
-    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v1),
-      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVerticesByLabel("B").collect());
+    GradoopTestUtils.validateGraphElementCollections(asList(v3, v4),
+      createLayout(asList(g0, g1), asList(v0, v1, v2, v3, v4), asList(e0, e1)).getVerticesByLabel("B").collect());
   }
 
   @Test
   public void testGetEdges() throws Exception {
-    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0, e1),
-      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdges().collect());
+    GradoopTestUtils.validateGraphElementCollections(asList(e0, e1, e2, e3),
+      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1, e2, e3)).getEdges().collect());
   }
 
   @Test
   public void testGetEdgesByLabel() throws Exception {
-    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e1),
-      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel("b").collect());
+    GradoopTestUtils.validateGraphElementCollections(asList(e2, e3),
+      createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1, e2, e3)).getEdgesByLabel("Y").collect());
   }
 
   @Test
-  public void testIsIndexedGVELayout() {
+  public void isIndexedGVELayout() {
     assertTrue(createLayout(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).isIndexedGVELayout());
   }
 
   /**
-   * Creates a {@link IndexedGVELayout} from collections of graph elements.
+   * Creates a temporal indexed GVE layout fom collections.
    *
-   * @param graphHeads a collection of graph heads
-   * @param vertices a collection of vertices
-   * @param edges a collection of edges
-   * @return an indexed GVE layout instance
+   * @param graphHeads graph heads to use
+   * @param vertices vertices to use
+   * @param edges edges to use
+   * @return the temporal indexed layout
    */
-  private IndexedGVELayout createLayout(Collection<EPGMGraphHead> graphHeads, Collection<EPGMVertex> vertices,
-    Collection<EPGMEdge> edges) {
-    Map<String, DataSet<EPGMGraphHead>> indexedGraphHeads =
-      graphHeads.stream().collect(Collectors.groupingBy(EPGMGraphHead::getLabel)).entrySet().stream().collect(
+  private TemporalIndexedLayout createLayout(Collection<TemporalGraphHead> graphHeads,
+    Collection<TemporalVertex> vertices, Collection<TemporalEdge> edges) {
+
+    Map<String, DataSet<TemporalGraphHead>> indexedGraphHeads =
+      graphHeads.stream().collect(Collectors.groupingBy(GraphHead::getLabel)).entrySet().stream().collect(
         Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<EPGMVertex>> indexedVertices =
-      vertices.stream().collect(Collectors.groupingBy(EPGMVertex::getLabel)).entrySet().stream().collect(
+    Map<String, DataSet<TemporalVertex>> indexedVertices =
+      vertices.stream().collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream().collect(
         Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<EPGMEdge>> indexedEdges =
-      edges.stream().collect(Collectors.groupingBy(EPGMEdge::getLabel)).entrySet().stream().collect(
+    Map<String, DataSet<TemporalEdge>> indexedEdges =
+      edges.stream().collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream().collect(
         Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    return new IndexedGVELayout(indexedGraphHeads, indexedVertices, indexedEdges);
+    return new TemporalIndexedLayout(indexedGraphHeads, indexedVertices, indexedEdges);
   }
 }

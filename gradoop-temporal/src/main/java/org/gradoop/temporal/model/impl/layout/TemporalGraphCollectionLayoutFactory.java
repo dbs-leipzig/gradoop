@@ -52,17 +52,12 @@ public class TemporalGraphCollectionLayoutFactory extends TemporalBaseLayoutFact
       Objects.requireNonNull(edges));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * Creating a temporal graph layout from an indexed dataset is not supported yet.
-   */
   @Override
   public GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> fromIndexedDataSets(
     Map<String, DataSet<TemporalGraphHead>> graphHeads,
     Map<String, DataSet<TemporalVertex>> vertices, Map<String, DataSet<TemporalEdge>> edges) {
-    throw new UnsupportedOperationException(
-      "Creating a temporal graph layout from an indexed dataset is not supported yet.");
+    return new TemporalIndexedLayout(graphHeads, vertices, edges);
+
   }
 
   @Override
