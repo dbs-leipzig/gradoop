@@ -1,0 +1,5 @@
+expected [
+ (v0 {name:"fo;o", value1:"453", value3:"71.03"}),
+ (v1 {name:"bar", value1:"76", value2:"false", value3:"33.4"}),
+ (v2 {name:"bla;", value1:"4568", value3:";9.4;2;"})
+]

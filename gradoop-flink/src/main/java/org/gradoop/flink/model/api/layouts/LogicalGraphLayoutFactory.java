@@ -71,16 +71,6 @@ public interface LogicalGraphLayoutFactory<
   /**
    * Creates a graph layout from the given datasets indexed by label.
    *
-   * @param vertices Mapping from label to vertex dataset
-   * @param edges Mapping from label to edge dataset
-   * @return Logical graph layout
-   */
-  LogicalGraphLayout<G, V, E> fromIndexedDataSets(Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
-
-  /**
-   * Creates a graph layout from the given datasets indexed by label.
-   *
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
    *

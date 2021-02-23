@@ -16,6 +16,7 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -27,13 +28,10 @@ import java.util.Objects;
 /**
  * Map the values of a token separated row of a file to the properties of a EPGM element.
  * Each property value will be mapped to the property name the user set via parameter.
+ *
+ * @param <T> input type
  */
-public class CsvRowToProperties implements FlatMapFunction<String, Properties> {
-
-  /**
-   * Token separator for the csv file.
-   */
-  private String tokenSeparator;
+public class CsvRowToProperties<T extends Tuple> implements FlatMapFunction<T, Properties> {
 
   /**
    * The name of the properties
@@ -53,26 +51,21 @@ public class CsvRowToProperties implements FlatMapFunction<String, Properties> {
   /**
    * Create a new RowToVertexMapper
    *
-   * @param tokenDelimiter in the file is used
    * @param propertyNames list of the property names
    * @param checkReoccurringHeader should the row checked for a occurring of the column names?
    */
-  public CsvRowToProperties(String tokenDelimiter, List<String> propertyNames,
-    boolean checkReoccurringHeader) {
-    this.tokenSeparator = Objects.requireNonNull(tokenDelimiter);
+  public CsvRowToProperties(List<String> propertyNames, boolean checkReoccurringHeader) {
     this.propertyNames = Objects.requireNonNull(propertyNames);
     this.checkReoccurringHeader = checkReoccurringHeader;
     this.reuseProperties = new Properties();
   }
 
   @Override
-  public void flatMap(String line, Collector<Properties> out) {
-    // Check if the line is an empty line
-    if (line.isEmpty()) {
-      return;
+  public void flatMap(T fields, Collector<Properties> out) {
+    String[] propertyValues = new String[fields.getArity()];
+    for (int i = 0; i < fields.getArity(); i++) {
+      propertyValues[i] = fields.getField(i);
     }
-
-    String[] propertyValues = line.split(tokenSeparator);
 
     // If the line to read is equals to the header and the checkReoccurringHeader flag is set to
     // TRUE, we do not import this line.
