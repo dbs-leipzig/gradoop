@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -82,9 +81,17 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
     this.hdfsConfig = hdfsConf;
   }
 
+  /**
+   * Will use a single graph head of the collection as final graph head for the graph.
+   * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.
+   *
+   * {@inheritDoc}
+   */
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-    return getGraphCollection().reduce(new ReduceCombination<>());
+    GraphCollection collection = getGraphCollection();
+    return collection.getGraphFactory()
+      .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
   }
 
   @Override

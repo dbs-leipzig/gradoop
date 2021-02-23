@@ -12,7 +12,7 @@
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
-    <inceptionYear>2014 - 2019</inceptionYear>
+    <inceptionYear>2014 - 2020</inceptionYear>
 
     <organization>
         <name>University of Leipzig</name>
@@ -159,11 +159,11 @@
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.commons-lang.version>2.6</dep.commons-lang.version>
         <dep.flink.version>1.7.2</dep.flink.version>
-        <dep.gdl.version>0.3</dep.gdl.version>
+        <dep.gdl.version>0.3.2</dep.gdl.version>
         <dep.guava.version>11.0.2</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
-        <dep.junit.version>4.12</dep.junit.version>
+        <dep.junit.version>4.13.1</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
@@ -403,7 +403,16 @@
                             <exclude>**/pom.xml</exclude>
                             <exclude>src/test/resources/**</exclude>
                             <exclude>src/main/resources/**</exclude>
+                            <exclude>src/site/site.xml</exclude>
+                            <exclude>spotbugs-exclude.xml</exclude>
+                            <exclude>.github/**</exclude>
                             <exclude>**/dev-support/**</exclude>
+                            <exclude>**/NOTICE</exclude>
+                            <exclude>**/NOTICE-binary</exclude>
+                            <exclude>licenses/**</exclude>
+                            <exclude>licenses-binary/**</exclude>
+                            <exclude>**/gradoop-common-testng.xml</exclude>
+                            <exclude>**/gradoop-hbase-testng.xml</exclude>
                         </excludes>
                         <mapping>
                             <java>SLASHSTAR_STYLE</java>

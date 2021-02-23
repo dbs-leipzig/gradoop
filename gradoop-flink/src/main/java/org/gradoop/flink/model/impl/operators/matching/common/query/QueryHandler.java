@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.GDLHandler;
+import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.GraphElement;
 import org.s1ck.gdl.model.Vertex;
@@ -101,6 +102,7 @@ public class QueryHandler {
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .setErrorStrategy(new BailSyntaxErrorStrategy())
       .buildFromString(gdlString);
     edgeCache = gdlHandler.getEdgeCache(true, true);
     vertexCache = gdlHandler.getVertexCache(true, true);

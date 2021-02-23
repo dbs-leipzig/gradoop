@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.s1ck.gdl.GDLHandler;
+import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
 import org.s1ck.gdl.model.Graph;
 import org.s1ck.gdl.model.GraphElement;
 
@@ -139,6 +140,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .setErrorStrategy(new BailSyntaxErrorStrategy())
       .buildFromString(asciiGraph),
       elementFactoryProvider);
   }
@@ -164,6 +166,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .setErrorStrategy(new BailSyntaxErrorStrategy())
       .buildFromFile(fileName),
       elementFactoryProvider);
   }
@@ -189,6 +192,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .setErrorStrategy(new BailSyntaxErrorStrategy())
       .buildFromStream(inputStream),
       elementFactoryProvider);
   }

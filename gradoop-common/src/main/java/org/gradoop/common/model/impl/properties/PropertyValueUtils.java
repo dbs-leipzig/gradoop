@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.gradoop.common.model.impl.properties;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -416,8 +418,7 @@ public class PropertyValueUtils {
      *
      * @return a < b
      */
-    private static boolean isLessOrEqualThan(
-      PropertyValue aValue, PropertyValue bValue) {
+    private static boolean isLessOrEqualThan(PropertyValue aValue, PropertyValue bValue) {
 
       int aType = checkNumericalAndGetType(aValue);
       int bType = checkNumericalAndGetType(bValue);
@@ -610,6 +611,83 @@ public class PropertyValueUtils {
       default:
         return value.getLong();
       }
+    }
+  }
+
+  /**
+   * Date and DateTime utilities.
+   */
+  public static class Date {
+
+    /**
+     * Compares two time property values and returns the chronological first one.
+     * <p>
+     * Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime}
+     * instance, but just for the comparison. The return value is not casted.
+     *
+     * @param a first value
+     * @param b second value
+     *
+     * @return the time property value that is the chronological first
+     */
+    public static PropertyValue min(PropertyValue a, PropertyValue b) {
+      return compare(a, b) <= 0 ? a : b;
+    }
+
+    /**
+     * Compares two time property values and returns the chronological last one.
+     * <p>
+     * Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime}
+     * instance, but just for the comparison. The return value is not casted.
+     *
+     * @param a first value
+     * @param b second value
+     *
+     * @return the time property value that is the chronological last
+     */
+    public static PropertyValue max(PropertyValue a, PropertyValue b) {
+      return compare(a, b) <= 0 ? b : a;
+    }
+
+    /**
+     * Compares two date or datetime property values and returns {@code -1}, if the first one is earlier,
+     * {@code 0} equal or {@code 1} later than the second one.
+     * Note that the comparison of a {@link java.time.LocalDate} with a {@link LocalDateTime}
+     * will cause casting the {@link java.time.LocalDate} to a {@link java.time.LocalDateTime} instance.
+     *
+     * @param aValue first value
+     * @param bValue second value
+     *
+     * @return returns {@code -1}, if the first one is earlier, {@code 0} equal or {@code 1} later than the
+     *         second one
+     * @throws IllegalArgumentException if arguments are not of type Date or DateTime
+     */
+    private static int compare(PropertyValue aValue, PropertyValue bValue) {
+      if (aValue.isDateTime() && bValue.isDateTime()) {
+        return aValue.getDateTime().compareTo(bValue.getDateTime());
+      } else if (aValue.isDate() && bValue.isDate()) {
+        return aValue.getDate().compareTo(bValue.getDate());
+      } else if (aValue.isDate() && bValue.isDateTime()) {
+        // cast a to DateTime
+        return LocalDateTime.of(aValue.getDate(), LocalTime.MIN).compareTo(bValue.getDateTime());
+      } else if (aValue.isDateTime() && bValue.isDate()) {
+        // cast b to DateTime
+        return aValue.getDateTime().compareTo(LocalDateTime.of(bValue.getDate(), LocalTime.MIN));
+      } else {
+        throw new IllegalArgumentException("Arguments to compare are not of type Date or DateTime.");
+      }
+    }
+
+    /**
+     * Checks the property value type for Date or DateTime.
+     *
+     * @param value the property value to check
+     * @return true, iff the value is a Date or DateTime type
+     */
+    public static boolean isDateOrDateTime(PropertyValue value) {
+      return value.isDate() || value.isDateTime();
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ public class MinMaxDurationTest extends TemporalGradoopTestBase {
   @Test
   public void testDurationWithDefaultValues() throws Exception {
     LogicalGraph logicalGraph  = getSocialNetworkLoader().getLogicalGraph();
-    TemporalGraph temporalGraph = TemporalGraph.fromLogicalGraph(logicalGraph);
+    TemporalGraph temporalGraph = TemporalGraph.fromGraph(logicalGraph);
     temporalGraph = temporalGraph.aggregate(
       new MinDuration("minDur", VALID_TIME),
       new MaxDuration("maxDur", VALID_TIME));

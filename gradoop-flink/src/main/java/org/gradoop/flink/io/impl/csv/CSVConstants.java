@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,14 @@ public class CSVConstants {
    * Used to separate key and value of maps in the CSV files.
    */
   public static final String MAP_SEPARATOR = "=";
+  /**
+   * Template for lists in CSV files.
+   */
+  public static final String LIST_TEMPLATE = "[%s]";
+  /**
+   * Template for maps in CSV files
+   */
+  public static final String MAP_TEMPLATE = "{%s}";
   /**
    * System constant file separator.
    */
