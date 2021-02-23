@@ -190,10 +190,20 @@ public abstract class CSVBase {
       CSVConstants.SIMPLE_FILE;
   }
 
+  /**
+   * Get the path to the metadata file.
+   *
+   * @return the path to the metadata file as string
+   */
   protected String getMetaDataPath() {
     return csvRoot + METADATA_FILE;
   }
 
+  /**
+   * Get the gradoop configuration.
+   *
+   * @return the gradoop configuration instance
+   */
   protected GradoopFlinkConfig getConfig() {
     return config;
   }
