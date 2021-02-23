@@ -59,19 +59,18 @@ public class MinimalCSVImporter implements DataSource {
   /**
    * The charset used in the csv file, e.g., "UTF-8".
    */
-  private final String charset;
+  private String charset = "UTF-8";
 
   /**
    * The property names for all columns in the file. If {@code null}, the first line will be
    * interpreted as header row.
    */
-  private List<String> columnNames;
+  private final List<String> columnNames;
 
   /**
-   * Flag to specify if each row of the file should be checked for reoccurring of the column
-   * property names.
+   * Flag to specify if each row of the file should be checked for reoccurring of the column property names.
    */
-  private boolean checkReoccurringHeader;
+  private boolean checkReoccurringHeader = false;
 
   /**
    * Flag to specify if quoted strings should be considered. Will escape delimiters inside quoted strings.
@@ -95,53 +94,41 @@ public class MinimalCSVImporter implements DataSource {
    * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig configuration
    * @param columnNames property identifiers for each column
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names
    */
   public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            List<String> columnNames, boolean checkReoccurringHeader) {
-    this(path, tokenSeparator, config, checkReoccurringHeader);
-    this.columnNames = Objects.requireNonNull(columnNames);
+                            List<String> columnNames) {
+    this.path = Objects.requireNonNull(path);
+    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);
+    this.config = Objects.requireNonNull(config);
+    this.columnNames = columnNames;
   }
 
   /**
-   * Create a new MinimalCSVImporter instance by the given parameters.
-   * Use the UTF-8 charset as default. The first line of the file will be set as the property
-   * names for each column.
-   *
-   * @param path the path to the csv file
-   * @param tokenSeparator the token delimiter of the csv file
-   * @param config GradoopFlinkConfig configuration
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names.
-   */
-  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            boolean checkReoccurringHeader) {
-    this(path, tokenSeparator, config, "UTF-8", checkReoccurringHeader);
-  }
-
-  /**
-   * Create a new MinimalCSVImporter with a user set charset. The first line of the file
+   * Create a new MinimalCSVImporter instance by the given parameters. The first line of the file
    * will set as the property names for each column.
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig configuration
-   * @param charset the charset used in the csv file
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names.
    */
-  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            String charset, boolean checkReoccurringHeader) {
-    this.path = Objects.requireNonNull(path);
-    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);
-    this.config = Objects.requireNonNull(config);
-    this.charset = Objects.requireNonNull(charset);
-    this.checkReoccurringHeader = checkReoccurringHeader;
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config) {
+    this(path, tokenSeparator, config, null);
+  }
+
+  /**
+   * Set charset of CSV file. UTF-8 is used as default.
+   *
+   * @param charset the charset used in the csv file, e.g., "UTF-8"
+   * @return this
+   */
+  public MinimalCSVImporter setCharset(String charset) {
+    this.charset = charset;
+    return this;
   }
 
   /**
    * Set checkReoccurringHeader flag.
+   * Each row of the file will be checked for reoccurrence of the column property names.
    *
    * @return this
    */
