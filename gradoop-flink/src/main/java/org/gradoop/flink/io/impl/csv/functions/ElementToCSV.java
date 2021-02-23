@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+import static org.gradoop.flink.io.impl.csv.CSVConstants.LIST_TEMPLATE;
+import static org.gradoop.flink.io.impl.csv.CSVConstants.MAP_TEMPLATE;
 
 /**
  * Base class to convert an EPGM element into a CSV representation.
@@ -95,9 +98,9 @@ public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
     if (p.isList() || p.isSet()) {
       return collectionToCsvString((Collection) p.getObject());
     } else if (p.isMap()) {
-      return p.getMap().entrySet().stream()
+      return String.format(MAP_TEMPLATE, p.getMap().entrySet().stream()
         .map(e -> escape(e.getKey()) + CSVConstants.MAP_SEPARATOR + escape(e.getValue()))
-        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "{", "}"));
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
     } else {
       return escape(p);
     }
@@ -110,9 +113,9 @@ public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
    * @return CSV string
    */
   protected String collectionToCsvString(Collection<?> collection) {
-    return collection.stream()
+    return String.format(LIST_TEMPLATE, collection.stream()
       .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
-      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
+      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
   }
 
   /**
