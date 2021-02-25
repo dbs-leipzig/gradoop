@@ -157,7 +157,7 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.commons-lang.version>2.6</dep.commons-lang.version>
+        <dep.commons-lang.version>3.11</dep.commons-lang.version>
         <dep.flink.version>1.7.2</dep.flink.version>
         <dep.gdl.version>0.3.2</dep.gdl.version>
         <dep.guava.version>11.0.2</dep.guava.version>
@@ -688,8 +688,8 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
                 <version>${dep.commons-lang.version}</version>
             </dependency>
 
