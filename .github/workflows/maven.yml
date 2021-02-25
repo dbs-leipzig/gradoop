@@ -23,6 +23,7 @@ jobs:
     - name: GitHub Actions workaround (Windows)
       if: matrix.os == 'windows-latest'
       run: |
+        echo "TMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
     - name: Build with Maven (Windows)
       if: matrix.os == 'windows-latest'
