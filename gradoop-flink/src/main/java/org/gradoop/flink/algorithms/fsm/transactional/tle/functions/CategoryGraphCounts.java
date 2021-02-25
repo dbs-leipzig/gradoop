@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Maps;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
