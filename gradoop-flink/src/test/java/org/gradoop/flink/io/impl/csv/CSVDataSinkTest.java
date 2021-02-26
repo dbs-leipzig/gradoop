@@ -19,10 +19,13 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.Path;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.*;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
@@ -40,11 +43,12 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests CSVDataSink
@@ -262,43 +266,12 @@ public class CSVDataSinkTest extends CSVTestBase {
   @Test
   public void testWriteMetadataCsvLocal() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
-    System.out.println(tmpPath);
-
-
-    Files.write(Paths.get(tmpPath, "test.txt"), Arrays.asList("erste", "zweite"),
-      StandardCharsets.UTF_8);
-    System.out.println(Files.readAllLines(Paths.get(tmpPath, "test.txt")).toString());
-
-    org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(new Configuration());
-    Path file = new Path(Paths.get(tmpPath, "test.txt").toString());
-    if (fs.exists(file)) {
-      fs.delete(file, false);
-    }
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
 
     List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
       .tuplesFromGraph(logicalGraph).collect();
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
-    try {
-      FSDataOutputStream outputStream = fs.create(file);
-      for (String graphLabel : metaData.getGraphLabels()) {
-        outputStream.writeBytes(graphLabel + CSVConstants.ROW_DELIMITER);
-      }
-      for (String vertexLabel : metaData.getVertexLabels()) {
-        outputStream.writeBytes(vertexLabel + CSVConstants.ROW_DELIMITER);
-      }
-      for (String edgeLabel : metaData.getEdgeLabels()) {
-        outputStream.writeBytes(edgeLabel + CSVConstants.ROW_DELIMITER);
-      }
-
-      outputStream.flush();
-      outputStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
     metaDataSink.writeLocal(
       tmpPath + "/metadata.csv", metaData, new Configuration(), true);

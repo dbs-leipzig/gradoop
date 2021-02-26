@@ -30,6 +30,4 @@ jobs:
     - name: Test with Maven (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        echo "$env:TMP"
-        echo "$env:TEMP"
         mvn verify -pl !:gradoop-hbase --no-transfer-progress -DtrimStackTrace=false
