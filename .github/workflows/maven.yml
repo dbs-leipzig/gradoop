@@ -37,4 +37,4 @@ jobs:
     - name: Test with Maven (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        mvn verify -pl !:gradoop-hbase --no-transfer-progress -DtrimStackTrace=false
+        mvn verify -pl !:gradoop-hbase,!:gradoop-accumulo --no-transfer-progress -DtrimStackTrace=false
