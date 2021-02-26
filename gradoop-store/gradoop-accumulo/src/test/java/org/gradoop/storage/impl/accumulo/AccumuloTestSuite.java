@@ -17,6 +17,7 @@ package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
+import org.apache.accumulo.minicluster.impl.MiniAccumuloConfigImpl;
 import org.gradoop.storage.accumulo.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.basic.StoreTest;
 import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
@@ -37,14 +38,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Scanner;
 
-import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
-import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
-import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX;
-import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ACCUMULO_USER;
-import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.ZOOKEEPER_HOSTS;
+import static org.gradoop.storage.accumulo.config.GradoopAccumuloConfig.*;
 
 /**
  * gradoop accumulo test suit
@@ -137,8 +138,41 @@ public class AccumuloTestSuite {
       URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(),
       StandardCharsets.UTF_8.name()));
     accumulo = new MiniAccumuloCluster(config);
-    accumulo.start();
+    MiniAccumuloConfig.class.getDeclaredField("impl").setAccessible(true);
+    MiniAccumuloConfigImpl impl = (MiniAccumuloConfigImpl) MiniAccumuloConfig.class.getField("impl")
+      .get(accumulo.getConfig());
+    File logdir = impl.getLogDir();
+    try {
+      accumulo.start();
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      Collection<File> all = new ArrayList<>();
+      addTree(new File("."), all);
+      all.stream().filter(f -> !f.isDirectory()).forEach(file -> {
+        try {
+          Scanner myReader = new Scanner(file);
+          while (myReader.hasNextLine()) {
+            String data = myReader.nextLine();
+            System.out.println(data);
+          }
+          myReader.close();
+        } catch (FileNotFoundException ed) {
+          ed.printStackTrace();
+        }
+      });
+      System.out.println();
+    }
     LOG.info("create mini accumulo start success!");
+  }
+
+  static void addTree(File file, Collection<File> all) {
+    File[] children = file.listFiles();
+    if (children != null) {
+      for (File child : children) {
+        all.add(child);
+        addTree(child, all);
+      }
+    }
   }
 
   /**
