@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -138,16 +139,16 @@ public class AccumuloTestSuite {
       URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(),
       StandardCharsets.UTF_8.name()));
     accumulo = new MiniAccumuloCluster(config);
-    MiniAccumuloConfig.class.getDeclaredField("impl").setAccessible(true);
-    MiniAccumuloConfigImpl impl = (MiniAccumuloConfigImpl) MiniAccumuloConfig.class.getField("impl")
-      .get(accumulo.getConfig());
-    File logdir = impl.getLogDir();
     try {
       accumulo.start();
     } catch (RuntimeException e) {
       e.printStackTrace();
+      Field fi = MiniAccumuloConfig.class.getDeclaredField("impl");
+      fi.setAccessible(true);
+      MiniAccumuloConfigImpl impl = (MiniAccumuloConfigImpl) fi.get(accumulo.getConfig());
+      File logdir = impl.getLogDir();
       Collection<File> all = new ArrayList<>();
-      addTree(new File("."), all);
+      addTree(logdir, all);
       all.stream().filter(f -> !f.isDirectory()).forEach(file -> {
         try {
           Scanner myReader = new Scanner(file);
