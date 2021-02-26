@@ -21,7 +21,7 @@ jobs:
     - name: Test with Maven
       if: matrix.os != 'windows-latest'
       run: |
-        mvn clean verify --no-transfer-progress
+        mvn verify --no-transfer-progress
     - name: GitHub Actions workaround (Windows)
       if: matrix.os == 'windows-latest'
       run: |
@@ -32,4 +32,4 @@ jobs:
       run: |
         echo "$env:TMP"
         echo "$env:TEMP"
-        mvn clean verify -pl !:gradoop-hbase --no-transfer-progress
+        mvn verify -pl !:gradoop-hbase --no-transfer-progress

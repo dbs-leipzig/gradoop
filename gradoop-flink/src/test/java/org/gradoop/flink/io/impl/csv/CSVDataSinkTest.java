@@ -46,12 +46,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Tests CSVDataSink
@@ -271,6 +269,15 @@ public class CSVDataSinkTest extends CSVTestBase {
     String tmpPath = temporaryFolder.getRoot().getPath();
     System.out.println(tmpPath);
 
+
+    Files.write(Paths.get("test.txt"), Arrays.asList("erste", "zweite"),
+      StandardCharsets.UTF_8);
+    System.out.println(Files.readAllLines(Paths.get("test.txt")).toString());
+
+    Files.write(Paths.get(tmpPath, "test.txt"), Arrays.asList("erste", "zweite"),
+      StandardCharsets.UTF_8);
+    System.out.println(Files.readAllLines(Paths.get(tmpPath, "test.txt")).toString());
+
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
     logicalGraph.print();
 
@@ -279,28 +286,8 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
-    System.out.println(Arrays.toString(metaData.getEdgeLabels().toArray()));
-    System.out.println("metadatasink: " + metaDataSink.toString());
-    System.out.println("metadata: " + metaData.toString());
-    Configuration conf = new Configuration();
-    System.out.println("configuration: " + conf.toString());
-    String metadataFile = tmpPath + "\\metadata.csv";
-    System.out.println(metadataFile);
-    File f = new File(tmpPath);
-    System.out.println("exists: " + f.exists());
-    System.out.println("dir: " + f.isDirectory());
-    System.out.println("read: " + f.canRead());
-    System.out.println("write: " + f.canWrite());
-    Path file = new Path(tmpPath);
-    try {
-      org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(conf);
-      System.out.println("exists: " + fs.exists(file));
-      System.out.println("dir: " + fs.isDirectory(file));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    metaDataSink.writeLocal(metadataFile, metaData, conf, true);
+    metaDataSink.writeLocal(tmpPath + "/metadata.csv", metaData, new Configuration(), true);
+    String metadataFile = tmpPath + "/metadata.csv";
     String line;
 
     BufferedReader br = new BufferedReader(new FileReader(metadataFile));
