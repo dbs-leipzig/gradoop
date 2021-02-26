@@ -30,5 +30,5 @@ jobs:
       run: |
         echo "$env:TMP"
         echo "$env:TEMP"
-        mvn clean install -DskipTests
-        mvn clean verify -pl !:gradoop-hbase
+        mvn clean install -DskipTests --no-transfer-progress
+        mvn clean verify -pl !:gradoop-hbase --no-transfer-progress
