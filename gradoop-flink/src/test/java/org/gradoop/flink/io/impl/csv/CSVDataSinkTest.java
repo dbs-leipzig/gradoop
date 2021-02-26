@@ -19,14 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.*;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
@@ -43,9 +37,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -279,20 +271,20 @@ public class CSVDataSinkTest extends CSVTestBase {
     System.out.println(Files.readAllLines(Paths.get(tmpPath, "test.txt")).toString());
 
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
-    logicalGraph.print();
 
     List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
       .tuplesFromGraph(logicalGraph).collect();
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
-    metaDataSink.writeLocal(tmpPath + "/metadata.csv", metaData, new Configuration(), true);
+    metaDataSink.writeLocal(
+      tmpPath + "/metadata.csv", metaData, new Configuration(), true);
+
     String metadataFile = tmpPath + "/metadata.csv";
     String line;
 
     BufferedReader br = new BufferedReader(new FileReader(metadataFile));
     while ((line = br.readLine()) != null) {
-      System.out.println(line);
       checkMetadataCsvLine(line);
     }
   }
