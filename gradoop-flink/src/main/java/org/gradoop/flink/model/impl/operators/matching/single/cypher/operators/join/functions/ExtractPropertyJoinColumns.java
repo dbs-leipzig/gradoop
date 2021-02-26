@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
