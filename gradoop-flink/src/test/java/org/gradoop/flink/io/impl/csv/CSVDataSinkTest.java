@@ -266,22 +266,27 @@ public class CSVDataSinkTest extends CSVTestBase {
   @Test
   public void testWriteMetadataCsvLocal() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
+    System.out.println(tmpPath);
 
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
+    logicalGraph.print();
 
     List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
       .tuplesFromGraph(logicalGraph).collect();
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
+    System.out.println(Arrays.toString(metaData.getEdgeLabels().toArray()));
     metaDataSink.writeLocal(
       tmpPath + "/metadata.csv", metaData, new Configuration(), true);
 
     String metadataFile = tmpPath + "/metadata.csv";
+    System.out.println(metadataFile);
     String line;
 
     BufferedReader br = new BufferedReader(new FileReader(metadataFile));
     while ((line = br.readLine()) != null) {
+      System.out.println(line);
       checkMetadataCsvLine(line);
     }
   }
