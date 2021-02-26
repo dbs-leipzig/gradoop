@@ -25,6 +25,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.temporal.model.impl.functions.tpgm.EdgeToTemporalEdge;
@@ -75,6 +76,17 @@ public class TemporalGraphFactory implements
     this.layoutFactory = layoutFactory;
   }
 
+  /**
+   * Creates a temporal graph instance from an existing layout.
+   *
+   * @param layout the layout that is used to store the graph data of this temporal graph instance
+   * @return a temporal graph
+   */
+  public TemporalGraph fromLayout(
+    LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout) {
+    return new TemporalGraph(layout, config);
+  }
+
   @Override
   public TemporalGraph fromDataSets(DataSet<TemporalVertex> vertices) {
     return new TemporalGraph(this.layoutFactory.fromDataSets(vertices), config);
@@ -89,12 +101,6 @@ public class TemporalGraphFactory implements
   public TemporalGraph fromDataSets(DataSet<TemporalGraphHead> graphHead,
     DataSet<TemporalVertex> vertices, DataSet<TemporalEdge> edges) {
     return new TemporalGraph(this.layoutFactory.fromDataSets(graphHead, vertices, edges), config);
-  }
-
-  @Override
-  public TemporalGraph fromIndexedDataSets(Map<String, DataSet<TemporalVertex>> vertices,
-    Map<String, DataSet<TemporalEdge>> edges) {
-    return new TemporalGraph(this.layoutFactory.fromIndexedDataSets(vertices, edges), config);
   }
 
   @Override
