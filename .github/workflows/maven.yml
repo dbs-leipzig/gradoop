@@ -17,11 +17,11 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: |
-        mvn clean install -DskipTests --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
+        mvn clean install -DskipTests --no-transfer-progress -DtrimStackTrace=false
     - name: Test with Maven
       if: matrix.os != 'windows-latest'
       run: |
-        mvn verify --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
+        mvn verify --no-transfer-progress -DtrimStackTrace=false
     - name: GitHub Actions workaround (Windows)
       if: matrix.os == 'windows-latest'
       run: |
@@ -32,4 +32,4 @@ jobs:
       run: |
         echo "$env:TMP"
         echo "$env:TEMP"
-        mvn verify -pl !:gradoop-hbase --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
+        mvn verify -pl !:gradoop-hbase --no-transfer-progress -DtrimStackTrace=false
