@@ -40,6 +40,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -279,7 +280,8 @@ public class CSVDataSinkTest extends CSVTestBase {
       .tuplesFromGraph(logicalGraph).collect();
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
-    try (FSDataOutputStream outputStream = fs.create(file)) {
+    try {
+      FSDataOutputStream outputStream = fs.create(file);
       for (String graphLabel : metaData.getGraphLabels()) {
         outputStream.writeBytes(graphLabel + CSVConstants.ROW_DELIMITER);
       }
@@ -291,6 +293,9 @@ public class CSVDataSinkTest extends CSVTestBase {
       }
 
       outputStream.flush();
+      outputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
 

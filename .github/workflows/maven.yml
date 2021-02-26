@@ -17,14 +17,19 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: |
-        mvn clean install -DskipTests --no-transfer-progress
+        mvn clean install -DskipTests --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
     - name: Test with Maven
       if: matrix.os != 'windows-latest'
       run: |
-        mvn verify --no-transfer-progress
+        mvn verify --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
+    - name: GitHub Actions workaround (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        echo "TMP=$env:USERPROFILE\AppData\Local\Temp" >> $env:GITHUB_ENV
+        echo "TEMP=$env:USERPROFILE\AppData\Local\Temp" >> $env:GITHUB_ENV
     - name: Test with Maven (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         echo "$env:TMP"
         echo "$env:TEMP"
-        mvn verify -pl !:gradoop-hbase --no-transfer-progress
+        mvn verify -pl !:gradoop-hbase --no-transfer-progress -Dsurefire.useFile=false -DtrimStackTrace=false
