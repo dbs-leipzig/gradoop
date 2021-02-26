@@ -121,7 +121,7 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-shaded-hadoop2</artifactId>
+            <artifactId>flink-shaded-hadoop-2</artifactId>
 	    </dependency>
 
         <!-- Test dependencies -->
