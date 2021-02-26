@@ -62,6 +62,10 @@ An overview and detailed descriptions of the implemented operators can be found 
 
 ## Setup
 
+### Windows
+
+* Some operators require the Hadoop winutils
+
 ### Use gradoop via Maven
 
 * Add one of the following dependencies to your maven project
@@ -128,7 +132,7 @@ In any case you also need Apache Flink (version 1.7.2):
 * You might want to skip tests for faster builds. Also, some tests fail on Windows due to missing test dependencies
 
     > mvn clean install -DskipTests
-    
+
 ## Gradoop modules
 
 ### gradoop-common
