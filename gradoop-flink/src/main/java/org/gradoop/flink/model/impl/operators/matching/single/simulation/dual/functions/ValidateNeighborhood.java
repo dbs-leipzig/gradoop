@@ -15,14 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
-  .IdPair;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.IdPair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;

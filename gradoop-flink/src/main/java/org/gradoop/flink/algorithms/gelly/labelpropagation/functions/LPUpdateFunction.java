@@ -15,10 +15,10 @@
  */
 package org.gradoop.flink.algorithms.gelly.labelpropagation.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.spargel.GatherFunction;
 import org.apache.flink.graph.spargel.MessageIterator;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
