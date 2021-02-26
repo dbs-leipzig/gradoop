@@ -19,6 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.Path;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.*;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -262,20 +264,36 @@ public class CSVDataSinkTest extends CSVTestBase {
     System.out.println(tmpPath);
 
 
-    Files.write(Paths.get("test.txt"), Arrays.asList("erste", "zweite"),
-      StandardCharsets.UTF_8);
-    System.out.println(Files.readAllLines(Paths.get("test.txt")).toString());
-
     Files.write(Paths.get(tmpPath, "test.txt"), Arrays.asList("erste", "zweite"),
       StandardCharsets.UTF_8);
     System.out.println(Files.readAllLines(Paths.get(tmpPath, "test.txt")).toString());
 
+    org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(new Configuration());
+    Path file = new Path(Paths.get(tmpPath, "test.txt").toString());
+    if (fs.exists(file)) {
+      fs.delete(file, false);
+    }
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
 
     List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
       .tuplesFromGraph(logicalGraph).collect();
 
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
+    try (FSDataOutputStream outputStream = fs.create(file)) {
+      for (String graphLabel : metaData.getGraphLabels()) {
+        outputStream.writeBytes(graphLabel + CSVConstants.ROW_DELIMITER);
+      }
+      for (String vertexLabel : metaData.getVertexLabels()) {
+        outputStream.writeBytes(vertexLabel + CSVConstants.ROW_DELIMITER);
+      }
+      for (String edgeLabel : metaData.getEdgeLabels()) {
+        outputStream.writeBytes(edgeLabel + CSVConstants.ROW_DELIMITER);
+      }
+
+      outputStream.flush();
+    }
+
+
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
     metaDataSink.writeLocal(
       tmpPath + "/metadata.csv", metaData, new Configuration(), true);
