@@ -267,8 +267,6 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWriteMetadataCsvLocal() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    System.out.println(System.getProperty("os.name"));
-
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
 
     List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
