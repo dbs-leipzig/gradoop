@@ -87,6 +87,8 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
 
         outputStream.flush();
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 

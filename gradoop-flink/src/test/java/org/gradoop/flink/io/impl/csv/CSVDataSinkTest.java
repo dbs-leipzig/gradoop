@@ -42,6 +42,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -277,11 +278,20 @@ public class CSVDataSinkTest extends CSVTestBase {
     CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
     CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
     System.out.println(Arrays.toString(metaData.getEdgeLabels().toArray()));
-    metaDataSink.writeLocal(
-      tmpPath + "/metadata.csv", metaData, new Configuration(), true);
-
+    System.out.println("metadatasink: " + metaDataSink == null);
+    System.out.println("metadata: " + metaData == null);
+    Configuration conf = new Configuration();
+    System.out.println("configuration: " + conf == null);
     String metadataFile = tmpPath + "/metadata.csv";
     System.out.println(metadataFile);
+    File f = new File(metadataFile);
+    System.out.println("exists: " + f.exists());
+    System.out.println("dir: " + f.isDirectory());
+    System.out.println("read: " + f.canRead());
+    System.out.println("write: " + f.canWrite());
+
+
+    metaDataSink.writeLocal(metadataFile, metaData, conf, true);
     String line;
 
     BufferedReader br = new BufferedReader(new FileReader(metadataFile));
