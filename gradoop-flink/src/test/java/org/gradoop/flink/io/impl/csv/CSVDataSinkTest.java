@@ -282,9 +282,9 @@ public class CSVDataSinkTest extends CSVTestBase {
     System.out.println("metadata: " + metaData == null);
     Configuration conf = new Configuration();
     System.out.println("configuration: " + conf == null);
-    String metadataFile = tmpPath + "/metadata.csv";
+    String metadataFile = tmpPath + "\\metadata.csv";
     System.out.println(metadataFile);
-    File f = new File(metadataFile);
+    File f = new File(tmpPath);
     System.out.println("exists: " + f.exists());
     System.out.println("dir: " + f.isDirectory());
     System.out.println("read: " + f.canRead());
