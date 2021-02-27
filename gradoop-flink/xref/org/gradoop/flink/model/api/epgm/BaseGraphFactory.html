@@ -9,7 +9,7 @@
 <div id="overview"><a href="../../../../../../../apidocs/org/gradoop/flink/model/api/epgm/BaseGraphFactory.html">View Javadoc</a></div><pre>
 
 <a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
-<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2020 Leipzig University (Database Research Group)</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2021 Leipzig University (Database Research Group)</em>
 <a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
 <a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
 <a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
@@ -100,55 +100,44 @@
 <a name="90" href="#90">90</a>    LG fromDataSets(DataSet&lt;G&gt; graphHead, DataSet&lt;V&gt; vertices, DataSet&lt;E&gt; edges);
 <a name="91" href="#91">91</a>  
 <a name="92" href="#92">92</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   * Creates a logical graph from the given datasets. A new graph head is created and all vertices</em>
-<a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   * and edges are assigned to that graph head.</em>
+<a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   * Creates a logical graph from the given datasets. The method assumes that all vertices and</em>
+<a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   * edges are already assigned to the specified graph head.</em>
 <a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * @param vertices label indexed vertex datasets</em>
-<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * @param edges label indexed edge datasets</em>
-<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @return Logical graph</em>
-<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="100" href="#100">100</a>   LG fromIndexedDataSets(Map&lt;String, DataSet&lt;V&gt;&gt; vertices,
-<a name="101" href="#101">101</a>     Map&lt;String, DataSet&lt;E&gt;&gt; edges);
-<a name="102" href="#102">102</a> 
-<a name="103" href="#103">103</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * Creates a logical graph from the given datasets. The method assumes that all vertices and</em>
-<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * edges are already assigned to the specified graph head.</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * @param graphHead label indexed graph head dataset (1-element)</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * @param vertices label indexed vertex datasets</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @param edges label indexed edge datasets</em>
+<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * @return Logical graph</em>
+<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   */</em>
+<a name="101" href="#101">101</a>   LG fromIndexedDataSets(Map&lt;String, DataSet&lt;G&gt;&gt; graphHead,
+<a name="102" href="#102">102</a>     Map&lt;String, DataSet&lt;V&gt;&gt; vertices, Map&lt;String, DataSet&lt;E&gt;&gt; edges);
+<a name="103" href="#103">103</a> 
+<a name="104" href="#104">104</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * Creates a logical graph from the given single graph head, vertex and edge collections.</em>
 <a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   *</em>
-<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * @param graphHead label indexed graph head dataset (1-element)</em>
-<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   * @param vertices label indexed vertex datasets</em>
-<a name="109" href="#109">109</a> <em class="jxr_javadoccomment">   * @param edges label indexed edge datasets</em>
+<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * @param graphHead Graph head associated with the logical graph</em>
+<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   * @param vertices  Vertex collection</em>
+<a name="109" href="#109">109</a> <em class="jxr_javadoccomment">   * @param edges     Edge collection</em>
 <a name="110" href="#110">110</a> <em class="jxr_javadoccomment">   * @return Logical graph</em>
 <a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   */</em>
-<a name="112" href="#112">112</a>   LG fromIndexedDataSets(Map&lt;String, DataSet&lt;G&gt;&gt; graphHead,
-<a name="113" href="#113">113</a>     Map&lt;String, DataSet&lt;V&gt;&gt; vertices, Map&lt;String, DataSet&lt;E&gt;&gt; edges);
-<a name="114" href="#114">114</a> 
-<a name="115" href="#115">115</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * Creates a logical graph from the given single graph head, vertex and edge collections.</em>
+<a name="112" href="#112">112</a>   LG fromCollections(G graphHead, Collection&lt;V&gt; vertices, Collection&lt;E&gt; edges);
+<a name="113" href="#113">113</a> 
+<a name="114" href="#114">114</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   * Creates a logical graph from the given vertex and edge collections. A new graph head is</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * created and all vertices and edges are assigned to that graph.</em>
 <a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   *</em>
-<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @param graphHead Graph head associated with the logical graph</em>
-<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * @param vertices  Vertex collection</em>
-<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * @param edges     Edge collection</em>
-<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   * @return Logical graph</em>
-<a name="122" href="#122">122</a> <em class="jxr_javadoccomment">   */</em>
-<a name="123" href="#123">123</a>   LG fromCollections(G graphHead, Collection&lt;V&gt; vertices, Collection&lt;E&gt; edges);
-<a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * Creates a logical graph from the given vertex and edge collections. A new graph head is</em>
-<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * created and all vertices and edges are assigned to that graph.</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   *</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param vertices    Vertex collection</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param edges       Edge collection</em>
-<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   * @return Logical graph</em>
-<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   */</em>
-<a name="133" href="#133">133</a>   LG fromCollections(Collection&lt;V&gt; vertices, Collection&lt;E&gt; edges);
-<a name="134" href="#134">134</a> 
-<a name="135" href="#135">135</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   * Creates an empty graph.</em>
-<a name="137" href="#137">137</a> <em class="jxr_javadoccomment">   *</em>
-<a name="138" href="#138">138</a> <em class="jxr_javadoccomment">   * @return empty graph</em>
-<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   */</em>
-<a name="140" href="#140">140</a>   LG createEmptyGraph();
-<a name="141" href="#141">141</a> }
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @param vertices    Vertex collection</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * @param edges       Edge collection</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * @return Logical graph</em>
+<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   */</em>
+<a name="122" href="#122">122</a>   LG fromCollections(Collection&lt;V&gt; vertices, Collection&lt;E&gt; edges);
+<a name="123" href="#123">123</a> 
+<a name="124" href="#124">124</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="125" href="#125">125</a> <em class="jxr_javadoccomment">   * Creates an empty graph.</em>
+<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   *</em>
+<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * @return empty graph</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   */</em>
+<a name="129" href="#129">129</a>   LG createEmptyGraph();
+<a name="130" href="#130">130</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

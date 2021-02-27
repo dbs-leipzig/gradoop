@@ -9,7 +9,7 @@
 <div id="overview"><a href="../../../../../../../../apidocs/org/gradoop/flink/io/impl/csv/indexed/IndexedCSVDataSource.html">View Javadoc</a></div><pre>
 
 <a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
-<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2020 Leipzig University (Database Research Group)</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2021 Leipzig University (Database Research Group)</em>
 <a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
 <a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
 <a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
@@ -87,57 +87,56 @@
 <a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="78" href="#78">78</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/indexed/IndexedCSVDataSource.html">IndexedCSVDataSource</a>(String csvPath, <a href="../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> conf, Configuration hdfsConf) {
 <a name="79" href="#79">79</a>      <strong class="jxr_keyword">super</strong>(csvPath, conf);
-<a name="80" href="#80">80</a>      Objects.requireNonNull(hdfsConf);
-<a name="81" href="#81">81</a>      <strong class="jxr_keyword">this</strong>.hdfsConfig = hdfsConf;
-<a name="82" href="#82">82</a>    }
-<a name="83" href="#83">83</a>  
-<a name="84" href="#84">84</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * Will use a single graph head of the collection as final graph head for the graph.</em>
-<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.</em>
-<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="90" href="#90">90</a>    @Override
-<a name="91" href="#91">91</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> getLogicalGraph() <strong class="jxr_keyword">throws</strong> IOException {
-<a name="92" href="#92">92</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection = getGraphCollection();
-<a name="93" href="#93">93</a>      <strong class="jxr_keyword">return</strong> collection.getGraphFactory()
-<a name="94" href="#94">94</a>        .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
-<a name="95" href="#95">95</a>    }
-<a name="96" href="#96">96</a>  
-<a name="97" href="#97">97</a>    @Override
-<a name="98" href="#98">98</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> getGraphCollection() <strong class="jxr_keyword">throws</strong> IOException {
-<a name="99" href="#99">99</a>      <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaDataSource.html">CSVMetaDataSource</a> source = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaDataSource.html">CSVMetaDataSource</a>();
-<a name="100" href="#100">100</a>     <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaData.html">CSVMetaData</a> metaData = source.readLocal(getMetaDataPath(), hdfsConfig);
-<a name="101" href="#101">101</a>     DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =
-<a name="102" href="#102">102</a>       source.readDistributed(getMetaDataPath(), getConfig());
-<a name="103" href="#103">103</a> 
-<a name="104" href="#104">104</a>     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-<a name="105" href="#105">105</a>     <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollectionFactory.html">GraphCollectionFactory</a> factory = getConfig().getGraphCollectionFactory();
-<a name="106" href="#106">106</a> 
-<a name="107" href="#107">107</a>     Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()
-<a name="108" href="#108">108</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
-<a name="109" href="#109">109</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToGraphHead.html">CSVLineToGraphHead</a>(factory.getGraphHeadFactory()))
-<a name="110" href="#110">110</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-<a name="111" href="#111">111</a>         .filter(graphHead -&gt; graphHead.getLabel().equals(label))))
-<a name="112" href="#112">112</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
-<a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()
-<a name="115" href="#115">115</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
-<a name="116" href="#116">116</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToVertex.html">CSVLineToVertex</a>(factory.getVertexFactory()))
-<a name="117" href="#117">117</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-<a name="118" href="#118">118</a>         .filter(vertex -&gt; vertex.getLabel().equals(label))))
-<a name="119" href="#119">119</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
-<a name="120" href="#120">120</a> 
-<a name="121" href="#121">121</a>     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()
-<a name="122" href="#122">122</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
-<a name="123" href="#123">123</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToEdge.html">CSVLineToEdge</a>(factory.getEdgeFactory()))
-<a name="124" href="#124">124</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
-<a name="125" href="#125">125</a>         .filter(edge -&gt; edge.getLabel().equals(label))))
-<a name="126" href="#126">126</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
-<a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     <strong class="jxr_keyword">return</strong> factory.fromIndexedDataSets(graphHeads, vertices, edges);
-<a name="129" href="#129">129</a>   }
-<a name="130" href="#130">130</a> }
+<a name="80" href="#80">80</a>      <strong class="jxr_keyword">this</strong>.hdfsConfig = Objects.requireNonNull(hdfsConf);
+<a name="81" href="#81">81</a>    }
+<a name="82" href="#82">82</a>  
+<a name="83" href="#83">83</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * Will use a single graph head of the collection as final graph head for the graph.</em>
+<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.</em>
+<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="89" href="#89">89</a>    @Override
+<a name="90" href="#90">90</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> getLogicalGraph() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="91" href="#91">91</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection = getGraphCollection();
+<a name="92" href="#92">92</a>      <strong class="jxr_keyword">return</strong> collection.getGraphFactory()
+<a name="93" href="#93">93</a>        .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
+<a name="94" href="#94">94</a>    }
+<a name="95" href="#95">95</a>  
+<a name="96" href="#96">96</a>    @Override
+<a name="97" href="#97">97</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> getGraphCollection() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="98" href="#98">98</a>      <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaDataSource.html">CSVMetaDataSource</a> source = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaDataSource.html">CSVMetaDataSource</a>();
+<a name="99" href="#99">99</a>      <a href="../../../../../../../org/gradoop/flink/io/impl/csv/metadata/CSVMetaData.html">CSVMetaData</a> metaData = source.readLocal(getMetaDataPath(), hdfsConfig);
+<a name="100" href="#100">100</a>     DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =
+<a name="101" href="#101">101</a>       source.readDistributed(getMetaDataPath(), getConfig());
+<a name="102" href="#102">102</a> 
+<a name="103" href="#103">103</a>     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+<a name="104" href="#104">104</a>     <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollectionFactory.html">GraphCollectionFactory</a> factory = getConfig().getGraphCollectionFactory();
+<a name="105" href="#105">105</a> 
+<a name="106" href="#106">106</a>     Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()
+<a name="107" href="#107">107</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
+<a name="108" href="#108">108</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToGraphHead.html">CSVLineToGraphHead</a>(factory.getGraphHeadFactory()))
+<a name="109" href="#109">109</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
+<a name="110" href="#110">110</a>         .filter(graphHead -&gt; graphHead.getLabel().equals(label))))
+<a name="111" href="#111">111</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
+<a name="112" href="#112">112</a> 
+<a name="113" href="#113">113</a>     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()
+<a name="114" href="#114">114</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
+<a name="115" href="#115">115</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToVertex.html">CSVLineToVertex</a>(factory.getVertexFactory()))
+<a name="116" href="#116">116</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
+<a name="117" href="#117">117</a>         .filter(vertex -&gt; vertex.getLabel().equals(label))))
+<a name="118" href="#118">118</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
+<a name="119" href="#119">119</a> 
+<a name="120" href="#120">120</a>     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()
+<a name="121" href="#121">121</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
+<a name="122" href="#122">122</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToEdge.html">CSVLineToEdge</a>(factory.getEdgeFactory()))
+<a name="123" href="#123">123</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
+<a name="124" href="#124">124</a>         .filter(edge -&gt; edge.getLabel().equals(label))))
+<a name="125" href="#125">125</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
+<a name="126" href="#126">126</a> 
+<a name="127" href="#127">127</a>     <strong class="jxr_keyword">return</strong> factory.fromIndexedDataSets(graphHeads, vertices, edges);
+<a name="128" href="#128">128</a>   }
+<a name="129" href="#129">129</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

@@ -9,7 +9,7 @@
 <div id="overview"><a href="../../../../../../../apidocs/org/gradoop/temporal/model/impl/layout/TemporalGraphCollectionLayoutFactory.html">View Javadoc</a></div><pre>
 
 <a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
-<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2020 Leipzig University (Database Research Group)</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2021 Leipzig University (Database Research Group)</em>
 <a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
 <a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
 <a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
@@ -62,70 +62,65 @@
 <a name="52" href="#52">52</a>        Objects.requireNonNull(edges));
 <a name="53" href="#53">53</a>    }
 <a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
-<a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Creating a temporal graph layout from an indexed dataset is not supported yet.</em>
-<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="60" href="#60">60</a>    @Override
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
-<a name="62" href="#62">62</a>      Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads,
-<a name="63" href="#63">63</a>      Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
-<a name="64" href="#64">64</a>      <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(
-<a name="65" href="#65">65</a>        <span class="jxr_string">"Creating a temporal graph layout from an indexed dataset is not supported yet."</span>);
-<a name="66" href="#66">66</a>    }
-<a name="67" href="#67">67</a>  
-<a name="68" href="#68">68</a>    @Override
-<a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
-<a name="70" href="#70">70</a>      Collection&lt;TemporalGraphHead&gt; graphHeads,
-<a name="71" href="#71">71</a>      Collection&lt;TemporalVertex&gt; vertices,
-<a name="72" href="#72">72</a>      Collection&lt;TemporalEdge&gt; edges) {
-<a name="73" href="#73">73</a>      <strong class="jxr_keyword">return</strong> fromDataSets(
-<a name="74" href="#74">74</a>        createGraphHeadDataSet(Objects.requireNonNull(graphHeads)),
-<a name="75" href="#75">75</a>        createVertexDataSet(Objects.requireNonNull(vertices)),
-<a name="76" href="#76">76</a>        createEdgeDataSet(Objects.requireNonNull(edges)));
-<a name="77" href="#77">77</a>    }
-<a name="78" href="#78">78</a>  
-<a name="79" href="#79">79</a>    @Override
-<a name="80" href="#80">80</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromGraphLayout(
-<a name="81" href="#81">81</a>      LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; logicalGraphLayout) {
-<a name="82" href="#82">82</a>      <strong class="jxr_keyword">return</strong> fromDataSets(
-<a name="83" href="#83">83</a>        logicalGraphLayout.getGraphHead(),
-<a name="84" href="#84">84</a>        logicalGraphLayout.getVertices(),
-<a name="85" href="#85">85</a>        logicalGraphLayout.getEdges());
-<a name="86" href="#86">86</a>    }
-<a name="87" href="#87">87</a>  
-<a name="88" href="#88">88</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
-<a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * Creating a temporal graph layout from graph transactions is not supported yet.</em>
-<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="93" href="#93">93</a>    @Override
-<a name="94" href="#94">94</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromTransactions(
-<a name="95" href="#95">95</a>      DataSet&lt;GraphTransaction&gt; transactions) {
-<a name="96" href="#96">96</a>      <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(
-<a name="97" href="#97">97</a>        <span class="jxr_string">"Creating a temporal graph layout from graph transactions is not supported yet."</span>);
-<a name="98" href="#98">98</a>    }
-<a name="99" href="#99">99</a>  
-<a name="100" href="#100">100</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
-<a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   *</em>
-<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * Creating a temporal graph layout from graph transactions is not supported yet.</em>
-<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   */</em>
-<a name="105" href="#105">105</a>   @Override
-<a name="106" href="#106">106</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromTransactions(
-<a name="107" href="#107">107</a>     DataSet&lt;GraphTransaction&gt; transactions,
-<a name="108" href="#108">108</a>     GroupReduceFunction&lt;TemporalVertex, TemporalVertex&gt; vertexMergeReducer,
-<a name="109" href="#109">109</a>     GroupReduceFunction&lt;TemporalEdge, TemporalEdge&gt; edgeMergeReducer) {
-<a name="110" href="#110">110</a>     <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(
-<a name="111" href="#111">111</a>       <span class="jxr_string">"Creating a temporal graph layout from graph transactions is not supported yet."</span>);
+<a name="55" href="#55">55</a>    @Override
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
+<a name="57" href="#57">57</a>      Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads,
+<a name="58" href="#58">58</a>      Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
+<a name="59" href="#59">59</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/temporal/model/impl/layout/TemporalIndexedLayout.html">TemporalIndexedLayout</a>(graphHeads, vertices, edges);
+<a name="60" href="#60">60</a>  
+<a name="61" href="#61">61</a>    }
+<a name="62" href="#62">62</a>  
+<a name="63" href="#63">63</a>    @Override
+<a name="64" href="#64">64</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
+<a name="65" href="#65">65</a>      Collection&lt;TemporalGraphHead&gt; graphHeads,
+<a name="66" href="#66">66</a>      Collection&lt;TemporalVertex&gt; vertices,
+<a name="67" href="#67">67</a>      Collection&lt;TemporalEdge&gt; edges) {
+<a name="68" href="#68">68</a>      <strong class="jxr_keyword">return</strong> fromDataSets(
+<a name="69" href="#69">69</a>        createGraphHeadDataSet(Objects.requireNonNull(graphHeads)),
+<a name="70" href="#70">70</a>        createVertexDataSet(Objects.requireNonNull(vertices)),
+<a name="71" href="#71">71</a>        createEdgeDataSet(Objects.requireNonNull(edges)));
+<a name="72" href="#72">72</a>    }
+<a name="73" href="#73">73</a>  
+<a name="74" href="#74">74</a>    @Override
+<a name="75" href="#75">75</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromGraphLayout(
+<a name="76" href="#76">76</a>      LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; logicalGraphLayout) {
+<a name="77" href="#77">77</a>      <strong class="jxr_keyword">return</strong> fromDataSets(
+<a name="78" href="#78">78</a>        logicalGraphLayout.getGraphHead(),
+<a name="79" href="#79">79</a>        logicalGraphLayout.getVertices(),
+<a name="80" href="#80">80</a>        logicalGraphLayout.getEdges());
+<a name="81" href="#81">81</a>    }
+<a name="82" href="#82">82</a>  
+<a name="83" href="#83">83</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
+<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * Creating a temporal graph layout from graph transactions is not supported yet.</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="88" href="#88">88</a>    @Override
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromTransactions(
+<a name="90" href="#90">90</a>      DataSet&lt;GraphTransaction&gt; transactions) {
+<a name="91" href="#91">91</a>      <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(
+<a name="92" href="#92">92</a>        <span class="jxr_string">"Creating a temporal graph layout from graph transactions is not supported yet."</span>);
+<a name="93" href="#93">93</a>    }
+<a name="94" href="#94">94</a>  
+<a name="95" href="#95">95</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * {@inheritDoc}</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * Creating a temporal graph layout from graph transactions is not supported yet.</em>
+<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="100" href="#100">100</a>   @Override
+<a name="101" href="#101">101</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromTransactions(
+<a name="102" href="#102">102</a>     DataSet&lt;GraphTransaction&gt; transactions,
+<a name="103" href="#103">103</a>     GroupReduceFunction&lt;TemporalVertex, TemporalVertex&gt; vertexMergeReducer,
+<a name="104" href="#104">104</a>     GroupReduceFunction&lt;TemporalEdge, TemporalEdge&gt; edgeMergeReducer) {
+<a name="105" href="#105">105</a>     <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(
+<a name="106" href="#106">106</a>       <span class="jxr_string">"Creating a temporal graph layout from graph transactions is not supported yet."</span>);
+<a name="107" href="#107">107</a>   }
+<a name="108" href="#108">108</a> 
+<a name="109" href="#109">109</a>   @Override
+<a name="110" href="#110">110</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; createEmptyCollection() {
+<a name="111" href="#111">111</a>     <strong class="jxr_keyword">return</strong> fromCollections(Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 <a name="112" href="#112">112</a>   }
-<a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>   @Override
-<a name="115" href="#115">115</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; createEmptyCollection() {
-<a name="116" href="#116">116</a>     <strong class="jxr_keyword">return</strong> fromCollections(Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-<a name="117" href="#117">117</a>   }
-<a name="118" href="#118">118</a> }
+<a name="113" href="#113">113</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

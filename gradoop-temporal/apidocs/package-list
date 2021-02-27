@@ -1,6 +1,7 @@
 org.gradoop.temporal.io.api
 org.gradoop.temporal.io.impl.csv
 org.gradoop.temporal.io.impl.csv.functions
+org.gradoop.temporal.io.impl.csv.indexed
 org.gradoop.temporal.io.impl.csv.tuples
 org.gradoop.temporal.model.api
 org.gradoop.temporal.model.api.functions

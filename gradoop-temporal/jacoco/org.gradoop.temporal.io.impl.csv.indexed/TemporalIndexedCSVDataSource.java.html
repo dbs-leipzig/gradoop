@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalIndexedCSVDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.io.impl.csv.indexed</a> &gt; <span class="el_source">TemporalIndexedCSVDataSource.java</span></div><h1>TemporalIndexedCSVDataSource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.io.impl.csv.indexed;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.hadoop.conf.Configuration;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.CSVBase;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.temporal.io.api.TemporalDataSource;
+import org.gradoop.temporal.io.impl.csv.functions.CSVLineToTemporalEdge;
+import org.gradoop.temporal.io.impl.csv.functions.CSVLineToTemporalGraphHead;
+import org.gradoop.temporal.io.impl.csv.functions.CSVLineToTemporalVertex;
+import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.layout.TemporalIndexedLayout;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.util.TemporalGradoopConfig;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * A temporal graph data source for CSV files indexed by label.
+ * &lt;p&gt;
+ * The datasource expects files separated by label, e.g. in the following directory structure:
+ * &lt;p&gt;
+ * {@code
+ * csvRoot
+ * |- vertices
+ *   |- person
+ *     |- data.csv    # contains all vertices with label 'Person'
+ *   |- university
+ *     |- data.csv    # contains all vertices with label 'University'
+ * |- edges
+ *   |- knows
+ *     |- data.csv    # contains all edges with label 'knows'
+ *   |- studyAt
+ *     |- data.csv    # contains all edges with label 'studyAt'
+ * |- graphs
+ *   |- myGraph
+ *     |- data.csv
+ * |- metadata.csv   # Meta data for all data contained in the graph
+ * }
+ */
+public class TemporalIndexedCSVDataSource extends CSVBase implements TemporalDataSource, DataSource {
+
+  /**
+   * HDFS Configuration.
+   */
+<span class="fc" id="L73">  private Configuration hdfsConfig = new Configuration();</span>
+
+  /**
+   * Creates a new data source. The constructor creates a default HDFS configuration.
+   *
+   * @param csvPath root path of csv files
+   * @param config  gradoop configuration
+   */
+  public TemporalIndexedCSVDataSource(String csvPath, TemporalGradoopConfig config) {
+<span class="fc" id="L82">    super(csvPath, config);</span>
+<span class="fc" id="L83">  }</span>
+
+  /**
+   * Reads a {@link TemporalGraph} and converts it to a {@link LogicalGraph} via function
+   * {@link TemporalGraph##getLogicalGraph()}.
+   *
+   * @return a logical graph instance
+   * @throws IOException in case of an error while reading the graph
+   */
+  @Override
+  public LogicalGraph getLogicalGraph() throws IOException {
+<span class="nc" id="L94">    return getTemporalGraph().toLogicalGraph();</span>
+  }
+
+  /**
+   * Reads a {@link TemporalGraphCollection} and converts it to a {@link GraphCollection} via function
+   * {@link TemporalGraphCollection##getGraphCollection()}.
+   *
+   * @return a graph collection instance
+   * @throws IOException in case of an error while reading the graph collection
+   */
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+<span class="nc" id="L106">    return getTemporalGraphCollection().toGraphCollection();</span>
+  }
+
+  @Override
+  public TemporalGraph getTemporalGraph() throws IOException {
+<span class="fc" id="L111">    return getConfig().getTemporalGraphFactory().fromLayout(readIndexedCSV());</span>
+  }
+
+  @Override
+  public TemporalGraphCollection getTemporalGraphCollection() throws IOException {
+<span class="fc" id="L116">    return getConfig().getTemporalGraphCollectionFactory().fromLayout(readIndexedCSV());</span>
+  }
+
+  /**
+   * Reads the graph data from (distributed) file system.
+   *
+   * @return a temporal indexed layout containing the graph/collection data
+   * @throws IOException in case of an error while reading
+   */
+  private TemporalIndexedLayout readIndexedCSV() throws IOException {
+<span class="fc" id="L126">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
+<span class="fc" id="L127">    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);</span>
+<span class="fc" id="L128">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =</span>
+<span class="fc" id="L129">      source.readDistributed(getMetaDataPath(), getConfig());</span>
+
+<span class="fc" id="L131">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+
+<span class="fc" id="L133">    Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()</span>
+<span class="fc" id="L134">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))</span>
+<span class="fc" id="L135">        .map(new CSVLineToTemporalGraphHead(getConfig().getTemporalGraphFactory().getGraphHeadFactory()))</span>
+<span class="fc" id="L136">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L137">        .filter(graphHead -&gt; graphHead.getLabel().equals(label))))</span>
+<span class="fc" id="L138">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+
+<span class="fc" id="L140">    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()</span>
+<span class="fc" id="L141">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))</span>
+<span class="fc" id="L142">        .map(new CSVLineToTemporalVertex(getConfig().getTemporalGraphFactory().getVertexFactory()))</span>
+<span class="fc" id="L143">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L144">        .filter(vertex -&gt; vertex.getLabel().equals(label))))</span>
+<span class="fc" id="L145">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+
+<span class="fc" id="L147">    Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()</span>
+<span class="fc" id="L148">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))</span>
+<span class="fc" id="L149">        .map(new CSVLineToTemporalEdge(getConfig().getTemporalGraphFactory().getEdgeFactory()))</span>
+<span class="fc" id="L150">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L151">        .filter(edge -&gt; edge.getLabel().equals(label))))</span>
+<span class="fc" id="L152">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+
+<span class="fc" id="L154">    return new TemporalIndexedLayout(graphHeads, vertices, edges);</span>
+  }
+
+  /**
+   * Sets a hdfs config used for reading metadata.
+   *
+   * @param hdfsConfig the config file
+   */
+  public void setHdfsConfig(Configuration hdfsConfig) {
+<span class="nc" id="L163">    this.hdfsConfig = hdfsConfig;</span>
+<span class="nc" id="L164">  }</span>
+
+  @Override
+  protected TemporalGradoopConfig getConfig() {
+<span class="fc" id="L168">    return (TemporalGradoopConfig) super.getConfig();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,6 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl.config,EdgeDirection,0,44,0,0,0,5,0,1,0,1
-Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.csv,MinimalCSVImporter,0,187,0,6,0,34,0,10,0,7
+Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.csv,MinimalCSVImporter,5,258,0,10,2,52,1,18,1,13
 Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.json.functions,MinimalJsonToVertex,16,112,4,10,3,29,4,6,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateVertexFromEdges,0,68,0,0,0,11,0,3,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateEdgesFromTriple,0,83,0,0,0,18,0,3,0,3
@@ -15,7 +15,7 @@ Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,Bu
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,MarkDuplicatesInGroup,0,38,0,4,0,13,0,4,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,BuildIdPropertyValuePairs,0,47,0,4,0,11,0,4,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.csv.functions,PropertiesToVertex,0,18,0,0,0,6,0,2,0,2
-Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.csv.functions,CsvRowToProperties,1,72,1,9,1,16,1,6,0,2
+Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.csv.functions,CsvRowToProperties,0,78,0,10,0,16,0,7,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl.functions,CreateNewVertex,0,44,0,0,0,11,0,2,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl.functions,CreateNewVertexWithEqualityCondense,0,70,0,4,0,19,0,4,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl.functions,CreateNewEdges,0,70,0,10,0,14,0,7,0,2

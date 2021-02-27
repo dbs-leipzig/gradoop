@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IndexedCSVDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.indexed</a> &gt; <span class="el_source">IndexedCSVDataSource.java</span></div><h1>IndexedCSVDataSource.java</h1><pre class="source lang-java linenums">/*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,8 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf) {
 <span class="fc" id="L79">    super(csvPath, conf);</span>
-<span class="fc" id="L80">    Objects.requireNonNull(hdfsConf);</span>
-<span class="fc" id="L81">    this.hdfsConfig = hdfsConf;</span>
-<span class="fc" id="L82">  }</span>
+<span class="fc" id="L80">    this.hdfsConfig = Objects.requireNonNull(hdfsConf);</span>
+<span class="fc" id="L81">  }</span>
 
   /**
    * Will use a single graph head of the collection as final graph head for the graph.
@@ -89,43 +88,43 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    */
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
-<span class="fc" id="L92">    GraphCollection collection = getGraphCollection();</span>
-<span class="fc" id="L93">    return collection.getGraphFactory()</span>
-<span class="fc" id="L94">      .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());</span>
+<span class="fc" id="L91">    GraphCollection collection = getGraphCollection();</span>
+<span class="fc" id="L92">    return collection.getGraphFactory()</span>
+<span class="fc" id="L93">      .fromDataSets(collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-<span class="fc" id="L99">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
-<span class="fc" id="L100">    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);</span>
-<span class="fc" id="L101">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =</span>
-<span class="fc" id="L102">      source.readDistributed(getMetaDataPath(), getConfig());</span>
+<span class="fc" id="L98">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
+<span class="fc" id="L99">    CSVMetaData metaData = source.readLocal(getMetaDataPath(), hdfsConfig);</span>
+<span class="fc" id="L100">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataBroadcast =</span>
+<span class="fc" id="L101">      source.readDistributed(getMetaDataPath(), getConfig());</span>
 
-<span class="fc" id="L104">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
-<span class="fc" id="L105">    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();</span>
+<span class="fc" id="L103">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+<span class="fc" id="L104">    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();</span>
 
-<span class="fc" id="L107">    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()</span>
-<span class="fc" id="L108">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))</span>
-<span class="fc" id="L109">        .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))</span>
-<span class="fc" id="L110">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L111">        .filter(graphHead -&gt; graphHead.getLabel().equals(label))))</span>
-<span class="fc" id="L112">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+<span class="fc" id="L106">    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()</span>
+<span class="fc" id="L107">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))</span>
+<span class="fc" id="L108">        .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))</span>
+<span class="fc" id="L109">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L110">        .filter(graphHead -&gt; graphHead.getLabel().equals(label))))</span>
+<span class="fc" id="L111">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
 
-<span class="fc" id="L114">    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()</span>
-<span class="fc" id="L115">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))</span>
-<span class="fc" id="L116">        .map(new CSVLineToVertex(factory.getVertexFactory()))</span>
-<span class="fc" id="L117">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L118">        .filter(vertex -&gt; vertex.getLabel().equals(label))))</span>
-<span class="fc" id="L119">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+<span class="fc" id="L113">    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()</span>
+<span class="fc" id="L114">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))</span>
+<span class="fc" id="L115">        .map(new CSVLineToVertex(factory.getVertexFactory()))</span>
+<span class="fc" id="L116">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L117">        .filter(vertex -&gt; vertex.getLabel().equals(label))))</span>
+<span class="fc" id="L118">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
 
-<span class="fc" id="L121">    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()</span>
-<span class="fc" id="L122">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))</span>
-<span class="fc" id="L123">        .map(new CSVLineToEdge(factory.getEdgeFactory()))</span>
-<span class="fc" id="L124">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
-<span class="fc" id="L125">        .filter(edge -&gt; edge.getLabel().equals(label))))</span>
-<span class="fc" id="L126">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
+<span class="fc" id="L120">    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()</span>
+<span class="fc" id="L121">      .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))</span>
+<span class="fc" id="L122">        .map(new CSVLineToEdge(factory.getEdgeFactory()))</span>
+<span class="fc" id="L123">        .withBroadcastSet(metaDataBroadcast, BC_METADATA)</span>
+<span class="fc" id="L124">        .filter(edge -&gt; edge.getLabel().equals(label))))</span>
+<span class="fc" id="L125">      .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));</span>
 
-<span class="fc" id="L128">    return factory.fromIndexedDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L127">    return factory.fromIndexedDataSets(graphHeads, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

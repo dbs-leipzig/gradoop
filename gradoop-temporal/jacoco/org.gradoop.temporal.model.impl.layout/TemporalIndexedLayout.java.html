@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalIndexedLayout.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.layout</a> &gt; <span class="el_source">TemporalIndexedLayout.java</span></div><h1>TemporalIndexedLayout.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.layout;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Represents a temporal graph or graph collection using one dataset per label and graph instance:
+ * &lt;ol&gt;
+ *   &lt;li&gt;a Map&lt;L, G&gt; containing the graph label L as key and a graph head dataset G as value&lt;/li&gt;
+ *   &lt;li&gt;a Map&lt;L, V&gt; containing the vertex label L as key and a vertex dataset V as value&lt;/li&gt;
+ *   &lt;li&gt;a Map&lt;L, E&gt; containing the edge label L as key and a edge dataset E as value&lt;/li&gt;
+ * &lt;/ol&gt;
+ */
+public class TemporalIndexedLayout implements
+  LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt;,
+  GraphCollectionLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; {
+
+  /**
+   * Mapping from graph label to graph heads with that label.
+   */
+  private final Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads;
+  /**
+   * Mapping from vertex label to vertices with that label.
+   */
+  private final Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices;
+  /**
+   * Mapping from edge label to edges with that label.
+   */
+  private final Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges;
+
+  /**
+   * Creates a new temporal indexed layout.
+   *
+   * @param graphHeads mapping from label to graph heads
+   * @param vertices mapping from label to vertices
+   * @param edges mapping from label to edges
+   */
+  public TemporalIndexedLayout(Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads,
+<span class="fc" id="L62">    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {</span>
+<span class="fc" id="L63">    this.graphHeads = Objects.requireNonNull(graphHeads);</span>
+<span class="fc" id="L64">    this.vertices = Objects.requireNonNull(vertices);</span>
+<span class="fc" id="L65">    this.edges = Objects.requireNonNull(edges);</span>
+<span class="fc" id="L66">  }</span>
+
+  @Override
+  public boolean isGVELayout() {
+<span class="fc" id="L70">    return false;</span>
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+<span class="fc" id="L75">    return true;</span>
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
+<span class="fc" id="L80">    return false;</span>
+  }
+
+  @Override
+  public DataSet&lt;TemporalGraphHead&gt; getGraphHeadsByLabel(String label) {
+<span class="fc" id="L85">    return graphHeads.get(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphTransaction&gt; getGraphTransactions() {
+<span class="fc" id="L90">    throw new UnsupportedOperationException(</span>
+      &quot;Converting a indexed graph to graph transactions is not supported yet.&quot;);
+  }
+
+  @Override
+  public DataSet&lt;TemporalVertex&gt; getVerticesByLabel(String label) {
+<span class="fc" id="L96">    return vertices.get(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;TemporalEdge&gt; getEdgesByLabel(String label) {
+<span class="fc" id="L101">    return edges.get(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;TemporalGraphHead&gt; getGraphHead() {
+<span class="fc" id="L106">    return getGraphHeads();</span>
+  }
+
+  /**
+   * The request for all elements without specifying a label results in a union of all label-partitioned
+   * datasets.
+   *
+   * @return the whole graph head dataset created by a union of all single datasets
+   */
+  @Override
+  public DataSet&lt;TemporalGraphHead&gt; getGraphHeads() {
+<span class="fc" id="L117">    return graphHeads.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L118">      .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union.&quot;));</span>
+  }
+
+  /**
+   * The request for all elements without specifying a label results in a union of all label-partitioned
+   * datasets.
+   *
+   * @return the whole vertex dataset created by a union of all single datasets
+   */
+  @Override
+  public DataSet&lt;TemporalVertex&gt; getVertices() {
+<span class="fc" id="L129">    return vertices.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L130">      .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union.&quot;));</span>
+  }
+
+  /**
+   * The request for all elements without specifying a label results in a union of all label-partitioned
+   * datasets.
+   *
+   * @return the whole edge dataset created by a union of all single datasets
+   */
+  @Override
+  public DataSet&lt;TemporalEdge&gt; getEdges() {
+<span class="fc" id="L141">    return edges.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L142">      .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union.&quot;));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

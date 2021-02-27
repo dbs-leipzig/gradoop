@@ -1,28 +1,29 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalVertexFactory,38,68,0,0,6,13,6,8,6,8
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalVertexFactory,26,80,0,0,4,15,4,10,4,10
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalVertex,0,12,0,0,0,4,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHeadFactory,26,45,0,0,5,9,3,7,3,7
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHeadFactory,21,50,0,0,4,10,2,8,2,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement.new Object() {...},2,17,0,0,0,1,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphElement,1,65,2,4,0,17,2,9,0,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHead,0,11,0,0,0,4,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdgeFactory,41,86,0,0,5,14,5,9,5,9
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdgeFactory,34,93,0,0,4,15,4,10,4,10
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdge,0,32,0,0,0,12,0,6,0,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement,14,227,2,15,1,48,2,24,0,17
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff.functions,DiffPerElement.new Object() {...},2,17,0,0,0,1,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff.functions,DiffPerElement,15,82,1,10,1,22,1,7,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphLayoutFactory,38,110,2,2,7,26,6,5,4,5
+Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphLayoutFactory,35,110,2,2,6,26,5,5,3,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalBaseLayoutFactory,20,110,2,4,3,24,2,14,0,13
-Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphCollectionLayoutFactory,5,67,0,0,1,17,1,8,1,8
+Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalIndexedLayout,15,80,0,0,0,19,3,12,3,12
+Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGraphCollectionLayoutFactory,7,67,0,0,1,17,1,8,1,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.layout,TemporalGVELayout,9,50,0,0,3,13,3,9,3,9
 Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,7,85,0,0,1,11,1,11,1,11
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension.Field,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping,TemporalGroupingKeys,0,23,0,0,0,4,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring.functions,TemporalElementToDataString,0,44,0,4,0,12,0,4,0,2
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollectionFactory,52,187,0,4,9,32,7,13,7,11
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,33,146,0,0,6,33,5,19,5,19
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollectionFactory,52,194,0,4,9,33,7,14,7,12
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphCollection,15,164,0,0,5,34,4,20,4,20
 Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraph,11,155,0,0,4,32,3,18,3,18
-Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphFactory,63,133,0,0,8,20,7,10,7,10
+Gradoop Temporal,org.gradoop.temporal.model.impl,TemporalGraphFactory,52,140,0,0,7,21,6,11,6,11
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSource,0,49,0,0,0,12,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv,TemporalCSVDataSink,16,111,4,4,3,27,4,6,1,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,All,0,7,0,0,0,3,0,3,0,3
@@ -45,6 +46,8 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,TemporalEdgeToEd
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,VertexToTemporalVertex,0,49,0,2,0,13,0,4,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.tpgm,TemporalGraphHeadToGraphHead,0,28,0,0,0,7,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.verify.functions,UpdateEdgeValidity,0,46,0,8,0,11,0,6,0,2
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.indexed,TemporalIndexedCSVDataSource,12,207,0,0,4,30,3,17,3,17
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.indexed,TemporalIndexedCSVDataSink,19,152,8,4,1,40,6,7,0,7
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction,15,131,5,12,1,22,5,7,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinDuration,17,73,0,8,2,16,1,8,1,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageDuration,39,87,3,7,3,16,4,8,1,6
@@ -75,9 +78,9 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,Ti
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,65,132,5,24,6,30,5,16,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot,Snapshot,5,46,0,0,2,9,1,2,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot.functions,ByTemporalPredicate,0,32,0,0,0,6,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVVertex,16,23,0,0,4,11,4,6,4,6
-Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVEdge,24,31,0,0,6,15,6,8,6,8
-Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVGraphHead,12,19,0,0,3,9,3,5,3,5
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVVertex,12,27,0,0,3,12,3,7,3,7
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVEdge,20,35,0,0,5,16,5,9,5,9
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVGraphHead,8,23,0,0,2,10,2,6,2,6
 Gradoop Temporal,org.gradoop.temporal.model.api.functions,TemporalAggregateFunction,0,17,0,2,0,4,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,TemporalElementToCSV,0,28,0,0,0,2,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,CSVLineToTemporalGraphHead,0,54,0,0,0,13,0,2,0,2

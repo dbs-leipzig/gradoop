@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalGraphLayoutFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.layout</a> &gt; <span class="el_source">TemporalGraphLayoutFactory.java</span></div><h1>TemporalGraphLayoutFactory.java</h1><pre class="source lang-java linenums">/*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  * you may not use this file except in compliance with the License.
@@ -75,59 +75,49 @@ import static java.util.Objects.requireNonNull;
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a graph layout from the given datasets indexed by label.
    *
-   * Creating a temporal graph layout from an indexed dataset is not supported yet.
-   */
-  @Override
-  public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
-<span class="nc" id="L85">    throw new UnsupportedOperationException(</span>
-      &quot;Creating a temporal graph layout from an indexed dataset is not supported yet.&quot;);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * Creating a temporal graph layout from an indexed dataset is not supported yet.
+   * @param graphHeads 1-element Mapping from label to GraphHead DataSet
+   * @param vertices Mapping from label to vertex dataset
+   * @param edges Mapping from label to edge dataset
+   * @return a temporal indexed graph layout
    */
   @Override
   public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromIndexedDataSets(
     Map&lt;String, DataSet&lt;TemporalGraphHead&gt;&gt; graphHeads,
     Map&lt;String, DataSet&lt;TemporalVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;TemporalEdge&gt;&gt; edges) {
-<span class="nc" id="L98">    throw new UnsupportedOperationException(</span>
-      &quot;Creating a temporal graph layout from an indexed dataset is not supported yet.&quot;);
+<span class="nc" id="L89">    return new TemporalIndexedLayout(graphHeads, vertices, edges);</span>
   }
 
   @Override
   public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
     TemporalGraphHead graphHead, Collection&lt;TemporalVertex&gt; vertices,
     Collection&lt;TemporalEdge&gt; edges) {
-<span class="fc" id="L106">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
+<span class="fc" id="L96">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
 
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    List&lt;TemporalGraphHead&gt; graphHeads = graphHead == null ? Collections.emptyList() :</span>
-<span class="pc" id="L109">      Collections.singletonList(graphHead);</span>
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">    if (edges == null) {</span>
-<span class="nc" id="L111">      edges = Collections.emptyList();</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    List&lt;TemporalGraphHead&gt; graphHeads = graphHead == null ? Collections.emptyList() :</span>
+<span class="pc" id="L99">      Collections.singletonList(graphHead);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (edges == null) {</span>
+<span class="nc" id="L101">      edges = Collections.emptyList();</span>
     }
 
-<span class="fc" id="L114">    return fromDataSets(</span>
-<span class="fc" id="L115">      createGraphHeadDataSet(graphHeads),</span>
-<span class="fc" id="L116">      createVertexDataSet(vertices),</span>
-<span class="fc" id="L117">      createEdgeDataSet(edges));</span>
+<span class="fc" id="L104">    return fromDataSets(</span>
+<span class="fc" id="L105">      createGraphHeadDataSet(graphHeads),</span>
+<span class="fc" id="L106">      createVertexDataSet(vertices),</span>
+<span class="fc" id="L107">      createEdgeDataSet(edges));</span>
   }
 
   @Override
   public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
     Collection&lt;TemporalVertex&gt; vertices, Collection&lt;TemporalEdge&gt; edges) {
-<span class="nc" id="L123">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
-<span class="nc" id="L124">    requireNonNull(edges, &quot;Temporal edge collection is null.&quot;);</span>
-<span class="nc" id="L125">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
+<span class="nc" id="L113">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
+<span class="nc" id="L114">    requireNonNull(edges, &quot;Temporal edge collection is null.&quot;);</span>
+<span class="nc" id="L115">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
   }
 
   @Override
   public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; createEmptyGraph() {
-<span class="fc" id="L130">    return fromCollections(null, Collections.emptyList(), Collections.emptyList());</span>
+<span class="fc" id="L120">    return fromCollections(null, Collections.emptyList(), Collections.emptyList());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

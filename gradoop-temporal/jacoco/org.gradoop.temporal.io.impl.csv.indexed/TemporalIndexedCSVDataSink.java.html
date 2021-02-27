@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalIndexedCSVDataSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.io.impl.csv.indexed</a> &gt; <span class="el_source">TemporalIndexedCSVDataSink.java</span></div><h1>TemporalIndexedCSVDataSink.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.io.impl.csv.indexed;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
+import org.apache.flink.core.fs.Path;
+import org.gradoop.flink.io.impl.csv.CSVBase;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.indexed.functions.IndexedCSVFileFormat;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSink;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.temporal.io.api.TemporalDataSink;
+import org.gradoop.temporal.io.impl.csv.functions.TemporalEdgeToTemporalCSVEdge;
+import org.gradoop.temporal.io.impl.csv.functions.TemporalGraphHeadToTemporalCSVGraphHead;
+import org.gradoop.temporal.io.impl.csv.functions.TemporalVertexToTemporalCSVVertex;
+import org.gradoop.temporal.io.impl.csv.tuples.TemporalCSVEdge;
+import org.gradoop.temporal.io.impl.csv.tuples.TemporalCSVGraphHead;
+import org.gradoop.temporal.io.impl.csv.tuples.TemporalCSVVertex;
+import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+
+import java.io.IOException;
+
+/**
+ * A temporal graph data sink for CSV files indexed by label.
+ */
+public class TemporalIndexedCSVDataSink extends CSVBase implements TemporalDataSink {
+  /**
+   * Path to meta data file that is used to write the output.
+   */
+  private final String metaDataPath;
+
+  /**
+   * Creates a new indexed CSV data sink. Computes the meta data based on the given graph.
+   *
+   * @param csvPath directory to write to
+   * @param config  Gradoop Flink configuration
+   */
+  public TemporalIndexedCSVDataSink(String csvPath, GradoopFlinkConfig config) {
+<span class="fc" id="L56">    this(csvPath, null, config);</span>
+<span class="fc" id="L57">  }</span>
+
+  /**
+   * Creates an new indexed CSV data sink. Uses the specified meta data to write the CSV output.
+   *
+   * @param csvPath      directory to write CSV files to
+   * @param metaDataPath path to meta data CSV file that is reused to prevent the creation of metadata
+   * @param config       Gradoop Flink configuration
+   */
+  public TemporalIndexedCSVDataSink(String csvPath, String metaDataPath, GradoopFlinkConfig config) {
+<span class="fc" id="L67">    super(csvPath, config);</span>
+<span class="fc" id="L68">    this.metaDataPath = metaDataPath;</span>
+<span class="fc" id="L69">  }</span>
+
+  @Override
+  public void write(TemporalGraph temporalGraph) throws IOException {
+<span class="fc" id="L73">    write(temporalGraph, false);</span>
+<span class="fc" id="L74">  }</span>
+
+  @Override
+  public void write(TemporalGraphCollection temporalGraphCollection) throws IOException {
+<span class="fc" id="L78">    write(temporalGraphCollection, false);</span>
+<span class="fc" id="L79">  }</span>
+
+  @Override
+  public void write(TemporalGraph temporalGraph, boolean overwrite) throws IOException {
+<span class="fc" id="L83">    write(temporalGraph.getCollectionFactory().fromGraph(temporalGraph), overwrite);</span>
+<span class="fc" id="L84">  }</span>
+
+  @Override
+  public void write(TemporalGraphCollection temporalGraphCollection, boolean overwrite) throws IOException {
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    WriteMode writeMode = overwrite ?</span>
+      WriteMode.OVERWRITE : WriteMode.NO_OVERWRITE;
+
+    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaData;
+<span class="fc" id="L92">    CSVMetaDataSource source = new CSVMetaDataSource();</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    if (isMetadataReusable()) {</span>
+<span class="nc" id="L94">      metaData = source.readDistributed(metaDataPath, getConfig());</span>
+    } else {
+<span class="fc" id="L96">      metaData = source.tuplesFromCollection(temporalGraphCollection);</span>
+    }
+
+<span class="fc" id="L99">    DataSet&lt;TemporalCSVGraphHead&gt; csvGraphHeads = temporalGraphCollection.getGraphHeads()</span>
+<span class="fc" id="L100">      .map(new TemporalGraphHeadToTemporalCSVGraphHead())</span>
+<span class="fc" id="L101">      .withBroadcastSet(metaData, BC_METADATA);</span>
+
+<span class="fc" id="L103">    DataSet&lt;TemporalCSVVertex&gt; csvVertices = temporalGraphCollection.getVertices()</span>
+<span class="fc" id="L104">      .map(new TemporalVertexToTemporalCSVVertex())</span>
+<span class="fc" id="L105">      .withBroadcastSet(metaData, BC_METADATA);</span>
+
+<span class="fc" id="L107">    DataSet&lt;TemporalCSVEdge&gt; csvEdges = temporalGraphCollection.getEdges()</span>
+<span class="fc" id="L108">      .map(new TemporalEdgeToTemporalCSVEdge())</span>
+<span class="fc" id="L109">      .withBroadcastSet(metaData, BC_METADATA);</span>
+
+<span class="pc bpc" id="L111" title="3 of 4 branches missed.">    if (!getMetaDataPath().equals(metaDataPath) || !isMetadataReusable()) {</span>
+<span class="fc" id="L112">      new CSVMetaDataSink().writeDistributed(getMetaDataPath(), metaData, writeMode);</span>
+    }
+
+<span class="fc" id="L115">    IndexedCSVFileFormat&lt;TemporalCSVGraphHead&gt; graphHeadFormat = new IndexedCSVFileFormat&lt;&gt;(</span>
+<span class="fc" id="L116">      new Path(getGraphHeadPath()),</span>
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
+<span class="fc" id="L120">    graphHeadFormat.setWriteMode(writeMode);</span>
+<span class="fc" id="L121">    csvGraphHeads.output(graphHeadFormat);</span>
+
+<span class="fc" id="L123">    IndexedCSVFileFormat&lt;TemporalCSVVertex&gt; vertexFormat = new IndexedCSVFileFormat&lt;&gt;(</span>
+<span class="fc" id="L124">      new Path(getVertexPath()),</span>
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
+<span class="fc" id="L128">    vertexFormat.setWriteMode(writeMode);</span>
+<span class="fc" id="L129">    csvVertices.output(vertexFormat);</span>
+
+<span class="fc" id="L131">    IndexedCSVFileFormat&lt;TemporalCSVEdge&gt; edgeFormat = new IndexedCSVFileFormat&lt;&gt;(</span>
+<span class="fc" id="L132">      new Path(getEdgePath()),</span>
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
+<span class="fc" id="L136">    edgeFormat.setWriteMode(writeMode);</span>
+<span class="fc" id="L137">    csvEdges.output(edgeFormat);</span>
+<span class="fc" id="L138">  }</span>
+
+  /**
+   * Returns true, if the meta data shall be reused.
+   *
+   * @return true, iff reuse is possible
+   */
+  private boolean isMetadataReusable() {
+<span class="pc bpc" id="L146" title="3 of 4 branches missed.">    return this.metaDataPath != null &amp;&amp; !this.metaDataPath.isEmpty();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
