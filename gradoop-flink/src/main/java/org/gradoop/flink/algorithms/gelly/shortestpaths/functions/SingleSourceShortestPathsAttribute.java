@@ -42,8 +42,8 @@ public class SingleSourceShortestPathsAttribute<V extends Vertex>
   }
 
   @Override
-  public V join(org.apache.flink.graph.Vertex<GradoopId, Double> gellyVertex, V gradoopVertex) {
-    gradoopVertex.setProperty(shortestPathProperty, gellyVertex.getValue());
-    return gradoopVertex;
+  public V join(org.apache.flink.graph.Vertex<GradoopId, Double> gellyVertex, V vertex) {
+    vertex.setProperty(shortestPathProperty, gellyVertex.getValue());
+    return vertex;
   }
 }

@@ -18,12 +18,12 @@ package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.library.ConnectedComponents;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLongSourceIds;
@@ -50,8 +50,8 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
  */
 public class ValueWeaklyConnectedComponents<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends BaseGellyAlgorithm<G, V, E, LG, GC, Long, Long, NullValue, DataSet<Tuple2<Long, Long>>> {
@@ -82,10 +82,10 @@ public class ValueWeaklyConnectedComponents<
     DataSet<Tuple2<Long, GradoopId>> uniqueVertexID =
       DataSetUtils.zipWithUniqueId(graph.getVertices().map(new Id<>()));
 
-    DataSet<Vertex<Long, Long>> vertices = uniqueVertexID
+    DataSet<org.apache.flink.graph.Vertex<Long, Long>> vertices = uniqueVertexID
       .map(new LongTupleToGellyVertexWithLongValue());
 
-    DataSet<Edge<Long, NullValue>> edges =
+    DataSet<org.apache.flink.graph.Edge<Long, NullValue>> edges =
       uniqueVertexID
       .join(graph.getEdges())
       .where(1).equalTo(new SourceId<>())

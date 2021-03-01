@@ -18,7 +18,9 @@ package org.gradoop.flink.algorithms.gelly.labelpropagation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
@@ -35,8 +37,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  */
 public class GellyLabelPropagation<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends LabelPropagation<G, V, E, LG, GC> {
 

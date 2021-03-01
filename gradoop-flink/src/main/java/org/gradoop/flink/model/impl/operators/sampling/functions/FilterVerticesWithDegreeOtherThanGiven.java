@@ -16,7 +16,9 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -35,8 +37,8 @@ import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
  */
 public class FilterVerticesWithDegreeOtherThanGiven<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 

@@ -15,7 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.statistics;
 
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
@@ -36,8 +38,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Aver
  */
 public class AverageClusteringCoefficient<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 

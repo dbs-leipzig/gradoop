@@ -42,9 +42,9 @@ public class EdgeToGellyEdgeWithNullValue<E extends Edge> implements EdgeToGelly
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(E epgmEdge) throws Exception {
-    reuseEdge.setSource(epgmEdge.getSourceId());
-    reuseEdge.setTarget(epgmEdge.getTargetId());
+  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(E edge) throws Exception {
+    reuseEdge.setSource(edge.getSourceId());
+    reuseEdge.setTarget(edge.getTargetId());
     return reuseEdge;
   }
 }

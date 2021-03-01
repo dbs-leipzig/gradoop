@@ -19,19 +19,20 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.library.clustering.directed.GlobalClusteringCoefficient;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Gradoop EPGM model wrapper for Flink Gellys implementation of the global clustering coefficient
  * algorithm for directed graphs
  * {@link org.apache.flink.graph.library.clustering.directed.GlobalClusteringCoefficient}.
- * Returns the initial {@link LogicalGraph} with global value written to the graph head.
+ * Returns the initial {@link BaseGraph} with global value written to the graph head.
  *
  * @param <G>  Gradoop graph head type.
  * @param <V>  Gradoop vertex type.
@@ -41,8 +42,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
  */
 public class GellyGlobalClusteringCoefficientDirected<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends ClusteringCoefficientBase<G, V, E, LG, GC> {
 

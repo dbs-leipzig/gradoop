@@ -43,8 +43,8 @@ public class GellyVertexValueToVertexPropertyJoin<V extends Vertex>
   }
 
   @Override
-  public V join(org.apache.flink.graph.Vertex<GradoopId, GradoopId> gellyVertex, V gradoopVertex) {
-    gradoopVertex.setProperty(propertyKey, gellyVertex.getValue());
-    return gradoopVertex;
+  public V join(org.apache.flink.graph.Vertex<GradoopId, GradoopId> gellyVertex, V vertex) {
+    vertex.setProperty(propertyKey, gellyVertex.getValue());
+    return vertex;
   }
 }

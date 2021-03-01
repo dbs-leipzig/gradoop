@@ -19,11 +19,11 @@ import org.apache.flink.api.common.aggregators.LongSumAggregator;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.pregel.VertexCentricConfiguration;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.EdgeWithGellyEdgeIdJoin;
@@ -74,8 +74,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class KRandomJumpGellyVCI<
   G extends GraphHead,
-  V extends org.gradoop.common.model.api.entities.Vertex,
-  E extends org.gradoop.common.model.api.entities.Edge,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends BaseGellyAlgorithm<G, V, E, LG, GC, Long, VCIVertexValue, Long, LG>
@@ -147,10 +147,10 @@ public class KRandomJumpGellyVCI<
     indexToVertexIdMap = DataSetUtils.zipWithIndex(graph.getVertices().map(new Id<>()));
     indexToEdgeIdMap = DataSetUtils.zipWithIndex(graph.getEdges().map(new Id<>()));
 
-    DataSet<Vertex<Long, VCIVertexValue>> vertices = indexToVertexIdMap
+    DataSet<org.apache.flink.graph.Vertex<Long, VCIVertexValue>> vertices = indexToVertexIdMap
       .map(new LongIdToGellyVertexWithVCIValueMap());
 
-    DataSet<Edge<Long, Long>> edges = graph.getEdges()
+    DataSet<org.apache.flink.graph.Edge<Long, Long>> edges = graph.getEdges()
       .join(indexToVertexIdMap)
       .where(new SourceId<>()).equalTo(1)
       .with(new LongIdWithEdgeToTupleJoin<>())

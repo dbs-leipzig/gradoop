@@ -50,10 +50,10 @@ public class EdgeToGellyEdgeWithPropertyValue<E extends Edge> implements EdgeToG
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, PropertyValue> map(E epgmEdge) {
-    reuseEdge.setSource(epgmEdge.getSourceId());
-    reuseEdge.setTarget(epgmEdge.getTargetId());
-    reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey));
+  public org.apache.flink.graph.Edge<GradoopId, PropertyValue> map(E edge) {
+    reuseEdge.setSource(edge.getSourceId());
+    reuseEdge.setTarget(edge.getTargetId());
+    reuseEdge.setValue(edge.getPropertyValue(propertyKey));
     return reuseEdge;
   }
 }
