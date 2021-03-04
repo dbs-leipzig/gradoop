@@ -16,7 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.keyedgrouping;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.DurationKeyFunction;
@@ -47,7 +46,7 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting the duration.
    * @see DurationKeyFunction
    */
-  public static <T extends TemporalElement> KeyFunction<T, Long> duration(
+  public static <T extends TemporalElement> KeyFunctionWithDefaultValue<T, Long> duration(
     TimeDimension interval, TemporalUnit timeUnit) {
     return new DurationKeyFunction<>(interval, timeUnit);
   }
@@ -60,7 +59,7 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting a time interval.
    * @see TimeIntervalKeyFunction
    */
-  public static <T extends TemporalElement> KeyFunction<T, Tuple2<Long, Long>> timeInterval(
+  public static <T extends TemporalElement> KeyFunctionWithDefaultValue<T, Tuple2<Long, Long>> timeInterval(
     TimeDimension interval) {
     return new TimeIntervalKeyFunction<>(interval);
   }
