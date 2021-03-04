@@ -19,7 +19,7 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -42,7 +42,7 @@ import static java.time.ZoneOffset.UTC;
  *
  * @param <T> The type of the temporal elements.
  */
-public class DurationKeyFunction<T extends TemporalElement> implements KeyFunction<T, Long> {
+public class DurationKeyFunction<T extends TemporalElement> implements KeyFunctionWithDefaultValue<T, Long> {
 
   /**
    * A key function used to extract the interval from the element.
@@ -89,6 +89,11 @@ public class DurationKeyFunction<T extends TemporalElement> implements KeyFuncti
   }
 
   @Override
+  public Long getDefaultKey() {
+    return -1L;
+  }
+
+  @Override
   public TypeInformation<Long> getType() {
     return BasicTypeInfo.LONG_TYPE_INFO;
   }
@@ -97,6 +102,9 @@ public class DurationKeyFunction<T extends TemporalElement> implements KeyFuncti
   public void addKeyToElement(T element, Object key) {
     if (!(key instanceof Long)) {
       throw new IllegalArgumentException("Invalid type for key: " + key.getClass().getSimpleName());
+    }
+    if (getDefaultKey().equals(key)) {
+      return;
     }
     element.setProperty("duration_" + intervalExtractor + "_" + timeUnit, PropertyValue.create(key));
   }
