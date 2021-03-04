@@ -54,11 +54,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
     List<EPGMVertex> dbDegreeVertices = Lists.newArrayList();
-    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
+    LogicalGraph inputWithDegrees = input.callForGraph(new DistinctVertexDegrees<>(
       VertexDegree.BOTH.getName(),
       VertexDegree.IN.getName(),
       VertexDegree.OUT.getName(),
-      true).execute(input);
+      true));
     inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbDegreeVertices));
 
     getExecutionEnvironment().execute();

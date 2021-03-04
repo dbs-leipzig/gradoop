@@ -41,7 +41,7 @@ public class WeaklyConnectedComponentsAsCollectionTest extends GradoopFlinkTestB
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     GraphCollection result = input
-      .callForCollection(new WeaklyConnectedComponentsAsCollection(propertyKey, 10));
+      .callForCollection(new WeaklyConnectedComponentsAsCollection<>(propertyKey, 10));
     GraphCollection components = input.splitBy("component");
 
     collectAndAssertTrue(result.equalsByGraphElementIds(components));

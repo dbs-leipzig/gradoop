@@ -15,7 +15,12 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
@@ -73,7 +78,13 @@ public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTes
    *
    * @return The clustering coefficient algorithm wrapper
    */
-  public abstract ClusteringCoefficientBase getCCAlgorithm();
+  public abstract <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  ClusteringCoefficientBase<G, V, E, LG, GC> getCCAlgorithm();
 
   /**
    * Checks if clustering coefficient properties are written

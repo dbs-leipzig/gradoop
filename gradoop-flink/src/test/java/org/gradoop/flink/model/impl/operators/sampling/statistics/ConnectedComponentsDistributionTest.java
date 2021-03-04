@@ -114,8 +114,8 @@ public class ConnectedComponentsDistributionTest extends GradoopFlinkTestBase {
       "]";
 
     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g");
-    DataSet<Tuple3<String, Long, Long>> componentDist = new ConnectedComponentsDistribution(
-      propertyKey, maxIterations, annotateEdges).execute(graph);
+    DataSet<Tuple3<String, Long, Long>> componentDist = graph.callForValue(
+      new ConnectedComponentsDistribution<>(propertyKey, maxIterations, annotateEdges));
 
     List<Tuple3<String, Long, Long>> componentDistList = Lists.newArrayList();
 

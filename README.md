@@ -124,7 +124,15 @@ In any case you also need Apache Flink (version 1.7.2):
     > cd gradoop
     
     > mvn clean install
-    
+
+* You might want to skip tests for faster builds. Also, some tests fail on Windows due to missing test dependencies
+
+    > mvn clean install -DskipTests
+
+### Windows
+
+* Some operators require the Hadoop winutils
+
 ## Gradoop modules
 
 ### gradoop-common

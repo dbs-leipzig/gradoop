@@ -90,7 +90,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     EPGMVertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
     GradoopId srcVertexIdDouble = srcVertexDouble.getId();
 
-    LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths(srcVertexIdDouble,
+    LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths<>(srcVertexIdDouble,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expectDouble = loaderDouble.getLogicalGraphByVariable("result");
 
@@ -102,7 +102,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     EPGMVertex srcVertex = loader.getVertexByVariable("v0");
     GradoopId srcVertexId = srcVertex.getId();
 
-    LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths(srcVertexId,
+    LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths<>(srcVertexId,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 

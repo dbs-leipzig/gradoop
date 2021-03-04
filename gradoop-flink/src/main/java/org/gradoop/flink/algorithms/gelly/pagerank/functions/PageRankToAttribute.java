@@ -18,15 +18,16 @@ package org.gradoop.flink.algorithms.gelly.pagerank.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.library.linkanalysis.PageRank;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Stores the page rank result from the left as a Property in in the right.
+ *
+ * @param <V> Gradoop vertex type.
  */
-public class PageRankToAttribute
-  implements JoinFunction<PageRank.Result<GradoopId>, EPGMVertex, EPGMVertex> {
+public class PageRankToAttribute<V extends Vertex> implements JoinFunction<PageRank.Result<GradoopId>, V, V> {
 
   /**
    * Property to store the page rank in.
@@ -43,7 +44,7 @@ public class PageRankToAttribute
   }
 
   @Override
-  public EPGMVertex join(PageRank.Result result, EPGMVertex vertex) {
+  public V join(PageRank.Result<GradoopId> result, V vertex) {
     vertex.setProperty(pageRankPropery, PropertyValue.create(result.getPageRankScore().getValue()));
     return vertex;
   }

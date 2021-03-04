@@ -17,14 +17,16 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Maps EPGM vertex to a Gelly vertex with the {@link GradoopId} as its id.
+ * Maps Gradoop Vertex to a Gelly vertex with the {@link GradoopId} as its id.
+ *
+ * @param <V> Gradoop Vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class VertexToGellyVertexWithNullValue implements VertexToGellyVertex<NullValue> {
+public class VertexToGellyVertexWithNullValue<V extends Vertex> implements VertexToGellyVertex<V, NullValue> {
   /**
    * Reduce object instantiations
    */
@@ -39,8 +41,8 @@ public class VertexToGellyVertexWithNullValue implements VertexToGellyVertex<Nul
   }
 
   @Override
-  public org.apache.flink.graph.Vertex<GradoopId, NullValue> map(EPGMVertex epgmVertex) {
-    reuseVertex.setId(epgmVertex.getId());
+  public org.apache.flink.graph.Vertex<GradoopId, NullValue> map(V vertex) {
+    reuseVertex.setId(vertex.getId());
     return reuseVertex;
   }
 }

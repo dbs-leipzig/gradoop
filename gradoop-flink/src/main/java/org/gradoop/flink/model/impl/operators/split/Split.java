@@ -19,16 +19,16 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
@@ -46,29 +46,40 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Splits a LogicalGraph into a GraphCollection based on user-defined property
- * values. The operator supports overlapping logical graphs, where a vertex
- * can be in more than one logical graph. Edges, where source and target vertex
- * have no graphs in common, are removed from the resulting collection.
+ * Splits a LogicalGraph into a GraphCollection based on user-defined property values. The operator supports
+ * overlapping logical graphs, where a vertex can be in more than one logical graph. Edges, where source and
+ * target vertex have no graphs in common, are removed from the resulting collection.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class Split implements UnaryGraphToCollectionOperator, Serializable {
+public class Split<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC>, Serializable {
 
   /**
    * User-defined function for value extraction
    */
-  private final Function<EPGMVertex, List<PropertyValue>> function;
+  private final Function<V, List<PropertyValue>> function;
 
   /**
    * Constructor
    *
    * @param function user-defined function
    */
-  public Split(Function<EPGMVertex, List<PropertyValue>> function) {
+  public Split(Function<V, List<PropertyValue>> function) {
     this.function = function;
   }
 
   @Override
-  public GraphCollection execute(LogicalGraph graph) {
+  public GC execute(LG graph) {
 
     //--------------------------------------------------------------------------
     // compute vertices
@@ -100,7 +111,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .reduceGroup(new MultipleGraphIdsGroupReducer());
 
     // add new graph ids to the initial vertex set
-    DataSet<EPGMVertex> vertices = graph.getVertices()
+    DataSet<V> vertices = graph.getVertices()
       .join(vertexIdWithGraphIds)
       .where(new Id<>()).equalTo(0)
       .with(new AddNewGraphsToVertex<>());
@@ -114,15 +125,15 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
       .map(new Project2To1<>());
 
     // add new graph id's to the initial graph set
-    DataSet<EPGMGraphHead> newGraphs = newGraphIds
-      .map(new InitGraphHead(graph.getFactory().getGraphHeadFactory()));
+    DataSet<G> newGraphs = newGraphIds
+      .map(new InitGraphHead<>(graph.getFactory().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
     // compute edges
     //--------------------------------------------------------------------------
 
     // replace source and target id by the graph list the corresponding vertex
-    DataSet<Tuple3<EPGMEdge, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
+    DataSet<Tuple3<E, GradoopIdSet, GradoopIdSet>> edgeGraphIdsGraphIds =
       graph.getEdges()
         .join(vertexIdWithGraphIds)
         .where(new SourceId<>()).equalTo(0)
@@ -131,9 +142,8 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .where("f0.targetId").equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<>());
 
-    // add new graph ids to the edges iff source and target are contained in the
-    // same graph
-    DataSet<EPGMEdge> edges = edgeGraphIdsGraphIds
+    // add new graph ids to the edges iff source and target are contained in the same graph
+    DataSet<E> edges = edgeGraphIdsGraphIds
       .flatMap(new AddNewGraphsToEdge<>());
 
     //--------------------------------------------------------------------------
