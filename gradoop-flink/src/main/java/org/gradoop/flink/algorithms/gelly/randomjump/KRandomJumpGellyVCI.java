@@ -19,16 +19,15 @@ import org.apache.flink.api.common.aggregators.LongSumAggregator;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.pregel.VertexCentricConfiguration;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
-import org.gradoop.flink.algorithms.gelly.randomjump.functions.EPGMEdgeWithGellyEdgeIdJoin;
-import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithEPGMVertexJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.EdgeWithGellyEdgeIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithVertexJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithLongIdToGradoopIdJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedGellyEdgeLongIdsFlatMap;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedSourceTargetIdsFlatMap;
@@ -40,7 +39,9 @@ import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIComputeFunctio
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIVertexValue;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VertexWithVisitedSourceTargetIdJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VisitedGellyEdgesWithLongIdToGradoopIdJoin;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
@@ -53,8 +54,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Performs the RandomJump using Gellys VertexCentricIteration (VCI).
- * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk for each
- * starting vertex on the graph, where once visited edges are not used again. For each walker,
+ * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk
+ * for each starting vertex on the graph, where once visited edges are not used again. For each walker,
  * with a given {@link #jumpProbability}, or if the walk ends in a sink, or if all outgoing edges
  * of the current vertex were visited, randomly jumps to any vertex in the graph and starts a new
  * RandomWalk from there.
@@ -64,13 +65,25 @@ import static com.google.common.base.Preconditions.checkArgument;
  * visit at least given in {@link #percentageToVisit}).
  * Returns the initial graph with vertices and edges annotated by a boolean property named
  * "sampled", which is set to {@code true} if visited, or {@code false} if not.
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class KRandomJumpGellyVCI
-  extends BaseGellyAlgorithm<Long, VCIVertexValue, Long, LogicalGraph> {
+public class KRandomJumpGellyVCI<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  extends BaseGellyAlgorithm<G, V, E, LG, GC, Long, VCIVertexValue, Long, LG>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
-   * The graph used in {@link KRandomJumpGellyVCI#execute(LogicalGraph)}.
+   * The graph used in {@link KRandomJumpGellyVCI#execute(LG)}.
    */
-  protected LogicalGraph currentGraph;
+  protected LG currentGraph;
 
   /**
    * Number of starting vertices.
@@ -128,19 +141,19 @@ public class KRandomJumpGellyVCI
   }
 
   @Override
-  public Graph<Long, VCIVertexValue, Long> transformToGelly(LogicalGraph graph) {
+  public Graph<Long, VCIVertexValue, Long> transformToGelly(LG graph) {
     this.currentGraph = graph;
 
     indexToVertexIdMap = DataSetUtils.zipWithIndex(graph.getVertices().map(new Id<>()));
     indexToEdgeIdMap = DataSetUtils.zipWithIndex(graph.getEdges().map(new Id<>()));
 
-    DataSet<Vertex<Long, VCIVertexValue>> vertices = indexToVertexIdMap
+    DataSet<org.apache.flink.graph.Vertex<Long, VCIVertexValue>> vertices = indexToVertexIdMap
       .map(new LongIdToGellyVertexWithVCIValueMap());
 
-    DataSet<Edge<Long, Long>> edges = graph.getEdges()
+    DataSet<org.apache.flink.graph.Edge<Long, Long>> edges = graph.getEdges()
       .join(indexToVertexIdMap)
       .where(new SourceId<>()).equalTo(1)
-      .with(new LongIdWithEdgeToTupleJoin())
+      .with(new LongIdWithEdgeToTupleJoin<>())
       .join(indexToVertexIdMap)
       .where(1).equalTo(1)
       .with(new ReplaceTargetWithLongIdJoin())
@@ -152,8 +165,7 @@ public class KRandomJumpGellyVCI
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph<Long, VCIVertexValue, Long> gellyGraph)
-    throws Exception {
+  public LG executeInGelly(Graph<Long, VCIVertexValue, Long> gellyGraph) throws Exception {
 
     long vertexCount = gellyGraph.numberOfVertices();
 
@@ -197,27 +209,27 @@ public class KRandomJumpGellyVCI
       .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());
 
     // compute new visited edges
-    DataSet<EPGMEdge> visitedEdges = currentGraph.getEdges()
+    DataSet<E> visitedEdges = currentGraph.getEdges()
       .leftOuterJoin(visitedGellyEdgeIds)
       .where(new Id<>()).equalTo("*")
-      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
+      .with(new EdgeWithGellyEdgeIdJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     DataSet<GradoopId> visitedSourceTargetIds = visitedEdges
-      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingConstants.PROPERTY_KEY_SAMPLED))
+      .flatMap(new GetVisitedSourceTargetIdsFlatMap<>(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .distinct();
 
     // compute new visited vertices
-    DataSet<EPGMVertex> visitedVertices = resultGraph.getVertices()
+    DataSet<V> visitedVertices = resultGraph.getVertices()
       .join(indexToVertexIdMap)
       .where(0).equalTo(0)
       .with(new GellyVertexWithLongIdToGradoopIdJoin())
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new GellyVertexWithEPGMVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
+      .with(new GellyVertexWithVertexJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)
       .where(new Id<>()).equalTo("*")
-      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
+      .with(new VertexWithVisitedSourceTargetIdJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     // return graph
     return currentGraph.getFactory().fromDataSets(

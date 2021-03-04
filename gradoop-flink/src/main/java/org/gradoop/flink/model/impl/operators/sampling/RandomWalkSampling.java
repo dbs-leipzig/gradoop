@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.randomjump.KRandomJumpGellyVCI;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
@@ -87,8 +87,8 @@ public class RandomWalkSampling extends SamplingAlgorithm {
   @Override
   protected LogicalGraph sample(LogicalGraph graph) {
 
-    LogicalGraph gellyResult = new KRandomJumpGellyVCI(numberOfStartVertices, maxIteration,
-      jumpProbability, sampleSize).execute(graph);
+    LogicalGraph gellyResult = graph.callForGraph(
+      new KRandomJumpGellyVCI<>(numberOfStartVertices, maxIteration, jumpProbability, sampleSize));
 
     DataSet<EPGMVertex> sampledVertices = gellyResult.getVertices()
       .filter(new ByProperty<>(SamplingConstants.PROPERTY_KEY_SAMPLED));

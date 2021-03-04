@@ -17,16 +17,18 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Joins an EPGM edge with a GradoopId of an visited edge from the VCI run. Assigns a boolean
- * property to the EPGM edge, determining if this edge was visited. The property is set to
- * {@code true} if the EPGM edge has a join partner, set to {@code false} otherwise.
+ * Joins an Gradoop edge with a GradoopId of an visited edge from the VCI run. Assigns a boolean
+ * property to the Gradoop edge, determining if this edge was visited. The property is set to
+ * {@code true} if the Gradoop edge has a join partner, set to {@code false} otherwise.
+ *
+ * @param <E> Gradoop Edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id;sourceId;targetId;label;graphIds")
-public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction<EPGMEdge, GradoopId, EPGMEdge> {
+public class EdgeWithGellyEdgeIdJoin<E extends Edge> implements JoinFunction<E, GradoopId, E> {
 
   /**
    * Key for the boolean property of the edge.
@@ -34,17 +36,16 @@ public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction<EPGMEdge, Grado
   private final String propertyKey;
 
   /**
-   * Creates an instance of EPGMEdgeWithGellyEdgeIdJoin with a given key for the boolean
-   * property value.
+   * Creates an instance of EdgeWithGellyEdgeIdJoin with a given key for the boolean property value.
    *
    * @param propertyKey propertyKey Key for the boolean property value.
    */
-  public EPGMEdgeWithGellyEdgeIdJoin(String propertyKey) {
+  public EdgeWithGellyEdgeIdJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public EPGMEdge join(EPGMEdge edge, GradoopId visitedEdgeId) throws Exception {
+  public E join(E edge, GradoopId visitedEdgeId) throws Exception {
     boolean visited = false;
     if (visitedEdgeId != null) {
       visited = true;

@@ -28,8 +28,7 @@ public class LPMessageFunction
   extends ScatterFunction<GradoopId, PropertyValue, PropertyValue, NullValue> {
 
   @Override
-  public void sendMessages(Vertex<GradoopId, PropertyValue> vertex) throws
-    Exception {
+  public void sendMessages(Vertex<GradoopId, PropertyValue> vertex) {
     sendMessageToAllNeighbors(vertex.getValue());
   }
 }

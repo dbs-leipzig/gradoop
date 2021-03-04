@@ -15,17 +15,32 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphCollectionOperator;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper
  * {@link AnnotateWeaklyConnectedComponents} of Flinks ConnectedComponents.
- * Splits the resulting {@link LogicalGraph} into a {@link GraphCollection} of its weakly connected
+ * Splits the resulting {@link BaseGraph} into a {@link BaseGraphCollection} of its weakly connected
  * components.
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollectionOperator {
+public class WeaklyConnectedComponentsAsCollection<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphCollectionOperator<LG, GC> {
 
   /**
    * Default property key to temporarily store the component id.
@@ -65,10 +80,10 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
   }
 
   @Override
-  public GraphCollection execute(LogicalGraph graph) {
+  public GC execute(LG graph) {
 
-    LogicalGraph graphWithWccIds = graph.callForGraph(
-      new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
+    LG graphWithWccIds = graph.callForGraph(
+      new AnnotateWeaklyConnectedComponents<>(propertyKey, maxIterations));
 
     return graphWithWccIds.splitBy(propertyKey);
   }

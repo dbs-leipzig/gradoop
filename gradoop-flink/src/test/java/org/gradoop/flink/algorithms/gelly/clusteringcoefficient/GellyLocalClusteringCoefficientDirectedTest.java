@@ -15,7 +15,12 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.List;
@@ -30,8 +35,14 @@ public class GellyLocalClusteringCoefficientDirectedTest
   extends GellyClusteringCoefficientTestBase {
 
   @Override
-  public ClusteringCoefficientBase getCCAlgorithm() {
-    return new GellyLocalClusteringCoefficientDirected();
+  public <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  ClusteringCoefficientBase<G, V, E, LG, GC> getCCAlgorithm() {
+    return new GellyLocalClusteringCoefficientDirected<>();
   }
 
   @Override

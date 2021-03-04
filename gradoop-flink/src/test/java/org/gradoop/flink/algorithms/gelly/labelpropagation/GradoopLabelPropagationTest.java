@@ -79,7 +79,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 
     LogicalGraph outputGraph = loader.getLogicalGraphByVariable("input")
-      .callForGraph(new GradoopLabelPropagation(10, "value"));
+      .callForGraph(new GradoopLabelPropagation<>(10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByData(
       loader.getLogicalGraphByVariable("result")));
@@ -141,7 +141,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 
     LogicalGraph outputGraph = loader.getLogicalGraphByVariable("input")
-      .callForGraph(new GradoopLabelPropagation(10, "value"));
+      .callForGraph(new GradoopLabelPropagation<>(10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementIds(
       loader.getLogicalGraphByVariable("result")));

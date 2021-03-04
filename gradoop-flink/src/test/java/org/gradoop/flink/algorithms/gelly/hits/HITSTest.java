@@ -36,7 +36,7 @@ public class HITSTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("input");
     LogicalGraph expectedResult = getLoaderFromString(expectedResultString)
       .getLogicalGraphByVariable("input");
-    LogicalGraph result = input.callForGraph(new HITS("aScore", "hScore", 1));
+    LogicalGraph result = input.callForGraph(new HITS<>("aScore", "hScore", 1));
 
     collectAndAssertTrue(result.equalsByData(expectedResult));
   }

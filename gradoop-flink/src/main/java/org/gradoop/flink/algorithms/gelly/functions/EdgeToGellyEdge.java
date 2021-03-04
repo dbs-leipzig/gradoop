@@ -15,13 +15,14 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Convert a Gradoop {@link EPGMEdge} to a Gelly EPGMEdge.
+ * Convert a Gradoop {@link Edge} to a Gelly Edge.
  *
+ * @param <E>  Gradoop edge type.
  * @param <EV> Value type of the output gelly edge.
  */
-public interface EdgeToGellyEdge<EV> extends ElementToGellyEdge<EPGMEdge, GradoopId, EV> {
+public interface EdgeToGellyEdge<E extends Edge, EV> extends ElementToGellyEdge<E, GradoopId, EV> {
 }
