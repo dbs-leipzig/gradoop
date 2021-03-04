@@ -18,16 +18,17 @@ package org.gradoop.flink.algorithms.gelly.vertexdegrees.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees;
 import org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees.Degrees;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Stores the in-degree, out-degree and the sum of both as a property in vertex
+ *
+ * @param <V> Gradoop Vertex type
  */
-public class DistinctVertexDegreesToAttribute
-  implements JoinFunction
-  <org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, EPGMVertex, EPGMVertex> {
+public class DistinctVertexDegreesToAttribute<V extends Vertex>
+  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, V, V> {
 
   /**
    * Property to store the sum of vertex degrees in.
@@ -57,14 +58,13 @@ public class DistinctVertexDegreesToAttribute
   }
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex<GradoopId, Degrees> degree, EPGMVertex vertex)
-    throws Exception {
+  public V join(org.apache.flink.graph.Vertex<GradoopId, Degrees> degree, V vertex) throws Exception {
     vertex.setProperty(vertexDegreesProperty,
-        PropertyValue.create(degree.getValue().getDegree().getValue()));
+      PropertyValue.create(degree.getValue().getDegree().getValue()));
     vertex.setProperty(vertexInDegreeProperty,
-        PropertyValue.create(degree.getValue().getInDegree().getValue()));
+      PropertyValue.create(degree.getValue().getInDegree().getValue()));
     vertex.setProperty(vertexOutDegreeProperty,
-        PropertyValue.create(degree.getValue().getOutDegree().getValue()));
+      PropertyValue.create(degree.getValue().getOutDegree().getValue()));
     return vertex;
   }
 }

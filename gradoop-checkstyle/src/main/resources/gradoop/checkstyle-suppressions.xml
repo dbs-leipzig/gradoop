@@ -10,10 +10,10 @@
              lines="0-9999"/>
   <suppress checks="IllegalCatch"
             files="BaseGellyAlgorithm.java"
-            lines="36-42"/>
+            lines="50-55"/>
   <suppress checks="IllegalCatch"
             files="GradoopGellyAlgorithm.java"
-            lines="70-77"/>
+            lines="80-85"/>
   <suppress checks="IllegalCatch"
             files="PrintTableSink"
             lines="90-100"/>

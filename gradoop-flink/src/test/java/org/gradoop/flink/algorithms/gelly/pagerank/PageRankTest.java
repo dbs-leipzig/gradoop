@@ -69,8 +69,8 @@ public class PageRankTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testPageRankWithoutZeroDegrees() throws Exception {
-    LogicalGraph resultGraph = new PageRank(propertyKey, 0.3, 20)
-      .execute(testGraph);
+    LogicalGraph resultGraph = testGraph
+      .callForGraph(new PageRank<>(propertyKey, 0.3, 20));
     checkPageRankProperty(resultGraph);
     assertEquals(resultGraph.getVertices().count(), 3L);
   }
@@ -82,8 +82,8 @@ public class PageRankTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testPageRankWithZeroDegrees() throws Exception {
-    LogicalGraph resultGraph = new PageRank(propertyKey, 0.3, 20, true)
-      .execute(testGraph);
+    LogicalGraph resultGraph = testGraph
+      .callForGraph(new PageRank<>(propertyKey, 0.3, 20, true));
     checkPageRankProperty(resultGraph);
     assertEquals(resultGraph.getVertices().count(), testGraph.getVertices().count());
   }

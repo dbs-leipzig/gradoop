@@ -18,13 +18,16 @@ package org.gradoop.flink.algorithms.gelly.vertexdegrees;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.functions.DistinctVertexDegreesToAttribute;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
@@ -33,8 +36,20 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * <p>
  * Note: This Gelly implementation count loops between edges like {@code (v1) -> (v2)},
  * {@code (v2) -> (v1)} as one.
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, NullValue> {
+public class DistinctVertexDegrees<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  extends GradoopGellyAlgorithm<G, V, E, LG, GC, NullValue, NullValue> {
 
   /**
    * Property key to store the sum vertex degree in.
@@ -76,7 +91,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
    */
   public DistinctVertexDegrees(String propertyKey, String propertyKeyIn, String propertyKeyOut,
     boolean includeZeroDegreeVertices) {
-    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
+    super(new VertexToGellyVertexWithNullValue<>(), new EdgeToGellyEdgeWithNullValue<>());
     this.propertyKey = propertyKey;
     this.propertyKeyIn = propertyKeyIn;
     this.propertyKeyOut = propertyKeyOut;
@@ -84,14 +99,14 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph) throws Exception {
-    DataSet<EPGMVertex> newVertices =
+  public LG executeInGelly(Graph<GradoopId, NullValue, NullValue> gellyGraph) throws Exception {
+    DataSet<V> newVertices =
       new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue, NullValue>()
       .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)
-      .run(graph)
+      .run(gellyGraph)
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
+      .with(new DistinctVertexDegreesToAttribute<>(propertyKey, propertyKeyIn, propertyKeyOut));
 
     return currentGraph.getFactory()
       .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
