@@ -59,6 +59,11 @@ public class CanonicalAdjacencyMatrixBuilder<
   implements UnaryBaseGraphCollectionToValueOperator<GC, DataSet<String>> {
 
   /**
+   * Character used to separate lines. Should be the same regardless of OS.
+   */
+  public static final Character LINE_SEPARATOR = '\n';
+
+  /**
    * function describing string representation of graph heads
    */
   private final GraphHeadToString<G> graphHeadToString;
