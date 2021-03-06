@@ -18,32 +18,30 @@ package org.gradoop.flink.model.impl.operators.split.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Join edge tuples with the graph sets of their sources
+ * Join edge tuples with the graph sets of their sources.
  *
- * @param &lt;E&gt; EPGM edge type
+ * @param &lt;E&gt; Edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;*-&gt;f0&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f1-&gt;f1&quot;)
-<span class="fc" id="L32">public class JoinEdgeTupleWithSourceGraphs&lt;E extends EPGMEdge&gt;</span>
-  implements JoinFunction&lt;E, Tuple2&lt;GradoopId, GradoopIdSet&gt;,
-  Tuple2&lt;E, GradoopIdSet&gt;&gt; {
+<span class="fc" id="L32">public class JoinEdgeTupleWithSourceGraphs&lt;E extends Edge&gt;</span>
+  implements JoinFunction&lt;E, Tuple2&lt;GradoopId, GradoopIdSet&gt;, Tuple2&lt;E, GradoopIdSet&gt;&gt; {
 
   /**
    * Reduce object instantiation.
    */
-<span class="fc" id="L39">  private final Tuple2&lt;E, GradoopIdSet&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L38">  private final Tuple2&lt;E, GradoopIdSet&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
 
   @Override
-  public Tuple2&lt;E, GradoopIdSet&gt; join(
-    E left, Tuple2&lt;GradoopId, GradoopIdSet&gt; right) {
-<span class="fc" id="L44">    reuseTuple.f0 = left;</span>
-<span class="fc" id="L45">    reuseTuple.f1 = right.f1;</span>
-<span class="fc" id="L46">    return reuseTuple;</span>
+  public Tuple2&lt;E, GradoopIdSet&gt; join(E left, Tuple2&lt;GradoopId, GradoopIdSet&gt; right) {
+<span class="fc" id="L42">    reuseTuple.f0 = left;</span>
+<span class="fc" id="L43">    reuseTuple.f1 = right.f1;</span>
+<span class="fc" id="L44">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

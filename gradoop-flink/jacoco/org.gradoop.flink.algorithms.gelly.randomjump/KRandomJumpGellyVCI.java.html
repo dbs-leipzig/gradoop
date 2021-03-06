@@ -19,16 +19,15 @@ import org.apache.flink.api.common.aggregators.LongSumAggregator;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Graph;
-import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.pregel.VertexCentricConfiguration;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
-import org.gradoop.flink.algorithms.gelly.randomjump.functions.EPGMEdgeWithGellyEdgeIdJoin;
-import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithEPGMVertexJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.EdgeWithGellyEdgeIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithVertexJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithLongIdToGradoopIdJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedGellyEdgeLongIdsFlatMap;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedSourceTargetIdsFlatMap;
@@ -40,7 +39,9 @@ import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIComputeFunctio
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIVertexValue;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VertexWithVisitedSourceTargetIdJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.VisitedGellyEdgesWithLongIdToGradoopIdJoin;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
@@ -53,8 +54,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Performs the RandomJump using Gellys VertexCentricIteration (VCI).
- * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk for each
- * starting vertex on the graph, where once visited edges are not used again. For each walker,
+ * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk
+ * for each starting vertex on the graph, where once visited edges are not used again. For each walker,
  * with a given {@link #jumpProbability}, or if the walk ends in a sink, or if all outgoing edges
  * of the current vertex were visited, randomly jumps to any vertex in the graph and starts a new
  * RandomWalk from there.
@@ -64,13 +65,25 @@ import static com.google.common.base.Preconditions.checkArgument;
  * visit at least given in {@link #percentageToVisit}).
  * Returns the initial graph with vertices and edges annotated by a boolean property named
  * &quot;sampled&quot;, which is set to {@code true} if visited, or {@code false} if not.
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public class KRandomJumpGellyVCI
-  extends BaseGellyAlgorithm&lt;Long, VCIVertexValue, Long, LogicalGraph&gt; {
+public class KRandomJumpGellyVCI&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  extends BaseGellyAlgorithm&lt;G, V, E, LG, GC, Long, VCIVertexValue, Long, LG&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
   /**
-   * The graph used in {@link KRandomJumpGellyVCI#execute(LogicalGraph)}.
+   * The graph used in {@link KRandomJumpGellyVCI#execute(LG)}.
    */
-  protected LogicalGraph currentGraph;
+  protected LG currentGraph;
 
   /**
    * Number of starting vertices.
@@ -112,77 +125,76 @@ public class KRandomJumpGellyVCI
    * @param percentageToVisit Relative amount of vertices to visit at least.
    */
   public KRandomJumpGellyVCI(int numberOfStartVertices, int maxIterations, double jumpProbability,
-<span class="fc" id="L115">    double percentageToVisit) {</span>
-<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    checkArgument(numberOfStartVertices &gt;= 1,</span>
+<span class="fc" id="L128">    double percentageToVisit) {</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    checkArgument(numberOfStartVertices &gt;= 1,</span>
       &quot;at least 1 starting vertex is needed, numberOfStartVertices must be equal or greater 1&quot;);
-<span class="pc bpc" id="L118" title="1 of 2 branches missed.">    checkArgument(maxIterations &gt; 0,</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    checkArgument(maxIterations &gt; 0,</span>
       &quot;maxIterations must be greater than 0&quot;);
-<span class="pc bpc" id="L120" title="2 of 4 branches missed.">    checkArgument(jumpProbability &gt;= 0d &amp;&amp; jumpProbability &lt;= 1d,</span>
+<span class="pc bpc" id="L133" title="2 of 4 branches missed.">    checkArgument(jumpProbability &gt;= 0d &amp;&amp; jumpProbability &lt;= 1d,</span>
       &quot;jumpProbability must be equal/greater than 0.0 and smaller/equal 1.0&quot;);
-<span class="pc bpc" id="L122" title="2 of 4 branches missed.">    checkArgument(percentageToVisit &gt; 0d &amp;&amp; percentageToVisit &lt;= 1d,</span>
+<span class="pc bpc" id="L135" title="2 of 4 branches missed.">    checkArgument(percentageToVisit &gt; 0d &amp;&amp; percentageToVisit &lt;= 1d,</span>
       &quot;percentageToVisit must be greater than 0.0 and smaller/equal 1.0&quot;);
-<span class="fc" id="L124">    this.numberOfStartVertices = numberOfStartVertices;</span>
-<span class="fc" id="L125">    this.maxIterations = maxIterations;</span>
-<span class="fc" id="L126">    this.jumpProbability = jumpProbability;</span>
-<span class="fc" id="L127">    this.percentageToVisit = percentageToVisit;</span>
-<span class="fc" id="L128">  }</span>
+<span class="fc" id="L137">    this.numberOfStartVertices = numberOfStartVertices;</span>
+<span class="fc" id="L138">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L139">    this.jumpProbability = jumpProbability;</span>
+<span class="fc" id="L140">    this.percentageToVisit = percentageToVisit;</span>
+<span class="fc" id="L141">  }</span>
 
   @Override
-  public Graph&lt;Long, VCIVertexValue, Long&gt; transformToGelly(LogicalGraph graph) {
-<span class="fc" id="L132">    this.currentGraph = graph;</span>
+  public Graph&lt;Long, VCIVertexValue, Long&gt; transformToGelly(LG graph) {
+<span class="fc" id="L145">    this.currentGraph = graph;</span>
 
-<span class="fc" id="L134">    indexToVertexIdMap = DataSetUtils.zipWithIndex(graph.getVertices().map(new Id&lt;&gt;()));</span>
-<span class="fc" id="L135">    indexToEdgeIdMap = DataSetUtils.zipWithIndex(graph.getEdges().map(new Id&lt;&gt;()));</span>
+<span class="fc" id="L147">    indexToVertexIdMap = DataSetUtils.zipWithIndex(graph.getVertices().map(new Id&lt;&gt;()));</span>
+<span class="fc" id="L148">    indexToEdgeIdMap = DataSetUtils.zipWithIndex(graph.getEdges().map(new Id&lt;&gt;()));</span>
 
-<span class="fc" id="L137">    DataSet&lt;Vertex&lt;Long, VCIVertexValue&gt;&gt; vertices = indexToVertexIdMap</span>
-<span class="fc" id="L138">      .map(new LongIdToGellyVertexWithVCIValueMap());</span>
+<span class="fc" id="L150">    DataSet&lt;org.apache.flink.graph.Vertex&lt;Long, VCIVertexValue&gt;&gt; vertices = indexToVertexIdMap</span>
+<span class="fc" id="L151">      .map(new LongIdToGellyVertexWithVCIValueMap());</span>
 
-<span class="fc" id="L140">    DataSet&lt;Edge&lt;Long, Long&gt;&gt; edges = graph.getEdges()</span>
-<span class="fc" id="L141">      .join(indexToVertexIdMap)</span>
-<span class="fc" id="L142">      .where(new SourceId&lt;&gt;()).equalTo(1)</span>
-<span class="fc" id="L143">      .with(new LongIdWithEdgeToTupleJoin())</span>
-<span class="fc" id="L144">      .join(indexToVertexIdMap)</span>
-<span class="fc" id="L145">      .where(1).equalTo(1)</span>
-<span class="fc" id="L146">      .with(new ReplaceTargetWithLongIdJoin())</span>
-<span class="fc" id="L147">      .join(indexToEdgeIdMap)</span>
-<span class="fc" id="L148">      .where(2).equalTo(1)</span>
-<span class="fc" id="L149">      .with(new LongIdTupleToGellyEdgeWithLongValueJoin());</span>
+<span class="fc" id="L153">    DataSet&lt;org.apache.flink.graph.Edge&lt;Long, Long&gt;&gt; edges = graph.getEdges()</span>
+<span class="fc" id="L154">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L155">      .where(new SourceId&lt;&gt;()).equalTo(1)</span>
+<span class="fc" id="L156">      .with(new LongIdWithEdgeToTupleJoin&lt;&gt;())</span>
+<span class="fc" id="L157">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L158">      .where(1).equalTo(1)</span>
+<span class="fc" id="L159">      .with(new ReplaceTargetWithLongIdJoin())</span>
+<span class="fc" id="L160">      .join(indexToEdgeIdMap)</span>
+<span class="fc" id="L161">      .where(2).equalTo(1)</span>
+<span class="fc" id="L162">      .with(new LongIdTupleToGellyEdgeWithLongValueJoin());</span>
 
-<span class="fc" id="L151">    return Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());</span>
+<span class="fc" id="L164">    return Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());</span>
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph&lt;Long, VCIVertexValue, Long&gt; gellyGraph)
-    throws Exception {
+  public LG executeInGelly(Graph&lt;Long, VCIVertexValue, Long&gt; gellyGraph) throws Exception {
 
-<span class="fc" id="L158">    long vertexCount = gellyGraph.numberOfVertices();</span>
+<span class="fc" id="L170">    long vertexCount = gellyGraph.numberOfVertices();</span>
 
     //--------------------------------------------------------------------------
     // pre compute
     //--------------------------------------------------------------------------
 
     // define start vertices
-<span class="fc" id="L165">    Set&lt;Long&gt; randomStartIndices = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L166" title="All 2 branches covered.">    while (randomStartIndices.size() &lt; numberOfStartVertices) {</span>
-<span class="fc" id="L167">      long randomLongInBounds = (long) (Math.random() * (vertexCount - 1L));</span>
-<span class="fc" id="L168">      randomStartIndices.add(randomLongInBounds);</span>
-<span class="fc" id="L169">    }</span>
-<span class="fc" id="L170">    DataSet&lt;Long&gt; startIndices = currentGraph.getConfig().getExecutionEnvironment()</span>
-<span class="fc" id="L171">      .fromCollection(randomStartIndices);</span>
+<span class="fc" id="L177">    Set&lt;Long&gt; randomStartIndices = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    while (randomStartIndices.size() &lt; numberOfStartVertices) {</span>
+<span class="fc" id="L179">      long randomLongInBounds = (long) (Math.random() * (vertexCount - 1L));</span>
+<span class="fc" id="L180">      randomStartIndices.add(randomLongInBounds);</span>
+<span class="fc" id="L181">    }</span>
+<span class="fc" id="L182">    DataSet&lt;Long&gt; startIndices = currentGraph.getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L183">      .fromCollection(randomStartIndices);</span>
 
     // define how many vertices to visit
-<span class="fc" id="L174">    long verticesToVisit = (long) Math.ceil((double) vertexCount * percentageToVisit);</span>
+<span class="fc" id="L186">    long verticesToVisit = (long) Math.ceil((double) vertexCount * percentageToVisit);</span>
 
     // set compute parameters
-<span class="fc" id="L177">    VertexCentricConfiguration parameters = new VertexCentricConfiguration();</span>
-<span class="fc" id="L178">    parameters.addBroadcastSet(VCIComputeFunction.START_INDICES_BROADCAST_SET, startIndices);</span>
-<span class="fc" id="L179">    parameters.addBroadcastSet(VCIComputeFunction.VERTEX_INDICES_BROADCAST_SET,</span>
-<span class="fc" id="L180">      indexToVertexIdMap.map(new Value0Of2&lt;&gt;()));</span>
-<span class="fc" id="L181">    parameters.registerAggregator(VCIComputeFunction.VISITED_VERTICES_AGGREGATOR_NAME,</span>
+<span class="fc" id="L189">    VertexCentricConfiguration parameters = new VertexCentricConfiguration();</span>
+<span class="fc" id="L190">    parameters.addBroadcastSet(VCIComputeFunction.START_INDICES_BROADCAST_SET, startIndices);</span>
+<span class="fc" id="L191">    parameters.addBroadcastSet(VCIComputeFunction.VERTEX_INDICES_BROADCAST_SET,</span>
+<span class="fc" id="L192">      indexToVertexIdMap.map(new Value0Of2&lt;&gt;()));</span>
+<span class="fc" id="L193">    parameters.registerAggregator(VCIComputeFunction.VISITED_VERTICES_AGGREGATOR_NAME,</span>
       new LongSumAggregator());
 
     // run gelly
-<span class="fc" id="L185">    Graph&lt;Long, VCIVertexValue, Long&gt; resultGraph = gellyGraph.runVertexCentricIteration(</span>
+<span class="fc" id="L197">    Graph&lt;Long, VCIVertexValue, Long&gt; resultGraph = gellyGraph.runVertexCentricIteration(</span>
       new VCIComputeFunction(jumpProbability, verticesToVisit),
         null, maxIterations, parameters);
 
@@ -190,38 +202,38 @@ public class KRandomJumpGellyVCI
     // post compute
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L193">    DataSet&lt;GradoopId&gt; visitedGellyEdgeIds = resultGraph.getVertices()</span>
-<span class="fc" id="L194">      .flatMap(new GetVisitedGellyEdgeLongIdsFlatMap())</span>
-<span class="fc" id="L195">      .join(indexToEdgeIdMap)</span>
-<span class="fc" id="L196">      .where(&quot;*&quot;).equalTo(0)</span>
-<span class="fc" id="L197">      .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());</span>
+<span class="fc" id="L205">    DataSet&lt;GradoopId&gt; visitedGellyEdgeIds = resultGraph.getVertices()</span>
+<span class="fc" id="L206">      .flatMap(new GetVisitedGellyEdgeLongIdsFlatMap())</span>
+<span class="fc" id="L207">      .join(indexToEdgeIdMap)</span>
+<span class="fc" id="L208">      .where(&quot;*&quot;).equalTo(0)</span>
+<span class="fc" id="L209">      .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());</span>
 
     // compute new visited edges
-<span class="fc" id="L200">    DataSet&lt;EPGMEdge&gt; visitedEdges = currentGraph.getEdges()</span>
-<span class="fc" id="L201">      .leftOuterJoin(visitedGellyEdgeIds)</span>
-<span class="fc" id="L202">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
-<span class="fc" id="L203">      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+<span class="fc" id="L212">    DataSet&lt;E&gt; visitedEdges = currentGraph.getEdges()</span>
+<span class="fc" id="L213">      .leftOuterJoin(visitedGellyEdgeIds)</span>
+<span class="fc" id="L214">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L215">      .with(new EdgeWithGellyEdgeIdJoin&lt;&gt;(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
 
-<span class="fc" id="L205">    DataSet&lt;GradoopId&gt; visitedSourceTargetIds = visitedEdges</span>
-<span class="fc" id="L206">      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingConstants.PROPERTY_KEY_SAMPLED))</span>
-<span class="fc" id="L207">      .distinct();</span>
+<span class="fc" id="L217">    DataSet&lt;GradoopId&gt; visitedSourceTargetIds = visitedEdges</span>
+<span class="fc" id="L218">      .flatMap(new GetVisitedSourceTargetIdsFlatMap&lt;&gt;(SamplingConstants.PROPERTY_KEY_SAMPLED))</span>
+<span class="fc" id="L219">      .distinct();</span>
 
     // compute new visited vertices
-<span class="fc" id="L210">    DataSet&lt;EPGMVertex&gt; visitedVertices = resultGraph.getVertices()</span>
-<span class="fc" id="L211">      .join(indexToVertexIdMap)</span>
-<span class="fc" id="L212">      .where(0).equalTo(0)</span>
-<span class="fc" id="L213">      .with(new GellyVertexWithLongIdToGradoopIdJoin())</span>
-<span class="fc" id="L214">      .join(currentGraph.getVertices())</span>
-<span class="fc" id="L215">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L216">      .with(new GellyVertexWithEPGMVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+<span class="fc" id="L222">    DataSet&lt;V&gt; visitedVertices = resultGraph.getVertices()</span>
+<span class="fc" id="L223">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L224">      .where(0).equalTo(0)</span>
+<span class="fc" id="L225">      .with(new GellyVertexWithLongIdToGradoopIdJoin())</span>
+<span class="fc" id="L226">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L227">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L228">      .with(new GellyVertexWithVertexJoin&lt;&gt;(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
 
-<span class="fc" id="L218">    visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)</span>
-<span class="fc" id="L219">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
-<span class="fc" id="L220">      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+<span class="fc" id="L230">    visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)</span>
+<span class="fc" id="L231">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L232">      .with(new VertexWithVisitedSourceTargetIdJoin&lt;&gt;(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
 
     // return graph
-<span class="fc" id="L223">    return currentGraph.getFactory().fromDataSets(</span>
-<span class="fc" id="L224">      currentGraph.getGraphHead(), visitedVertices, visitedEdges);</span>
+<span class="fc" id="L235">    return currentGraph.getFactory().fromDataSets(</span>
+<span class="fc" id="L236">      currentGraph.getGraphHead(), visitedVertices, visitedEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

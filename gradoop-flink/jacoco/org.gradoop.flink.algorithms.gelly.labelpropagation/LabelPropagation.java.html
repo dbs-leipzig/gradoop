@@ -18,14 +18,17 @@ package org.gradoop.flink.algorithms.gelly.labelpropagation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithPropertyValue;
 import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.LPVertexJoin;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,15 +38,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * During vertex centric iteration (Label Propagation Algorithm):
  *
- * In each super step each vertex will adopt the value sent by the majority of
- * their neighbors or the smallest one if there is just one neighbor. If
- * multiple labels occur with the same frequency, the minimum of them will be
- * selected as new label. If a vertex changes its value in a super step, the new
- * value will be propagated to the neighbours.
+ * In each super step each vertex will adopt the value sent by the majority of their neighbors or the smallest
+ * one if there is just one neighbor. If multiple labels occur with the same frequency, the minimum of them
+ * will be selected as new label. If a vertex changes its value in a super step, the new value will be
+ * propagated to the neighbours.
  *
  * The computation will terminate if no new values are assigned.
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public abstract class LabelPropagation extends GradoopGellyAlgorithm&lt;PropertyValue, NullValue&gt; {
+public abstract class LabelPropagation&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  extends GradoopGellyAlgorithm&lt;G, V, E, LG, GC, PropertyValue, NullValue&gt; {
 
   /**
    * Counter to define maximum number of iterations for the algorithm
@@ -62,22 +76,22 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm&lt;Property
    * @param propertyKey   Property key to access the label value
    */
   protected LabelPropagation(int maxIterations, String propertyKey) {
-<span class="fc" id="L65">    super(new VertexToGellyVertexWithPropertyValue(propertyKey),</span>
-            new EdgeToGellyEdgeWithNullValue());
-<span class="fc" id="L67">    this.maxIterations = maxIterations;</span>
-<span class="fc" id="L68">    this.propertyKey = checkNotNull(propertyKey);</span>
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L79">    super(new VertexToGellyVertexWithPropertyValue&lt;&gt;(propertyKey),</span>
+            new EdgeToGellyEdgeWithNullValue&lt;&gt;());
+<span class="fc" id="L81">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L82">    this.propertyKey = checkNotNull(propertyKey);</span>
+<span class="fc" id="L83">  }</span>
 
   @Override
-  public LogicalGraph executeInGelly(Graph&lt;GradoopId, PropertyValue, NullValue&gt; graph) {
-<span class="fc" id="L73">    DataSet&lt;EPGMVertex&gt; labeledVertices = executeInternal(graph)</span>
-<span class="fc" id="L74">      .join(currentGraph.getVertices())</span>
-<span class="fc" id="L75">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L76">      .with(new LPVertexJoin(propertyKey));</span>
+  public LG executeInGelly(Graph&lt;GradoopId, PropertyValue, NullValue&gt; gellyGraph) {
+<span class="fc" id="L87">    DataSet&lt;V&gt; labeledVertices = executeInternal(gellyGraph)</span>
+<span class="fc" id="L88">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L89">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L90">      .with(new LPVertexJoin&lt;&gt;(propertyKey));</span>
 
     // return labeled graph
-<span class="fc" id="L79">    return currentGraph.getFactory()</span>
-<span class="fc" id="L80">      .fromDataSets(currentGraph.getGraphHead(), labeledVertices, currentGraph.getEdges());</span>
+<span class="fc" id="L93">    return currentGraph.getFactory()</span>
+<span class="fc" id="L94">      .fromDataSets(currentGraph.getGraphHead(), labeledVertices, currentGraph.getEdges());</span>
   }
 
   /**
@@ -95,7 +109,7 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm&lt;Property
    * @return maximum number of iterations
    */
   protected int getMaxIterations() {
-<span class="fc" id="L98">    return maxIterations;</span>
+<span class="fc" id="L112">    return maxIterations;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

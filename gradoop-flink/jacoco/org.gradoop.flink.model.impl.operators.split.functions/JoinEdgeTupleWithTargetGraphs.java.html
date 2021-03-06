@@ -19,36 +19,34 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Join edge tuples with the graph sets of their targets
+ * Join edge tuples with the graph sets of their targets.
  *
- * @param &lt;E&gt; EPGM edge type
+ * @param &lt;E&gt; Edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;f0;f1&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f1-&gt;f2&quot;)
-<span class="fc" id="L33">public class JoinEdgeTupleWithTargetGraphs&lt;E extends EPGMEdge&gt;</span>
-  implements JoinFunction
-  &lt;Tuple2&lt;E, GradoopIdSet&gt;, Tuple2&lt;GradoopId, GradoopIdSet&gt;,
-    Tuple3&lt;E, GradoopIdSet, GradoopIdSet&gt;&gt; {
+<span class="fc" id="L33">public class JoinEdgeTupleWithTargetGraphs&lt;E extends Edge&gt;</span>
+  implements JoinFunction&lt;Tuple2&lt;E, GradoopIdSet&gt;, Tuple2&lt;GradoopId, GradoopIdSet&gt;,
+  Tuple3&lt;E, GradoopIdSet, GradoopIdSet&gt;&gt; {
 
   /**
    * Reduce object instantiation.
    */
-<span class="fc" id="L41">  private final Tuple3&lt;E, GradoopIdSet, GradoopIdSet&gt; reuseTuple =</span>
-    new Tuple3&lt;&gt;();
+<span class="fc" id="L40">  private final Tuple3&lt;E, GradoopIdSet, GradoopIdSet&gt; reuseTuple = new Tuple3&lt;&gt;();</span>
 
   @Override
   public Tuple3&lt;E, GradoopIdSet, GradoopIdSet&gt; join(
     Tuple2&lt;E, GradoopIdSet&gt; left,
     Tuple2&lt;GradoopId, GradoopIdSet&gt; right) throws Exception {
-<span class="fc" id="L48">    reuseTuple.f0 = left.f0;</span>
-<span class="fc" id="L49">    reuseTuple.f1 = left.f1;</span>
-<span class="fc" id="L50">    reuseTuple.f2 = right.f1;</span>
-<span class="fc" id="L51">    return reuseTuple;</span>
+<span class="fc" id="L46">    reuseTuple.f0 = left.f0;</span>
+<span class="fc" id="L47">    reuseTuple.f1 = left.f1;</span>
+<span class="fc" id="L48">    reuseTuple.f2 = right.f1;</span>
+<span class="fc" id="L49">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

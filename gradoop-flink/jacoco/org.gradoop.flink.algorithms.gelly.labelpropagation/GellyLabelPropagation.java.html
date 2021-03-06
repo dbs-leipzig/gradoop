@@ -18,13 +18,29 @@ package org.gradoop.flink.algorithms.gelly.labelpropagation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
  * Executes the label propagation integrated in Flink Gelly.
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public class GellyLabelPropagation extends LabelPropagation {
+public class GellyLabelPropagation&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends LabelPropagation&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Constructor
@@ -33,15 +49,15 @@ public class GellyLabelPropagation extends LabelPropagation {
    * @param propertyKey   Property key to access the label value
    */
   public GellyLabelPropagation(int maxIterations, String propertyKey) {
-<span class="nc" id="L36">    super(maxIterations, propertyKey);</span>
-<span class="nc" id="L37">  }</span>
+<span class="nc" id="L52">    super(maxIterations, propertyKey);</span>
+<span class="nc" id="L53">  }</span>
 
   @Override
   protected DataSet&lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;&gt;
   executeInternal(
     Graph&lt;GradoopId, PropertyValue, NullValue&gt; gellyGraph) {
-<span class="nc" id="L43">    return new org.apache.flink.graph.library.LabelPropagation</span>
-<span class="nc" id="L44">      &lt;GradoopId, PropertyValue, NullValue&gt;(getMaxIterations()).run(gellyGraph);</span>
+<span class="nc" id="L59">    return new org.apache.flink.graph.library.LabelPropagation</span>
+<span class="nc" id="L60">      &lt;GradoopId, PropertyValue, NullValue&gt;(getMaxIterations()).run(gellyGraph);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

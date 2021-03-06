@@ -17,21 +17,23 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 
 /**
  * Writes the local clustering coefficient from {@code Tuple2&lt;GradoopId, Double&gt;} to the
- * corresponding epgm vertex as property.
+ * corresponding Gradoop vertex as property.
+ *
+ * @param &lt;V&gt; Gradoop vertex type.
  */
-<span class="fc" id="L28">public class LocalCCResultTupleToVertexJoin implements</span>
-  JoinFunction&lt;Tuple2&lt;GradoopId, Double&gt;, EPGMVertex, EPGMVertex&gt; {
+<span class="fc" id="L30">public class LocalCCResultTupleToVertexJoin&lt;V extends Vertex&gt;</span>
+  implements JoinFunction&lt;Tuple2&lt;GradoopId, Double&gt;, V, V&gt; {
 
   @Override
-  public EPGMVertex join(Tuple2&lt;GradoopId, Double&gt; resultTuple, EPGMVertex vertex) throws Exception {
-<span class="fc" id="L33">    vertex.setProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL, resultTuple.f1);</span>
-<span class="fc" id="L34">    return vertex;</span>
+  public V join(Tuple2&lt;GradoopId, Double&gt; resultTuple, V vertex) throws Exception {
+<span class="fc" id="L35">    vertex.setProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL, resultTuple.f1);</span>
+<span class="fc" id="L36">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

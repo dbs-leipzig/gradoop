@@ -16,14 +16,16 @@
 package org.gradoop.flink.algorithms.gelly.shortestpaths.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Stores the minimum distance as a property in vertex.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
-public class SingleSourceShortestPathsAttribute
-  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, Double&gt;, EPGMVertex, EPGMVertex&gt; {
+public class SingleSourceShortestPathsAttribute&lt;V extends Vertex&gt;
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, Double&gt;, V, V&gt; {
 
   /**
    * Property to store the minimum distance in.
@@ -35,15 +37,14 @@ public class SingleSourceShortestPathsAttribute
    *
    * @param shortestPathProperty property key to store shortest path in
    */
-<span class="fc" id="L38">  public SingleSourceShortestPathsAttribute(String shortestPathProperty) {</span>
-<span class="fc" id="L39">    this.shortestPathProperty = shortestPathProperty;</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L40">  public SingleSourceShortestPathsAttribute(String shortestPathProperty) {</span>
+<span class="fc" id="L41">    this.shortestPathProperty = shortestPathProperty;</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex&lt;GradoopId, Double&gt; gellyVertex,
-    EPGMVertex gradoopVertex) {
-<span class="fc" id="L45">    gradoopVertex.setProperty(shortestPathProperty, gellyVertex.getValue());</span>
-<span class="fc" id="L46">    return gradoopVertex;</span>
+  public V join(org.apache.flink.graph.Vertex&lt;GradoopId, Double&gt; gellyVertex, V vertex) {
+<span class="fc" id="L46">    vertex.setProperty(shortestPathProperty, gellyVertex.getValue());</span>
+<span class="fc" id="L47">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -95,11 +95,11 @@ public class PageRankSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-<span class="fc" id="L98">    LogicalGraph pageRankGraph = new PageRank(</span>
+<span class="fc" id="L98">    LogicalGraph pageRankGraph = graph.callForGraph(new PageRank&lt;&gt;(</span>
       SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
       dampeningFactor,
       maxIteration,
-<span class="fc" id="L102">      true).execute(graph);</span>
+      true));
 
 <span class="fc" id="L104">    graph = graph.getFactory().fromDataSets(</span>
 <span class="fc" id="L105">      graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());</span>

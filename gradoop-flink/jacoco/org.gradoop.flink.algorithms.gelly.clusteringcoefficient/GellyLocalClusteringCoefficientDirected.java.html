@@ -18,47 +18,55 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalCCResultTupleToVertexJoin;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalDirectedCCResultToTupleMap;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering coefficient
  * algorithm for directed graphs
  * {@link org.apache.flink.graph.library.clustering.directed.LocalClusteringCoefficient}.
- * Returns the initial {@link LogicalGraph} with local values written to the vertices.
+ * Returns the initial {@link BaseGraph} with local values written to the vertices.
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public class GellyLocalClusteringCoefficientDirected extends ClusteringCoefficientBase {
+public class GellyLocalClusteringCoefficientDirected&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends ClusteringCoefficientBase&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Creates an instance of the GellyLocalClusteringCoefficientDirected wrapper class.
    * Calls constructor of super class {@link ClusteringCoefficientBase}.
    */
   public GellyLocalClusteringCoefficientDirected() {
-<span class="fc" id="L41">    super();</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L55">    super();</span>
+<span class="fc" id="L56">  }</span>
 
-  /**
-   * {@inheritDoc}
-   *
-   * Calls Flink Gelly algorithms to compute the local clustering coefficients for a directed graph.
-   */
   @Override
-  protected LogicalGraph executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
-    throws Exception {
+  protected LG executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph) throws Exception {
 
-<span class="fc" id="L53">    DataSet&lt;EPGMVertex&gt; resultVertices = new org.apache.flink.graph.library.clustering.directed</span>
-<span class="fc" id="L54">      .LocalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph)</span>
-<span class="fc" id="L55">      .map(new LocalDirectedCCResultToTupleMap())</span>
-<span class="fc" id="L56">      .join(currentGraph.getVertices())</span>
-<span class="fc" id="L57">      .where(0).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L58">      .with(new LocalCCResultTupleToVertexJoin());</span>
+<span class="fc" id="L61">    DataSet&lt;V&gt; resultVertices = new org.apache.flink.graph.library.clustering.directed</span>
+<span class="fc" id="L62">      .LocalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph)</span>
+<span class="fc" id="L63">      .map(new LocalDirectedCCResultToTupleMap())</span>
+<span class="fc" id="L64">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L65">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L66">      .with(new LocalCCResultTupleToVertexJoin&lt;&gt;());</span>
 
-<span class="fc" id="L60">    return currentGraph.getFactory().fromDataSets(</span>
-<span class="fc" id="L61">      currentGraph.getGraphHead(), resultVertices, currentGraph.getEdges());</span>
+<span class="fc" id="L68">    return currentGraph.getFactory().fromDataSets(</span>
+<span class="fc" id="L69">      currentGraph.getGraphHead(), resultVertices, currentGraph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

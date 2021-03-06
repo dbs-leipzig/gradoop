@@ -72,8 +72,8 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalGrap
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalEdgeToDataString,0,48,0,2,0,8,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring,TemporalVertexToDataString,0,44,0,2,0,7,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction.new Object() {...},4,33,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction,62,69,7,5,8,17,7,5,0,5
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,25,82,4,4,3,15,4,4,0,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction,70,69,7,5,9,17,8,5,1,5
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,DurationKeyFunction,26,90,5,5,4,17,5,5,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeIntervalKeyFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,65,132,5,24,6,30,5,16,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot,Snapshot,5,46,0,0,2,9,1,2,1,2

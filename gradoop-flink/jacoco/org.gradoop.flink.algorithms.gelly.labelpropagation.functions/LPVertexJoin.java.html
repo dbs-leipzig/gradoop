@@ -17,38 +17,39 @@ package org.gradoop.flink.algorithms.gelly.labelpropagation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Updates the vertex on the left side with the property value on the right side
+ * Updates the vertex on the left side with the property value on the right side.
+ *
+ * @param &lt;V&gt; Gradoop vertex type.
  */
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;id;label;graphIds&quot;)
 @FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
-public class LPVertexJoin implements JoinFunction
-  &lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;, EPGMVertex, EPGMVertex&gt; {
+public class LPVertexJoin&lt;V extends Vertex&gt;
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;, V, V&gt; {
 
   /**
-   * Property key to access the value which will be propagated
+   * Property key to access the value which will be propagated.
    */
   private final String propertyKey;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param propertyKey property key to access the propagation value
    */
-<span class="fc" id="L42">  public LPVertexJoin(String propertyKey) {</span>
-<span class="fc" id="L43">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L44">  public LPVertexJoin(String propertyKey) {</span>
+<span class="fc" id="L45">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L46">  }</span>
 
   @Override
-  public EPGMVertex join(
-    org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; gellyVertex,
-    EPGMVertex epgmVertex) throws Exception {
-<span class="fc" id="L50">    epgmVertex.setProperty(propertyKey, gellyVertex.getValue());</span>
-<span class="fc" id="L51">    return epgmVertex;</span>
+  public V join(org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; gellyVertex, V vertex)
+    throws Exception {
+<span class="fc" id="L51">    vertex.setProperty(propertyKey, gellyVertex.getValue());</span>
+<span class="fc" id="L52">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

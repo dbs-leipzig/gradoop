@@ -17,9 +17,13 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.AnnotateWeaklyConnectedComponents;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccEdges;
 import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccVertices;
@@ -30,9 +34,20 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.GetConnectedC
  * {@link AnnotateWeaklyConnectedComponents} of Flinks ConnectedComponents.
  * Returns a {@code Tuple3&lt;String, Long, Long&gt;}, containing the component id and the number of
  * graph elements (vertices and edges) associated with it.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class ConnectedComponentsDistribution
-  implements UnaryGraphToValueOperator&lt;DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt;&gt; {
+public class ConnectedComponentsDistribution&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToValueOperator&lt;LG, DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt;&gt; {
 
   /**
    * Property key to store the component id.
@@ -56,8 +71,8 @@ public class ConnectedComponentsDistribution
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
   public ConnectedComponentsDistribution(int maxIterations) {
-<span class="nc" id="L59">    this(SamplingEvaluationConstants.PROPERTY_KEY_WCC_ID, maxIterations, false);</span>
-<span class="nc" id="L60">  }</span>
+<span class="nc" id="L74">    this(SamplingEvaluationConstants.PROPERTY_KEY_WCC_ID, maxIterations, false);</span>
+<span class="nc" id="L75">  }</span>
 
   /**
    * Constructor
@@ -67,8 +82,8 @@ public class ConnectedComponentsDistribution
    * @param annotateEdges Whether to write the component property to the edges
    */
   public ConnectedComponentsDistribution(int maxIterations, boolean annotateEdges) {
-<span class="nc" id="L70">    this(SamplingEvaluationConstants.PROPERTY_KEY_WCC_ID, maxIterations, annotateEdges);</span>
-<span class="nc" id="L71">  }</span>
+<span class="nc" id="L85">    this(SamplingEvaluationConstants.PROPERTY_KEY_WCC_ID, maxIterations, annotateEdges);</span>
+<span class="nc" id="L86">  }</span>
 
   /**
    * Constructor
@@ -78,8 +93,8 @@ public class ConnectedComponentsDistribution
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
   public ConnectedComponentsDistribution(String propertyKey, int maxIterations) {
-<span class="nc" id="L81">    this(propertyKey, maxIterations, false);</span>
-<span class="nc" id="L82">  }</span>
+<span class="nc" id="L96">    this(propertyKey, maxIterations, false);</span>
+<span class="nc" id="L97">  }</span>
 
   /**
    * Constructor
@@ -90,25 +105,25 @@ public class ConnectedComponentsDistribution
    * @param annotateEdges Whether to write the component property to the edges
    */
   public ConnectedComponentsDistribution(String propertyKey, int maxIterations,
-<span class="fc" id="L93">    boolean annotateEdges) {</span>
-<span class="fc" id="L94">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L95">    this.maxIterations = maxIterations;</span>
-<span class="fc" id="L96">    this.annotateEdges = annotateEdges;</span>
-<span class="fc" id="L97">  }</span>
+<span class="fc" id="L108">    boolean annotateEdges) {</span>
+<span class="fc" id="L109">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L110">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L111">    this.annotateEdges = annotateEdges;</span>
+<span class="fc" id="L112">  }</span>
 
   @Override
-  public DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt; execute(LogicalGraph graph) {
+  public DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt; execute(LG graph) {
 
-<span class="fc" id="L102">    LogicalGraph graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents(</span>
+<span class="fc" id="L117">    LG graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents&lt;&gt;(</span>
       propertyKey, maxIterations, annotateEdges));
 
-<span class="fc" id="L105">    graphWithWccIds = graphWithWccIds.aggregate(new AggregateListOfWccVertices(propertyKey));</span>
-<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (annotateEdges) {</span>
-<span class="fc" id="L107">      graphWithWccIds = graphWithWccIds.aggregate(new AggregateListOfWccEdges(propertyKey));</span>
+<span class="fc" id="L120">    graphWithWccIds = graphWithWccIds.aggregate(new AggregateListOfWccVertices(propertyKey));</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (annotateEdges) {</span>
+<span class="fc" id="L122">      graphWithWccIds = graphWithWccIds.aggregate(new AggregateListOfWccEdges(propertyKey));</span>
     }
 
-<span class="fc" id="L110">    return graphWithWccIds.getGraphHead().flatMap(</span>
-      new GetConnectedComponentDistributionFlatMap(propertyKey, annotateEdges));
+<span class="fc" id="L125">    return graphWithWccIds.getGraphHead().flatMap(</span>
+      new GetConnectedComponentDistributionFlatMap&lt;&gt;(propertyKey, annotateEdges));
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

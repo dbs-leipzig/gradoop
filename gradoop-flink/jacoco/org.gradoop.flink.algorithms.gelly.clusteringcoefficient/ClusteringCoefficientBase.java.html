@@ -17,25 +17,39 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
- * Base class for Gradoop EPGM model wrapper for Flink Gellys implementation of the clustering
- * coefficient algorithm. Implementations compute the local and global clustering coefficient of
- * a graph, where:
+ * Base class for Gradoop EPGM model wrapper for Flink Gellys implementation of the clustering coefficient
+ * algorithm. Implementations compute the local and global clustering coefficient of a graph, where:
  * &lt;pre&gt;
  *   local - connectedness of a single vertex regarding the connections of its neighborhood, with
  *           value between 0.0 (no edges between neighbors) and 1.0 (neighbors fully connected)
  *   global - connectedness of the graph as ratio from closed triplets (triangles) to all triplets
  *            with value between 0.0 (no closed triplets) and 1.0 (all triplets closed)
  * &lt;/pre&gt;
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public abstract class ClusteringCoefficientBase extends
-  GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
+public abstract class ClusteringCoefficientBase&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  extends GradoopGellyAlgorithm&lt;G, V, E, LG, GC, NullValue, NullValue&gt; {
 
   /**
    * Property key to access the local clustering coefficient value stored in the vertices
@@ -52,25 +66,23 @@ public abstract class ClusteringCoefficientBase extends
    * Calls constructor of super class {@link GradoopGellyAlgorithm}
    */
   public ClusteringCoefficientBase() {
-<span class="fc" id="L55">    super(new VertexToGellyVertexWithNullValue(),</span>
-      new EdgeToGellyEdgeWithNullValue());
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L69">    super(new VertexToGellyVertexWithNullValue&lt;&gt;(),</span>
+      new EdgeToGellyEdgeWithNullValue&lt;&gt;());
+<span class="fc" id="L71">  }</span>
 
   @Override
-  public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
-    throws Exception {
-<span class="fc" id="L62">    return executeInternal(graph);</span>
+  public LG executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph) throws Exception {
+<span class="fc" id="L75">    return executeInternal(gellyGraph);</span>
   }
 
   /**
    * Executes the computation of the clustering coefficient.
    *
    * @param gellyGraph Gelly graph with initialized vertices
-   * @return {@link LogicalGraph} with local values written to the vertices or global value
+   * @return {@link BaseGraph} with local values written to the vertices or global value
    * written to the graph head
    * @throws Exception Thrown if the gelly algorithm fails
    */
-  protected abstract LogicalGraph executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
-    throws Exception;
+  protected abstract LG executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph) throws Exception;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

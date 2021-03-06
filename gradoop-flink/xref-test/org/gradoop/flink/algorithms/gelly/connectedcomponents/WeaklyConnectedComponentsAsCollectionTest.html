@@ -51,7 +51,7 @@
 <a name="41" href="#41">41</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 <a name="42" href="#42">42</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
 <a name="43" href="#43">43</a>      GraphCollection result = input
-<a name="44" href="#44">44</a>        .callForCollection(<strong class="jxr_keyword">new</strong> WeaklyConnectedComponentsAsCollection(propertyKey, 10));
+<a name="44" href="#44">44</a>        .callForCollection(<strong class="jxr_keyword">new</strong> WeaklyConnectedComponentsAsCollection&lt;&gt;(propertyKey, 10));
 <a name="45" href="#45">45</a>      GraphCollection components = input.splitBy(<span class="jxr_string">"component"</span>);
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>      collectAndAssertTrue(result.equalsByGraphElementIds(components));

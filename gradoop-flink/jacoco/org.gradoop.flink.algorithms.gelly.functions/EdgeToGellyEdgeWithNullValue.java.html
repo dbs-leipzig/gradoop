@@ -17,15 +17,17 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link NullValue} as edge value.
+ *
+ * @param &lt;E&gt; Gradoop edge type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;sourceId-&gt;f0;targetId-&gt;f1&quot;)
-public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge&lt;NullValue&gt; {
+public class EdgeToGellyEdgeWithNullValue&lt;E extends Edge&gt; implements EdgeToGellyEdge&lt;E, NullValue&gt; {
   /**
    * Reduce object instantiations
    */
@@ -34,17 +36,16 @@ public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge&lt;NullValu
   /**
    * Constructor.
    */
-<span class="fc" id="L37">  public EdgeToGellyEdgeWithNullValue() {</span>
-<span class="fc" id="L38">    reuseEdge = new org.apache.flink.graph.Edge&lt;&gt;();</span>
-<span class="fc" id="L39">    reuseEdge.setValue(NullValue.getInstance());</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L39">  public EdgeToGellyEdgeWithNullValue() {</span>
+<span class="fc" id="L40">    reuseEdge = new org.apache.flink.graph.Edge&lt;&gt;();</span>
+<span class="fc" id="L41">    reuseEdge.setValue(NullValue.getInstance());</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
-  public org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt; map(EPGMEdge epgmEdge)
-      throws Exception {
-<span class="fc" id="L45">    reuseEdge.setSource(epgmEdge.getSourceId());</span>
-<span class="fc" id="L46">    reuseEdge.setTarget(epgmEdge.getTargetId());</span>
-<span class="fc" id="L47">    return reuseEdge;</span>
+  public org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt; map(E edge) throws Exception {
+<span class="fc" id="L46">    reuseEdge.setSource(edge.getSourceId());</span>
+<span class="fc" id="L47">    reuseEdge.setTarget(edge.getTargetId());</span>
+<span class="fc" id="L48">    return reuseEdge;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

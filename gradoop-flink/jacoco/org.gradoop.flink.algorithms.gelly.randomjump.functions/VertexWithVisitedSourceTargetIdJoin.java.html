@@ -17,15 +17,17 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Joins an EPGM vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
+ * Joins an Gradoop vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
  * property to {@code true}, if there is a join-partner.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;id;label;graphIds&quot;)
-public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction&lt;EPGMVertex, GradoopId, EPGMVertex&gt; {
+public class VertexWithVisitedSourceTargetIdJoin&lt;V extends Vertex&gt; implements JoinFunction&lt;V, GradoopId, V&gt; {
 
   /**
    * Key for the boolean property of the edge.
@@ -37,16 +39,16 @@ public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction&lt;EPGM
    *
    * @param propertyKey propertyKey Key for the boolean property value.
    */
-<span class="fc" id="L40">  public VertexWithVisitedSourceTargetIdJoin(String propertyKey) {</span>
-<span class="fc" id="L41">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L42">  public VertexWithVisitedSourceTargetIdJoin(String propertyKey) {</span>
+<span class="fc" id="L43">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L44">  }</span>
 
   @Override
-  public EPGMVertex join(EPGMVertex vertex, GradoopId visitedId) throws Exception {
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (visitedId != null) {</span>
-<span class="fc" id="L47">      vertex.setProperty(propertyKey, true);</span>
+  public V join(V vertex, GradoopId visitedId) throws Exception {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    if (visitedId != null) {</span>
+<span class="fc" id="L49">      vertex.setProperty(propertyKey, true);</span>
     }
-<span class="fc" id="L49">    return vertex;</span>
+<span class="fc" id="L51">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

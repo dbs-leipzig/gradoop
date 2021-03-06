@@ -508,20 +508,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithEPGMVertexJoin.java">org/gradoop/flink/algorithms/gelly/randomjump/functions/GellyVertexWithEPGMVertexJoin.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.ExtractExpandColumnTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/functions/ExtractExpandColumnTest.java</a>
                 </td>
                 <td>
@@ -12548,20 +12534,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.randomjump.functions.EPGMEdgeWithGellyEdgeIdJoin.java">org/gradoop/flink/algorithms/gelly/randomjump/functions/EPGMEdgeWithGellyEdgeIdJoin.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectEdgesTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/FilterAndProjectEdgesTest.java</a>
                 </td>
                 <td>
@@ -21676,6 +21648,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithVertexJoin.java">org/gradoop/flink/algorithms/gelly/randomjump/functions/GellyVertexWithVertexJoin.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.storage.common.predicate.filter.impl.PropReg.java">org/gradoop/storage/common/predicate/filter/impl/PropReg.java</a>
                 </td>
                 <td>
@@ -25051,6 +25037,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToValueOperator.java">org/gradoop/flink/model/api/operators/UnaryBaseGraphCollectionToValueOperator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/checkstyle.html#org.gradoop.flink.algorithms.gelly.randomjump.functions.EdgeWithGellyEdgeIdJoin.java">org/gradoop/flink/algorithms/gelly/randomjump/functions/EdgeWithGellyEdgeIdJoin.java</a>
                 </td>
                 <td>
                   0

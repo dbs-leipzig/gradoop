@@ -124,8 +124,8 @@
 <a name="114" href="#114">114</a>       <span class="jxr_string">"]"</span>;
 <a name="115" href="#115">115</a> 
 <a name="116" href="#116">116</a>     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable(<span class="jxr_string">"g"</span>);
-<a name="117" href="#117">117</a>     DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt; componentDist = <strong class="jxr_keyword">new</strong> ConnectedComponentsDistribution(
-<a name="118" href="#118">118</a>       propertyKey, maxIterations, annotateEdges).execute(graph);
+<a name="117" href="#117">117</a>     DataSet&lt;Tuple3&lt;String, Long, Long&gt;&gt; componentDist = graph.callForValue(
+<a name="118" href="#118">118</a>       <strong class="jxr_keyword">new</strong> ConnectedComponentsDistribution&lt;&gt;(propertyKey, maxIterations, annotateEdges));
 <a name="119" href="#119">119</a> 
 <a name="120" href="#120">120</a>     List&lt;Tuple3&lt;String, Long, Long&gt;&gt; componentDistList = Lists.newArrayList();
 <a name="121" href="#121">121</a> 

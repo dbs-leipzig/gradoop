@@ -79,8 +79,8 @@
 <a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="70" href="#70">70</a>    @Test
 <a name="71" href="#71">71</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPageRankWithoutZeroDegrees() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="72" href="#72">72</a>      LogicalGraph resultGraph = <strong class="jxr_keyword">new</strong> PageRank(propertyKey, 0.3, 20)
-<a name="73" href="#73">73</a>        .execute(testGraph);
+<a name="72" href="#72">72</a>      LogicalGraph resultGraph = testGraph
+<a name="73" href="#73">73</a>        .callForGraph(<strong class="jxr_keyword">new</strong> PageRank&lt;&gt;(propertyKey, 0.3, 20));
 <a name="74" href="#74">74</a>      checkPageRankProperty(resultGraph);
 <a name="75" href="#75">75</a>      assertEquals(resultGraph.getVertices().count(), 3L);
 <a name="76" href="#76">76</a>    }
@@ -92,8 +92,8 @@
 <a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="83" href="#83">83</a>    @Test
 <a name="84" href="#84">84</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPageRankWithZeroDegrees() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="85" href="#85">85</a>      LogicalGraph resultGraph = <strong class="jxr_keyword">new</strong> PageRank(propertyKey, 0.3, 20, <strong class="jxr_keyword">true</strong>)
-<a name="86" href="#86">86</a>        .execute(testGraph);
+<a name="85" href="#85">85</a>      LogicalGraph resultGraph = testGraph
+<a name="86" href="#86">86</a>        .callForGraph(<strong class="jxr_keyword">new</strong> PageRank&lt;&gt;(propertyKey, 0.3, 20, <strong class="jxr_keyword">true</strong>));
 <a name="87" href="#87">87</a>      checkPageRankProperty(resultGraph);
 <a name="88" href="#88">88</a>      assertEquals(resultGraph.getVertices().count(), testGraph.getVertices().count());
 <a name="89" href="#89">89</a>    }

@@ -117,11 +117,10 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 <span class="fc" id="L117">      .filter(new EdgesWithSampledVerticesFilter(neighborType))</span>
 <span class="fc" id="L118">      .map(new Value0Of3&lt;&gt;());</span>
 
-<span class="fc" id="L120">    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges);</span>
+<span class="fc" id="L120">    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges)</span>
+<span class="fc" id="L121">      .callForGraph(new FilterVerticesWithDegreeOtherThanGiven&lt;&gt;(0L));</span>
 
-<span class="fc" id="L122">    graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);</span>
-
-<span class="fc" id="L124">    return graph;</span>
+<span class="fc" id="L123">    return graph;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

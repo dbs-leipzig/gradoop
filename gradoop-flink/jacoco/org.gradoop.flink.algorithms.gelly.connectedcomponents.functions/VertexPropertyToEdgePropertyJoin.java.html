@@ -16,16 +16,20 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Reads a vertex property and stores it to an edge property, using the given property key.
  * If the edge already has this property, compare the edge value to the vertex value and store the
  * smaller property value.
+ *
+ * @param &lt;V&gt; Gradoop vertex type.
+ * @param &lt;E&gt; Gradoop edge type.
  */
-public class VertexPropertyToEdgePropertyJoin implements JoinFunction&lt;EPGMEdge, EPGMVertex, EPGMEdge&gt; {
+public class VertexPropertyToEdgePropertyJoin&lt;V extends Vertex, E extends Edge&gt;
+  implements JoinFunction&lt;E, V, E&gt; {
 
   /**
    * Property key to store the property.
@@ -37,20 +41,20 @@ public class VertexPropertyToEdgePropertyJoin implements JoinFunction&lt;EPGMEdg
    *
    * @param propertyKey Property key to store the property.
    */
-<span class="fc" id="L40">  public VertexPropertyToEdgePropertyJoin(String propertyKey) {</span>
-<span class="fc" id="L41">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L44">  public VertexPropertyToEdgePropertyJoin(String propertyKey) {</span>
+<span class="fc" id="L45">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L46">  }</span>
 
   @Override
-  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
-<span class="fc" id="L46">    PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (edge.hasProperty(propertyKey)) {</span>
-<span class="pc bpc" id="L48" title="1 of 2 branches missed.">      if (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) &lt; 0) {</span>
-<span class="nc" id="L49">        return edge;</span>
+  public E join(E edge, V vertex) throws Exception {
+<span class="fc" id="L50">    PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    if (edge.hasProperty(propertyKey)) {</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">      if (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) &lt; 0) {</span>
+<span class="nc" id="L53">        return edge;</span>
       }
     }
-<span class="fc" id="L52">    edge.setProperty(propertyKey, newEdgeValue);</span>
-<span class="fc" id="L53">    return edge;</span>
+<span class="fc" id="L56">    edge.setProperty(propertyKey, newEdgeValue);</span>
+<span class="fc" id="L57">    return edge;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

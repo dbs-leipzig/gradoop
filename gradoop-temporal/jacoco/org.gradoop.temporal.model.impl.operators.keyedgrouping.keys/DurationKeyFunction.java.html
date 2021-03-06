@@ -19,7 +19,7 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -42,7 +42,7 @@ import static java.time.ZoneOffset.UTC;
  *
  * @param &lt;T&gt; The type of the temporal elements.
  */
-public class DurationKeyFunction&lt;T extends TemporalElement&gt; implements KeyFunction&lt;T, Long&gt; {
+public class DurationKeyFunction&lt;T extends TemporalElement&gt; implements KeyFunctionWithDefaultValue&lt;T, Long&gt; {
 
   /**
    * A key function used to extract the interval from the element.
@@ -89,16 +89,24 @@ public class DurationKeyFunction&lt;T extends TemporalElement&gt; implements Key
   }
 
   @Override
+  public Long getDefaultKey() {
+<span class="fc" id="L93">    return -1L;</span>
+  }
+
+  @Override
   public TypeInformation&lt;Long&gt; getType() {
-<span class="fc" id="L93">    return BasicTypeInfo.LONG_TYPE_INFO;</span>
+<span class="fc" id="L98">    return BasicTypeInfo.LONG_TYPE_INFO;</span>
   }
 
   @Override
   public void addKeyToElement(T element, Object key) {
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (!(key instanceof Long)) {</span>
-<span class="nc" id="L99">      throw new IllegalArgumentException(&quot;Invalid type for key: &quot; + key.getClass().getSimpleName());</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    if (!(key instanceof Long)) {</span>
+<span class="nc" id="L104">      throw new IllegalArgumentException(&quot;Invalid type for key: &quot; + key.getClass().getSimpleName());</span>
     }
-<span class="fc" id="L101">    element.setProperty(&quot;duration_&quot; + intervalExtractor + &quot;_&quot; + timeUnit, PropertyValue.create(key));</span>
-<span class="fc" id="L102">  }</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    if (getDefaultKey().equals(key)) {</span>
+<span class="nc" id="L107">      return;</span>
+    }
+<span class="fc" id="L109">    element.setProperty(&quot;duration_&quot; + intervalExtractor + &quot;_&quot; + timeUnit, PropertyValue.create(key));</span>
+<span class="fc" id="L110">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

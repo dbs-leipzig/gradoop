@@ -75,7 +75,7 @@
 <a name="65" href="#65">65</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
 <a name="66" href="#66">66</a>  
 <a name="67" href="#67">67</a>      GraphCollection result =
-<a name="68" href="#68">68</a>        input.callForCollection(<strong class="jxr_keyword">new</strong> Split(SplitTest::getSplitValues));
+<a name="68" href="#68">68</a>        input.callForCollection(<strong class="jxr_keyword">new</strong> Split&lt;&gt;(SplitTest::getSplitValues));
 <a name="69" href="#69">69</a>  
 <a name="70" href="#70">70</a>      collectAndAssertTrue(result.equalsByGraphElementIds(
 <a name="71" href="#71">71</a>        loader.getGraphCollectionByVariables(<span class="jxr_string">"graph1"</span>, <span class="jxr_string">"graph2"</span>)));
@@ -112,7 +112,7 @@
 <a name="102" href="#102">102</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
 <a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a>     GraphCollection result = input
-<a name="105" href="#105">105</a>       .callForCollection(<strong class="jxr_keyword">new</strong> Split(SplitTest::getSplitValues));
+<a name="105" href="#105">105</a>       .callForCollection(<strong class="jxr_keyword">new</strong> Split&lt;&gt;(SplitTest::getSplitValues));
 <a name="106" href="#106">106</a> 
 <a name="107" href="#107">107</a>     GraphCollection expectation = loader.getGraphCollectionByVariables(
 <a name="108" href="#108">108</a>       <span class="jxr_string">"graph1"</span>, <span class="jxr_string">"graph2"</span>, <span class="jxr_string">"graph3"</span>);
@@ -147,7 +147,7 @@
 <a name="137" href="#137">137</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
 <a name="138" href="#138">138</a> 
 <a name="139" href="#139">139</a>     GraphCollection result = input
-<a name="140" href="#140">140</a>       .callForCollection(<strong class="jxr_keyword">new</strong> Split(SplitTest::getSplitValues));
+<a name="140" href="#140">140</a>       .callForCollection(<strong class="jxr_keyword">new</strong> Split&lt;&gt;(SplitTest::getSplitValues));
 <a name="141" href="#141">141</a> 
 <a name="142" href="#142">142</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
 <a name="143" href="#143">143</a>       loader.getGraphCollectionByVariables(<span class="jxr_string">"graph1"</span>, <span class="jxr_string">"graph2"</span>)));

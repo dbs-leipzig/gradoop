@@ -19,17 +19,19 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Join function to receive structural information of the graph.
  * Builds edge triples with long id's.
+ *
+ * @param &lt;E&gt; Gradoop Edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;f0-&gt;f0&quot;, &quot;f1-&gt;f1&quot;, &quot;f0-&gt;f2&quot;})
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;targetId-&gt;f3&quot;)
-public class CreateLongSourceIds
-  implements JoinFunction&lt;Tuple2&lt;Long, GradoopId&gt;, EPGMEdge, Tuple4&lt;Long, GradoopId, Long, GradoopId&gt;&gt; {
+public class CreateLongSourceIds&lt;E extends Edge&gt;
+  implements JoinFunction&lt;Tuple2&lt;Long, GradoopId&gt;, E, Tuple4&lt;Long, GradoopId, Long, GradoopId&gt;&gt; {
 
   /**
    * Reuse object.
@@ -39,9 +41,9 @@ public class CreateLongSourceIds
   /**
    * Creates an instance of this join function.
    */
-<span class="fc" id="L42">  public CreateLongSourceIds() {</span>
-<span class="fc" id="L43">    reuse = new Tuple4&lt;&gt;();</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L44">  public CreateLongSourceIds() {</span>
+<span class="fc" id="L45">    reuse = new Tuple4&lt;&gt;();</span>
+<span class="fc" id="L46">  }</span>
 
   /**
    * Builds intermediate result.
@@ -51,12 +53,12 @@ public class CreateLongSourceIds
    * @return tuple {@code &lt;vertexID&lt;Long&gt;,vertexID&lt;GradoopID&gt;,sourceID&lt;Long&gt;,targetID&lt;GradoopID&gt;&gt;}
    */
   @Override
-  public Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; join(Tuple2&lt;Long, GradoopId&gt; tuple, EPGMEdge edge) {
-<span class="fc" id="L55">    reuse.f0 = tuple.f0;</span>
-<span class="fc" id="L56">    reuse.f1 = tuple.f1;</span>
-<span class="fc" id="L57">    reuse.f2 = tuple.f0;</span>
-<span class="fc" id="L58">    reuse.f3 = edge.getTargetId();</span>
-<span class="fc" id="L59">    return reuse;</span>
+  public Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; join(Tuple2&lt;Long, GradoopId&gt; tuple, E edge) {
+<span class="fc" id="L57">    reuse.f0 = tuple.f0;</span>
+<span class="fc" id="L58">    reuse.f1 = tuple.f1;</span>
+<span class="fc" id="L59">    reuse.f2 = tuple.f0;</span>
+<span class="fc" id="L60">    reuse.f3 = edge.getTargetId();</span>
+<span class="fc" id="L61">    return reuse;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

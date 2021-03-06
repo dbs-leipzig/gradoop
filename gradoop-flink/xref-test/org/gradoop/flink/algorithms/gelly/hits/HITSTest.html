@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>        .getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
 <a name="37" href="#37">37</a>      LogicalGraph expectedResult = getLoaderFromString(expectedResultString)
 <a name="38" href="#38">38</a>        .getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="39" href="#39">39</a>      LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">new</strong> HITS(<span class="jxr_string">"aScore"</span>, <span class="jxr_string">"hScore"</span>, 1));
+<a name="39" href="#39">39</a>      LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">new</strong> HITS&lt;&gt;(<span class="jxr_string">"aScore"</span>, <span class="jxr_string">"hScore"</span>, 1));
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>      collectAndAssertTrue(result.equalsByData(expectedResult));
 <a name="42" href="#42">42</a>    }

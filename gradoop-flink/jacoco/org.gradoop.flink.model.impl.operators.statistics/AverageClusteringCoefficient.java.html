@@ -15,18 +15,33 @@
  */
 package org.gradoop.flink.model.impl.operators.statistics;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.average.AverageVertexProperty;
 
 /**
  * Calculates the average local clustering coefficient of a graph and writes it to the graph head.
  * Uses the Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering
  * coefficient algorithm for directed graphs {@link GellyLocalClusteringCoefficientDirected}
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-<span class="fc" id="L29">public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {</span>
+<span class="fc" id="L39">public class AverageClusteringCoefficient&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
   /**
    * Property key to access the average clustering coefficient value stored the graph head
@@ -34,10 +49,11 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Aver
   public static final String PROPERTY_KEY_AVERAGE = &quot;clustering_coefficient_average&quot;;
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LG execute(LG graph) {
 
-<span class="fc" id="L39">    return new GellyLocalClusteringCoefficientDirected().execute(graph).aggregate(</span>
-      new AverageVertexProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL,
+<span class="fc" id="L54">    return graph</span>
+<span class="fc" id="L55">      .callForGraph(new GellyLocalClusteringCoefficientDirected&lt;&gt;())</span>
+<span class="fc" id="L56">      .aggregate(new AverageVertexProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL,</span>
         PROPERTY_KEY_AVERAGE));
   }
 }

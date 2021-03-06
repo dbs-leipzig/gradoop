@@ -18,14 +18,17 @@ package org.gradoop.flink.algorithms.gelly.hits;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.hits.functions.HITSToAttributes;
 import org.gradoop.flink.algorithms.gelly.hits.functions.HitsResultKeySelector;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
@@ -35,8 +38,20 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * convergence threshold, or both.
  * &lt;p&gt;
  * The Results are stored as properties of the vertices (with given keys).
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public class HITS extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
+public class HITS&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  extends GradoopGellyAlgorithm&lt;G, V, E, LG, GC, NullValue, NullValue&gt; {
 
   /**
    * Property key to store the authority score.
@@ -61,11 +76,11 @@ public class HITS extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
    * @param iterations           number of iterations
    */
   public HITS(String authorityPropertyKey, String hubPropertyKey, int iterations) {
-<span class="fc" id="L64">    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());</span>
-<span class="fc" id="L65">    this.authorityPropertyKey = authorityPropertyKey;</span>
-<span class="fc" id="L66">    this.hubPropertyKey = hubPropertyKey;</span>
-<span class="fc" id="L67">    hits = new org.apache.flink.graph.library.linkanalysis.HITS&lt;&gt;(iterations, Double.MAX_VALUE);</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L79">    super(new VertexToGellyVertexWithNullValue&lt;&gt;(), new EdgeToGellyEdgeWithNullValue&lt;&gt;());</span>
+<span class="fc" id="L80">    this.authorityPropertyKey = authorityPropertyKey;</span>
+<span class="fc" id="L81">    this.hubPropertyKey = hubPropertyKey;</span>
+<span class="fc" id="L82">    hits = new org.apache.flink.graph.library.linkanalysis.HITS&lt;&gt;(iterations, Double.MAX_VALUE);</span>
+<span class="fc" id="L83">  }</span>
 
 
   /**
@@ -76,12 +91,12 @@ public class HITS extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
    * @param convergenceThreshold convergence threshold for sum of scores
    */
   public HITS(String authorityPropertyKey, String hubPropertyKey, double convergenceThreshold) {
-<span class="nc" id="L79">    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());</span>
-<span class="nc" id="L80">    this.authorityPropertyKey = authorityPropertyKey;</span>
-<span class="nc" id="L81">    this.hubPropertyKey = hubPropertyKey;</span>
-<span class="nc" id="L82">    hits = new org.apache.flink.graph.library.linkanalysis.HITS&lt;&gt;(Integer.MAX_VALUE,</span>
+<span class="nc" id="L94">    super(new VertexToGellyVertexWithNullValue&lt;&gt;(), new EdgeToGellyEdgeWithNullValue&lt;&gt;());</span>
+<span class="nc" id="L95">    this.authorityPropertyKey = authorityPropertyKey;</span>
+<span class="nc" id="L96">    this.hubPropertyKey = hubPropertyKey;</span>
+<span class="nc" id="L97">    hits = new org.apache.flink.graph.library.linkanalysis.HITS&lt;&gt;(Integer.MAX_VALUE,</span>
       convergenceThreshold);
-<span class="nc" id="L84">  }</span>
+<span class="nc" id="L99">  }</span>
 
   /**
    * HITS with convergence threshold and maximum number of iterations
@@ -93,25 +108,24 @@ public class HITS extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
    */
   public HITS(String authorityPropertyKey, String hubPropertyKey, int maxIterations,
     double convergenceThreshold) {
-<span class="nc" id="L96">    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());</span>
-<span class="nc" id="L97">    this.authorityPropertyKey = authorityPropertyKey;</span>
-<span class="nc" id="L98">    this.hubPropertyKey = hubPropertyKey;</span>
-<span class="nc" id="L99">    hits =</span>
+<span class="nc" id="L111">    super(new VertexToGellyVertexWithNullValue&lt;&gt;(), new EdgeToGellyEdgeWithNullValue&lt;&gt;());</span>
+<span class="nc" id="L112">    this.authorityPropertyKey = authorityPropertyKey;</span>
+<span class="nc" id="L113">    this.hubPropertyKey = hubPropertyKey;</span>
+<span class="nc" id="L114">    hits =</span>
       new org.apache.flink.graph.library.linkanalysis.HITS&lt;&gt;(maxIterations, convergenceThreshold);
-<span class="nc" id="L101">  }</span>
+<span class="nc" id="L116">  }</span>
 
 
   @Override
-  public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
-    throws Exception {
+  public LG executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph) throws Exception {
 
-<span class="fc" id="L108">    DataSet&lt;EPGMVertex&gt; newVertices = hits.runInternal(graph)</span>
-<span class="fc" id="L109">      .join(currentGraph.getVertices())</span>
-<span class="fc" id="L110">      .where(new HitsResultKeySelector()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L111">      .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));</span>
+<span class="fc" id="L122">    DataSet&lt;V&gt; newVertices = hits.runInternal(gellyGraph)</span>
+<span class="fc" id="L123">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L124">      .where(new HitsResultKeySelector()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L125">      .with(new HITSToAttributes&lt;&gt;(authorityPropertyKey, hubPropertyKey));</span>
 
-<span class="fc" id="L113">    return currentGraph.getFactory()</span>
-<span class="fc" id="L114">      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());</span>
+<span class="fc" id="L127">    return currentGraph.getFactory()</span>
+<span class="fc" id="L128">      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());</span>
   }
 
 }

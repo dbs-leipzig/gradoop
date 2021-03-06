@@ -16,15 +16,17 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Stores the gelly vertex value (a {@link GradoopId}) as property with the given property key in
  * the gradoop vertex.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
-public class GellyVertexValueToVertexPropertyJoin
-  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt;, EPGMVertex, EPGMVertex&gt; {
+public class GellyVertexValueToVertexPropertyJoin&lt;V extends Vertex&gt;
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt;, V, V&gt; {
 
   /**
    * Property key to store the gelly vertex value.
@@ -36,15 +38,14 @@ public class GellyVertexValueToVertexPropertyJoin
    *
    * @param propertyKey Property key to store the gelly vertex value
    */
-<span class="fc" id="L39">  public GellyVertexValueToVertexPropertyJoin(String propertyKey) {</span>
-<span class="fc" id="L40">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L41">  public GellyVertexValueToVertexPropertyJoin(String propertyKey) {</span>
+<span class="fc" id="L42">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L43">  }</span>
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; gellyVertex,
-    EPGMVertex gradoopVertex) {
-<span class="fc" id="L46">    gradoopVertex.setProperty(propertyKey, gellyVertex.getValue());</span>
-<span class="fc" id="L47">    return gradoopVertex;</span>
+  public V join(org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; gellyVertex, V vertex) {
+<span class="fc" id="L47">    vertex.setProperty(propertyKey, gellyVertex.getValue());</span>
+<span class="fc" id="L48">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -17,14 +17,16 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Maps EPGM vertex to a Gelly vertex with the {@link GradoopId} as its id.
+ * Maps Gradoop Vertex to a Gelly vertex with the {@link GradoopId} as its id.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
-public class VertexToGellyVertexWithNullValue implements VertexToGellyVertex&lt;NullValue&gt; {
+public class VertexToGellyVertexWithNullValue&lt;V extends Vertex&gt; implements VertexToGellyVertex&lt;V, NullValue&gt; {
   /**
    * Reduce object instantiations
    */
@@ -33,15 +35,15 @@ public class VertexToGellyVertexWithNullValue implements VertexToGellyVertex&lt;
   /**
    * Constructor.
    */
-<span class="fc" id="L36">  public VertexToGellyVertexWithNullValue() {</span>
-<span class="fc" id="L37">    reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
-<span class="fc" id="L38">    reuseVertex.setValue(NullValue.getInstance());</span>
-<span class="fc" id="L39">  }</span>
+<span class="fc" id="L38">  public VertexToGellyVertexWithNullValue() {</span>
+<span class="fc" id="L39">    reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
+<span class="fc" id="L40">    reuseVertex.setValue(NullValue.getInstance());</span>
+<span class="fc" id="L41">  }</span>
 
   @Override
-  public org.apache.flink.graph.Vertex&lt;GradoopId, NullValue&gt; map(EPGMVertex epgmVertex) {
-<span class="fc" id="L43">    reuseVertex.setId(epgmVertex.getId());</span>
-<span class="fc" id="L44">    return reuseVertex;</span>
+  public org.apache.flink.graph.Vertex&lt;GradoopId, NullValue&gt; map(V vertex) {
+<span class="fc" id="L45">    reuseVertex.setId(vertex.getId());</span>
+<span class="fc" id="L46">    return reuseVertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

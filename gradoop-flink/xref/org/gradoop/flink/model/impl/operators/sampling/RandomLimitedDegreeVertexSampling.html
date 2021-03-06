@@ -126,11 +126,11 @@
 <a name="116" href="#116">116</a>   @Override
 <a name="117" href="#117">117</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> sample(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
 <a name="118" href="#118">118</a> 
-<a name="119" href="#119">119</a>     graph = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/vertexdegrees/DistinctVertexDegrees.html">DistinctVertexDegrees</a>(
+<a name="119" href="#119">119</a>     graph = graph.callForGraph(<strong class="jxr_keyword">new</strong> DistinctVertexDegrees&lt;&gt;(
 <a name="120" href="#120">120</a>       SamplingConstants.DEGREE_PROPERTY_KEY,
 <a name="121" href="#121">121</a>       SamplingConstants.IN_DEGREE_PROPERTY_KEY,
 <a name="122" href="#122">122</a>       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
-<a name="123" href="#123">123</a>       <strong class="jxr_keyword">true</strong>).execute(graph);
+<a name="123" href="#123">123</a>       <strong class="jxr_keyword">true</strong>));
 <a name="124" href="#124">124</a> 
 <a name="125" href="#125">125</a>     DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()
 <a name="126" href="#126">126</a>       .filter(<strong class="jxr_keyword">new</strong> LimitedDegreeVertexRandomFilter&lt;&gt;(

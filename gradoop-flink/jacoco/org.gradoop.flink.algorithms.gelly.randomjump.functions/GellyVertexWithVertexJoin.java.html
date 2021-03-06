@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GellyVertexWithVertexJoin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.randomjump.functions</a> &gt; <span class="el_source">GellyVertexWithVertexJoin.java</span></div><h1>GellyVertexWithVertexJoin.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+/**
+ * Joins a Gelly result vertex with an Gradoop Vertex. Assigning a boolean property value from the
+ * Gelly vertex to the Gradoop Vertex, determining if this vertex was visited.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
+ */
+@FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
+@FunctionAnnotation.ForwardedFieldsSecond(&quot;id;label;graphIds&quot;)
+public class GellyVertexWithVertexJoin&lt;V extends Vertex&gt;
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, VCIVertexValue&gt;, V, V&gt; {
+
+  /**
+   * Key for the boolean property value to assign to the Gradoop vertex.
+   */
+  private final String propertyKey;
+
+  /**
+   * Creates an instance of GellyVertexWithVertexJoin with a given key for the boolean property value.
+   *
+   * @param propertyKey Key for the boolean property value.
+   */
+<span class="fc" id="L44">  public GellyVertexWithVertexJoin(String propertyKey) {</span>
+<span class="fc" id="L45">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L46">  }</span>
+
+  @Override
+  public V join(org.apache.flink.graph.Vertex&lt;GradoopId, VCIVertexValue&gt; gellyVertex, V vertex)
+    throws Exception {
+<span class="fc" id="L51">    vertex.setProperty(propertyKey, gellyVertex.getValue().f0);</span>
+<span class="fc" id="L52">    return vertex;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

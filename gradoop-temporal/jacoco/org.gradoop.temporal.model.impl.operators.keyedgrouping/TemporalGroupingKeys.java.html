@@ -16,7 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.keyedgrouping;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.DurationKeyFunction;
@@ -47,9 +46,9 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting the duration.
    * @see DurationKeyFunction
    */
-  public static &lt;T extends TemporalElement&gt; KeyFunction&lt;T, Long&gt; duration(
+  public static &lt;T extends TemporalElement&gt; KeyFunctionWithDefaultValue&lt;T, Long&gt; duration(
     TimeDimension interval, TemporalUnit timeUnit) {
-<span class="fc" id="L52">    return new DurationKeyFunction&lt;&gt;(interval, timeUnit);</span>
+<span class="fc" id="L51">    return new DurationKeyFunction&lt;&gt;(interval, timeUnit);</span>
   }
 
   /**
@@ -60,9 +59,9 @@ public final class TemporalGroupingKeys {
    * @return The grouping key function extracting a time interval.
    * @see TimeIntervalKeyFunction
    */
-  public static &lt;T extends TemporalElement&gt; KeyFunction&lt;T, Tuple2&lt;Long, Long&gt;&gt; timeInterval(
+  public static &lt;T extends TemporalElement&gt; KeyFunctionWithDefaultValue&lt;T, Tuple2&lt;Long, Long&gt;&gt; timeInterval(
     TimeDimension interval) {
-<span class="fc" id="L65">    return new TimeIntervalKeyFunction&lt;&gt;(interval);</span>
+<span class="fc" id="L64">    return new TimeIntervalKeyFunction&lt;&gt;(interval);</span>
   }
 
   /**
@@ -76,7 +75,7 @@ public final class TemporalGroupingKeys {
    */
   public static &lt;T extends TemporalElement&gt; KeyFunctionWithDefaultValue&lt;T, Long&gt; timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField) {
-<span class="fc" id="L79">    return timeStamp(interval, intervalField, null);</span>
+<span class="fc" id="L78">    return timeStamp(interval, intervalField, null);</span>
   }
 
   /**
@@ -96,7 +95,7 @@ public final class TemporalGroupingKeys {
   public static &lt;T extends TemporalElement&gt; KeyFunctionWithDefaultValue&lt;T, Long&gt; timeStamp(
     TimeDimension interval, TimeDimension.Field intervalField,
     TemporalField fieldOfTimeStamp) {
-<span class="fc" id="L99">    return new TimeStampKeyFunction&lt;&gt;(interval, intervalField, fieldOfTimeStamp);</span>
+<span class="fc" id="L98">    return new TimeStampKeyFunction&lt;&gt;(interval, intervalField, fieldOfTimeStamp);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

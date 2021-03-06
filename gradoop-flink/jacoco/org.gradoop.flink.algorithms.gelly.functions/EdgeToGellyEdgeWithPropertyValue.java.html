@@ -16,17 +16,19 @@
 package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link PropertyValue} as edge value.
+ *
+ * @param &lt;E&gt;  Gradoop edge type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;sourceId-&gt;f0;targetId-&gt;f1&quot;)
 @FunctionAnnotation.ReadFields(&quot;properties&quot;)
-public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge&lt;PropertyValue&gt; {
+public class EdgeToGellyEdgeWithPropertyValue&lt;E extends Edge&gt; implements EdgeToGellyEdge&lt;E, PropertyValue&gt; {
   /**
    * Property key to get the value for.
    */
@@ -35,25 +37,24 @@ public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge&lt;Prop
   /**
    * Reduce object instantiations.
    */
-  private final org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt;
-    reuseEdge;
+  private final org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt; reuseEdge;
 
   /**
    * Constructor.
    *
    * @param propertyKey property key for get property value
    */
-<span class="nc" id="L46">  public EdgeToGellyEdgeWithPropertyValue(String propertyKey) {</span>
-<span class="nc" id="L47">    this.propertyKey = propertyKey;</span>
-<span class="nc" id="L48">    this.reuseEdge = new org.apache.flink.graph.Edge&lt;&gt;();</span>
-<span class="nc" id="L49">  }</span>
+<span class="nc" id="L47">  public EdgeToGellyEdgeWithPropertyValue(String propertyKey) {</span>
+<span class="nc" id="L48">    this.propertyKey = propertyKey;</span>
+<span class="nc" id="L49">    this.reuseEdge = new org.apache.flink.graph.Edge&lt;&gt;();</span>
+<span class="nc" id="L50">  }</span>
 
   @Override
-  public org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt; map(EPGMEdge epgmEdge) {
-<span class="nc" id="L53">    reuseEdge.setSource(epgmEdge.getSourceId());</span>
-<span class="nc" id="L54">    reuseEdge.setTarget(epgmEdge.getTargetId());</span>
-<span class="nc" id="L55">    reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey));</span>
-<span class="nc" id="L56">    return reuseEdge;</span>
+  public org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt; map(E edge) {
+<span class="nc" id="L54">    reuseEdge.setSource(edge.getSourceId());</span>
+<span class="nc" id="L55">    reuseEdge.setTarget(edge.getTargetId());</span>
+<span class="nc" id="L56">    reuseEdge.setValue(edge.getPropertyValue(propertyKey));</span>
+<span class="nc" id="L57">    return reuseEdge;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

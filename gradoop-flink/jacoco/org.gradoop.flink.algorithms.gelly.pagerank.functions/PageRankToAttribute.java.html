@@ -18,15 +18,16 @@ package org.gradoop.flink.algorithms.gelly.pagerank.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.library.linkanalysis.PageRank;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Stores the page rank result from the left as a Property in in the right.
+ *
+ * @param &lt;V&gt; Gradoop vertex type.
  */
-public class PageRankToAttribute
-  implements JoinFunction&lt;PageRank.Result&lt;GradoopId&gt;, EPGMVertex, EPGMVertex&gt; {
+public class PageRankToAttribute&lt;V extends Vertex&gt; implements JoinFunction&lt;PageRank.Result&lt;GradoopId&gt;, V, V&gt; {
 
   /**
    * Property to store the page rank in.
@@ -38,14 +39,14 @@ public class PageRankToAttribute
    *
    * @param targetProperty Property name.
    */
-<span class="fc" id="L41">  public PageRankToAttribute(String targetProperty) {</span>
-<span class="fc" id="L42">    this.pageRankPropery = targetProperty;</span>
-<span class="fc" id="L43">  }</span>
+<span class="fc" id="L42">  public PageRankToAttribute(String targetProperty) {</span>
+<span class="fc" id="L43">    this.pageRankPropery = targetProperty;</span>
+<span class="fc" id="L44">  }</span>
 
   @Override
-  public EPGMVertex join(PageRank.Result result, EPGMVertex vertex) {
-<span class="fc" id="L47">    vertex.setProperty(pageRankPropery, PropertyValue.create(result.getPageRankScore().getValue()));</span>
-<span class="fc" id="L48">    return vertex;</span>
+  public V join(PageRank.Result&lt;GradoopId&gt; result, V vertex) {
+<span class="fc" id="L48">    vertex.setProperty(pageRankPropery, PropertyValue.create(result.getPageRankScore().getValue()));</span>
+<span class="fc" id="L49">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

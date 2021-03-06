@@ -19,51 +19,58 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.library.clustering.undirected.GlobalClusteringCoefficient;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
  * Gradoop EPGM model wrapper for Flink Gellys implementation of the global clustering coefficient
  * algorithm for undirected graphs
  * {@link org.apache.flink.graph.library.clustering.undirected.GlobalClusteringCoefficient}.
- * Returns the initial {@link LogicalGraph} with global value written to the graph head.
+ * Returns the initial {@link BaseGraph} with global value written to the graph head.
+ *
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
  */
-public class GellyGlobalClusteringCoefficientUndirected extends ClusteringCoefficientBase {
+public class GellyGlobalClusteringCoefficientUndirected&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends ClusteringCoefficientBase&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Creates an instance of the GellyGlobalClusteringCoefficientUndirected wrapper class.
    * Calls constructor of super class {@link ClusteringCoefficientBase}.
    */
   public GellyGlobalClusteringCoefficientUndirected() {
-<span class="fc" id="L41">    super();</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L55">    super();</span>
+<span class="fc" id="L56">  }</span>
 
-  /**
-   * {@inheritDoc}
-   *
-   * Calls Flink Gelly algorithms to compute the global clustering coefficient for an undirected
-   * graph.
-   */
   @Override
-  protected LogicalGraph executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
-    throws Exception {
+  protected LG executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph) throws Exception {
 
-<span class="fc" id="L54">    GlobalClusteringCoefficient global = new org.apache.flink.graph.library.clustering.undirected</span>
-<span class="fc" id="L55">      .GlobalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph);</span>
+<span class="fc" id="L61">    GlobalClusteringCoefficient global = new org.apache.flink.graph.library.clustering.undirected</span>
+<span class="fc" id="L62">      .GlobalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph);</span>
 
-<span class="fc" id="L57">    currentGraph.getConfig().getExecutionEnvironment().execute();</span>
+<span class="fc" id="L64">    currentGraph.getConfig().getExecutionEnvironment().execute();</span>
 
-<span class="fc" id="L59">    double globalValue = global.getResult().getGlobalClusteringCoefficientScore();</span>
+<span class="fc" id="L66">    double globalValue = global.getResult().getGlobalClusteringCoefficientScore();</span>
 
-<span class="fc" id="L61">    DataSet&lt;EPGMGraphHead&gt; resultHead = currentGraph.getGraphHead()</span>
-<span class="fc" id="L62">      .map(new WritePropertyToGraphHeadMap(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,</span>
-<span class="fc" id="L63">        PropertyValue.create(globalValue)));</span>
+<span class="fc" id="L68">    DataSet&lt;G&gt; resultHead = currentGraph.getGraphHead()</span>
+<span class="fc" id="L69">      .map(new WritePropertyToGraphHeadMap&lt;&gt;(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,</span>
+<span class="fc" id="L70">        PropertyValue.create(globalValue)));</span>
 
-<span class="fc" id="L65">    return currentGraph.getFactory().fromDataSets(</span>
-<span class="fc" id="L66">      resultHead, currentGraph.getVertices(), currentGraph.getEdges());</span>
+<span class="fc" id="L72">    return currentGraph.getFactory().fromDataSets(</span>
+<span class="fc" id="L73">      resultHead, currentGraph.getVertices(), currentGraph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

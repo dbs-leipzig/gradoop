@@ -72,11 +72,11 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-<span class="fc" id="L75">    graph = new DistinctVertexDegrees(</span>
+<span class="fc" id="L75">    graph = graph.callForGraph(new DistinctVertexDegrees&lt;&gt;(</span>
       SamplingConstants.DEGREE_PROPERTY_KEY,
       SamplingConstants.IN_DEGREE_PROPERTY_KEY,
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
-<span class="fc" id="L79">      true).execute(graph);</span>
+      true));
 
 <span class="fc" id="L81">    DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()</span>
 <span class="fc" id="L82">      .map(new VertexToDegreeMap(SamplingConstants.DEGREE_PROPERTY_KEY))</span>

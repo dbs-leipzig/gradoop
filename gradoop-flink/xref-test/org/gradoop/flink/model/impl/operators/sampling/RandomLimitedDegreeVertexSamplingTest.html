@@ -64,11 +64,11 @@
 <a name="54" href="#54">54</a>    @Override
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> validateSpecific(LogicalGraph input, LogicalGraph output) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="56" href="#56">56</a>      List&lt;EPGMVertex&gt; dbDegreeVertices = Lists.newArrayList();
-<a name="57" href="#57">57</a>      LogicalGraph inputWithDegrees = <strong class="jxr_keyword">new</strong> DistinctVertexDegrees(
+<a name="57" href="#57">57</a>      LogicalGraph inputWithDegrees = input.callForGraph(<strong class="jxr_keyword">new</strong> DistinctVertexDegrees&lt;&gt;(
 <a name="58" href="#58">58</a>        VertexDegree.BOTH.getName(),
 <a name="59" href="#59">59</a>        VertexDegree.IN.getName(),
 <a name="60" href="#60">60</a>        VertexDegree.OUT.getName(),
-<a name="61" href="#61">61</a>        <strong class="jxr_keyword">true</strong>).execute(input);
+<a name="61" href="#61">61</a>        <strong class="jxr_keyword">true</strong>));
 <a name="62" href="#62">62</a>      inputWithDegrees.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(dbDegreeVertices));
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>      getExecutionEnvironment().execute();

@@ -116,11 +116,11 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-<span class="fc" id="L119">    graph = new DistinctVertexDegrees(</span>
+<span class="fc" id="L119">    graph = graph.callForGraph(new DistinctVertexDegrees&lt;&gt;(</span>
       SamplingConstants.DEGREE_PROPERTY_KEY,
       SamplingConstants.IN_DEGREE_PROPERTY_KEY,
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
-<span class="fc" id="L123">      true).execute(graph);</span>
+      true));
 
 <span class="fc" id="L125">    DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()</span>
 <span class="fc" id="L126">      .filter(new LimitedDegreeVertexRandomFilter&lt;&gt;(</span>

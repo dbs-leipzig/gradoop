@@ -18,16 +18,17 @@ package org.gradoop.flink.algorithms.gelly.vertexdegrees.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees;
 import org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees.Degrees;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Stores the in-degree, out-degree and the sum of both as a property in vertex
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
-public class DistinctVertexDegreesToAttribute
-  implements JoinFunction
-  &lt;org.apache.flink.graph.Vertex&lt;GradoopId, VertexDegrees.Degrees&gt;, EPGMVertex, EPGMVertex&gt; {
+public class DistinctVertexDegreesToAttribute&lt;V extends Vertex&gt;
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, VertexDegrees.Degrees&gt;, V, V&gt; {
 
   /**
    * Property to store the sum of vertex degrees in.
@@ -50,21 +51,20 @@ public class DistinctVertexDegreesToAttribute
    * @param vertexOutDegreesProperty property key to store out degree
    */
   public DistinctVertexDegreesToAttribute(String vertexDegreesProperty,
-<span class="fc" id="L53">      String vertexInDegreesProperty, String vertexOutDegreesProperty) {</span>
-<span class="fc" id="L54">    this.vertexDegreesProperty = vertexDegreesProperty;</span>
-<span class="fc" id="L55">    this.vertexInDegreeProperty = vertexInDegreesProperty;</span>
-<span class="fc" id="L56">    this.vertexOutDegreeProperty = vertexOutDegreesProperty;</span>
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L54">      String vertexInDegreesProperty, String vertexOutDegreesProperty) {</span>
+<span class="fc" id="L55">    this.vertexDegreesProperty = vertexDegreesProperty;</span>
+<span class="fc" id="L56">    this.vertexInDegreeProperty = vertexInDegreesProperty;</span>
+<span class="fc" id="L57">    this.vertexOutDegreeProperty = vertexOutDegreesProperty;</span>
+<span class="fc" id="L58">  }</span>
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex&lt;GradoopId, Degrees&gt; degree, EPGMVertex vertex)
-    throws Exception {
+  public V join(org.apache.flink.graph.Vertex&lt;GradoopId, Degrees&gt; degree, V vertex) throws Exception {
 <span class="fc" id="L62">    vertex.setProperty(vertexDegreesProperty,</span>
-<span class="fc" id="L63">        PropertyValue.create(degree.getValue().getDegree().getValue()));</span>
+<span class="fc" id="L63">      PropertyValue.create(degree.getValue().getDegree().getValue()));</span>
 <span class="fc" id="L64">    vertex.setProperty(vertexInDegreeProperty,</span>
-<span class="fc" id="L65">        PropertyValue.create(degree.getValue().getInDegree().getValue()));</span>
+<span class="fc" id="L65">      PropertyValue.create(degree.getValue().getInDegree().getValue()));</span>
 <span class="fc" id="L66">    vertex.setProperty(vertexOutDegreeProperty,</span>
-<span class="fc" id="L67">        PropertyValue.create(degree.getValue().getOutDegree().getValue()));</span>
+<span class="fc" id="L67">      PropertyValue.create(degree.getValue().getOutDegree().getValue()));</span>
 <span class="fc" id="L68">    return vertex;</span>
   }
 }

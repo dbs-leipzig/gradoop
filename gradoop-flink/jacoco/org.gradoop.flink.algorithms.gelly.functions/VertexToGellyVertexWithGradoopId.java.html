@@ -16,14 +16,16 @@
 package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Maps EPGM vertex to a Gelly vertex with the {@link GradoopId} as its id and value.
+ * Maps Gradoop vertex to a Gelly vertex with the {@link GradoopId} as its id and value.
+ *
+ * @param &lt;V&gt; Gradoop Vertex type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0;id-&gt;f1&quot;)
-public class VertexToGellyVertexWithGradoopId implements VertexToGellyVertex&lt;GradoopId&gt; {
+public class VertexToGellyVertexWithGradoopId&lt;V extends Vertex&gt; implements VertexToGellyVertex&lt;V, GradoopId&gt; {
   /**
    * Reduce object instantiations
    */
@@ -32,16 +34,16 @@ public class VertexToGellyVertexWithGradoopId implements VertexToGellyVertex&lt;
   /**
    * Constructor.
    */
-<span class="fc" id="L35">  public VertexToGellyVertexWithGradoopId() {</span>
-<span class="fc" id="L36">    reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
-<span class="fc" id="L37">  }</span>
+<span class="fc" id="L37">  public VertexToGellyVertexWithGradoopId() {</span>
+<span class="fc" id="L38">    reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
+<span class="fc" id="L39">  }</span>
 
   @Override
-  public org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; map(EPGMVertex epgmVertex) {
-<span class="fc" id="L41">    GradoopId id = epgmVertex.getId();</span>
-<span class="fc" id="L42">    reuseVertex.setId(id);</span>
-<span class="fc" id="L43">    reuseVertex.setValue(id);</span>
-<span class="fc" id="L44">    return reuseVertex;</span>
+  public org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; map(V vertex) {
+<span class="fc" id="L43">    GradoopId id = vertex.getId();</span>
+<span class="fc" id="L44">    reuseVertex.setId(id);</span>
+<span class="fc" id="L45">    reuseVertex.setValue(id);</span>
+<span class="fc" id="L46">    return reuseVertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

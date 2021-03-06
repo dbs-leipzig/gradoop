@@ -20,37 +20,39 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Initializes a new graph head from a given GradoopId.
+ *
+ * @param &lt;G&gt; Graph head type
  */
-public class InitGraphHead implements MapFunction&lt;Tuple1&lt;GradoopId&gt;, EPGMGraphHead&gt;,
-  ResultTypeQueryable&lt;EPGMGraphHead&gt; {
+public class InitGraphHead&lt;G extends GraphHead&gt;
+  implements MapFunction&lt;Tuple1&lt;GradoopId&gt;, G&gt;, ResultTypeQueryable&lt;G&gt; {
   /**
-   * EPGMGraphHeadFactory
+   * GraphHeadFactory
    */
-  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
 
   /**
    * Constructor
    *
-   * @param epgmGraphHeadFactory graph head factory
+   * @param graphHeadFactory graph head factory
    */
-<span class="fc" id="L42">  public InitGraphHead(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory) {</span>
-<span class="fc" id="L43">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L44">  public InitGraphHead(GraphHeadFactory&lt;G&gt; graphHeadFactory) {</span>
+<span class="fc" id="L45">    this.graphHeadFactory = graphHeadFactory;</span>
+<span class="fc" id="L46">  }</span>
 
   @Override
-  public EPGMGraphHead map(Tuple1&lt;GradoopId&gt; idTuple) {
-<span class="fc" id="L48">    return graphHeadFactory.initGraphHead(idTuple.f0);</span>
+  public G map(Tuple1&lt;GradoopId&gt; idTuple) {
+<span class="fc" id="L50">    return graphHeadFactory.initGraphHead(idTuple.f0);</span>
   }
 
   @Override
-  public TypeInformation&lt;EPGMGraphHead&gt; getProducedType() {
-<span class="fc" id="L53">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
+  public TypeInformation&lt;G&gt; getProducedType() {
+<span class="fc" id="L55">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

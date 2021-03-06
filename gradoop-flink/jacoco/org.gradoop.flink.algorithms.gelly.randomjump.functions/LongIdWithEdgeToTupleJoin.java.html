@@ -19,17 +19,19 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Takes an EPGM edge and creates a tuple, containing the edges source id as unique long id, its
+ * Takes an Gradoop edge and creates a tuple, containing the edges source id as unique long id, its
  * target id as GradoopId and its own id as GradoopId.
+ *
+ * @param &lt;E&gt; Gradoop Edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;targetId-&gt;f1;id-&gt;f2&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f0&quot;)
-public class LongIdWithEdgeToTupleJoin implements
-  JoinFunction&lt;EPGMEdge, Tuple2&lt;Long, GradoopId&gt;, Tuple3&lt;Long, GradoopId, GradoopId&gt;&gt; {
+public class LongIdWithEdgeToTupleJoin&lt;E extends Edge&gt;
+  implements JoinFunction&lt;E, Tuple2&lt;Long, GradoopId&gt;, Tuple3&lt;Long, GradoopId, GradoopId&gt;&gt; {
 
   /**
    * Reduce object instantiation.
@@ -39,18 +41,17 @@ public class LongIdWithEdgeToTupleJoin implements
   /**
    * Creates an instance of LongIdWithEdgeToTupleJoin.
    */
-<span class="fc" id="L42">  public LongIdWithEdgeToTupleJoin() {</span>
-<span class="fc" id="L43">    this.reuseTuple = new Tuple3&lt;&gt;();</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L44">  public LongIdWithEdgeToTupleJoin() {</span>
+<span class="fc" id="L45">    this.reuseTuple = new Tuple3&lt;&gt;();</span>
+<span class="fc" id="L46">  }</span>
 
   @Override
-  public Tuple3&lt;Long, GradoopId, GradoopId&gt; join(
-    EPGMEdge epgmEdge,
-    Tuple2&lt;Long, GradoopId&gt; uniqueLongToVertexId) throws Exception {
-<span class="fc" id="L50">    reuseTuple.f0 = uniqueLongToVertexId.f0;</span>
-<span class="fc" id="L51">    reuseTuple.f1 = epgmEdge.getTargetId();</span>
-<span class="fc" id="L52">    reuseTuple.f2 = epgmEdge.getId();</span>
-<span class="fc" id="L53">    return reuseTuple;</span>
+  public Tuple3&lt;Long, GradoopId, GradoopId&gt; join(E edge, Tuple2&lt;Long, GradoopId&gt; uniqueLongToVertexId)
+    throws Exception {
+<span class="fc" id="L51">    reuseTuple.f0 = uniqueLongToVertexId.f0;</span>
+<span class="fc" id="L52">    reuseTuple.f1 = edge.getTargetId();</span>
+<span class="fc" id="L53">    reuseTuple.f2 = edge.getId();</span>
+<span class="fc" id="L54">    return reuseTuple;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

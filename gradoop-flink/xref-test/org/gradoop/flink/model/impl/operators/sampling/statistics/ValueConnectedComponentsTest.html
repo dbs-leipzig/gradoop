@@ -94,8 +94,8 @@
 <a name="84" href="#84">84</a>      LogicalGraph graph = loader.getLogicalGraphByVariable(<span class="jxr_string">"g"</span>);
 <a name="85" href="#85">85</a>  
 <a name="86" href="#86">86</a>      <em class="jxr_comment">// execute Gelly ConnectedComponents.</em>
-<a name="87" href="#87">87</a>      DataSet&lt;Tuple2&lt;Long, Long&gt;&gt; cComponents =
-<a name="88" href="#88">88</a>        <strong class="jxr_keyword">new</strong> ConnectedComponentsDistributionAsValues(Integer.MAX_VALUE).execute(graph);
+<a name="87" href="#87">87</a>      DataSet&lt;Tuple2&lt;Long, Long&gt;&gt; cComponents = graph.callForValue(
+<a name="88" href="#88">88</a>        <strong class="jxr_keyword">new</strong> ConnectedComponentsDistributionAsValues&lt;&gt;(Integer.MAX_VALUE));
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>      List&lt;Tuple2&lt;Long, Long&gt;&gt; vertexComponentList = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="91" href="#91">91</a>      cComponents.output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertexComponentList));

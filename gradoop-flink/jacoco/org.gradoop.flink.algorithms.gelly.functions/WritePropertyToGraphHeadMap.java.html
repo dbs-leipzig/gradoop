@@ -16,39 +16,41 @@
 package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * MapFunction, that writes a given property value to the EPGMGraphHead.
+ * MapFunction, that writes a given property value to the GraphHead.
+ *
+ * @param &lt;G&gt; Gradoop graph head type.
  */
-public class WritePropertyToGraphHeadMap implements MapFunction&lt;EPGMGraphHead, EPGMGraphHead&gt; {
+public class WritePropertyToGraphHeadMap&lt;G extends GraphHead&gt; implements MapFunction&lt;G, G&gt; {
 
   /**
-   * PropertyKey to access the value
+   * PropertyKey to access the value.
    */
   private final String propertyKey;
 
   /**
-   * PropertyValue to store in EPGMGraphHead
+   * PropertyValue to store in GraphHead.
    */
   private final PropertyValue propertyValue;
 
   /**
-   * Creates an instance of a MapFunction, that writes a given property value to the EPGMGraphHead.
+   * Creates an instance of a MapFunction, that writes a given property value to the GraphHead.
    *
    * @param propertyKey PropertyKey to access the value
-   * @param propertyValue PropertyValue to store in EPGMGraphHead
+   * @param propertyValue PropertyValue to store in GraphHead
    */
-<span class="fc" id="L43">  public WritePropertyToGraphHeadMap(String propertyKey, PropertyValue propertyValue) {</span>
-<span class="fc" id="L44">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L45">    this.propertyValue = propertyValue;</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L45">  public WritePropertyToGraphHeadMap(String propertyKey, PropertyValue propertyValue) {</span>
+<span class="fc" id="L46">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L47">    this.propertyValue = propertyValue;</span>
+<span class="fc" id="L48">  }</span>
 
   @Override
-  public EPGMGraphHead map(EPGMGraphHead graphHead) throws Exception {
-<span class="fc" id="L50">    graphHead.setProperty(propertyKey, propertyValue);</span>
-<span class="fc" id="L51">    return graphHead;</span>
+  public G map(G graphHead) throws Exception {
+<span class="fc" id="L52">    graphHead.setProperty(propertyKey, propertyValue);</span>
+<span class="fc" id="L53">    return graphHead;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

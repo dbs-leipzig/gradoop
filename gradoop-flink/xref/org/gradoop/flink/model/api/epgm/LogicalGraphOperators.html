@@ -93,41 +93,31 @@
 <a name="83" href="#83">83</a>    <em class="jxr_comment">//----------------------------------------------------------------------------</em>
 <a name="84" href="#84">84</a>  
 <a name="85" href="#85">85</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * Splits the graph into multiple logical graphs using the property value</em>
-<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * which is assigned to the given property key. Vertices and edges that do</em>
-<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * not have this property will be removed from the resulting collection.</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   * @param propertyKey split property key</em>
-<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * @return graph collection</em>
-<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="93" href="#93">93</a>    <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> splitBy(String propertyKey);
-<a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and other graphs using the given operator.</em>
-<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @param operator    multi graph to graph operator</em>
-<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * @param otherGraphs other graphs</em>
-<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
-<a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   */</em>
-<a name="102" href="#102">102</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/GraphsToGraphOperator.html">GraphsToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, LogicalGraph... otherGraphs);
-<a name="103" href="#103">103</a> 
-<a name="104" href="#104">104</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">     * Writes the graph to given data sink.</em>
-<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">     *</em>
-<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">     * @param dataSink The data sink to which the graph should be written.</em>
-<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">     * @throws IOException if the graph can't be written to the sink</em>
-<a name="109" href="#109">109</a> <em class="jxr_javadoccomment">     */</em>
-<a name="110" href="#110">110</a>   <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink) <strong class="jxr_keyword">throws</strong> IOException;
-<a name="111" href="#111">111</a> 
-<a name="112" href="#112">112</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="113" href="#113">113</a> <em class="jxr_javadoccomment">     * Writes the graph to given data sink with an optional overwrite option.</em>
-<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">     *</em>
-<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">     * @param dataSink The data sink to which the graph should be written.</em>
-<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">     * @param overWrite determines whether existing files are overwritten</em>
-<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">     * @throws IOException if the graph can't be written to the sink</em>
-<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">     */</em>
-<a name="119" href="#119">119</a>   <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink, <strong class="jxr_keyword">boolean</strong> overWrite) <strong class="jxr_keyword">throws</strong> IOException;
-<a name="120" href="#120">120</a> }
+<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and other graphs using the given operator.</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * @param operator    multi graph to graph operator</em>
+<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * @param otherGraphs other graphs</em>
+<a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   * @return result of given operator</em>
+<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="92" href="#92">92</a>    <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/GraphsToGraphOperator.html">GraphsToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, LogicalGraph... otherGraphs);
+<a name="93" href="#93">93</a>  
+<a name="94" href="#94">94</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">     * Writes the graph to given data sink.</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">     *</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">     * @param dataSink The data sink to which the graph should be written.</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">     * @throws IOException if the graph can't be written to the sink</em>
+<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">     */</em>
+<a name="100" href="#100">100</a>   <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="101" href="#101">101</a> 
+<a name="102" href="#102">102</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="103" href="#103">103</a> <em class="jxr_javadoccomment">     * Writes the graph to given data sink with an optional overwrite option.</em>
+<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">     *</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">     * @param dataSink The data sink to which the graph should be written.</em>
+<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">     * @param overWrite determines whether existing files are overwritten</em>
+<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">     * @throws IOException if the graph can't be written to the sink</em>
+<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">     */</em>
+<a name="109" href="#109">109</a>   <strong class="jxr_keyword">void</strong> writeTo(<a href="../../../../../../org/gradoop/flink/io/api/DataSink.html">DataSink</a> dataSink, <strong class="jxr_keyword">boolean</strong> overWrite) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="110" href="#110">110</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

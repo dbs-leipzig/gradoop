@@ -17,18 +17,33 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.ValueWeaklyConnectedComponents;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 
 /**
  * Computes the weakly connected components of a graph structure. Uses the gradoop wrapper
  * {@link ValueWeaklyConnectedComponents} of Flinks ConnectedComponents.
  * &lt;p&gt;
  * Returns a mapping of {@code VertexId -&gt; ComponentId}
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class ConnectedComponentsDistributionAsValues
-  implements UnaryGraphToValueOperator&lt;DataSet&lt;Tuple2&lt;Long, Long&gt;&gt;&gt; {
+public class ConnectedComponentsDistributionAsValues&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToValueOperator&lt;LG, DataSet&lt;Tuple2&lt;Long, Long&gt;&gt;&gt; {
 
   /**
    * Max iterations.
@@ -40,13 +55,13 @@ public class ConnectedComponentsDistributionAsValues
    *
    * @param maxiIteration max iteration count.
    */
-<span class="fc" id="L43">  public ConnectedComponentsDistributionAsValues(int maxiIteration) {</span>
-<span class="fc" id="L44">    this.maxIteration = maxiIteration;</span>
-<span class="fc" id="L45">  }</span>
+<span class="fc" id="L58">  public ConnectedComponentsDistributionAsValues(int maxiIteration) {</span>
+<span class="fc" id="L59">    this.maxIteration = maxiIteration;</span>
+<span class="fc" id="L60">  }</span>
 
   @Override
-  public DataSet&lt;Tuple2&lt;Long, Long&gt;&gt; execute(LogicalGraph graph) {
-<span class="fc" id="L49">    return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);</span>
+  public DataSet&lt;Tuple2&lt;Long, Long&gt;&gt; execute(LG graph) {
+<span class="fc" id="L64">    return new ValueWeaklyConnectedComponents&lt;G, V, E, LG, GC&gt;(maxIteration).execute(graph);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -16,25 +16,40 @@
 package org.gradoop.flink.algorithms.gelly;
 
 import org.apache.flink.graph.Graph;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 
 /**
  * Base class for Algorithms executed in Flink Gelly.
  *
- * @param &lt;K&gt;   Key type of output gelly graph.
- * @param &lt;VV&gt;  Value type of output gelly vertex.
- * @param &lt;EV&gt;  Value type of output gelly edge.
- * @param &lt;O&gt;   Output type.
+ * @param &lt;G&gt;  Gradoop graph head type.
+ * @param &lt;V&gt;  Gradoop vertex type.
+ * @param &lt;E&gt;  Gradoop edge type.
+ * @param &lt;LG&gt; Gradoop type of the graph.
+ * @param &lt;GC&gt; Gradoop type of the graph collection.
+ * @param &lt;K&gt;  Key type of output gelly graph.
+ * @param &lt;VV&gt; Value type of output gelly vertex.
+ * @param &lt;EV&gt; Value type of output gelly edge.
+ * @param &lt;O&gt;  Output type.
  */
-<span class="fc" id="L30">public abstract class BaseGellyAlgorithm&lt;K, VV, EV, O&gt; implements UnaryGraphToValueOperator&lt;O&gt; {</span>
+<span class="fc" id="L39">public abstract class BaseGellyAlgorithm&lt;</span>
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;,
+  K, VV, EV, O&gt; implements UnaryBaseGraphToValueOperator&lt;LG, O&gt; {
 
   @Override
-  public O execute(LogicalGraph graph) {
+  public O execute(LG graph) {
     try {
-<span class="fc" id="L35">      return executeInGelly(transformToGelly(graph));</span>
-<span class="nc" id="L36">    } catch (Exception e) {</span>
-<span class="nc" id="L37">      throw new RuntimeException(e);</span>
+<span class="fc" id="L50">      return executeInGelly(transformToGelly(graph));</span>
+<span class="nc" id="L51">    } catch (Exception e) {</span>
+<span class="nc" id="L52">      throw new RuntimeException(e);</span>
     }
   }
 
@@ -44,15 +59,15 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
    * @param graph Gradoop Graph.
    * @return Gelly Graph.
    */
-  public abstract Graph&lt;K, VV, EV&gt; transformToGelly(LogicalGraph graph);
+  public abstract Graph&lt;K, VV, EV&gt; transformToGelly(LG graph);
 
   /**
    * Perform some operation in Gelly and transform the Gelly graph back to a dedicated value.
    *
-   * @param graph The Gelly graph.
+   * @param gellyGraph The Gelly graph.
    * @return output format.
    * @throws Exception on failure
    */
-  public abstract O executeInGelly(Graph&lt;K, VV, EV&gt; graph) throws Exception;
+  public abstract O executeInGelly(Graph&lt;K, VV, EV&gt; gellyGraph) throws Exception;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
