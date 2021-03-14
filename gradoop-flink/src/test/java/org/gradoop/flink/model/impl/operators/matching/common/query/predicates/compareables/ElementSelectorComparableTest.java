@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.ElementSelector;
+import org.gradoop.gdl.model.comparables.ElementSelector;
 
 import java.util.NoSuchElementException;
 

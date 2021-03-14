@@ -26,10 +26,10 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
-import org.s1ck.gdl.model.Graph;
-import org.s1ck.gdl.model.GraphElement;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.exceptions.BailSyntaxErrorStrategy;
+import org.gradoop.gdl.model.Graph;
+import org.gradoop.gdl.model.GraphElement;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -456,11 +456,11 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Initializes vertices and their cache.
    */
   private void initVertices() {
-    for (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {
+    for (org.gradoop.gdl.model.Vertex v : gdlHandler.getVertices()) {
       initVertex(v);
     }
 
-    for (Map.Entry<String, org.s1ck.gdl.model.Vertex> e : gdlHandler.getVertexCache().entrySet()) {
+    for (Map.Entry<String, org.gradoop.gdl.model.Vertex> e : gdlHandler.getVertexCache().entrySet()) {
       updateVertexCache(e.getKey(), e.getValue());
     }
   }
@@ -469,11 +469,11 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Initializes edges and their cache.
    */
   private void initEdges() {
-    for (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {
+    for (org.gradoop.gdl.model.Edge e : gdlHandler.getEdges()) {
       initEdge(e);
     }
 
-    for (Map.Entry<String, org.s1ck.gdl.model.Edge> e : gdlHandler.getEdgeCache().entrySet()) {
+    for (Map.Entry<String, org.gradoop.gdl.model.Edge> e : gdlHandler.getEdgeCache().entrySet()) {
       updateEdgeCache(e.getKey(), e.getValue());
     }
   }
@@ -498,7 +498,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * @param v vertex from GDL Loader
    * @return vertex
    */
-  private V initVertex(org.s1ck.gdl.model.Vertex v) {
+  private V initVertex(org.gradoop.gdl.model.Vertex v) {
     V vertex;
     if (!vertexIds.containsKey(v.getId())) {
       vertex = elementFactoryProvider.getVertexFactory().createVertex(
@@ -520,7 +520,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * @param e edge from GDL loader
    * @return edge
    */
-  private E initEdge(org.s1ck.gdl.model.Edge e) {
+  private E initEdge(org.gradoop.gdl.model.Edge e) {
     E edge;
     if (!edgeIds.containsKey(e.getId())) {
       edge = elementFactoryProvider.getEdgeFactory().createEdge(
@@ -555,7 +555,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * @param variable vertex variable used in GDL script
    * @param v vertex from GDL loader
    */
-  private void updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
+  private void updateVertexCache(String variable, org.gradoop.gdl.model.Vertex v) {
     vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
   }
 
@@ -565,7 +565,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * @param variable edge variable used in the GDL script
    * @param e edge from GDL loader
    */
-  private void updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
+  private void updateEdgeCache(String variable, org.gradoop.gdl.model.Edge e) {
     edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
   }
 

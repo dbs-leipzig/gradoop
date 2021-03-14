@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 /**
  * Takes a vertex-edge pair and the corresponding target vertex as input and evaluates, if the triple matches
