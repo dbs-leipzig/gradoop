@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.s1ck.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.booleans.Or;
 
 import java.util.Objects;
 

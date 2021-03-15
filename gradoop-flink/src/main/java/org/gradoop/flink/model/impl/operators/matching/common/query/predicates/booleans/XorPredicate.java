@@ -17,16 +17,16 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.booleans.Xor;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.booleans.Xor;
 
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
+ * Wraps a {@link Xor} predicate
  */
 public class XorPredicate extends QueryPredicate {
   /**

@@ -158,10 +158,10 @@ public class SplitTest extends GradoopFlinkTestBase {
           "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
           "]" +
           "g2 [" +
-          "(v0)-[e0:sameAs {id : 0, sim : \"0.91\"}]->(v1)" +
-          "(v0)-[e1:sameAs {id : 1, sim : \"0.3\"}]->(v2)" +
-          "(v2)-[e2:sameAs {id : 2, sim : \"0.1\"}]->(v1)" +
-          "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
+          "(v0)-[e0]->(v1)" +
+          "(v0)-[e1]->(v2)" +
+          "(v2)-[e2]->(v1)" +
+          "(v2)-[e3]->(v3)" +
           "]"
       );
 

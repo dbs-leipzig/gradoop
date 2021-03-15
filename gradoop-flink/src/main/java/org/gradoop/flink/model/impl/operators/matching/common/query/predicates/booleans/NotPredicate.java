@@ -19,18 +19,18 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
+ * Wraps a {@link org.gradoop.gdl.model.predicates.booleans.Not} predicate
  */
 public class NotPredicate extends QueryPredicate {
 

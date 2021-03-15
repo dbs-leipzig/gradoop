@@ -57,7 +57,7 @@ public class VerifyTest extends GradoopFlinkTestBase {
   public void testVerifyWithSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
     loader.appendToDatabaseFromString("expected[" +
-      "(eve)-[ekb:knows {since : 2015}]->(bob)" +
+      "(eve)-[ekb]->(bob)" +
       "]");
     LogicalGraph input = loader.getLogicalGraphByVariable("g0");
 
@@ -94,9 +94,9 @@ public class VerifyTest extends GradoopFlinkTestBase {
   public void testVerifyWithApplySubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
     loader.appendToDatabaseFromString("expected0[" +
-      "(eve)-[ekb:knows {since : 2015}]->(bob)" +
+      "(eve)-[ekb]->(bob)" +
       "] expected1 [" +
-      "(frank)-[fkd:knows {since : 2015}]->(dave)" +
+      "(frank)-[fkd]->(dave)" +
       "]");
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1");
     GradoopId id0 = loader.getGraphHeadByVariable("g0").getId();

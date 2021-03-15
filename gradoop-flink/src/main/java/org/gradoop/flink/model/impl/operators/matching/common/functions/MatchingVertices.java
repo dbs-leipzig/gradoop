@@ -38,7 +38,7 @@ public class MatchingVertices<V extends Vertex> extends AbstractFilter<V> {
   /**
    * Query vertices to match against.
    */
-  private transient Collection<org.s1ck.gdl.model.Vertex> queryVertices;
+  private transient Collection<org.gradoop.gdl.model.Vertex> queryVertices;
   /**
    * Create new filter.
    *

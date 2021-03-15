@@ -23,8 +23,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.Objects;
 import java.util.Set;

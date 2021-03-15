@@ -19,9 +19,9 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import static org.junit.Assert.*;
 

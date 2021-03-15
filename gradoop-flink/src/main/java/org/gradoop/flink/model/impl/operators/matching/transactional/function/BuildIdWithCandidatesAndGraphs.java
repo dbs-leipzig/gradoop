@@ -45,7 +45,7 @@ public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
   /**
    * Query vertices to match against.
    */
-  private transient Collection<org.s1ck.gdl.model.Vertex> queryVertices;
+  private transient Collection<org.gradoop.gdl.model.Vertex> queryVertices;
   /**
    * Number of vertices in the query graph
    */

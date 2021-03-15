@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import org.junit.Test;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
 
 import static org.junit.Assert.*;
 

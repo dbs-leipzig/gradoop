@@ -38,7 +38,7 @@ public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
   /**
    * Query edges to match against.
    */
-  private transient Collection<org.s1ck.gdl.model.Edge> queryEdges;
+  private transient Collection<org.gradoop.gdl.model.Edge> queryEdges;
   /**
    * Constructor
    *

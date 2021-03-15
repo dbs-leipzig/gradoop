@@ -329,7 +329,7 @@ public class EqualityTest extends GradoopFlinkTestBase {
       // loop around a1 and edge from a1 to a2
       "(a1:A{x : 1})-[loop:a{x : 1}]->(a1)-[aa:a{x : 1}]->(a2:A{x : 2})" +
       // parallel edge from a1 to b1
-      "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1:B)" +
+      "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1)" +
       // cycle of bs
       "(b1)-[cyc1:c]->(b2:B)-[cyc2:c]->(b3:B)-[cyc3:c]->(b1)]" +
 
