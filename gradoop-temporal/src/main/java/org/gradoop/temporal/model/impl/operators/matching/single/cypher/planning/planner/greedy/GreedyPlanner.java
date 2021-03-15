@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.HashSet;

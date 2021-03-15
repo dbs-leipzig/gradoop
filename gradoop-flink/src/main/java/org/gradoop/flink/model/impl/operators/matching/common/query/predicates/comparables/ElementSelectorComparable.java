@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
 import org.gradoop.gdl.model.comparables.ElementSelector;
 
 import java.util.HashSet;

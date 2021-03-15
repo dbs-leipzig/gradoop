@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.stream.Collectors;
 

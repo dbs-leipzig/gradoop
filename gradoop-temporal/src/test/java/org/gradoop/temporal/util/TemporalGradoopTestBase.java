@@ -398,8 +398,6 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
         long end = value.getPropertyValue("end").getLong();
         value.setValidTime(new Tuple2<>(start, end));
         value.setTransactionTime(value.getValidTime());
-        //value.removeProperty("start");
-        //value.removeProperty("end");
         return value;
       }
     };
@@ -412,8 +410,6 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
         long end = value.getPropertyValue("end").getLong();
         value.setValidTime(new Tuple2<>(start, end));
         value.setTransactionTime(value.getValidTime());
-        //value.removeProperty("start");
-        //value.removeProperty("end");
         return value;
       }
     };

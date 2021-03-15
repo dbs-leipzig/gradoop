@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,16 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.comparables.ElementSelector;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.comparables.time.Duration;
-import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
-import org.s1ck.gdl.model.comparables.time.MinTimePoint;
-import org.s1ck.gdl.model.comparables.time.TimeConstant;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.ElementSelector;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
 /**
  * Factory for temporal comparables

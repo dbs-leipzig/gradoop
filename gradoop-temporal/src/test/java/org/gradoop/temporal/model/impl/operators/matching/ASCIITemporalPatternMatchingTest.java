@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,20 +124,6 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
     collectAndAssertTrue(result.equalsByGraphElementData(expectedByData));
     // correct times in graph head
 
-  }
-
-
-  private void printResult(TemporalGraphCollection gc) throws Exception {
-    ArrayList<Integer> vertices = gc.getVertices().collect().stream()
-      .map(v -> v.getPropertyValue("vertexId").getInt())
-      .collect(Collectors.toCollection(ArrayList::new));
-    ArrayList<Integer> edges = gc.getEdges().collect().stream()
-      .map(v -> v.getPropertyValue("edgeId").getInt())
-      .collect(Collectors.toCollection(ArrayList::new));
-
-    System.out.println("Vertices " + vertices);
-    System.out.println("Edges " + edges);
-    System.out.println();
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,17 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.e
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.s1ck.gdl.utils.Comparator.GT;
-import static org.s1ck.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
 
 /**
  * Looks for trivial contradictions like {@code a.tx_from > a.tx_to} or (b.prop!=b.prop).
@@ -56,6 +56,7 @@ public class TrivialContradictions implements QueryTransformation {
   /**
    * Checks a disjunctive clause for trivial contradictions and removes them.
    * If all comparisons are contradictory, an exception is thrown.
+   *
    * @param clause clause to check
    * @return the clause iff it does not contain a trivial contradiction
    * @throws QueryContradictoryException iff the clause contains a trivial contradiction
@@ -79,8 +80,9 @@ public class TrivialContradictions implements QueryTransformation {
 
 
   /**
-   * checks whether a comparison is a trivial contradiction (x < x, x!=x, !(a.tx_from <= a.tx_to,
-   *  contradictory comparison between two time literals)
+   * Checks whether a comparison is a trivial contradiction (x < x, x!=x, !(a.tx_from <= a.tx_to,
+   * contradictory comparison between two time literals)
+   *
    * @param comp comparison to check
    * @return true iff comparison is a trivial contradiction
    */

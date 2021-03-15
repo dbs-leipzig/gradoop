@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
 
 import com.google.common.collect.Lists;
@@ -29,10 +28,10 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
 
 public class EmbeddingTPGMFactoryTest {
 

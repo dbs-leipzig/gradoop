@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQ
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,10 +118,9 @@ public class FilterAndProjectTemporalEdgesTest {
     TemporalQueryHandler queryHandler = new TemporalQueryHandler(query);
     CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet("e"));
     Set<String> projectionKeys = queryHandler.getPredicates().getPropertyKeys("e");
-    System.out.println(projectionKeys);
 
-    FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges, "a", "e", "b",
-      filterPredicate, projectionKeys, false);
+    FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
+      edges, "a", "e", "b", filterPredicate, projectionKeys, false);
 
     List<Embedding> filteredEdges = node.execute().collect();
 

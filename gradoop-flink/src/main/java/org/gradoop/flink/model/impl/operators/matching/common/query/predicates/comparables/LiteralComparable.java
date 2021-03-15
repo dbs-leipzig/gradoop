@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.Literal}
  */
 public class LiteralComparable extends QueryComparable {
   /**

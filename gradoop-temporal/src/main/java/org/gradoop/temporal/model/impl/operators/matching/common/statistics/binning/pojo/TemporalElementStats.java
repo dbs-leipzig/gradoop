@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics.bin
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -120,6 +120,7 @@ public class TemporalElementStats implements Serializable {
    * Creates a element statistics object and set the size of the reservoir sample to compute
    * the statistics. The numerical and categorical properties are set by the user.
    * Omitted properties are ignored, always assigned the probability 0.5
+   *
    * @param reservoirSampleSize size of reservoir sample
    * @param numericalProperties list of numerical properties to consider
    * @param categoricalProperties list of categorical properties to consider
@@ -170,6 +171,7 @@ public class TemporalElementStats implements Serializable {
   /**
    * Creates an element statistics object that uses a reservoir sample of default size.
    * Numerical and categorical properties to consider are given explicitly
+   *
    * @param numericalProperties numerical properties to consider
    * @param categoricalProperties categorical properties to consider
    */

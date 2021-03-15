@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.comparables.time.Duration;
-import org.s1ck.gdl.model.comparables.time.TimeConstant;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,15 +46,15 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
-import static org.s1ck.gdl.utils.Comparator.EQ;
-import static org.s1ck.gdl.utils.Comparator.GT;
-import static org.s1ck.gdl.utils.Comparator.GTE;
-import static org.s1ck.gdl.utils.Comparator.LT;
-import static org.s1ck.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.gradoop.gdl.utils.Comparator.EQ;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.GTE;
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
 
 public class CNFEstimationTest extends TemporalGradoopTestBase {
 

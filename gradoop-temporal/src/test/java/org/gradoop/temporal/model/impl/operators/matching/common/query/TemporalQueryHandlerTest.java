@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,26 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.junit.Test;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Element;
-import org.s1ck.gdl.model.Vertex;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
-import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
-import org.s1ck.gdl.model.comparables.time.MinTimePoint;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Element;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.gradoop.temporal.model.impl.operators.matching.common.query.Util.equalCNFs;
@@ -48,19 +44,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
-import static org.s1ck.gdl.utils.Comparator.GT;
-import static org.s1ck.gdl.utils.Comparator.LT;
-import static org.s1ck.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
 
 
 public class TemporalQueryHandlerTest {
 
   /**
-   * copied from QueryHandlerTest (changed to TemporalQueryHandler). Ensure that this still works
+   * Copied from QueryHandlerTest (changed to TemporalQueryHandler). Ensure that this still works
    */
   static final String ECC_PROPERTY_KEY = "ecc";
   static final String TEST_QUERY = "" +
@@ -147,8 +143,6 @@ public class TemporalQueryHandlerTest {
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
 
-    // System.out.println("Here");
-
     // global and non-global predicates
     testquery = "MATCH (a)-[e1:test]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(b.val_to)";
     handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
@@ -170,13 +164,11 @@ public class TemporalQueryHandlerTest {
     );
 
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
-    // System.out.println("handlerPredicates: \n" + handler.getPredicates() + "\n");
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
 
     // only global
     testquery = "MATCH (a)-[e1]->(b) WHERE tx_to.before(b.val_to) AND a.val_to.after(val_to)";
     handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
-    // System.out.println(handler.getPredicates());
     MinTimePoint globalValTo = new MinTimePoint(e1ValTo, aValTo, bValTo);
 
     expectedPredicate = new And(
@@ -187,7 +179,6 @@ public class TemporalQueryHandlerTest {
         new Comparison(aValTo, GT, globalValTo),
         new Comparison(globalValFrom, LTE, globalValTo))
     );
-    // System.out.println("expected: \n" + handler.getPredicates() + "\n");
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
   }
@@ -209,10 +200,9 @@ public class TemporalQueryHandlerTest {
     TimeSelector tFrom = new TimeSelector("b", VAL_FROM);
     TimeSelector tTo = new TimeSelector("b", TimeSelector.TimeField.VAL_TO);
 
-    Predicate overlaps = new Comparison(
+    return new Comparison(
       new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
     );
-    return overlaps;
   }
 
 
@@ -248,19 +238,19 @@ public class TemporalQueryHandlerTest {
   }
 
   @Test
-  public void testGetVertexById() throws Exception {
+  public void testGetVertexById() {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
     assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
   }
 
   @Test
-  public void testGetEdgeById() throws Exception {
+  public void testGetEdgeById() {
     Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
     assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
   }
 
   @Test
-  public void testGetVertexByVariable() throws Exception {
+  public void testGetVertexByVariable() {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
     assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
     assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);

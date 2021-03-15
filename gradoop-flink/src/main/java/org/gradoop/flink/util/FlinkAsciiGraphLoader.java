@@ -35,7 +35,7 @@ import java.util.Collection;
  * Used the {@link AsciiGraphLoader} to generate instances of
  * {@link LogicalGraph} and {@link GraphCollection} from GDL.
  *
- * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
+ * @see <a href="https://github.com/dbs-leipzig/gdl">GDL on GitHub</a>
  */
 public class FlinkAsciiGraphLoader {
 

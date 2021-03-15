@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,21 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
-import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
-import org.s1ck.gdl.model.comparables.time.MinTimePoint;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.s1ck.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.utils.Comparator.LTE;
 
 /**
  * Wraps a {@link GDLHandler} and adds functionality needed for query

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.comparables.time.TimeLiteral;
-import org.s1ck.gdl.model.comparables.time.TimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.time.TimeLiteral}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.time.TimeLiteral}
  */
 public class TimeLiteralComparable extends TemporalComparable {
 

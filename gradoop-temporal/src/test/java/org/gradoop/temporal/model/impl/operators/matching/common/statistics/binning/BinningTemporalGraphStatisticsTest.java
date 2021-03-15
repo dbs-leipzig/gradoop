@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Assert;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.time.TimeSelector;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,16 +38,16 @@ import static org.gradoop.temporal.model.impl.operators.matching.common.statisti
 import static org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics.ElementType.VERTEX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.s1ck.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
-import static org.s1ck.gdl.utils.Comparator.EQ;
-import static org.s1ck.gdl.utils.Comparator.GT;
-import static org.s1ck.gdl.utils.Comparator.GTE;
-import static org.s1ck.gdl.utils.Comparator.LT;
-import static org.s1ck.gdl.utils.Comparator.LTE;
-import static org.s1ck.gdl.utils.Comparator.NEQ;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.gradoop.gdl.utils.Comparator.EQ;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.GTE;
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.utils.Comparator.NEQ;
 
 public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,15 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
-import org.s1ck.gdl.model.comparables.time.MaxTimePoint;
-import org.s1ck.gdl.model.comparables.time.TimePoint;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.time.MaxTimePoint}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.time.MaxTimePoint}
  */
 public class MaxTimePointComparable extends TemporalComparable {
 

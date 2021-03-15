@@ -23,7 +23,7 @@ import org.gradoop.gdl.model.predicates.booleans.Or;
 import java.util.Objects;
 
 /**
- * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
+ * Wraps an {@link org.gradoop.gdl.model.predicates.booleans.Or} predicate
  */
 public class OrPredicate extends QueryPredicate {
   /**
