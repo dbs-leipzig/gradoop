@@ -16,8 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.junit.Test;
 import org.gradoop.gdl.model.comparables.time.TimeLiteral;
@@ -25,12 +23,8 @@ import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.gdl.model.predicates.expressions.Comparison;
 
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import static org.gradoop.temporal.model.impl.operators.matching.common.query.Util.equalCNFs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
 import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
 import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;

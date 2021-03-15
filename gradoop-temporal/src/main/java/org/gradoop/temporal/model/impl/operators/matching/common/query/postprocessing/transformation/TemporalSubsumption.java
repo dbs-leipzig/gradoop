@@ -84,111 +84,56 @@ public class TemporalSubsumption extends Subsumption {
    * @return true iff (a comparator1 literal1) implies (a comparator2 literal2)
    */
   private boolean implies(Comparator comparator1, Long literal1, Comparator comparator2, Long literal2) {
-    switch(comparator1){
-    case EQ: {
-      switch(comparator2) {
-      case EQ: {
-        return literal1.equals(literal2);
-      } case NEQ: {
-        return !literal1.equals(literal2);
-      } case LTE: {
-        return literal1 <= literal2;
-      } case LT: {
-        return literal1 < literal2;
-      } case GTE: {
-        return literal1 >= literal2;
-      } case GT: {
-        return literal1 > literal2;
+    switch (comparator1) {
+    case EQ:
+      switch (comparator2) {
+      case EQ: return literal1.equals(literal2);
+      case NEQ: return !literal1.equals(literal2);
+      case LTE: return literal1 <= literal2;
+      case LT: return literal1 < literal2;
+      case GTE: return literal1 >= literal2;
+      case GT: return literal1 > literal2;
+      default: return false;
       }
+    case NEQ: return false;
+    case LTE:
+      switch (comparator2) {
+      case EQ: return false;
+      case NEQ: return literal1 < literal2;
+      case LTE: return literal1 <= literal2;
+      case LT: return literal1 < literal2;
+      default: return false;
       }
+    case LT:
+      switch (comparator2) {
+      case EQ: return false;
+      case NEQ: return literal1 <= literal2;
+      case LTE: return literal1 - 1 <= literal2;
+      case LT: return literal1 <= literal2;
+      default: return false;
+      }
+    case GTE:
+      switch (comparator2) {
+      case EQ: return false;
+      case NEQ: return literal1 > literal2;
+      case LTE: return false;
+      case LT: return false;
+      case GTE: return literal1 >= literal2;
+      case GT: return literal1 > literal2;
+      default: return false;
+      }
+    case GT:
+      switch (comparator2) {
+      case EQ: return false;
+      case NEQ: return literal1 >= literal2;
+      case LTE: return false;
+      case LT: return false;
+      case GTE: return literal1 + 1 >= literal2;
+      case GT: return literal1 >= literal2;
+      default: return false;
+      }
+    default: return false;
     }
-    case NEQ: {
-      return false;
-    }
-    case LTE: {
-      switch(comparator2){
-      case EQ: {
-          return false;
-        }
-      case NEQ: {
-          return literal1 < literal2;
-        }
-      case LTE: {
-          return literal1 <= literal2;
-        }
-      case LT: {
-          return literal1 < literal2;
-        }
-      default: {
-          return false;
-        }
-      }
-    }
-    case LT: {
-      switch(comparator2) {
-      case EQ: {
-        return false;
-      }
-      case NEQ: {
-        return literal1 <= literal2;
-      }
-      case LTE: {
-        return literal1 - 1 <= literal2;
-      }
-      case LT: {
-        return literal1 <= literal2;
-      }
-      default: {
-        return false;
-      }
-      }
-    }
-    case GTE: {
-      switch(comparator2) {
-      case EQ: {
-          return false;
-        }
-        case NEQ: {
-          return literal1 > literal2;
-        }
-        case LTE: {
-          return false;
-        }
-        case LT: {
-         return false;
-        }
-      case GTE: {
-          return literal1 >= literal2;
-        }
-      case GT: {
-          return literal1 > literal2;
-        }
-      }
-    }
-    case GT: {
-      switch(comparator2) {
-      case EQ: {
-        return false;
-      }
-      case NEQ: {
-        return literal1 >= literal2;
-      }
-      case LTE: {
-        return false;
-      }
-      case LT: {
-        return false;
-      }
-      case GTE: {
-        return literal1 + 1 >= literal2;
-      }
-      case GT: {
-        return literal1 >= literal2;
-      }
-      }
-    }
-    }
-    return false;
   }
 
   /**

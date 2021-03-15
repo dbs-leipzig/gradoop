@@ -18,6 +18,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics.bin
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphFactory;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -25,8 +27,6 @@ import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Assert;
 import org.junit.Test;
-import org.gradoop.gdl.model.comparables.time.TimeSelector;
-import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.Collections;

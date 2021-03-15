@@ -57,7 +57,7 @@ import static org.gradoop.gdl.utils.Comparator.LTE;
  * Furthermore, contradictions are detected.
  */
 public class BoundsInference implements QueryTransformation {
-  
+
   @Override
   public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     /*
@@ -118,8 +118,6 @@ public class BoundsInference implements QueryTransformation {
         cNeq.putIfAbsent(lhs, new HashSet<>());
         cNeq.get(lhs).add(rhs);
       }
-
-
     }
 
     // compute closures for =,<,<=

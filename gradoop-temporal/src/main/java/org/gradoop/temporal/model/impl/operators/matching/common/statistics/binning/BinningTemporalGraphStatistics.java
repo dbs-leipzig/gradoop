@@ -57,6 +57,16 @@ import static org.gradoop.gdl.utils.Comparator.NEQ;
 public class BinningTemporalGraphStatistics extends TemporalGraphStatistics implements Serializable {
 
   /**
+   * A value to return for a probability close to 0
+   */
+  static final double VERY_LOW_PROB = 0.001;
+
+  /**
+   * A value to return for a probability close to 1
+   */
+  static final double VERY_HIGH_PROB = 0.999;
+
+  /**
    * Statistics for every vertex label
    */
   private final Map<String, TemporalElementStats> vertexStats;
@@ -93,16 +103,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
    * If null, all properties are considered.
    */
   private Set<String> relevantProperties;
-
-  /**
-   * A value to return for a probability close to 0
-   */
-  static final double VERY_LOW_PROB = 0.001;
-
-  /**
-   * A value to return for a probability close to 1
-   */
-  static final double VERY_HIGH_PROB = 0.999;
 
   /**
    * Creates new graph statistics
@@ -377,7 +377,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     double rhsMean = rhs[0];
     double rhsVariance = rhs[1];
     double rhsExtreme = rhs[2];
-    // probability that both lhs and rhs not TemporalElement.DEFAULT_TIME_FROM or TemporalElement.DEFAULT_TIME_TO
+    // probability that both lhs and rhs not TemporalElement.DEFAULT_TIME_FROM or
+    // TemporalElement.DEFAULT_TIME_TO
     double probBothNotExtreme = (1 - lhsExtreme) * (1 - rhsExtreme);
     // distribution for difference between lhs and rhs values
     NormalDistribution diffDist = new NormalDistribution(lhsMean - rhsMean,
@@ -1065,7 +1066,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       return value < arr[index + 1];
     } else {
       boolean lowerCond = value >= arr[index];
-      boolean upperCond = value == TemporalElement.DEFAULT_TIME_TO ? value <= arr[index + 1] :
+      boolean upperCond = value.equals(TemporalElement.DEFAULT_TIME_TO) ? value <= arr[index + 1] :
         value < arr[index + 1];
       return lowerCond && upperCond;
     }

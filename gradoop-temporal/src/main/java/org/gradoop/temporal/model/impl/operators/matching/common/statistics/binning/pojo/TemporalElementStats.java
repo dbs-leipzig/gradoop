@@ -232,13 +232,15 @@ public class TemporalElementStats implements Serializable {
         sampleSize - sampleSize % numBins);
     }
 
-    // lists collecting all values for each time property, i.e. TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
+    // lists collecting all values for each time property, i.e.
+    // TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
     ArrayList<Long> allTxFroms = new ArrayList<Long>();
     ArrayList<Long> allTxTos = new ArrayList<Long>();
     ArrayList<Long> allValFroms = new ArrayList<Long>();
     ArrayList<Long> allValTos = new ArrayList<Long>();
 
-    // lists collecting only those values for each time property unequal to TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
+    // lists collecting only those values for each time property unequal to
+    // TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
     ArrayList<Long> txFroms = new ArrayList<Long>();
     ArrayList<Long> txTos = new ArrayList<Long>();
     ArrayList<Long> valFroms = new ArrayList<Long>();
@@ -550,7 +552,7 @@ public class TemporalElementStats implements Serializable {
    * @return double representation of value
    */
   private double propertyValueToDouble(PropertyValue value, Class cls) {
-    if (value.isNumber()){
+    if (value.isNumber()) {
       return ((Number) value.getObject()).doubleValue();
     }
     return 0.;
@@ -650,7 +652,9 @@ public class TemporalElementStats implements Serializable {
 
   /**
    * Returns the (not binning-based) statistics for temporal properties.
-   * They are arrays of the form {mean, variance, prob. that from=TemporalElement.DEFAULT_TIME_FROM / to=TemporalElement.DEFAULT_TIME_TO}
+   * They are arrays of the form {mean, variance, prob. that
+   * from=TemporalElement.DEFAULT_TIME_FROM / to=TemporalElement.DEFAULT_TIME_TO}
+   *
    * @param property temporal property
    * @return statistics array for the property
    */
