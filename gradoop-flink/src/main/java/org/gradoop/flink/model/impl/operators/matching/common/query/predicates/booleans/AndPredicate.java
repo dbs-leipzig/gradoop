@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.And;
 
 import java.util.Objects;
 
 /**
- * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.And} predicate
+ * Wraps an {@link org.gradoop.gdl.model.predicates.booleans.And} predicate
  */
 public class AndPredicate extends QueryPredicate {
   /**

@@ -38,15 +38,15 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     "expectedIncoming:test [" +
     "(i)-[:neighbor]->(i2)" +
     "(i2)-[:neighbor]->(i)" +
-    "(i:V)-->(c:Center)-->(o:V)" +
-    "(i2:V)-->(c)-->(o2:V)" +
+    "(i)-->(c)-->(o)" +
+    "(i2)-->(c)-->(o2)" +
     "(:other)-->(c)-->(:other)" +
     "]" +
     "expectedOutgoing:test [" +
     "(o)-[:neighbor]->(o2)" +
     "(o2)-[:neighbor]->(o)" +
-    "(i:V)-->(c:Center)-->(o:V)" +
-    "(i2:V)-->(c)-->(o2:V)" +
+    "(i)-->(c)-->(o)" +
+    "(i2)-->(c)-->(o2)" +
     "(:other)-->(c)-->(:other)" +
     "]" +
     "expectedUndirected:test [" +
@@ -54,8 +54,8 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     "(i2)-[:neighbor]->(i)" +
     "(o)-[:neighbor]->(o2)" +
     "(o2)-[:neighbor]->(o)" +
-    "(i:V)-->(c:Center)-->(o:V)" +
-    "(i2:V)-->(c)-->(o2:V)" +
+    "(i)-->(c)-->(o)" +
+    "(i2)-->(c)-->(o2)" +
     "(:other)-->(c)-->(:other)" +
     "]");
 

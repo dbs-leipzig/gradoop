@@ -34,7 +34,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
-      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
+      "g2[(v1)-[:a]->(v2)<-[:b]-(v1)]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
@@ -56,7 +56,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     String asciiGraphs = "" +
       "g1[(v1:A),(v2:B)]" +
-      "g2[(v1:A),(v2:B)]";
+      "g2[(v1),(v2)]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
@@ -81,7 +81,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
     String asciiGraphs = "" +
       "g1[(v1:A)-[:a]->(v2:B)-[:b]->(v1)]" +
-      "g2[(v1:A)-[:a]->(v2:B)<-[:b]-(v1)]";
+      "g2[(v1)-[:a]->(v2)<-[:b]-(v1)]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 

@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util.MessageType;
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 import java.util.Collection;
 import java.util.List;

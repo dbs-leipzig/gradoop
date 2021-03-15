@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.Literal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

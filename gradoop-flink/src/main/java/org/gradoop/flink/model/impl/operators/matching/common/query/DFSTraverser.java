@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import com.google.common.collect.Sets;
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

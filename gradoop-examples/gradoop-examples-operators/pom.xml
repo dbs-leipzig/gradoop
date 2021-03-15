@@ -85,7 +85,7 @@
                                     <include>org.apache.flink:flink-gelly_2.11</include>
                                     <include>org.apache.flink:flink-java</include>
                                     <!-- others -->
-                                    <include>com.github.s1ck:gdl</include>
+                                    <include>org.gradoop:gradoop-gdl</include>
                                     <include>org.antlr:antlr4-runtime</include>
                                     <include>com.google.guava:*</include>
                                     <!-- DIMSpan dependencies -->

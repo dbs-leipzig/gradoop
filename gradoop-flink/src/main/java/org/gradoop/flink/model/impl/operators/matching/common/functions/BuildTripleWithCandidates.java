@@ -48,7 +48,7 @@ public class BuildTripleWithCandidates<E extends Edge>
   /**
    * Query vertices to match against.
    */
-  private transient Collection<org.s1ck.gdl.model.Edge> queryEdges;
+  private transient Collection<org.gradoop.gdl.model.Edge> queryEdges;
   /**
    * Number of edges in the query graph
    */

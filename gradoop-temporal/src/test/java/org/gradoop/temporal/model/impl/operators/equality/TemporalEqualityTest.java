@@ -361,7 +361,7 @@ public class TemporalEqualityTest extends TemporalGradoopTestBase {
       "(a1:A{x : 1})-[loop:a{x : 1, __valFrom : 1543400000000L, __valTo : 1543900000000L}]->" +
       "(a1)-[aa:a{x : 1}]->(a2:A{x : 2, __valFrom : 1543800000000L})" +
       // parallel edge from a1 to b1
-      "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1:B)" +
+      "(a1)-[par1:p]->(b1:B),(a1)-[par2:p]->(b1)" +
       // cycle of bs
       "(b1)-[cyc1:c]->(b2:B)-[cyc2:c]->(b3:B)-[cyc3:c]->(b1)]" +
 

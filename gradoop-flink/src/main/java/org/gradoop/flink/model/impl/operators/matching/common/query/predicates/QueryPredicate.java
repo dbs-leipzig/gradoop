@@ -20,12 +20,12 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.b
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.XorPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.booleans.Xor;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.booleans.Xor;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
 
 import java.io.Serializable;
 
