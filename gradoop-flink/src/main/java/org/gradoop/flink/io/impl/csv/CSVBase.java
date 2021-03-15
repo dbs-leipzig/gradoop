@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,10 +190,20 @@ public abstract class CSVBase {
       CSVConstants.SIMPLE_FILE;
   }
 
+  /**
+   * Get the path to the metadata file.
+   *
+   * @return the path to the metadata file as string
+   */
   protected String getMetaDataPath() {
     return csvRoot + METADATA_FILE;
   }
 
+  /**
+   * Get the gradoop configuration.
+   *
+   * @return the gradoop configuration instance
+   */
   protected GradoopFlinkConfig getConfig() {
     return config;
   }

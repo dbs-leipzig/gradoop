@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.layouts.gve;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -30,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Responsible for creating a {@link GVELayout} from given data.
@@ -67,31 +65,6 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
     DataSet<EPGMGraphHead> graphHead, DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     return create(graphHead, vertices, edges);
-  }
-
-  @Override
-  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
-    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
-    EPGMGraphHead graphHead = getGraphHeadFactory().createGraphHead();
-
-    DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
-      .fromElements(graphHead);
-
-    Map<String, DataSet<EPGMGraphHead>> graphHeads = Maps.newHashMap();
-    graphHeads.put(graphHead.getLabel(), graphHeadSet);
-
-    // update vertices and edges with new graph head id
-    vertices = vertices.entrySet().stream()
-      .collect(Collectors.toMap(
-        Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
-          .withForwardedFields("id;label;properties")));
-
-    edges = edges.entrySet().stream()
-      .collect(Collectors.toMap(
-        Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
-          .withForwardedFields("id;sourceId;targetId;label;properties")));
-
-    return create(graphHeads, vertices, edges);
   }
 
   @Override

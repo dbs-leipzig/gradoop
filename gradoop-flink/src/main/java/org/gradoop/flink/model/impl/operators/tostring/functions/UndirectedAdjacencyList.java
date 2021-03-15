@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR;
+
 /**
  * generates a string representation fo an outgoing adjacency list
  */
-public class UndirectedAdjacencyList implements
-  GroupReduceFunction<EdgeString, VertexString> {
+public class UndirectedAdjacencyList implements GroupReduceFunction<EdgeString, VertexString> {
 
   @Override
   public void reduce(Iterable<EdgeString> outgoingEdgeLabels,
@@ -49,7 +50,7 @@ public class UndirectedAdjacencyList implements
         first = false;
       }
 
-      adjacencyListEntries.add("\n  -" + edgeString.getEdgeLabel() + "-" +
+      adjacencyListEntries.add(LINE_SEPARATOR + "  -" + edgeString.getEdgeLabel() + "-" +
         edgeString.getTargetLabel());
     }
 

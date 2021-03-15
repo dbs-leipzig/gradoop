@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,16 +81,6 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Splits the graph into multiple logical graphs using the property value
-   * which is assigned to the given property key. Vertices and edges that do
-   * not have this property will be removed from the resulting collection.
-   *
-   * @param propertyKey split property key
-   * @return graph collection
-   */
-  GraphCollection splitBy(String propertyKey);
 
   /**
    * Creates a logical graph from that graph and other graphs using the given operator.

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Maps;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 

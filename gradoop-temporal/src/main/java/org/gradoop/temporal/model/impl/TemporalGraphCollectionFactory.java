@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -80,6 +81,17 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
   public void setLayoutFactory(GraphCollectionLayoutFactory<TemporalGraphHead, TemporalVertex,
     TemporalEdge> factory) {
     this.layoutFactory = factory;
+  }
+
+  /**
+   * Creates a temporal graph collection instance from an existing layout.
+   *
+   * @param layout the layout that is used to store the graph data of this temporal graph collection instance
+   * @return a temporal graph collection
+   */
+  public TemporalGraphCollection fromLayout(
+    GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout) {
+    return new TemporalGraphCollection(layout, config);
   }
 
   @Override

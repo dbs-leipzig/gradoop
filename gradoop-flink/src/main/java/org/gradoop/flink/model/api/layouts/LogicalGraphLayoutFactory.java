@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,16 +67,6 @@ public interface LogicalGraphLayoutFactory<
    */
   LogicalGraphLayout<G, V, E> fromDataSets(DataSet<G> graphHead, DataSet<V> vertices,
     DataSet<E> edges);
-
-  /**
-   * Creates a graph layout from the given datasets indexed by label.
-   *
-   * @param vertices Mapping from label to vertex dataset
-   * @param edges Mapping from label to edge dataset
-   * @return Logical graph layout
-   */
-  LogicalGraphLayout<G, V, E> fromIndexedDataSets(Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
 
   /**
    * Creates a graph layout from the given datasets indexed by label.

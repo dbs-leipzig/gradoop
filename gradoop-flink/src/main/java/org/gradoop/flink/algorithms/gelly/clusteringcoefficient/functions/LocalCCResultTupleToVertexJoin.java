@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,21 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 
 /**
  * Writes the local clustering coefficient from {@code Tuple2<GradoopId, Double>} to the
- * corresponding epgm vertex as property.
+ * corresponding Gradoop vertex as property.
+ *
+ * @param <V> Gradoop vertex type.
  */
-public class LocalCCResultTupleToVertexJoin implements
-  JoinFunction<Tuple2<GradoopId, Double>, EPGMVertex, EPGMVertex> {
+public class LocalCCResultTupleToVertexJoin<V extends Vertex>
+  implements JoinFunction<Tuple2<GradoopId, Double>, V, V> {
 
   @Override
-  public EPGMVertex join(Tuple2<GradoopId, Double> resultTuple, EPGMVertex vertex) throws Exception {
+  public V join(Tuple2<GradoopId, Double> resultTuple, V vertex) throws Exception {
     vertex.setProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL, resultTuple.f1);
     return vertex;
   }

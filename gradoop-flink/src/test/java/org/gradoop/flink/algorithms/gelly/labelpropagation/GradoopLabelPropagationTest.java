@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 
     LogicalGraph outputGraph = loader.getLogicalGraphByVariable("input")
-      .callForGraph(new GradoopLabelPropagation(10, "value"));
+      .callForGraph(new GradoopLabelPropagation<>(10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByData(
       loader.getLogicalGraphByVariable("result")));
@@ -141,7 +141,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
 
     LogicalGraph outputGraph = loader.getLogicalGraphByVariable("input")
-      .callForGraph(new GradoopLabelPropagation(10, "value"));
+      .callForGraph(new GradoopLabelPropagation<>(10, "value"));
 
     collectAndAssertTrue(outputGraph.equalsByElementIds(
       loader.getLogicalGraphByVariable("result")));

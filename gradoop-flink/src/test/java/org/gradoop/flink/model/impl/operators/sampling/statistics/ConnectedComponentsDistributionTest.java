@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,8 +114,8 @@ public class ConnectedComponentsDistributionTest extends GradoopFlinkTestBase {
       "]";
 
     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g");
-    DataSet<Tuple3<String, Long, Long>> componentDist = new ConnectedComponentsDistribution(
-      propertyKey, maxIterations, annotateEdges).execute(graph);
+    DataSet<Tuple3<String, Long, Long>> componentDist = graph.callForValue(
+      new ConnectedComponentsDistribution<>(propertyKey, maxIterations, annotateEdges));
 
     List<Tuple3<String, Long, Long>> componentDistList = Lists.newArrayList();
 

@@ -1,0 +1,10 @@
+
+# Checkout all text files with LF line endings regardless of git config. Needed for:
+# - Checkstyle (all source code)
+# - gradoop-flink cam tests (resources/data/expected)
+# - gradoop-temporal cam tests (resources/data/expected)
+* text=auto eol=lf
+
+# Denote all binary files that aren't correctly auto detected. Example:
+#*.png binary
+#*.jpg binary

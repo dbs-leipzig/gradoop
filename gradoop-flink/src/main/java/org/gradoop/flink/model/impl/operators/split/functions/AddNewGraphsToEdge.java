@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -27,11 +27,11 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * Adds new graph id's to the edge if source and target vertex are part of
  * the same graph. Filters all edges between graphs.
  *
- * @param <E> EPGM edge Type
+ * @param <E> Edge type.
  */
 @FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
   "f0.targetId->targetId;f0.label->label;f0.properties->properties")
-public class AddNewGraphsToEdge<E extends EPGMEdge>
+public class AddNewGraphsToEdge<E extends Edge>
   implements FlatMapFunction<Tuple3<E, GradoopIdSet, GradoopIdSet>, E> {
 
   @Override

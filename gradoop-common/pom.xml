@@ -102,8 +102,8 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <!-- Flink -->
@@ -114,8 +114,8 @@
 
         <!-- Others -->
         <dependency>
-            <groupId>com.github.s1ck</groupId>
-            <artifactId>gdl</artifactId>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-gdl</artifactId>
         </dependency>
 
         <dependency>

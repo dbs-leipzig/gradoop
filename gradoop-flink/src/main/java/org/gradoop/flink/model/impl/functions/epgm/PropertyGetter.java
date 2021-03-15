@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.Function;
 
 import java.util.List;
 
@@ -27,12 +27,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Extracts a list of {@link PropertyValue} instances from a given entity using
  * a list of property keys. The order of the property keys determines the order
- * of the values in the result. If the EPGM element does not have a property,
+ * of the values in the result. If the element does not have a property,
  * the property value will be {@code PropertyValue.NULL_VALUE}.
  *
- * @param <EL> EPGM element
+ * @param <EL> Element
  */
-public class PropertyGetter<EL extends EPGMElement>
+public class PropertyGetter<EL extends Element>
   implements Function<EL, List<PropertyValue>> {
 
   /**

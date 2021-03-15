@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Joins an EPGM vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
+ * Joins an Gradoop vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
  * property to {@code true}, if there is a join-partner.
+ *
+ * @param <V> Gradoop Vertex type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id;label;graphIds")
-public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction<EPGMVertex, GradoopId, EPGMVertex> {
+public class VertexWithVisitedSourceTargetIdJoin<V extends Vertex> implements JoinFunction<V, GradoopId, V> {
 
   /**
    * Key for the boolean property of the edge.
@@ -42,7 +44,7 @@ public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction<EPGMVer
   }
 
   @Override
-  public EPGMVertex join(EPGMVertex vertex, GradoopId visitedId) throws Exception {
+  public V join(V vertex, GradoopId visitedId) throws Exception {
     if (visitedId != null) {
       vertex.setProperty(propertyKey, true);
     }

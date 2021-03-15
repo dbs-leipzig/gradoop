@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,17 +52,12 @@ public class TemporalGraphCollectionLayoutFactory extends TemporalBaseLayoutFact
       Objects.requireNonNull(edges));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * Creating a temporal graph layout from an indexed dataset is not supported yet.
-   */
   @Override
   public GraphCollectionLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> fromIndexedDataSets(
     Map<String, DataSet<TemporalGraphHead>> graphHeads,
     Map<String, DataSet<TemporalVertex>> vertices, Map<String, DataSet<TemporalEdge>> edges) {
-    throw new UnsupportedOperationException(
-      "Creating a temporal graph layout from an indexed dataset is not supported yet.");
+    return new TemporalIndexedLayout(graphHeads, vertices, edges);
+
   }
 
   @Override

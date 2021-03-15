@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
     List<EPGMVertex> dbDegreeVertices = Lists.newArrayList();
-    LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
+    LogicalGraph inputWithDegrees = input.callForGraph(new DistinctVertexDegrees<>(
       VertexDegree.BOTH.getName(),
       VertexDegree.IN.getName(),
       VertexDegree.OUT.getName(),
-      true).execute(input);
+      true));
     inputWithDegrees.getVertices().output(new LocalCollectionOutputFormat<>(dbDegreeVertices));
 
     getExecutionEnvironment().execute();
