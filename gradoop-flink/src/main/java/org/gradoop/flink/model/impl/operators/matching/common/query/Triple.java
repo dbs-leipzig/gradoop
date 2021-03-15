@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
-
 import org.gradoop.gdl.model.Edge;
 import org.gradoop.gdl.model.Vertex;
 

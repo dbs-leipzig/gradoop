@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wraps an {@link org.gradoop.gdl.model.comparables.ElementSelector}
+ * Wraps an {@link ElementSelector}
  */
 public class ElementSelectorComparable extends QueryComparable {
   /**

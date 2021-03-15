@@ -26,7 +26,7 @@ import org.gradoop.gdl.model.predicates.booleans.Xor;
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.gradoop.gdl.model.predicates.booleans.Xor} predicate
+ * Wraps a {@link Xor} predicate
  */
 public class XorPredicate extends QueryPredicate {
   /**
