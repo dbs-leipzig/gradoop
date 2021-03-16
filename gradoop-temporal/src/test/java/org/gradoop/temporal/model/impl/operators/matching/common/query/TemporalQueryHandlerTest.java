@@ -105,9 +105,9 @@ public class TemporalQueryHandlerTest {
     }
 
     Predicate and = new And(
-      new Comparison(new TimeSelector("b", "tx_to"),
-        GT,
-        new TimeSelector("a", "tx_from")),
+      new Comparison(new TimeSelector("a", "tx_from"),
+        LT,
+        new TimeSelector("b", "tx_to")),
       new Comparison(new PropertySelector("e1", "__label__"),
         Comparator.EQ,
         new Literal("test"))
@@ -132,13 +132,12 @@ public class TemporalQueryHandlerTest {
     TimeSelector aValTo = new TimeSelector("a", VAL_TO);
     TimeSelector bValTo = new TimeSelector("b", VAL_TO);
     TimeSelector e1ValTo = new TimeSelector("e1", VAL_TO);
-    TemporalQueryHandler handler = new TemporalQueryHandler(testquery,
-      new CNFPostProcessing(new ArrayList<>()));
+    TemporalQueryHandler handler = new TemporalQueryHandler(
+      testquery, new CNFPostProcessing(new ArrayList<>()));
     Predicate expectedPredicate = new And(
       new Comparison(aTxTo, LT, bValTo),
-      new Comparison(new PropertySelector("e1", "__label__"),
-        Comparator.EQ,
-        new Literal("test"))
+      new Comparison(
+        new PropertySelector("e1", "__label__"), Comparator.EQ, new Literal("test"))
     );
     expectedPredicate = new And(expectedPredicate, getOverlapsPredicate());
     assertPredicateEquals(expectedPredicate, handler.getPredicates());
@@ -155,7 +154,6 @@ public class TemporalQueryHandlerTest {
         new And(
           new Comparison(globalTxTo, LT, bValTo),
           new Comparison(globalTxFrom, LTE, globalTxTo)),
-
         new Comparison(aValTo, GT, bValTo)
       ),
       new Comparison(new PropertySelector("e1", "__label__"),

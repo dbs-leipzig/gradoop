@@ -101,7 +101,6 @@ public abstract class ASCIITemporalPatternMatchingTest extends TemporalGradoopTe
 
     loader.appendToDatabaseFromString(expectedCollection);
 
-
     TemporalGraphCollection result = getImplementation(queryGraph, true).execute(db);
 
     TemporalGraphCollection expectedByID = toTemporalGraphCollection(

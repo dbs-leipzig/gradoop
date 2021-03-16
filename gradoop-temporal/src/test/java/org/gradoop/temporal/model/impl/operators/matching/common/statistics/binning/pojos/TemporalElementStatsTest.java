@@ -222,7 +222,7 @@ public class TemporalElementStatsTest {
     Map<String, Double[]> meanAndVariance = stats.getNumericalPropertyStatsEstimation();
 
     assertEquals(occurence.get(decimalKeyFloat), 0.01, 0.);
-    assertEquals(meanAndVariance.get(decimalKeyFloat)[0], meanFloat, 0.);
+    assertEquals(meanAndVariance.get(decimalKeyFloat)[0], meanFloat, 0.00001);
     assertEquals(meanAndVariance.get(decimalKeyFloat)[1], varianceFloat, 0.00001);
 
     assertEquals(occurence.get(decimalKeyDouble), 0.03, 0.);
