@@ -126,8 +126,8 @@ public class HomomorphismSelectedData implements TemporalTestData {
       CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a)-[e]->(b) WHERE e.tx.succeeds(a.tx)"
       ),
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

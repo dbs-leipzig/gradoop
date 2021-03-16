@@ -80,8 +80,8 @@ public class IsomorphismSelectedData implements TemporalTestData {
       CBCypherTemporalPatternMatchingTest.prepareQueryString(
         "MATCH (a) WHERE NOT a.val.merge(a.val).contains(a.val.join(a.val))"
       ),
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     // 1.[(Broadway & E14) -> (S 5 Pl)]
