@@ -69,7 +69,7 @@ public class TimeSelectorComparableTest {
     PropertyValue valFromValue = PropertyValue.create(validFrom);
     Long validTo = 98765L;
     PropertyValue valToValue = PropertyValue.create(validTo);
-    embedding.add(GradoopId.get(), new PropertyValue[] {txFromValue, txToValue, valFromValue, valToValue});
+    embedding.add(GradoopId.get(), txFromValue, txToValue, valFromValue, valToValue);
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EmbeddingMetaData.EntryType.VERTEX, 0);
@@ -105,10 +105,8 @@ public class TimeSelectorComparableTest {
     TimeSelectorComparable wrapper = new TimeSelectorComparable(selector);
 
     Embedding embedding = new Embedding();
-    embedding.add(GradoopId.get(), new PropertyValue[] {
-      PropertyValue.create(1234L),
-      PropertyValue.create(4321L),
-      PropertyValue.create(6789L) });
+    embedding.add(GradoopId.get(), PropertyValue.create(1234L), PropertyValue.create(4321L),
+      PropertyValue.create(6789L));
 
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("b", EmbeddingMetaData.EntryType.VERTEX, 0);

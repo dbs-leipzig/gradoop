@@ -17,30 +17,30 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
+import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
-import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
-public class FilterAndProjectTemporalEdgesTest {
+public class FilterAndProjectTemporalEdgesTest extends TemporalGradoopTestBase {
   TemporalEdgeFactory factory = new TemporalEdgeFactory();
 
   @Test
@@ -52,10 +52,10 @@ public class FilterAndProjectTemporalEdgesTest {
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
-    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
-    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(2));
-    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(sourceVariable));
+    assertEquals(1, embeddingMetaData.getEntryColumn(edgeVariable));
+    assertEquals(2, embeddingMetaData.getEntryColumn(targetVariable));
+    assertEquals(0, embeddingMetaData.getPropertyKeys(edgeVariable).size());
   }
 
   @Test
@@ -67,10 +67,10 @@ public class FilterAndProjectTemporalEdgesTest {
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
-    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
-    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(0));
-    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(sourceVariable));
+    assertEquals(1, embeddingMetaData.getEntryColumn(edgeVariable));
+    assertEquals(0, embeddingMetaData.getEntryColumn(targetVariable));
+    assertEquals(0, embeddingMetaData.getPropertyKeys(edgeVariable).size());
   }
 
   @Test
@@ -105,7 +105,7 @@ public class FilterAndProjectTemporalEdgesTest {
     e2.setValidTime(new Tuple2<>(edge2TimeData[2], edge2TimeData[3]));
 
     TemporalEdge e3 =
-      factory.initEdge(edge3Id, "c", sourceId, targetId, Properties.createFromMap(edge2Props));
+      factory.initEdge(edge3Id, "c", sourceId, targetId, Properties.createFromMap(edge3Props));
     e3.setTransactionTime(new Tuple2<>(edge3TimeData[0], edge3TimeData[1]));
     e3.setValidTime(new Tuple2<>(edge3TimeData[2], edge3TimeData[3]));
 
@@ -122,22 +122,25 @@ public class FilterAndProjectTemporalEdgesTest {
     FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(
       edges, "a", "e", "b", filterPredicate, projectionKeys, false);
 
-    List<Embedding> filteredEdges = node.execute().collect();
+    List<Embedding> filteredEdges = new ArrayList<>();
+    node.execute().output(new LocalCollectionOutputFormat<>(filteredEdges));
 
-    assertThat(filteredEdges.size(), is(1));
-    assertThat(filteredEdges.get(0).getId(0).equals(sourceId), is(true));
-    assertThat(filteredEdges.get(0).getId(1).equals(edge1Id), is(true));
-    assertThat(filteredEdges.get(0).getId(2).equals(targetId), is(true));
+    getExecutionEnvironment().execute();
+
+    assertEquals(2, filteredEdges.size());
+    assertEquals(sourceId, filteredEdges.get(0).getId(0));
+    assertEquals(edge1Id, filteredEdges.get(0).getId(1));
+    assertEquals(targetId, filteredEdges.get(0).getId(2));
 
 
     EmbeddingMetaData metaData = node.getEmbeddingMetaData();
-    assertThat(metaData.getEntryColumn("a"), is(0));
-    assertThat(metaData.getEntryColumn("e"), is(1));
-    assertThat(metaData.getEntryColumn("b"), is(2));
-    assertThat(metaData.getPropertyKeys("e").size(), is(3));
+    assertEquals(0, metaData.getEntryColumn("a"));
+    assertEquals(1, metaData.getEntryColumn("e"));
+    assertEquals(2, metaData.getEntryColumn("b"));
+    assertEquals(3, metaData.getPropertyKeys("e").size());
 
-    assertEquals(metaData.getPropertyColumn("e", "foo"), 1);
-    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_FROM.toString()), 2);
-    assertEquals(metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_TO.toString()), 0);
+    assertEquals(1, metaData.getPropertyColumn("e", "foo"));
+    assertEquals(2, metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_FROM.toString()));
+    assertEquals(0, metaData.getPropertyColumn("e", TimeSelector.TimeField.VAL_TO.toString()));
   }
 }

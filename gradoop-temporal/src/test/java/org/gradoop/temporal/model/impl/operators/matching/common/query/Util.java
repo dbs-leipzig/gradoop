@@ -17,9 +17,7 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
-import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.gdl.utils.Comparator;
 
 import java.util.List;
 
@@ -47,24 +45,4 @@ public class Util {
       }
     }
   }
-
-  public static boolean comparisonEqual(ComparisonExpression a, ComparisonExpression b) {
-    QueryComparable lhsA = a.getLhs();
-    QueryComparable rhsA = a.getRhs();
-    QueryComparable lhsB = b.getLhs();
-    QueryComparable rhsB = b.getRhs();
-    Comparator compA = a.getComparator();
-    Comparator compB = b.getComparator();
-
-    if (lhsA.equals(lhsB) && (compA.equals(compB)) && rhsA.equals(rhsB)) {
-      return true;
-    }
-
-    Comparator compASwitched = a.switchSides().getComparator();
-    if (lhsA.equals(rhsB) && (compASwitched.equals(compB)) && rhsA.equals(lhsB)) {
-      return true;
-    }
-    return false;
-  }
-
 }

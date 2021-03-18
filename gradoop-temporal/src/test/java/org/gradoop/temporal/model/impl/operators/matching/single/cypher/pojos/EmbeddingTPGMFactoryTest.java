@@ -36,7 +36,7 @@ import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_
 public class EmbeddingTPGMFactoryTest {
 
   @Test
-  public void testFromVertex() throws Exception {
+  public void testFromVertex() {
     Properties properties = new Properties();
     properties.set("foo", 1);
     properties.set("bar", "42");
@@ -62,14 +62,13 @@ public class EmbeddingTPGMFactoryTest {
   }
 
   @Test
-  public void testFromEdge() throws Exception {
+  public void testFromEdge() {
     Properties properties = new Properties();
     properties.set("foo", 1);
     properties.set("bar", "42");
     properties.set("baz", false);
     TemporalEdge edge = new TemporalEdgeFactory().createEdge(
-      "TestVertex", GradoopId.get(), GradoopId.get(), properties
-    );
+      "TestVertex", GradoopId.get(), GradoopId.get(), properties);
     Long txFrom = 1253453L;
     Long valTo = 127834487L;
     Tuple2<Long, Long> tx = new Tuple2<>(txFrom, 124346557L);
@@ -89,8 +88,5 @@ public class EmbeddingTPGMFactoryTest {
     assertEquals(PropertyValue.create(1), embedding.getProperty(1));
     assertEquals(PropertyValue.create(valTo), embedding.getProperty(2));
     assertEquals(PropertyValue.create("42"), embedding.getProperty(3));
-
   }
-
 }
-

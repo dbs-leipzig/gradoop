@@ -179,11 +179,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   }
 
   @Override
-  public BinningTemporalGraphStatisticsFactory getFactory() {
-    return new BinningTemporalGraphStatisticsFactory();
-  }
-
-  @Override
   public long getVertexCount(String label) {
     if (label.isEmpty()) {
       return getVertexCount();

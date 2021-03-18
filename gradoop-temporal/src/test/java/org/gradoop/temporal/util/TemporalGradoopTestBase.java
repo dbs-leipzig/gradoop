@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 
 import static java.lang.Long.MAX_VALUE;
@@ -94,6 +93,12 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    * Current timestamp in milliseconds.
    */
   protected static final Long CURRENT_TIME = System.currentTimeMillis();
+
+  /**
+   * Path to the Citibike Temporal-GDL file.
+   */
+  public static final String TEMPORAL_GDL_CITIBIKE_PATH = TemporalGradoopTestBase.class
+    .getResource("/data/patternmatchingtest/citibikesample.gdl").getPath();
 
   @Override
   protected TemporalGradoopConfig getConfig() {
@@ -369,48 +374,50 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   }
 
   public TemporalGraph loadCitibikeSample() throws Exception {
-    String file = "src/test/resources/data/patternmatchingtest/citibikesample";
-
-    FlinkAsciiGraphLoader loader =
-      new FlinkAsciiGraphLoader(getConfig());
-    try {
-      loader.initDatabaseFromFile(file);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    LogicalGraph g = loader.getLogicalGraph();
-    return transformToTemporalGraph(g);
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
+    loader.initDatabaseFromFile(TEMPORAL_GDL_CITIBIKE_PATH);
+    return transformToTemporalGraph(loader.getLogicalGraph());
   }
 
-
-  private TemporalGraph transformToTemporalGraph(LogicalGraph g) throws Exception {
-    TemporalGraph tg = toTemporalGraph(g);
-    List<TemporalEdge> newEdges = tg.getEdges().map(edgeTransform).collect();
-    List<TemporalVertex> newVertices = tg.getVertices().map(vertexTransform).collect();
-    return tg.getFactory().fromCollections(newVertices, newEdges);
+  /**
+   * Given a logical graph, this method transforms it to a temporal graph.
+   * {@code start} and {@code end} values are extracted from the edges (= "trips")
+   * and used to set {@code valid_from}/{@code tx_from} and {@code valid_to}/{@code tx_to}
+   * values.
+   *
+   * @param logicalGraph the logical graph to transform
+   * @return logical graph transformed to temporal graph
+   */
+  protected TemporalGraph transformToTemporalGraph(LogicalGraph logicalGraph) {
+    TemporalGraph tg = toTemporalGraph(logicalGraph);
+    return tg.getFactory().fromDataSets(
+      tg.getVertices().map(vertexTransform),
+      tg.getEdges().map(edgeTransform));
   }
 
-  private final MapFunction<TemporalEdge, TemporalEdge> edgeTransform = new
-    MapFunction<TemporalEdge, TemporalEdge>() {
-      @Override
-      public TemporalEdge map(TemporalEdge value) throws Exception {
-        long start = value.getPropertyValue("start").getLong();
-        long end = value.getPropertyValue("end").getLong();
-        value.setValidTime(new Tuple2<>(start, end));
-        value.setTransactionTime(value.getValidTime());
-        return value;
-      }
-    };
+  /**
+   * Set the edge's {@code valid_from} and {@code tx_from} according to the {@code start}
+   * property and the edge's {@code valid_to} and {@code tx_to} according to the
+   * {@code end} property. Both properties are retained.
+   */
+  protected static final MapFunction<TemporalEdge, TemporalEdge> edgeTransform = value -> {
+    long start = value.getPropertyValue("start").getLong();
+    long end = value.getPropertyValue("end").getLong();
+    value.setValidTime(new Tuple2<>(start, end));
+    value.setTransactionTime(new Tuple2<>(start, end));
+    return value;
+  };
 
-  private final MapFunction<TemporalVertex, TemporalVertex> vertexTransform = new
-    MapFunction<TemporalVertex, TemporalVertex>() {
-      @Override
-      public TemporalVertex map(TemporalVertex value) throws Exception {
-        long start = value.getPropertyValue("start").getLong();
-        long end = value.getPropertyValue("end").getLong();
-        value.setValidTime(new Tuple2<>(start, end));
-        value.setTransactionTime(value.getValidTime());
-        return value;
-      }
-    };
+  /**
+   * Set the vertex {@code valid_from} and {@code tx_from} according to the {@code start}
+   * property and the vertice's {@code valid_to} and {@code tx_to} according to the
+   * {@code end} property. Both properties are retained.
+   */
+  protected static final MapFunction<TemporalVertex, TemporalVertex> vertexTransform = value -> {
+    long start = value.getPropertyValue("start").getLong();
+    long end = value.getPropertyValue("end").getLong();
+    value.setValidTime(new Tuple2<>(start, end));
+    value.setTransactionTime(new Tuple2<>(start, end));
+    return value;
+  };
 }

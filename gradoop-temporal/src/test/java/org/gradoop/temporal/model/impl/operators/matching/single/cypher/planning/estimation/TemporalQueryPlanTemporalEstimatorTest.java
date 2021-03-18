@@ -40,15 +40,17 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests the {@link TemporalQueryPlanEstimator}.
+ */
 public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestBase {
 
-  TemporalGraphStatistics stats;
-  CNFEstimation est;
+  private TemporalGraphStatistics stats;
+  private CNFEstimation est;
 
   @Before
   public void setUp() throws Exception {
-    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(
-      loadCitibikeSample());
+    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(loadCitibikeSample());
   }
 
   @Test

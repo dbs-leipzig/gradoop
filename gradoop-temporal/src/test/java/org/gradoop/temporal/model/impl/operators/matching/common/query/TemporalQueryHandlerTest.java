@@ -24,7 +24,6 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.junit.Test;
 import org.gradoop.gdl.GDLHandler;
 import org.gradoop.gdl.model.Edge;
-import org.gradoop.gdl.model.Element;
 import org.gradoop.gdl.model.Vertex;
 import org.gradoop.gdl.model.comparables.Literal;
 import org.gradoop.gdl.model.comparables.PropertySelector;
@@ -37,7 +36,6 @@ import org.gradoop.gdl.model.predicates.expressions.Comparison;
 import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.gradoop.temporal.model.impl.operators.matching.common.query.Util.equalCNFs;
 import static org.junit.Assert.assertEquals;
@@ -52,13 +50,14 @@ import static org.gradoop.gdl.utils.Comparator.GT;
 import static org.gradoop.gdl.utils.Comparator.LT;
 import static org.gradoop.gdl.utils.Comparator.LTE;
 
-
+/**
+ * Tests the {@link TemporalQueryHandler}.
+ */
 public class TemporalQueryHandlerTest {
 
   /**
    * Copied from QueryHandlerTest (changed to TemporalQueryHandler). Ensure that this still works
    */
-  static final String ECC_PROPERTY_KEY = "ecc";
   static final String TEST_QUERY = "" +
     "(v1:A {ecc : 2})" +
     "(v2:B {ecc : 1})" +
@@ -78,32 +77,10 @@ public class TemporalQueryHandlerTest {
     }
   }
 
-  private static <EL extends Element> boolean elementsEqual(List<EL> list, List<EL> expected) {
-    boolean equal = list.size() == expected.size();
-
-    if (equal) {
-      list.sort(java.util.Comparator.comparingLong(Element::getId));
-      expected.sort(java.util.Comparator.comparingLong(Element::getId));
-      for (int i = 0; i < list.size(); i++) {
-        if (!list.get(i).equals(expected.get(i))) {
-          equal = false;
-          break;
-        }
-      }
-    }
-    return equal;
-  }
-
   @Test
-  public void testSimplePredicates() {
+  public void testSimplePredicates() throws Exception {
     String testquery = "MATCH (a)-[e1:test]->(b) WHERE a.tx_from.before(b.tx_to)";
-    TemporalQueryHandler handler = null;
-    try {
-      handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
-    } catch (QueryContradictoryException e) {
-      e.printStackTrace();
-    }
-
+    TemporalQueryHandler handler = new TemporalQueryHandler(testquery, new CNFPostProcessing(new ArrayList<>()));
     Predicate and = new And(
       new Comparison(new TimeSelector("a", "tx_from"),
         LT,
@@ -238,26 +215,26 @@ public class TemporalQueryHandlerTest {
   @Test
   public void testGetVertexById() {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
-    assertTrue(QUERY_HANDLER.getVertexById(expected.getId()).equals(expected));
+    assertEquals(expected, QUERY_HANDLER.getVertexById(expected.getId()));
   }
 
   @Test
   public void testGetEdgeById() {
     Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
-    assertTrue(QUERY_HANDLER.getEdgeById(expected.getId()).equals(expected));
+    assertEquals(expected, QUERY_HANDLER.getEdgeById(expected.getId()));
   }
 
   @Test
   public void testGetVertexByVariable() {
     Vertex expected = GDL_HANDLER.getVertexCache().get("v1");
-    assertEquals(QUERY_HANDLER.getVertexByVariable("v1"), expected);
-    assertNotEquals(QUERY_HANDLER.getVertexByVariable("v2"), expected);
+    assertEquals(expected, QUERY_HANDLER.getVertexByVariable("v1"));
+    assertNotEquals(expected, QUERY_HANDLER.getVertexByVariable("v2"));
   }
 
   @Test
-  public void testGetEdgeByVariable() throws Exception {
+  public void testGetEdgeByVariable() {
     Edge expected = GDL_HANDLER.getEdgeCache().get("e1");
-    assertEquals(QUERY_HANDLER.getEdgeByVariable("e1"), expected);
-    assertNotEquals(QUERY_HANDLER.getEdgeByVariable("e2"), expected);
+    assertEquals(expected, QUERY_HANDLER.getEdgeByVariable("e1"));
+    assertNotEquals(expected, QUERY_HANDLER.getEdgeByVariable("e2"));
   }
 }

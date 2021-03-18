@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
-import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.PhysicalTPGMOperatorTest;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.BasePhysicalTPGMOperatorTest;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdgeFactory;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class FilterAndProjectTemporalEdgesTest extends PhysicalTPGMOperatorTest {
+public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorTest {
   @Test
   public void testFilterWithNoPredicates() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->()");

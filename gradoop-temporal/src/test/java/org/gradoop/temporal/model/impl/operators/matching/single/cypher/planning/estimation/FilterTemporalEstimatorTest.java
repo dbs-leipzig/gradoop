@@ -32,6 +32,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests the {@link FilterTemporalEstimator}.
+ */
 public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
 
   TemporalGraphStatistics stats;
@@ -39,8 +42,7 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
 
   @Before
   public void setUp() throws Exception {
-    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(
-      loadCitibikeSample());
+    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(loadCitibikeSample());
   }
 
   @Test

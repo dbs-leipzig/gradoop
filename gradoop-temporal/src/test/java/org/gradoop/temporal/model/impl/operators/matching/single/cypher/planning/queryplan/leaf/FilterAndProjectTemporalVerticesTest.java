@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.plannin
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -26,30 +27,30 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertexFactory;
+import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.flink.api.java.ExecutionEnvironment.getExecutionEnvironment;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FilterAndProjectTemporalVerticesTest {
+public class FilterAndProjectTemporalVerticesTest extends TemporalGradoopTestBase {
 
-  public void testMetaDataInitialization() throws Exception {
+  @Test
+  public void testMetaDataInitialization() {
     String variable = "a";
     FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(
       null, variable, new CNF(), Sets.newHashSet());
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(variable), is(0));
-    assertThat(node.getEmbeddingMetaData().getPropertyKeys(variable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(variable));
+    assertEquals(0, node.getEmbeddingMetaData().getPropertyKeys(variable).size());
   }
 
   @Test
@@ -96,11 +97,13 @@ public class FilterAndProjectTemporalVerticesTest {
 
     FilterAndProjectTemporalVerticesNode node = new FilterAndProjectTemporalVerticesNode(
       vertices, "n", filterPredicate, projectionKeys);
-    List<Embedding> filteredVertices = node.execute().collect();
 
-    assertThat(filteredVertices.size(), is(1));
-    assertThat(filteredVertices.get(0).getId(0).equals(vertex1Id), is(true));
+    List<Embedding> filteredVertices = new ArrayList<>();
+    node.execute().output(new LocalCollectionOutputFormat<>(filteredVertices));
+    getExecutionEnvironment().execute();
 
+    assertEquals(1, filteredVertices.size());
+    assertEquals(vertex1Id, filteredVertices.get(0).getId(0));
 
     EmbeddingMetaData metaData = node.getEmbeddingMetaData();
     assertEquals(metaData.getEntryColumn("n"), 0);

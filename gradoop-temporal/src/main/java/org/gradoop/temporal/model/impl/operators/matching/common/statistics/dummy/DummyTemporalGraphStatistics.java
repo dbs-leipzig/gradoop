@@ -17,20 +17,15 @@ package org.gradoop.temporal.model.impl.operators.matching.common.statistics.dum
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
-import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatisticsFactory;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.gdl.utils.Comparator;
 
 import java.util.Optional;
 
 /**
- * A dummy graph statistics where every relevant value is set to 1
+ * A dummy graph statistics where every relevant value is set to 1.
  */
 public class DummyTemporalGraphStatistics extends TemporalGraphStatistics {
-  @Override
-  public TemporalGraphStatisticsFactory getFactory() {
-    return null;
-  }
 
   @Override
   public long getVertexCount(String label) {

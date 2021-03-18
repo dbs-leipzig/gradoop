@@ -27,13 +27,6 @@ import java.util.Optional;
 public abstract class TemporalGraphStatistics {
 
   /**
-   * Returns the factory to create instances.
-   *
-   * @return factory
-   */
-  public abstract TemporalGraphStatisticsFactory getFactory();
-
-  /**
    * Returns the number of vertices with a given label
    *
    * @param label label of the vertices to count

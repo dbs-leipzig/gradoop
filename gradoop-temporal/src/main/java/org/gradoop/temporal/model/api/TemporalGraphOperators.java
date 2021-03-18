@@ -18,7 +18,6 @@ package org.gradoop.temporal.model.api;
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
-import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -236,27 +235,29 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
   }
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
-   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
-   * is attached to the resulting vertices.
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the graph
+   * elements is attached to the resulting vertices.
    * <p>
    * Note, that this method used no statistics about the data graph which may result in bad runtime
-   * performance. Use {@link #query(String, GraphStatistics)} to provide statistics for the query planner.
+   * performance. Use {@link #temporalQuery(String, TemporalGraphStatistics)} to provide statistics for the
+   * query planner.
    *
-   * @param query Cypher query
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
    * @return graph collection containing matching subgraphs
    */
-  default TemporalGraphCollection query(String query) {
-    return query(query, new DummyTemporalGraphStatistics());
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery) {
+    return temporalQuery(temporalGdlQuery, new DummyTemporalGraphStatistics());
   }
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
-   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
-   * is attached to the resulting vertices.
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
    * <p>
    * Note, that this method used no statistics about the data graph which may result in bad runtime
-   * performance. Use {@link #query(String, String, GraphStatistics)} to provide statistics for the query planner.
+   * performance. Use {@link #temporalQuery(String, String, TemporalGraphStatistics)} to provide statistics
+   * for the query planner.
    * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
    * elements based on variable bindings of the match pattern. Consider the following example:
@@ -268,32 +269,32 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * The query pattern is looking for pairs of authors that worked on the same paper.
    * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
-   * @param query               Cypher query string
-   * @param constructionPattern Construction pattern
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
    * @return graph collection containing the output of the construct pattern
    */
-  default TemporalGraphCollection query(String query, String constructionPattern) {
-    return query(query, constructionPattern, new DummyTemporalGraphStatistics());
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern) {
+    return temporalQuery(temporalGdlQuery, constructionPattern, new DummyTemporalGraphStatistics());
   }
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
-   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
-   * is attached to the resulting vertices.
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
    *
-   * @param query           Cypher query
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
    */
-  default TemporalGraphCollection query(String query, TemporalGraphStatistics graphStatistics) {
-    return query(query, true, MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM,
-      graphStatistics);
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery,
+    TemporalGraphStatistics graphStatistics) {
+    return temporalQuery(temporalGdlQuery, null, graphStatistics);
   }
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism strategies,
-   * which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph elements
-   * is attached to the resulting vertices.
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
    * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
    * elements based on variable bindings of the match pattern. Consider the following example:
@@ -305,50 +306,36 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
    * The query pattern is looking for pairs of authors that worked on the same paper.
    * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
-   * @param query               Cypher query
-   * @param constructionPattern Construction pattern
-   * @param graphStatistics     statistics about the data graph
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
+   * @param graphStatistics Statistics about the data graph
    * @return graph collection containing the output of the construct pattern
    */
-  default TemporalGraphCollection query(String query, String constructionPattern,
-                                        TemporalGraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true, MatchStrategy.ISOMORPHISM,
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
+    TemporalGraphStatistics graphStatistics) {
+    return temporalQuery(temporalGdlQuery, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
       MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
   /**
-   * Evaluates the given query using the Cypher query engine.
+   * Evaluates the given query using the Temporal-GDL query engine.
    *
-   * @param query           Cypher query
-   * @param attachData      attach original vertex and edge data to the result
-   * @param vertexStrategy  morphism setting for vertex mapping
-   * @param edgeStrategy    morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
+   * @param attachData attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param stats statistics about the data graph
+   * @return graph collection containing the output of the construct pattern or a graph collection containing
+   *         matching subgraphs if the construction pattern is {@code null}.
    */
-  default TemporalGraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-                                        MatchStrategy edgeStrategy, TemporalGraphStatistics graphStatistics) {
-    return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
+    boolean attachData, MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    TemporalGraphStatistics stats) {
+    return callForCollection(
+      new CypherTemporalPatternMatching(temporalGdlQuery, constructionPattern, attachData, vertexStrategy,
+        edgeStrategy, stats, new CNFPostProcessing()));
   }
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query               Cypher query
-   * @param constructionPattern Construction pattern
-   * @param attachData          attach original vertex and edge data to the result
-   * @param vertexStrategy      morphism setting for vertex mapping
-   * @param edgeStrategy        morphism setting for edge mapping
-   * @param stats               statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   */
-  default TemporalGraphCollection query(String query, String constructionPattern, boolean attachData,
-                                        MatchStrategy vertexStrategy,
-                                        MatchStrategy edgeStrategy, TemporalGraphStatistics stats) {
-    return callForCollection(new CypherTemporalPatternMatching(query, constructionPattern, attachData,
-      vertexStrategy, edgeStrategy, stats, new CNFPostProcessing()));
-  }
-
   //----------------------------------------------------------------------------
   // Utilities
   //----------------------------------------------------------------------------

@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.operators.matching;
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism;
 
+import org.gradoop.temporal.model.impl.operators.matching.TemporalTestData;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * An interface providing a getter for parameterized tests.
- */
-public interface TemporalTestData {
-  /**
-   * Input for parameterized testing.
-   *
-   * @return Iterable of string arrays (length 5) containing input for constructor
-   * {@link BaseTemporalPatternMatchingTest#BaseTemporalPatternMatchingTest(String, String, String, String)}.
-   */
-  Collection<String[]> getData();
+public class HomomorphismSelfLoopData implements TemporalTestData {
+  @Override
+  public Collection<String[]> getData() {
+    ArrayList<String[]> data = new ArrayList<>();
+    data.add(new String[] {
+      "SelfLoop_HOM_1_default_citibike",
+      "MATCH (a)-[e]->(a)",
+      "expected1,expected2", "expected1[(s2)-[e2]->(s2)],expected2[(s27)-[e17]->(s27)]"
+    });
+    return data;
+  }
 }

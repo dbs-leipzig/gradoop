@@ -34,14 +34,16 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+/**
+ * Tests the {@link JoinTemporalEstimator}.
+ */
 public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
 
   TemporalGraphStatistics stats;
 
   @Before
   public void setUp() throws Exception {
-    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(
-      loadCitibikeSample());
+    stats = new BinningTemporalGraphStatisticsFactory().fromGraph(loadCitibikeSample());
   }
 
   @Test

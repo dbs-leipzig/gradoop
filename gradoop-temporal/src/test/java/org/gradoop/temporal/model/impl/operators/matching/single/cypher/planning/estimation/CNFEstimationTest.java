@@ -21,6 +21,13 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
@@ -31,31 +38,20 @@ import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Test;
-import org.gradoop.gdl.model.comparables.Literal;
-import org.gradoop.gdl.model.comparables.PropertySelector;
-import org.gradoop.gdl.model.comparables.time.Duration;
-import org.gradoop.gdl.model.comparables.time.TimeConstant;
-import org.gradoop.gdl.model.comparables.time.TimeLiteral;
-import org.gradoop.gdl.model.comparables.time.TimeSelector;
-import org.gradoop.gdl.model.predicates.expressions.Comparison;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.*;
+import static org.gradoop.gdl.utils.Comparator.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
-import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
-import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
-import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
-import static org.gradoop.gdl.utils.Comparator.EQ;
-import static org.gradoop.gdl.utils.Comparator.GT;
-import static org.gradoop.gdl.utils.Comparator.GTE;
-import static org.gradoop.gdl.utils.Comparator.LT;
-import static org.gradoop.gdl.utils.Comparator.LTE;
 
+/**
+ * Tests the {@link CNFEstimation}.
+ */
 public class CNFEstimationTest extends TemporalGradoopTestBase {
 
   final TimeSelector aTxFrom = new TimeSelector("a", TX_FROM);
@@ -66,19 +62,10 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
   final TimeSelector bTxFrom = new TimeSelector("b", TX_FROM);
   final TimeSelector bTxTo = new TimeSelector("b", TX_TO);
   final TimeSelector cTxTo = new TimeSelector("c", TX_TO);
-  final Duration eValDuration = new Duration(new TimeSelector("e", VAL_FROM),
-    new TimeSelector("e", VAL_TO));
-  final Duration eTxDuration = new Duration(new TimeSelector("e", TX_FROM),
-    new TimeSelector("e", TX_TO));
-  final Duration fValDuration = new Duration(new TimeSelector("f", VAL_FROM),
-    new TimeSelector("f", VAL_TO));
-  TimeSelector bValFrom = new TimeSelector("b", VAL_FROM);
-  TimeSelector bValTo = new TimeSelector("b", VAL_TO);
-  TimeSelector cTxFrom = new TimeSelector("c", TX_FROM);
-  TimeSelector cValFrom = new TimeSelector("c", VAL_FROM);
-  TimeSelector cValTo = new TimeSelector("c", VAL_TO);
-  Duration cTxDuration = new Duration(new TimeSelector("c", TX_FROM),
-    new TimeSelector("c", TX_TO));
+  final Duration eValDuration = new Duration(new TimeSelector("e", VAL_FROM), new TimeSelector("e", VAL_TO));
+  final Duration eTxDuration = new Duration(new TimeSelector("e", TX_FROM), new TimeSelector("e", TX_TO));
+  final Duration fValDuration = new Duration(new TimeSelector("f", VAL_FROM), new TimeSelector("f", VAL_TO));
+
 
   @Test
   public void timeSelectorComparisonTest() throws Exception {
@@ -334,16 +321,16 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     //0.9*0.125*0.15
     CNF cnf1 = new CNF(Arrays.asList(e1, e2, e4));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.017, 0.002);
+    assertEquals(0.017, estimation1, 0.002);
 
     CNF cnf2 = new CNF(Arrays.asList(e1, e2, e3, e4));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation1, 0.017, 0.002);
+    assertEquals(0.017, estimation2, 0.002);
 
     //0.9 * 0.125
     CNF cnf3 = new CNF(Arrays.asList(e1, e2));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 0.1125, 0.01);
+    assertEquals(0.1125, estimation3, 0.01);
   }
 
   @Test
@@ -473,11 +460,11 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       vertex.setLabel(vLabel1);
 
       vertex.setTxFrom(100L + i);
-      Long txTo = i % 2 == 0 ? 300L + i : Long.MAX_VALUE;
+      long txTo = i % 2 == 0 ? 300L + i : Long.MAX_VALUE;
       vertex.setTxTo(txTo);
 
       vertex.setValidFrom(150L + i);
-      Long valTo = i % 2 == 0 ? 350L + i : Long.MAX_VALUE;
+      long valTo = i % 2 == 0 ? 350L + i : Long.MAX_VALUE;
       vertex.setValidTo(valTo);
 
       // 6 nodes with property value x
@@ -511,11 +498,11 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       vertex.setLabel(vLabel2);
 
       vertex.setTxFrom(1000L + i * 10);
-      Long txTo = i % 2 == 0 ? 1500L + i * 20 : Long.MAX_VALUE;
+      long txTo = i % 2 == 0 ? 1500L + i * 20 : Long.MAX_VALUE;
       vertex.setTxTo(txTo);
 
       vertex.setValidFrom(3000L + i * 10);
-      Long valTo = i % 2 == 0 ? 3500L + i * 20 : Long.MAX_VALUE;
+      long valTo = i % 2 == 0 ? 3500L + i * 20 : Long.MAX_VALUE;
       vertex.setValidTo(valTo);
 
       if (i % 5 == 0) {
@@ -550,12 +537,9 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       edgeList.add(edge);
     }
 
-    TemporalGraph graph = new TemporalGraphFactory(getConfig()).fromCollections(
-      vertexList, edgeList
-    );
+    TemporalGraph graph = new TemporalGraphFactory(getConfig()).fromCollections(vertexList, edgeList);
 
-    return new BinningTemporalGraphStatisticsFactory()
-      .fromGraphWithSampling(graph, 100);
+    return new BinningTemporalGraphStatisticsFactory().fromGraphWithSampling(graph, 100);
   }
 
 }

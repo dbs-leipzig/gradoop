@@ -51,7 +51,6 @@ import static org.gradoop.gdl.utils.Comparator.NEQ;
 
 public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase {
 
-
   @Test
   public void simpleComparisonTest() throws Exception {
     BinningTemporalGraphStatistics stats = getDummyStats();
@@ -565,17 +564,6 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       NEQ, VERTEX, Optional.of("v1"), VAL_FROM);
     assertEquals(estimation12, 0.999, 0.01);
 
-/*    // lhs=rhs, if both unbound (have value Long.MAX_VALUE)
-    // P(both unbound) = 0.25
-    double estimation13 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_TO,
-      EQ, VERTEX, Optional.of("v1"), VAL_TO);
-    assertEquals(estimation12, 0.25, 0.01);
-
-    // inverse of above case
-    double estimation14 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_TO,
-      NEQ, VERTEX, Optional.of("v1"), VAL_TO);
-    assertEquals(estimation12, 0.75, 0.01);*/
-
     // label not there
     double estimation13 = stats.estimateTemporalProb(VERTEX, Optional.empty(), VAL_FROM,
       LTE, VERTEX, Optional.of("unknownLabel"), VAL_FROM);
@@ -648,7 +636,7 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
    * @return dummy statistics
    */
   private BinningTemporalGraphStatistics getDummyStats(Set<String> relevantNumerical,
-                                                       Set<String> relevantCategorical) throws Exception {
+    Set<String> relevantCategorical) throws Exception {
     ArrayList<TemporalVertex> vertexList = new ArrayList<>();
 
     // first type of vertex has label1
@@ -663,11 +651,11 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       vertex.setLabel(vLabel1);
 
       vertex.setTxFrom(100L + i);
-      Long txTo = i % 2 == 0 ? 300L + i : Long.MAX_VALUE;
+      long txTo = i % 2 == 0 ? 300L + i : Long.MAX_VALUE;
       vertex.setTxTo(txTo);
 
       vertex.setValidFrom(150L + i);
-      Long valTo = i % 2 == 0 ? 350L + i : Long.MAX_VALUE;
+      long valTo = i % 2 == 0 ? 350L + i : Long.MAX_VALUE;
       vertex.setValidTo(valTo);
 
       // 6 nodes with property value x
@@ -701,11 +689,11 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       vertex.setLabel(vLabel2);
 
       vertex.setTxFrom(1000L + i * 10);
-      Long txTo = i % 2 == 0 ? 1500L + i * 20 : Long.MAX_VALUE;
+      long txTo = i % 2 == 0 ? 1500L + i * 20 : Long.MAX_VALUE;
       vertex.setTxTo(txTo);
 
       vertex.setValidFrom(3000L + i * 10);
-      Long valTo = i % 2 == 0 ? 3500L + i * 20 : Long.MAX_VALUE;
+      long valTo = i % 2 == 0 ? 3500L + i * 20 : Long.MAX_VALUE;
       vertex.setValidTo(valTo);
 
       if (i % 5 == 0) {
