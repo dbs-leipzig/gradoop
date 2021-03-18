@@ -35,8 +35,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -70,12 +68,12 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     // 30 stations
     TemporalQueryPlanEstimator estimator =
       new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
-    assertThat(estimator.getCardinality(), is(30L));
+    assertEquals(30L, estimator.getCardinality());
 
     queryPlan = new QueryPlan(mNode);
     estimator = new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
     // 30 stations
-    assertThat(estimator.getCardinality(), is(30L));
+    assertEquals(30L, estimator.getCardinality());
   }
 
   @Test
@@ -98,11 +96,11 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     TemporalQueryPlanEstimator estimator =
       new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
     // 20 edges
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
 
     queryPlan = new QueryPlan(fNode);
     estimator = new TemporalQueryPlanEstimator(queryPlan, queryHandler, stats, est);
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
   }
 
   @Test
@@ -119,24 +117,20 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
     LeafNode oNode = new FilterAndProjectTemporalVerticesNode(null, "o",
       queryHandler.getPredicates().getSubCNF("o"), Sets.newHashSet());
-    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null,
-      "n", "e", "m",
+    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null, "n", "e", "m",
       queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
-    LeafNode fNode = new FilterAndProjectTemporalEdgesNode(null,
-      "m", "f", "o",
+    LeafNode fNode = new FilterAndProjectTemporalEdgesNode(null, "m", "f", "o",
       queryHandler.getPredicates().getSubCNF("f"), Sets.newHashSet(), false);
-
-    QueryPlan plan = new QueryPlan(nNode);
-    TemporalQueryPlanEstimator estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
 
     // (n)-[e]->
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    plan = new QueryPlan(neJoin);
-    estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
+    QueryPlan plan = new QueryPlan(neJoin);
+    TemporalQueryPlanEstimator estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
 
-    assertTrue(18 <= estimator.getCardinality() && estimator.getCardinality() <= 20);
+    assertTrue(18 <= estimator.getCardinality());
+    assertTrue(estimator.getCardinality() <= 20);
 
     // (n)-[e]->(m)
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
@@ -145,7 +139,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     plan = new QueryPlan(nemJoin);
     estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
 
-    assert 18 <= estimator.getCardinality() && estimator.getCardinality() <= 20;
+    assertTrue(18 <= estimator.getCardinality());
+    assertTrue(estimator.getCardinality() <= 20);
 
     // (n)-[e]->(m)-[f]->
     JoinEmbeddingsNode nemfJoin = new JoinEmbeddingsNode(nemJoin, fNode, Lists.newArrayList("m"),
@@ -155,7 +150,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
 
     // 20*30*20*30 / (30*17*30)  rather inaccurate,...
-    assertTrue(22 <= estimator.getCardinality() && estimator.getCardinality() <= 24);
+    assertTrue(22 <= estimator.getCardinality());
+    assertTrue(estimator.getCardinality() <= 24);
 
     // (n)-[e]->(m)-[f]->(o)
     JoinEmbeddingsNode nemfoJoin = new JoinEmbeddingsNode(nemfJoin, oNode, Lists.newArrayList("o"),
@@ -164,7 +160,8 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
     plan = new QueryPlan(nemfoJoin);
     estimator = new TemporalQueryPlanEstimator(plan, queryHandler, stats, est);
 
-    assertTrue(20 <= estimator.getCardinality() && estimator.getCardinality() <= 30);
+    assertTrue(20 <= estimator.getCardinality());
+    assertTrue(estimator.getCardinality() <= 30);
   }
 
 
@@ -210,40 +207,37 @@ public class TemporalQueryPlanTemporalEstimatorTest extends TemporalGradoopTestB
       queryHandler.getPredicates().getSubCNF("b"), Sets.newHashSet());
     TemporalQueryPlanEstimator
       bEstimator = new TemporalQueryPlanEstimator(new QueryPlan(bNode), queryHandler, stats, est);
-    assertEquals(bEstimator.getCardinality(), 30);
+    assertEquals(30, bEstimator.getCardinality());
 
     LeafNode cNode = new FilterAndProjectTemporalVerticesNode(null, "c",
       queryHandler.getPredicates().getSubCNF("c"), Sets.newHashSet());
     TemporalQueryPlanEstimator
       cEstimator = new TemporalQueryPlanEstimator(new QueryPlan(cNode), queryHandler, stats, est);
-    assertEquals(cEstimator.getCardinality(), 30);
+    assertEquals(30, cEstimator.getCardinality());
 
     LeafNode dNode = new FilterAndProjectTemporalVerticesNode(null, "d",
       queryHandler.getPredicates().getSubCNF("d"), Sets.newHashSet());
     TemporalQueryPlanEstimator
       dEstimator = new TemporalQueryPlanEstimator(new QueryPlan(dNode), queryHandler, stats, est);
-    assertEquals(dEstimator.getCardinality(), 30);
+    assertEquals(30, dEstimator.getCardinality());
 
     LeafNode e1Node = new FilterAndProjectTemporalEdgesNode(null, "a", "e1", "b",
       queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet(), false);
     TemporalQueryPlanEstimator
       e1Estimator = new TemporalQueryPlanEstimator(new QueryPlan(e1Node), queryHandler, stats, est);
-    assertTrue(18 <= e1Estimator.getCardinality() &&
-      e1Estimator.getCardinality() <= 20);
+    assertTrue(18 <= e1Estimator.getCardinality() && e1Estimator.getCardinality() <= 20);
 
     LeafNode e2Node = new FilterAndProjectTemporalEdgesNode(null, "c", "e2", "d",
       queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet(), false);
     TemporalQueryPlanEstimator
       e2Estimator = new TemporalQueryPlanEstimator(new QueryPlan(e2Node), queryHandler, stats, est);
-    assertTrue(18 <= e2Estimator.getCardinality() &&
-      e2Estimator.getCardinality() <= 20);
+    assertTrue(18 <= e2Estimator.getCardinality() && e2Estimator.getCardinality() <= 20);
 
     BinaryNode ae1 = new JoinEmbeddingsNode(aNode, e1Node, Lists.newArrayList("a"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
-    TemporalQueryPlanEstimator
-      ae1Estimator = new TemporalQueryPlanEstimator(new QueryPlan(ae1), queryHandler, stats, est);
-    assertTrue(18 <= ae1Estimator.getCardinality() &&
-      ae1Estimator.getCardinality() <= 20);
+    TemporalQueryPlanEstimator ae1Estimator =
+      new TemporalQueryPlanEstimator(new QueryPlan(ae1), queryHandler, stats, est);
+    assertTrue(18 <= ae1Estimator.getCardinality() && ae1Estimator.getCardinality() <= 20);
 
     BinaryNode ae1b = new JoinEmbeddingsNode(ae1, bNode, Lists.newArrayList("b"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);

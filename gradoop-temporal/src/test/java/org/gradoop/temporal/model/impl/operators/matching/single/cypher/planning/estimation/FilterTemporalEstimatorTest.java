@@ -28,8 +28,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -58,9 +56,10 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     FilterTemporalEstimator elementEstimator = new FilterTemporalEstimator(queryHandler, stats, est);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(30L));
-    assertThat(elementEstimator.getSelectivity(), is(elementEstimator.getCnfEstimation()
-      .estimateCNF(queryHandler.getPredicates().getSubCNF("n"))));
+    assertEquals(30L, elementEstimator.getCardinality());
+    assertEquals(
+      elementEstimator.getCnfEstimation().estimateCNF(queryHandler.getPredicates().getSubCNF("n")),
+      elementEstimator.getSelectivity(), 0.001);
   }
 
   @Test
@@ -76,9 +75,9 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     FilterTemporalEstimator elementEstimator = new FilterTemporalEstimator(queryHandler, stats, est);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(0L));
+    assertEquals(0L, elementEstimator.getCardinality());
     // selectivity for any label is 1.
-    assertEquals(elementEstimator.getSelectivity(), 1., 0.001);
+    assertEquals(1., elementEstimator.getSelectivity(), 0.001);
   }
 
   @Test
@@ -95,11 +94,10 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     FilterTemporalEstimator elementEstimator = new FilterTemporalEstimator(queryHandler, stats, est);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(20L));
-    assertThat(elementEstimator.getSelectivity(), is(
-      elementEstimator.getCnfEstimation().estimateCNF(
-        queryHandler.getPredicates().getSubCNF("e")
-      )));
+    assertEquals(20L, elementEstimator.getCardinality());
+    assertEquals(
+      elementEstimator.getCnfEstimation().estimateCNF(queryHandler.getPredicates().getSubCNF("e")),
+      elementEstimator.getSelectivity(), 0.001);
   }
 
   @Test
@@ -116,8 +114,8 @@ public class FilterTemporalEstimatorTest extends TemporalGradoopTestBase {
     FilterTemporalEstimator elementEstimator = new FilterTemporalEstimator(queryHandler, stats, est);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(0L));
+    assertEquals(0L, elementEstimator.getCardinality());
     // selectivity for any label is 1
-    assertEquals(elementEstimator.getSelectivity(), 1., 0.0001);
+    assertEquals(1., elementEstimator.getSelectivity(), 0.001);
   }
 }

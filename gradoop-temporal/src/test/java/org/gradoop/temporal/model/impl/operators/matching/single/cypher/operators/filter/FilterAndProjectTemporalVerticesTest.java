@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.matching.single.cypher.operato
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -70,14 +71,14 @@ public class FilterAndProjectTemporalVerticesTest extends BasePhysicalTPGMOperat
 
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
+    List<Embedding> result = new ArrayList<>();
 
-    List<Embedding> result =
-      new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
-        .evaluate()
-        .collect();
+    new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>()).evaluate()
+      .output(new LocalCollectionOutputFormat<>(result));
+    getExecutionEnvironment().execute();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(0), v1.getId());
+    assertEquals(v1.getId(), result.get(0).getId(0));
   }
 
   @Test
@@ -93,13 +94,14 @@ public class FilterAndProjectTemporalVerticesTest extends BasePhysicalTPGMOperat
     v2.setValidTime(new Tuple2<>(678L, 6789L));
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    List<Embedding> result =
-      new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
-        .evaluate()
-        .collect();
+    List<Embedding> result = new ArrayList<>();
+
+    new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>()).evaluate()
+      .output(new LocalCollectionOutputFormat<>(result));
+    getExecutionEnvironment().execute();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(0), v1.getId());
+    assertEquals(v1.getId(), result.get(0).getId(0));
   }
 
   @Test
@@ -118,13 +120,14 @@ public class FilterAndProjectTemporalVerticesTest extends BasePhysicalTPGMOperat
     v2.setValidTime(new Tuple2<>(678L, 6789L));
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
-    List<Embedding> result =
-      new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>())
-        .evaluate()
-        .collect();
+    List<Embedding> result = new ArrayList<>();
+
+    new FilterAndProjectTemporalVertices(vertices, predicates, new ArrayList<>()).evaluate()
+      .output(new LocalCollectionOutputFormat<>(result));
+    getExecutionEnvironment().execute();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(0), v1.getId());
+    assertEquals(v1.getId(), result.get(0).getId(0));
   }
 
   @Test
@@ -140,15 +143,17 @@ public class FilterAndProjectTemporalVerticesTest extends BasePhysicalTPGMOperat
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
-    Embedding result =
-      new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys)
-        .evaluate()
-        .collect()
-        .get(0);
+    List<Embedding> results = new ArrayList<>();
+
+    new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys).evaluate()
+      .output(new LocalCollectionOutputFormat<>(results));
+    getExecutionEnvironment().execute();
+
+    Embedding result = results.get(0);
 
     assertEquals(person.getId(), result.getId(0));
-    assertEquals(result.getId(0), person.getId());
-    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
+    assertEquals(person.getId(), result.getId(0));
+    assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
   }
 
   @Test
@@ -164,14 +169,16 @@ public class FilterAndProjectTemporalVerticesTest extends BasePhysicalTPGMOperat
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 
-    Embedding result =
-      new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys)
-        .evaluate()
-        .collect()
-        .get(0);
+    List<Embedding> results = new ArrayList<>();
+
+    new FilterAndProjectTemporalVertices(vertices, predicates, projectionPropertyKeys).evaluate()
+      .output(new LocalCollectionOutputFormat<>(results));
+    getExecutionEnvironment().execute();
+
+    Embedding result = results.get(0);
 
     assertEquals(person.getId(), result.getId(0));
-    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
-    assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
+    assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
+    assertEquals(PropertyValue.NULL_VALUE, result.getProperty(1));
   }
 }

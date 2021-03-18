@@ -31,8 +31,7 @@ import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link JoinTemporalEstimator}.
@@ -56,8 +55,7 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
       queryHandler.getPredicates().getSubCNF("n"), Sets.newHashSet());
     LeafNode mNode = new FilterAndProjectTemporalVerticesNode(null, "m",
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
-    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null,
-      "n", "e", "m",
+    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null, "n", "e", "m",
       queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
     JoinEmbeddingsNode neJoin = new JoinEmbeddingsNode(nNode, eNode, Lists.newArrayList("n"),
@@ -69,9 +67,8 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    // there are 20 "trips" in the citibike sample graph, condition
-    // always holds
-    assertThat(estimator.getCardinality(), is(20L));
+    // there are 20 "trips" in the citibike sample graph
+    assertEquals(20L, estimator.getCardinality());
   }
 
   @Test
@@ -98,7 +95,7 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(0L));
+    assertEquals(0L, estimator.getCardinality());
   }
 
   @Test
@@ -125,7 +122,7 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
   }
 
   @Test
@@ -149,9 +146,9 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
 
     JoinTemporalEstimator estimator = new JoinTemporalEstimator(queryHandler, stats);
     estimator.visit(neJoin);
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
     estimator.visit(nemJoin);
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
   }
 
   @Test
@@ -175,9 +172,9 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
 
     JoinTemporalEstimator estimator = new JoinTemporalEstimator(queryHandler, stats);
     estimator.visit(neJoin);
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
     estimator.visit(nemJoin);
-    assertThat(estimator.getCardinality(), is(20L));
+    assertEquals(20L, estimator.getCardinality());
   }
 
   @Test
@@ -190,12 +187,10 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
       queryHandler.getPredicates().getSubCNF("n"), Sets.newHashSet());
     LeafNode mNode = new FilterAndProjectTemporalVerticesNode(null, "m",
       queryHandler.getPredicates().getSubCNF("m"), Sets.newHashSet());
-    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null,
-      "n", "e", "m",
+    LeafNode eNode = new FilterAndProjectTemporalEdgesNode(null, "n", "e", "m",
       queryHandler.getPredicates().getSubCNF("e"), Sets.newHashSet(), false);
 
-    ExpandEmbeddingsNode neJoin = new ExpandEmbeddingsNode(nNode, eNode,
-      "n", "e", "m", 1, 10,
+    ExpandEmbeddingsNode neJoin = new ExpandEmbeddingsNode(nNode, eNode, "n", "e", "m", 1, 10,
       ExpandDirection.OUT, MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
@@ -204,7 +199,7 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
     // 24 1-edge paths + 10 2-edge paths
-    assertThat(estimator.getCardinality(), is(22L));
+    assertEquals(22L, estimator.getCardinality());
   }
 
   @Test
@@ -231,7 +226,7 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(2L));
+    assertEquals(2L, estimator.getCardinality());
   }
 
   @Test
@@ -270,6 +265,6 @@ public class JoinTemporalEstimatorTest extends TemporalGradoopTestBase {
     estimator.visit(ne1mJoin);
     estimator.visit(ne1Join);
 
-    assertThat(estimator.getCardinality(), is(2L));
+    assertEquals(2L, estimator.getCardinality());
   }
 }
