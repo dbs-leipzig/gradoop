@@ -62,7 +62,7 @@ public class SyntacticSubsumptionTest {
       Collections.singletonList(eq),
       Arrays.asList(lte1, lt2)
     );
-    assertEquals(subsumer.transformCNF(cnf1), expected1);
+    assertEquals(expected1, subsumer.transformCNF(cnf1));
   }
 
   @Test
@@ -76,7 +76,7 @@ public class SyntacticSubsumptionTest {
     CNF expected2 = Util.cnfFromLists(
       Arrays.asList(eq, lt2)
     );
-    assertEquals(subsumer.transformCNF(cnf2), expected2);
+    assertEquals(expected2, subsumer.transformCNF(cnf2));
   }
 
   @Test
@@ -91,7 +91,7 @@ public class SyntacticSubsumptionTest {
       Arrays.asList(lt1, eq),
       Arrays.asList(lte1, eq, lt2)
     );
-    assertEquals(subsumer.transformCNF(cnf3), expected3);
+    assertEquals(expected3, subsumer.transformCNF(cnf3));
   }
 
   @Test
@@ -105,7 +105,7 @@ public class SyntacticSubsumptionTest {
     CNF expected4 = Util.cnfFromLists(
       Arrays.asList(eq, lt2)
     );
-    assertEquals(subsumer.transformCNF(cnf4), expected4);
+    assertEquals(expected4, subsumer.transformCNF(cnf4));
   }
 
   @Test
@@ -119,6 +119,6 @@ public class SyntacticSubsumptionTest {
     CNF expected5 = Util.cnfFromLists(
       Collections.singletonList(withLiteral)
     );
-    assertEquals(subsumer.transformCNF(cnf5), expected5);
+    assertEquals(expected5, subsumer.transformCNF(cnf5));
   }
 }

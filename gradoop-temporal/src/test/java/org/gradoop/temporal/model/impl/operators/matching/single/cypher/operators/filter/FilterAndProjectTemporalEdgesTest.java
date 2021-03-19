@@ -53,7 +53,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
         .collect();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(1), e1.getId());
+    assertEquals(e1.getId(), result.get(0).getId(1));
   }
 
   @Test
@@ -81,7 +81,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
         .collect();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(1), e1.getId());
+    assertEquals(e1.getId(), result.get(0).getId(1));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
         .collect();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(1), e1.getId());
+    assertEquals(e1.getId(), result.get(0).getId(1));
   }
 
   @Test
@@ -128,7 +128,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
         .collect();
 
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(1), e2.getId());
+    assertEquals(e2.getId(), result.get(0).getId(1));
   }
 
   @Test
@@ -176,7 +176,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
     Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
-    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
+    assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
   }
 
   @Test
@@ -197,8 +197,8 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
     Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
-    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
-    assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
+    assertEquals(PropertyValue.create("Alice"), result.getProperty(0));
+    assertEquals(PropertyValue.NULL_VALUE, result.getProperty(1));
   }
 
   @Test
@@ -215,7 +215,7 @@ public class FilterAndProjectTemporalEdgesTest extends BasePhysicalTPGMOperatorT
     Embedding result = new FilterAndProjectTemporalEdges(edges, predicates, Collections.emptyList(), true)
       .evaluate().collect().get(0);
 
-    assertEquals(result.size(), 2);
+    assertEquals(2, result.size());
     assertEquals(a, result.getId(0));
     assertEquals(edge.getId(), result.getId(1));
   }

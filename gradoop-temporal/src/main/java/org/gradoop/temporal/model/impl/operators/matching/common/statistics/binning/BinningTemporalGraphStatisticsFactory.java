@@ -15,6 +15,8 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning;
 
+import org.apache.commons.compress.utils.Lists;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatisticsFactory;
@@ -59,16 +61,20 @@ public class BinningTemporalGraphStatisticsFactory implements
                                                               Set<String> categoricalProperties)
     throws Exception {
 
-    List<TemporalElementStats> vertexStats = g.getVertices()
+    List<TemporalElementStats> vertexStats = Lists.newArrayList();
+    g.getVertices()
       .groupBy(EPGMElement::getLabel)
       .reduceGroup(new ElementsToStats<>(numericalProperties, categoricalProperties))
-      .collect();
+      .output(new LocalCollectionOutputFormat<>(vertexStats));
 
-    List<TemporalElementStats> edgeStats = g.getEdges()
+    List<TemporalElementStats> edgeStats = Lists.newArrayList();
+    g.getEdges()
       // do not replace this with the method reference!!!
       .groupBy(edge -> edge.getLabel())
       .reduceGroup(new ElementsToStats<>(numericalProperties, categoricalProperties))
-      .collect();
+      .output(new LocalCollectionOutputFormat<>(edgeStats));
+
+    g.getConfig().getExecutionEnvironment().execute();
 
     HashSet<String> relevantProperties = null;
     // both only null, if all properties should be considered

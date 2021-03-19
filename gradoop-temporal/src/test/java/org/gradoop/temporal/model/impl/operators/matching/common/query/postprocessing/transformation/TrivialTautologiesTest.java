@@ -88,14 +88,14 @@ public class TrivialTautologiesTest {
       Arrays.asList(tlNonTaut2, lNonTaut2)
     );
 
-    assertEquals(tautologyDetector.transformCNF(cnf1), expected1);
+    assertEquals(expected1, tautologyDetector.transformCNF(cnf1));
 
     // only tautologies here
     CNF cnf2 = Util.cnfFromLists(
       Arrays.asList(tsTaut1, lTaut3)
     );
     CNF expected2 = new CNF();
-    assertEquals(tautologyDetector.transformCNF(cnf2), expected2);
+    assertEquals(expected2, tautologyDetector.transformCNF(cnf2));
 
 
   }

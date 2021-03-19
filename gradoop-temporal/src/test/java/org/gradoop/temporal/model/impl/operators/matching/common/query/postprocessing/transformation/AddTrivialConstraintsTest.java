@@ -67,7 +67,7 @@ public class AddTrivialConstraintsTest {
       Collections.singletonList(new Comparison(lit2, LT, lit3))
     ));
 
-    assertEquals(constraintAdder.transformCNF(cnf), expected);
+    assertEquals(expected, constraintAdder.transformCNF(cnf));
   }
 
   @Test
@@ -78,7 +78,7 @@ public class AddTrivialConstraintsTest {
     CNF expected = new CNF(cnf).and(Util.cnfFromLists(
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo))
     ));
-    assertEquals(constraintAdder.transformCNF(cnf), expected);
+    assertEquals(expected, constraintAdder.transformCNF(cnf));
   }
 
   @Test
@@ -88,7 +88,7 @@ public class AddTrivialConstraintsTest {
       Collections.singletonList(new Comparison(bTxFrom, LTE, lit3))
     );
 
-    assertEquals(constraintAdder.transformCNF(cnf), cnf);
+    assertEquals(cnf, constraintAdder.transformCNF(cnf));
   }
 
   @Test
@@ -105,6 +105,6 @@ public class AddTrivialConstraintsTest {
       Collections.singletonList(new Comparison(aTxFrom, LTE, aTxTo)),
       Collections.singletonList(new Comparison(bTxFrom, LTE, bTxTo))
     ));
-    assertEquals(constraintAdder.transformCNF(cnf), expected);
+    assertEquals(expected, constraintAdder.transformCNF(cnf));
   }
 }

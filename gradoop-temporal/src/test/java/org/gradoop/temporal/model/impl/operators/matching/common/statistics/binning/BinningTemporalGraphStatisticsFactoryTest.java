@@ -71,8 +71,8 @@ public class BinningTemporalGraphStatisticsFactoryTest extends TemporalGradoopTe
 
     Map<String, TemporalElementStats> edgeStats = stat.getEdgeStats();
     Map<String, TemporalElementStats> vertexStats = stat.getVertexStats();
-    assertEquals(edgeStats.keySet().size(), 2);
-    assertEquals(vertexStats.keySet().size(), 2);
+    assertEquals(2, edgeStats.keySet().size());
+    assertEquals(2, vertexStats.keySet().size());
     assertTrue(edgeStats.containsKey(edgeLabels[0]));
     assertTrue(edgeStats.containsKey(edgeLabels[1]));
     assertTrue(vertexStats.containsKey(vertexLabels[0]));

@@ -38,12 +38,12 @@ public class ReservoirSamplerTest {
 
     assertTrue(sampler.updateSample(5));
     List<Integer> res1 = sampler.getReservoirSample();
-    assertEquals(res1.size(), 1);
-    assertEquals((int) res1.get(0), 5);
+    assertEquals(1, res1.size());
+    assertEquals(5, (int) res1.get(0));
 
     sampler = new ReservoirSampler<>(sampleSize);
     sampler.updateSample(input);
-    assertEquals(sampler.getSampleSize(), sampleSize);
+    assertEquals(sampleSize, sampler.getSampleSize());
     assertEquals(sampler.getSampleSize(), sampler.getReservoirSample().size());
     List<Integer> sample = sampler.getReservoirSample();
     for (int i = 0; i < sample.size(); i++) {

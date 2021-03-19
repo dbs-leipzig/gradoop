@@ -33,12 +33,11 @@ public class BinningTest {
 
     Binning binning = new Binning(input, 100);
     Long[] bins = binning.getBins();
-    assertEquals(bins.length, 100);
-    assertEquals((long) bins[0], Long.MIN_VALUE);
+    assertEquals(100, bins.length);
+    assertEquals(Long.MIN_VALUE, (long) bins[0]);
     for (int i = 1; i < 100; i++) {
-      assertEquals((long) bins[i], 3 * i - 1);
+      assertEquals(3 * i - 1, (long) bins[i]);
     }
-
   }
 
   @Test(expected = IllegalArgumentException.class)

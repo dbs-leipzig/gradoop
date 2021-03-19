@@ -38,15 +38,15 @@ public class TemporalElementStatsTest {
       assertTrue(stats.addElement(vertex));
     }
     Binning[] timeBins = stats.getEstimatedTimeBins();
-    assertEquals(timeBins.length, 4);
+    assertEquals(4, timeBins.length);
     Long[] startValues = new Long[]{0L, 10000L, 1000000L, 2000000L};
 
     for (int i = 0; i < 4; i++) {
       Long[] bins = timeBins[i].getBins();
-      assertEquals((long) bins[0], Long.MIN_VALUE);
+      assertEquals(Long.MIN_VALUE, (long) bins[0]);
       for (int k = 1; k < 100; k++) {
         // 50 is the default bin size
-        assertEquals((long) bins[k], startValues[i] + (50 * k) - 1);
+        assertEquals(startValues[i] + (50 * k) - 1, (long) bins[k]);
       }
     }
   }
@@ -73,13 +73,13 @@ public class TemporalElementStatsTest {
 
     double txDurationMean = stats.getTxDurationStats()[0];
     double txDurationVariance = stats.getTxDurationStats()[1];
-    assertEquals(txDurationMean, 2.5, 0.001);
-    assertEquals(txDurationVariance, 0.25, 0.001);
+    assertEquals(2.5, txDurationMean, 0.001);
+    assertEquals(0.25, txDurationVariance, 0.001);
 
     double valDurationMean = stats.getValDurationStats()[0];
     double valDurationVariance = stats.getValDurationStats()[1];
-    assertEquals(valDurationMean, 7.5, 0.001);
-    assertEquals(valDurationVariance, 6.25, 0.001);
+    assertEquals(7.5, valDurationMean, 0.001);
+    assertEquals(6.25, valDurationVariance, 0.001);
   }
 
   @Test
@@ -214,25 +214,25 @@ public class TemporalElementStatsTest {
     Map<String, Double> occurence = stats.getNumericalOccurrenceEstimation();
     Map<String, Double[]> meanAndVariance = stats.getNumericalPropertyStatsEstimation();
 
-    assertEquals(occurence.get(decimalKeyFloat), 0.01, 0.);
-    assertEquals(meanAndVariance.get(decimalKeyFloat)[0], meanFloat, 0.00001);
-    assertEquals(meanAndVariance.get(decimalKeyFloat)[1], varianceFloat, 0.00001);
+    assertEquals(0.01, occurence.get(decimalKeyFloat), 0.);
+    assertEquals(meanFloat, meanAndVariance.get(decimalKeyFloat)[0], 0.00001);
+    assertEquals(varianceFloat, meanAndVariance.get(decimalKeyFloat)[1], 0.00001);
 
-    assertEquals(occurence.get(decimalKeyDouble), 0.03, 0.);
-    assertEquals(meanAndVariance.get(decimalKeyDouble)[0], meanDouble, 0.);
-    assertEquals(meanAndVariance.get(decimalKeyDouble)[1], varianceDouble, 0.001);
+    assertEquals(0.03, occurence.get(decimalKeyDouble), 0.);
+    assertEquals(meanDouble, meanAndVariance.get(decimalKeyDouble)[0], 0.);
+    assertEquals(varianceDouble, meanAndVariance.get(decimalKeyDouble)[1], 0.001);
 
-    assertEquals(occurence.get(integerKey), 0.1, 0.);
-    assertEquals(meanAndVariance.get(integerKey)[0], meanInteger, 0.);
-    assertEquals(meanAndVariance.get(integerKey)[1], varianceInteger, 0.000001);
+    assertEquals(0.1, occurence.get(integerKey), 0.);
+    assertEquals(meanInteger, meanAndVariance.get(integerKey)[0], 0.);
+    assertEquals(varianceInteger, meanAndVariance.get(integerKey)[1], 0.000001);
 
-    assertEquals(occurence.get(shortKey), 0.1, 0.);
-    assertEquals(meanAndVariance.get(shortKey)[0], meanShort, 0.);
-    assertEquals(meanAndVariance.get(shortKey)[1], varianceShort, 0.000001);
+    assertEquals(0.1, occurence.get(shortKey), 0.);
+    assertEquals(meanShort, meanAndVariance.get(shortKey)[0], 0.);
+    assertEquals(varianceShort, meanAndVariance.get(shortKey)[1], 0.000001);
 
-    assertEquals(occurence.get(longKey), 0.2, 0.);
-    assertEquals(meanAndVariance.get(longKey)[0], meanLong, 0.);
-    assertEquals(meanAndVariance.get(longKey)[1], varianceLong, 0.);
+    assertEquals(0.2, occurence.get(longKey), 0.);
+    assertEquals(meanLong, meanAndVariance.get(longKey)[0], 0.);
+    assertEquals(varianceLong, meanAndVariance.get(longKey)[1], 0.);
 
   }
 
@@ -270,7 +270,7 @@ public class TemporalElementStatsTest {
     }
     Map<String, Map<PropertyValue, Double>> categoricalEstimations =
       stats.getCategoricalSelectivityEstimation();
-    assertEquals(categoricalEstimations.keySet().size(), 2);
+    assertEquals(2, categoricalEstimations.keySet().size());
 
     // first property
     Map<PropertyValue, Double> firstProperty = categoricalEstimations.get(prop1);
@@ -278,7 +278,7 @@ public class TemporalElementStatsTest {
     for (int i = 0; i < prop1Values.length; i++) {
       double expected = prop1Selectivity[i];
       double actual = firstProperty.get(prop1Values[i]);
-      assertEquals(actual, expected, 0.0001);
+      assertEquals(expected, actual, 0.0001);
     }
 
     // second
@@ -287,7 +287,7 @@ public class TemporalElementStatsTest {
     for (int i = 0; i < prop2Values.length; i++) {
       double expected = prop2Selectivity[i];
       double actual = secondProperty.get(prop2Values[i]);
-      assertEquals(actual, expected, 0.0001);
+      assertEquals(expected, actual, 0.0001);
     }
   }
 

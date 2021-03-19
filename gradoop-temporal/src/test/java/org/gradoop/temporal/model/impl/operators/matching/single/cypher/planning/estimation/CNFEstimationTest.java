@@ -79,10 +79,10 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.24, 0.01);
+    assertEquals(0.24, estimation1, 0.01);
     // does the cache work?
     double estimation1Cached = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1Cached, estimation1, .0);
+    assertEquals(estimation1, estimation1Cached, .0);
 
     // switch sides
     Comparison comp2 = new Comparison(new TimeLiteral(175L), LT, aTxFrom);
@@ -90,7 +90,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation2, estimation1, 0.);
+    assertEquals(estimation1, estimation2, 0.);
 
     // comparisons where lhs and rhs are both selectors are estimated to 1.
     // (no matter how much sense they make)
@@ -99,7 +99,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 1., 0.00001);
+    assertEquals(1., estimation3, 0.00001);
   }
 
   @Test
@@ -112,7 +112,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.9, 0.03);
+    assertEquals(0.9, estimation1, 0.03);
 
     // switch sides
     Comparison comp2 = new Comparison(new TimeConstant(10), LT, eValDuration);
@@ -120,7 +120,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation2, estimation1, 0.);
+    assertEquals(estimation1, estimation2, 0.);
 
     // durations that do not compare tx_from / val_duration with a constant
     // are evaluated to, i.e. neglected in the estimation
@@ -129,7 +129,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 1., 0.0001);
+    assertEquals(1., estimation3, 0.0001);
 
     Comparison comp4 = new Comparison(new Duration(
       new TimeSelector("e", TX_FROM),
@@ -139,7 +139,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
     CNF cnf4 = new CNF(Collections.singletonList(e4));
     double estimation4 = estimator.estimateCNF(cnf4);
-    assertEquals(estimation4, 1., 0.0001);
+    assertEquals(1., estimation4, 0.0001);
   }
 
   @Test
@@ -151,21 +151,21 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.5, 0.02);
+    assertEquals(0.5, estimation1, 0.02);
 
     Comparison comp2 = new Comparison(eTxDuration, EQ, fValDuration);
     CNFElement e2 =
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation2, 0., 0.01);
+    assertEquals(0., estimation2, 0.01);
 
     Comparison comp3 = new Comparison(eTxDuration, LT, fValDuration);
     CNFElement e3 =
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 0.5, 0.02);
+    assertEquals(0.5, estimation3, 0.02);
     assertTrue(estimation3 < estimation1);
   }
 
@@ -183,7 +183,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.06, 0.001);
+    assertEquals(0.06, estimation1, 0.001);
     // sides switched
     Comparison comp2 = new Comparison(
       new Literal("x"),
@@ -194,7 +194,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation2, 0.06, 0.001);
+    assertEquals(0.06, estimation2, 0.001);
 
     // numerical
     Comparison comp3 = new Comparison(
@@ -206,7 +206,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 0.15, 0.02);
+    assertEquals(0.15, estimation3, 0.02);
     // switched sides
     Comparison comp4 = new Comparison(
       new Literal(50),
@@ -217,7 +217,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp4, new ComparableTPGMFactory())));
     CNF cnf4 = new CNF(Collections.singletonList(e4));
     double estimation4 = estimator.estimateCNF(cnf4);
-    assertEquals(estimation4, estimation3, 0.);
+    assertEquals(estimation3, estimation4, 0.);
   }
 
   @Test
@@ -236,7 +236,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
     // (2/3)² * (1/3)²
-    assertEquals(estimation1, 0.55, 0.01);
+    assertEquals(0.55, estimation1, 0.01);
 
 
     // numerical
@@ -251,7 +251,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     double estimation2 = estimator.estimateCNF(cnf2);
     // occurrences of numProp * prob(a.numProb >= b.numProb)
     // = (1/2)*(1/10) * (1/2) = 0.025
-    assertEquals(estimation2, 0.025, 0.01);
+    assertEquals(0.025, estimation2, 0.01);
     // switch sides
     Comparison comp3 = new Comparison(
       new PropertySelector("b", "numProp"),
@@ -262,7 +262,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, estimation2, 0.01);
+    assertEquals(estimation2, estimation3, 0.01);
   }
 
   @Test
@@ -275,19 +275,19 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     CNFElement e1 =
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp1, new ComparableTPGMFactory())));
     double estimation1 = estimator.estimateCNF(new CNF(Collections.singletonList(e1)));
-    assertEquals(estimation1, 0.25, 0.025);
+    assertEquals(0.25, estimation1, 0.025);
 
     Comparison comp2 = new Comparison(aValTo, LT, cTxTo);
     CNFElement e2 =
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp2, new ComparableTPGMFactory())));
     double estimation2 = estimator.estimateCNF(new CNF(Collections.singletonList(e2)));
-    assertEquals(estimation2, 0.375, 0.1);
+    assertEquals(0.375, estimation2, 0.1);
 
     Comparison comp3 = new Comparison(cTxTo, LTE, bTxFrom);
     CNFElement e3 =
       new CNFElement(Collections.singletonList(new ComparisonExpression(comp3, new ComparableTPGMFactory())));
     double estimation3 = estimator.estimateCNF(new CNF(Collections.singletonList(e3)));
-    assertEquals(estimation3, 0.25, 0.05);
+    assertEquals(0.25, estimation3, 0.05);
   }
 
   @Test
@@ -361,7 +361,7 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     CNFElement e1 = new CNFElement(Arrays.asList(c1, c2));
     CNF cnf1 = new CNF(Collections.singletonList(e1));
     double estimation1 = estimator.estimateCNF(cnf1);
-    assertEquals(estimation1, 0.9125, 0.02);
+    assertEquals(0.9125, estimation1, 0.02);
 
     // (a) OR (b) OR (d)
     // = P(a) + P(b) + P(d) - P(a)*P(b) - P(a)*P(d) - P(b)*P(d) + P(a)*P(b)*P(d)
@@ -370,27 +370,25 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
     CNFElement e2 = new CNFElement(Arrays.asList(c1, c2, c4));
     CNF cnf2 = new CNF(Collections.singletonList(e2));
     double estimation2 = estimator.estimateCNF(cnf2);
-    assertEquals(estimation2, 0.925, 0.02);
+    assertEquals(0.925, estimation2, 0.02);
 
     // (a) OR (b) OR (c) = 1
     CNFElement e3 = new CNFElement(Arrays.asList(c1, c2, c3));
     CNF cnf3 = new CNF(Collections.singletonList(e3));
     double estimation3 = estimator.estimateCNF(cnf3);
-    assertEquals(estimation3, 1., 0.01);
+    assertEquals(1., estimation3, 0.01);
 
     // conjunction of disjunctions
     // independence assumption, should thus be ~ 0.9125*0.925*1. = 0.844
     CNF cnf4 = new CNF(Arrays.asList(e2, e1, e3));
     double estimation4 = estimator.estimateCNF(cnf4);
-    assertEquals(estimation4, 0.84, 0.03);
+    assertEquals(0.84, estimation4, 0.03);
 
     // check reordering of cnf4: sequence should be e1, e2, e3
     CNFElement e2Reordered = new CNFElement(Arrays.asList(c1, c4, c2));
     CNFElement e3Reordered = new CNFElement(Arrays.asList(c3, c1, c2));
-    CNF cnf4Reordered = new CNF(Arrays.asList(
-      e1, e2Reordered, e3Reordered));
-    assertEquals(estimator.reorderCNF(cnf4), cnf4Reordered);
-
+    CNF cnf4Reordered = new CNF(Arrays.asList(e1, e2Reordered, e3Reordered));
+    assertEquals(cnf4Reordered, estimator.reorderCNF(cnf4));
   }
 
   /**
@@ -541,5 +539,4 @@ public class CNFEstimationTest extends TemporalGradoopTestBase {
 
     return new BinningTemporalGraphStatisticsFactory().fromGraphWithSampling(graph, 100);
   }
-
 }

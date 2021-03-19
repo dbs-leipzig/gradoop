@@ -65,7 +65,7 @@ public class MinMaxUnfoldingTest {
         new Comparison(min1.getArgs().get(2), Comparator.LT, l1)
       )
     );
-    assertEquals(unfolder.transformCNF(cnf1), expected1);
+    assertEquals(expected1, unfolder.transformCNF(cnf1));
 
 
     Comparison c2 = new Comparison(max1, LTE, l1);
@@ -78,7 +78,7 @@ public class MinMaxUnfoldingTest {
       Collections.singletonList(new Comparison(max1.getArgs().get(2), LTE, l1))
 
     );
-    assertEquals(unfolder.transformCNF(cnf2), expected2);
+    assertEquals(expected2, unfolder.transformCNF(cnf2));
 
 
     Comparison c3 = new Comparison(max1, Comparator.EQ, l1);
@@ -87,7 +87,7 @@ public class MinMaxUnfoldingTest {
     );
     CNF expected3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(max1, EQ, l1)));
-    assertEquals(unfolder.transformCNF(cnf3), expected3);
+    assertEquals(expected3, unfolder.transformCNF(cnf3));
 
 
     Comparison c4 = new Comparison(l1, LTE, min1);
@@ -99,7 +99,7 @@ public class MinMaxUnfoldingTest {
       Collections.singletonList(new Comparison(l1, LTE, min1.getArgs().get(1))),
       Collections.singletonList(new Comparison(l1, LTE, min1.getArgs().get(2)))
     );
-    assertEquals(unfolder.transformCNF(cnf4), expected4);
+    assertEquals(expected4, unfolder.transformCNF(cnf4));
 
 
     Comparison c5 = new Comparison(l1, Comparator.LT, max1);
@@ -113,7 +113,7 @@ public class MinMaxUnfoldingTest {
         new Comparison(l1, Comparator.LT, max1.getArgs().get(2))
       )
     );
-    assertEquals(unfolder.transformCNF(cnf5), expected5);
+    assertEquals(expected5, unfolder.transformCNF(cnf5));
 
 
     Comparison c6 = new Comparison(l1, NEQ, min1);
@@ -122,7 +122,7 @@ public class MinMaxUnfoldingTest {
     );
     CNF expected6 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(l1, NEQ, min1)));
-    assertEquals(unfolder.transformCNF(cnf6), expected6);
+    assertEquals(expected6, unfolder.transformCNF(cnf6));
 
 
     // MIN < MIN is only unfolded once, rhs stays untouched (to ensure a CNF result)
@@ -135,7 +135,7 @@ public class MinMaxUnfoldingTest {
         new Comparison(min2.getArgs().get(0), Comparator.LT, min2),
         new Comparison(min2.getArgs().get(1), Comparator.LT, min2)
       ));
-    assertEquals(unfolder.transformCNF(cnf7), expected7);
+    assertEquals(expected7, unfolder.transformCNF(cnf7));
 
     // MIN < MAX
     Comparison c8 = new Comparison(min2, LTE, max2);
@@ -149,7 +149,7 @@ public class MinMaxUnfoldingTest {
         new Comparison(min2.getArgs().get(1), LTE, max2.getArgs().get(0)),
         new Comparison(min2.getArgs().get(1), LTE, max2.getArgs().get(1))
       ));
-    assertEquals(unfolder.transformCNF(cnf8), expected8);
+    assertEquals(expected8, unfolder.transformCNF(cnf8));
 
     // MAX < MIN
     Comparison c9 = new Comparison(max2, LTE, min2);
@@ -162,7 +162,7 @@ public class MinMaxUnfoldingTest {
       Collections.singletonList(new Comparison(max2.getArgs().get(1), LTE, min2.getArgs().get(0))),
       Collections.singletonList(new Comparison(max2.getArgs().get(1), LTE, min2.getArgs().get(1)))
     );
-    assertEquals(unfolder.transformCNF(cnf9), expected9);
+    assertEquals(expected9, unfolder.transformCNF(cnf9));
 
     // MAX < MAX
     Comparison c10 = new Comparison(max2, LTE, max2);
@@ -175,7 +175,7 @@ public class MinMaxUnfoldingTest {
       Arrays.asList(new Comparison(max2.getArgs().get(1), LTE, max2.getArgs().get(0)),
         new Comparison(max2.getArgs().get(1), LTE, max2.getArgs().get(1)))
     );
-    assertEquals(unfolder.transformCNF(cnf10), expected10);
+    assertEquals(expected10, unfolder.transformCNF(cnf10));
 
     Comparison c11 = new Comparison(max2, NEQ, min2);
     CNF cnf11 = Util.cnfFromLists(
@@ -184,7 +184,7 @@ public class MinMaxUnfoldingTest {
     CNF expected11 = Util.cnfFromLists(
       Collections.singletonList(c11)
     );
-    assertEquals(unfolder.transformCNF(cnf11), expected11);
+    assertEquals(expected11, unfolder.transformCNF(cnf11));
 
     // more complex
     CNF noMinMax = Util.cnfFromLists(
@@ -203,9 +203,9 @@ public class MinMaxUnfoldingTest {
     CNF expectedComplex = expected1.and(expected2).and(expected3)
       .and(expected4).and(noMinMax).and(expected5).and(expected6).and(expected7)
       .and(expected8).and(expected9).and(expected10).and(expected11);
-    assertEquals(unfolder.transformCNF(complex), expectedComplex);
+    assertEquals(expectedComplex, unfolder.transformCNF(complex));
 
     CNF empty = new CNF();
-    assertEquals(unfolder.transformCNF(empty), empty);
+    assertEquals(empty, unfolder.transformCNF(empty));
   }
 }

@@ -51,52 +51,40 @@ public class NormalizationTest {
     // for GT or GTE, sides should be switched
     CNF gteCNF = Util.cnfFromLists(Collections.singletonList(gte));
     CNF gteExpected = Util.cnfFromLists(Collections.singletonList(gte.switchSides()));
-    assertEquals(normalization.transformCNF(gteCNF), gteExpected);
+    assertEquals(gteExpected, normalization.transformCNF(gteCNF));
 
     CNF gtCNF = Util.cnfFromLists(Collections.singletonList(gt));
     CNF gtExpected = Util.cnfFromLists(Collections.singletonList(gt.switchSides()));
-    assertEquals(normalization.transformCNF(gtCNF), gtExpected);
+    assertEquals(gtExpected, normalization.transformCNF(gtCNF));
 
     // all other comparisons should be left unchanged
     CNF eqCNF = Util.cnfFromLists(Collections.singletonList(eq));
-    assertEquals(normalization.transformCNF(eqCNF), eqCNF);
+    assertEquals(eqCNF, normalization.transformCNF(eqCNF));
 
     CNF neqCNF = Util.cnfFromLists(Collections.singletonList(neq));
-    assertEquals(normalization.transformCNF(neqCNF), neqCNF);
+    assertEquals(neqCNF, normalization.transformCNF(neqCNF));
 
     CNF ltCNF = Util.cnfFromLists(Collections.singletonList(lt));
-    assertEquals(normalization.transformCNF(ltCNF), ltCNF);
+    assertEquals(ltCNF, normalization.transformCNF(ltCNF));
 
     CNF lteCNF = Util.cnfFromLists(Collections.singletonList(lte));
-    assertEquals(normalization.transformCNF(lteCNF), lteCNF);
+    assertEquals(lteCNF, normalization.transformCNF(lteCNF));
   }
 
   @Test
   public void complexCNFTest() {
     // input
-    ArrayList<Comparison> clause1 = new ArrayList<>(Arrays.asList(
-      eq, gt, lte
-    ));
-    ArrayList<Comparison> clause2 = new ArrayList<>(Arrays.asList(
-      neq, lt
-    ));
-    ArrayList<Comparison> clause3 = new ArrayList<>(Collections.singletonList(
-      gte
-    ));
+    ArrayList<Comparison> clause1 = new ArrayList<>(Arrays.asList(eq, gt, lte));
+    ArrayList<Comparison> clause2 = new ArrayList<>(Arrays.asList(neq, lt));
+    ArrayList<Comparison> clause3 = new ArrayList<>(Collections.singletonList(gte));
     CNF input = Util.cnfFromLists(clause1, clause2, clause3);
 
     // expected
-    ArrayList<Comparison> expectedClause1 = new ArrayList<>(Arrays.asList(
-      eq, gt.switchSides(), lte
-    ));
-    ArrayList<Comparison> expectedClause2 = new ArrayList<>(Arrays.asList(
-      neq, lt
-    ));
-    ArrayList<Comparison> expectedClause3 = new ArrayList<>(Collections.singletonList(
-      gte.switchSides()
-    ));
+    ArrayList<Comparison> expectedClause1 = new ArrayList<>(Arrays.asList(eq, gt.switchSides(), lte));
+    ArrayList<Comparison> expectedClause2 = new ArrayList<>(Arrays.asList(neq, lt));
+    ArrayList<Comparison> expectedClause3 = new ArrayList<>(Collections.singletonList(gte.switchSides()));
     CNF expected = Util.cnfFromLists(expectedClause1, expectedClause2, expectedClause3);
 
-    assertEquals(normalization.transformCNF(input), expected);
+    assertEquals(expected, normalization.transformCNF(input));
   }
 }

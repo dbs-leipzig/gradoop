@@ -49,7 +49,7 @@ public class TemporalSubsumtionTest {
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a)),
       Collections.singletonList(new Comparison(selector1, EQ, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf1), cnf1);
+    assertEquals(cnf1, subsumption.transformCNF(cnf1));
 
     CNF cnf2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a)),
@@ -58,7 +58,7 @@ public class TemporalSubsumtionTest {
     CNF expected2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf2), expected2);
+    assertEquals(expected2, subsumption.transformCNF(cnf2));
 
     CNF cnf3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a)),
@@ -67,13 +67,13 @@ public class TemporalSubsumtionTest {
     CNF expected3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf3), expected3);
+    assertEquals(expected3, subsumption.transformCNF(cnf3));
 
     CNF cnf4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a)),
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf4), cnf4);
+    assertEquals(cnf4, subsumption.transformCNF(cnf4));
 
     CNF cnf5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a)),
@@ -82,7 +82,7 @@ public class TemporalSubsumtionTest {
     CNF expected5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf5), expected5);
+    assertEquals(expected5, subsumption.transformCNF(cnf5));
   }
 
   @Test
@@ -94,25 +94,25 @@ public class TemporalSubsumtionTest {
     CNF expected1 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, EQ, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf1), expected1);
+    assertEquals(expected1, subsumption.transformCNF(cnf1));
 
     CNF cnf2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, NEQ, lit1970a)),
       Collections.singletonList(new Comparison(selector1, NEQ, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf2), cnf2);
+    assertEquals(cnf2, subsumption.transformCNF(cnf2));
 
     CNF cnf3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, NEQ, lit1970a)),
       Collections.singletonList(new Comparison(selector1, LTE, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf3), cnf3);
+    assertEquals(cnf3, subsumption.transformCNF(cnf3));
 
     CNF cnf4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, NEQ, lit1970a)),
       Collections.singletonList(new Comparison(selector1, LT, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf4), cnf4);
+    assertEquals(cnf4, subsumption.transformCNF(cnf4));
   }
 
   @Test
@@ -121,7 +121,7 @@ public class TemporalSubsumtionTest {
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a)),
       Collections.singletonList(new Comparison(selector1, EQ, lit1970b))
     );
-    assertEquals(subsumption.transformCNF(cnf1), cnf1);
+    assertEquals(cnf1, subsumption.transformCNF(cnf1));
 
     CNF cnf2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a)),
@@ -130,7 +130,7 @@ public class TemporalSubsumtionTest {
     CNF expected2 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf2), expected2);
+    assertEquals(expected2, subsumption.transformCNF(cnf2));
 
     CNF cnf3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a)),
@@ -139,7 +139,7 @@ public class TemporalSubsumtionTest {
     CNF expected3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf3), expected3);
+    assertEquals(expected3, subsumption.transformCNF(cnf3));
 
     CNF cnf4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a)),
@@ -148,7 +148,7 @@ public class TemporalSubsumtionTest {
     CNF expected4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf4), expected4);
+    assertEquals(expected4, subsumption.transformCNF(cnf4));
 
     CNF cnf5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LTE, lit1970a)),
@@ -157,7 +157,7 @@ public class TemporalSubsumtionTest {
     CNF expected5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf5), expected5);
+    assertEquals(expected5, subsumption.transformCNF(cnf5));
   }
 
   @Test
@@ -178,7 +178,7 @@ public class TemporalSubsumtionTest {
       Collections.singletonList(new Comparison(selector1, LT, lit1970b)),
       Collections.singletonList(new Comparison(selector1, NEQ, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf2), cnf2);
+    assertEquals(cnf2, subsumption.transformCNF(cnf2));
 
     CNF cnf3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a)),
@@ -187,7 +187,7 @@ public class TemporalSubsumtionTest {
     CNF expected3 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf3), expected3);
+    assertEquals(expected3, subsumption.transformCNF(cnf3));
 
     CNF cnf4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a)),
@@ -196,7 +196,7 @@ public class TemporalSubsumtionTest {
     CNF expected4 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf4), expected4);
+    assertEquals(expected4, subsumption.transformCNF(cnf4));
 
     CNF cnf5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a)),
@@ -205,7 +205,7 @@ public class TemporalSubsumtionTest {
     CNF expected5 = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf5), expected5);
+    assertEquals(expected5, subsumption.transformCNF(cnf5));
   }
 
   @Test
@@ -222,7 +222,7 @@ public class TemporalSubsumtionTest {
     CNF expected = Util.cnfFromLists(
       Collections.singletonList(new Comparison(selector1, LT, lit1970a))
     );
-    assertEquals(subsumption.transformCNF(cnf), expected);
+    assertEquals(expected, subsumption.transformCNF(cnf));
 
     CNF cnf2 = Util.cnfFromLists(
       Arrays.asList(new Comparison(selector1, LT, lit1970a),
@@ -237,6 +237,6 @@ public class TemporalSubsumtionTest {
       Arrays.asList(new Comparison(selector2, NEQ, lit2020a),
         new Comparison(selector2, LT, lit2020b))
     );
-    assertEquals(subsumption.transformCNF(cnf2), expected2);
+    assertEquals(expected2, subsumption.transformCNF(cnf2));
   }
 }

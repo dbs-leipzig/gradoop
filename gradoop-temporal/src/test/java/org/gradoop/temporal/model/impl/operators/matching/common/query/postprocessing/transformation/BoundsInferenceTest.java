@@ -240,5 +240,4 @@ public class BoundsInferenceTest {
     BoundsInference prep = new BoundsInference();
     CNF processedCNF = prep.transformCNF(cnf);
   }
-
 }
