@@ -19,9 +19,9 @@ import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 import org.gradoop.gdl.model.comparables.time.TimePoint;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
 
 import java.util.Collections;
 import java.util.HashSet;

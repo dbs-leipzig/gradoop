@@ -124,7 +124,7 @@ public class CypherTemporalPatternMatching
     // Query planning
     TemporalQueryHandler queryHandler = getQueryHandler();
     QueryPlan plan =
-      new GreedyPlanner(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()
+      new GreedyPlanner<>(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()
         .getQueryPlan();
 
     // Query execution
@@ -149,14 +149,8 @@ public class CypherTemporalPatternMatching
 
     // Post processing
     TemporalGraphCollection graphCollection = doAttachData() ?
-      PostProcessor.<TemporalGraphHead,
-        TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
-        extractGraphCollectionWithData(
-          finalElements, graph, true) :
-      PostProcessor.<TemporalGraphHead,
-        TemporalVertex, TemporalEdge, TemporalGraph, TemporalGraphCollection>
-        extractGraphCollection(finalElements, graph.getCollectionFactory(),
-          true);
+      PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
+      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);
 
     return graphCollection;
   }
@@ -204,7 +198,7 @@ public class CypherTemporalPatternMatching
       new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());
 
     return addEmbeddingsElements.evaluate().flatMap(
-      new ElementsFromEmbeddingTPGM(
+      new ElementsFromEmbeddingTPGM<>(
         graph.getFactory().getGraphHeadFactory(),
         graph.getFactory().getVertexFactory(),
         graph.getFactory().getEdgeFactory(),
@@ -243,6 +237,4 @@ public class CypherTemporalPatternMatching
     }
     return newMetaData;
   }
-
-
 }

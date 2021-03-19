@@ -90,7 +90,7 @@ public class DurationComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-    Long toLong = to.evaluate(embedding, metaData).getLong() == TemporalElement.DEFAULT_TIME_TO ?
+    long toLong = to.evaluate(embedding, metaData).getLong() == TemporalElement.DEFAULT_TIME_TO ?
       now : to.evaluate(embedding, metaData).getLong();
     return PropertyValue.create(toLong -
       from.evaluate(embedding, metaData).getLong());
@@ -98,7 +98,7 @@ public class DurationComparable extends TemporalComparable {
 
   @Override
   public PropertyValue evaluate(GraphElement element) {
-    Long toLong = to.evaluate(element).getLong() == TemporalElement.DEFAULT_TIME_TO ?
+    long toLong = to.evaluate(element).getLong() == TemporalElement.DEFAULT_TIME_TO ?
       now : to.evaluate(element).getLong();
     return PropertyValue.create(toLong -
       from.evaluate(element).getLong());

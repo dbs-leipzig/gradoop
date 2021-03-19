@@ -33,11 +33,11 @@ public class ElementsToStats<T extends TemporalElement> implements
   /**
    * List of numerical properties to consider
    */
-  private Set<String> numericalProperties;
+  private final Set<String> numericalProperties;
   /**
    * List of categorical properties to consider
    */
-  private Set<String> categoricalProperties;
+  private final Set<String> categoricalProperties;
 
   /**
    * Creates a new ElementsToStats function considering only specified properties

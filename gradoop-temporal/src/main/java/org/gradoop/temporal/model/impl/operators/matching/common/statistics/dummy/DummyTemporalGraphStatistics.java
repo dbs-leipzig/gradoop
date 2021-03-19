@@ -105,5 +105,4 @@ public class DummyTemporalGraphStatistics extends TemporalGraphStatistics {
                                      String property2) {
     return 1;
   }
-
 }

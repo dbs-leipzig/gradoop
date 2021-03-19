@@ -158,5 +158,4 @@ public class FilterAndProjectTemporalEdgesNode extends LeafNode
         "projectionKeys=%s}",
       sourceVariable, edgeVariable, targetVariable, filterPredicate, projectionKeys);
   }
-
 }

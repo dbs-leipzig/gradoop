@@ -119,11 +119,10 @@ public class CNFEstimation {
     }
 
     labelMap = new HashMap<>();
-    queryHandler.getLabelsForVariables(
-      queryHandler.getAllVariables()).entrySet().forEach(
-      entry -> {
-        if (entry.getValue().length() > 0) {
-          labelMap.put(entry.getKey(), entry.getValue());
+    queryHandler.getLabelsForVariables(queryHandler.getAllVariables())
+      .forEach((key, value) -> {
+        if (value.length() > 0) {
+          labelMap.put(key, value);
         }
       });
     // pre-compute all estimations
@@ -143,14 +142,12 @@ public class CNFEstimation {
    * @return estimation of the probability that the CNF evaluates to true
    */
   public double estimateCNF(CNF cnf) {
-    if (cnf.getPredicates().isEmpty()) {
-      return 1.;
-    }
     return cnf.getPredicates().stream()
       .map(this::estimateCNFElement)
       .collect(Collectors.toList())
       .stream()
-      .reduce((i, j) -> i * j).get();
+      .reduce((i, j) -> i * j)
+      .orElse(1.);
   }
 
   /**
@@ -167,8 +164,7 @@ public class CNFEstimation {
       // recursively estimate P(a or b or c or...) as P(a) + P(b or c or...) - P(a)*P(b or c or...)
       List<ComparisonExpression> comparisons = element.getPredicates();
       double firstEst = estimateComparison(comparisons.get(0));
-      CNFElement rest = new CNFElement(comparisons.subList(
-        1, comparisons.size()));
+      CNFElement rest = new CNFElement(comparisons.subList(1, comparisons.size()));
       double restEst = estimateCNF(new CNF(Collections.singletonList(rest)));
       return firstEst + restEst - (firstEst * restEst);
     }
@@ -249,10 +245,8 @@ public class CNFEstimation {
         return 1.;
       }
     } else {
-      if ((lhs instanceof PropertySelectorComparable &&
-        rhs instanceof LiteralComparable) ||
-        (lhs instanceof LiteralComparable &&
-        rhs instanceof PropertySelectorComparable)) {
+      if ((lhs instanceof PropertySelectorComparable && rhs instanceof LiteralComparable) ||
+        (lhs instanceof LiteralComparable && rhs instanceof PropertySelectorComparable)) {
         return simplePropertyEstimation(comparisonExpression);
       } else if (lhs instanceof PropertySelectorComparable &&
         rhs instanceof PropertySelectorComparable) {
@@ -559,18 +553,14 @@ public class CNFEstimation {
   public CNF reorderCNF(CNF cnf) {
     ArrayList<CNFElement> clauses = new ArrayList<>(cnf.getPredicates());
     // resort the clauses: labels and then selective clauses first
-    clauses.sort(new java.util.Comparator<CNFElement>() {
-      @Override
-      public int compare(CNFElement clause1, CNFElement clause2) {
-        if (clause1.getPredicates().size() == 1 && isLabelComp(clause1.getPredicates().get(0))) {
-          return 100;
-        } else if (clause2.getPredicates().size() == 1 &&
-          isLabelComp(clause2.getPredicates().get(0))) {
-          return -100;
-        } else {
-          return (int) (100. *
-            (estimateCNFElement(clause1) - estimateCNFElement(clause2)));
-        }
+    clauses.sort((clause1, clause2) -> {
+      if (clause1.getPredicates().size() == 1 && isLabelComp(clause1.getPredicates().get(0))) {
+        return 100;
+      } else if (clause2.getPredicates().size() == 1 &&
+        isLabelComp(clause2.getPredicates().get(0))) {
+        return -100;
+      } else {
+        return (int) (100. * (estimateCNFElement(clause1) - estimateCNFElement(clause2)));
       }
     });
 
@@ -578,17 +568,13 @@ public class CNFEstimation {
     clauses = clauses.stream().map(clause -> {
       ArrayList<ComparisonExpression> comps = new ArrayList<>(
         clause.getPredicates());
-      comps.sort(new java.util.Comparator<ComparisonExpression>() {
-        @Override
-        public int compare(ComparisonExpression c1, ComparisonExpression c2) {
-          if (isLabelComp(c1)) {
-            return 100;
-          } else if (isLabelComp(c2)) {
-            return -100;
-          } else {
-            return (int) (100. *
-              (estimateComparison(c2) - estimateComparison(c1)));
-          }
+      comps.sort((c1, c2) -> {
+        if (isLabelComp(c1)) {
+          return 100;
+        } else if (isLabelComp(c2)) {
+          return -100;
+        } else {
+          return (int) (100. * (estimateComparison(c2) - estimateComparison(c1)));
         }
       });
       return new CNFElement(comps);

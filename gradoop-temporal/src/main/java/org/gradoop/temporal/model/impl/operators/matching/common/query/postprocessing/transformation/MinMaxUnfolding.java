@@ -128,8 +128,8 @@ public class MinMaxUnfolding implements QueryTransformation {
       }
     }
 
-    return new CNF(new ArrayList(
-      Collections.singletonList(new CNFElement(new ArrayList(Collections.singletonList(comp))))));
+    return new CNF(new ArrayList<>(
+      Collections.singletonList(new CNFElement(new ArrayList<>(Collections.singletonList(comp))))));
 
   }
 
@@ -150,7 +150,7 @@ public class MinMaxUnfolding implements QueryTransformation {
         new ComparableTPGMFactory()));
     }
     CNFElement singleClause = new CNFElement(comparisons);
-    return new CNF(new ArrayList(Collections.singletonList(singleClause)));
+    return new CNF(new ArrayList<>(Collections.singletonList(singleClause)));
   }
 
   /**
@@ -169,7 +169,7 @@ public class MinMaxUnfolding implements QueryTransformation {
       comparisons.add(new ComparisonExpression(new Comparison(lhs, comparator, arg),
         new ComparableTPGMFactory()));
     }
-    return new CNF(new ArrayList(Collections.singletonList(new CNFElement(comparisons))));
+    return new CNF(new ArrayList<>(Collections.singletonList(new CNFElement(comparisons))));
   }
 
   /**
@@ -185,7 +185,7 @@ public class MinMaxUnfolding implements QueryTransformation {
   private CNF forAll(List<TimePoint> args, Comparator comparator, ComparableExpression rhs) {
     List<CNFElement> clauses = new ArrayList<>();
     for (TimePoint arg : args) {
-      clauses.add(new CNFElement(new ArrayList(Collections.singletonList(new ComparisonExpression(
+      clauses.add(new CNFElement(new ArrayList<>(Collections.singletonList(new ComparisonExpression(
         new Comparison(arg, comparator, rhs),
         new ComparableTPGMFactory()
       )))));
@@ -206,7 +206,7 @@ public class MinMaxUnfolding implements QueryTransformation {
   private CNF forAll(ComparableExpression lhs, Comparator comparator, List<TimePoint> args) {
     List<CNFElement> clauses = new ArrayList<>();
     for (TimePoint arg : args) {
-      clauses.add(new CNFElement(new ArrayList(Collections.singletonList(new ComparisonExpression(
+      clauses.add(new CNFElement(new ArrayList<>(Collections.singletonList(new ComparisonExpression(
         new Comparison(lhs, comparator, arg),
         new ComparableTPGMFactory()
       )))));

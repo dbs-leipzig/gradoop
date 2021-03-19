@@ -86,8 +86,8 @@ public class CNFPostProcessing {
    *                                     during the postprocessing
    */
   public CNF postprocess(CNF cnf) throws QueryContradictoryException {
-    for (int i = 0; i < transformations.size(); i++) {
-      cnf = transformations.get(i).transformCNF(cnf);
+    for (QueryTransformation transformation : transformations) {
+      cnf = transformation.transformCNF(cnf);
     }
     return cnf;
   }

@@ -67,6 +67,4 @@ public class Normalization implements QueryTransformation {
       return comparison;
     }
   }
-
-
 }

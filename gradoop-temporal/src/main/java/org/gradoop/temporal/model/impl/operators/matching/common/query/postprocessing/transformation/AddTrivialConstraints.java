@@ -126,7 +126,7 @@ public class AddTrivialConstraints implements QueryTransformation {
       } else {
 
         // unwrap the comparison...
-        QueryComparable[] comparables = new QueryComparable[] {
+        QueryComparable[] comparables = new QueryComparable[]{
           clause.getPredicates().get(0).getLhs(),
           clause.getPredicates().get(0).getRhs()
         };

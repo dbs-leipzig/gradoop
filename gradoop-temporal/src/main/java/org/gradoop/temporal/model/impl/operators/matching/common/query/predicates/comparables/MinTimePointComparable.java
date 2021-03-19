@@ -144,7 +144,6 @@ public class MinTimePointComparable extends TemporalComparable {
     return minTimePoint != null ? minTimePoint.hashCode() : 0;
   }
 
-
   @Override
   public TimePoint getWrappedComparable() {
     return minTimePoint;

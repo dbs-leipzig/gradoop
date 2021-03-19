@@ -121,8 +121,8 @@ public class TemporalElementStats implements Serializable {
    * the statistics. The numerical and categorical properties are set by the user.
    * Omitted properties are ignored, always assigned the probability 0.5
    *
-   * @param reservoirSampleSize size of reservoir sample
-   * @param numericalProperties list of numerical properties to consider
+   * @param reservoirSampleSize   size of reservoir sample
+   * @param numericalProperties   list of numerical properties to consider
    * @param categoricalProperties list of categorical properties to consider
    */
   public TemporalElementStats(int reservoirSampleSize, Set<String> numericalProperties,
@@ -143,19 +143,19 @@ public class TemporalElementStats implements Serializable {
   public TemporalElementStats(int reservoirSampleSize) {
     label = "";
     elementCount = 0;
-    estimatedTimeBins = new Binning[] {};
+    estimatedTimeBins = new Binning[]{};
     categoricalSelectivityEstimation = new HashMap<>();
     numericalPropertyStatsEstimation = new HashMap<>();
     numericalOccurrenceEstimation = new HashMap<>();
     recomputeTemporalDataFlag = false;
     recomputePropertyDataFlag = false;
-    valFromStats = new double[] {};
-    txFromStats = new double[] {};
-    valToStats = new double[] {};
-    txToStats = new double[] {};
-    txDurationStats = new double[] {};
-    valDurationStats = new double[] {};
-    sampler = new ReservoirSampler<TemporalElement>(reservoirSampleSize);
+    valFromStats = new double[]{};
+    txFromStats = new double[]{};
+    valToStats = new double[]{};
+    txToStats = new double[]{};
+    txDurationStats = new double[]{};
+    valDurationStats = new double[]{};
+    sampler = new ReservoirSampler<>(reservoirSampleSize);
   }
 
   /**
@@ -172,7 +172,7 @@ public class TemporalElementStats implements Serializable {
    * Creates an element statistics object that uses a reservoir sample of default size.
    * Numerical and categorical properties to consider are given explicitly
    *
-   * @param numericalProperties numerical properties to consider
+   * @param numericalProperties   numerical properties to consider
    * @param categoricalProperties categorical properties to consider
    */
   public TemporalElementStats(Set<String> numericalProperties, Set<String> categoricalProperties) {
@@ -216,7 +216,7 @@ public class TemporalElementStats implements Serializable {
    * sample)
    */
   private void computeTemporalEstimations() {
-    Long now = new TimeLiteral("now").getMilliseconds();
+    long now = new TimeLiteral("now").getMilliseconds();
 
     List<TemporalElement> reservoirSample = sampler.getReservoirSample();
     int sampleSize = reservoirSample.size();
@@ -268,7 +268,7 @@ public class TemporalElementStats implements Serializable {
         txFromMinCount++;
       }
       if (txTo == TemporalElement.DEFAULT_TIME_TO) {
-        txToMaxCount  += 1;
+        txToMaxCount += 1;
         txDurations.add(now - txFrom);
       } else {
         txTos.add(txTo);
@@ -285,7 +285,7 @@ public class TemporalElementStats implements Serializable {
         valFromMinCount++;
       }
       if (valTo == TemporalElement.DEFAULT_TIME_TO) {
-        valToMaxCount  += 1;
+        valToMaxCount += 1;
         valDurations.add(now - valFrom);
       } else {
         valTos.add(valTo);
@@ -298,25 +298,25 @@ public class TemporalElementStats implements Serializable {
     double txFromMean = mean(txFroms);
     double txFromVariance = variance(txFroms, txFromMean);
     double txFromMinEstimation = (double) txFromMinCount / (double) sampleSize;
-    txFromStats = new double[] {txFromMean, txFromVariance, txFromMinEstimation};
+    txFromStats = new double[]{txFromMean, txFromVariance, txFromMinEstimation};
 
     double valFromMean = mean(valFroms);
     double valFromVariance = variance(valFroms, valFromMean);
     double valFromMinEstimation = (double) valFromMinCount / (double) sampleSize;
-    valFromStats = new double[] {valFromMean, valFromVariance, valFromMinEstimation};
+    valFromStats = new double[]{valFromMean, valFromVariance, valFromMinEstimation};
 
     double txToMean = mean(txTos);
     double txToVariance = variance(txTos, txToMean);
     double txToMaxEstimation = (double) txToMaxCount / (double) sampleSize;
-    txToStats = new double[] {txToMean, txToVariance, txToMaxEstimation};
+    txToStats = new double[]{txToMean, txToVariance, txToMaxEstimation};
 
     double valToMean = mean(valTos);
     double valToVariance = variance(valTos, valToMean);
     double valToMaxEstimation = (double) valToMaxCount / (double) sampleSize;
-    valToStats = new double[] {valToMean, valToVariance, valToMaxEstimation};
+    valToStats = new double[]{valToMean, valToVariance, valToMaxEstimation};
 
     // create binnings for the temporal properties
-    estimatedTimeBins = new Binning[] {
+    estimatedTimeBins = new Binning[]{
       new Binning(allTxFroms, numBins),
       new Binning(allTxTos, numBins),
       new Binning(allValFroms, numBins),
@@ -327,11 +327,11 @@ public class TemporalElementStats implements Serializable {
     // determine means and variances of the durations
     double txDurationMean = mean(txDurations);
     double txDurationVar = variance(txDurations, txDurationMean);
-    txDurationStats = new double[] {txDurationMean, txDurationVar};
+    txDurationStats = new double[]{txDurationMean, txDurationVar};
 
     double valDurationMean = mean(valDurations);
     double valDurationVar = variance(valDurations, valDurationMean);
-    valDurationStats = new double[] {valDurationMean, valDurationVar};
+    valDurationStats = new double[]{valDurationMean, valDurationVar};
 
 
     recomputeTemporalDataFlag = false;
@@ -346,7 +346,7 @@ public class TemporalElementStats implements Serializable {
   private double mean(List<Long> ls) {
     double mean = 0.;
     for (Long l : ls) {
-      mean  += (double) l / ls.size();
+      mean += (double) l / ls.size();
     }
     return mean;
   }
@@ -361,7 +361,7 @@ public class TemporalElementStats implements Serializable {
   private double variance(List<Long> ls, double mean) {
     double var = 0.;
     for (Long l : ls) {
-      var  += (l - mean) * (l - mean) * (1. / ls.size());
+      var += (l - mean) * (l - mean) * (1. / ls.size());
     }
     return var;
   }
@@ -395,7 +395,7 @@ public class TemporalElementStats implements Serializable {
         PropertyValue value = element.getPropertyValue(key);
         HashMap<String, List<PropertyValue>> data;
         // no outlier, i.e. NULL, NaN etc.?
-        if (numericalProperties.contains(key) && isNumerical(value)) {
+        if (numericalProperties.contains(key) && value.isNumber()) {
           data = numericalData;
         } else if (categoricalProperties.contains(key)) {
           data = categoricalData;
@@ -430,7 +430,7 @@ public class TemporalElementStats implements Serializable {
       }
       for (String key : element.getPropertyKeys()) {
         PropertyValue value = element.getPropertyValue(key);
-        if (isNumerical(value)) {
+        if (value.isNumber()) {
           numerical.put(key, numerical.getOrDefault(key, 0) + 1);
         } else {
           categorical.put(key, categorical.getOrDefault(key, 0) + 1);
@@ -445,7 +445,7 @@ public class TemporalElementStats implements Serializable {
     for (String property : allProperties) {
       int countNumerical = numerical.getOrDefault(property, 0);
       int countCategorical = categorical.getOrDefault(property, 0);
-      int countOverall = countCategorical  +  countNumerical;
+      int countOverall = countCategorical + countNumerical;
       // which type?
       if ((double) countNumerical / (double) countOverall >= thresh) {
         numericalProperties.add(property);
@@ -475,24 +475,13 @@ public class TemporalElementStats implements Serializable {
   }
 
   /**
-   * Checks if a PropertyValue is of numerical type
-   *
-   * @param value the PropertyValue
-   * @return true iff value is of numerical type
-   */
-  private boolean isNumerical(PropertyValue value) {
-    return value.isNumber();
-  }
-
-  /**
    * Initializes or updates the selectivity estimation for categorical properties
    *
    * @param data       map from categorical property names to a list of their respective
    *                   values in the sample
    * @param sampleSize size of the sample
    */
-  private void computeCategoricalEstimations(Map<String, List<PropertyValue>> data,
-                                             int sampleSize) {
+  private void computeCategoricalEstimations(Map<String, List<PropertyValue>> data, int sampleSize) {
     categoricalSelectivityEstimation = new HashMap<>();
 
     for (Map.Entry<String, List<PropertyValue>> entry : data.entrySet()) {
@@ -500,7 +489,7 @@ public class TemporalElementStats implements Serializable {
 
       for (PropertyValue value : entry.getValue()) {
         selectivityMap.put(value,
-          selectivityMap.getOrDefault(value, 0.)  +  1. / sampleSize);
+          selectivityMap.getOrDefault(value, 0.) + 1. / sampleSize);
       }
 
       categoricalSelectivityEstimation.put(entry.getKey(), selectivityMap);
@@ -516,8 +505,7 @@ public class TemporalElementStats implements Serializable {
    *                   values in the sample
    * @param sampleSize size of the sample
    */
-  private void computeNumericalEstimations(Map<String, List<PropertyValue>> data,
-                                           int sampleSize) {
+  private void computeNumericalEstimations(Map<String, List<PropertyValue>> data, int sampleSize) {
     numericalOccurrenceEstimation = new HashMap<>();
     numericalPropertyStatsEstimation = new HashMap<>();
     for (Map.Entry<String, List<PropertyValue>> entry : data.entrySet()) {
@@ -528,19 +516,17 @@ public class TemporalElementStats implements Serializable {
         (double) values.size() / sampleSize);
 
       // cast all values to doubles
-      Class cls = values.get(0).getType();
       List<Double> doubleValues = values.stream()
-        .map(val -> propertyValueToDouble(val, cls))
+        .map(this::propertyValueToDouble)
         .collect(Collectors.toList());
 
       // compute mean and variance for the property
       Double sum = doubleValues.stream().reduce(0., Double::sum);
       Double mean = sum / values.size();
-      Double variance = doubleValues.stream().reduce(0.,
-        (i, j) -> i  +  ((j - mean) * (j - mean) * (1. / values.size())));
+      Double variance = doubleValues.stream()
+        .reduce(0., (i, j) -> i + ((j - mean) * (j - mean) * (1. / values.size())));
 
-      numericalPropertyStatsEstimation.put(entry.getKey(), new Double[] {mean, variance});
-
+      numericalPropertyStatsEstimation.put(entry.getKey(), new Double[]{mean, variance});
     }
   }
 
@@ -548,10 +534,9 @@ public class TemporalElementStats implements Serializable {
    * Converts a numerical PropertyValue to its value as a double
    *
    * @param value PropertyValue to convert
-   * @param cls   type of the PropertyValue
    * @return double representation of value
    */
-  private double propertyValueToDouble(PropertyValue value, Class cls) {
+  private double propertyValueToDouble(PropertyValue value) {
     if (value.isNumber()) {
       return ((Number) value.getObject()).doubleValue();
     }

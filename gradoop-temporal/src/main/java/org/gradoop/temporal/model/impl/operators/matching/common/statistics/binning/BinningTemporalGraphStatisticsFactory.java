@@ -20,8 +20,6 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatisticsFactory;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.functions.ElementsToStats;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
-import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
-import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.HashSet;
 import java.util.List;
@@ -63,13 +61,13 @@ public class BinningTemporalGraphStatisticsFactory implements
 
     List<TemporalElementStats> vertexStats = g.getVertices()
       .groupBy(EPGMElement::getLabel)
-      .reduceGroup(new ElementsToStats<TemporalVertex>(numericalProperties, categoricalProperties))
+      .reduceGroup(new ElementsToStats<>(numericalProperties, categoricalProperties))
       .collect();
 
     List<TemporalElementStats> edgeStats = g.getEdges()
       // do not replace this with the method reference!!!
       .groupBy(edge -> edge.getLabel())
-      .reduceGroup(new ElementsToStats<TemporalEdge>(numericalProperties, categoricalProperties))
+      .reduceGroup(new ElementsToStats<>(numericalProperties, categoricalProperties))
       .collect();
 
     HashSet<String> relevantProperties = null;
@@ -82,8 +80,5 @@ public class BinningTemporalGraphStatisticsFactory implements
     }
 
     return new BinningTemporalGraphStatistics(vertexStats, edgeStats, relevantProperties);
-
-
   }
-
 }

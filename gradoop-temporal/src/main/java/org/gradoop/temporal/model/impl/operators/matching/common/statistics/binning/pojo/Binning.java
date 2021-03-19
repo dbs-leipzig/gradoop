@@ -33,7 +33,7 @@ public class Binning implements Serializable {
   /**
    * represents the bins. Every bin is defined by its lowest value
    */
-  private Long[] bins = new Long[] {};
+  private Long[] bins = new Long[]{};
 
   /**
    * Creates new bins from values. Furthermore, the number of bins to create is given.
@@ -67,11 +67,10 @@ public class Binning implements Serializable {
    */
   private void createBins(List<Long> values, int numberOfBins) throws IllegalArgumentException {
     if (values.size() % numberOfBins != 0) {
-      throw new IllegalArgumentException("Number of values must be a multiple " +
-        "of the number of bins!");
+      throw new IllegalArgumentException("Number of values must be a multiple of the number of bins!");
     }
 
-    values.sort((aLong, t1) -> Long.compare(aLong, t1));
+    values.sort(Long::compare);
 
     // there can not be more bins than values
     if (values.size() < numberOfBins) {
@@ -80,7 +79,6 @@ public class Binning implements Serializable {
 
     // size of a bin is the number of elements contained
     int binSize = values.size() / numberOfBins;
-
 
     bins = new Long[numberOfBins];
     bins[0] = TemporalElement.DEFAULT_TIME_FROM;

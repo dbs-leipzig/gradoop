@@ -16,18 +16,11 @@
 package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.gdl.model.comparables.time.TimeLiteral;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.gdl.utils.Comparator;
-
-import static org.gradoop.gdl.utils.Comparator.EQ;
-import static org.gradoop.gdl.utils.Comparator.GT;
-import static org.gradoop.gdl.utils.Comparator.GTE;
-import static org.gradoop.gdl.utils.Comparator.LT;
-import static org.gradoop.gdl.utils.Comparator.LTE;
-import static org.gradoop.gdl.utils.Comparator.NEQ;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 
 /**
  * Uses temporal information to subsume constraints that compare a time selector to a time literal.
@@ -95,41 +88,28 @@ public class TemporalSubsumption extends Subsumption {
       case GT: return literal1 > literal2;
       default: return false;
       }
-    case NEQ: return false;
     case LTE:
       switch (comparator2) {
-      case EQ: return false;
-      case NEQ: return literal1 < literal2;
+      case NEQ: case LT: return literal1 < literal2;
       case LTE: return literal1 <= literal2;
-      case LT: return literal1 < literal2;
       default: return false;
       }
     case LT:
       switch (comparator2) {
-      case EQ: return false;
-      case NEQ: return literal1 <= literal2;
+      case NEQ: case LT: return literal1 <= literal2;
       case LTE: return literal1 - 1 <= literal2;
-      case LT: return literal1 <= literal2;
       default: return false;
       }
     case GTE:
       switch (comparator2) {
-      case EQ: return false;
-      case NEQ: return literal1 > literal2;
-      case LTE: return false;
-      case LT: return false;
+      case NEQ: case GT: return literal1 > literal2;
       case GTE: return literal1 >= literal2;
-      case GT: return literal1 > literal2;
       default: return false;
       }
     case GT:
       switch (comparator2) {
-      case EQ: return false;
-      case NEQ: return literal1 >= literal2;
-      case LTE: return false;
-      case LT: return false;
+      case NEQ: case GT: return literal1 >= literal2;
       case GTE: return literal1 + 1 >= literal2;
-      case GT: return literal1 >= literal2;
       default: return false;
       }
     default: return false;

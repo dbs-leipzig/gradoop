@@ -39,7 +39,7 @@ public class TemporalElementStatsTest {
     }
     Binning[] timeBins = stats.getEstimatedTimeBins();
     assertEquals(timeBins.length, 4);
-    Long[] startValues = new Long[] {0L, 10000L, 1000000L, 2000000L};
+    Long[] startValues = new Long[]{0L, 10000L, 1000000L, 2000000L};
 
     for (int i = 0; i < 4; i++) {
       Long[] bins = timeBins[i].getBins();
@@ -98,9 +98,9 @@ public class TemporalElementStatsTest {
        * => variance(tx_to - val_to)(both unbounded) = 16
        * => P(both unbounded) = 0.8
        */
-      Long newTxTo = i % 10 == 0 ? Long.MAX_VALUE :
+      long newTxTo = i % 10 == 0 ? Long.MAX_VALUE :
         i % 2 == 0 ? 8L : 16L;
-      Long newValTo = i % 5 == 0 ? Long.MAX_VALUE : 8L;
+      long newValTo = i % 5 == 0 ? Long.MAX_VALUE : 8L;
       input.get(i).setTxTo(newTxTo);
       input.get(i).setValidTo(newValTo);
     }
@@ -124,7 +124,6 @@ public class TemporalElementStatsTest {
     // 1% with float property
     int numFloatDecimals = 50;
     String decimalKeyFloat = "float";
-    float[] decimalValuesFloat = new float[numFloatDecimals];
 
     // mean = 1.3f: half of the values have value 1.2, the other half 1.4
     // variance is then (0.1)*(0.1) = 0.01
@@ -142,7 +141,6 @@ public class TemporalElementStatsTest {
     //3 % with double property
     int numDoubleDecimals = 150;
     String decimalKeyDouble = "double";
-    double[] decimalValuesDouble = new double[numDoubleDecimals];
 
     // mean = 1.0, variance = ((0.5)^2)*2/3 = 1/6
     for (int i = 0; i < numDoubleDecimals; i = i + 3) {
@@ -160,15 +158,13 @@ public class TemporalElementStatsTest {
     //10% with integer property
     int numIntegers = 500;
     String integerKey = "int";
-    int[] integerValues = new int[numIntegers];
+    int[] integerValues = new int[]{1, 2, 3, 4, 5};
 
     // mean = 3, variance = 0.4*(2^2) + 0.4*(1^2) = 2
-    for (int i = 0; i < numIntegers; i = i + 5) {
-      input.get(i).setProperty(integerKey, 1);
-      input.get(i + 1).setProperty(integerKey, 2);
-      input.get(i + 2).setProperty(integerKey, 3);
-      input.get(i + 3).setProperty(integerKey, 4);
-      input.get(i + 4).setProperty(integerKey, 5);
+    for (int i = 0; i < numIntegers; i += integerValues.length) {
+      for (int j = 0; j < integerValues.length; j++) {
+        input.get(i + j).setProperty(integerKey, integerValues[j]);
+      }
     }
     double meanInteger = 3.;
     double varianceInteger = 2.;
@@ -177,18 +173,16 @@ public class TemporalElementStatsTest {
     // Short values
     //----------------------------------------------------
 
-    //10% with integer property
+    //10% with short property
     int numShorts = 500;
     String shortKey = "short";
-    int[] shortValues = new int[numIntegers];
+    short[] shortValues = new short[]{1, 2, 3, 4, 5};
 
     // mean = 3, variance = 0.4*(2^2) + 0.4*(1^2) = 2
-    for (int i = 0; i < numShorts; i = i + 5) {
-      input.get(i).setProperty(shortKey, 1);
-      input.get(i + 1).setProperty(shortKey, 2);
-      input.get(i + 2).setProperty(shortKey, 3);
-      input.get(i + 3).setProperty(shortKey, 4);
-      input.get(i + 4).setProperty(shortKey, 5);
+    for (int i = 0; i < numShorts; i += shortValues.length) {
+      for (int j = 0; j < shortValues.length; j++) {
+        input.get(i + j).setProperty(shortKey, shortValues[j]);
+      }
     }
     double meanShort = 3.;
     double varianceShort = 2.;
@@ -199,7 +193,6 @@ public class TemporalElementStatsTest {
     // 20% with long property
     int numLongs = 1000;
     String longKey = "long";
-    int[] longValues = new int[numLongs];
 
     // mean = 262.5, variance = 62*5^2 = 3906.25
     for (int i = 0; i < numLongs; i++) {
@@ -250,25 +243,25 @@ public class TemporalElementStatsTest {
     //first property occurs in 5 nodes (0.1%)
     String prop1 = "prop1";
     // one value 3 times (0.06% of all nodes), 2 further values only once (0.2% of all nodes)
-    PropertyValue[] prop1Values = new PropertyValue[] {PropertyValue.create("a"),
+    PropertyValue[] prop1Values = new PropertyValue[]{PropertyValue.create("a"),
       PropertyValue.create("b"), PropertyValue.create("c")};
     input.get(0).setProperty(prop1, prop1Values[0]);
     input.get(1).setProperty(prop1, prop1Values[0]);
     input.get(2).setProperty(prop1, prop1Values[0]);
     input.get(3).setProperty(prop1, prop1Values[1]);
     input.get(4).setProperty(prop1, prop1Values[2]);
-    double[] prop1Selectivity = new double[] {0.0006, 0.0002, 0.0002};
+    double[] prop1Selectivity = new double[]{0.0006, 0.0002, 0.0002};
 
     // second property occurs in 10 nodes (0.2%)
     String prop2 = "prop2";
     // two values, 5 times each
-    PropertyValue[] prop2Values = new PropertyValue[] {PropertyValue.create("x"),
+    PropertyValue[] prop2Values = new PropertyValue[]{PropertyValue.create("x"),
       PropertyValue.create("y")};
     for (int i = 0; i < 10; i++) {
       String value = i % 2 == 0 ? prop2Values[0].getString() : prop2Values[1].getString();
       input.get(i).setProperty(prop2, value);
     }
-    double[] prop2Selectivity = new double[] {0.001, 0.001};
+    double[] prop2Selectivity = new double[]{0.001, 0.001};
 
 
     TemporalElementStats stats = new TemporalElementStats();

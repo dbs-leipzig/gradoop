@@ -22,6 +22,7 @@ import java.util.Random;
 
 /**
  * Implements Reservoir Sampling.
+ *
  * @param <T> the type of elements to sample (vertices, edges)
  */
 public class ReservoirSampler<T> implements Serializable {

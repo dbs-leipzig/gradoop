@@ -18,14 +18,14 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.postproc
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 import org.gradoop.gdl.model.comparables.ComparableExpression;
 import org.gradoop.gdl.model.comparables.Literal;
 import org.gradoop.gdl.model.comparables.time.TimeLiteral;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.gdl.utils.Comparator;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
 
 import java.util.ArrayList;
 import java.util.List;

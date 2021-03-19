@@ -18,9 +18,6 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 import org.gradoop.gdl.GDLHandler;
 import org.gradoop.gdl.model.Edge;
 import org.gradoop.gdl.model.Vertex;
@@ -31,6 +28,9 @@ import org.gradoop.gdl.model.comparables.time.TimeSelector;
 import org.gradoop.gdl.model.predicates.Predicate;
 import org.gradoop.gdl.model.predicates.booleans.And;
 import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -126,6 +126,7 @@ public class TemporalQueryHandler extends QueryHandler {
   /**
    * Augments a predicate by constraints ensuring that valid times of
    * edges and their adjacent nodes overlap
+   *
    * @param predicate the predicate to augment
    * @return predicate augmented by edge overlaps constraints for every edge
    */
@@ -140,7 +141,7 @@ public class TemporalQueryHandler extends QueryHandler {
     }
 
     // determine all (vertex, edge, vertex) triples
-    for (String edgeVar: handler.getEdgeCache().keySet()) {
+    for (String edgeVar : handler.getEdgeCache().keySet()) {
       Edge edge = edgeCache.get(edgeVar);
       // no temporal predicates for paths
       if (edge.hasVariableLength()) {
@@ -163,8 +164,8 @@ public class TemporalQueryHandler extends QueryHandler {
       // create predicates edgeVar.val.overlaps(sourceVar.val) AND
       // edgeVar.val.overlaps(targetVar.val)...
       Predicate overlaps = new Comparison(
-          new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
-        );
+        new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
+      );
       // ...and add them to the resulting predicate
       predicate = new And(predicate, overlaps);
     }

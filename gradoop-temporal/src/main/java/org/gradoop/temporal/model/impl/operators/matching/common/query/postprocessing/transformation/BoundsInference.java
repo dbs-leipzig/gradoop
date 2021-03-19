@@ -20,6 +20,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
@@ -30,14 +35,10 @@ import org.gradoop.temporal.model.impl.operators.matching.common.query.predicate
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
-import org.gradoop.gdl.model.comparables.ComparableExpression;
-import org.gradoop.gdl.model.comparables.time.TimeLiteral;
-import org.gradoop.gdl.model.comparables.time.TimeSelector;
-import org.gradoop.gdl.model.predicates.expressions.Comparison;
-import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +91,7 @@ public class BoundsInference implements QueryTransformation {
 
 
     // init bounds
-    for (ComparisonExpression comp: relevantComparisons) {
+    for (ComparisonExpression comp : relevantComparisons) {
       ComparableExpression lhs = comp.getLhs().getWrappedComparable();
       ComparableExpression rhs = comp.getRhs().getWrappedComparable();
       Comparator comparator = comp.getComparator();
@@ -139,10 +140,10 @@ public class BoundsInference implements QueryTransformation {
 
     // construct the CNF
     List<CNFElement> remainingOldClauses = remainingOldComparisons.stream()
-      .map(comparison -> new CNFElement(Arrays.asList(comparison)))
+      .map(comparison -> new CNFElement(Collections.singletonList(comparison)))
       .collect(Collectors.toList());
     List<CNFElement> newClauses = newComparisons.stream()
-      .map(comparison -> new CNFElement(Arrays.asList(comparison)))
+      .map(comparison -> new CNFElement(Collections.singletonList(comparison)))
       .collect(Collectors.toList());
 
     List<CNFElement> allClauses = otherClauses;
@@ -153,6 +154,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Constructs new comparisons from the inferred bounds
+   *
    * @param lowerBounds inferred lower bounds
    * @param upperBounds inferred upper bounds
    * @return inferred comparisons
@@ -218,6 +220,7 @@ public class BoundsInference implements QueryTransformation {
    * l1 < l2 (l1, l2 literals).
    * Furthermore, comparisons between selectors and literals are removed, as they are
    * replaced by those gained from the bounds
+   *
    * @param comparisons comparisons to filter
    * @return @code{comparisons} without redundant comparisons
    */
@@ -225,22 +228,15 @@ public class BoundsInference implements QueryTransformation {
     List<ComparisonExpression> newComparisons = new ArrayList<>();
 
     // filter out redundant clauses
-    for (ComparisonExpression comp: comparisons) {
+    for (ComparisonExpression comp : comparisons) {
       QueryComparable rhs = comp.getRhs();
       QueryComparable lhs = comp.getLhs();
       Comparator comparator = comp.getComparator();
       // a.tx_from <= a.tx_to redundant
       if (rhs instanceof TimeSelectorComparable && lhs instanceof TimeSelectorComparable &&
         comparator.equals(Comparator.LTE)) {
-        if (((TimeSelectorComparable) rhs).getVariable()
+        if (!((TimeSelectorComparable) rhs).getVariable()
           .equals(((TimeSelectorComparable) lhs).getVariable())) {
-          if ((((TimeSelectorComparable) lhs).getTimeField().equals(VAL_FROM) &&
-            ((TimeSelectorComparable) rhs).getTimeField().equals(VAL_TO)) ||
-            (((TimeSelectorComparable) lhs).getTimeField().equals(TX_FROM) &&
-              ((TimeSelectorComparable) rhs).getTimeField().equals(TX_TO))) {
-            continue;
-          }
-        } else {
           newComparisons.add(comp);
         }
       } else if (rhs instanceof TimeLiteralComparable && lhs instanceof TimeLiteralComparable) {
@@ -262,7 +258,8 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Checks for contradictions between the inferred bounds and all relevant != constraints
-   * @param cNeq != constraints as relations
+   *
+   * @param cNeq        != constraints as relations
    * @param lowerBounds inferred lower bounds
    * @param upperBounds inferred upper bounds
    * @throws QueryContradictoryException if a contradiction is encountered
@@ -306,7 +303,8 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Updates lower and upper bounds with the lower-than relations
-   * @param rLt lower-than relations
+   *
+   * @param rLt         lower-than relations
    * @param lowerBounds lower bounds
    * @param upperBounds upper bounds
    * @return updated lower and upper bounds as a list [lower, upper]
@@ -348,7 +346,8 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Updates lower and upper bounds with the lighter-or-equal relations
-   * @param rLeq leq relations
+   *
+   * @param rLeq        leq relations
    * @param lowerBounds lower bounds
    * @param upperBounds upper bounds
    * @return updated lower and upper bounds as a list [lower, upper]
@@ -389,7 +388,8 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Updates lower and upper bounds with the equality relations
-   * @param rEq equality relations
+   *
+   * @param rEq         equality relations
    * @param lowerBounds lower bounds
    * @param upperBounds upper bounds
    * @return updated lower and upper bounds as a list [lower, upper]
@@ -429,13 +429,14 @@ public class BoundsInference implements QueryTransformation {
   /**
    * Flattens the map representation of a relation to a list of list of ComparableExpressions.
    * Each list has the length 2, representing one tuple in the relation.
+   *
    * @param rel relation to flatten
    * @return flattened relation
    */
   private ArrayList<ArrayList<ComparableExpression>> relationToTuples(HashMap<ComparableExpression,
     HashSet<ComparableExpression>> rel) {
     ArrayList<ArrayList<ComparableExpression>> list = new ArrayList<>();
-    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> mapEntry: rel.entrySet()) {
+    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> mapEntry : rel.entrySet()) {
       ComparableExpression c1 = mapEntry.getKey();
       for (ComparableExpression c2 : mapEntry.getValue()) {
         list.add(new ArrayList<>(Arrays.asList(c1, c2)));
@@ -447,6 +448,7 @@ public class BoundsInference implements QueryTransformation {
   /**
    * Checks the lighter-than relations for tuples (a,a) and throws an exception if such a tuple is
    * encountered. Other contradictions in this relation are checked later
+   *
    * @param ltRelation lighter-than relation
    * @throws QueryContradictoryException if a tuple (a,a) is encountered
    */
@@ -467,9 +469,10 @@ public class BoundsInference implements QueryTransformation {
    * rEq contains (a,b) iff relevant comparisons imply a=b
    * rLeq contains (a,b) iff relevant comparisons imply a<=b, but not a=b or a < b
    * rLt contains (a,b) iff relevant comparisons imply a < b
-   * @param cEq relation containing (a,b) iff relevant comparisons contain a=b
+   *
+   * @param cEq  relation containing (a,b) iff relevant comparisons contain a=b
    * @param cLeq relation containing (a,b) iff relevant comparisons contain a<=b
-   * @param cLt relation containing (a,b) iff relevant comparisons contain a < b
+   * @param cLt  relation containing (a,b) iff relevant comparisons contain a < b
    * @return list [rEq, rLeq, rLt]
    */
   private List<HashMap<ComparableExpression, HashSet<ComparableExpression>>> computeClosureRelations(
@@ -494,6 +497,7 @@ public class BoundsInference implements QueryTransformation {
   /**
    * Returns a subrelation containing all tuples whose inverses are also contained in the relation
    * I.e., a tuple (a,b) is included in the return value, if (a,b) in rel and (b,a) in rel.
+   *
    * @param rel relation
    * @return subrelation containing all tuples whose inverses are also contained @code{rel}
    */
@@ -501,9 +505,9 @@ public class BoundsInference implements QueryTransformation {
     HashMap<ComparableExpression, HashSet<ComparableExpression>> rel) {
 
     HashMap<ComparableExpression, HashSet<ComparableExpression>> newRel = new HashMap<>();
-    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r: rel.entrySet()) {
+    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r : rel.entrySet()) {
       ComparableExpression key = r.getKey();
-      for (ComparableExpression v: r.getValue()) {
+      for (ComparableExpression v : r.getValue()) {
         if (rel.containsKey(v)) {
           if (rel.get(v).contains(key)) {
             newRel.putIfAbsent(key, new HashSet<>());
@@ -518,6 +522,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Subtracts one relation from another
+   *
    * @param rel1 relation to subtract from
    * @param rel2 relation to be subtracted
    * @return @code{rel1} - @code{rel2}
@@ -528,7 +533,7 @@ public class BoundsInference implements QueryTransformation {
 
     HashMap<ComparableExpression, HashSet<ComparableExpression>> newRel = new HashMap<>();
 
-    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r1: rel1.entrySet()) {
+    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r1 : rel1.entrySet()) {
       ComparableExpression key = r1.getKey();
       HashSet<ComparableExpression> values1 = r1.getValue();
       HashSet<ComparableExpression> values2 = rel2.getOrDefault(key, new HashSet<>());
@@ -540,9 +545,9 @@ public class BoundsInference implements QueryTransformation {
   }
 
 
-
   /**
    * Compute the transitive closure of a relation
+   *
    * @param rel relation
    * @return transitive closure of relation
    */
@@ -556,9 +561,9 @@ public class BoundsInference implements QueryTransformation {
       HashMap<ComparableExpression, HashSet<ComparableExpression>> oldRel =
         (HashMap<ComparableExpression, HashSet<ComparableExpression>>) SerializationUtils.clone(newRel);
       changed = false;
-      for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r: oldRel.entrySet()) {
+      for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r : oldRel.entrySet()) {
         ComparableExpression key = r.getKey();
-        for (ComparableExpression value: r.getValue()) {
+        for (ComparableExpression value : r.getValue()) {
           newRel.putIfAbsent(key, new HashSet<>());
           changed = newRel.get(key).add(value) || changed;
           if (oldRel.containsKey(value)) {
@@ -572,6 +577,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Composition of two relations
+   *
    * @param rel1 first relation
    * @param rel2 second relation
    * @return composition of both
@@ -582,9 +588,9 @@ public class BoundsInference implements QueryTransformation {
 
     HashMap<ComparableExpression, HashSet<ComparableExpression>> newRel = new HashMap<>();
     // (a,b) in rel1, (b,c) in rel2 => put (a,c) into newRel
-    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r1: rel1.entrySet()) {
+    for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> r1 : rel1.entrySet()) {
       ComparableExpression key = r1.getKey();
-      for (ComparableExpression oldValue: r1.getValue()) {
+      for (ComparableExpression oldValue : r1.getValue()) {
         // transitive relation?
         if (rel2.containsKey(oldValue)) {
           HashSet<ComparableExpression> newValues = rel2.get(oldValue);
@@ -598,6 +604,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Unites relations
+   *
    * @param relations relations to unite
    * @return united relation
    */
@@ -606,7 +613,7 @@ public class BoundsInference implements QueryTransformation {
     HashMap<ComparableExpression, HashSet<ComparableExpression>> newRel = new HashMap<>();
     // add all relations from the array to newRel
     for (HashMap<ComparableExpression, HashSet<ComparableExpression>> relation : relations) {
-      for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> entry: relation.entrySet()) {
+      for (Map.Entry<ComparableExpression, HashSet<ComparableExpression>> entry : relation.entrySet()) {
         ComparableExpression key = entry.getKey();
         HashSet<ComparableExpression> values = entry.getValue();
         newRel.putIfAbsent(key, new HashSet<>());
@@ -619,6 +626,7 @@ public class BoundsInference implements QueryTransformation {
   /**
    * Checks whether a clause is relevant, i.e. it has size 1 and does not contain
    * MIN/MAX or duration
+   *
    * @param clause clause to check
    * @return true iff clause is relevant
    */
@@ -629,6 +637,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Checks whether a given wrapped comparison contains a MIN or MAX expression
+   *
    * @param comp comparison expression to check for MIN/MAX
    * @return true iff comp contains MIN or MAX
    */
@@ -641,6 +650,7 @@ public class BoundsInference implements QueryTransformation {
 
   /**
    * Checks if a comparison contains a duration
+   *
    * @param comp comparison
    * @return true iff comp contains a duration
    */

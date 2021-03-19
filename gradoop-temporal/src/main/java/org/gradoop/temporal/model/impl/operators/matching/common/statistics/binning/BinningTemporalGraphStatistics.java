@@ -107,8 +107,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   /**
    * Creates new graph statistics
    *
-   * @param vertexStats list of vertex statistics (one element for each label)
-   * @param edgeStats   list of edge statistics (one element for each label)
+   * @param vertexStats        list of vertex statistics (one element for each label)
+   * @param edgeStats          list of edge statistics (one element for each label)
    * @param relevantProperties properties to consider
    */
   protected BinningTemporalGraphStatistics(List<TemporalElementStats> vertexStats,
@@ -158,7 +158,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       distinctTargetCount.put(entries.getKey(), targetEstimation);
     }
   }
-
 
   /**
    * Returns the vertex statistics list
@@ -462,10 +461,9 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   @Override
   public double estimateDurationProb(ElementType type, Optional<String> label, Comparator comp,
                                      boolean transaction, Long value) {
-    Map<String, TemporalElementStats> statsMap = (type == ElementType.VERTEX) ?
-      vertexStats : edgeStats;
+    Map<String, TemporalElementStats> statsMap = (type == ElementType.VERTEX) ? vertexStats : edgeStats;
     List<TemporalElementStats> relevantStats = label.isPresent() ?
-      new ArrayList<>(Arrays.asList(statsMap.get(label.get()))) :
+      new ArrayList<>(Collections.singletonList(statsMap.get(label.get()))) :
       new ArrayList<>(statsMap.values());
 
     double sum = 0.;
@@ -506,14 +504,12 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   public double estimateDurationProb(ElementType type1, Optional<String> label1, boolean transaction1,
                                      Comparator comp, ElementType type2, Optional<String> label2,
                                      boolean transaction2) {
-    Map<String, TemporalElementStats> statsMapLhs = (type1 == ElementType.VERTEX) ?
-      vertexStats : edgeStats;
+    Map<String, TemporalElementStats> statsMapLhs = (type1 == ElementType.VERTEX) ? vertexStats : edgeStats;
     List<TemporalElementStats> relevantStatsLhs = label1.isPresent() ?
       new ArrayList<>(Collections.singletonList(statsMapLhs.get(label1.get()))) :
       new ArrayList<>(statsMapLhs.values());
 
-    Map<String, TemporalElementStats> statsMapRhs = (type2 == ElementType.VERTEX) ?
-      vertexStats : edgeStats;
+    Map<String, TemporalElementStats> statsMapRhs = (type2 == ElementType.VERTEX) ? vertexStats : edgeStats;
     List<TemporalElementStats> relevantStatsRhs = label2.isPresent() ?
       new ArrayList<>(Collections.singletonList(statsMapRhs.get(label2.get()))) :
       new ArrayList<>(statsMapRhs.values());
@@ -584,7 +580,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
     }
 
 
-    if (isNumerical(value)) {
+    if (value.isNumber()) {
       return estimateNumericalPropertyProb(relevantStats, property, comp, value);
     } else {
       return estimateCategoricalPropertyProb(relevantStats, property, comp, value);
@@ -596,13 +592,11 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   public double estimatePropertyProb(ElementType type1, Optional<String> label1, String property1,
                                      Comparator comp,
                                      ElementType type2, Optional<String> label2, String property2) {
-    Map<String, TemporalElementStats> statsMap1 = type1 == ElementType.VERTEX ?
-      vertexStats : edgeStats;
+    Map<String, TemporalElementStats> statsMap1 = type1 == ElementType.VERTEX ? vertexStats : edgeStats;
     List<TemporalElementStats> relevantStats1 = label1.isPresent() ?
       new ArrayList<>(Collections.singletonList(statsMap1.get(label1.get()))) :
       new ArrayList<>(statsMap1.values());
-    Map<String, TemporalElementStats> statsMap2 = type2 == ElementType.VERTEX ?
-      vertexStats : edgeStats;
+    Map<String, TemporalElementStats> statsMap2 = type2 == ElementType.VERTEX ? vertexStats : edgeStats;
     List<TemporalElementStats> relevantStats2 = label2.isPresent() ?
       new ArrayList<>(Collections.singletonList(statsMap2.get(label2.get()))) :
       new ArrayList<>(statsMap1.values());
@@ -812,18 +806,6 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   }
 
   /**
-   * Determines if a {@link PropertyValue} is numerical
-   *
-   * @param value the PropertyValue to check
-   * @return true iff the value is of numerical type (Float, Double, Integer, Long)
-   */
-  private boolean isNumerical(PropertyValue value) {
-    Class clz = value.getType();
-    return clz.equals(Float.class) || clz.equals(Double.class) ||
-      clz.equals(Integer.class) || clz.equals(Long.class);
-  }
-
-  /**
    * Estimates the probability that a comparison between a categorical property value
    * and a constant holds
    *
@@ -1001,8 +983,8 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
   /**
    * Checks whether a property key should be considered.
    * This is the case iff no property keys to consider are specified
-   * (then all are relevant) or the set of specified relevant key contains
-   * the property
+   * (then all are relevant) or the set of specified relevant key contains the property
+   *
    * @param property property to check for relevance
    * @return true iff property should be considered for estimations
    */
@@ -1040,7 +1022,7 @@ public class BinningTemporalGraphStatistics extends TemporalGraphStatistics impl
       maxBin++;
     }
     maxBin--;
-    return new int[] {minBin, maxBin};
+    return new int[]{minBin, maxBin};
   }
 
   /**

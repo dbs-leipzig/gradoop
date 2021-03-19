@@ -86,7 +86,6 @@ public class TimeConstantComparable extends TemporalComparable {
     TimeConstantComparable that = (TimeConstantComparable) o;
 
     return that.constant.equals(constant);
-
   }
 
   @Override
@@ -97,5 +96,4 @@ public class TimeConstantComparable extends TemporalComparable {
   public TimeConstant getConstant() {
     return constant;
   }
-
 }

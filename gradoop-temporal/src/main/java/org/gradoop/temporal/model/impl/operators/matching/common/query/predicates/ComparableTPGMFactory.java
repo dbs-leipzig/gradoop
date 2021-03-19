@@ -42,8 +42,6 @@ import org.gradoop.gdl.model.comparables.time.TimeSelector;
  */
 public class ComparableTPGMFactory extends QueryComparableFactory {
 
-
-
   /**
    * Holds the system time stamp when the query was issued
    */
@@ -66,27 +64,28 @@ public class ComparableTPGMFactory extends QueryComparableFactory {
 
   @Override
   public QueryComparable createFrom(ComparableExpression expression) {
-    if (expression.getClass() == Literal.class) {
+    Class cls = expression.getClass();
+    if (cls == Literal.class) {
       return new LiteralComparable((Literal) expression);
-    } else if (expression.getClass() == PropertySelector.class) {
+    } else if (cls == PropertySelector.class) {
       return new PropertySelectorComparable((PropertySelector) expression);
-    } else if (expression.getClass() == ElementSelector.class) {
+    } else if (cls == ElementSelector.class) {
       return new ElementSelectorComparable((ElementSelector) expression);
-    } else if (expression.getClass() == TimeLiteral.class) {
+    } else if (cls == TimeLiteral.class) {
       return new TimeLiteralComparable((TimeLiteral) expression);
-    } else if (expression.getClass() == TimeSelector.class) {
+    } else if (cls == TimeSelector.class) {
       return new TimeSelectorComparable((TimeSelector) expression);
-    } else if (expression.getClass() == MinTimePoint.class) {
+    } else if (cls == MinTimePoint.class) {
       return new MinTimePointComparable((MinTimePoint) expression);
-    } else if (expression.getClass() == MaxTimePoint.class) {
+    } else if (cls == MaxTimePoint.class) {
       return new MaxTimePointComparable((MaxTimePoint) expression);
-    } else if (expression.getClass() == TimeConstant.class) {
+    } else if (cls == TimeConstant.class) {
       return new TimeConstantComparable((TimeConstant) expression);
-    } else if (expression.getClass() == Duration.class) {
+    } else if (cls == Duration.class) {
       return new DurationComparable((Duration) expression, now);
     } else {
       throw new IllegalArgumentException(
-        expression.getClass() + " is not a temporal GDL ComparableExpression"
+        cls.getSimpleName() + " is not a temporal GDL ComparableExpression"
       );
     }
   }

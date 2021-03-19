@@ -125,5 +125,4 @@ public class EmbeddingTPGMFactory {
       !key.equals(TimeSelector.TimeField.TX_FROM.toString()) &&
       !key.equals(TimeSelector.TimeField.TX_TO.toString());
   }
-
 }

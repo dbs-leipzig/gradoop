@@ -17,8 +17,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
-import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
 
 import java.io.Serializable;
 
@@ -45,11 +45,10 @@ public abstract class QueryComparableTPGM extends QueryComparable implements Ser
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || !(o instanceof QueryComparableTPGM)) {
+    if (!(o instanceof QueryComparableTPGM)) {
       return false;
     }
-    return getWrappedComparable().equals(
-      ((QueryComparableTPGM) o).getWrappedComparable());
+    return getWrappedComparable().equals(((QueryComparableTPGM) o).getWrappedComparable());
   }
 
   @Override

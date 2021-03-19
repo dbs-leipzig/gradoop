@@ -80,8 +80,7 @@ public abstract class TemporalGraphStatistics {
   public abstract long getDistinctTargetVertexCount();
 
   /**
-   * Counts or estimates the number of distinct target vertices for edges
-   * with a certain label
+   * Counts or estimates the number of distinct target vertices for edges with a certain label
    *
    * @param edgeLabel label of the edge to count the target vertices
    * @return number of distinct target vertices for edges with given label
@@ -150,9 +149,9 @@ public abstract class TemporalGraphStatistics {
    * @param label1       label of the lhs element
    * @param transaction1 indicates whether lhs transaction time should be compared (=>true)
    *                     or valid time (=> false)
-   * @param comp comparator of the comparison
-   * @param type2 type of the rhs element (vertex/edge)
-   * @param label2 label of the rhs element
+   * @param comp         comparator of the comparison
+   * @param type2        type of the rhs element (vertex/edge)
+   * @param label2       label of the rhs element
    * @param transaction2 indicates whether rhs transaction time should be compared (=>true) or valid time
    *                     (=> false)
    * @return estimated probability that the comparison holds
@@ -165,11 +164,11 @@ public abstract class TemporalGraphStatistics {
   /**
    * Estimates the probability that a comparison of a property value with a constant holds
    *
-   * @param type  type of the lhs (vertex/edge)
-   * @param label label of the lhs, if known
+   * @param type     type of the lhs (vertex/edge)
+   * @param label    label of the lhs, if known
    * @param property property to compare
-   * @param comp  comparator of the comparison
-   * @param value rhs value
+   * @param comp     comparator of the comparison
+   * @param value    rhs value
    * @return estimated probability that the comparison holds
    */
   public abstract double estimatePropertyProb(ElementType type, Optional<String> label, String property,

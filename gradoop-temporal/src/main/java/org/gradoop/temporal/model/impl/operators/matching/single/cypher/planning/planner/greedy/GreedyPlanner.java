@@ -619,6 +619,4 @@ public class GreedyPlanner<
     rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());
     return leftPredicates.and(rightPredicates);
   }
-
-
 }

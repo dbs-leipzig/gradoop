@@ -147,7 +147,6 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   /**
    * Convert some graph to a {@link TemporalGraph}.
    *
-   * @see org.gradoop.temporal.model.impl.TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    * @param graph The graph.
    * @return The resulting temporal graph.
    */
@@ -373,6 +372,14 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     }
   }
 
+  /**
+   * Loads citibike sample dataset as temporal graph.
+   * Uses {@code start} and {@code end} edge properties to set {@code valid_from}/{@code tx_from}
+   * and {@code valid_to}/{@code tx_to} values.
+   *
+   * @return temporal citibike sample graph
+   * @throws Exception on failure
+   */
   public TemporalGraph loadCitibikeSample() throws Exception {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
     loader.initDatabaseFromFile(TEMPORAL_GDL_CITIBIKE_PATH);

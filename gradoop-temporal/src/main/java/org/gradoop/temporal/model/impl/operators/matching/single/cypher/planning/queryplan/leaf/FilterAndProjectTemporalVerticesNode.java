@@ -111,5 +111,4 @@ public class FilterAndProjectTemporalVerticesNode extends LeafNode
         "projectionKeys=%s}",
       vertexVariable, filterPredicate, projectionKeys);
   }
-
 }
