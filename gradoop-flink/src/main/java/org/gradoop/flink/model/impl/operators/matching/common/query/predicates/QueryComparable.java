@@ -78,4 +78,10 @@ public abstract class QueryComparable implements Serializable {
    * @return set of property keys
    */
   public abstract Set<String> getPropertyKeys(String variable);
+
+  /**
+   * Returns the wrapped comparable
+   * @return wrapped comparable
+   */
+  public abstract ComparableExpression getWrappedComparable();
 }

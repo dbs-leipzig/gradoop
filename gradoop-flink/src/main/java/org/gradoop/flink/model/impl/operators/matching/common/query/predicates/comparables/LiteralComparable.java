@@ -21,13 +21,14 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.Q
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.Literal}
  */
 public class LiteralComparable extends QueryComparable {
   /**
@@ -73,6 +74,11 @@ public class LiteralComparable extends QueryComparable {
   @Override
   public Set<String> getPropertyKeys(String variable) {
     return new HashSet<>(0);
+  }
+
+  @Override
+  public ComparableExpression getWrappedComparable() {
+    return literal;
   }
 
   @Override

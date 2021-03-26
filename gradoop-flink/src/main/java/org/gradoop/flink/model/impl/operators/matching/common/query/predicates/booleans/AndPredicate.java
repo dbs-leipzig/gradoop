@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.gdl.model.predicates.booleans.And;
 
@@ -31,15 +32,33 @@ public class AndPredicate extends QueryPredicate {
   private final And and;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Returns a new AndPredicate
+   *
    * @param and the predicate
    */
   public AndPredicate(And and) {
+    this(and, null);
+  }
+
+  /**
+   * Returns a new AndPredicate
+   *
+   * @param and the predicate
+   * @param comparableFactory factory for query comparables
+   */
+  public AndPredicate(And and, QueryComparableFactory comparableFactory) {
     this.and = and;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in CNF
    */
   public CNF asCNF() {
@@ -49,18 +68,20 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Retruns the wrapped left hand side predicate
+   *
    * @return the left hand side
    */
   public QueryPredicate getLhs() {
-    return QueryPredicate.createFrom(and.getArguments()[0]);
+    return QueryPredicate.createFrom(and.getArguments()[0], comparableFactory);
   }
 
   /**
    * Retruns the wrapped right hand side predicate
+   *
    * @return the right hand side
    */
   public QueryPredicate getRhs() {
-    return QueryPredicate.createFrom(and.getArguments()[1]);
+    return QueryPredicate.createFrom(and.getArguments()[1], comparableFactory);
   }
 
   @Override

@@ -29,6 +29,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class CNFElementTest {
+
   @Test
   public void extractVariablesTest() {
     QueryHandler query = new QueryHandler("MATCH (a), (b) WHERE a=b OR a.name = \"Alice\"");
@@ -61,54 +62,30 @@ public class CNFElementTest {
 
     //Should be true if a = b
     Embedding embedding = new Embedding();
-    embedding.add(
-      a,
-      PropertyValue.create("Alfred"), PropertyValue.create(42)
-    );
+    embedding.add(a, PropertyValue.create("Alfred"), PropertyValue.create(42));
     embedding.add(a);
-    embedding.add(
-      c,
-      PropertyValue.create(42)
-    );
+    embedding.add(c, PropertyValue.create(42));
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be true if a.name = "Alice"
     embedding = new Embedding();
-    embedding.add(
-      a,
-      PropertyValue.create("Alice"), PropertyValue.create(42)
-    );
+    embedding.add(a, PropertyValue.create("Alice"), PropertyValue.create(42));
     embedding.add(GradoopId.get());
-    embedding.add(
-      c,
-      PropertyValue.create(42)
-    );
+    embedding.add(c, PropertyValue.create(42));
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be true if a.age > c.age
     embedding = new Embedding();
-    embedding.add(
-      a,
-      PropertyValue.create("Alfred"), PropertyValue.create(42)
-    );
+    embedding.add(a, PropertyValue.create("Alfred"), PropertyValue.create(42));
     embedding.add(GradoopId.get());
-    embedding.add(
-      c,
-      PropertyValue.create(23)
-    );
+    embedding.add(c, PropertyValue.create(23));
     assertTrue(cnfElement.evaluate(embedding, metaData));
 
     //Should be false otherwise
     embedding = new Embedding();
-    embedding.add(
-      a,
-      PropertyValue.create("Alfred"), PropertyValue.create(42)
-    );
+    embedding.add(a, PropertyValue.create("Alfred"), PropertyValue.create(42));
     embedding.add(GradoopId.get());
-    embedding.add(
-      c,
-      PropertyValue.create(42)
-    );
+    embedding.add(c, PropertyValue.create(42));
     assertFalse(cnfElement.evaluate(embedding, metaData));
   }
 }

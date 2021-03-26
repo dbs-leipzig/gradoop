@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Creates collections of graphs, vertices and edges from a given GDL script.
  *
- * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
+ * @see <a href="https://github.com/dbs-leipzig/gdl">GDL on GitHub</a>
  *
  * @param <G> graph head type
  * @param <V> vertex type

@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.gdl.model.predicates.Predicate;
 import org.gradoop.gdl.model.predicates.booleans.And;
@@ -35,12 +36,28 @@ public class XorPredicate extends QueryPredicate {
   private final Xor xor;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Creates a new Wrapper
    *
    * @param xor The wrapped xor predicate
    */
   public XorPredicate(Xor xor) {
+    this(xor, null);
+  }
+
+  /**
+   * Creates a new Wrapper
+   *
+   * @param xor The wrapped xor predicate
+   * @param comparableFactory factory for comparables
+   */
+  public XorPredicate(Xor xor, QueryComparableFactory comparableFactory) {
     this.xor = xor;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
@@ -53,7 +70,8 @@ public class XorPredicate extends QueryPredicate {
     Predicate rhs = xor.getArguments()[1];
 
     QueryPredicate wrapper = QueryPredicate.createFrom(
-      new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs))
+      new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs)),
+      comparableFactory
     );
 
     return wrapper.asCNF();
@@ -61,18 +79,20 @@ public class XorPredicate extends QueryPredicate {
 
   /**
    * Returns the wrapped left hand side predicate
+   *
    * @return wrapped left hand side predicate
    */
   public QueryPredicate getLhs() {
-    return QueryPredicate.createFrom(xor.getArguments()[0]);
+    return QueryPredicate.createFrom(xor.getArguments()[0], comparableFactory);
   }
 
   /**
    * Returns the wrapped right hand side predicate
+   *
    * @return wrapped right hand side predicate
    */
   public QueryPredicate getRhs() {
-    return QueryPredicate.createFrom(xor.getArguments()[1]);
+    return QueryPredicate.createFrom(xor.getArguments()[1], comparableFactory);
   }
 
   @Override

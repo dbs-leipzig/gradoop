@@ -666,4 +666,12 @@ public class QueryHandler {
     vertexCache = Collections.unmodifiableMap(newVertexCache);
     edgeCache = Collections.unmodifiableMap(newEdgeCache);
   }
+
+  /**
+   * Returns the GDL handler
+   * @return GDL handler
+   */
+  public GDLHandler getGdlHandler() {
+    return gdlHandler;
+  }
 }

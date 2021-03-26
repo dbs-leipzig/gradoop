@@ -16,13 +16,14 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.gdl.model.predicates.booleans.Or;
 
 import java.util.Objects;
 
 /**
- * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
+ * Wraps an {@link org.gradoop.gdl.model.predicates.booleans.Or} predicate
  */
 public class OrPredicate extends QueryPredicate {
   /**
@@ -31,15 +32,33 @@ public class OrPredicate extends QueryPredicate {
   private final Or or;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Creates a new or wrapper
+   *
    * @param or the wrapped or predicate
    */
   public OrPredicate(Or or) {
+    this(or, null);
+  }
+
+  /**
+   * Creates a new or wrapper
+   *
+   * @param or the wrapped or predicate
+   * @param comparableFactory factory for query comparables
+   */
+  public OrPredicate(Or or, QueryComparableFactory comparableFactory) {
     this.or = or;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   public CNF asCNF() {
@@ -48,18 +67,20 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Returns the left hand side predicate
+   *
    * @return the left hand side predicate
    */
   public QueryPredicate getLhs() {
-    return QueryPredicate.createFrom(or.getArguments()[0]);
+    return QueryPredicate.createFrom(or.getArguments()[0], comparableFactory);
   }
 
   /**
    * Returns the right hand side predicate
+   *
    * @return the right hand side predicate
    */
   public QueryPredicate getRhs() {
-    return QueryPredicate.createFrom(or.getArguments()[1]);
+    return QueryPredicate.createFrom(or.getArguments()[1], comparableFactory);
   }
 
   @Override
