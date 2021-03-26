@@ -197,7 +197,6 @@ public class TemporalElementStats implements Serializable {
 
   }
 
-
   /**
    * Returns the binning estimations for tx_from, tx_to, val_from, val_to depending on
    * the vertices that are currently in the reservoir sample
@@ -323,7 +322,6 @@ public class TemporalElementStats implements Serializable {
       new Binning(allValTos, numBins)
     };
 
-
     // determine means and variances of the durations
     double txDurationMean = mean(txDurations);
     double txDurationVar = variance(txDurations, txDurationMean);
@@ -332,7 +330,6 @@ public class TemporalElementStats implements Serializable {
     double valDurationMean = mean(valDurations);
     double valDurationVar = variance(valDurations, valDurationMean);
     valDurationStats = new double[]{valDurationMean, valDurationVar};
-
 
     recomputeTemporalDataFlag = false;
   }
@@ -633,7 +630,6 @@ public class TemporalElementStats implements Serializable {
   public int hashCode() {
     return sampler.hashCode();
   }
-
 
   /**
    * Returns the (not binning-based) statistics for temporal properties.

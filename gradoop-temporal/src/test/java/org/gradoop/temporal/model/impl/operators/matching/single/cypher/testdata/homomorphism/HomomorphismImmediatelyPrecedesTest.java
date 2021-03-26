@@ -57,8 +57,8 @@ public class HomomorphismImmediatelyPrecedesTest implements TemporalTestData {
       "ImmPrecedes_HOM_4_default_citibike",
       "MATCH (a)-[e]->(b) WHERE a.val.immediatelyPrecedes(" +
         "Interval(Timestamp(2013-07-23T00:00:01), Timestamp(2020-05-05)))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

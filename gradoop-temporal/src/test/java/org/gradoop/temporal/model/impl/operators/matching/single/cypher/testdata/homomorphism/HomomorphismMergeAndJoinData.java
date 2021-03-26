@@ -39,8 +39,8 @@ public class HomomorphismMergeAndJoinData implements TemporalTestData {
     data.add(new String[] {
       "MergeJoin_HOM_2_default_citibike",
       "MATCH (a) WHERE NOT a.val.merge(a.val).contains(a.val.join(a.val))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     // 1.[(Murray St & West St) -> (Shevchenko Pl)]

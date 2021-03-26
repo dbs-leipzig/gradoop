@@ -22,7 +22,6 @@ import java.util.Collection;
 
 public class IsomorphismContainsData implements TemporalTestData {
 
-
   @Override
   public Collection<String[]> getData() {
     ArrayList<String[]> data = new ArrayList<>();

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
  * It is not guaranteed that all subsumptions or the optimal sequence of subsumptions are applied
  */
 public abstract class Subsumption implements QueryTransformation {
+
   @Override
   public CNF transformCNF(CNF cnf) {
     // separate singleton clauses from disjunctive clauses

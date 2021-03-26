@@ -38,7 +38,7 @@ import org.gradoop.gdl.model.comparables.time.TimeLiteral;
 import org.gradoop.gdl.model.comparables.time.TimeSelector;
 
 /**
- * Factory for temporal comparables
+ * Factory for temporal comparable
  */
 public class ComparableTPGMFactory extends QueryComparableFactory {
 
@@ -49,6 +49,7 @@ public class ComparableTPGMFactory extends QueryComparableFactory {
 
   /**
    * Create a new instance
+   *
    * @param now system time of the query
    */
   public ComparableTPGMFactory(TimeLiteral now) {

@@ -29,6 +29,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class CNFElementTest {
+
   @Test
   public void extractVariablesTest() {
     QueryHandler query = new QueryHandler("MATCH (a), (b) WHERE a=b OR a.name = \"Alice\"");

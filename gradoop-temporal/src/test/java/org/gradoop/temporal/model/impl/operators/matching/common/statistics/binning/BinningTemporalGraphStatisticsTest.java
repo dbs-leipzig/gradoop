@@ -170,7 +170,6 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       GTE, EDGE, Optional.of("edge"), false);
     assertTrue(estimation6 > estimation5);
     assertEquals(0.5, estimation6, 0.02);
-
   }
 
   @Test
@@ -213,7 +212,6 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.of("v2"), "unknown",
       NEQ, PropertyValue.create("nonsense"));
     assertEquals(0.0001, estimation10, 0.0001);
-
   }
 
   @Test
@@ -376,7 +374,6 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
       "numProp",
       LT, VERTEX, Optional.of("v2"), "unknown");
     assertEquals(0.0001, estimation10, 0.001);
-
   }
 
   @Test
@@ -447,7 +444,6 @@ public class BinningTemporalGraphStatisticsTest extends TemporalGradoopTestBase 
     double estimation10 = stats.estimatePropertyProb(VERTEX, Optional.empty(), "gender",
       EQ, VERTEX, Optional.empty(), "gender");
     assertEquals(0.1375, estimation10, 0.001);
-
   }
 
   @Test

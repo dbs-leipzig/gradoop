@@ -51,8 +51,8 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
       "MinMax_HOM_3_default_citibike",
       "MATCH (a)-[e]->(b) WHERE val_from!=MAX(a.val_from,e.val_from) OR " +
         "val_to!=MIN(b.val_to,e.val_to)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     // empty
@@ -60,8 +60,8 @@ public class HomomorphismMinMaxTest implements TemporalTestData {
       "MinMax_HOM_4_default_citibike",
       "MATCH (a)-[e]->(b) WHERE NOT a.tx.join(b.tx).equals(" +
         "Interval(MIN(a.tx_from, b.tx_from), MAX(a.tx_to, b.tx_to)))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

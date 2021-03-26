@@ -52,7 +52,6 @@ public class FilterTemporalEstimator extends TemporalEstimator {
                           CNFEstimation cnfEstimation) {
     super(queryHandler, graphStatistics);
     this.selectivity = 1f;
-    //initCNFEstimator();
     this.cnfEstimation = cnfEstimation;
   }
 

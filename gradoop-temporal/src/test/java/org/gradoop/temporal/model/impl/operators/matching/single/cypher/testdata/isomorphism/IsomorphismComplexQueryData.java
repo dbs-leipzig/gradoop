@@ -20,7 +20,8 @@ import org.gradoop.temporal.model.impl.operators.matching.TemporalTestData;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class IsomorphismComplexQueryData implements TemporalTestData {
+public class
+IsomorphismComplexQueryData implements TemporalTestData {
   @Override
   public Collection<String[]> getData() {
     ArrayList<String[]> data = new ArrayList<>();
@@ -52,6 +53,7 @@ public class IsomorphismComplexQueryData implements TemporalTestData {
       "expected1[(s21)-[e19]->(s11)]," +
         "expected2[(s28)-[e18]->(s29)],expected3[(s3)-[e3]->(s4)]"
     });
+
     /*
      * 1.[(Lispenard St) -> (Broadway & W 51 St)]
      */

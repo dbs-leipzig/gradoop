@@ -39,6 +39,7 @@ public class PropertySelectorComparable extends QueryComparable {
 
   /**
    * Creates a new wrapper
+   *
    * @param propertySelector the wrapped property selector
    */
   public PropertySelectorComparable(PropertySelector propertySelector) {

@@ -69,5 +69,4 @@ public class FilterAndProjectTemporalEdge extends RichFlatMapFunction<TemporalEd
       out.collect(EmbeddingTPGMFactory.fromEdge(edge, projectionPropertyKeys, isLoop));
     }
   }
-
 }

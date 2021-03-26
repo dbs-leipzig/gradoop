@@ -46,6 +46,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Creates a new comparison wrapped
+   *
    * @param comparison the wrapped comparison
    */
   public ComparisonExpression(Comparison comparison) {
@@ -54,6 +55,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Creates a new wrapped comparison and sets the query comparable factory
+   *
    * @param comparison the wrapped comparison
    * @param comparableFactory QueryComparableFactory to use
    */
@@ -64,6 +66,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Returns the wrapped left hand side of the comparison
+   *
    * @return wrapped left hand side
    */
   public QueryComparable getLhs() {
@@ -74,6 +77,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Returns the wrapped left hand side of the comparison
+   *
    * @return wrapped left hand side
    */
   public QueryComparable getRhs() {
@@ -136,9 +140,9 @@ public class ComparisonExpression extends QueryPredicate {
     }
   }
 
-
   /**
    * Returns the variables referenced by the expression
+   *
    * @return set of variables
    */
   public Set<String> getVariables() {
@@ -147,6 +151,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Returns the properties referenced by the expression for a given variable
+   *
    * @param variable the variable
    * @return set of referenced properties
    */
@@ -160,6 +165,7 @@ public class ComparisonExpression extends QueryPredicate {
   /**
    * Returns a ComparisonExpression that wraps the same comparison, but with lhs and
    * rhs switched
+   *
    * @return ComparisonExpression wrapping comparison with lhs and rhs switched
    */
   public ComparisonExpression switchSides() {
@@ -169,6 +175,7 @@ public class ComparisonExpression extends QueryPredicate {
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   @Override

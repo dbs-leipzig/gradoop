@@ -51,8 +51,8 @@ public class IsomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_ISO_3_default_citibike",
       "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(Hours(1))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     //1.[(E15 St) -> (Washington Park)]
@@ -81,8 +81,8 @@ public class IsomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_ISO_6_default_citibike",
       "MATCH (a)-[e]->(b) WHERE NOT b.tx.longerThan(val)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     //1.[(Henry St & Grand St) (Murray St & West St)]

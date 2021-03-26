@@ -38,7 +38,6 @@ public class HomomorphismComparisonData implements TemporalTestData {
         "expected3[(s3)-[e3]->(s4) (s2)-[e2]->(s2)]"
     });
 
-
     // 1. [(Broadway & W29)-[edgeId:13]->(8 Ave & W31)      (Broadway & W29)-[edgeId:19]->(8 Ave & W31)]
     data.add(new String[] {
       "Comparison_HOM_2_default_citibike",
@@ -48,7 +47,6 @@ public class HomomorphismComparisonData implements TemporalTestData {
       "expected1[(s21)-[e13]->(s11) (s21)-[e19]->(s11)]"
     });
 
-
     // 1. [(Hicks St & Montague) -> (Hicks St & Montague) <- (W 37 St & 5 Ave)]
     data.add(new String[] {
       "Comparison_HOM_3_default_citibike",
@@ -57,7 +55,6 @@ public class HomomorphismComparisonData implements TemporalTestData {
       "expected1",
       "expected1[(s2)-[e2]->(s2)<-[e5]-(s7)]"
     });
-
 
     // 1.[(Hicks St)->(Hicks St)]
     // 2.[Broadway & W24) -[edgeId:0]-> (9 Ave & W18)

@@ -316,6 +316,4 @@ public class TemporalElementStatsTest {
     }
     return input;
   }
-
-
 }

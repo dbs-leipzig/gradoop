@@ -15,7 +15,6 @@
  */
 package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
 
-
 import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 

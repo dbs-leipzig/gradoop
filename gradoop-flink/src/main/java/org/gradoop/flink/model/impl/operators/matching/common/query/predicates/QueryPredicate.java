@@ -30,12 +30,13 @@ import org.gradoop.gdl.model.predicates.expressions.Comparison;
 import java.io.Serializable;
 
 /**
- * Wrapps a Predicate
+ * Wrapper class for a Predicate
  */
 public abstract class QueryPredicate implements Serializable {
 
   /**
    * Generic wrapper function to createFrom a given predicate
+   *
    * @param predicate the predicate to be warpped
    * @return the wrapped predicate
    */
@@ -45,8 +46,9 @@ public abstract class QueryPredicate implements Serializable {
 
   /**
    * Generic wrapper function to createFrom a given predicate
-   * @param predicate the predicate to be warpped
-   * @param comparableFactory factory for comparables
+   *
+   * @param predicate the predicate to be wrapped
+   * @param comparableFactory factory for comparable
    * @return the wrapped predicate
    */
   public static QueryPredicate createFrom(Predicate predicate, QueryComparableFactory comparableFactory) {
@@ -71,6 +73,7 @@ public abstract class QueryPredicate implements Serializable {
 
   /**
    * Converts the predicate into Conjunctive Normal Form
+   *
    * @return the predicate in CNF
    */
   public abstract CNF asCNF();

@@ -26,6 +26,7 @@ public abstract class QueryComparableFactory implements Serializable {
 
   /**
    * Creates a {@link QueryComparable} from a GDL comparable expression
+   *
    * @param comparable comparable to create wrapper for
    * @return QueryComparable
    */

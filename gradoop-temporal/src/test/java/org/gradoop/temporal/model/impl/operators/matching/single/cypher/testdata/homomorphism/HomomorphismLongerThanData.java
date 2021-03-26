@@ -53,8 +53,8 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_3_default_citibike",
       "MATCH (a)-[e]->(b) WHERE e.tx.longerThan(Hours(1))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     //1.[(E15 St) -> (Washington Park)]
@@ -85,8 +85,8 @@ public class HomomorphismLongerThanData implements TemporalTestData {
     data.add(new String[] {
       "LongerThan_HOM_6_default_citibike",
       "MATCH (a)-[e]->(b) WHERE NOT b.tx.longerThan(val)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

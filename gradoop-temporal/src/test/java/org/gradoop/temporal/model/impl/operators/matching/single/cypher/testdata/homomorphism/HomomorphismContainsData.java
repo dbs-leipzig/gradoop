@@ -56,8 +56,8 @@ public class HomomorphismContainsData implements TemporalTestData {
     data.add(new String[] {
       "Contains_HOM_4_default_citibike",
       "MATCH (a) WHERE NOT a.tx.contains(a.tx)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     // 1.[(Hicks St)->(Hicks St)]

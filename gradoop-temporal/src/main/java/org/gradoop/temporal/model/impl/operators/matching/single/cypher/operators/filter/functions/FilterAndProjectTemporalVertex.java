@@ -28,8 +28,8 @@ import java.util.List;
  * Applies a given predicate on a {@link org.gradoop.temporal.model.impl.pojo.TemporalVertex}
  * and projects specified property values to the output embedding.
  */
-public class FilterAndProjectTemporalVertex extends
-  RichFlatMapFunction<TemporalVertex, Embedding> {
+public class FilterAndProjectTemporalVertex extends RichFlatMapFunction<TemporalVertex, Embedding> {
+
   /**
    * Predicates used for filtering
    */
@@ -56,5 +56,4 @@ public class FilterAndProjectTemporalVertex extends
       out.collect(EmbeddingTPGMFactory.fromVertex(vertex, projectionPropertyKeys));
     }
   }
-
 }

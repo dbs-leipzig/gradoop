@@ -87,6 +87,4 @@ public class HomomorphismSelectedData implements TemporalTestData {
 
     return data;
   }
-
-
 }

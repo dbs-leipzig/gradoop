@@ -128,7 +128,6 @@ public class MaxTimePointComparable extends TemporalComparable {
     return maxTimePoint != null ? maxTimePoint.hashCode() : 0;
   }
 
-
   @Override
   public TimePoint getWrappedComparable() {
     return maxTimePoint;

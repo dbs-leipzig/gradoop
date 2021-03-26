@@ -45,7 +45,6 @@ public class HomomorphismOtherData implements TemporalTestData {
       "expected1[(s27)-[e17]->(s27)],expected2[(s27)-[e17]->(s27)-[e17]->(s27)]"
     });
 
-
     return data;
   }
 }

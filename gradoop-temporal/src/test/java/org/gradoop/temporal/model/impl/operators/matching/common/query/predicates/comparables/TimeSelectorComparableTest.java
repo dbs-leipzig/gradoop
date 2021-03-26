@@ -114,5 +114,4 @@ public class TimeSelectorComparableTest {
 
     wrapper.evaluate(embedding, metaData).getLong();
   }
-
 }

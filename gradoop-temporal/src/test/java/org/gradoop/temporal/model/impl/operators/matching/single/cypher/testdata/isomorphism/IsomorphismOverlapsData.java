@@ -55,7 +55,6 @@ public class IsomorphismOverlapsData implements TemporalTestData {
       "expected1[(s12)-[e8]->(s13) (s3)-[e3]->(s4)]"
     });
 
-
     return data;
   }
 }

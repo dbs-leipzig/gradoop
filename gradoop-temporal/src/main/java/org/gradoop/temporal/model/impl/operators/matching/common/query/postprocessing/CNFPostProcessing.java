@@ -35,7 +35,6 @@ import java.util.List;
  */
 public class CNFPostProcessing {
 
-
   /**
    * List of transformations. They are applied in the order of the list
    */

@@ -27,6 +27,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
 
   /**
    * Create statistics from a temporal graph
+   *
    * @param g graph to create statistics for
    * @return graph statistics
    * @throws Exception if anything flink-related goes wrong
@@ -36,6 +37,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
   /**
    * Create statistics from a temporal graph, specifying numerical and categorical
    * properties to consider explicitly
+   *
    * @param g graph to create statistics for
    * @param numericalProperties list of numerical properties to consider
    * @param categoricalProperties list of categorical properties to consider
@@ -47,6 +49,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
 
   /**
    * Create statistics from a temporal graph based on a sample of given size
+   *
    * @param g graph to create statistics for
    * @param sampleSize size of sample to be used
    * @return graph statistics
@@ -57,6 +60,7 @@ public interface TemporalGraphStatisticsFactory<T extends TemporalGraphStatistic
   /**
    * Create statistics from a temporal graph based on a sample of given size.
    * Numerical and categorical properties to be considered are specified explicitly.
+   *
    * @param g graph to create statistics for
    * @param numericalProperties list of numerical properties to consider
    * @param categoricalProperties list of categorical properties to consider

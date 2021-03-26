@@ -47,6 +47,7 @@ public class NotPredicate extends QueryPredicate {
 
   /**
    * Create a new wrapper
+   *
    * @param not the wrapped not predicate
    */
   public NotPredicate(Not not) {
@@ -55,6 +56,7 @@ public class NotPredicate extends QueryPredicate {
 
   /**
    * Create a new wrapper
+   *
    * @param not the wrapped not predicate
    * @param comparableFactory factory for comparables
    */
@@ -65,6 +67,7 @@ public class NotPredicate extends QueryPredicate {
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   @Override
@@ -117,6 +120,7 @@ public class NotPredicate extends QueryPredicate {
   /**
    * Invert a comparison
    * eg NOT(a > b) == (a <= b)
+   *
    * @param comparison the comparison that will be inverted
    * @return inverted comparison
    */

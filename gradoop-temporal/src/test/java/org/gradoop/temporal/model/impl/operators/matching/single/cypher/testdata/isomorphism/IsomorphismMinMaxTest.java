@@ -24,14 +24,16 @@ public class IsomorphismMinMaxTest implements TemporalTestData {
   @Override
   public Collection<String[]> getData() {
     ArrayList<String[]> data = new ArrayList<>();
+
     // empty
     data.add(new String[] {
       "MinMax_HOM_1_default_citibike",
       "MATCH (a)<-[e1]-(b)-[e2]->(c) " +
         "WHERE e1.tx_from!=e2.tx_from AND MIN(a.tx_from, b.tx_from, c.tx_from)=Timestamp(2013-05-10)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
+
     // 1. [ (9 Ave & W 18)<-[e0]-(Broadway & W24)-[e1]-> (9 Ave & W  18)]
     // 2. [ (9 Ave & W 18)<-[e1]-(Broadway & W24)-[e0]-> (9 Ave & W  18)]
     data.add(new String[] {
@@ -46,8 +48,8 @@ public class IsomorphismMinMaxTest implements TemporalTestData {
       "MinMax_HOM_4_default_citibike",
       "MATCH (a)-[e]->(b) WHERE NOT a.tx.join(b.tx).equals(" +
         "Interval(MIN(a.tx_from, b.tx_from), MAX(a.tx_to, b.tx_to)))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

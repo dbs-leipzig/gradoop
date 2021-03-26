@@ -27,12 +27,13 @@ public class IsomorphismEqualsTest implements TemporalTestData {
   @Override
   public Collection<String[]> getData() {
     ArrayList<String[]> data = new ArrayList<>();
+
     //empty
     data.add(new String[] {
       "Equals_ISO1_default_citibike",
       "MATCH (a)-[e]->(b) WHERE a.tx.equals(b.tx)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     // 1.[(9 Ave & W14 St)->(Mercer St & Spring St)]
@@ -57,8 +58,8 @@ public class IsomorphismEqualsTest implements TemporalTestData {
     data.add(new String[] {
       "Equals_ISO_4_default_citibike",
       "MATCH (a)-[e]->(b) WHERE a.tx.equals(e.tx) OR e.tx.equals(b.tx)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     return data;

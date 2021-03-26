@@ -223,7 +223,6 @@ public class GreedyPlanner<
 
       boolean isPath = edge.getUpperBound() != 1;
 
-
       DataSet<TemporalEdge> edges =
         edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
           graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
@@ -235,8 +234,6 @@ public class GreedyPlanner<
 
       planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,
         new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
-
-
     }
   }
 

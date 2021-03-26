@@ -56,8 +56,8 @@ public class IsomorphismLengthAtMostData implements TemporalTestData {
       "LengthAtMost_ISO_3_default_citibike",
       "MATCH (a)-[e]->(b) WHERE Interval(Timestamp(1970-01-01), Timestamp(1970-01-01T01:00:00))" +
         ".lengthAtMost(e.tx)",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     //1.[(E15 St) -> (Washington Park)]

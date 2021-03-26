@@ -88,8 +88,6 @@ public class Binning implements Serializable {
       long minCurrentBin = values.get(i * binSize);
       bins[i] = maxPreviousBin + (minCurrentBin - maxPreviousBin) / 2;
     }
-
-
   }
 
   /**
@@ -100,7 +98,6 @@ public class Binning implements Serializable {
   public Long[] getBins() {
     return bins.clone();
   }
-
 
   public void setBins(Long[] bins) {
     this.bins = bins.clone();

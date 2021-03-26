@@ -49,7 +49,6 @@ public class IsomorphismBetweenData implements TemporalTestData {
         "expected2[(s8)-[e6]->(s9)], expected3[(s28)-[e18]->(s29)]"
     });
 
-
     // 1.[(E15 St & Irving Pl) -> (Washington Park)]
     // 2.[(Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
     // 3.[(Lispenard St) -> (Broadway & W 51 St)]

@@ -25,6 +25,7 @@ import java.util.Set;
 /**
  * Reduces a set of {@link TemporalElement} to a {@link TemporalElementStats} about this set.
  * It is assumed that all elements have the same label.
+ *
  * @param <T> type of element to reduce
  */
 public class ElementsToStats<T extends TemporalElement> implements
@@ -41,6 +42,7 @@ public class ElementsToStats<T extends TemporalElement> implements
 
   /**
    * Creates a new ElementsToStats function considering only specified properties
+   *
    * @param numericalProperties numerical properties to consider
    * @param categoricalProperties categorical propberties to consider
    */

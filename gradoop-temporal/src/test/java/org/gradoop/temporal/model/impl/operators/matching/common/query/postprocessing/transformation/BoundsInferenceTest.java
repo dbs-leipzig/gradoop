@@ -103,7 +103,6 @@ public class BoundsInferenceTest {
     );
 
     equalCNFs(processedCNF, expectedCNF);
-
   }
 
   @Test

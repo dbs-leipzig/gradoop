@@ -47,6 +47,7 @@ import static org.gradoop.gdl.utils.Comparator.LTE;
  * a.tx_from or a.tx_to is found within the singleton clauses of the CNF (analogously for val)
  */
 public class AddTrivialConstraints implements QueryTransformation {
+
   @Override
   public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
     // determine all variables of interest for tx and val intervals

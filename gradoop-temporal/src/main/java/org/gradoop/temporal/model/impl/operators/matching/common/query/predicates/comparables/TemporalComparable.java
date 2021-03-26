@@ -18,8 +18,8 @@ package org.gradoop.temporal.model.impl.operators.matching.common.query.predicat
 import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.QueryComparableTPGM;
 
 /**
- * Abstract base class for all temporal comparables
- * Provides the opportunity to implement methods specific for temporal comparables
+ * Abstract base class for all temporal comparable
+ * Provides the opportunity to implement methods specific for temporal comparable
  */
 public abstract class TemporalComparable extends QueryComparableTPGM {
 

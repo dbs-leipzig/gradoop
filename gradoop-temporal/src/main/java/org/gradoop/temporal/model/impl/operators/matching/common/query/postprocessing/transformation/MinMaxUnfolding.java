@@ -52,6 +52,7 @@ import static org.gradoop.gdl.utils.Comparator.LTE;
  * !!! This class assumes input CNFs to be normalized, i.e. not to contain > or >= !!!
  */
 public class MinMaxUnfolding implements QueryTransformation {
+
   @Override
   public CNF transformCNF(CNF cnf) {
     if (cnf.getPredicates().size() == 0) {

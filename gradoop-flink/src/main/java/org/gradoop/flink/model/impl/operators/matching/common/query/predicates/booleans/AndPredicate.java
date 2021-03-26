@@ -38,6 +38,7 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Returns a new AndPredicate
+   *
    * @param and the predicate
    */
   public AndPredicate(And and) {
@@ -46,6 +47,7 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Returns a new AndPredicate
+   *
    * @param and the predicate
    * @param comparableFactory factory for query comparables
    */
@@ -56,6 +58,7 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in CNF
    */
   public CNF asCNF() {
@@ -65,6 +68,7 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Retruns the wrapped left hand side predicate
+   *
    * @return the left hand side
    */
   public QueryPredicate getLhs() {
@@ -73,6 +77,7 @@ public class AndPredicate extends QueryPredicate {
 
   /**
    * Retruns the wrapped right hand side predicate
+   *
    * @return the right hand side
    */
   public QueryPredicate getRhs() {

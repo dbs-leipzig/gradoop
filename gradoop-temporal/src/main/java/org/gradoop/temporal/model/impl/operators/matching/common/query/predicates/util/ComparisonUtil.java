@@ -25,6 +25,7 @@ public class ComparisonUtil {
 
   /**
    * Checks whether a comparison expression compares temporal elements
+   *
    * @param comparison comparison expression to check
    * @return true iff expression wraps a well-formed temporal comparison
    */

@@ -25,7 +25,6 @@ public class HomomorphismAsOfData implements TemporalTestData {
   public Collection<String[]> getData() {
     ArrayList<String[]> data = new ArrayList<>();
 
-
     // 1.[(Hicks St) -> (Hicks St)]
     // 2.[(Broadway & W24) -[edgeId:1]-> (9 Ave & W18)]
     // 3.[(Broadway & W24) -[edgeId:0]-> (9 Ave & W18)]
@@ -36,7 +35,6 @@ public class HomomorphismAsOfData implements TemporalTestData {
       "expected1[(s2)-[e2]->(s2)], expected2[(s0)-[e0]->(s1)]," +
         "expected3[(s0)-[e1]->(s1)]"
     });
-
 
     // 1.[(Greenwich St & W Houston)<-(Murray St & West St)->(Shevchenko Pl)]
     // 2.[(Shevchenko Pl)<-(Murray St & West St)->(Shevchenko Pl)]
@@ -49,7 +47,6 @@ public class HomomorphismAsOfData implements TemporalTestData {
         "expected3[(s26)<-[e16]-(s24)-[e16]->(s26)]"
     });
 
-
     // 1.[(Broadway & W 29 St) -[edgeId:19]-> (8 Ave & W 31)]
     // 2.[(E15 St & Irving) -> (Washington Park)
     // 2.[(Lispenard St) -> (Broadway & W 51)]
@@ -60,7 +57,6 @@ public class HomomorphismAsOfData implements TemporalTestData {
       "expected1[(s21)-[e19]->(s11)], expected2[(s3)-[e3]->(s4)]," +
         " expected3[(s28)-[e18]->(s29)]"
     });
-
 
     // 1.[(Stanton St & Chrystie ST)]
     // 2.[(Shevchenko Pl & E 7 St)]

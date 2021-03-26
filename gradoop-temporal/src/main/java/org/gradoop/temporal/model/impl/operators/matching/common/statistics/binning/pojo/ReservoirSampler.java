@@ -128,7 +128,6 @@ public class ReservoirSampler<T> implements Serializable {
     return reservoirSample.size();
   }
 
-
   @Override
   public int hashCode() {
     if (reservoirSample == null) {

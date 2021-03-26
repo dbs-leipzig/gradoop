@@ -44,7 +44,7 @@ import static org.gradoop.gdl.utils.Comparator.LTE;
  */
 public class TemporalQueryHandler extends QueryHandler {
   /**
-   * Time Literal representing the systime at the start of query processing
+   * Time Literal representing the system time at the start of query processing
    */
   private final TimeLiteral now;
   /**

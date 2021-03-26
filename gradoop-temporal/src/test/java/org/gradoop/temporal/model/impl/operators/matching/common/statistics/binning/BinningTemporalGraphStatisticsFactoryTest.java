@@ -77,7 +77,5 @@ public class BinningTemporalGraphStatisticsFactoryTest extends TemporalGradoopTe
     assertTrue(edgeStats.containsKey(edgeLabels[1]));
     assertTrue(vertexStats.containsKey(vertexLabels[0]));
     assertTrue(vertexStats.containsKey(vertexLabels[1]));
-
   }
-
 }

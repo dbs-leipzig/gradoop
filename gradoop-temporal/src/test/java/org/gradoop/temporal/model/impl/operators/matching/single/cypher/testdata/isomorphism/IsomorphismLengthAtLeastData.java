@@ -53,8 +53,8 @@ public class IsomorphismLengthAtLeastData implements TemporalTestData {
     data.add(new String[] {
       "LengthAtLeast_ISO_3_default_citibike",
       "MATCH (a)-[e]->(b) WHERE e.tx.lengthAtLeast(Hours(1))",
-      "",
-      ""
+      "[]",
+      "[]"
     });
 
     //1.[(E15 St) -> (Washington Park)]

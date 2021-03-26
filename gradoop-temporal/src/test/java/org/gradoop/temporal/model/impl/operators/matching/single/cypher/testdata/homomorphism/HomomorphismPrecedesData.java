@@ -34,7 +34,6 @@ public class HomomorphismPrecedesData implements TemporalTestData {
       "expected1[(s3)-[e3]->(s4) (s18)-[e11]->(s9)]"
     });
 
-
     // 1.[(Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
     // 2.[(E 20 St & Park Ave) -> (E 20 St & Park Ave)]
     // 3.[(Lispenard St) -> (Broadway & W 51 St)]

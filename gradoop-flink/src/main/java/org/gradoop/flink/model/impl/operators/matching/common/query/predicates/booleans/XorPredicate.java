@@ -79,6 +79,7 @@ public class XorPredicate extends QueryPredicate {
 
   /**
    * Returns the wrapped left hand side predicate
+   *
    * @return wrapped left hand side predicate
    */
   public QueryPredicate getLhs() {
@@ -87,6 +88,7 @@ public class XorPredicate extends QueryPredicate {
 
   /**
    * Returns the wrapped right hand side predicate
+   *
    * @return wrapped right hand side predicate
    */
   public QueryPredicate getRhs() {

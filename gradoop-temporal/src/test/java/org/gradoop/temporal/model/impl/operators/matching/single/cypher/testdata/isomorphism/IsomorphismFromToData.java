@@ -38,7 +38,6 @@ public class IsomorphismFromToData implements TemporalTestData {
         "expected2[(s8)-[e6]->(s9)], expected3[(s28)-[e18]->(s29)]"
     });
 
-
     // 1.[(E15 St & Irving Pl) -> (Washington Park)]
     // 2.[(Broadway & W29) -[edgeId:19]->(8 Ave & W31)]
     // 3.[(Lispenard St) -> (Broadway & W 51 St)]
@@ -51,7 +50,6 @@ public class IsomorphismFromToData implements TemporalTestData {
         "expected3[(s28)-[e18]->(s29)]"
     });
 
-
     // 1.[(Broadway & W 29) -[e19]-> (8 Ave & W 31) <-[e13]- (Broadway & W29)]
     // 2.[(Broadway & W 29) -[e13]-> (8 Ave & W 31) <-[e19]- (Broadway & W29)]
     data.add(new String[] {
@@ -62,7 +60,6 @@ public class IsomorphismFromToData implements TemporalTestData {
       "expected1[(s21)-[e19]->(s11)<-[e13]-(s21)]," +
         "expected2[(s21)-[e13]->(s11)<-[e19]-(s21)]"
     });
-
 
     // 1.[(W37 St & 5 Ave) -> (Hicks St)]
     // 2.[(Stanton St) -> (Hancock St & Bedford Ave)]

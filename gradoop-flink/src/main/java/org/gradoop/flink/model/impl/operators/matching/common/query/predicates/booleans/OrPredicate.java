@@ -38,8 +38,8 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Creates a new or wrapper
-   * @param or the wrapped or predicate
    *
+   * @param or the wrapped or predicate
    */
   public OrPredicate(Or or) {
     this(or, null);
@@ -47,6 +47,7 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Creates a new or wrapper
+   *
    * @param or the wrapped or predicate
    * @param comparableFactory factory for query comparables
    */
@@ -57,6 +58,7 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   public CNF asCNF() {
@@ -65,6 +67,7 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Returns the left hand side predicate
+   *
    * @return the left hand side predicate
    */
   public QueryPredicate getLhs() {
@@ -73,6 +76,7 @@ public class OrPredicate extends QueryPredicate {
 
   /**
    * Returns the right hand side predicate
+   *
    * @return the right hand side predicate
    */
   public QueryPredicate getRhs() {

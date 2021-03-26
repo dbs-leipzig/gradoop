@@ -116,6 +116,7 @@ public class EmbeddingTPGMFactory {
 
   /**
    * Checks if a string refers to an actual property or a time stamp
+   *
    * @param key string to check
    * @return true iff key refers to an actual property
    */
