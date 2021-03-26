@@ -24,7 +24,8 @@ help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
-* [Graph Sampling with Distributed In-Memory Dataflow Systems, arXiv, October 2019](https://arxiv.org/pdf/1910.04493.pdf)
+* [Exploration and Analysis of Temporal Property Graphs, EDBT Demo, March 2021](https://dbs.uni-leipzig.de/file/EDBT21_Demo_Gradoop_camera_ready_v1.pdf)
+* [Graph Sampling with Distributed In-Memory Dataflow Systems, BTW, March 2021](https://dbs.uni-leipzig.de/file/A3-21.pdf)
 * [Evolution Analysis of Large Graphs with Gradoop, ECML PKDD LEG Workshop, September 2019](https://dbs.uni-leipzig.de/file/LEGECML-PKDD_2019_paper_9.pdf)
 * [Gradoop @Gridka Keynote Distributed Graph Analytics, August 2019](https://indico.scc.kit.edu/event/460/contributions/5772/attachments/2873/4171/gradoop_gridka19.pdf)
 * [Temporal Graph Analysis using Gradoop, BTW 2019-Workshopband, March 2019](https://dl.gi.de/bitstream/handle/20.500.12116/21797/C2-1.pdf)
@@ -96,18 +97,18 @@ Latest weekly build (additional repository is required):
 </dependency>
 
 ```
-In any case you also need Apache Flink (version 1.7.2):
+In any case you also need Apache Flink (version 1.9.3):
 ```xml
 <dependencies>
     <dependency>
         <groupId>org.apache.flink</groupId>
         <artifactId>flink-java</artifactId>
-        <version>1.7.2</version>
+        <version>1.9.3</version>
     </dependency>
     <dependency>
         <groupId>org.apache.flink</groupId>
         <artifactId>flink-clients_2.11</artifactId>
-        <version>1.7.2</version>
+        <version>1.9.3</version>
     </dependency>
 </dependencies>
 ```
@@ -182,6 +183,10 @@ Used to maintain the code style for the whole project.
 
 ## Related Repositories
 
+### [Gradoop Tutorial](https://github.com/dbs-leipzig/gradoop-tutorial)
+
+Gradoop Tutorial which has been shown in [BOSS20'](https://boss-workshop.github.io/boss-2020/) Workshop of VLDB 2020 international conference.
+
 ### [Gradoop Benchmarks](https://github.com/dbs-leipzig/gradoop-benchmarks)
 
 This repository contains sets of Gradoop operator benchmarks designed to run on a cluster to measure
@@ -190,6 +195,15 @@ scalability and speedup of the operators.
 ### [Gradoop Demo](https://github.com/dbs-leipzig/gradoop_demo)
 
 Demo application to show the functionalities of the grouping and query operator in an interactive web UI.
+
+
+### [Temporal Graph Explorer](https://github.com/dbs-leipzig/temporal_graph_explorer)
+
+Gradoop Temporal Graph Explorer Demo which showcases some operators of the Temporal Property Graph Model.
+
+### [Gradoop GDL](https://github.com/dbs-leipzig/gdl)
+
+This repository contains the definition of our Temporal Graph Definition Language (Temporal-GDL).
 
 ### Version History
 
