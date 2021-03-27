@@ -22,10 +22,10 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.c
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.comparables.ElementSelector;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.ElementSelector;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -78,5 +78,11 @@ import java.util.Set;
    * @return set of property keys
    */
   public abstract Set&lt;String&gt; getPropertyKeys(String variable);
+
+  /**
+   * Returns the wrapped comparable
+   * @return wrapped comparable
+   */
+  public abstract ComparableExpression getWrappedComparable();
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

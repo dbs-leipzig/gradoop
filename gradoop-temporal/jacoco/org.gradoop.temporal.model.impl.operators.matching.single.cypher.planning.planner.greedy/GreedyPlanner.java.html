@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GreedyPlanner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.planner.greedy</a> &gt; <span class="el_source">GreedyPlanner.java</span></div><h1>GreedyPlanner.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.planner.greedy;
+
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.util.GradoopConstants;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTable;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.CartesianProductNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ExpandEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.JoinEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary.ValueJoinNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.ProjectEmbeddingsNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.CNFEstimation;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation.TemporalQueryPlanEstimator;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.plantable.TemporalPlanTableEntry;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.utils.Comparator;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.EDGE;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.GRAPH;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.PATH;
+import static org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable.PlanTableEntry.Type.VERTEX;
+
+/**
+ * Greedy query planning for temporal queries
+ * @param &lt;G&gt; a temporal graph head type
+ * @param &lt;LG&gt; a logical graph type for temporal elements
+ * @param &lt;GC&gt; a graph collection type for temporal elements
+ */
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">public class GreedyPlanner&lt;</span>
+  G extends TemporalGraphHead,
+  LG extends BaseGraph&lt;G, TemporalVertex, TemporalEdge, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, TemporalVertex, TemporalEdge, LG, GC&gt;&gt; {
+
+  /**
+   * The search graph to be queried
+   */
+  private final LG graph;
+  /**
+   * The query handler represents the query.
+   */
+  private final TemporalQueryHandler queryHandler;
+  /**
+   * Statistics about the search graph.
+   */
+  private final TemporalGraphStatistics graphStatistics;
+  /**
+   * The morphism type for vertex mappings.
+   */
+  private final MatchStrategy vertexStrategy;
+  /**
+   * The morphism type for edge mappings.
+   */
+  private final MatchStrategy edgeStrategy;
+  /**
+   * Estimates the selectivity of predicates
+   */
+  private final CNFEstimation cnfEstimation;
+  /**
+   * The conjunctive normal form for the predicates
+   */
+  private final CNF cnf;
+
+  /**
+   * Creates a new greedy planner.
+   *
+   * @param graph           search graph
+   * @param queryHandler    query handler
+   * @param graphStatistics search graph statistics
+   * @param vertexStrategy  morphism type for vertex mappings
+   * @param edgeStrategy    morphism type for edge mappings
+   */
+  public GreedyPlanner(LG graph, TemporalQueryHandler queryHandler,
+                       TemporalGraphStatistics graphStatistics, MatchStrategy vertexStrategy,
+<span class="fc" id="L118">                       MatchStrategy edgeStrategy) {</span>
+<span class="fc" id="L119">    this.graph = graph;</span>
+<span class="fc" id="L120">    this.queryHandler = queryHandler;</span>
+<span class="fc" id="L121">    this.graphStatistics = graphStatistics;</span>
+<span class="fc" id="L122">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L123">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L124">    this.cnfEstimation = new CNFEstimation(graphStatistics, queryHandler);</span>
+<span class="fc" id="L125">    this.cnf = cnfEstimation.reorderCNF(queryHandler.getPredicates());</span>
+<span class="fc" id="L126">  }</span>
+
+  /**
+   * Computes the {@link TemporalPlanTableEntry} that wraps the {@link QueryPlan} with the minimum costs
+   * according to the greedy optimization algorithm.
+   *
+   * @return entry with minimum execution costs
+   */
+  public TemporalPlanTableEntry plan() {
+<span class="fc" id="L135">    PlanTable planTable = initPlanTable();</span>
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    while (planTable.size() &gt; 1) {</span>
+<span class="fc" id="L138">      PlanTable newPlans = evaluateJoins(planTable);</span>
+
+<span class="fc bfc" id="L140" title="All 2 branches covered.">      if (newPlans.size() == 0) {</span>
+        // No new plans where generated by joining but there are still multiple disconnected
+        // query graph components. In this case we need to do a cartesian product.
+<span class="fc" id="L143">        newPlans = evaluateCartesianProducts(planTable);</span>
+      }
+<span class="fc" id="L145">      newPlans = evaluateFilter(newPlans);</span>
+<span class="fc" id="L146">      newPlans = evaluateProjection(newPlans);</span>
+
+      // get plan with minimum costs and remove all plans covered by this plan
+<span class="fc" id="L149">      TemporalPlanTableEntry bestEntry = (TemporalPlanTableEntry) newPlans.min();</span>
+<span class="fc" id="L150">      planTable.removeCoveredBy(bestEntry);</span>
+<span class="fc" id="L151">      planTable.add(bestEntry);</span>
+<span class="fc" id="L152">    }</span>
+
+<span class="fc" id="L154">    return (TemporalPlanTableEntry) planTable.get(0);</span>
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Initialization
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Creates the initial plan table entries according to the specified vertices and edges.
+   *
+   * @return initial plan table
+   */
+  private PlanTable initPlanTable() {
+<span class="fc" id="L167">    PlanTable planTable = new PlanTable();</span>
+<span class="fc" id="L168">    createVertexPlans(planTable);</span>
+<span class="fc" id="L169">    createEdgePlans(planTable);</span>
+<span class="fc" id="L170">    return planTable;</span>
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Leaf nodes (i.e. vertices and (variable length) edges)
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Creates an initial {@link TemporalPlanTableEntry} for each vertex in the query graph and adds it to the
+   * specified {@link PlanTable}. The entry wraps a query plan that filters vertices based on their
+   * predicates and projects properties that are required for further query planning.
+   *
+   * @param planTable plan table
+   */
+  private void createVertexPlans(PlanTable planTable) {
+<span class="fc bfc" id="L185" title="All 2 branches covered.">    for (Vertex vertex : queryHandler.getVertices()) {</span>
+<span class="fc" id="L186">      String vertexVariable = vertex.getVariable();</span>
+<span class="fc" id="L187">      CNF allPredicates = this.cnf;</span>
+
+<span class="fc" id="L189">      CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);</span>
+<span class="fc" id="L190">      Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(vertexVariable);</span>
+
+<span class="fc" id="L192">      DataSet&lt;TemporalVertex&gt; vertices =</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">        vertex.getLabel().equals(GradoopConstants.DEFAULT_VERTEX_LABEL) ?</span>
+<span class="fc" id="L194">          graph.getVertices() : graph.getVerticesByLabel(vertex.getLabel());</span>
+
+<span class="fc" id="L196">      FilterAndProjectTemporalVerticesNode node =</span>
+        new FilterAndProjectTemporalVerticesNode(vertices,
+<span class="fc" id="L198">          vertex.getVariable(), vertexPredicates, projectionKeys);</span>
+
+<span class="fc" id="L200">      planTable.add(new TemporalPlanTableEntry(VERTEX, Sets.newHashSet(vertexVariable), allPredicates,</span>
+        new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+<span class="fc" id="L202">    }</span>
+<span class="fc" id="L203">  }</span>
+
+  /**
+   * Creates an initial {@link TemporalPlanTableEntry} for each edge in the query graph and adds it to the
+   * specified {@link PlanTable}. The entry wraps a {@link QueryPlan} that filters edges based on
+   * their predicates and projects properties that are required for further query planning.
+   *
+   * @param planTable plan table
+   */
+  private void createEdgePlans(PlanTable planTable) {
+<span class="fc bfc" id="L213" title="All 2 branches covered.">    for (Edge edge : queryHandler.getEdges()) {</span>
+<span class="fc" id="L214">      String edgeVariable = edge.getVariable();</span>
+<span class="fc" id="L215">      String sourceVariable = queryHandler.getVertexById(edge.getSourceVertexId()).getVariable();</span>
+<span class="fc" id="L216">      String targetVariable = queryHandler.getVertexById(edge.getTargetVertexId()).getVariable();</span>
+
+<span class="fc" id="L218">      CNF allPredicates = this.cnf;</span>
+
+<span class="fc" id="L220">      CNF edgePredicates = allPredicates.removeSubCNF(edgeVariable);</span>
+
+<span class="fc" id="L222">      Set&lt;String&gt; projectionKeys = allPredicates.getPropertyKeys(edgeVariable);</span>
+
+<span class="fc bfc" id="L224" title="All 2 branches covered.">      boolean isPath = edge.getUpperBound() != 1;</span>
+
+<span class="fc" id="L226">      DataSet&lt;TemporalEdge&gt; edges =</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?</span>
+<span class="fc" id="L228">          graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());</span>
+
+<span class="fc" id="L230">      FilterAndProjectTemporalEdgesNode node = new FilterAndProjectTemporalEdgesNode(edges,</span>
+        sourceVariable, edgeVariable, targetVariable, edgePredicates, projectionKeys, isPath);
+
+<span class="fc bfc" id="L233" title="All 2 branches covered.">      PlanTableEntry.Type type = edge.hasVariableLength() ? PATH : EDGE;</span>
+
+<span class="fc" id="L235">      planTable.add(new TemporalPlanTableEntry(type, Sets.newHashSet(edgeVariable), allPredicates,</span>
+        new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+<span class="fc" id="L237">    }</span>
+<span class="fc" id="L238">  }</span>
+
+  //------------------------------------------------------------------------------------------------
+  // Join and Expand
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Evaluates which entries in the specified plan table can be joined. The joined entries
+   * are added to a new table which is returned.
+   *
+   * @param currentTable query plan table
+   * @return new table containing solely joined plans from the input table
+   */
+  private PlanTable evaluateJoins(PlanTable currentTable) {
+<span class="fc" id="L252">    PlanTable newTable = new PlanTable();</span>
+
+<span class="fc bfc" id="L254" title="All 2 branches covered.">    for (int i = 0; i &lt; currentTable.size(); i++) {</span>
+<span class="fc" id="L255">      PlanTableEntry leftEntry = currentTable.get(i);</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">      if (mayExtend(leftEntry)) {</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        for (int j = 0; j &lt; currentTable.size(); j++) {</span>
+<span class="fc" id="L258">          PlanTableEntry rightEntry = currentTable.get(j);</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">          if (i != j) {</span>
+<span class="fc" id="L260">            List&lt;String&gt; joinVariables = getOverlap(leftEntry, rightEntry);</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">            if (joinVariables.size() &gt; 0) {</span>
+<span class="pc bpc" id="L262" title="1 of 4 branches missed.">              if (rightEntry.getType() == PATH &amp;&amp; joinVariables.size() == 2) {</span>
+                // evaluate join with variable length path on source and target vertex
+<span class="nc" id="L264">                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(0, 1)));</span>
+<span class="nc" id="L265">                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables.subList(1, 2)));</span>
+              } else {
+                // regular join or join with variable length path on source or target vertex
+<span class="fc" id="L268">                newTable.add(joinEntries(leftEntry, rightEntry, joinVariables));</span>
+              }
+            }
+          }
+        }
+      }
+    }
+<span class="fc" id="L275">    return newTable;</span>
+  }
+
+  /**
+   * Checks if the given entry may be extended. This is only the case for entries that represents
+   * either a vertex or a partial match graph.
+   *
+   * @param entry plan table entry
+   * @return true, iff the specified entry may be extended
+   */
+  private boolean mayExtend(PlanTableEntry entry) {
+<span class="fc bfc" id="L286" title="All 4 branches covered.">    return entry.getType() == VERTEX || entry.getType() == GRAPH;</span>
+  }
+
+  /**
+   * Computes the overlapping query variables of the specified entries.
+   *
+   * @param firstEntry  first entry
+   * @param secondEntry second entry
+   * @return variables that are available in both input entries
+   */
+  private List&lt;String&gt; getOverlap(PlanTableEntry firstEntry, PlanTableEntry secondEntry) {
+<span class="fc" id="L297">    Set&lt;String&gt; overlap = firstEntry.getAllVariables();</span>
+<span class="fc" id="L298">    overlap.retainAll(secondEntry.getAllVariables());</span>
+<span class="fc" id="L299">    return new ArrayList&lt;&gt;(overlap);</span>
+  }
+
+  /**
+   * Joins the query plans represented by the specified plan table entries.
+   * &lt;p&gt;
+   * The method considers if the right entry is a variable length path and in that case
+   * creates an {@link ExpandEmbeddingsNode}. In any other case, a regular
+   * {@link JoinEmbeddingsNode} is used to join the query plans.
+   *
+   * @param leftEntry     left entry
+   * @param rightEntry    right entry
+   * @param joinVariables join variables
+   * @return an entry that represents the join of both input entries
+   */
+  private PlanTableEntry joinEntries(PlanTableEntry leftEntry, PlanTableEntry rightEntry,
+                                             List&lt;String&gt; joinVariables) {
+
+    PlanNode node;
+<span class="fc bfc" id="L318" title="All 2 branches covered.">    if (rightEntry.getType() == PATH) {</span>
+<span class="pc bpc" id="L319" title="2 of 4 branches missed.">      assert joinVariables.size() == 1;</span>
+<span class="fc" id="L320">      node = createExpandNode(leftEntry, rightEntry, joinVariables.get(0));</span>
+    } else {
+<span class="fc" id="L322">      node = new JoinEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),</span>
+<span class="fc" id="L323">        rightEntry.getQueryPlan().getRoot(), joinVariables, vertexStrategy, edgeStrategy);</span>
+    }
+
+    // update processed variables
+<span class="fc" id="L327">    HashSet&lt;String&gt; processedVariables = Sets.newHashSet(leftEntry.getProcessedVariables());</span>
+<span class="fc" id="L328">    processedVariables.addAll(rightEntry.getProcessedVariables());</span>
+    // create resulting predicates
+    // TODO: this might be moved to the join/expand node in issue #510
+<span class="fc" id="L331">    CNF predicates = mergePredicates(leftEntry, rightEntry);</span>
+
+<span class="fc" id="L333">    return new TemporalPlanTableEntry(GRAPH, processedVariables, predicates,</span>
+      new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation));
+  }
+
+  /**
+   * Creates an {@link ExpandEmbeddingsNode} from the specified arguments.
+   *
+   * @param leftEntry     left entry
+   * @param rightEntry    right entry
+   * @param startVariable vertex variable to expand from
+   * @return new expand node
+   */
+  private ExpandEmbeddingsNode createExpandNode(PlanTableEntry leftEntry, PlanTableEntry rightEntry,
+                                                String startVariable) {
+
+<span class="fc" id="L348">    String pathVariable = rightEntry.getQueryPlan().getRoot()</span>
+<span class="fc" id="L349">      .getEmbeddingMetaData().getEdgeVariables().get(0);</span>
+
+<span class="fc" id="L351">    Edge queryEdge = queryHandler.getEdgeByVariable(pathVariable);</span>
+<span class="fc" id="L352">    Vertex sourceVertex = queryHandler.getVertexById(queryEdge.getSourceVertexId());</span>
+<span class="fc" id="L353">    Vertex targetVertex = queryHandler.getVertexById(queryEdge.getTargetVertexId());</span>
+
+<span class="fc" id="L355">    int lowerBound = queryEdge.getLowerBound();</span>
+<span class="fc" id="L356">    int upperBound = queryEdge.getUpperBound();</span>
+<span class="fc bfc" id="L357" title="All 2 branches covered.">    ExpandDirection direction = sourceVertex.getVariable().equals(startVariable) ?</span>
+      ExpandDirection.OUT : ExpandDirection.IN;
+<span class="fc bfc" id="L359" title="All 2 branches covered.">    String endVariable = direction == ExpandDirection.OUT ?</span>
+<span class="fc" id="L360">      targetVertex.getVariable() : sourceVertex.getVariable();</span>
+
+<span class="fc" id="L362">    return new ExpandEmbeddingsNode(leftEntry.getQueryPlan().getRoot(),</span>
+<span class="fc" id="L363">      rightEntry.getQueryPlan().getRoot(),</span>
+      startVariable, pathVariable, endVariable, lowerBound, upperBound, direction,
+      vertexStrategy, edgeStrategy);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Filter embedding evaluation
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * The method checks if a filter can be applied on any of the entries in the specified table. If
+   * this is the case, a {@link FilterEmbeddingsNode} is added to the query plan represented by the
+   * affected entries.
+   *
+   * @param currentTable query plan table
+   * @return input table with possibly updated entries
+   */
+  private PlanTable evaluateFilter(PlanTable currentTable) {
+<span class="fc" id="L381">    PlanTable newTable = new PlanTable();</span>
+
+<span class="fc bfc" id="L383" title="All 2 branches covered.">    for (PlanTableEntry entry : currentTable) {</span>
+<span class="fc" id="L384">      Set&lt;String&gt; variables = Sets.newHashSet(entry.getProcessedVariables());</span>
+<span class="fc" id="L385">      CNF predicates = entry.getPredicates();</span>
+<span class="fc" id="L386">      CNF subCNF = predicates.removeSubCNF(variables);</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">      if (subCNF.size() &gt; 0) {</span>
+<span class="fc" id="L388">        FilterEmbeddingsNode node = new FilterEmbeddingsNode(</span>
+<span class="fc" id="L389">          entry.getQueryPlan().getRoot(), subCNF);</span>
+<span class="fc" id="L390">        newTable.add(new TemporalPlanTableEntry(GRAPH, Sets.newHashSet(entry.getProcessedVariables()),</span>
+          predicates,
+          new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+<span class="fc" id="L393">      } else {</span>
+<span class="fc" id="L394">        newTable.add(entry);</span>
+      }
+<span class="fc" id="L396">    }</span>
+
+<span class="fc" id="L398">    return newTable;</span>
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Filter embedding evaluation
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * The method checks if a filter can be applied on any of the entries in the specified table. If
+   * this is the case, a {@link ProjectEmbeddingsNode} is added to the query plan represented by the
+   * affected entries.
+   *
+   * @param currentTable query plan table
+   * @return input table with possibly updated entries
+   */
+  private PlanTable evaluateProjection(PlanTable currentTable) {
+<span class="fc" id="L414">    PlanTable newTable = new PlanTable();</span>
+
+<span class="fc bfc" id="L416" title="All 2 branches covered.">    for (PlanTableEntry entry : currentTable) {</span>
+<span class="fc" id="L417">      Set&lt;Pair&lt;String, String&gt;&gt; propertyPairs = entry.getPropertyPairs();</span>
+<span class="fc" id="L418">      Set&lt;Pair&lt;String, String&gt;&gt; projectionPairs = entry.getProjectionPairs();</span>
+
+<span class="fc" id="L420">      Set&lt;Pair&lt;String, String&gt;&gt; updatedPropertyPairs = propertyPairs.stream()</span>
+<span class="fc" id="L421">        .filter(projectionPairs::contains)</span>
+<span class="fc" id="L422">        .collect(Collectors.toSet());</span>
+
+<span class="fc bfc" id="L424" title="All 2 branches covered.">      if (updatedPropertyPairs.size() &lt; propertyPairs.size()) {</span>
+<span class="fc" id="L425">        ProjectEmbeddingsNode node = new ProjectEmbeddingsNode(entry.getQueryPlan().getRoot(),</span>
+          new ArrayList&lt;&gt;(updatedPropertyPairs));
+<span class="fc" id="L427">        newTable.add(new TemporalPlanTableEntry(GRAPH,</span>
+<span class="fc" id="L428">          Sets.newHashSet(entry.getProcessedVariables()), entry.getPredicates(),</span>
+          new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)));
+<span class="fc" id="L430">      } else {</span>
+<span class="fc" id="L431">        newTable.add(entry);</span>
+      }
+<span class="fc" id="L433">    }</span>
+<span class="fc" id="L434">    return newTable;</span>
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Join and Expand
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Evaluates which entries in the specified plan table can be joined. The joined entries
+   * are added to a new table which is returned.
+   *
+   * @param currentTable query plan table
+   * @return new table containing solely joined plans from the input table
+   */
+  private PlanTable evaluateCartesianProducts(PlanTable currentTable) {
+<span class="fc" id="L449">    PlanTable newTable = new PlanTable();</span>
+<span class="fc bfc" id="L450" title="All 2 branches covered.">    for (int i = 0; i &lt; currentTable.size(); i++) {</span>
+<span class="fc" id="L451">      PlanTableEntry leftEntry = currentTable.get(i);</span>
+<span class="fc bfc" id="L452" title="All 2 branches covered.">      for (int j = i + 1; j &lt; currentTable.size(); j++) {</span>
+<span class="fc" id="L453">        PlanTableEntry rightEntry = currentTable.get(j);</span>
+<span class="fc" id="L454">        CNF joinPredicate = getJoinPredicate(leftEntry, rightEntry);</span>
+<span class="pc bpc" id="L455" title="1 of 2 branches missed.">        if (joinPredicate.size() &gt; 0) {</span>
+<span class="nc" id="L456">          newTable.add(createValueJoinEntry(leftEntry, rightEntry, joinPredicate));</span>
+        } else {
+          // regular join or join with variable length path on source or target vertex
+<span class="fc" id="L459">          newTable.add(createCartesianProductEntry(leftEntry, rightEntry));</span>
+        }
+      }
+    }
+<span class="fc" id="L463">    return newTable;</span>
+  }
+
+  /**
+   * Computes the overlapping query variables of the specified entries.
+   *
+   * @param leftEntry  first entry
+   * @param rightEntry second entry
+   * @return variables that are available in both input entries
+   */
+  private CNF getJoinPredicate(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
+<span class="fc" id="L474">    Set&lt;String&gt; allVariables = leftEntry.getAllVariables();</span>
+<span class="fc" id="L475">    allVariables.addAll(rightEntry.getAllVariables());</span>
+
+<span class="fc" id="L477">    CNF leftPredicates = new CNF(leftEntry.getPredicates());</span>
+<span class="fc" id="L478">    CNF rightPredicates = new CNF(rightEntry.getPredicates());</span>
+<span class="fc" id="L479">    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());</span>
+<span class="fc" id="L480">    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());</span>
+<span class="fc" id="L481">    CNF predicates = leftPredicates.and(rightPredicates).getSubCNF(allVariables);</span>
+
+<span class="fc" id="L483">    return new CNF(</span>
+<span class="fc" id="L484">      predicates.getPredicates()</span>
+<span class="fc" id="L485">        .stream()</span>
+<span class="fc" id="L486">        .filter(p -&gt;</span>
+<span class="pc bpc" id="L487" title="1 of 4 branches missed.">          p.size() == 1 &amp;&amp; p.getPredicates().get(0).getComparator().equals(Comparator.EQ)</span>
+<span class="fc" id="L488">        ).collect(Collectors.toList())</span>
+    );
+  }
+
+  /**
+   * Creates an {@link CartesianProductNode} from the specified arguments.
+   *
+   * @param leftEntry  left entry
+   * @param rightEntry right entry
+   * @return new expand node
+   */
+  private TemporalPlanTableEntry createCartesianProductEntry(PlanTableEntry leftEntry,
+                                                             PlanTableEntry rightEntry) {
+<span class="fc" id="L501">    CartesianProductNode node = new CartesianProductNode(</span>
+<span class="fc" id="L502">      leftEntry.getQueryPlan().getRoot(),</span>
+<span class="fc" id="L503">      rightEntry.getQueryPlan().getRoot(),</span>
+      vertexStrategy, edgeStrategy
+    );
+
+<span class="fc" id="L507">    Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();</span>
+<span class="fc" id="L508">    processedVariables.addAll(rightEntry.getProcessedVariables());</span>
+
+<span class="fc" id="L510">    CNF predicates = mergePredicates(leftEntry, rightEntry);</span>
+
+<span class="fc" id="L512">    return new TemporalPlanTableEntry(</span>
+      GRAPH,
+      processedVariables,
+      predicates,
+      new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)
+    );
+  }
+
+  /**
+   * Creates an {@link ValueJoinNode} from the specified arguments.
+   *
+   * @param leftEntry     left entry
+   * @param rightEntry    right entry
+   * @param joinPredicate join predicate
+   * @return new value join node
+   */
+  private PlanTableEntry createValueJoinEntry(PlanTableEntry leftEntry,
+                                                      PlanTableEntry rightEntry,
+                                                      CNF joinPredicate) {
+
+<span class="nc" id="L532">    List&lt;Pair&lt;String, String&gt;&gt; leftProperties = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L533">    List&lt;Pair&lt;String, String&gt;&gt; rightProperties = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L535" title="All 2 branches missed.">    for (CNFElement e : joinPredicate.getPredicates()) {</span>
+<span class="nc" id="L536">      ComparisonExpression comparison = e.getPredicates().get(0);</span>
+
+<span class="nc" id="L538">      Pair&lt;String, String&gt; joinExpression = extractJoinExpression(comparison.getLhs());</span>
+<span class="nc bnc" id="L539" title="All 2 branches missed.">      if (leftEntry.getAllVariables().contains(joinExpression.getKey())) {</span>
+        /*if (!isTemporal(joinExpression)) {
+          leftProperties.add(joinExpression);
+        }*/
+<span class="nc" id="L543">        leftProperties.add(joinExpression);</span>
+      } else {
+        /*if (!isTemporal(joinExpression)) {
+          rightProperties.add(joinExpression);
+        }*/
+<span class="nc" id="L548">        rightProperties.add(joinExpression);</span>
+      }
+
+<span class="nc" id="L551">      joinExpression = extractJoinExpression(comparison.getRhs());</span>
+<span class="nc bnc" id="L552" title="All 2 branches missed.">      if (leftEntry.getAllVariables().contains(joinExpression.getKey())) {</span>
+        /*if (!isTemporal(joinExpression)) {
+          leftProperties.add(joinExpression);
+        }*/
+<span class="nc" id="L556">        leftProperties.add(joinExpression);</span>
+      } else {
+        /*if (!isTemporal(joinExpression)) {
+          rightProperties.add(joinExpression);
+        }*/
+<span class="nc" id="L561">        rightProperties.add(joinExpression);</span>
+      }
+<span class="nc" id="L563">    }</span>
+
+<span class="nc" id="L565">    ValueJoinNode node = new ValueJoinNode(</span>
+<span class="nc" id="L566">      leftEntry.getQueryPlan().getRoot(),</span>
+<span class="nc" id="L567">      rightEntry.getQueryPlan().getRoot(),</span>
+      leftProperties, rightProperties,
+      vertexStrategy, edgeStrategy
+    );
+
+<span class="nc" id="L572">    Set&lt;String&gt; processedVariables = leftEntry.getProcessedVariables();</span>
+<span class="nc" id="L573">    processedVariables.addAll(rightEntry.getProcessedVariables());</span>
+
+<span class="nc" id="L575">    CNF predicates = mergePredicates(leftEntry, rightEntry);</span>
+
+<span class="nc" id="L577">    return new TemporalPlanTableEntry(</span>
+      GRAPH,
+      processedVariables,
+      predicates,
+      new TemporalQueryPlanEstimator(new QueryPlan(node), queryHandler, graphStatistics, cnfEstimation)
+    );
+  }
+
+  /**
+   * Turns a QueryComparable into a {@code Pair&lt;Variable, PropertyKey&gt;}
+   *
+   * @param comparable query comparable
+   * @return join property
+   */
+  private Pair&lt;String, String&gt; extractJoinExpression(QueryComparable comparable) {
+<span class="nc bnc" id="L592" title="All 2 branches missed.">    if (comparable instanceof PropertySelectorComparable) {</span>
+<span class="nc" id="L593">      PropertySelectorComparable propertySelector = (PropertySelectorComparable) comparable;</span>
+<span class="nc" id="L594">      return Pair.of(propertySelector.getVariable(), propertySelector.getPropertyKey());</span>
+    }
+<span class="nc bnc" id="L596" title="All 2 branches missed.">    if (comparable instanceof TimeSelectorComparable) {</span>
+<span class="nc" id="L597">      TimeSelectorComparable timeSelector = (TimeSelectorComparable) comparable;</span>
+<span class="nc" id="L598">      return Pair.of(timeSelector.getVariable(), timeSelector.getTimeField().name());</span>
+    } else {
+      //TODO #580 Include ElementSelector -&gt; ID needs to be projected as property
+<span class="nc" id="L601">      throw new RuntimeException(&quot;Comparable &quot; + comparable + &quot;cant be used for ValueJoin&quot;);</span>
+    }
+  }
+
+  /**
+   * Creates a new predicate that includes only elements that exist in both input predicates
+   *
+   * @param leftEntry  left side plant table entry
+   * @param rightEntry right side plan table entry
+   * @return Merged predicates
+   */
+  private CNF mergePredicates(PlanTableEntry leftEntry, PlanTableEntry rightEntry) {
+<span class="fc" id="L613">    CNF leftPredicates = new CNF(leftEntry.getPredicates());</span>
+<span class="fc" id="L614">    CNF rightPredicates = new CNF(rightEntry.getPredicates());</span>
+<span class="fc" id="L615">    leftPredicates.removeSubCNF(rightEntry.getProcessedVariables());</span>
+<span class="fc" id="L616">    rightPredicates.removeSubCNF(leftEntry.getProcessedVariables());</span>
+<span class="fc" id="L617">    return leftPredicates.and(rightPredicates);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalQueryHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query</a> &gt; <span class="el_source">TemporalQueryHandler.java</span></div><h1>TemporalQueryHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Wraps a {@link GDLHandler} and adds functionality needed for query
+ * processing during graph pattern matching.
+ * Extension of the flink QueryHandler for temporal queries
+ */
+public class TemporalQueryHandler extends QueryHandler {
+  /**
+   * Time Literal representing the system time at the start of query processing
+   */
+  private final TimeLiteral now;
+  /**
+   * Transformations to apply to the query cnf
+   */
+  private final CNFPostProcessing cnfPostProcessing;
+
+  /**
+   * The query CNF
+   */
+  private CNF cnf;
+
+  /**
+   * Creates a new query handler that postprocesses the CNF with a default
+   * {@link CNFPostProcessing}
+   *
+   * @param gdlString GDL query string
+   * @throws QueryContradictoryException if a contradiction in the query is encountered
+   */
+  public TemporalQueryHandler(String gdlString) throws QueryContradictoryException {
+<span class="fc" id="L68">    this(gdlString, new CNFPostProcessing());</span>
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Creates a new query handler.
+   *
+   * @param gdlString      GDL query string
+   * @param postProcessing transformations to apply to the CNF
+   * @throws QueryContradictoryException if a contradiction in the query is encountered
+   */
+  public TemporalQueryHandler(String gdlString, CNFPostProcessing postProcessing)
+    throws QueryContradictoryException {
+<span class="fc" id="L80">    super(gdlString);</span>
+<span class="fc" id="L81">    this.cnfPostProcessing = postProcessing;</span>
+<span class="fc" id="L82">    now = new TimeLiteral(&quot;now&quot;);</span>
+<span class="fc" id="L83">    initCNF();</span>
+<span class="fc" id="L84">  }</span>
+
+  /**
+   * Returns all available predicates in Conjunctive Normal Form {@link CNF}. If there are no
+   * predicates defined in the query, a CNF containing zero predicates is returned.
+   *
+   * @return predicates
+   */
+  @Override
+  public CNF getPredicates() {
+<span class="fc" id="L94">    return cnf;</span>
+  }
+
+  /**
+   * Initiates the query CNF from the query, including postprocessing
+   *
+   * @throws QueryContradictoryException if query is found to be contradictory
+   */
+  private void initCNF() throws QueryContradictoryException {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (getGdlHandler().getPredicates().isPresent()) {</span>
+<span class="fc" id="L104">      Predicate predicate = getGdlHandler().getPredicates().get();</span>
+      // some transformations on the GDL query before conversion to CNF
+<span class="fc" id="L106">      predicate = preprocessPredicate(predicate);</span>
+<span class="fc" id="L107">      CNF rawCNF = QueryPredicate.createFrom(predicate, new ComparableTPGMFactory(now)).asCNF();</span>
+<span class="fc" id="L108">      cnf = cnfPostProcessing.postprocess(rawCNF);</span>
+<span class="fc" id="L109">    } else {</span>
+      // empty CNF
+<span class="fc" id="L111">      cnf = new CNF();</span>
+    }
+<span class="fc" id="L113">  }</span>
+
+  /**
+   * Pipeline for preprocessing GDL query predicates. Currently, only predicates for
+   * valid interval overlap of edges and their vertices are added.
+   *
+   * @param predicate the GDL predicate to preprocess
+   * @return preprocessed GDL predicate
+   */
+  private Predicate preprocessPredicate(Predicate predicate) {
+<span class="fc" id="L123">    return addEdgeOverlapPredicates(predicate);</span>
+  }
+
+  /**
+   * Augments a predicate by constraints ensuring that valid times of
+   * edges and their adjacent nodes overlap
+   *
+   * @param predicate the predicate to augment
+   * @return predicate augmented by edge overlaps constraints for every edge
+   */
+  private Predicate addEdgeOverlapPredicates(Predicate predicate) {
+<span class="fc" id="L134">    GDLHandler handler = getGdlHandler();</span>
+<span class="fc" id="L135">    Map&lt;String, Edge&gt; edgeCache = handler.getEdgeCache();</span>
+
+    // maps vertex ids to vertex variables
+<span class="fc" id="L138">    Map&lt;Long, String&gt; vertexMap = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">    for (Vertex vertex : handler.getVertexCache(true, true).values()) {</span>
+<span class="fc" id="L140">      vertexMap.put(vertex.getId(), vertex.getVariable());</span>
+<span class="fc" id="L141">    }</span>
+
+    // determine all (vertex, edge, vertex) triples
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (String edgeVar : handler.getEdgeCache().keySet()) {</span>
+<span class="fc" id="L145">      Edge edge = edgeCache.get(edgeVar);</span>
+      // no temporal predicates for paths
+<span class="fc bfc" id="L147" title="All 2 branches covered.">      if (edge.hasVariableLength()) {</span>
+<span class="fc" id="L148">        continue;</span>
+      }
+<span class="fc" id="L150">      String sourceVar = vertexMap.get(edge.getSourceVertexId());</span>
+<span class="fc" id="L151">      String targetVar = vertexMap.get(edge.getTargetVertexId());</span>
+
+
+      // all relevant val-selectors
+<span class="fc" id="L155">      TimeSelector eFrom = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_FROM);</span>
+<span class="fc" id="L156">      TimeSelector eTo = new TimeSelector(edgeVar, TimeSelector.TimeField.VAL_TO);</span>
+
+<span class="fc" id="L158">      TimeSelector sFrom = new TimeSelector(sourceVar, TimeSelector.TimeField.VAL_FROM);</span>
+<span class="fc" id="L159">      TimeSelector sTo = new TimeSelector(sourceVar, TimeSelector.TimeField.VAL_TO);</span>
+
+<span class="fc" id="L161">      TimeSelector tFrom = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_FROM);</span>
+<span class="fc" id="L162">      TimeSelector tTo = new TimeSelector(targetVar, TimeSelector.TimeField.VAL_TO);</span>
+
+      // create predicates edgeVar.val.overlaps(sourceVar.val) AND
+      // edgeVar.val.overlaps(targetVar.val)...
+<span class="fc" id="L166">      Predicate overlaps = new Comparison(</span>
+        new MaxTimePoint(eFrom, sFrom, tFrom), LTE, new MinTimePoint(eTo, sTo, tTo)
+      );
+      // ...and add them to the resulting predicate
+<span class="fc" id="L170">      predicate = new And(predicate, overlaps);</span>
+<span class="fc" id="L171">    }</span>
+<span class="fc" id="L172">    return predicate;</span>
+  }
+
+  /**
+   * Returns the TimeLiteral representing the systime at the start of query processing
+   *
+   * @return TimeLiteral representing the systime at the start of query processing
+   */
+  public TimeLiteral getNow() {
+<span class="nc" id="L181">    return now;</span>
+  }
+
+  /**
+   * Checks if the graph returns a single vertex and no edges (no loops).
+   *
+   * @return true, if single vertex graph
+   */
+  public boolean isSingleVertexGraph() {
+<span class="pc bpc" id="L190" title="1 of 4 branches missed.">    return getVertexCount() == 1 &amp;&amp; getEdgeCount() == 0;</span>
+  }
+
+  /**
+   * Returns the number of vertices in the query graph.
+   *
+   * @return vertex count
+   */
+  public int getVertexCount() {
+<span class="fc" id="L199">    return getVertices().size();</span>
+  }
+
+  /**
+   * Returns the number of edges in the query graph.
+   *
+   * @return edge count
+   */
+  public int getEdgeCount() {
+<span class="fc" id="L208">    return getEdges().size();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

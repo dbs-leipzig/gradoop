@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TrivialContradictions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">TrivialContradictions.java</span></div><h1>TrivialContradictions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Looks for trivial contradictions like {@code a.tx_from &gt; a.tx_to} or (b.prop!=b.prop).
+ * Every contradictory comparison is removed from its disjunctive clause.
+ * If every comparison in a clause is contradictory, the whole CNF is a contradiction.
+ * In this case, the transformation throws a {@link QueryContradictoryException}
+ * !!! This class assumes input CNFs to be normalized, i.e. not to contain &lt; or &lt;= !!!
+ */
+<span class="fc" id="L43">public class TrivialContradictions implements QueryTransformation {</span>
+
+  @Override
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
+<span class="fc" id="L47">    ArrayList&lt;CNFElement&gt; newClauses = new ArrayList&lt;&gt;();</span>
+    // check every clause for contradictions
+<span class="fc bfc" id="L49" title="All 2 branches covered.">    for (CNFElement clause : cnf.getPredicates()) {</span>
+<span class="fc" id="L50">      CNFElement newClause = transformDisjunction(clause);</span>
+<span class="fc" id="L51">      newClauses.add(newClause);</span>
+<span class="fc" id="L52">    }</span>
+<span class="fc" id="L53">    return new CNF(newClauses);</span>
+  }
+
+  /**
+   * Checks a disjunctive clause for trivial contradictions and removes them.
+   * If all comparisons are contradictory, an exception is thrown.
+   *
+   * @param clause clause to check
+   * @return the clause iff it does not contain a trivial contradiction
+   * @throws QueryContradictoryException iff the clause contains a trivial contradiction
+   */
+  private CNFElement transformDisjunction(CNFElement clause) throws QueryContradictoryException {
+<span class="fc" id="L65">    List&lt;ComparisonExpression&gt; oldComparisons = clause.getPredicates();</span>
+<span class="fc" id="L66">    ArrayList&lt;ComparisonExpression&gt; newComparisons = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (ComparisonExpression comparison : oldComparisons) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      if (!isContradictory(comparison)) {</span>
+        // contradictory comparisons are omitted in the resulting clause
+<span class="fc" id="L70">        newComparisons.add(comparison);</span>
+      }
+<span class="fc" id="L72">    }</span>
+    // all comparisons contradictory?
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (newComparisons.isEmpty()) {</span>
+<span class="fc" id="L75">      throw new QueryContradictoryException();</span>
+    } else {
+<span class="fc" id="L77">      return new CNFElement(newComparisons);</span>
+    }
+  }
+
+
+  /**
+   * Checks whether a comparison is a trivial contradiction (x &lt; x, x!=x, !(a.tx_from &lt;= a.tx_to,
+   * contradictory comparison between two time literals)
+   *
+   * @param comp comparison to check
+   * @return true iff comparison is a trivial contradiction
+   */
+  private boolean isContradictory(ComparisonExpression comp) {
+    // unwrap the comparison
+<span class="fc" id="L91">    ComparableExpression lhs = comp.getLhs().getWrappedComparable();</span>
+<span class="fc" id="L92">    Comparator comparator = comp.getComparator();</span>
+<span class="fc" id="L93">    ComparableExpression rhs = comp.getRhs().getWrappedComparable();</span>
+
+    // x&lt;x, x!=x
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (lhs.equals(rhs)) {</span>
+<span class="pc bpc" id="L97" title="2 of 4 branches missed.">      if (!(comparator.equals(Comparator.EQ) || comparator.equals(LTE))) {</span>
+<span class="fc" id="L98">        return true;</span>
+      }
+    }
+    // a.tx_from &gt; a.tx_to
+<span class="fc bfc" id="L102" title="All 4 branches covered.">    if (lhs instanceof TimeSelector &amp;&amp; rhs instanceof TimeSelector &amp;&amp;</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">      lhs.getVariable().equals(rhs.getVariable())) {</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">      if (((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.TX_FROM) &amp;&amp;</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.TX_TO) ||</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        ((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.VAL_FROM) &amp;&amp;</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">          ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.VAL_TO)) {</span>
+<span class="fc" id="L108">        return comparator.equals(GT);</span>
+      }
+<span class="pc bpc" id="L110" title="1 of 8 branches missed.">    } else if ((lhs instanceof TimeLiteral &amp;&amp; rhs instanceof TimeLiteral) ||</span>
+      (lhs instanceof Literal &amp;&amp; rhs instanceof Literal)) {
+      // comparison of two (time) literals is tautological iff the comparison holds
+      // true iff the comparison holds
+<span class="fc bfc" id="L114" title="All 2 branches covered.">      return !comp.evaluate(new TemporalVertex());</span>
+    }
+<span class="fc" id="L116">    return false;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

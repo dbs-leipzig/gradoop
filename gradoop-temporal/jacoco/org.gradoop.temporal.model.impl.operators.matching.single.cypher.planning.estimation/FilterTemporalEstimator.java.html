@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilterTemporalEstimator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation</a> &gt; <span class="el_source">FilterTemporalEstimator.java</span></div><h1>FilterTemporalEstimator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalEdgesNode;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesNode;
+
+/**
+ * Keeps track of the leaf nodes in a query plan and computes a final selectivity factor resulting
+ * from the applied predicates.
+ */
+public class FilterTemporalEstimator extends TemporalEstimator {
+  /**
+   * Used to estimate filter selectivity
+   */
+  private final CNFEstimation cnfEstimation;
+  /**
+   * The non-filtered cardinality of the leaf node.
+   */
+  private long cardinality;
+  /**
+   * The resulting selectivity factor of all leaf predicates
+   */
+  private double selectivity;
+
+  /**
+   * Creates a new estimator.
+   *
+   * @param queryHandler    query handler
+   * @param graphStatistics graph statistics
+   * @param cnfEstimation estimation of CNF predicates
+   */
+  FilterTemporalEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics,
+                          CNFEstimation cnfEstimation) {
+<span class="fc" id="L53">    super(queryHandler, graphStatistics);</span>
+<span class="fc" id="L54">    this.selectivity = 1f;</span>
+<span class="fc" id="L55">    this.cnfEstimation = cnfEstimation;</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Updates the selectivity factor according to the given node.
+   *
+   * @param node leaf node
+   */
+  void visit(FilterNode node) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (node instanceof FilterAndProjectTemporalVerticesNode) {</span>
+<span class="fc" id="L65">      FilterAndProjectTemporalVerticesNode vertexNode =</span>
+        (FilterAndProjectTemporalVerticesNode) node;
+<span class="fc" id="L67">      setCardinality(vertexNode.getEmbeddingMetaData().getVertexVariables().get(0), true);</span>
+<span class="fc" id="L68">      updateSelectivity(vertexNode.getFilterPredicate());</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    } else if (node instanceof FilterAndProjectTemporalEdgesNode) {</span>
+<span class="fc" id="L70">      FilterAndProjectTemporalEdgesNode edgeNode = (FilterAndProjectTemporalEdgesNode) node;</span>
+<span class="fc" id="L71">      setCardinality(edgeNode.getEmbeddingMetaData().getEdgeVariables().get(0), false);</span>
+<span class="fc" id="L72">      updateSelectivity(edgeNode.getFilterPredicate());</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">    } else if (node instanceof FilterEmbeddingsNode) {</span>
+<span class="fc" id="L74">      updateSelectivity(((FilterEmbeddingsNode) node).getFilterPredicate());</span>
+    }
+<span class="fc" id="L76">  }</span>
+
+  /**
+   * Returns the non-filtered cardinality of the leaf node output.
+   *
+   * @return estimated cardinality
+   */
+  long getCardinality() {
+<span class="fc" id="L84">    return cardinality;</span>
+  }
+
+  /**
+   * Returns the combined selectivity of all leaf nodes.
+   *
+   * @return combined selectivity factor
+   */
+  double getSelectivity() {
+<span class="fc" id="L93">    return selectivity;</span>
+  }
+
+  /**
+   * Updates the cardinality of the leaf node output.
+   *
+   * @param variable query variable
+   * @param isVertex true, iff the variable maps to a vertex
+   */
+  private void setCardinality(String variable, boolean isVertex) {
+<span class="fc" id="L103">    cardinality = getCardinality(getLabel(variable, isVertex), isVertex);</span>
+<span class="fc" id="L104">  }</span>
+
+  /**
+   * Updates the selectivity based on the given predicates.
+   *
+   * @param predicates query predicates
+   */
+  private void updateSelectivity(CNF predicates) {
+<span class="fc" id="L112">    selectivity *= cnfEstimation.estimateCNF(predicates);</span>
+<span class="fc" id="L113">  }</span>
+
+  public CNFEstimation getCnfEstimation() {
+<span class="fc" id="L116">    return cnfEstimation;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

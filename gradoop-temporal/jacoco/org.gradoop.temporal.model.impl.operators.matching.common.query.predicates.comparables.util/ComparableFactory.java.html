@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ComparableFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util</a> &gt; <span class="el_source">ComparableFactory.java</span></div><h1>ComparableFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.ElementSelector;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.PropertySelector;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+
+/**
+ * Class for creating a {@link QueryComparable} wrapper for a GDL {@link ComparableExpression}
+ */
+<span class="nc" id="L42">public class ComparableFactory {</span>
+
+  /**
+   * Create a wrapper for a GDL comparable
+   *
+   * @param expression the GDL element to wrap
+   * @return wrapper for expression
+   * @throws IllegalArgumentException if expression is no GDL ComparableExpression
+   */
+  public static QueryComparable createComparableFrom(ComparableExpression expression) {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">    if (expression.getClass() == Literal.class) {</span>
+<span class="nc" id="L53">      return new LiteralComparable((Literal) expression);</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">    } else if (expression.getClass() == PropertySelector.class) {</span>
+<span class="nc" id="L55">      return new PropertySelectorComparable((PropertySelector) expression);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    } else if (expression.getClass() == ElementSelector.class) {</span>
+<span class="nc" id="L57">      return new ElementSelectorComparable((ElementSelector) expression);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    } else if (expression.getClass() == TimeLiteral.class) {</span>
+<span class="fc" id="L59">      return new TimeLiteralComparable((TimeLiteral) expression);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    } else if (expression.getClass() == TimeSelector.class) {</span>
+<span class="fc" id="L61">      return new TimeSelectorComparable((TimeSelector) expression);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    } else if (expression.getClass() == MinTimePoint.class) {</span>
+<span class="fc" id="L63">      return new MinTimePointComparable((MinTimePoint) expression);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    } else if (expression.getClass() == MaxTimePoint.class) {</span>
+<span class="fc" id="L65">      return new MaxTimePointComparable((MaxTimePoint) expression);</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">    } else if (expression.getClass() == TimeConstant.class) {</span>
+<span class="nc" id="L67">      return new TimeConstantComparable((TimeConstant) expression);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    } else if (expression.getClass() == Duration.class) {</span>
+<span class="nc" id="L69">      return new DurationComparable((Duration) expression);</span>
+    } else {
+<span class="nc" id="L71">      throw new IllegalArgumentException(</span>
+<span class="nc" id="L72">        expression.getClass() + &quot; is not a GDL ComparableExpression&quot;</span>
+      );
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Subsumption.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">Subsumption.java</span></div><h1>Subsumption.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Abstract base class for subsumptions of clauses.
+ * A simplifying assumption is made: smaller clauses are not subsumed by larger ones.
+ * It is not guaranteed that all subsumptions or the optimal sequence of subsumptions are applied
+ */
+<span class="fc" id="L36">public abstract class Subsumption implements QueryTransformation {</span>
+
+  @Override
+  public CNF transformCNF(CNF cnf) {
+    // separate singleton clauses from disjunctive clauses
+<span class="fc" id="L41">    ArrayList&lt;CNFElement&gt; necessaryClauses = cnf.getPredicates().stream()</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">      .filter(clause -&gt; clause.size() == 1).collect(Collectors.toCollection(ArrayList::new));</span>
+<span class="fc" id="L43">    List&lt;CNFElement&gt; disjunctiveClauses = cnf.getPredicates().stream()</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">      .filter(clause -&gt; clause.size() &gt; 1)</span>
+<span class="fc" id="L45">      .collect(Collectors.toList());</span>
+    // apply subsumption within disjunctive clauses while keeping the singletons and ...
+<span class="fc" id="L47">    cnf = new CNF(necessaryClauses).and(</span>
+<span class="fc" id="L48">      subsumeDisjunctiveClauses(disjunctiveClauses));</span>
+<span class="fc" id="L49">    List&lt;CNFElement&gt; oldClauses = cnf.getPredicates();</span>
+    // ... apply subsumption to the result
+<span class="fc" id="L51">    return new CNF(subsumeClauses(oldClauses));</span>
+  }
+
+  /**
+   * Sort clauses: clauses that subsume most other clauses are sorted at the beginning of
+   * the list
+   *
+   * @param clauses clauses to sort
+   * @return sorted clauses
+   */
+  protected ArrayList&lt;CNFElement&gt; sortClauses(List&lt;CNFElement&gt; clauses) {
+    // count for every clause how much clauses it subsumes
+<span class="fc" id="L63">    HashMap&lt;CNFElement, Integer&gt; countSubsumes = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    for (int i = 0; i &lt; clauses.size(); i++) {</span>
+<span class="fc" id="L65">      CNFElement clause1 = clauses.get(i);</span>
+<span class="fc" id="L66">      countSubsumes.putIfAbsent(clause1, 0);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      for (int j = i; j &lt; clauses.size(); j++) {</span>
+<span class="fc" id="L68">        CNFElement clause2 = clauses.get(j);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (subsumes(clause1, clause2)) {</span>
+<span class="fc" id="L70">          countSubsumes.put(clause1, countSubsumes.get(clause1) + 1);</span>
+        }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (subsumes(clause2, clause1)) {</span>
+<span class="fc" id="L73">          countSubsumes.putIfAbsent(clause2, 0);</span>
+<span class="fc" id="L74">          countSubsumes.put(clause2, countSubsumes.get(clause2) + 1);</span>
+        }
+      }
+    }
+    // sort by these counts. If two clauses subsume the same number of clauses,
+    // the shorter clause is sorted first
+<span class="fc" id="L80">    ArrayList&lt;CNFElement&gt; clausesSorted = new ArrayList&lt;&gt;(clauses);</span>
+<span class="fc" id="L81">    clausesSorted.sort(new Comparator&lt;CNFElement&gt;() {</span>
+      @Override
+      public int compare(CNFElement t1, CNFElement t2) {
+<span class="fc" id="L84">        int subsumedDifference = countSubsumes.get(t2) -</span>
+<span class="fc" id="L85">          countSubsumes.get(t1);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        return subsumedDifference != 0 ? subsumedDifference :</span>
+<span class="fc" id="L87">          t1.size() - t2.size();</span>
+      }
+    });
+<span class="fc" id="L90">    return clausesSorted;</span>
+  }
+
+  /**
+   * Performs the subsumption of a set of clauses
+   *
+   * @param clauses clauses for subsumption
+   * @return sublist of the clauses after subsumption
+   */
+  protected ArrayList&lt;CNFElement&gt; subsumeClauses(List&lt;CNFElement&gt; clauses) {
+<span class="fc" id="L100">    ArrayList&lt;CNFElement&gt; oldClauses = sortClauses(clauses);</span>
+    // points to clauses that are already subsumed (their index in the clauses list)
+<span class="fc" id="L102">    HashSet&lt;Integer&gt; subsumed = new HashSet&lt;&gt;();</span>
+
+    // check for every clause if it subsumes other clauses
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    for (int i = 0; i &lt; oldClauses.size(); i++) {</span>
+      // clause c_i is already subsumed, i.e. actually not there anymore
+<span class="fc bfc" id="L107" title="All 2 branches covered.">      if (subsumed.contains(i)) {</span>
+<span class="fc" id="L108">        continue;</span>
+      }
+      // clause c_i is not subsumed yet, i.e. may subsume other clauses
+<span class="fc" id="L111">      CNFElement c1 = oldClauses.get(i);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">      for (int j = i + 1; j &lt; oldClauses.size(); j++) {</span>
+        // clause c_j is already subsumed, i.e. actually not there anymore
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (subsumed.contains(j)) {</span>
+<span class="fc" id="L115">          continue;</span>
+        }
+        // clause c_j is not subsumed yet, i.e. may be subsumed
+<span class="fc" id="L118">        CNFElement c2 = oldClauses.get(j);</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        if (subsumes(c1, c2)) {</span>
+<span class="fc" id="L120">          subsumed.add(j);</span>
+        }
+      }
+    }
+    // only clauses that are not subsumed by other clauses are contained in the new CNF
+<span class="fc" id="L125">    ArrayList&lt;CNFElement&gt; newClauses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">    for (int i = 0; i &lt; oldClauses.size(); i++) {</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">      if (subsumed.contains(i)) {</span>
+<span class="fc" id="L128">        continue;</span>
+      }
+<span class="fc" id="L130">      newClauses.add(oldClauses.get(i));</span>
+    }
+<span class="fc" id="L132">    return newClauses;</span>
+  }
+
+  /**
+   * Applies {@link this::subsumeDisjunctiveClause} to all disjunctive clauses
+   * (CNF clauses of size &gt; 1)
+   *
+   * @param disjClauses clauses
+   * @return CNF conjoining the subsumed clauses
+   */
+  protected CNF subsumeDisjunctiveClauses(List&lt;CNFElement&gt; disjClauses) {
+<span class="fc" id="L143">    List&lt;CNFElement&gt; newClauses = disjClauses.stream()</span>
+<span class="fc" id="L144">      .map(this::subsumeDisjunctiveClause)</span>
+<span class="fc" id="L145">      .collect(Collectors.toList());</span>
+
+<span class="fc" id="L147">    return new CNF(newClauses);</span>
+  }
+
+  /**
+   * Applies subsumption to a disjunctive clause (might simplify the clause)
+   *
+   * @param clause clause to apply subsumption to.
+   * @return subsumed clause
+   */
+  protected CNFElement subsumeDisjunctiveClause(CNFElement clause) {
+<span class="fc" id="L157">    return new CNFElement(subsumeClauses(</span>
+<span class="fc" id="L158">      clause.getPredicates().stream()</span>
+<span class="fc" id="L159">        .map(comparison -&gt; new CNFElement(Collections.singletonList(comparison)))</span>
+<span class="fc" id="L160">        .collect(Collectors.toList()))</span>
+<span class="fc" id="L161">      .stream()</span>
+<span class="fc" id="L162">      .map(c -&gt; c.getPredicates().get(0))</span>
+<span class="fc" id="L163">      .collect(Collectors.toList()));</span>
+  }
+
+  /**
+   * Checks for two disjunctive clauses c1 and c2 whether c1 subsumes c2.
+   * Here, c1 subsumes c2 iff c1's comparisons form a subset of c2's comparisons
+   *
+   * @param c1 first clause
+   * @param c2 second clause
+   * @return true iff c1 subsumes c2
+   */
+  protected boolean subsumes(CNFElement c1, CNFElement c2) {
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    for (ComparisonExpression comp1 : c1) {</span>
+<span class="fc" id="L176">      boolean foundMatch = false;</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      for (ComparisonExpression comp2 : c2) {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (subsumes(comp1, comp2)) {</span>
+<span class="fc" id="L179">          foundMatch = true;</span>
+<span class="fc" id="L180">          break;</span>
+        }
+<span class="fc" id="L182">      }</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">      if (!foundMatch) {</span>
+<span class="fc" id="L184">        return false;</span>
+      }
+<span class="fc" id="L186">    }</span>
+<span class="fc" id="L187">    return true;</span>
+  }
+
+  /**
+   * Checks whether a ComparisonExpression c1 subsumes c2
+   *
+   * @param c1 potentially subsuming comparison
+   * @param c2 potentially subsumed comparison
+   * @return true iff c1 subsumes c2
+   */
+  public abstract boolean subsumes(ComparisonExpression c1,
+                                   ComparisonExpression c2);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

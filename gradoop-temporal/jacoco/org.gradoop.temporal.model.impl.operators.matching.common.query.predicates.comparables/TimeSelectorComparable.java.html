@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TimeSelectorComparable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables</a> &gt; <span class="el_source">TimeSelectorComparable.java</span></div><h1>TimeSelectorComparable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
+
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Wraps an {@link org.gradoop.gdl.model.comparables.time.TimeSelector}
+ */
+public class TimeSelectorComparable extends TemporalComparable {
+
+  /**
+   * The wrapped TimeSelector
+   */
+  private final TimeSelector timeSelector;
+
+  /**
+   * Creates a new wrapper
+   *
+   * @param timeSelector the wrapped literal
+   */
+<span class="fc" id="L45">  public TimeSelectorComparable(TimeSelector timeSelector) {</span>
+<span class="fc" id="L46">    this.timeSelector = timeSelector;</span>
+<span class="fc" id="L47">  }</span>
+
+  /**
+   * Returns the variable of the wrapped TimeSelector
+   *
+   * @return variable of the TimeSelector
+   */
+  public String getVariable() {
+<span class="fc" id="L55">    return timeSelector.getVariable();</span>
+  }
+
+  /**
+   * Returns the TimeField (i.e. TX_FROM, TX_TO, VAL_FROM or VAL_TO) of the wrapped TimeSelector
+   *
+   * @return TimeField of wrapped TimeSelector
+   */
+  public TimeSelector.TimeField getTimeField() {
+<span class="fc" id="L64">    return timeSelector.getTimeProp();</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+<span class="fc" id="L69">    String selectorString = timeSelector.getTimeProp().toString();</span>
+<span class="fc" id="L70">    int column = metaData</span>
+<span class="fc" id="L71">      .getPropertyColumn(timeSelector.getVariable(), selectorString);</span>
+
+<span class="fc" id="L73">    return embedding.getProperty(column);</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(GraphElement element) {
+    // here no distinction from global selectors, as element is always a single vertex or edge
+<span class="fc" id="L79">    Long time = -1L;</span>
+<span class="fc" id="L80">    TimeSelector.TimeField field = timeSelector.getTimeProp();</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (field.equals(TimeSelector.TimeField.TX_FROM)) {</span>
+<span class="fc" id="L82">      time = ((TemporalGraphElement) element).getTxFrom();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    } else if (field == TimeSelector.TimeField.TX_TO) {</span>
+<span class="fc" id="L84">      time = ((TemporalGraphElement) element).getTxTo();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    } else if (field == TimeSelector.TimeField.VAL_FROM) {</span>
+<span class="fc" id="L86">      time = ((TemporalGraphElement) element).getValidFrom();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    } else if (field == TimeSelector.TimeField.VAL_TO) {</span>
+<span class="fc" id="L88">      time = ((TemporalGraphElement) element).getValidTo();</span>
+    }
+<span class="fc" id="L90">    return PropertyValue.create(time);</span>
+  }
+
+  @Override
+  public Set&lt;String&gt; getPropertyKeys(String variable) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    return getVariable().equals(variable) ?</span>
+<span class="fc" id="L96">      new HashSet&lt;&gt;(Collections.singletonList(getTimeField().toString())) :</span>
+      new HashSet&lt;&gt;();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L103">      return true;</span>
+    }
+<span class="nc bnc" id="L105" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L106">      return false;</span>
+    }
+
+<span class="nc" id="L109">    TimeSelectorComparable that = (TimeSelectorComparable) o;</span>
+
+<span class="nc" id="L111">    return that.timeSelector.equals(timeSelector);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    return timeSelector != null ? timeSelector.hashCode() : 0;</span>
+  }
+
+
+  @Override
+  public TimePoint getWrappedComparable() {
+<span class="fc" id="L122">    return timeSelector;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

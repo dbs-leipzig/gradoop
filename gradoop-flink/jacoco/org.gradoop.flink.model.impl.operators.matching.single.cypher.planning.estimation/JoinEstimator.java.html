@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 import java.util.Collection;
 import java.util.HashMap;

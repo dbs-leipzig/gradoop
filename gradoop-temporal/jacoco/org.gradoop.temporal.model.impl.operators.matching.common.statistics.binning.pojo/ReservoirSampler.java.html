@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservoirSampler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo</a> &gt; <span class="el_source">ReservoirSampler.java</span></div><h1>ReservoirSampler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Implements Reservoir Sampling.
+ *
+ * @param &lt;T&gt; the type of elements to sample (vertices, edges)
+ */
+public class ReservoirSampler&lt;T&gt; implements Serializable {
+
+  /**
+   * Default value for reservoir sample size
+   */
+  public static final int DEFAULT_SAMPLE_SIZE = 5000;
+  /**
+   * The number of vertices to include in the reservoir sample
+   */
+  private final int reservoirSampleSize;
+  /**
+   * Holds the reservoir sampled vertices
+   */
+  private final ArrayList&lt;T&gt; reservoirSample;
+
+  /**
+   * Random for use in reservoir sampling
+   */
+  private final Random random;
+
+  /**
+   * Number of all elements already seen
+   */
+  private long count;
+
+  /**
+   * Creates a new reservoir sampler
+   *
+   * @param reservoirSampleSize maximum size of the sample
+   */
+<span class="fc" id="L58">  public ReservoirSampler(int reservoirSampleSize) {</span>
+<span class="fc" id="L59">    this.reservoirSampleSize = reservoirSampleSize;</span>
+<span class="fc" id="L60">    reservoirSample = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L61">    random = new Random();</span>
+<span class="fc" id="L62">    count = 0;</span>
+<span class="fc" id="L63">  }</span>
+
+  /**
+   * Creates a new reservoir sample with default sample size
+   */
+  public ReservoirSampler() {
+<span class="fc" id="L69">    this(DEFAULT_SAMPLE_SIZE);</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Updates the sample with a given element, i.e. might add this element
+   *
+   * @param element element that might be included in the sample
+   * @return true iff element was actually included in the sample
+   */
+  public boolean updateSample(T element) {
+<span class="fc" id="L79">    count++;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (count &lt;= reservoirSampleSize) {</span>
+      // sample every element until reservoir sample is full
+<span class="fc" id="L82">      reservoirSample.add(element);</span>
+<span class="fc" id="L83">      return true;</span>
+    } else {
+      // sample with probability size/count if reservoir sample is full
+<span class="fc" id="L86">      double randomDouble = random.nextDouble();</span>
+<span class="fc" id="L87">      double ratio = (double) reservoirSampleSize / (double) count;</span>
+      // include vertex?
+<span class="fc bfc" id="L89" title="All 2 branches covered.">      if (randomDouble &lt;= ratio) {</span>
+        // replace a random element, probability of replacement is 1/size for each element in the reservoir
+<span class="fc" id="L91">        int randomIndex = random.nextInt(reservoirSampleSize);</span>
+<span class="fc" id="L92">        reservoirSample.set(randomIndex, element);</span>
+<span class="fc" id="L93">        return true;</span>
+      }
+    }
+<span class="fc" id="L96">    return false;</span>
+  }
+
+  /**
+   * Updates the sample with a given element list, i.e. might add elements from this list
+   *
+   * @param elements elements that might be included in the sample
+   * @return true iff at least one element was actually included in the sample
+   */
+  public boolean updateSample(List&lt;T&gt; elements) {
+<span class="fc" id="L106">    boolean updated = false;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">    for (T element : elements) {</span>
+<span class="pc bpc" id="L108" title="1 of 4 branches missed.">      updated = updateSample(element) || updated;</span>
+<span class="fc" id="L109">    }</span>
+<span class="fc" id="L110">    return updated;</span>
+  }
+
+  /**
+   * Returns the reservoir sample
+   *
+   * @return reservoir sample
+   */
+  public List&lt;T&gt; getReservoirSample() {
+<span class="fc" id="L119">    return reservoirSample;</span>
+  }
+
+  /**
+   * Returns the size of the sample
+   *
+   * @return size of the sample
+   */
+  public int getSampleSize() {
+<span class="fc" id="L128">    return reservoirSample.size();</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    if (reservoirSample == null) {</span>
+<span class="nc" id="L134">      return 0;</span>
+    }
+<span class="nc" id="L136">    return reservoirSample.hashCode();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

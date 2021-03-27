@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalSubsumption.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">TemporalSubsumption.java</span></div><h1>TemporalSubsumption.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+
+/**
+ * Uses temporal information to subsume constraints that compare a time selector to a time literal.
+ * Here, a temporal comparison c1 subsumes a temporal comparison c2 iff
+ * c1 logically implies c2 and c1 is not equal to c2.
+ * !!! This class assumes the input to be normalized, i.e. not to contain &gt; or &gt;= !!!
+ */
+<span class="fc" id="L31">public class TemporalSubsumption extends Subsumption {</span>
+  @Override
+  public boolean subsumes(ComparisonExpression c1, ComparisonExpression c2) {
+    // check if comparisons are both of the desired form and could thus be - potentially - subsumed
+<span class="fc bfc" id="L35" title="All 2 branches covered.">    if (!structureMatches(c1, c2)) {</span>
+<span class="fc" id="L36">      return false;</span>
+    }
+    // ensure that selectors in both comparisons are always on the left hand side
+<span class="fc" id="L39">    boolean selectorIsLeft = c1.getLhs() instanceof TimeSelectorComparable;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    if (!selectorIsLeft) {</span>
+<span class="fc" id="L41">      c1 = c1.switchSides();</span>
+<span class="fc" id="L42">      c2 = c2.switchSides();</span>
+    }
+    // check if both comparisons' variables are equal (otherwise, no subsumption is possible)
+<span class="fc" id="L45">    String var1 = ((TimeSelectorComparable) (c1.getLhs())).getWrappedComparable().getVariable();</span>
+<span class="fc" id="L46">    String var2 = ((TimeSelectorComparable) (c2.getLhs())).getWrappedComparable().getVariable();</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (!var1.equals(var2)) {</span>
+<span class="fc" id="L48">      return false;</span>
+    }
+    // check if both comparisons' time properties (tx_from, tx_to,...) are equal
+    // (otherwise, no subsumption is possible)
+<span class="fc" id="L52">    TimeSelector.TimeField field1 = ((TimeSelector) ((TimeSelectorComparable)</span>
+<span class="fc" id="L53">      (c1.getLhs())).getWrappedComparable()).getTimeProp();</span>
+<span class="fc" id="L54">    TimeSelector.TimeField field2 = ((TimeSelector) ((TimeSelectorComparable) (c2.getLhs()))</span>
+<span class="fc" id="L55">      .getWrappedComparable()).getTimeProp();</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (!field1.equals(field2)) {</span>
+<span class="fc" id="L57">      return false;</span>
+    }
+    // unwrap the rest of the comparisons and check whether c1 implies c2
+<span class="fc" id="L60">    Comparator comparator1 = c1.getComparator();</span>
+<span class="fc" id="L61">    Comparator comparator2 = c2.getComparator();</span>
+<span class="fc" id="L62">    Long literal1 = ((TimeLiteral) ((TimeLiteralComparable) c1.getRhs()).getWrappedComparable())</span>
+<span class="fc" id="L63">      .getMilliseconds();</span>
+<span class="fc" id="L64">    Long literal2 = ((TimeLiteral) ((TimeLiteralComparable) c2.getRhs()).getWrappedComparable())</span>
+<span class="fc" id="L65">      .getMilliseconds();</span>
+<span class="fc bfc" id="L66" title="All 4 branches covered.">    return implies(comparator1, literal1, comparator2, literal2) &amp;&amp; !c1.equals(c2);</span>
+  }
+
+  /**
+   * Checks if a comparison constraint (a comparator1 literal1) implies a comparison
+   * constraint (a comparator2 literal2).
+   *
+   * @param comparator1 comparator of the potentially implying constraint
+   * @param literal1    rhs literal of the potentially implying constraint
+   * @param comparator2 comparator of the potentially implied constraint
+   * @param literal2    rhs literal of the potentially implied constraint
+   * @return true iff (a comparator1 literal1) implies (a comparator2 literal2)
+   */
+  private boolean implies(Comparator comparator1, Long literal1, Comparator comparator2, Long literal2) {
+<span class="fc bfc" id="L80" title="All 6 branches covered.">    switch (comparator1) {</span>
+    case EQ:
+<span class="pc bpc" id="L82" title="3 of 7 branches missed.">      switch (comparator2) {</span>
+<span class="fc" id="L83">      case EQ: return literal1.equals(literal2);</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">      case NEQ: return !literal1.equals(literal2);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">      case LTE: return literal1 &lt;= literal2;</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      case LT: return literal1 &lt; literal2;</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">      case GTE: return literal1 &gt;= literal2;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">      case GT: return literal1 &gt; literal2;</span>
+<span class="nc" id="L89">      default: return false;</span>
+      }
+    case LTE:
+<span class="fc bfc" id="L92" title="All 3 branches covered.">      switch (comparator2) {</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">      case NEQ: case LT: return literal1 &lt; literal2;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">      case LTE: return literal1 &lt;= literal2;</span>
+<span class="fc" id="L95">      default: return false;</span>
+      }
+    case LT:
+<span class="fc bfc" id="L98" title="All 3 branches covered.">      switch (comparator2) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">      case NEQ: case LT: return literal1 &lt;= literal2;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      case LTE: return literal1 - 1 &lt;= literal2;</span>
+<span class="fc" id="L101">      default: return false;</span>
+      }
+    case GTE:
+<span class="pc bpc" id="L104" title="2 of 3 branches missed.">      switch (comparator2) {</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">      case NEQ: case GT: return literal1 &gt; literal2;</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">      case GTE: return literal1 &gt;= literal2;</span>
+<span class="nc" id="L107">      default: return false;</span>
+      }
+    case GT:
+<span class="pc bpc" id="L110" title="2 of 3 branches missed.">      switch (comparator2) {</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">      case NEQ: case GT: return literal1 &gt;= literal2;</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">      case GTE: return literal1 + 1 &gt;= literal2;</span>
+<span class="nc" id="L113">      default: return false;</span>
+      }
+<span class="fc" id="L115">    default: return false;</span>
+    }
+  }
+
+  /**
+   * Checks if two comparisons &quot;match&quot; for a subsumption.
+   * Here, only comparisons comparing a selector to a literal are relevant.
+   * As the CNF is assumed to be normalized (no &lt;,&lt;=), comparisons c1 and
+   * c2 are relevant iff they both have the form (selector comparator literal)
+   * or both have the form (literal comparator selector)
+   *
+   * @param c1 comparison
+   * @param c2 comparison
+   * @return true iff the structures of c1 and c2 match
+   * according to the criteria defined above
+   */
+  private boolean structureMatches(ComparisonExpression c1, ComparisonExpression c2) {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    return (c1.getLhs() instanceof TimeSelectorComparable &amp;&amp;</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">      c2.getLhs() instanceof TimeSelectorComparable &amp;&amp;</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">      c1.getRhs() instanceof TimeLiteralComparable &amp;&amp;</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">      c2.getRhs() instanceof TimeLiteralComparable) ||</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">      (c1.getLhs() instanceof TimeLiteralComparable &amp;&amp;</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        c2.getLhs() instanceof TimeLiteralComparable &amp;&amp;</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        c1.getRhs() instanceof TimeSelectorComparable &amp;&amp;</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        c2.getRhs() instanceof TimeSelectorComparable);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

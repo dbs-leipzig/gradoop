@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmbeddingTPGMFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos</a> &gt; <span class="el_source">EmbeddingTPGMFactory.java</span></div><h1>EmbeddingTPGMFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos;
+
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphElement;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+
+import java.util.List;
+
+/**
+ * Utility class to convert an element ({@link TemporalVertex} and {@link TemporalEdge} into an
+ * {@link Embedding}.
+ * Analogous to
+ * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory}
+ * but creating TPGMEmbeddings from TPGM elements
+ */
+<span class="nc" id="L34">public class EmbeddingTPGMFactory {</span>
+
+  /**
+   * Converts a {@link TemporalVertex} into an {@link Embedding}.
+   * &lt;p&gt;
+   * The resulting embedding has one entry containing the vertex id and one entry for each property
+   * value associated with the specified property keys (ordered by list order). Note that missing
+   * property values are represented by a {@link PropertyValue#NULL_VALUE}.
+   * Furthermore, the time data of each element ({tx_from, tx_to, valid_from, valid_to}) is stored
+   * in the embedding, just like normal properties
+   *
+   * @param vertex       vertex to create embedding from
+   * @param propertyKeys properties that will be stored in the embedding
+   * @return Embedding
+   */
+  public static Embedding fromVertex(TemporalVertex vertex, List&lt;String&gt; propertyKeys) {
+<span class="fc" id="L50">    Embedding embedding = new Embedding();</span>
+<span class="fc" id="L51">    embedding.add(vertex.getId(), project(vertex, propertyKeys));</span>
+<span class="fc" id="L52">    return embedding;</span>
+  }
+
+  /**
+   * Converts an {@link TemporalEdge} into an {@link Embedding}.
+   * &lt;p&gt;
+   * The resulting embedding has three entries containing the source vertex id, the edge id and the
+   * target vertex id. Furthermore, the embedding has one entry for each property value associated
+   * with the specified property keys (ordered by list order). Note that missing property values are
+   * represented by a {@link PropertyValue#NULL_VALUE}.
+   * Additionally, the time data of the edge ({tx_from, tx_to, valid_from, valid_to}) are stored
+   * in the embedding, just like properties
+   *
+   * @param edge         edge to create embedding from
+   * @param propertyKeys properties that will be stored in the embedding
+   * @param isLoop       indicates if the edges is a loop
+   * @return Embedding
+   */
+  public static Embedding fromEdge(TemporalEdge edge, List&lt;String&gt; propertyKeys, boolean isLoop) {
+<span class="fc" id="L71">    Embedding embedding = new Embedding();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (isLoop) {</span>
+<span class="fc" id="L73">      embedding.addAll(edge.getSourceId(), edge.getId());</span>
+    } else {
+<span class="fc" id="L75">      embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());</span>
+    }
+<span class="fc" id="L77">    embedding.addPropertyValues(project(edge, propertyKeys));</span>
+<span class="fc" id="L78">    return embedding;</span>
+  }
+
+  /**
+   * Projects the elements properties into a list of property values. Only those properties
+   * specified by their key will be kept. Properties that are specified but not present at the
+   * element will be adopted as {@link PropertyValue#NULL_VALUE}.
+   * Temporal properties are stored just like &quot;normal&quot; ones
+   *
+   * @param element      element of which the properties will be projected
+   * @param propertyKeys properties that will be projected from the specified element
+   * @return projected property values
+   */
+  private static PropertyValue[] project(TemporalGraphElement element, List&lt;String&gt; propertyKeys) {
+<span class="fc" id="L92">    PropertyValue[] propertyValues = new PropertyValue[propertyKeys.size()];</span>
+<span class="fc" id="L93">    int i = 0;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    for (String propertyKey : propertyKeys) {</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">      if (propertyKey.equals(&quot;__label__&quot;)) {</span>
+<span class="nc" id="L96">        propertyValues[i++] = PropertyValue.create(element.getLabel());</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      } else if (isProperty(propertyKey)) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        propertyValues[i++] = element.hasProperty(propertyKey) ?</span>
+<span class="fc" id="L99">          element.getPropertyValue(propertyKey) : PropertyValue.NULL_VALUE;</span>
+      } else {
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (propertyKey.equals(TimeSelector.TimeField.VAL_FROM.toString())) {</span>
+<span class="fc" id="L102">          propertyValues[i++] = PropertyValue.create(element.getValidFrom());</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        } else if (propertyKey.equals(TimeSelector.TimeField.VAL_TO.toString())) {</span>
+<span class="fc" id="L104">          propertyValues[i++] = PropertyValue.create(element.getValidTo());</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        } else if (propertyKey.equals(TimeSelector.TimeField.TX_FROM.toString())) {</span>
+<span class="fc" id="L106">          propertyValues[i++] = PropertyValue.create(element.getTxFrom());</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        } else if (propertyKey.equals(TimeSelector.TimeField.TX_TO.toString())) {</span>
+<span class="fc" id="L108">          propertyValues[i++] = PropertyValue.create(element.getTxTo());</span>
+        } else {
+<span class="nc" id="L110">          propertyValues[i++] = PropertyValue.NULL_VALUE;</span>
+        }
+      }
+<span class="fc" id="L113">    }</span>
+<span class="fc" id="L114">    return propertyValues;</span>
+  }
+
+  /**
+   * Checks if a string refers to an actual property or a time stamp
+   *
+   * @param key string to check
+   * @return true iff key refers to an actual property
+   */
+  private static boolean isProperty(String key) {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">    return !key.equals(TimeSelector.TimeField.VAL_FROM.toString()) &amp;&amp;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">      !key.equals(TimeSelector.TimeField.VAL_TO.toString()) &amp;&amp;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      !key.equals(TimeSelector.TimeField.TX_FROM.toString()) &amp;&amp;</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">      !key.equals(TimeSelector.TimeField.TX_TO.toString());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

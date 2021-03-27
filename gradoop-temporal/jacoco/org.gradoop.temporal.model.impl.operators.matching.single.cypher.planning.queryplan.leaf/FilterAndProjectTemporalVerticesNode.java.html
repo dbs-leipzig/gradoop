@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilterAndProjectTemporalVerticesNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf</a> &gt; <span class="el_source">FilterAndProjectTemporalVerticesNode.java</span></div><h1>FilterAndProjectTemporalVerticesNode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.FilterNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.ProjectionNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.operators.filter.FilterAndProjectTemporalVertices;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Leaf node that wraps a {@link FilterAndProjectTemporalVertices} operator.
+ */
+public class FilterAndProjectTemporalVerticesNode extends LeafNode
+  implements FilterNode, ProjectionNode {
+
+  /**
+   * Input data set
+   */
+  private final DataSet&lt;TemporalVertex&gt; vertices;
+  /**
+   * Query variable of the vertex
+   */
+  private final String vertexVariable;
+  /**
+   * Filter predicate that is applied on the input data set
+   */
+  private final CNF filterPredicate;
+  /**
+   * Property keys used for projection
+   */
+  private final List&lt;String&gt; projectionKeys;
+
+  /**
+   * Creates a new node.
+   *
+   * @param vertices        input vertices
+   * @param vertexVariable  query variable of the vertex
+   * @param filterPredicate filter predicate to be applied on edges
+   * @param projectionKeys  property keys whose associated values are projected to the output
+   */
+  public FilterAndProjectTemporalVerticesNode(DataSet&lt;TemporalVertex&gt; vertices, String vertexVariable,
+<span class="fc" id="L64">                                              CNF filterPredicate, Set&lt;String&gt; projectionKeys) {</span>
+<span class="fc" id="L65">    this.vertices = vertices;</span>
+<span class="fc" id="L66">    this.vertexVariable = vertexVariable;</span>
+<span class="fc" id="L67">    this.filterPredicate = filterPredicate;</span>
+<span class="fc" id="L68">    this.projectionKeys = new ArrayList&lt;&gt;(projectionKeys);</span>
+<span class="fc" id="L69">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; execute() {
+<span class="fc" id="L73">    FilterAndProjectTemporalVertices op =</span>
+      new FilterAndProjectTemporalVertices(vertices, filterPredicate, projectionKeys);
+<span class="fc" id="L75">    op.setName(toString());</span>
+<span class="fc" id="L76">    return op.evaluate();</span>
+  }
+
+  /**
+   * Returns a copy of the filter predicate attached to this node.
+   *
+   * @return filter predicate
+   */
+  public CNF getFilterPredicate() {
+<span class="fc" id="L85">    return new CNF(filterPredicate);</span>
+  }
+
+  /**
+   * Returns a copy of the projection keys attached to this node.
+   *
+   * @return projection keys
+   */
+  public List&lt;String&gt; getProjectionKeys() {
+<span class="nc" id="L94">    return new ArrayList&lt;&gt;(projectionKeys);</span>
+  }
+
+  @Override
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+<span class="fc" id="L99">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L100">    embeddingMetaData.setEntryColumn(vertexVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
+<span class="fc" id="L101">    embeddingMetaData = setPropertyColumns(embeddingMetaData, vertexVariable, projectionKeys);</span>
+
+<span class="fc" id="L103">    return embeddingMetaData;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L108">    return String.format(&quot;FilterAndProjectVerticesNode{&quot; +</span>
+        &quot;vertexVariable=%s, &quot; +
+        &quot;filterPredicate=%s, &quot; +
+        &quot;projectionKeys=%s}&quot;,
+      vertexVariable, filterPredicate, projectionKeys);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

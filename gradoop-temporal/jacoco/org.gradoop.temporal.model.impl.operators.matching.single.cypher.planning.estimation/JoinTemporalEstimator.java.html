@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JoinTemporalEstimator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation</a> &gt; <span class="el_source">JoinTemporalEstimator.java</span></div><h1>JoinTemporalEstimator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
+
+import com.google.common.collect.Lists;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.gdl.model.Edge;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Keeps track of the joined leaf nodes in a query plan and computes a total estimated cardinality
+ * for the plan.
+ */
+public class JoinTemporalEstimator extends TemporalEstimator {
+  /**
+   * Maps vertex and edge variables to their estimated cardinality
+   */
+  private final Map&lt;String, Long&gt; cardinalities;
+  /**
+   * Maps vertex variables to their distinct counts per embedding
+   */
+  private final Map&lt;String, List&lt;Long&gt;&gt; distinctValues;
+
+  /**
+   * Creates a new estimator.
+   *
+   * @param queryHandler    query handler
+   * @param graphStatistics graph statistics
+   */
+  JoinTemporalEstimator(TemporalQueryHandler queryHandler, TemporalGraphStatistics graphStatistics) {
+<span class="fc" id="L54">    super(queryHandler, graphStatistics);</span>
+<span class="fc" id="L55">    this.cardinalities = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L56">    this.distinctValues = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L57">  }</span>
+
+  /**
+   * Updates the cardinalities according to the given join node.
+   *
+   * @param node join node
+   */
+  void visit(JoinNode node) {
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (node instanceof BinaryNode) {</span>
+<span class="fc" id="L66">      BinaryNode binaryNode = (BinaryNode) node;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (binaryNode.getLeftChild() instanceof LeafNode) {</span>
+<span class="fc" id="L68">        process(binaryNode.getLeftChild().getEmbeddingMetaData());</span>
+      }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      if (binaryNode.getRightChild() instanceof LeafNode) {</span>
+<span class="fc" id="L71">        process(binaryNode.getRightChild().getEmbeddingMetaData());</span>
+      }
+    }
+<span class="fc" id="L74">  }</span>
+
+  /**
+   * Computes the final cardinality according to the visited nodes.
+   *
+   * @return estimated cardinality
+   */
+  long getCardinality() {
+<span class="fc" id="L82">    long numerator = cardinalities.values().stream().reduce((i, j) -&gt; i * j).orElse(0L);</span>
+
+<span class="fc" id="L84">    long denominator = distinctValues.values().stream()</span>
+<span class="fc" id="L85">      .map(list -&gt; list.stream().sorted().collect(Collectors.toList()))</span>
+<span class="fc" id="L86">      .map(list -&gt; list.subList(1, list.size()))</span>
+<span class="fc" id="L87">      .flatMap(Collection::stream)</span>
+<span class="fc" id="L88">      .reduce((i, j) -&gt; i * j)</span>
+<span class="fc" id="L89">      .orElse(1L);</span>
+
+<span class="fc" id="L91">    return Math.round(1.0 * numerator / denominator);</span>
+  }
+
+  /**
+   * Updates the state using the information stored in the given meta data.
+   *
+   * @param metaData meta data from leaf node
+   */
+  private void process(EmbeddingMetaData metaData) {
+<span class="fc" id="L100">    int entryCount = metaData.getEntryCount();</span>
+<span class="fc" id="L101">    List&lt;String&gt; variables = metaData.getVariables();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    if (entryCount == 1) {</span>
+<span class="fc" id="L103">      processVertex(variables.get(0));</span>
+    } else {
+<span class="fc" id="L105">      String edgeVariable = variables.get(1);</span>
+<span class="fc" id="L106">      String sourceVariable = getQueryHandler().getVertexById(</span>
+<span class="fc" id="L107">        getQueryHandler().getEdgeByVariable(edgeVariable).getSourceVertexId()).getVariable();</span>
+<span class="fc" id="L108">      String targetVariable = getQueryHandler().getVertexById(</span>
+<span class="fc" id="L109">        getQueryHandler().getEdgeByVariable(edgeVariable).getTargetVertexId()).getVariable();</span>
+<span class="fc" id="L110">      processEdge(sourceVariable, variables.get(1), targetVariable);</span>
+    }
+<span class="fc" id="L112">  }</span>
+
+  /**
+   * Updates the state according to vertex statistics.
+   *
+   * @param vertexVariable vertex variable
+   */
+  private void processVertex(String vertexVariable) {
+<span class="fc" id="L120">    String label = getLabel(vertexVariable, true);</span>
+<span class="fc" id="L121">    long cardinality = getCardinality(label, true);</span>
+<span class="fc" id="L122">    updateCardinality(vertexVariable, cardinality);</span>
+<span class="fc" id="L123">    updateDistinctValues(vertexVariable, cardinality);</span>
+<span class="fc" id="L124">  }</span>
+
+  /**
+   * Updates the state according to the edge statistics.
+   *
+   * @param sourceVariable source vertex variable
+   * @param edgeVariable   edge variable
+   * @param targetVariable target vertex variable
+   */
+  private void processEdge(String sourceVariable, String edgeVariable, String targetVariable) {
+<span class="fc" id="L134">    String edgeLabel = getLabel(edgeVariable, false);</span>
+
+<span class="fc" id="L136">    long distinctSourceCount = getGraphStatistics().getDistinctSourceVertexCount(edgeLabel);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    if (distinctSourceCount == 0L) {</span>
+<span class="fc" id="L138">      distinctSourceCount = getGraphStatistics().getDistinctSourceVertexCount();</span>
+    }
+<span class="fc" id="L140">    long distinctTargetCount = getGraphStatistics().getDistinctTargetVertexCount(edgeLabel);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (distinctTargetCount == 0L) {</span>
+<span class="fc" id="L142">      distinctTargetCount = getGraphStatistics().getDistinctTargetVertexCount();</span>
+    }
+
+<span class="fc" id="L145">    Edge queryEdge = getQueryHandler().getEdgeByVariable(edgeVariable);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    if (queryEdge.getUpperBound() &gt; 1) {</span>
+      // variable case: n-hop edge
+<span class="fc" id="L148">      updateCardinality(edgeVariable, getPathCardinality(getCardinality(edgeLabel, false),</span>
+<span class="fc" id="L149">        queryEdge.getLowerBound(), queryEdge.getUpperBound(),</span>
+        distinctSourceCount, distinctTargetCount));
+    } else {
+      // static case: 1-hop edge
+<span class="fc" id="L153">      updateCardinality(edgeVariable, getCardinality(edgeLabel, false));</span>
+    }
+<span class="fc" id="L155">    updateDistinctValues(sourceVariable, distinctSourceCount);</span>
+<span class="fc" id="L156">    updateDistinctValues(targetVariable, distinctTargetCount);</span>
+<span class="fc" id="L157">  }</span>
+
+  /**
+   * Estimated the total number of paths whose length is between the specified bounds.
+   *
+   * @param edgeCardinality     cardinality of the traversed edge
+   * @param lowerBound          minimum path length
+   * @param upperBound          maximum path length
+   * @param distinctSourceCount number of distinct source vertices
+   * @param distinctTargetCount number of distinct target vertices
+   * @return estimated number of paths with a length in the given range
+   */
+  private long getPathCardinality(long edgeCardinality, int lowerBound, int upperBound,
+                                  long distinctSourceCount, long distinctTargetCount) {
+
+<span class="fc" id="L172">    double totalCardinality = 0L;</span>
+<span class="fc" id="L173">    long probability = distinctSourceCount * distinctTargetCount;</span>
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    for (int i = lowerBound; i &lt;= upperBound; i++) {</span>
+<span class="fc" id="L176">      totalCardinality += Math.pow(edgeCardinality, i) / Math.pow(probability, i - 1);</span>
+    }
+
+<span class="fc" id="L179">    return Math.round(totalCardinality);</span>
+  }
+
+  /**
+   * Updates the cardinality of the variable.
+   *
+   * @param variable    query variable
+   * @param cardinality cardinality
+   */
+  private void updateCardinality(String variable, long cardinality) {
+<span class="fc" id="L189">    cardinalities.put(variable, cardinalities.getOrDefault(variable, 1L) * cardinality);</span>
+<span class="fc" id="L190">  }</span>
+
+  /**
+   * Updates the distinct value list of a vertex with the given count.
+   *
+   * @param variable vertex variable
+   * @param count    distinct count
+   */
+  private void updateDistinctValues(String variable, long count) {
+<span class="fc bfc" id="L199" title="All 2 branches covered.">    if (distinctValues.containsKey(variable)) {</span>
+<span class="fc" id="L200">      distinctValues.get(variable).add(count);</span>
+    } else {
+<span class="fc" id="L202">      distinctValues.put(variable, Lists.newArrayList(count));</span>
+    }
+<span class="fc" id="L204">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TimeConstantComparable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables</a> &gt; <span class="el_source">TimeConstantComparable.java</span></div><h1>TimeConstantComparable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
+
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Wraps a {@link org.gradoop.gdl.model.comparables.time.TimeConstant}
+ */
+public class TimeConstantComparable extends TemporalComparable {
+
+  /**
+   * The wrapped constant
+   */
+  private final TimeConstant constant;
+
+  /**
+   * Creates a new wrapper for a TimeConstant.
+   *
+   * @param constant the TimeConstant to wrap
+   */
+<span class="fc" id="L43">  public TimeConstantComparable(TimeConstant constant) {</span>
+<span class="fc" id="L44">    this.constant = constant;</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Returns the wrapped constant
+   *
+   * @return the wrapped constant
+   */
+  public TimeConstant getTimeConstant() {
+<span class="nc" id="L53">    return constant;</span>
+  }
+
+
+  @Override
+  public TimePoint getWrappedComparable() {
+<span class="fc" id="L59">    return constant;</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+<span class="fc" id="L64">    return PropertyValue.create(constant.evaluate().get());</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(GraphElement element) {
+<span class="fc" id="L69">    return PropertyValue.create(constant.evaluate().get());</span>
+  }
+
+  @Override
+  public Set&lt;String&gt; getPropertyKeys(String variable) {
+<span class="fc" id="L74">    return new HashSet&lt;&gt;();</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L79" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L80">      return true;</span>
+    }
+<span class="nc bnc" id="L82" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L83">      return false;</span>
+    }
+
+<span class="nc" id="L86">    TimeConstantComparable that = (TimeConstantComparable) o;</span>
+
+<span class="nc" id="L88">    return that.constant.equals(constant);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L93">    return constant.hashCode();</span>
+  }
+
+  public TimeConstant getConstant() {
+<span class="nc" id="L97">    return constant;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

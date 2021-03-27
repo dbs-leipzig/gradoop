@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testVerifyWithSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="58" href="#58">58</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="59" href="#59">59</a>      loader.appendToDatabaseFromString(<span class="jxr_string">"expected["</span> +
-<a name="60" href="#60">60</a>        <span class="jxr_string">"(eve)-[ekb:knows {since : 2015}]-&gt;(bob)"</span> +
+<a name="60" href="#60">60</a>        <span class="jxr_string">"(eve)-[ekb]-&gt;(bob)"</span> +
 <a name="61" href="#61">61</a>        <span class="jxr_string">"]"</span>);
 <a name="62" href="#62">62</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="63" href="#63">63</a>  
@@ -104,9 +104,9 @@
 <a name="94" href="#94">94</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testVerifyWithApplySubgraph() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="95" href="#95">95</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="96" href="#96">96</a>      loader.appendToDatabaseFromString(<span class="jxr_string">"expected0["</span> +
-<a name="97" href="#97">97</a>        <span class="jxr_string">"(eve)-[ekb:knows {since : 2015}]-&gt;(bob)"</span> +
+<a name="97" href="#97">97</a>        <span class="jxr_string">"(eve)-[ekb]-&gt;(bob)"</span> +
 <a name="98" href="#98">98</a>        <span class="jxr_string">"] expected1 ["</span> +
-<a name="99" href="#99">99</a>        <span class="jxr_string">"(frank)-[fkd:knows {since : 2015}]-&gt;(dave)"</span> +
+<a name="99" href="#99">99</a>        <span class="jxr_string">"(frank)-[fkd]-&gt;(dave)"</span> +
 <a name="100" href="#100">100</a>       <span class="jxr_string">"]"</span>);
 <a name="101" href="#101">101</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>);
 <a name="102" href="#102">102</a>     GradoopId id0 = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();

@@ -82,12 +82,15 @@ public class ProjectEmbeddingsNode extends UnaryNode implements ProjectionNode {
 <span class="fc" id="L82">      embeddingMetaData.setPropertyColumn(</span>
 <span class="fc" id="L83">        projectionKeys.get(i).getLeft(), projectionKeys.get(i).getRight(), i));</span>
 
-<span class="fc" id="L85">    return embeddingMetaData;</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">    for (String var: childMetaData.getDirectionMapping().keySet()) {</span>
+<span class="nc" id="L86">      embeddingMetaData.setDirection(var, childMetaData.getDirection(var));</span>
+<span class="nc" id="L87">    }</span>
+<span class="fc" id="L88">    return embeddingMetaData;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L90">    return String.format(&quot;ProjectEmbeddingsNode{projectionKeys=%s}&quot;, projectionKeys);</span>
+<span class="fc" id="L93">    return String.format(&quot;ProjectEmbeddingsNode{projectionKeys=%s}&quot;, projectionKeys);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

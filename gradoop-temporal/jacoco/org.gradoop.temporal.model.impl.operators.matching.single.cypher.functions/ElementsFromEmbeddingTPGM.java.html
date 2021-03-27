@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementsFromEmbeddingTPGM.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions</a> &gt; <span class="el_source">ElementsFromEmbeddingTPGM.java</span></div><h1>ElementsFromEmbeddingTPGM.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions;
+
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Extracts elements from an {@link Embedding}.
+ * Is almost identical to
+ * {@link org.gradoop.flink.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbedding}
+ * extends it for TPGM embeddings.
+ * Could be further extended to specify temporal properties like global val/tx in the graph head
+ *
+ * @param &lt;G&gt; The graph head type.
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ */
+public class ElementsFromEmbeddingTPGM&lt;
+  G extends TemporalGraphHead,
+  V extends TemporalVertex,
+  E extends TemporalEdge&gt; implements FlatMapFunction&lt;Embedding, Element&gt; {
+  /**
+   * Constructs temporal graph heads
+   */
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
+  /**
+   * Constructs temporal vertices
+   */
+  private final VertexFactory&lt;V&gt; vertexFactory;
+  /**
+   * Constructs temporal edges
+   */
+  private final EdgeFactory&lt;E&gt; edgeFactory;
+  /**
+   * Describes the embedding content
+   */
+  private final EmbeddingMetaData metaData;
+  /**
+   * Source vertex variables by edge id
+   */
+  private final Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables;
+  /**
+   * Stores the mapping between query variable and element id. The mapping is added as a property
+   * to the graph head representing an embedding.
+   */
+  private final Map&lt;PropertyValue, PropertyValue&gt; variableMapping;
+  /**
+   * Stores the identifiers that have already been processed.
+   */
+  private final Set&lt;GradoopId&gt; processedIds;
+  /**
+   * Stores the mapping between return pattern variables and its labels
+   */
+  private final Map&lt;String, String&gt; labelMapping;
+
+  /**
+   * Constructor.
+   *
+   * @param graphHeadFactory      temporal graph head factory
+   * @param vertexFactory         temporal vertex factory
+   * @param edgeFactory           temporal edge factory
+   * @param embeddingMetaData     meta data for the TPGM embedding
+   * @param sourceTargetVariables source and target vertex variables by edge variable
+   */
+  public ElementsFromEmbeddingTPGM(GraphHeadFactory&lt;G&gt; graphHeadFactory,
+                                   VertexFactory&lt;V&gt; vertexFactory, EdgeFactory&lt;E&gt; edgeFactory,
+                                   EmbeddingMetaData embeddingMetaData,
+                                   Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables) {
+<span class="fc" id="L105">    this(graphHeadFactory, vertexFactory, edgeFactory, embeddingMetaData,</span>
+<span class="fc" id="L106">      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));</span>
+<span class="fc" id="L107">  }</span>
+
+  /**
+   * Constructor.
+   *
+   * @param graphHeadFactory      temporal graph head factory
+   * @param vertexFactory         temporal vertex factory
+   * @param edgeFactory           temporal edge factory
+   * @param embeddingMetaData     meta data for the TPGM embedding
+   * @param sourceTargetVariables source and target vertex variables by edge variable
+   * @param labelMapping          mapping between newElementVariables and its labels
+   */
+  public ElementsFromEmbeddingTPGM(GraphHeadFactory&lt;G&gt; graphHeadFactory,
+                                   VertexFactory&lt;V&gt; vertexFactory,
+                                   EdgeFactory&lt;E&gt; edgeFactory,
+                                   EmbeddingMetaData embeddingMetaData,
+                                   Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables,
+<span class="fc" id="L124">                                   Map&lt;String, String&gt; labelMapping) {</span>
+<span class="fc" id="L125">    this.graphHeadFactory = graphHeadFactory;</span>
+<span class="fc" id="L126">    this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L127">    this.edgeFactory = edgeFactory;</span>
+<span class="fc" id="L128">    this.metaData = embeddingMetaData;</span>
+<span class="fc" id="L129">    this.sourceTargetVariables = sourceTargetVariables;</span>
+<span class="fc" id="L130">    this.labelMapping = labelMapping;</span>
+<span class="fc" id="L131">    this.variableMapping = new HashMap&lt;&gt;(embeddingMetaData.getEntryCount());</span>
+<span class="fc" id="L132">    this.processedIds = new HashSet&lt;&gt;(embeddingMetaData.getEntryCount());</span>
+<span class="fc" id="L133">  }</span>
+
+  @Override
+  public void flatMap(Embedding embedding, Collector&lt;Element&gt; out) throws Exception {
+    // clear for each embedding
+<span class="fc" id="L138">    processedIds.clear();</span>
+
+    // create graph head for this embedding
+<span class="fc" id="L141">    TemporalGraphHead graphHead = graphHeadFactory.createGraphHead();</span>
+
+    // vertices
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (String vertexVariable : metaData.getVertexVariables()) {</span>
+<span class="fc" id="L145">      GradoopId id = embedding.getId(metaData.getEntryColumn(vertexVariable));</span>
+
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">      if (labelMapping.containsKey(vertexVariable)) {</span>
+<span class="nc" id="L148">        String label = labelMapping.get(vertexVariable);</span>
+<span class="nc" id="L149">        initVertexWithData(out, graphHead, id, label);</span>
+<span class="nc" id="L150">      } else {</span>
+<span class="fc" id="L151">        initVertex(out, graphHead, id);</span>
+      }
+<span class="fc" id="L153">      variableMapping.put(PropertyValue.create(vertexVariable), PropertyValue.create(id));</span>
+<span class="fc" id="L154">    }</span>
+
+    // edges
+    GradoopId edgeId;
+    GradoopId sourceId;
+    GradoopId targetId;
+    // Long[] timeData;
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    for (String edgeVariable : metaData.getEdgeVariables()) {</span>
+<span class="fc" id="L162">      edgeId = embedding.getId(metaData.getEntryColumn(edgeVariable));</span>
+<span class="fc" id="L163">      sourceId = embedding.getId(</span>
+<span class="fc" id="L164">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getLeft()));</span>
+<span class="fc" id="L165">      targetId = embedding.getId(</span>
+<span class="fc" id="L166">        metaData.getEntryColumn(sourceTargetVariables.get(edgeVariable).getRight()));</span>
+
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">      if (labelMapping.containsKey(edgeVariable)) {</span>
+<span class="nc" id="L169">        String label = labelMapping.get(edgeVariable);</span>
+<span class="nc" id="L170">        initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, label);</span>
+<span class="nc" id="L171">      } else {</span>
+<span class="fc" id="L172">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
+      }
+<span class="fc" id="L174">      variableMapping.put(PropertyValue.create(edgeVariable), PropertyValue.create(edgeId));</span>
+<span class="fc" id="L175">    }</span>
+
+    // paths (copied from EPGM)
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    for (String pathVariable : metaData.getPathVariables()) {</span>
+<span class="fc" id="L180">      ExpandDirection direction = metaData.getDirection(pathVariable);</span>
+<span class="fc" id="L181">      List&lt;GradoopId&gt; path = embedding.getIdList(metaData.getEntryColumn(pathVariable));</span>
+<span class="fc" id="L182">      List&lt;PropertyValue&gt; mappingValue = new ArrayList&lt;&gt;(path.size());</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">      for (int i = 0; i &lt; path.size(); i += 2) {</span>
+<span class="fc" id="L184">        edgeId = path.get(i);</span>
+<span class="fc" id="L185">        mappingValue.add(PropertyValue.create(edgeId));</span>
+
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">        if (direction == ExpandDirection.OUT) {</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">          sourceId = i &gt; 0 ?</span>
+<span class="fc" id="L189">            path.get(i - 1) :</span>
+<span class="fc" id="L190">            embedding.getId(</span>
+<span class="fc" id="L191">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
+
+
+<span class="fc bfc" id="L194" title="All 2 branches covered.">          targetId = i &lt; path.size() - 1 ?</span>
+<span class="fc" id="L195">            path.get(i + 1) :</span>
+<span class="fc" id="L196">            embedding.getId(</span>
+<span class="fc" id="L197">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getRight()));</span>
+
+<span class="fc bfc" id="L199" title="All 2 branches covered.">          if (i + 2 &lt; path.size()) {</span>
+<span class="fc" id="L200">            mappingValue.add(PropertyValue.create(targetId));</span>
+          }
+        } else {
+<span class="nc bnc" id="L203" title="All 2 branches missed.">          sourceId = i &lt; path.size() - 1 ?</span>
+<span class="nc" id="L204">            path.get(i + 1) :</span>
+<span class="nc" id="L205">            embedding.getId(</span>
+<span class="nc" id="L206">              metaData.getEntryColumn(sourceTargetVariables.get(pathVariable).getLeft()));</span>
+
+<span class="nc bnc" id="L208" title="All 2 branches missed.">          targetId = i &gt; 0 ?</span>
+<span class="nc" id="L209">            path.get(i - 1) :</span>
+<span class="nc" id="L210">            embedding.getId(metaData.getEntryColumn(</span>
+<span class="nc" id="L211">              sourceTargetVariables.get(pathVariable).getRight()));</span>
+
+<span class="nc bnc" id="L213" title="All 2 branches missed.">          if (i &gt; 0) {</span>
+<span class="nc" id="L214">            mappingValue.add(PropertyValue.create(sourceId));</span>
+          }
+        }
+
+<span class="fc" id="L218">        initVertex(out, graphHead, sourceId);</span>
+<span class="fc" id="L219">        initVertex(out, graphHead, targetId);</span>
+<span class="fc" id="L220">        initEdge(out, graphHead, edgeId, sourceId, targetId);</span>
+      }
+<span class="fc" id="L222">      variableMapping.put(PropertyValue.create(pathVariable), PropertyValue.create(mappingValue));</span>
+<span class="fc" id="L223">    }</span>
+
+
+<span class="fc" id="L226">    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, variableMapping);</span>
+<span class="fc" id="L227">    out.collect(graphHead);</span>
+
+
+<span class="fc" id="L230">  }</span>
+
+  /**
+   * Initializes an vertex using the specified parameters
+   *
+   * @param out       flat map collector
+   * @param graphHead temporal graph head to assign vertex to
+   * @param vertexId  vertex identifier
+   */
+  private void initVertex(Collector&lt;Element&gt; out, TemporalGraphHead graphHead,
+                          GradoopId vertexId) {
+<span class="fc" id="L241">    initVertexWithData(out, graphHead, vertexId, null);</span>
+<span class="fc" id="L242">  }</span>
+
+  /**
+   * Initializes an vertex using the specified parameters and adds its label
+   * if the given vertex was created for the return pattern.
+   *
+   * @param out       flat map collector
+   * @param graphHead temporal graph head to assign vertex to
+   * @param vertexId  vertex identifier
+   * @param label     label associated with vertex
+   */
+  private void initVertexWithData(Collector&lt;Element&gt; out, TemporalGraphHead graphHead,
+                                  GradoopId vertexId,
+                                  String label) {
+<span class="fc bfc" id="L256" title="All 2 branches covered.">    if (!processedIds.contains(vertexId)) {</span>
+<span class="fc" id="L257">      TemporalVertex v = vertexFactory.initVertex(vertexId);</span>
+<span class="fc" id="L258">      v.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L259">      v.setLabel(label);</span>
+<span class="fc" id="L260">      out.collect(v);</span>
+<span class="fc" id="L261">      processedIds.add(vertexId);</span>
+    }
+<span class="fc" id="L263">  }</span>
+
+  /**
+   * Initializes an edge using the specified parameters.
+   *
+   * @param out       flat map collector
+   * @param graphHead temporal graph head to assign edge to
+   * @param edgeId    edge identifier
+   * @param sourceId  source vertex identifier
+   * @param targetId  target vertex identifier
+   */
+  private void initEdge(Collector&lt;Element&gt; out, TemporalGraphHead graphHead,
+                        GradoopId edgeId, GradoopId sourceId, GradoopId targetId) {
+<span class="fc" id="L276">    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);</span>
+<span class="fc" id="L277">  }</span>
+
+  /**
+   * Initializes an edge using the specified parameters and adds its label
+   * if the given edge was created for return pattern
+   *
+   * @param out       flat map collector
+   * @param graphHead temporal graph head to assign edge to
+   * @param edgeId    edge identifier
+   * @param sourceId  source vertex identifier
+   * @param targetId  target vertex identifier
+   * @param label     label associated with edge
+   */
+  private void initEdgeWithData(Collector&lt;Element&gt; out, TemporalGraphHead graphHead,
+                                GradoopId edgeId, GradoopId sourceId, GradoopId targetId,
+                                String label) {
+<span class="fc bfc" id="L293" title="All 2 branches covered.">    if (!processedIds.contains(edgeId)) {</span>
+<span class="fc" id="L294">      TemporalEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);</span>
+<span class="fc" id="L295">      e.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L296">      e.setLabel(label);</span>
+<span class="fc" id="L297">      out.collect(e);</span>
+<span class="fc" id="L298">      processedIds.add(edgeId);</span>
+    }
+<span class="fc" id="L300">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

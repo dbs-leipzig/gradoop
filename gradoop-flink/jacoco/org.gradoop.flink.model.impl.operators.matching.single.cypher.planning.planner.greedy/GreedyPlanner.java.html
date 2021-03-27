@@ -44,9 +44,9 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.FilterEmbeddingsNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.unary.ProjectEmbeddingsNode;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.ArrayList;
 import java.util.HashSet;

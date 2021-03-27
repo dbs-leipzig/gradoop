@@ -180,7 +180,7 @@
 <a name="170" href="#170">170</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype :"</span> +
 <a name="171" href="#171">171</a>         <span class="jxr_string">" \&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> +
 <a name="172" href="#172">172</a> 
-<a name="173" href="#173">173</a>         <span class="jxr_string">"graphWithA:G {graphWithA : \&quot;graph\&quot;}[(a:A {atype : \&quot;avalue\&quot;})]"</span> +
+<a name="173" href="#173">173</a>         <span class="jxr_string">"graphWithA:G {graphWithA : \&quot;graph\&quot;}[(a)]"</span> +
 <a name="174" href="#174">174</a> 
 <a name="175" href="#175">175</a>         <span class="jxr_string">"aggregatedASource:G {ab_edgeWithAlpha : \&quot;graph\&quot;}["</span> +
 <a name="176" href="#176">176</a>         <span class="jxr_string">"(:G {graphWithA : \&quot;graph\&quot;})-[:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(:B {btype : "</span> +
@@ -264,307 +264,299 @@
 <a name="254" href="#254">254</a>       <span class="jxr_string">"ab_edgeWithAlpha:G {ab_edgeWithAlpha : \&quot;graph\&quot;}["</span> +
 <a name="255" href="#255">255</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype :"</span> +
 <a name="256" href="#256">256</a>         <span class="jxr_string">" \&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
-<a name="257" href="#257">257</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="258" href="#258">258</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"ab_edgeWithBeta_loop:G {ab_edgeWithAlpha : \&quot;graph\&quot;}["</span> +
-<a name="259" href="#259">259</a>         <span class="jxr_string">"(g2:G {ab_edgeWithBeta : \&quot;graph\&quot;})-[:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(g2:G "</span> +
-<a name="260" href="#260">260</a>         <span class="jxr_string">"{ab_edgeWithBeta : \&quot;graph\&quot;}) "</span> + <span class="jxr_string">"]"</span>);
-<a name="261" href="#261">261</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithAlpha"</span>);
-<a name="262" href="#262">262</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="263" href="#263">263</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="264" href="#264">264</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="265" href="#265">265</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta_loop"</span>);
-<a name="266" href="#266">266</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="267" href="#267">267</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="268" href="#268">268</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="269" href="#269">269</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="270" href="#270">270</a>     }
-<a name="271" href="#271">271</a>   }
+<a name="257" href="#257">257</a>         <span class="jxr_string">"(a)-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b) "</span> +
+<a name="258" href="#258">258</a>         <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"ab_edgeWithBeta_loop:G {ab_edgeWithAlpha : \&quot;graph\&quot;}["</span> +
+<a name="259" href="#259">259</a>         <span class="jxr_string">"(g2:G {ab_edgeWithBeta : \&quot;graph\&quot;})-[:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(g2)]"</span>);
+<a name="260" href="#260">260</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithAlpha"</span>);
+<a name="261" href="#261">261</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="262" href="#262">262</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="263" href="#263">263</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="264" href="#264">264</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta_loop"</span>);
+<a name="265" href="#265">265</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="266" href="#266">266</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="267" href="#267">267</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="268" href="#268">268</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="269" href="#269">269</a>     }
+<a name="270" href="#270">270</a>   }
+<a name="271" href="#271">271</a> 
 <a name="272" href="#272">272</a> 
-<a name="273" href="#273">273</a> 
-<a name="274" href="#274">274</a>   @Test
-<a name="275" href="#275">275</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abEdgeWithBetaAndEmptyToAbedgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="276" href="#276">276</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
-<a name="277" href="#277">277</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
-<a name="278" href="#278">278</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="279" href="#279">279</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"empty:G[]"</span>);
-<a name="280" href="#280">280</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="281" href="#281">281</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"empty"</span>);
-<a name="282" href="#282">282</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="283" href="#283">283</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="284" href="#284">284</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="285" href="#285">285</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="286" href="#286">286</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="287" href="#287">287</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="288" href="#288">288</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="289" href="#289">289</a>     }
-<a name="290" href="#290">290</a>   }
-<a name="291" href="#291">291</a> 
-<a name="292" href="#292">292</a>   @Test
-<a name="293" href="#293">293</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abedgeWithBetaAndEmptyVertexToAbedgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="294" href="#294">294</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
-<a name="295" href="#295">295</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
-<a name="296" href="#296">296</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="297" href="#297">297</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"emptyVertex:G {emptyVertex : \&quot;graph\&quot;}[()]"</span>);
-<a name="298" href="#298">298</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="299" href="#299">299</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"emptyVertex"</span>);
-<a name="300" href="#300">300</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="301" href="#301">301</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="302" href="#302">302</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="303" href="#303">303</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="304" href="#304">304</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="305" href="#305">305</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="306" href="#306">306</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="307" href="#307">307</a>     }
-<a name="308" href="#308">308</a>   }
-<a name="309" href="#309">309</a> 
-<a name="310" href="#310">310</a>   @Test
-<a name="311" href="#311">311</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abEdgeWithBetaAndAbedgeWithBetaToFusedEdgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="312" href="#312">312</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
-<a name="313" href="#313">313</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
-<a name="314" href="#314">314</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="315" href="#315">315</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
-<a name="316" href="#316">316</a>         <span class="jxr_string">"fused_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}[(:G {ab_edgeWithBeta : \&quot;graph\&quot;})]"</span>);
-<a name="317" href="#317">317</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="318" href="#318">318</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
-<a name="319" href="#319">319</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="320" href="#320">320</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="321" href="#321">321</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"fused_edgeWithBeta"</span>);
-<a name="322" href="#322">322</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="323" href="#323">323</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="324" href="#324">324</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="325" href="#325">325</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="326" href="#326">326</a>     }
-<a name="327" href="#327">327</a>   }
-<a name="328" href="#328">328</a> 
-<a name="329" href="#329">329</a>   @Test
-<a name="330" href="#330">330</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abcdGraphAndAbcdGraphToAbdGraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="331" href="#331">331</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"abcdGraph:G {abcdGraph : \&quot;graph\&quot;}["</span> +
-<a name="332" href="#332">332</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="333" href="#333">333</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="334" href="#334">334</a>       <span class="jxr_string">"(b:B {btype : \&quot;bvalue\&quot;})-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;}) "</span> +
-<a name="335" href="#335">335</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"abdGraph:G {abcdGraph : \&quot;graph\&quot;}[(:G {abcdGraph : \&quot;graph\&quot;})]"</span>);
-<a name="336" href="#336">336</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"abcdGraph"</span>);
-<a name="337" href="#337">337</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"abcdGraph"</span>);
-<a name="338" href="#338">338</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="339" href="#339">339</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="340" href="#340">340</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"abdGraph"</span>);
-<a name="341" href="#341">341</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="342" href="#342">342</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="343" href="#343">343</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="344" href="#344">344</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="345" href="#345">345</a>     }
-<a name="346" href="#346">346</a>   }
+<a name="273" href="#273">273</a>   @Test
+<a name="274" href="#274">274</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abEdgeWithBetaAndEmptyToAbedgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="275" href="#275">275</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="276" href="#276">276</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
+<a name="277" href="#277">277</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="278" href="#278">278</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"empty:G[]"</span>);
+<a name="279" href="#279">279</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="280" href="#280">280</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"empty"</span>);
+<a name="281" href="#281">281</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="282" href="#282">282</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="283" href="#283">283</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="284" href="#284">284</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="285" href="#285">285</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="286" href="#286">286</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="287" href="#287">287</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="288" href="#288">288</a>     }
+<a name="289" href="#289">289</a>   }
+<a name="290" href="#290">290</a> 
+<a name="291" href="#291">291</a>   @Test
+<a name="292" href="#292">292</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abedgeWithBetaAndEmptyVertexToAbedgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="293" href="#293">293</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="294" href="#294">294</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
+<a name="295" href="#295">295</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="296" href="#296">296</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"emptyVertex:G {emptyVertex : \&quot;graph\&quot;}[()]"</span>);
+<a name="297" href="#297">297</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="298" href="#298">298</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"emptyVertex"</span>);
+<a name="299" href="#299">299</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="300" href="#300">300</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="301" href="#301">301</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="302" href="#302">302</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="303" href="#303">303</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="304" href="#304">304</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="305" href="#305">305</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="306" href="#306">306</a>     }
+<a name="307" href="#307">307</a>   }
+<a name="308" href="#308">308</a> 
+<a name="309" href="#309">309</a>   @Test
+<a name="310" href="#310">310</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abEdgeWithBetaAndAbedgeWithBetaToFusedEdgeWithBeta() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="311" href="#311">311</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="312" href="#312">312</a>       <span class="jxr_string">"ab_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}["</span> +
+<a name="313" href="#313">313</a>         <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="314" href="#314">314</a>         <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
+<a name="315" href="#315">315</a>         <span class="jxr_string">"fused_edgeWithBeta:G {ab_edgeWithBeta : \&quot;graph\&quot;}[(:G {ab_edgeWithBeta : \&quot;graph\&quot;})]"</span>);
+<a name="316" href="#316">316</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="317" href="#317">317</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"ab_edgeWithBeta"</span>);
+<a name="318" href="#318">318</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="319" href="#319">319</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="320" href="#320">320</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"fused_edgeWithBeta"</span>);
+<a name="321" href="#321">321</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="322" href="#322">322</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="323" href="#323">323</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="324" href="#324">324</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="325" href="#325">325</a>     }
+<a name="326" href="#326">326</a>   }
+<a name="327" href="#327">327</a> 
+<a name="328" href="#328">328</a>   @Test
+<a name="329" href="#329">329</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> abcdGraphAndAbcdGraphToAbdGraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="330" href="#330">330</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"abcdGraph:G {abcdGraph : \&quot;graph\&quot;}["</span> +
+<a name="331" href="#331">331</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="332" href="#332">332</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="333" href="#333">333</a>       <span class="jxr_string">"(b)-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;}) "</span> +
+<a name="334" href="#334">334</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"abdGraph:G {abcdGraph : \&quot;graph\&quot;}[(:G {abcdGraph : \&quot;graph\&quot;})]"</span>);
+<a name="335" href="#335">335</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"abcdGraph"</span>);
+<a name="336" href="#336">336</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"abcdGraph"</span>);
+<a name="337" href="#337">337</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="338" href="#338">338</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="339" href="#339">339</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"abdGraph"</span>);
+<a name="340" href="#340">340</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="341" href="#341">341</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="342" href="#342">342</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="343" href="#343">343</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="344" href="#344">344</a>     }
+<a name="345" href="#345">345</a>   }
+<a name="346" href="#346">346</a> 
 <a name="347" href="#347">347</a> 
-<a name="348" href="#348">348</a> 
-<a name="349" href="#349">349</a>   @Test
-<a name="350" href="#350">350</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> semicomplexAndLooplessPatternToFirstmatch() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="351" href="#351">351</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"semicomplex:G {semicomplex : \&quot;graph\&quot;}["</span> +
-<a name="352" href="#352">352</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="353" href="#353">353</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="354" href="#354">354</a>       <span class="jxr_string">"(b:B {btype : \&quot;bvalue\&quot;})-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(b:B {btype : \&quot;bvalue\&quot;})  "</span> +
-<a name="355" href="#355">355</a>       <span class="jxr_string">"(b:B {btype : \&quot;bvalue\&quot;})--&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="356" href="#356">356</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})--&gt;(e:E {etype : \&quot;evalue\&quot;})  "</span> +
-<a name="357" href="#357">357</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(d:D {dtype : "</span> +
-<a name="358" href="#358">358</a>       <span class="jxr_string">"\&quot;dvalue\&quot;})  "</span> + <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})--&gt;(e:E {etype : \&quot;evalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
-<a name="359" href="#359">359</a>       <span class="jxr_string">"looplessPattern:G {looplessPattern : \&quot;graph\&quot;}["</span> +
-<a name="360" href="#360">360</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="361" href="#361">361</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> + <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})"</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
-<a name="362" href="#362">362</a>       <span class="jxr_string">"firstmatch:G {semicomplex : \&quot;graph\&quot;}["</span> +
-<a name="363" href="#363">363</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(c2:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="364" href="#364">364</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(e2:E {etype : \&quot;evalue\&quot;})  "</span> +
-<a name="365" href="#365">365</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(g2:G {looplessPattern "</span> +
-<a name="366" href="#366">366</a>       <span class="jxr_string">": \&quot;graph\&quot;})  "</span> +
-<a name="367" href="#367">367</a>       <span class="jxr_string">"(c2:C {ctype : \&quot;cvalue\&quot;})-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(g2:G {looplessPattern"</span> +
-<a name="368" href="#368">368</a>       <span class="jxr_string">" : \&quot;graph\&quot;})  "</span> + <span class="jxr_string">"(c2:C {ctype : \&quot;cvalue\&quot;})--&gt;(e2:E {etype : \&quot;evalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
-<a name="369" href="#369">369</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"semicomplex"</span>);
-<a name="370" href="#370">370</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"looplessPattern"</span>);
-<a name="371" href="#371">371</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="372" href="#372">372</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="373" href="#373">373</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"firstmatch"</span>);
-<a name="374" href="#374">374</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="375" href="#375">375</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="376" href="#376">376</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="377" href="#377">377</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="378" href="#378">378</a>     }
-<a name="379" href="#379">379</a>   }
-<a name="380" href="#380">380</a> 
-<a name="381" href="#381">381</a> 
-<a name="382" href="#382">382</a>   @Test
-<a name="383" href="#383">383</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> trickyLooplessAndPatternToThirdmatch() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="384" href="#384">384</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"tricky:G {tricky : \&quot;graph\&quot;}["</span> +
-<a name="385" href="#385">385</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="386" href="#386">386</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="387" href="#387">387</a>       <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(b:B {btype : \&quot;bvalue\&quot;})  "</span> +
-<a name="388" href="#388">388</a>       <span class="jxr_string">"(b:B {btype : \&quot;bvalue\&quot;})--&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="389" href="#389">389</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})--&gt;(e:E {etype : \&quot;evalue\&quot;})  "</span> +
-<a name="390" href="#390">390</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(d:D {dtype : "</span> +
-<a name="391" href="#391">391</a>       <span class="jxr_string">"\&quot;dvalue\&quot;})  "</span> + <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})--&gt;(e:E {etype : \&quot;evalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
-<a name="392" href="#392">392</a>       <span class="jxr_string">"looplessPattern:G {looplessPattern : \&quot;graph\&quot;}["</span> +
-<a name="393" href="#393">393</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="394" href="#394">394</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> + <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})"</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
-<a name="395" href="#395">395</a>       <span class="jxr_string">"thirdmatch:G {tricky : \&quot;graph\&quot;}["</span> +
-<a name="396" href="#396">396</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(c2:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="397" href="#397">397</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(e2:E {etype : \&quot;evalue\&quot;})  "</span> +
-<a name="398" href="#398">398</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(g2:G {looplessPattern "</span> +
-<a name="399" href="#399">399</a>       <span class="jxr_string">": \&quot;graph\&quot;})  "</span> +
-<a name="400" href="#400">400</a>       <span class="jxr_string">"(c2:C {ctype : \&quot;cvalue\&quot;})-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(g2:G {looplessPattern"</span> +
-<a name="401" href="#401">401</a>       <span class="jxr_string">" : \&quot;graph\&quot;})  "</span> + <span class="jxr_string">"(c2:C {ctype : \&quot;cvalue\&quot;})--&gt;(e2:E {etype : \&quot;evalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
-<a name="402" href="#402">402</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"tricky"</span>);
-<a name="403" href="#403">403</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"looplessPattern"</span>);
-<a name="404" href="#404">404</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="405" href="#405">405</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="406" href="#406">406</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"thirdmatch"</span>);
-<a name="407" href="#407">407</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="408" href="#408">408</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="409" href="#409">409</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="410" href="#410">410</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="411" href="#411">411</a>     }
-<a name="412" href="#412">412</a>   }
-<a name="413" href="#413">413</a> 
-<a name="414" href="#414">414</a>   @Test
-<a name="415" href="#415">415</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> sourceAndPatternToSourceFusewithPattern() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="416" href="#416">416</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
-<a name="417" href="#417">417</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="418" href="#418">418</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="419" href="#419">419</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="420" href="#420">420</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="421" href="#421">421</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="422" href="#422">422</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d:D {dtype : \&quot;dvalue\&quot;}) "</span> +
-<a name="423" href="#423">423</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"pattern:G {pattern : \&quot;graph\&quot;}["</span> +
-<a name="424" href="#424">424</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="425" href="#425">425</a>       <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"source_fusewith_pattern:G {source : \&quot;graph\&quot;}["</span> +
-<a name="426" href="#426">426</a>       <span class="jxr_string">"(k2:G {pattern : \&quot;graph\&quot;})-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(k2:G {pattern : "</span> +
-<a name="427" href="#427">427</a>       <span class="jxr_string">"\&quot;graph\&quot;})  "</span> +
-<a name="428" href="#428">428</a>       <span class="jxr_string">"(k2:G {pattern : \&quot;graph\&quot;})-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c2:C {ctype : \&quot;cvalue\&quot;}) "</span> +
-<a name="429" href="#429">429</a>       <span class="jxr_string">"(c2:C {ctype : \&quot;cvalue\&quot;})-[:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d2:D {dtype : \&quot;dvalue\&quot;})"</span> +
-<a name="430" href="#430">430</a>       <span class="jxr_string">" "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
-<a name="431" href="#431">431</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"source"</span>);
-<a name="432" href="#432">432</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern"</span>);
-<a name="433" href="#433">433</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="434" href="#434">434</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="435" href="#435">435</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"source_fusewith_pattern"</span>);
-<a name="436" href="#436">436</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="437" href="#437">437</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="438" href="#438">438</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="439" href="#439">439</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="440" href="#440">440</a>     }
-<a name="441" href="#441">441</a>   }
-<a name="442" href="#442">442</a> 
-<a name="443" href="#443">443</a>   @Test
-<a name="444" href="#444">444</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> patternAndSourceToPatternfusewithsource() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="445" href="#445">445</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"pattern:G {pattern : \&quot;graph\&quot;}["</span> +
-<a name="446" href="#446">446</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="447" href="#447">447</a>       <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
-<a name="448" href="#448">448</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="449" href="#449">449</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="450" href="#450">450</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="451" href="#451">451</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="452" href="#452">452</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
-<a name="453" href="#453">453</a>       <span class="jxr_string">"(c:C {ctype : \&quot;cvalue\&quot;})-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d:D {dtype : \&quot;dvalue\&quot;}) "</span> +
-<a name="454" href="#454">454</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"pattern_fusewith_source:G {pattern : \&quot;graph\&quot;}[(u:G {source : \&quot;graph\&quot;})]"</span>);
-<a name="455" href="#455">455</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern"</span>);
-<a name="456" href="#456">456</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"source"</span>);
-<a name="457" href="#457">457</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="458" href="#458">458</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
-<a name="459" href="#459">459</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern_fusewith_source"</span>);
-<a name="460" href="#460">460</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="461" href="#461">461</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="462" href="#462">462</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="463" href="#463">463</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="464" href="#464">464</a>     }
-<a name="465" href="#465">465</a>   }
-<a name="466" href="#466">466</a> 
-<a name="467" href="#467">467</a>   @Test
-<a name="468" href="#468">468</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> filterMultiplePatterns() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="469" href="#469">469</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input:G {graph: \&quot;inputgraph\&quot;}["</span> +
-<a name="470" href="#470">470</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="471" href="#471">471</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="472" href="#472">472</a>       <span class="jxr_string">"(a2:A {atype : \&quot;avalue\&quot;})-[beta2:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b2:B {btype : "</span> +
-<a name="473" href="#473">473</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="474" href="#474">474</a>       <span class="jxr_string">"(dummy:Foo)"</span> +
-<a name="475" href="#475">475</a>       <span class="jxr_string">"] "</span> +
-<a name="476" href="#476">476</a>       <span class="jxr_string">"pattern1:G {graph:\&quot;pattern 1\&quot;} [(a)-[beta]-&gt;(b)]"</span> +
-<a name="477" href="#477">477</a>       <span class="jxr_string">"pattern2:G {graph:\&quot;pattern 2\&quot;} [(a2)-[beta2]-&gt;(b2)]"</span> +
-<a name="478" href="#478">478</a>       <span class="jxr_string">"result:G {graph: \&quot;inputgraph\&quot;} [(:G {graph:\&quot;pattern 1\&quot;}) (:G {graph:\&quot;pattern 2\&quot;}) (dummy)]"</span>);
-<a name="479" href="#479">479</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="480" href="#480">480</a>     GraphCollection patternGraphs = loader.getGraphCollectionByVariables(<span class="jxr_string">"pattern1"</span>, <span class="jxr_string">"pattern2"</span>);
-<a name="481" href="#481">481</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="482" href="#482">482</a>     LogicalGraph output = f.execute(searchGraph, patternGraphs);
-<a name="483" href="#483">483</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
-<a name="484" href="#484">484</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="485" href="#485">485</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="486" href="#486">486</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="487" href="#487">487</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="488" href="#488">488</a>     }
-<a name="489" href="#489">489</a>   }
-<a name="490" href="#490">490</a> 
-<a name="491" href="#491">491</a>   @Test
-<a name="492" href="#492">492</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> filterMultipleOverlappingPatterns() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="493" href="#493">493</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input:G {graph: \&quot;inputgraph\&quot;}["</span> +
-<a name="494" href="#494">494</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
-<a name="495" href="#495">495</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="496" href="#496">496</a>       <span class="jxr_string">"(a)-[beta2:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b2:B {btype : "</span> +
-<a name="497" href="#497">497</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
-<a name="498" href="#498">498</a>       <span class="jxr_string">"(a)-[f:foo]-&gt;(dummy:Foo)"</span> +
-<a name="499" href="#499">499</a>       <span class="jxr_string">"] "</span> +
-<a name="500" href="#500">500</a>       <span class="jxr_string">"pattern1:H {graph:\&quot;pattern 1\&quot;} [(a)-[beta]-&gt;(b)]"</span> +
-<a name="501" href="#501">501</a>       <span class="jxr_string">"pattern2:H {graph:\&quot;pattern 2\&quot;} [(a)-[beta2]-&gt;(b2)]"</span> +
-<a name="502" href="#502">502</a>       <span class="jxr_string">"result:G {graph: \&quot;inputgraph\&quot;} [(:H {graph:\&quot;pattern 2\&quot;})-[:foo]-&gt;(dummy) (:H {graph:\&quot;pattern 1\&quot;})-[:foo]-&gt;(dummy)]"</span>);
-<a name="503" href="#503">503</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="504" href="#504">504</a>     GraphCollection patternGraphs = loader.getGraphCollectionByVariables(<span class="jxr_string">"pattern1"</span>, <span class="jxr_string">"pattern2"</span>);
-<a name="505" href="#505">505</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="506" href="#506">506</a>     LogicalGraph output = f.execute(searchGraph, patternGraphs);
-<a name="507" href="#507">507</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
-<a name="508" href="#508">508</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="509" href="#509">509</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
-<a name="510" href="#510">510</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
-<a name="511" href="#511">511</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
-<a name="512" href="#512">512</a>     }
-<a name="513" href="#513">513</a>   }
-<a name="514" href="#514">514</a> 
-<a name="515" href="#515">515</a>   @Test
-<a name="516" href="#516">516</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> fuseSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="517" href="#517">517</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
-<a name="518" href="#518">518</a>       <span class="jxr_string">"(a:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P1\&quot;})-[:cite {difference : 0}]-&gt;(b:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P2\&quot;})"</span> +
-<a name="519" href="#519">519</a>       <span class="jxr_string">"(a)-[:cite {difference : 0}]-&gt;(c:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P3\&quot;})"</span> +
-<a name="520" href="#520">520</a>       <span class="jxr_string">"(b)-[:cite {difference : 0}]-&gt;(c)\n"</span> +
-<a name="521" href="#521">521</a>       <span class="jxr_string">"(a)-[:cite {difference : 5}]-&gt;(d:Patent {author : \&quot;zxcv\&quot;, year: 1995, title: \&quot;Earlier...\&quot;})"</span> +
-<a name="522" href="#522">522</a>       <span class="jxr_string">"(b)-[:cite {difference : 5}]-&gt;(d)"</span> +
-<a name="523" href="#523">523</a>       <span class="jxr_string">"(e:Patent {author : \&quot;kdkdkd\&quot;, year: 1997, title: \&quot;Once upon a time\&quot;})-[e_d:cite {difference : 2}]-&gt;(d)"</span> +
-<a name="524" href="#524">524</a>       <span class="jxr_string">"]"</span> +
-<a name="525" href="#525">525</a>       <span class="jxr_string">"expected:Combined ["</span> +
-<a name="526" href="#526">526</a>       <span class="jxr_string">"(combined:Combined {source: \&quot;graph\&quot;})-[:cite {difference : 5}]-&gt;(d)"</span> +
-<a name="527" href="#527">527</a>       <span class="jxr_string">"(combined)-[:cite {difference : 5}]-&gt;(d)"</span> +
-<a name="528" href="#528">528</a>       <span class="jxr_string">"(e)-[e_d]-&gt;(d)"</span> +
-<a name="529" href="#529">529</a>       <span class="jxr_string">"]"</span>);
-<a name="530" href="#530">530</a>     GraphCollection sourceGraph = loader.getGraphCollectionByVariables(<span class="jxr_string">"source"</span>);
-<a name="531" href="#531">531</a>     LogicalGraph searchGraph = sourceGraph.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination&lt;&gt;());
-<a name="532" href="#532">532</a>     GraphCollection patternGraph = sourceGraph
-<a name="533" href="#533">533</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph&lt;&gt;(<strong class="jxr_keyword">null</strong>, edge -&gt;
-<a name="534" href="#534">534</a>         edge.getPropertyValue(<span class="jxr_string">"difference"</span>).getInt() == 0,
-<a name="535" href="#535">535</a>         Subgraph.Strategy.EDGE_INDUCED))
-<a name="536" href="#536">536</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;((gh, plain) -&gt; {
-<a name="537" href="#537">537</a>         gh.setLabel(<span class="jxr_string">"Combined"</span>);
-<a name="538" href="#538">538</a>         <strong class="jxr_keyword">return</strong> gh;
-<a name="539" href="#539">539</a>       },
-<a name="540" href="#540">540</a>         <strong class="jxr_keyword">null</strong>,
-<a name="541" href="#541">541</a>         <strong class="jxr_keyword">null</strong>));
-<a name="542" href="#542">542</a> 
-<a name="543" href="#543">543</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
-<a name="544" href="#544">544</a>     LogicalGraph output = f
-<a name="545" href="#545">545</a>       .execute(searchGraph, patternGraph)
-<a name="546" href="#546">546</a>       .transform((gh, plain) -&gt; {
-<a name="547" href="#547">547</a>         gh.setLabel(<span class="jxr_string">"Combined"</span>);
-<a name="548" href="#548">548</a>         <strong class="jxr_keyword">return</strong> gh;
-<a name="549" href="#549">549</a>       },
-<a name="550" href="#550">550</a>         <strong class="jxr_keyword">null</strong>,
-<a name="551" href="#551">551</a>         <strong class="jxr_keyword">null</strong>);
-<a name="552" href="#552">552</a> 
-<a name="553" href="#553">553</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
-<a name="554" href="#554">554</a> 
-<a name="555" href="#555">555</a>     collectAndAssertTrue(output.equalsByData(expected));
-<a name="556" href="#556">556</a>   }
-<a name="557" href="#557">557</a> }
+<a name="348" href="#348">348</a>   @Test
+<a name="349" href="#349">349</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> semicomplexAndLooplessPatternToFirstmatch() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="350" href="#350">350</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"semicomplex:G {semicomplex : \&quot;graph\&quot;}["</span> +
+<a name="351" href="#351">351</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="352" href="#352">352</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="353" href="#353">353</a>       <span class="jxr_string">"(b)-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(b)  "</span> +
+<a name="354" href="#354">354</a>       <span class="jxr_string">"(b)--&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="355" href="#355">355</a>       <span class="jxr_string">"(c)--&gt;(e:E {etype : \&quot;evalue\&quot;})  "</span> +
+<a name="356" href="#356">356</a>       <span class="jxr_string">"(c)-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(d:D {dtype : "</span> +
+<a name="357" href="#357">357</a>       <span class="jxr_string">"\&quot;dvalue\&quot;})  "</span> + <span class="jxr_string">"(d)--&gt;(e) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
+<a name="358" href="#358">358</a>       <span class="jxr_string">"looplessPattern:G {looplessPattern : \&quot;graph\&quot;}["</span> +
+<a name="359" href="#359">359</a>       <span class="jxr_string">"(a)-[alpha]-&gt;(b)  "</span> + <span class="jxr_string">"(d)"</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> +
+<a name="360" href="#360">360</a>       <span class="jxr_string">"firstmatch:G {semicomplex : \&quot;graph\&quot;}["</span> +
+<a name="361" href="#361">361</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(c2:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="362" href="#362">362</a>       <span class="jxr_string">"(g2)--&gt;(e2:E {etype : \&quot;evalue\&quot;})  "</span> +
+<a name="363" href="#363">363</a>       <span class="jxr_string">"(g2)-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(g2)  "</span> +
+<a name="364" href="#364">364</a>       <span class="jxr_string">"(c2)-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(g2)  "</span> +
+<a name="365" href="#365">365</a>       <span class="jxr_string">"(c2)--&gt;(e2) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
+<a name="366" href="#366">366</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"semicomplex"</span>);
+<a name="367" href="#367">367</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"looplessPattern"</span>);
+<a name="368" href="#368">368</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="369" href="#369">369</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="370" href="#370">370</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"firstmatch"</span>);
+<a name="371" href="#371">371</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="372" href="#372">372</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="373" href="#373">373</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="374" href="#374">374</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="375" href="#375">375</a>     }
+<a name="376" href="#376">376</a>   }
+<a name="377" href="#377">377</a> 
+<a name="378" href="#378">378</a> 
+<a name="379" href="#379">379</a>   @Test
+<a name="380" href="#380">380</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> trickyLooplessAndPatternToThirdmatch() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="381" href="#381">381</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"tricky:G {tricky : \&quot;graph\&quot;}["</span> +
+<a name="382" href="#382">382</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="383" href="#383">383</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="384" href="#384">384</a>       <span class="jxr_string">"(d:D {dtype : \&quot;dvalue\&quot;})-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(b)  "</span> +
+<a name="385" href="#385">385</a>       <span class="jxr_string">"(b)--&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="386" href="#386">386</a>       <span class="jxr_string">"(c)--&gt;(e:E {etype : \&quot;evalue\&quot;})  "</span> +
+<a name="387" href="#387">387</a>       <span class="jxr_string">"(c)-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(d)  "</span> +
+<a name="388" href="#388">388</a>       <span class="jxr_string">"(d)--&gt;(e)]"</span> +
+<a name="389" href="#389">389</a>       <span class="jxr_string">"looplessPattern:G {looplessPattern : \&quot;graph\&quot;}["</span> +
+<a name="390" href="#390">390</a>       <span class="jxr_string">"(a)-[alpha]-&gt;(b)  "</span> +
+<a name="391" href="#391">391</a>       <span class="jxr_string">"(d)]"</span> +
+<a name="392" href="#392">392</a>       <span class="jxr_string">"thirdmatch:G {tricky : \&quot;graph\&quot;}["</span> +
+<a name="393" href="#393">393</a>       <span class="jxr_string">"(g2:G {looplessPattern : \&quot;graph\&quot;})--&gt;(c2:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="394" href="#394">394</a>       <span class="jxr_string">"(g2)--&gt;(e2:E {etype : \&quot;evalue\&quot;})  "</span> +
+<a name="395" href="#395">395</a>       <span class="jxr_string">"(g2)-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(g2)"</span> +
+<a name="396" href="#396">396</a>       <span class="jxr_string">"(c2)-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(g2)  "</span> +
+<a name="397" href="#397">397</a>       <span class="jxr_string">"(c2)--&gt;(e2) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
+<a name="398" href="#398">398</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"tricky"</span>);
+<a name="399" href="#399">399</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"looplessPattern"</span>);
+<a name="400" href="#400">400</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="401" href="#401">401</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="402" href="#402">402</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"thirdmatch"</span>);
+<a name="403" href="#403">403</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="404" href="#404">404</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="405" href="#405">405</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="406" href="#406">406</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="407" href="#407">407</a>     }
+<a name="408" href="#408">408</a>   }
+<a name="409" href="#409">409</a> 
+<a name="410" href="#410">410</a>   @Test
+<a name="411" href="#411">411</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> sourceAndPatternToSourceFusewithPattern() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="412" href="#412">412</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
+<a name="413" href="#413">413</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="414" href="#414">414</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="415" href="#415">415</a>       <span class="jxr_string">"(a)-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b)  "</span> +
+<a name="416" href="#416">416</a>       <span class="jxr_string">"(a)-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="417" href="#417">417</a>       <span class="jxr_string">"(c)-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d:D {dtype : \&quot;dvalue\&quot;}) "</span> +
+<a name="418" href="#418">418</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"pattern:G {pattern : \&quot;graph\&quot;}["</span> +
+<a name="419" href="#419">419</a>       <span class="jxr_string">"(a)-[alpha]-&gt;(b) "</span> +
+<a name="420" href="#420">420</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"source_fusewith_pattern:G {source : \&quot;graph\&quot;}["</span> +
+<a name="421" href="#421">421</a>       <span class="jxr_string">"(k2:G {pattern : \&quot;graph\&quot;})-[:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(k2)  "</span> +
+<a name="422" href="#422">422</a>       <span class="jxr_string">"(k2)-[:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c2:C {ctype : \&quot;cvalue\&quot;}) "</span> +
+<a name="423" href="#423">423</a>       <span class="jxr_string">"(c2)-[:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d2:D {dtype : \&quot;dvalue\&quot;})"</span> +
+<a name="424" href="#424">424</a>       <span class="jxr_string">" "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span>);
+<a name="425" href="#425">425</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"source"</span>);
+<a name="426" href="#426">426</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern"</span>);
+<a name="427" href="#427">427</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="428" href="#428">428</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="429" href="#429">429</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"source_fusewith_pattern"</span>);
+<a name="430" href="#430">430</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="431" href="#431">431</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="432" href="#432">432</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="433" href="#433">433</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="434" href="#434">434</a>     }
+<a name="435" href="#435">435</a>   }
+<a name="436" href="#436">436</a> 
+<a name="437" href="#437">437</a>   @Test
+<a name="438" href="#438">438</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> patternAndSourceToPatternfusewithsource() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="439" href="#439">439</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"pattern:G {pattern : \&quot;graph\&quot;}["</span> +
+<a name="440" href="#440">440</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[alpha:AlphaEdge {alphatype : \&quot;alphavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="441" href="#441">441</a>       <span class="jxr_string">"\&quot;bvalue\&quot;}) "</span> + <span class="jxr_string">"]"</span> + <span class="jxr_string">""</span> + <span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
+<a name="442" href="#442">442</a>       <span class="jxr_string">"(a)-[alpha]-&gt;(b)  "</span> +
+<a name="443" href="#443">443</a>       <span class="jxr_string">"(a)-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b)  "</span> +
+<a name="444" href="#444">444</a>       <span class="jxr_string">"(a)-[l:loop {ltype : \&quot;lvalue\&quot;}]-&gt;(c:C {ctype : \&quot;cvalue\&quot;})  "</span> +
+<a name="445" href="#445">445</a>       <span class="jxr_string">"(c)-[g:GammaEdge {gtype : \&quot;gvalue\&quot;}]-&gt;(d:D {dtype : \&quot;dvalue\&quot;}) "</span> +
+<a name="446" href="#446">446</a>       <span class="jxr_string">"]"</span> + <span class="jxr_string">"pattern_fusewith_source:G {pattern : \&quot;graph\&quot;}[(u:G {source : \&quot;graph\&quot;})]"</span>);
+<a name="447" href="#447">447</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern"</span>);
+<a name="448" href="#448">448</a>     LogicalGraph patternGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"source"</span>);
+<a name="449" href="#449">449</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="450" href="#450">450</a>     LogicalGraph output = f.execute(searchGraph, patternGraph);
+<a name="451" href="#451">451</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"pattern_fusewith_source"</span>);
+<a name="452" href="#452">452</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="453" href="#453">453</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="454" href="#454">454</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="455" href="#455">455</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="456" href="#456">456</a>     }
+<a name="457" href="#457">457</a>   }
+<a name="458" href="#458">458</a> 
+<a name="459" href="#459">459</a>   @Test
+<a name="460" href="#460">460</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> filterMultiplePatterns() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="461" href="#461">461</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input:G {graph: \&quot;inputgraph\&quot;}["</span> +
+<a name="462" href="#462">462</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="463" href="#463">463</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="464" href="#464">464</a>       <span class="jxr_string">"(a2:A {atype : \&quot;avalue\&quot;})-[beta2:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b2:B {btype : "</span> +
+<a name="465" href="#465">465</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="466" href="#466">466</a>       <span class="jxr_string">"(dummy:Foo)"</span> +
+<a name="467" href="#467">467</a>       <span class="jxr_string">"] "</span> +
+<a name="468" href="#468">468</a>       <span class="jxr_string">"pattern1:G {graph:\&quot;pattern 1\&quot;} [(a)-[beta]-&gt;(b)]"</span> +
+<a name="469" href="#469">469</a>       <span class="jxr_string">"pattern2:G {graph:\&quot;pattern 2\&quot;} [(a2)-[beta2]-&gt;(b2)]"</span> +
+<a name="470" href="#470">470</a>       <span class="jxr_string">"result:G {graph: \&quot;inputgraph\&quot;} [(:G {graph:\&quot;pattern 1\&quot;}) (:G {graph:\&quot;pattern 2\&quot;}) (dummy)]"</span>);
+<a name="471" href="#471">471</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="472" href="#472">472</a>     GraphCollection patternGraphs = loader.getGraphCollectionByVariables(<span class="jxr_string">"pattern1"</span>, <span class="jxr_string">"pattern2"</span>);
+<a name="473" href="#473">473</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="474" href="#474">474</a>     LogicalGraph output = f.execute(searchGraph, patternGraphs);
+<a name="475" href="#475">475</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
+<a name="476" href="#476">476</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="477" href="#477">477</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="478" href="#478">478</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="479" href="#479">479</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="480" href="#480">480</a>     }
+<a name="481" href="#481">481</a>   }
+<a name="482" href="#482">482</a> 
+<a name="483" href="#483">483</a>   @Test
+<a name="484" href="#484">484</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> filterMultipleOverlappingPatterns() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="485" href="#485">485</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input:G {graph: \&quot;inputgraph\&quot;}["</span> +
+<a name="486" href="#486">486</a>       <span class="jxr_string">"(a:A {atype : \&quot;avalue\&quot;})-[beta:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b:B {btype : "</span> +
+<a name="487" href="#487">487</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="488" href="#488">488</a>       <span class="jxr_string">"(a)-[beta2:BetaEdge {betatype : \&quot;betavalue\&quot;}]-&gt;(b2:B {btype : "</span> +
+<a name="489" href="#489">489</a>       <span class="jxr_string">"\&quot;bvalue\&quot;})  "</span> +
+<a name="490" href="#490">490</a>       <span class="jxr_string">"(a)-[f:foo]-&gt;(dummy:Foo)"</span> +
+<a name="491" href="#491">491</a>       <span class="jxr_string">"] "</span> +
+<a name="492" href="#492">492</a>       <span class="jxr_string">"pattern1:H {graph:\&quot;pattern 1\&quot;} [(a)-[beta]-&gt;(b)]"</span> +
+<a name="493" href="#493">493</a>       <span class="jxr_string">"pattern2:H {graph:\&quot;pattern 2\&quot;} [(a)-[beta2]-&gt;(b2)]"</span> +
+<a name="494" href="#494">494</a>       <span class="jxr_string">"result:G {graph: \&quot;inputgraph\&quot;} [(:H {graph:\&quot;pattern 2\&quot;})-[:foo]-&gt;(dummy) (:H {graph:\&quot;pattern 1\&quot;})-[:foo]-&gt;(dummy)]"</span>);
+<a name="495" href="#495">495</a>     LogicalGraph searchGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
+<a name="496" href="#496">496</a>     GraphCollection patternGraphs = loader.getGraphCollectionByVariables(<span class="jxr_string">"pattern1"</span>, <span class="jxr_string">"pattern2"</span>);
+<a name="497" href="#497">497</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="498" href="#498">498</a>     LogicalGraph output = f.execute(searchGraph, patternGraphs);
+<a name="499" href="#499">499</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
+<a name="500" href="#500">500</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="501" href="#501">501</a>     <strong class="jxr_keyword">if</strong> (deepSearch) {
+<a name="502" href="#502">502</a>       collectAndAssertTrue(VertexFusionUtils.myInducedEdgeSubgraphForFusion(searchGraph, expected)
+<a name="503" href="#503">503</a>         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
+<a name="504" href="#504">504</a>     }
+<a name="505" href="#505">505</a>   }
+<a name="506" href="#506">506</a> 
+<a name="507" href="#507">507</a>   @Test
+<a name="508" href="#508">508</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> fuseSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="509" href="#509">509</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
+<a name="510" href="#510">510</a>       <span class="jxr_string">"(a:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P1\&quot;})-[:cite {difference : 0}]-&gt;(b:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P2\&quot;})"</span> +
+<a name="511" href="#511">511</a>       <span class="jxr_string">"(a)-[:cite {difference : 0}]-&gt;(c:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P3\&quot;})"</span> +
+<a name="512" href="#512">512</a>       <span class="jxr_string">"(b)-[:cite {difference : 0}]-&gt;(c)\n"</span> +
+<a name="513" href="#513">513</a>       <span class="jxr_string">"(a)-[:cite {difference : 5}]-&gt;(d:Patent {author : \&quot;zxcv\&quot;, year: 1995, title: \&quot;Earlier...\&quot;})"</span> +
+<a name="514" href="#514">514</a>       <span class="jxr_string">"(b)-[:cite {difference : 5}]-&gt;(d)"</span> +
+<a name="515" href="#515">515</a>       <span class="jxr_string">"(e:Patent {author : \&quot;kdkdkd\&quot;, year: 1997, title: \&quot;Once upon a time\&quot;})-[e_d:cite {difference : 2}]-&gt;(d)"</span> +
+<a name="516" href="#516">516</a>       <span class="jxr_string">"]"</span> +
+<a name="517" href="#517">517</a>       <span class="jxr_string">"expected:Combined ["</span> +
+<a name="518" href="#518">518</a>       <span class="jxr_string">"(combined:Combined {source: \&quot;graph\&quot;})-[:cite {difference : 5}]-&gt;(d)"</span> +
+<a name="519" href="#519">519</a>       <span class="jxr_string">"(combined)-[:cite {difference : 5}]-&gt;(d)"</span> +
+<a name="520" href="#520">520</a>       <span class="jxr_string">"(e)-[e_d]-&gt;(d)"</span> +
+<a name="521" href="#521">521</a>       <span class="jxr_string">"]"</span>);
+<a name="522" href="#522">522</a>     GraphCollection sourceGraph = loader.getGraphCollectionByVariables(<span class="jxr_string">"source"</span>);
+<a name="523" href="#523">523</a>     LogicalGraph searchGraph = sourceGraph.reduce(<strong class="jxr_keyword">new</strong> ReduceCombination&lt;&gt;());
+<a name="524" href="#524">524</a>     GraphCollection patternGraph = sourceGraph
+<a name="525" href="#525">525</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph&lt;&gt;(<strong class="jxr_keyword">null</strong>, edge -&gt;
+<a name="526" href="#526">526</a>         edge.getPropertyValue(<span class="jxr_string">"difference"</span>).getInt() == 0,
+<a name="527" href="#527">527</a>         Subgraph.Strategy.EDGE_INDUCED))
+<a name="528" href="#528">528</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyTransformation&lt;&gt;((gh, plain) -&gt; {
+<a name="529" href="#529">529</a>         gh.setLabel(<span class="jxr_string">"Combined"</span>);
+<a name="530" href="#530">530</a>         <strong class="jxr_keyword">return</strong> gh;
+<a name="531" href="#531">531</a>       },
+<a name="532" href="#532">532</a>         <strong class="jxr_keyword">null</strong>,
+<a name="533" href="#533">533</a>         <strong class="jxr_keyword">null</strong>));
+<a name="534" href="#534">534</a> 
+<a name="535" href="#535">535</a>     VertexFusion f = <strong class="jxr_keyword">new</strong> VertexFusion();
+<a name="536" href="#536">536</a>     LogicalGraph output = f
+<a name="537" href="#537">537</a>       .execute(searchGraph, patternGraph)
+<a name="538" href="#538">538</a>       .transform((gh, plain) -&gt; {
+<a name="539" href="#539">539</a>         gh.setLabel(<span class="jxr_string">"Combined"</span>);
+<a name="540" href="#540">540</a>         <strong class="jxr_keyword">return</strong> gh;
+<a name="541" href="#541">541</a>       },
+<a name="542" href="#542">542</a>         <strong class="jxr_keyword">null</strong>,
+<a name="543" href="#543">543</a>         <strong class="jxr_keyword">null</strong>);
+<a name="544" href="#544">544</a> 
+<a name="545" href="#545">545</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
+<a name="546" href="#546">546</a> 
+<a name="547" href="#547">547</a>     collectAndAssertTrue(output.equalsByData(expected));
+<a name="548" href="#548">548</a>   }
+<a name="549" href="#549">549</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

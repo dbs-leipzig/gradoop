@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CNFPostProcessing.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing</a> &gt; <span class="el_source">CNFPostProcessing.java</span></div><h1>CNFPostProcessing.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.AddTrivialConstraints;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.BoundsInference;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.MinMaxUnfolding;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.Normalization;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.SyntacticSubsumption;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TemporalSubsumption;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TrivialContradictions;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.TrivialTautologies;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Postprocessing pipeline for CNFs.
+ * Contains a list of {@link QueryTransformation} objects, that are applied to a CNF
+ */
+public class CNFPostProcessing {
+
+  /**
+   * List of transformations. They are applied in the order of the list
+   */
+  private final List&lt;QueryTransformation&gt; transformations;
+
+  /**
+   * Creates a new custom postprocessing pipeline
+   *
+   * @param transformations list of transformations to apply
+   */
+<span class="fc" id="L48">  public CNFPostProcessing(List&lt;QueryTransformation&gt; transformations) {</span>
+<span class="fc" id="L49">    this.transformations = transformations;</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Creates a default postprocessing pipeline:
+   * 1. Normalization
+   * 2. &quot;Translate&quot; suitable Min/Max expressions to simple predicates
+   * 3. subsumption on a purely syntactical basis
+   * 4. checking for trivial tautologies, maybe simplifying the query
+   * 5. checking for trivial contradictions, maybe simplifying the query
+   * 6. checking for less trivial contradictions in temporal comparisons
+   * 7. inferring implicit temporal information
+   * 8. subsumption with temporal information
+   * 9. deduplication of clauses
+   */
+  public CNFPostProcessing() {
+<span class="fc" id="L65">    this(Arrays.asList(</span>
+      new Normalization(),
+      new MinMaxUnfolding(),
+      new SyntacticSubsumption(),
+      new TrivialTautologies(),
+      new TrivialContradictions(),
+      new AddTrivialConstraints(),
+      //new CheckForCircles(),
+      new BoundsInference(),
+      new TemporalSubsumption(),
+      new TrivialTautologies()
+    ));
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * Executes the postprocessing pipeline on a CNF
+   *
+   * @param cnf CNF to postprocess
+   * @return postprocessed CNF
+   * @throws QueryContradictoryException if the CNF is found to be contradictory
+   *                                     during the postprocessing
+   */
+  public CNF postprocess(CNF cnf) throws QueryContradictoryException {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">    for (QueryTransformation transformation : transformations) {</span>
+<span class="fc" id="L89">      cnf = transformation.transformCNF(cnf);</span>
+<span class="fc" id="L90">    }</span>
+<span class="fc" id="L91">    return cnf;</span>
+  }
+
+  public List&lt;QueryTransformation&gt; getTransformations() {
+<span class="nc" id="L95">    return transformations;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

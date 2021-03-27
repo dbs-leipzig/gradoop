@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TrivialTautologies.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">TrivialTautologies.java</span></div><h1>TrivialTautologies.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.stream.Collectors;
+
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Looks for trivial tautologies like {@code a.tx_from &lt;= a.tx_to} or (b.prop=b.prop).
+ * Every disjunctive clause containing a tautology is removed from the CNF.
+ * !!! This class assumes input CNFs to be normalized, i.e. not to contain &gt; or &gt;= !!!
+ */
+<span class="fc" id="L38">public class TrivialTautologies implements QueryTransformation {</span>
+  @Override
+  public CNF transformCNF(CNF cnf) {
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">    if (cnf.getPredicates().size() == 0) {</span>
+<span class="nc" id="L42">      return cnf;</span>
+    }
+<span class="fc" id="L44">    return new CNF(</span>
+<span class="fc" id="L45">      cnf.getPredicates().stream()</span>
+<span class="fc" id="L46">        .filter(this::notTautological)</span>
+<span class="fc" id="L47">        .collect(Collectors.toList())</span>
+    );
+  }
+
+  /**
+   * Checks whether a clause is not tautological, i.e. contains no tautological comparison
+   *
+   * @param clause clause to check for tautologies
+   * @return true iff the clause is not tautological
+   */
+  private boolean notTautological(CNFElement clause) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    for (ComparisonExpression comparison : clause.getPredicates()) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">      if (isTautological(comparison)) {</span>
+<span class="fc" id="L60">        return false;</span>
+      }
+<span class="fc" id="L62">    }</span>
+<span class="fc" id="L63">    return true;</span>
+  }
+
+  /**
+   * Checks if a comparison is tautological. This check is &quot;uninformed&quot;, it only employs
+   * simple (domain) logic. The following comparisons are considered tautological:
+   * - x=x
+   * - x&lt;=x
+   * - a.tx_from &lt;= a.tx_to
+   * - a.val_from &lt;= a.val_to
+   * - literal1 comp literal2    iff the comparison holds
+   *
+   * @param comp comparison to check for tautology
+   * @return true iff the comparison is tautological according to the criteria listed above.
+   */
+  private boolean isTautological(ComparisonExpression comp) {
+<span class="fc" id="L79">    ComparableExpression lhs = comp.getLhs().getWrappedComparable();</span>
+<span class="fc" id="L80">    Comparator comparator = comp.getComparator();</span>
+<span class="fc" id="L81">    ComparableExpression rhs = comp.getRhs().getWrappedComparable();</span>
+
+    // x=x, x&lt;=x
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (lhs.equals(rhs)) {</span>
+<span class="fc bfc" id="L85" title="All 4 branches covered.">      if (comparator.equals(Comparator.EQ) || comparator.equals(LTE)) {</span>
+<span class="fc" id="L86">        return true;</span>
+      }
+    }
+    // a.tx_from &lt;= a.tx_to, a.val_from &lt;= a.val_to
+<span class="fc bfc" id="L90" title="All 4 branches covered.">    if (lhs instanceof TimeSelector &amp;&amp; rhs instanceof TimeSelector &amp;&amp;</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      lhs.getVariable().equals(rhs.getVariable())) {</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">      if (((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.TX_FROM) &amp;&amp;</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.TX_TO) ||</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        ((TimeSelector) lhs).getTimeProp().equals(TimeSelector.TimeField.VAL_FROM) &amp;&amp;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">          ((TimeSelector) rhs).getTimeProp().equals(TimeSelector.TimeField.VAL_TO)) {</span>
+<span class="fc" id="L96">        return comparator.equals(LTE);</span>
+      }
+<span class="pc bpc" id="L98" title="1 of 8 branches missed.">    } else if ((lhs instanceof TimeLiteral &amp;&amp; rhs instanceof TimeLiteral) ||</span>
+      (lhs instanceof Literal &amp;&amp; rhs instanceof Literal)) {
+      // comparison of two (time) literals is tautological iff the comparison holds
+      // true iff the comparison holds
+<span class="fc" id="L102">      return comp.evaluate(new TemporalVertex());</span>
+    }
+<span class="fc" id="L104">    return false;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

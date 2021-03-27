@@ -16,17 +16,18 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans;
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.booleans.Xor;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.booleans.Xor;
 
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Xor} predicate
+ * Wraps a {@link Xor} predicate
  */
 public class XorPredicate extends QueryPredicate {
   /**
@@ -35,13 +36,29 @@ public class XorPredicate extends QueryPredicate {
   private final Xor xor;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Creates a new Wrapper
    *
    * @param xor The wrapped xor predicate
    */
-<span class="fc" id="L42">  public XorPredicate(Xor xor) {</span>
-<span class="fc" id="L43">    this.xor = xor;</span>
-<span class="fc" id="L44">  }</span>
+  public XorPredicate(Xor xor) {
+<span class="fc" id="L49">    this(xor, null);</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Creates a new Wrapper
+   *
+   * @param xor The wrapped xor predicate
+   * @param comparableFactory factory for comparables
+   */
+<span class="fc" id="L58">  public XorPredicate(Xor xor, QueryComparableFactory comparableFactory) {</span>
+<span class="fc" id="L59">    this.xor = xor;</span>
+<span class="fc" id="L60">    this.comparableFactory = comparableFactory;</span>
+<span class="fc" id="L61">  }</span>
 
   /**
    * Converts the predicate into conjunctive normal form
@@ -49,49 +66,52 @@ public class XorPredicate extends QueryPredicate {
    * @return predicate in cnf
    */
   public CNF asCNF() {
-<span class="fc" id="L52">    Predicate lhs = xor.getArguments()[0];</span>
-<span class="fc" id="L53">    Predicate rhs = xor.getArguments()[1];</span>
+<span class="fc" id="L69">    Predicate lhs = xor.getArguments()[0];</span>
+<span class="fc" id="L70">    Predicate rhs = xor.getArguments()[1];</span>
 
-<span class="fc" id="L55">    QueryPredicate wrapper = QueryPredicate.createFrom(</span>
-      new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs))
+<span class="fc" id="L72">    QueryPredicate wrapper = QueryPredicate.createFrom(</span>
+      new Or(new And(lhs, new Not(rhs)), new And(new Not(lhs), rhs)),
+      comparableFactory
     );
 
-<span class="fc" id="L59">    return wrapper.asCNF();</span>
+<span class="fc" id="L77">    return wrapper.asCNF();</span>
   }
 
   /**
    * Returns the wrapped left hand side predicate
+   *
    * @return wrapped left hand side predicate
    */
   public QueryPredicate getLhs() {
-<span class="nc" id="L67">    return QueryPredicate.createFrom(xor.getArguments()[0]);</span>
+<span class="nc" id="L86">    return QueryPredicate.createFrom(xor.getArguments()[0], comparableFactory);</span>
   }
 
   /**
    * Returns the wrapped right hand side predicate
+   *
    * @return wrapped right hand side predicate
    */
   public QueryPredicate getRhs() {
-<span class="nc" id="L75">    return QueryPredicate.createFrom(xor.getArguments()[1]);</span>
+<span class="nc" id="L95">    return QueryPredicate.createFrom(xor.getArguments()[1], comparableFactory);</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="nc bnc" id="L80" title="All 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L81">      return true;</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L101">      return true;</span>
     }
-<span class="nc bnc" id="L83" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L84">      return false;</span>
+<span class="nc bnc" id="L103" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L104">      return false;</span>
     }
 
-<span class="nc" id="L87">    XorPredicate that = (XorPredicate) o;</span>
+<span class="nc" id="L107">    XorPredicate that = (XorPredicate) o;</span>
 
-<span class="nc" id="L89">    return Objects.equals(xor, that.xor);</span>
+<span class="nc" id="L109">    return Objects.equals(xor, that.xor);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L94" title="All 2 branches missed.">    return xor != null ? xor.hashCode() : 0;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">    return xor != null ? xor.hashCode() : 0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CNFEstimation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation</a> &gt; <span class="el_source">CNFEstimation.java</span></div><h1>CNFEstimation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation;
+
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.PropertySelectorComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TemporalComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.TimeConstant;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.gradoop.gdl.utils.Comparator.EQ;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.GTE;
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.utils.Comparator.NEQ;
+
+/**
+ * Class to estimate the selectivity of a CNF
+ */
+public class CNFEstimation {
+
+  /**
+   * Graph statistics on which the estimations are based
+   */
+  private final TemporalGraphStatistics stats;
+
+  /**
+   * maps variable names to their type (vertex or edge)
+   */
+  private Map&lt;String, TemporalGraphStatistics.ElementType&gt; typeMap;
+
+  /**
+   * maps variable names to labels (if known)
+   */
+  private Map&lt;String, String&gt; labelMap;
+
+  /**
+   * saves estimations so that they can be looked up, when they are checked more than once
+   */
+  private Map&lt;ComparisonExpression, Double&gt; cache;
+
+  /**
+   * Creates a new instance
+   *
+   * @param stats    graph statistics on which estimations are based
+   * @param typeMap  map from variable name to type (vertex/edge)
+   * @param labelMap map from variable name to label
+   */
+  public CNFEstimation(TemporalGraphStatistics stats,
+                       Map&lt;String, TemporalGraphStatistics.ElementType&gt; typeMap,
+<span class="fc" id="L89">                       Map&lt;String, String&gt; labelMap) {</span>
+<span class="fc" id="L90">    this.stats = stats;</span>
+<span class="fc" id="L91">    this.typeMap = typeMap;</span>
+<span class="fc" id="L92">    this.labelMap = labelMap;</span>
+<span class="fc" id="L93">    this.cache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L94">  }</span>
+
+  /**
+   * Creates a new instance
+   *
+   * @param stats   graph statistics on which estimations are based
+   * @param handler QueryHandler to create typeMap and labelMap from
+   */
+<span class="fc" id="L102">  public CNFEstimation(TemporalGraphStatistics stats, TemporalQueryHandler handler) {</span>
+<span class="fc" id="L103">    this.stats = stats;</span>
+<span class="fc" id="L104">    initializeWithHandler(handler);</span>
+<span class="fc" id="L105">  }</span>
+
+  /**
+   * Initializes typeMap, labelMap and cache from a {@link TemporalQueryHandler}
+   *
+   * @param queryHandler QueryHandler to use for initialization
+   */
+  private void initializeWithHandler(TemporalQueryHandler queryHandler) {
+<span class="fc" id="L113">    typeMap = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    for (String edgeVar : queryHandler.getEdgeVariables()) {</span>
+<span class="fc" id="L115">      typeMap.put(edgeVar, TemporalGraphStatistics.ElementType.EDGE);</span>
+<span class="fc" id="L116">    }</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    for (String vertexVar : queryHandler.getVertexVariables()) {</span>
+<span class="fc" id="L118">      typeMap.put(vertexVar, TemporalGraphStatistics.ElementType.VERTEX);</span>
+<span class="fc" id="L119">    }</span>
+
+<span class="fc" id="L121">    labelMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L122">    queryHandler.getLabelsForVariables(queryHandler.getAllVariables())</span>
+<span class="fc" id="L123">      .forEach((key, value) -&gt; {</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (value.length() &gt; 0) {</span>
+<span class="fc" id="L125">          labelMap.put(key, value);</span>
+        }
+<span class="fc" id="L127">      });</span>
+    // pre-compute all estimations
+<span class="fc" id="L129">    cache = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">    for (CNFElement clause : queryHandler.getPredicates()) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">      for (ComparisonExpression comp : clause.getPredicates()) {</span>
+<span class="fc" id="L132">        cache.put(comp, estimateComparison(comp));</span>
+<span class="fc" id="L133">      }</span>
+<span class="fc" id="L134">    }</span>
+<span class="fc" id="L135">  }</span>
+
+  /**
+   * Estimates the probability that a CNF is true, based on the graph statistics.
+   * Naive assumption: all contained comparisons are pair-wise independent.
+   *
+   * @param cnf cnf
+   * @return estimation of the probability that the CNF evaluates to true
+   */
+  public double estimateCNF(CNF cnf) {
+<span class="fc" id="L145">    return cnf.getPredicates().stream()</span>
+<span class="fc" id="L146">      .map(this::estimateCNFElement)</span>
+<span class="fc" id="L147">      .collect(Collectors.toList())</span>
+<span class="fc" id="L148">      .stream()</span>
+<span class="fc" id="L149">      .reduce((i, j) -&gt; i * j)</span>
+<span class="fc" id="L150">      .orElse(1.);</span>
+  }
+
+  /**
+   * Estimates the probability that a {@link CNFElement}, i.e. a disjunction of
+   * comparisons, is true (based on the graph statistics).
+   *
+   * @param element CNFElement
+   * @return estimation of probability that the CNFElement evaluates to true
+   */
+  private double estimateCNFElement(CNFElement element) {
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (element.getPredicates().size() == 1) {</span>
+<span class="fc" id="L162">      return estimateComparison(element.getPredicates().get(0));</span>
+    } else {
+      // recursively estimate P(a or b or c or...) as P(a) + P(b or c or...) - P(a)*P(b or c or...)
+<span class="fc" id="L165">      List&lt;ComparisonExpression&gt; comparisons = element.getPredicates();</span>
+<span class="fc" id="L166">      double firstEst = estimateComparison(comparisons.get(0));</span>
+<span class="fc" id="L167">      CNFElement rest = new CNFElement(comparisons.subList(1, comparisons.size()));</span>
+<span class="fc" id="L168">      double restEst = estimateCNF(new CNF(Collections.singletonList(rest)));</span>
+<span class="fc" id="L169">      return firstEst + restEst - (firstEst * restEst);</span>
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison evaluates to true, based on
+   * the graph statistics.
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison evaluates to true
+   */
+  private double estimateComparison(ComparisonExpression comparisonExpression) {
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    if (cache.containsKey(comparisonExpression)) {</span>
+<span class="fc" id="L182">      return cache.get(comparisonExpression);</span>
+    }
+<span class="fc" id="L184">    double result = 1.;</span>
+    // probability of labels is not estimated here, belongs to the structural estimations
+<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (isLabelComp(comparisonExpression)) {</span>
+<span class="fc" id="L187">      return 1.;</span>
+    } else {
+      // more than one element in the comparison?
+<span class="fc bfc" id="L190" title="All 2 branches covered.">      if (comparisonExpression.getVariables().size() &gt; 1) {</span>
+<span class="fc" id="L191">        result = estimateComparisonOnDifferent(comparisonExpression);</span>
+      } else {
+        // exactly one element in the comparison
+<span class="fc" id="L194">        result = estimateCompOnSameTPGM(comparisonExpression);</span>
+      }
+    }
+<span class="fc" id="L197">    cache.put(comparisonExpression, result);</span>
+<span class="fc" id="L198">    return result;</span>
+  }
+
+  /**
+   * Checks if a comparison describes the label of an element
+   *
+   * @param comparison comparison to check
+   * @return true iff the comparison describes the label of an element
+   */
+  private boolean isLabelComp(ComparisonExpression comparison) {
+<span class="fc bfc" id="L208" title="All 2 branches covered.">    if (comparison.getComparator() != EQ) {</span>
+<span class="fc" id="L209">      return false;</span>
+    }
+<span class="fc bfc" id="L211" title="All 2 branches covered.">    if (comparison.getLhs() instanceof PropertySelectorComparable) {</span>
+<span class="fc" id="L212">      return ((PropertySelectorComparable) comparison.getLhs())</span>
+<span class="fc" id="L213">        .getPropertyKey().equals(&quot;__label__&quot;);</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    } else if (comparison.getRhs() instanceof PropertySelectorComparable) {</span>
+<span class="fc" id="L215">      return ((PropertySelectorComparable) comparison.getRhs())</span>
+<span class="fc" id="L216">        .getPropertyKey().equals(&quot;__label__&quot;);</span>
+    }
+<span class="fc" id="L218">    return false;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison involving only one element holds.
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of probability that the comparison holds
+   */
+  private double estimateCompOnSameTPGM(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L228">    QueryComparable lhs = comparisonExpression.getLhs();</span>
+<span class="fc" id="L229">    QueryComparable rhs = comparisonExpression.getRhs();</span>
+
+<span class="fc bfc" id="L231" title="All 2 branches covered.">    if (ComparisonUtil.isTemporal(comparisonExpression)) {</span>
+<span class="fc bfc" id="L232" title="All 4 branches covered.">      if (lhs instanceof TimeSelectorComparable &amp;&amp; rhs instanceof TimeSelectorComparable) {</span>
+        // TODO implement?
+<span class="fc" id="L234">        return 1.;</span>
+<span class="pc bpc" id="L235" title="2 of 8 branches missed.">      } else if (lhs instanceof TimeSelectorComparable &amp;&amp; rhs instanceof TimeLiteralComparable ||</span>
+        lhs instanceof TimeLiteralComparable &amp;&amp; rhs instanceof TimeSelectorComparable) {
+<span class="fc" id="L237">        return simpleTemporalEstimation(comparisonExpression);</span>
+<span class="pc bpc" id="L238" title="3 of 8 branches missed.">      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||</span>
+        rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
+<span class="fc" id="L240">        return minMaxTemporalEstimation(comparisonExpression);</span>
+<span class="pc bpc" id="L241" title="1 of 8 branches missed.">      } else if ((lhs instanceof DurationComparable &amp;&amp; rhs instanceof TimeConstantComparable) ||</span>
+        (lhs instanceof TimeConstantComparable &amp;&amp; rhs instanceof DurationComparable)) {
+<span class="fc" id="L243">        return simpleDurationComparisonEstimation(comparisonExpression);</span>
+      } else {
+<span class="fc" id="L245">        return 1.;</span>
+      }
+    } else {
+<span class="pc bpc" id="L248" title="1 of 8 branches missed.">      if ((lhs instanceof PropertySelectorComparable &amp;&amp; rhs instanceof LiteralComparable) ||</span>
+        (lhs instanceof LiteralComparable &amp;&amp; rhs instanceof PropertySelectorComparable)) {
+<span class="fc" id="L250">        return simplePropertyEstimation(comparisonExpression);</span>
+<span class="pc bpc" id="L251" title="2 of 4 branches missed.">      } else if (lhs instanceof PropertySelectorComparable &amp;&amp;</span>
+        rhs instanceof PropertySelectorComparable) {
+<span class="fc" id="L253">        return complexPropertyEstimation(comparisonExpression);</span>
+      } else {
+<span class="nc" id="L255">        return 1.;</span>
+      }
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison between a tx or val duration and
+   * a time constant evaluates to true.
+   * All other possible comparisons involving a duration are estimated 1.0
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison evaluates to true
+   */
+  private double simpleDurationComparisonEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L269">    QueryComparable lhs = comparisonExpression.getLhs();</span>
+<span class="fc" id="L270">    QueryComparable rhs = comparisonExpression.getRhs();</span>
+<span class="fc" id="L271">    Comparator comp = comparisonExpression.getComparator();</span>
+    // ensure that the duration is always on the left side
+<span class="fc bfc" id="L273" title="All 2 branches covered.">    if (rhs instanceof DurationComparable) {</span>
+<span class="fc" id="L274">      QueryComparable t = lhs;</span>
+<span class="fc" id="L275">      lhs = rhs;</span>
+<span class="fc" id="L276">      rhs = t;</span>
+<span class="fc" id="L277">      comp = switchComparator(comp);</span>
+    }
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">    if (!(rhs instanceof TimeConstantComparable)) {</span>
+<span class="nc" id="L280">      return 1.;</span>
+    }
+    // only valid and tx durations can be estimated
+<span class="fc" id="L283">    Duration duration = (Duration) ((DurationComparable) lhs).getWrappedComparable();</span>
+    // complex durations not supported yet, only transaction and valid interval durations
+<span class="fc bfc" id="L285" title="All 2 branches covered.">    if (!checkSimpleDuration(duration)) {</span>
+<span class="fc" id="L286">      return 1.;</span>
+    }
+
+<span class="fc" id="L289">    String variable = new ArrayList&lt;&gt;(comparisonExpression.getVariables()).get(0);</span>
+<span class="fc" id="L290">    TemporalGraphStatistics.ElementType type = typeMap.get(variable);</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    Optional&lt;String&gt; label = labelMap.containsKey(variable) ?</span>
+<span class="fc" id="L292">      Optional.of(labelMap.get(variable)) : Optional.empty();</span>
+<span class="fc" id="L293">    TimeSelector from = (TimeSelector) duration.getFrom();</span>
+    // tx or valid interval?
+<span class="fc bfc" id="L295" title="All 2 branches covered.">    boolean transaction = from.getTimeProp() == TimeSelector.TimeField.TX_FROM;</span>
+<span class="fc" id="L296">    long rhsValue = ((TimeConstant) ((TimeConstantComparable) rhs)</span>
+<span class="fc" id="L297">      .getWrappedComparable()).getMillis();</span>
+
+<span class="fc" id="L299">    return stats.estimateDurationProb(type, label, comp, transaction, rhsValue);</span>
+  }
+
+  /**
+   * Checks if a duration is of the simple form [a.tx_from, a.tx_to] or
+   * [a.val_from, a.val_to]
+   *
+   * @param duration duration to check
+   * @return true iff the duration has this simple form
+   */
+  private boolean checkSimpleDuration(Duration duration) {
+    // two time selectors?
+<span class="fc bfc" id="L311" title="All 4 branches covered.">    if (!(duration.getFrom() instanceof TimeSelector) || !(duration.getTo() instanceof TimeSelector)) {</span>
+<span class="fc" id="L312">      return false;</span>
+    }
+<span class="fc" id="L314">    TimeSelector from = (TimeSelector) duration.getFrom();</span>
+<span class="fc" id="L315">    TimeSelector to = (TimeSelector) duration.getTo();</span>
+    // val_from, val_to or tx_from, tx_to?
+<span class="fc" id="L317">    if (!</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">      ((from.getTimeProp() == TimeSelector.TimeField.VAL_FROM &amp;&amp;</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">        to.getTimeProp() == TimeSelector.TimeField.VAL_TO) ||</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">        (from.getTimeProp() == TimeSelector.TimeField.TX_FROM &amp;&amp;</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">          to.getTimeProp() == TimeSelector.TimeField.TX_TO))) {</span>
+<span class="nc" id="L322">      return false;</span>
+    }
+    // same variable for both selectors?
+<span class="fc" id="L325">    return from.getVariable().equals(to.getVariable());</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison involving MIN or MAX holds.
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of probability that the comparison holds
+   */
+  private double minMaxTemporalEstimation(ComparisonExpression comparisonExpression) {
+    // TODO implement if needed
+<span class="fc" id="L336">    return 1.0;</span>
+  }
+
+
+  /**
+   * Computes the estimation of the probability that a comparison between a time selector
+   * and a time literal holds
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double simpleTemporalEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L348">    TemporalComparable lhs = (TemporalComparable) comparisonExpression.getLhs();</span>
+<span class="fc" id="L349">    TemporalComparable rhs = (TemporalComparable) comparisonExpression.getRhs();</span>
+<span class="fc" id="L350">    Comparator comp = comparisonExpression.getComparator();</span>
+    // adjust the comparison so that the selector is always on the lhs
+<span class="fc bfc" id="L352" title="All 2 branches covered.">    if (rhs instanceof TimeSelectorComparable) {</span>
+<span class="fc" id="L353">      TemporalComparable t = lhs;</span>
+<span class="fc" id="L354">      lhs = rhs;</span>
+<span class="fc" id="L355">      rhs = t;</span>
+<span class="fc" id="L356">      comp = switchComparator(comp);</span>
+    }
+<span class="fc" id="L358">    String variable = ((TimeSelectorComparable) lhs).getVariable();</span>
+<span class="fc" id="L359">    TemporalGraphStatistics.ElementType type = typeMap.get(variable);</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">    Optional&lt;String&gt; label = labelMap.containsKey(variable) ?</span>
+<span class="fc" id="L361">      Optional.of(labelMap.get(variable)) : Optional.empty();</span>
+<span class="fc" id="L362">    TimeSelector.TimeField field = ((TimeSelectorComparable) lhs).getTimeField();</span>
+<span class="fc" id="L363">    Long value = ((TimeLiteralComparable) rhs).getTimeLiteral().getMilliseconds();</span>
+
+<span class="fc" id="L365">    return stats.estimateTemporalProb(type, label, field, comp, value);</span>
+  }
+
+  /**
+   * Computes the estimation of the probability that a comparison between
+   * two property selectors holds
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double complexPropertyEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L376">    QueryComparable lhs = comparisonExpression.getLhs();</span>
+<span class="fc" id="L377">    QueryComparable rhs = comparisonExpression.getRhs();</span>
+<span class="fc" id="L378">    Comparator comp = comparisonExpression.getComparator();</span>
+
+<span class="fc" id="L380">    String variable1 = ((PropertySelectorComparable) lhs).getVariable();</span>
+<span class="fc" id="L381">    TemporalGraphStatistics.ElementType type1 = typeMap.get(variable1);</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">    Optional&lt;String&gt; label1 = labelMap.containsKey(variable1) ?</span>
+<span class="fc" id="L383">      Optional.of(labelMap.get(variable1)) : Optional.empty();</span>
+<span class="fc" id="L384">    String property1 = ((PropertySelectorComparable) lhs).getPropertyKey();</span>
+
+<span class="fc" id="L386">    String variable2 = ((PropertySelectorComparable) rhs).getVariable();</span>
+<span class="fc" id="L387">    TemporalGraphStatistics.ElementType type2 = typeMap.get(variable2);</span>
+<span class="fc bfc" id="L388" title="All 2 branches covered.">    Optional&lt;String&gt; label2 = labelMap.containsKey(variable2) ?</span>
+<span class="fc" id="L389">      Optional.of(labelMap.get(variable2)) : Optional.empty();</span>
+<span class="fc" id="L390">    String property2 = ((PropertySelectorComparable) rhs).getPropertyKey();</span>
+
+<span class="fc" id="L392">    return stats.estimatePropertyProb(type1, label1, property1, comp,</span>
+      type2, label2, property2);
+  }
+
+  /**
+   * Computes the estimation of the probability that a comparison between a property
+   * selector and a constant holds
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double simplePropertyEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L404">    QueryComparable lhs = comparisonExpression.getLhs();</span>
+<span class="fc" id="L405">    QueryComparable rhs = comparisonExpression.getRhs();</span>
+<span class="fc" id="L406">    Comparator comp = comparisonExpression.getComparator();</span>
+    // &quot;normalize&quot; the comparison so that the selector is on the left side
+<span class="fc bfc" id="L408" title="All 2 branches covered.">    if (rhs instanceof PropertySelectorComparable) {</span>
+<span class="fc" id="L409">      QueryComparable t = lhs;</span>
+<span class="fc" id="L410">      lhs = rhs;</span>
+<span class="fc" id="L411">      rhs = t;</span>
+<span class="fc" id="L412">      comp = switchComparator(comp);</span>
+    }
+<span class="fc" id="L414">    String variable = ((PropertySelectorComparable) lhs).getVariable();</span>
+<span class="fc" id="L415">    TemporalGraphStatistics.ElementType type = typeMap.get(variable);</span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">    Optional&lt;String&gt; label = labelMap.containsKey(variable) ?</span>
+<span class="fc" id="L417">      Optional.of(labelMap.get(variable)) : Optional.empty();</span>
+<span class="fc" id="L418">    String property = ((PropertySelectorComparable) lhs).getPropertyKey();</span>
+<span class="fc" id="L419">    PropertyValue value = PropertyValue.create(((LiteralComparable) rhs).getValue());</span>
+<span class="fc" id="L420">    return stats.estimatePropertyProb(type, label, property, comp, value);</span>
+  }
+
+  /**
+   * Used to switch lhs and rhs of a comparison. Switches the comparator.
+   * This is not the inversion function!
+   * E.g., for &lt;, the return value is &gt; (while the inverse of &lt; is &gt;=)
+   *
+   * @param comp comparator to switch
+   * @return switched comparator
+   */
+  private Comparator switchComparator(Comparator comp) {
+<span class="pc bpc" id="L432" title="1 of 4 branches missed.">    if (comp == EQ || comp == NEQ) {</span>
+<span class="fc" id="L433">      return comp;</span>
+<span class="fc bfc" id="L434" title="All 2 branches covered.">    } else if (comp == LT) {</span>
+<span class="fc" id="L435">      return GT;</span>
+<span class="fc bfc" id="L436" title="All 2 branches covered.">    } else if (comp == LTE) {</span>
+<span class="fc" id="L437">      return GTE;</span>
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">    } else if (comp == GT) {</span>
+<span class="nc" id="L439">      return LT;</span>
+    } else {
+<span class="fc" id="L441">      return LTE;</span>
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison involving more than one element holds.
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of probability that the comparison holds.
+   */
+  private double estimateComparisonOnDifferent(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L452">    QueryComparable lhs = comparisonExpression.getLhs();</span>
+<span class="fc" id="L453">    QueryComparable rhs = comparisonExpression.getRhs();</span>
+
+<span class="fc bfc" id="L455" title="All 2 branches covered.">    if (ComparisonUtil.isTemporal(comparisonExpression)) {</span>
+<span class="pc bpc" id="L456" title="1 of 4 branches missed.">      if (lhs instanceof TimeSelectorComparable &amp;&amp; rhs instanceof TimeSelectorComparable) {</span>
+<span class="fc" id="L457">        return timeSelectorComparisonEstimation(comparisonExpression);</span>
+<span class="pc bpc" id="L458" title="2 of 8 branches missed.">      } else if (lhs instanceof MinTimePointComparable || lhs instanceof MaxTimePointComparable ||</span>
+        rhs instanceof MinTimePointComparable || rhs instanceof MaxTimePointComparable) {
+<span class="fc" id="L460">        return minMaxTemporalEstimation(comparisonExpression);</span>
+<span class="fc bfc" id="L461" title="All 4 branches covered.">      } else if (lhs instanceof DurationComparable &amp;&amp; rhs instanceof DurationComparable) {</span>
+<span class="fc" id="L462">        return durationComparisonEstimation(comparisonExpression);</span>
+      } else {
+<span class="fc" id="L464">        return 1.;</span>
+      }
+    } else {
+<span class="pc bpc" id="L467" title="1 of 4 branches missed.">      if (lhs instanceof PropertySelectorComparable &amp;&amp;</span>
+        rhs instanceof PropertySelectorComparable) {
+<span class="fc" id="L469">        return complexPropertyEstimation(comparisonExpression);</span>
+      } else {
+<span class="fc" id="L471">        return 1.;</span>
+      }
+    }
+  }
+
+  /**
+   * Computes the estimation of the probability that a comparison between two
+   * durations holds
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double durationComparisonEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L484">    Duration lhs = (Duration) comparisonExpression.getLhs().getWrappedComparable();</span>
+<span class="fc" id="L485">    Duration rhs = (Duration) comparisonExpression.getRhs().getWrappedComparable();</span>
+<span class="fc bfc" id="L486" title="All 4 branches covered.">    if (!(checkSimpleDuration(lhs) &amp;&amp; checkSimpleDuration(rhs))) {</span>
+<span class="fc" id="L487">      return 1.;</span>
+    }
+
+<span class="fc" id="L490">    TimeSelector from1 = (TimeSelector) lhs.getFrom();</span>
+<span class="fc" id="L491">    String variable1 = from1.getVariable();</span>
+<span class="fc" id="L492">    TemporalGraphStatistics.ElementType type1 = typeMap.get(variable1);</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">    Optional&lt;String&gt; label1 = labelMap.containsKey(variable1) ?</span>
+<span class="fc" id="L494">      Optional.of(labelMap.get(variable1)) : Optional.empty();</span>
+    // transaction or valid interval
+<span class="fc bfc" id="L496" title="All 2 branches covered.">    boolean transaction1 = from1.getTimeProp() == TimeSelector.TimeField.TX_FROM;</span>
+
+<span class="fc" id="L498">    TimeSelector from2 = (TimeSelector) rhs.getFrom();</span>
+<span class="fc" id="L499">    String variable2 = from2.getVariable();</span>
+<span class="fc" id="L500">    TemporalGraphStatistics.ElementType type2 = typeMap.get(variable2);</span>
+<span class="pc bpc" id="L501" title="1 of 2 branches missed.">    Optional&lt;String&gt; label2 = labelMap.containsKey(variable2) ?</span>
+<span class="pc" id="L502">      Optional.of(labelMap.get(variable2)) : Optional.empty();</span>
+<span class="fc bfc" id="L503" title="All 2 branches covered.">    boolean transaction2 = from2.getTimeProp() == TimeSelector.TimeField.TX_FROM;</span>
+
+<span class="fc" id="L505">    Comparator comp = comparisonExpression.getComparator();</span>
+
+<span class="fc" id="L507">    return stats.estimateDurationProb(type1, label1, transaction1, comp, type2,</span>
+      label2, transaction2);
+  }
+
+  /**
+   * Computes the estimation of the probability that a comparison between two time
+   * selectors (of different elements) holds
+   *
+   * @param comparisonExpression comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double timeSelectorComparisonEstimation(ComparisonExpression comparisonExpression) {
+<span class="fc" id="L519">    TimeSelectorComparable lhs = (TimeSelectorComparable) comparisonExpression.getLhs();</span>
+<span class="fc" id="L520">    TimeSelectorComparable rhs = (TimeSelectorComparable) comparisonExpression.getRhs();</span>
+<span class="fc" id="L521">    Comparator comp = comparisonExpression.getComparator();</span>
+
+<span class="fc" id="L523">    String lhsVariable = lhs.getVariable();</span>
+<span class="fc" id="L524">    TemporalGraphStatistics.ElementType type1 = typeMap.getOrDefault(lhsVariable, null);</span>
+<span class="pc bpc" id="L525" title="1 of 2 branches missed.">    if (type1 == null) {</span>
+<span class="nc" id="L526">      return 0.001;</span>
+    }
+<span class="fc bfc" id="L528" title="All 2 branches covered.">    Optional&lt;String&gt; label1 = labelMap.containsKey(lhsVariable) ?</span>
+<span class="fc" id="L529">      Optional.of(labelMap.get(lhsVariable)) : Optional.empty();</span>
+<span class="fc" id="L530">    TimeSelector.TimeField field1 = lhs.getTimeField();</span>
+
+<span class="fc" id="L532">    String rhsVariable = rhs.getVariable();</span>
+<span class="fc" id="L533">    TemporalGraphStatistics.ElementType type2 = typeMap.getOrDefault(rhsVariable, null);</span>
+<span class="pc bpc" id="L534" title="1 of 2 branches missed.">    if (type2 == null) {</span>
+<span class="nc" id="L535">      return 0.001;</span>
+    }
+<span class="fc bfc" id="L537" title="All 2 branches covered.">    Optional&lt;String&gt; label2 = labelMap.containsKey(rhsVariable) ?</span>
+<span class="fc" id="L538">      Optional.of(labelMap.get(rhsVariable)) : Optional.empty();</span>
+<span class="fc" id="L539">    TimeSelector.TimeField field2 = rhs.getTimeField();</span>
+
+<span class="fc" id="L541">    return stats.estimateTemporalProb(type1, label1, field1, comp, type2, label2, field2);</span>
+  }
+
+  /**
+   * Reorders the clauses of the CNF: the most selective clauses are moved to the beginning
+   * of the CNF (exception: label constraint is always the first constraint).
+   * Within a clause, the least selective comparisons are moved to the beginning of the clause.
+   * The motivation is to minimize the number of comparisons to check when processing the CNF
+   *
+   * @param cnf the CNF to reorder
+   * @return reordered CNF
+   */
+  public CNF reorderCNF(CNF cnf) {
+<span class="fc" id="L554">    ArrayList&lt;CNFElement&gt; clauses = new ArrayList&lt;&gt;(cnf.getPredicates());</span>
+    // resort the clauses: labels and then selective clauses first
+<span class="fc" id="L556">    clauses.sort((clause1, clause2) -&gt; {</span>
+<span class="fc bfc" id="L557" title="All 4 branches covered.">      if (clause1.getPredicates().size() == 1 &amp;&amp; isLabelComp(clause1.getPredicates().get(0))) {</span>
+<span class="fc" id="L558">        return 100;</span>
+<span class="fc bfc" id="L559" title="All 2 branches covered.">      } else if (clause2.getPredicates().size() == 1 &amp;&amp;</span>
+<span class="fc bfc" id="L560" title="All 2 branches covered.">        isLabelComp(clause2.getPredicates().get(0))) {</span>
+<span class="fc" id="L561">        return -100;</span>
+      } else {
+<span class="fc" id="L563">        return (int) (100. * (estimateCNFElement(clause1) - estimateCNFElement(clause2)));</span>
+      }
+    });
+
+    // resort comparisons within clauses: labels and then non-selective comparisons first
+<span class="fc" id="L568">    clauses = clauses.stream().map(clause -&gt; {</span>
+<span class="fc" id="L569">      ArrayList&lt;ComparisonExpression&gt; comps = new ArrayList&lt;&gt;(</span>
+<span class="fc" id="L570">        clause.getPredicates());</span>
+<span class="fc" id="L571">      comps.sort((c1, c2) -&gt; {</span>
+<span class="pc bpc" id="L572" title="1 of 2 branches missed.">        if (isLabelComp(c1)) {</span>
+<span class="nc" id="L573">          return 100;</span>
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">        } else if (isLabelComp(c2)) {</span>
+<span class="nc" id="L575">          return -100;</span>
+        } else {
+<span class="fc" id="L577">          return (int) (100. * (estimateComparison(c2) - estimateComparison(c1)));</span>
+        }
+      });
+<span class="fc" id="L580">      return new CNFElement(comps);</span>
+<span class="fc" id="L581">    }).collect(Collectors.toCollection(ArrayList::new));</span>
+
+<span class="fc" id="L583">    return new CNF(clauses);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

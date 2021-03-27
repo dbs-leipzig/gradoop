@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoundsInference.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">BoundsInference.java</span></div><h1>BoundsInference.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.apache.commons.lang.SerializationUtils;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MinTimePointComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_TO;
+import static org.gradoop.gdl.utils.Comparator.EQ;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Transformation that aims to infer new, informative bounds for temporal properties
+ * according to the clauses.
+ * Furthermore, contradictions are detected.
+ */
+<span class="fc" id="L60">public class BoundsInference implements QueryTransformation {</span>
+
+  @Override
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
+    /*
+     * stores the newly inferred lower bounds for time selectors
+     */
+<span class="fc" id="L67">    HashMap&lt;TimeSelector, Long&gt; lowerBounds = new HashMap&lt;&gt;();</span>
+    /*
+     * stores the newly inferred upper bounds for time selectors
+     */
+<span class="fc" id="L71">    HashMap&lt;TimeSelector, Long&gt; upperBounds = new HashMap&lt;&gt;();</span>
+    // clauses (not) to consider
+<span class="fc" id="L73">    List&lt;CNFElement&gt; relevantClauses = cnf.getPredicates().stream()</span>
+<span class="fc" id="L74">      .filter(this::isRelevantClause)</span>
+<span class="fc" id="L75">      .collect(Collectors.toList());</span>
+<span class="fc" id="L76">    List&lt;CNFElement&gt; otherClauses = cnf.getPredicates().stream()</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      .filter(clause -&gt; !isRelevantClause(clause))</span>
+<span class="fc" id="L78">      .collect(Collectors.toList());</span>
+<span class="fc" id="L79">    List&lt;ComparisonExpression&gt; relevantComparisons = relevantClauses.stream()</span>
+<span class="fc" id="L80">      .map(clause -&gt; clause.getPredicates().get(0))</span>
+<span class="fc" id="L81">      .collect(Collectors.toList());</span>
+
+    // stores all tuples (a,b) with a=b in relevant comparisons
+<span class="fc" id="L84">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cEq = new HashMap&lt;&gt;();</span>
+    // stores all tuples (a,b) with a&lt;=b in relevant comparisons
+<span class="fc" id="L86">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cLeq = new HashMap&lt;&gt;();</span>
+    // stores all tuples (a,b) with a&lt;b in relevant comparisons
+<span class="fc" id="L88">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cLt = new HashMap&lt;&gt;();</span>
+    // stores all tuples (a,b) with a!=b in relevant comparisons
+<span class="fc" id="L90">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cNeq = new HashMap&lt;&gt;();</span>
+
+
+    // init bounds
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    for (ComparisonExpression comp : relevantComparisons) {</span>
+<span class="fc" id="L95">      ComparableExpression lhs = comp.getLhs().getWrappedComparable();</span>
+<span class="fc" id="L96">      ComparableExpression rhs = comp.getRhs().getWrappedComparable();</span>
+<span class="fc" id="L97">      Comparator comparator = comp.getComparator();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (comp.getLhs() instanceof TimeSelectorComparable) {</span>
+<span class="fc" id="L99">        lowerBounds.put((TimeSelector) lhs, TemporalElement.DEFAULT_TIME_FROM);</span>
+<span class="fc" id="L100">        upperBounds.put((TimeSelector) lhs, TemporalElement.DEFAULT_TIME_TO);</span>
+      }
+<span class="fc bfc" id="L102" title="All 2 branches covered.">      if (comp.getRhs() instanceof TimeSelectorComparable) {</span>
+<span class="fc" id="L103">        lowerBounds.put((TimeSelector) rhs, TemporalElement.DEFAULT_TIME_FROM);</span>
+<span class="fc" id="L104">        upperBounds.put((TimeSelector) rhs, TemporalElement.DEFAULT_TIME_TO);</span>
+      }
+      // init c-relations
+<span class="fc bfc" id="L107" title="All 2 branches covered.">      if (comparator.equals(EQ)) {</span>
+<span class="fc" id="L108">        cEq.putIfAbsent(lhs, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L109">        cEq.putIfAbsent(rhs, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L110">        cEq.get(lhs).add(rhs);</span>
+<span class="fc" id="L111">        cEq.get(rhs).add(lhs);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">      } else if (comparator.equals(Comparator.LTE)) {</span>
+<span class="fc" id="L113">        cLeq.putIfAbsent(lhs, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L114">        cLeq.get(lhs).add(rhs);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">      } else if (comparator.equals(Comparator.LT)) {</span>
+<span class="fc" id="L116">        cLt.putIfAbsent(lhs, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L117">        cLt.get(lhs).add(rhs);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">      } else if (comparator.equals(Comparator.NEQ)) {</span>
+<span class="fc" id="L119">        cNeq.putIfAbsent(lhs, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L120">        cNeq.get(lhs).add(rhs);</span>
+      }
+<span class="fc" id="L122">    }</span>
+
+    // compute closures for =,&lt;,&lt;=
+<span class="fc" id="L125">    List&lt;HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt;&gt; closures =</span>
+<span class="fc" id="L126">      computeClosureRelations(cEq, cLeq, cLt);</span>
+
+<span class="fc" id="L128">    checkLtContradictions(closures.get(2));</span>
+    // infer new bounds
+<span class="fc" id="L130">    List&lt;HashMap&lt;TimeSelector, Long&gt;&gt; newBounds = updateEq(closures.get(0), lowerBounds, upperBounds);</span>
+<span class="fc" id="L131">    newBounds = updateLeq(closures.get(1), newBounds.get(0), newBounds.get(1));</span>
+<span class="fc" id="L132">    newBounds = updateLt(closures.get(2), newBounds.get(0), newBounds.get(1));</span>
+
+    // check them for contradictions with NEQ clauses
+<span class="fc" id="L135">    checkNeqContradictions(cNeq, newBounds.get(0), newBounds.get(1));</span>
+    // filter redundant clauses like a.tx_from &lt;= a.tx_to and comparisons between selectors and literals
+<span class="fc" id="L137">    List&lt;ComparisonExpression&gt; remainingOldComparisons = filterRedundantComparisons(relevantComparisons);</span>
+    // construct new clauses
+<span class="fc" id="L139">    List&lt;ComparisonExpression&gt; newComparisons = comparisons(newBounds.get(0), newBounds.get(1));</span>
+
+    // construct the CNF
+<span class="fc" id="L142">    List&lt;CNFElement&gt; remainingOldClauses = remainingOldComparisons.stream()</span>
+<span class="fc" id="L143">      .map(comparison -&gt; new CNFElement(Collections.singletonList(comparison)))</span>
+<span class="fc" id="L144">      .collect(Collectors.toList());</span>
+<span class="fc" id="L145">    List&lt;CNFElement&gt; newClauses = newComparisons.stream()</span>
+<span class="fc" id="L146">      .map(comparison -&gt; new CNFElement(Collections.singletonList(comparison)))</span>
+<span class="fc" id="L147">      .collect(Collectors.toList());</span>
+
+<span class="fc" id="L149">    List&lt;CNFElement&gt; allClauses = otherClauses;</span>
+<span class="fc" id="L150">    allClauses.addAll(remainingOldClauses);</span>
+<span class="fc" id="L151">    allClauses.addAll(newClauses);</span>
+<span class="fc" id="L152">    return new CNF(allClauses);</span>
+  }
+
+  /**
+   * Constructs new comparisons from the inferred bounds
+   *
+   * @param lowerBounds inferred lower bounds
+   * @param upperBounds inferred upper bounds
+   * @return inferred comparisons
+   */
+  private List&lt;ComparisonExpression&gt; comparisons(HashMap&lt;TimeSelector, Long&gt; lowerBounds,
+                                                 HashMap&lt;TimeSelector, Long&gt; upperBounds) {
+<span class="fc" id="L164">    List&lt;ComparisonExpression&gt; newComparisons = new ArrayList&lt;&gt;();</span>
+    // for all selectors, as lowerBounds has the same keys as upperBounds
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    for (Map.Entry&lt;TimeSelector, Long&gt; entry : lowerBounds.entrySet()) {</span>
+<span class="fc" id="L167">      TimeSelector selector = entry.getKey();</span>
+<span class="fc" id="L168">      Long lower = entry.getValue();</span>
+<span class="fc" id="L169">      Long upper = upperBounds.get(selector);</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">      if (lower.equals(upper)) {</span>
+<span class="fc" id="L171">        newComparisons.add(new ComparisonExpression(</span>
+<span class="fc" id="L172">          new Comparison(selector, EQ, new TimeLiteral(lower)),</span>
+          new ComparableTPGMFactory()));
+      } else {
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (lower &gt; TemporalElement.DEFAULT_TIME_FROM) {</span>
+          // check if informative: lower bound of from is trivial lower bound of to
+<span class="fc bfc" id="L177" title="All 2 branches covered.">          if (selector.getTimeProp().equals(TX_TO)) {</span>
+<span class="fc" id="L178">            TimeSelector txFromSel = new TimeSelector(selector.getVariable(), TX_FROM);</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">            if (lowerBounds.getOrDefault(txFromSel, TemporalElement.DEFAULT_TIME_FROM).equals(lower)) {</span>
+<span class="fc" id="L180">              continue;</span>
+            }
+<span class="fc bfc" id="L182" title="All 2 branches covered.">          } else if (selector.getTimeProp().equals(VAL_TO)) {</span>
+<span class="fc" id="L183">            TimeSelector valFromSel = new TimeSelector(selector.getVariable(), VAL_FROM);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">            if (lowerBounds.getOrDefault(valFromSel, TemporalElement.DEFAULT_TIME_FROM).equals(lower)) {</span>
+<span class="fc" id="L185">              continue;</span>
+            }
+          }
+          // informative =&gt; build comparison
+<span class="fc" id="L189">          newComparisons.add(new ComparisonExpression(</span>
+<span class="fc" id="L190">            new Comparison(new TimeLiteral(lower), LTE, selector),</span>
+            new ComparableTPGMFactory()));
+        }
+<span class="fc bfc" id="L193" title="All 2 branches covered.">        if (upper &lt; TemporalElement.DEFAULT_TIME_TO) {</span>
+          // analagously as for lower bounds
+          // upper bound of to is trivial upper of from
+<span class="fc bfc" id="L196" title="All 2 branches covered.">          if (selector.getTimeProp().equals(TimeSelector.TimeField.TX_FROM)) {</span>
+<span class="fc" id="L197">            TimeSelector txToSel = new TimeSelector(selector.getVariable(), TX_TO);</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            if (upperBounds.getOrDefault(txToSel, TemporalElement.DEFAULT_TIME_TO).equals(upper)) {</span>
+<span class="fc" id="L199">              continue;</span>
+            }
+<span class="fc bfc" id="L201" title="All 2 branches covered.">          } else if (selector.getTimeProp().equals(TimeSelector.TimeField.VAL_FROM)) {</span>
+<span class="fc" id="L202">            TimeSelector valToSel = new TimeSelector(selector.getVariable(), VAL_TO);</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            if (upperBounds.getOrDefault(valToSel, TemporalElement.DEFAULT_TIME_TO).equals(upper)) {</span>
+<span class="fc" id="L204">              continue;</span>
+            }
+          }
+          // informative =&gt; build comparison
+<span class="fc" id="L208">          newComparisons.add(new ComparisonExpression(</span>
+<span class="fc" id="L209">            new Comparison(selector, LTE, new TimeLiteral(upper)),</span>
+            new ComparableTPGMFactory()));
+        }
+      }
+<span class="fc" id="L213">    }</span>
+<span class="fc" id="L214">    return newComparisons;</span>
+  }
+
+
+  /**
+   * Checks a set of comparisons for trivial comparisons like a.tx_from &lt;= a.tx_to or
+   * l1 &lt; l2 (l1, l2 literals).
+   * Furthermore, comparisons between selectors and literals are removed, as they are
+   * replaced by those gained from the bounds
+   *
+   * @param comparisons comparisons to filter
+   * @return @code{comparisons} without redundant comparisons
+   */
+  private List&lt;ComparisonExpression&gt; filterRedundantComparisons(List&lt;ComparisonExpression&gt; comparisons) {
+<span class="fc" id="L228">    List&lt;ComparisonExpression&gt; newComparisons = new ArrayList&lt;&gt;();</span>
+
+    // filter out redundant clauses
+<span class="fc bfc" id="L231" title="All 2 branches covered.">    for (ComparisonExpression comp : comparisons) {</span>
+<span class="fc" id="L232">      QueryComparable rhs = comp.getRhs();</span>
+<span class="fc" id="L233">      QueryComparable lhs = comp.getLhs();</span>
+<span class="fc" id="L234">      Comparator comparator = comp.getComparator();</span>
+      // a.tx_from &lt;= a.tx_to redundant
+<span class="fc bfc" id="L236" title="All 4 branches covered.">      if (rhs instanceof TimeSelectorComparable &amp;&amp; lhs instanceof TimeSelectorComparable &amp;&amp;</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        comparator.equals(Comparator.LTE)) {</span>
+<span class="fc" id="L238">        if (!((TimeSelectorComparable) rhs).getVariable()</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">          .equals(((TimeSelectorComparable) lhs).getVariable())) {</span>
+<span class="fc" id="L240">          newComparisons.add(comp);</span>
+        }
+<span class="fc bfc" id="L242" title="All 4 branches covered.">      } else if (rhs instanceof TimeLiteralComparable &amp;&amp; lhs instanceof TimeLiteralComparable) {</span>
+        // comparisons between literals not informative.
+        // Contradictory comparisons have been filtered out before
+        // cf. @link{TrivialContradictions}
+<span class="fc" id="L246">        continue;</span>
+<span class="pc bpc" id="L247" title="1 of 8 branches missed.">      } else if ((rhs instanceof TimeLiteralComparable &amp;&amp; lhs instanceof TimeSelectorComparable) ||</span>
+        (rhs instanceof TimeSelectorComparable &amp;&amp; lhs instanceof TimeLiteralComparable)) {
+        // comparisons between selectors and literals are redundant,
+        // as they are contained in the inferred bounds
+<span class="fc" id="L251">        continue;</span>
+      } else {
+<span class="fc" id="L253">        newComparisons.add(comp);</span>
+      }
+<span class="fc" id="L255">    }</span>
+<span class="fc" id="L256">    return newComparisons;</span>
+  }
+
+  /**
+   * Checks for contradictions between the inferred bounds and all relevant != constraints
+   *
+   * @param cNeq        != constraints as relations
+   * @param lowerBounds inferred lower bounds
+   * @param upperBounds inferred upper bounds
+   * @throws QueryContradictoryException if a contradiction is encountered
+   */
+  private void checkNeqContradictions(HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cNeq,
+                                      HashMap&lt;TimeSelector, Long&gt; lowerBounds,
+                                      HashMap&lt;TimeSelector, Long&gt; upperBounds)
+    throws QueryContradictoryException {
+<span class="fc" id="L271">    ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; neq = relationToTuples(cNeq);</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">    for (ArrayList&lt;ComparableExpression&gt; tuple : neq) {</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">      if (tuple.get(0) instanceof TimeSelector) {</span>
+<span class="fc" id="L274">        TimeSelector sel = (TimeSelector) tuple.get(0);</span>
+        // if lower(sel)!=upper(sel), no constraint sel!=x is contradictory
+<span class="fc bfc" id="L276" title="All 2 branches covered.">        if (!lowerBounds.get(sel).equals(upperBounds.get(sel))) {</span>
+<span class="fc" id="L277">          return;</span>
+        }
+        // selector1 != selector2 only contradictory if both selectors have the same fixed value
+        // (lower(selector1)=upper(selector1)=lower(selector2)=upper(selector2)
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        if (tuple.get(1) instanceof TimeSelector) {</span>
+<span class="nc" id="L282">          TimeSelector sel2 = (TimeSelector) tuple.get(1);</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">          if (lowerBounds.get(sel).equals(lowerBounds.get(sel2)) &amp;&amp;</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">            lowerBounds.get(sel2).equals(upperBounds.get(sel2))) {</span>
+<span class="nc" id="L285">            throw new QueryContradictoryException();</span>
+          } // selector != literal only contradictory if lower(selector)=upper(selector)=literal
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">        } else if (tuple.get(1) instanceof TimeLiteral) {</span>
+<span class="fc" id="L288">          Long literalValue = ((TimeLiteral) tuple.get(1)).getMilliseconds();</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">          if (lowerBounds.get(sel).equals(literalValue)) {</span>
+<span class="fc" id="L290">            throw new QueryContradictoryException();</span>
+          }
+        }
+<span class="pc bpc" id="L293" title="3 of 4 branches missed.">      } else if (tuple.get(0) instanceof TimeLiteral &amp;&amp; tuple.get(1) instanceof TimeSelector) {</span>
+        // selector != literal only contradictory if lower(selector)=upper(selector)=literal
+<span class="nc" id="L295">        TimeSelector sel = (TimeSelector) tuple.get(1);</span>
+<span class="nc" id="L296">        Long literalValue = ((TimeLiteral) tuple.get(0)).getMilliseconds();</span>
+<span class="nc bnc" id="L297" title="All 4 branches missed.">        if (lowerBounds.get(sel).equals(upperBounds.get(sel)) &amp;&amp; lowerBounds.get(sel).equals(literalValue)) {</span>
+<span class="nc" id="L298">          throw new QueryContradictoryException();</span>
+        }
+      }
+<span class="fc" id="L301">    }</span>
+<span class="fc" id="L302">  }</span>
+
+  /**
+   * Updates lower and upper bounds with the lower-than relations
+   *
+   * @param rLt         lower-than relations
+   * @param lowerBounds lower bounds
+   * @param upperBounds upper bounds
+   * @return updated lower and upper bounds as a list [lower, upper]
+   * @throws QueryContradictoryException if a contradiction is encountered
+   */
+  private List&lt;HashMap&lt;TimeSelector, Long&gt;&gt; updateLt(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rLt,
+    HashMap&lt;TimeSelector, Long&gt; lowerBounds, HashMap&lt;TimeSelector, Long&gt; upperBounds)
+    throws QueryContradictoryException {
+
+<span class="fc" id="L318">    ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; lt = relationToTuples(rLt);</span>
+<span class="fc bfc" id="L319" title="All 2 branches covered.">    for (ArrayList&lt;ComparableExpression&gt; tuple : lt) {</span>
+<span class="fc" id="L320">      TimeSelector selector = null;</span>
+<span class="fc" id="L321">      Long literalValue = null;</span>
+      // only comparisons between a selector and a literal are interesting here
+      // selector &lt; literal  =&gt; upper(selector) = min(upper(selector), literal-1)
+<span class="fc bfc" id="L324" title="All 4 branches covered.">      if (tuple.get(0) instanceof TimeSelector &amp;&amp; tuple.get(1) instanceof TimeLiteral) {</span>
+<span class="fc" id="L325">        selector = (TimeSelector) tuple.get(0);</span>
+<span class="fc" id="L326">        literalValue = ((TimeLiteral) tuple.get(1)).getMilliseconds() - 1;</span>
+<span class="fc" id="L327">        upperBounds.put(selector, Math.min(upperBounds.get(selector), literalValue));</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">      } else if (tuple.get(1) instanceof TimeSelector &amp;&amp;</span>
+<span class="fc bfc" id="L329" title="All 2 branches covered.">        tuple.get(0) instanceof TimeLiteral) {</span>
+        // selector &gt; literal  =&gt; lower(selector) = max(lower(selector), literal+1)
+<span class="fc" id="L331">        selector = (TimeSelector) tuple.get(1);</span>
+<span class="fc" id="L332">        literalValue = ((TimeLiteral) tuple.get(0)).getMilliseconds() + 1;</span>
+<span class="fc" id="L333">        lowerBounds.put(selector, Math.max(lowerBounds.get(selector), literalValue));</span>
+      } else {
+        continue;
+      }
+
+<span class="fc bfc" id="L338" title="All 2 branches covered.">      if (lowerBounds.get(selector) &gt; upperBounds.get(selector)) {</span>
+<span class="fc" id="L339">        throw new QueryContradictoryException();</span>
+      }
+<span class="fc" id="L341">    }</span>
+
+<span class="fc" id="L343">    return Arrays.asList(lowerBounds, upperBounds);</span>
+  }
+
+
+  /**
+   * Updates lower and upper bounds with the lighter-or-equal relations
+   *
+   * @param rLeq        leq relations
+   * @param lowerBounds lower bounds
+   * @param upperBounds upper bounds
+   * @return updated lower and upper bounds as a list [lower, upper]
+   * @throws QueryContradictoryException if a contradiction is encountered
+   */
+  private List&lt;HashMap&lt;TimeSelector, Long&gt;&gt; updateLeq(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rLeq,
+    HashMap&lt;TimeSelector, Long&gt; lowerBounds, HashMap&lt;TimeSelector, Long&gt; upperBounds)
+    throws QueryContradictoryException {
+
+<span class="fc" id="L361">    ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; leq = relationToTuples(rLeq);</span>
+<span class="fc bfc" id="L362" title="All 2 branches covered.">    for (ArrayList&lt;ComparableExpression&gt; tuple : leq) {</span>
+<span class="fc" id="L363">      TimeSelector selector = null;</span>
+<span class="fc" id="L364">      Long literalValue = null;</span>
+      // only comparisons between a selector and a literal are interesting here
+      // selector &lt;= literal  =&gt; upper(selector) = min(upper(selector), literal)
+<span class="fc bfc" id="L367" title="All 4 branches covered.">      if (tuple.get(0) instanceof TimeSelector &amp;&amp; tuple.get(1) instanceof TimeLiteral) {</span>
+<span class="fc" id="L368">        selector = (TimeSelector) tuple.get(0);</span>
+<span class="fc" id="L369">        literalValue = ((TimeLiteral) tuple.get(1)).getMilliseconds();</span>
+<span class="fc" id="L370">        upperBounds.put(selector, Math.min(upperBounds.get(selector), literalValue));</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">      } else if (tuple.get(1) instanceof TimeSelector &amp;&amp;</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        tuple.get(0) instanceof TimeLiteral) {</span>
+        // selector &gt;= literal  =&gt; lower(selector) = max(lower(selector), literal)
+<span class="fc" id="L374">        selector = (TimeSelector) tuple.get(1);</span>
+<span class="fc" id="L375">        literalValue = ((TimeLiteral) tuple.get(0)).getMilliseconds();</span>
+<span class="fc" id="L376">        lowerBounds.put(selector, Math.max(lowerBounds.get(selector), literalValue));</span>
+      } else {
+        continue;
+      }
+
+<span class="pc bpc" id="L381" title="1 of 2 branches missed.">      if (lowerBounds.get(selector) &gt; upperBounds.get(selector)) {</span>
+<span class="nc" id="L382">        throw new QueryContradictoryException();</span>
+      }
+<span class="fc" id="L384">    }</span>
+
+<span class="fc" id="L386">    return Arrays.asList(lowerBounds, upperBounds);</span>
+  }
+
+  /**
+   * Updates lower and upper bounds with the equality relations
+   *
+   * @param rEq         equality relations
+   * @param lowerBounds lower bounds
+   * @param upperBounds upper bounds
+   * @return updated lower and upper bounds as a list [lower, upper]
+   * @throws QueryContradictoryException if a contradiction is encountered
+   */
+  private List&lt;HashMap&lt;TimeSelector, Long&gt;&gt; updateEq(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rEq,
+    HashMap&lt;TimeSelector, Long&gt; lowerBounds, HashMap&lt;TimeSelector, Long&gt; upperBounds)
+    throws QueryContradictoryException {
+
+<span class="fc" id="L403">    ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; eq = relationToTuples(rEq);</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">    for (ArrayList&lt;ComparableExpression&gt; tuple : eq) {</span>
+<span class="fc" id="L405">      TimeSelector selector = null;</span>
+<span class="fc" id="L406">      TimeLiteral literal = null;</span>
+      // only comparisons between a selector and a literal are interesting here
+<span class="fc bfc" id="L408" title="All 4 branches covered.">      if (tuple.get(0) instanceof TimeSelector &amp;&amp; tuple.get(1) instanceof TimeLiteral) {</span>
+<span class="fc" id="L409">        selector = (TimeSelector) tuple.get(0);</span>
+<span class="fc" id="L410">        literal = (TimeLiteral) tuple.get(1);</span>
+<span class="fc bfc" id="L411" title="All 4 branches covered.">      } else if (tuple.get(1) instanceof TimeSelector &amp;&amp; tuple.get(0) instanceof TimeLiteral) {</span>
+<span class="fc" id="L412">        selector = (TimeSelector) tuple.get(1);</span>
+<span class="fc" id="L413">        literal = (TimeLiteral) tuple.get(0);</span>
+      } else {
+        continue;
+      }
+      // for selector=literal, lowerBound(selector) = literal and upperBound(selector) = literal
+<span class="fc" id="L418">      Long literalValue = literal.getMilliseconds();</span>
+<span class="pc bpc" id="L419" title="2 of 4 branches missed.">      if (lowerBounds.get(selector) &gt; literalValue || upperBounds.get(selector) &lt; literalValue) {</span>
+<span class="nc" id="L420">        throw new QueryContradictoryException();</span>
+      } else {
+<span class="fc" id="L422">        lowerBounds.put(selector, literalValue);</span>
+<span class="fc" id="L423">        upperBounds.put(selector, literalValue);</span>
+      }
+<span class="fc" id="L425">    }</span>
+<span class="fc" id="L426">    return Arrays.asList(lowerBounds, upperBounds);</span>
+  }
+
+  /**
+   * Flattens the map representation of a relation to a list of list of ComparableExpressions.
+   * Each list has the length 2, representing one tuple in the relation.
+   *
+   * @param rel relation to flatten
+   * @return flattened relation
+   */
+  private ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; relationToTuples(HashMap&lt;ComparableExpression,
+    HashSet&lt;ComparableExpression&gt;&gt; rel) {
+<span class="fc" id="L438">    ArrayList&lt;ArrayList&lt;ComparableExpression&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">    for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; mapEntry : rel.entrySet()) {</span>
+<span class="fc" id="L440">      ComparableExpression c1 = mapEntry.getKey();</span>
+<span class="fc bfc" id="L441" title="All 2 branches covered.">      for (ComparableExpression c2 : mapEntry.getValue()) {</span>
+<span class="fc" id="L442">        list.add(new ArrayList&lt;&gt;(Arrays.asList(c1, c2)));</span>
+<span class="fc" id="L443">      }</span>
+<span class="fc" id="L444">    }</span>
+<span class="fc" id="L445">    return list;</span>
+  }
+
+  /**
+   * Checks the lighter-than relations for tuples (a,a) and throws an exception if such a tuple is
+   * encountered. Other contradictions in this relation are checked later
+   *
+   * @param ltRelation lighter-than relation
+   * @throws QueryContradictoryException if a tuple (a,a) is encountered
+   */
+  private void checkLtContradictions(HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; ltRelation)
+    throws QueryContradictoryException {
+<span class="fc bfc" id="L457" title="All 2 branches covered.">    for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; tuple : ltRelation.entrySet()) {</span>
+<span class="fc" id="L458">      ComparableExpression key = tuple.getKey();</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">      for (ComparableExpression value : tuple.getValue()) {</span>
+<span class="fc bfc" id="L460" title="All 2 branches covered.">        if (key.equals(value)) {</span>
+<span class="fc" id="L461">          throw new QueryContradictoryException();</span>
+        }
+<span class="fc" id="L463">      }</span>
+<span class="fc" id="L464">    }</span>
+<span class="fc" id="L465">  }</span>
+
+  /**
+   * Computes relations rEq, rLeq, rLt so that
+   * rEq contains (a,b) iff relevant comparisons imply a=b
+   * rLeq contains (a,b) iff relevant comparisons imply a&lt;=b, but not a=b or a &lt; b
+   * rLt contains (a,b) iff relevant comparisons imply a &lt; b
+   *
+   * @param cEq  relation containing (a,b) iff relevant comparisons contain a=b
+   * @param cLeq relation containing (a,b) iff relevant comparisons contain a&lt;=b
+   * @param cLt  relation containing (a,b) iff relevant comparisons contain a &lt; b
+   * @return list [rEq, rLeq, rLt]
+   */
+  private List&lt;HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt;&gt; computeClosureRelations(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cEq,
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cLeq,
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; cLt) {
+    // init relations
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rEq;
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rLeq;
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rLt;
+    // compute them
+<span class="fc" id="L487">    rEq = union(transitiveClosure(cEq), selfInverses(transitiveClosure(union(cEq, cLeq))));</span>
+<span class="fc" id="L488">    rLeq = subtract(transitiveClosure(union(rEq, cLeq)), rEq);</span>
+<span class="fc" id="L489">    rLt = transitiveClosure(union(</span>
+<span class="fc" id="L490">      composition(union(rEq, rLeq), cLt),</span>
+<span class="fc" id="L491">      composition(cLt, union(rEq, rLeq)),</span>
+      cLt
+    ));
+<span class="fc" id="L494">    return Arrays.asList(rEq, rLeq, rLt);</span>
+  }
+
+  /**
+   * Returns a subrelation containing all tuples whose inverses are also contained in the relation
+   * I.e., a tuple (a,b) is included in the return value, if (a,b) in rel and (b,a) in rel.
+   *
+   * @param rel relation
+   * @return subrelation containing all tuples whose inverses are also contained @code{rel}
+   */
+  private HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; selfInverses(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel) {
+
+<span class="fc" id="L507">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; newRel = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L508" title="All 2 branches covered.">    for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; r : rel.entrySet()) {</span>
+<span class="fc" id="L509">      ComparableExpression key = r.getKey();</span>
+<span class="fc bfc" id="L510" title="All 2 branches covered.">      for (ComparableExpression v : r.getValue()) {</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">        if (rel.containsKey(v)) {</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">          if (rel.get(v).contains(key)) {</span>
+<span class="fc" id="L513">            newRel.putIfAbsent(key, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L514">            newRel.get(key).add(v);</span>
+          }
+        }
+<span class="fc" id="L517">      }</span>
+<span class="fc" id="L518">    }</span>
+
+<span class="fc" id="L520">    return newRel;</span>
+  }
+
+  /**
+   * Subtracts one relation from another
+   *
+   * @param rel1 relation to subtract from
+   * @param rel2 relation to be subtracted
+   * @return @code{rel1} - @code{rel2}
+   */
+  private HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; subtract(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel1,
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel2) {
+
+<span class="fc" id="L534">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; newRel = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L536" title="All 2 branches covered.">    for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; r1 : rel1.entrySet()) {</span>
+<span class="fc" id="L537">      ComparableExpression key = r1.getKey();</span>
+<span class="fc" id="L538">      HashSet&lt;ComparableExpression&gt; values1 = r1.getValue();</span>
+<span class="fc" id="L539">      HashSet&lt;ComparableExpression&gt; values2 = rel2.getOrDefault(key, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L540">      HashSet&lt;ComparableExpression&gt; newValues = new HashSet&lt;&gt;(values1);</span>
+<span class="fc" id="L541">      newValues.removeAll(values2);</span>
+<span class="fc" id="L542">      newRel.put(key, new HashSet&lt;&gt;(newValues));</span>
+<span class="fc" id="L543">    }</span>
+<span class="fc" id="L544">    return newRel;</span>
+  }
+
+
+  /**
+   * Compute the transitive closure of a relation
+   *
+   * @param rel relation
+   * @return transitive closure of relation
+   */
+  private HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; transitiveClosure(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel) {
+
+<span class="fc" id="L557">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; newRel = rel;</span>
+<span class="fc" id="L558">    boolean changed = true;</span>
+    // apply transitivity until closure is complete: (a,b) in rel, (b,c) in rel =&gt; (a,c) in rel
+<span class="fc bfc" id="L560" title="All 2 branches covered.">    while (changed) {</span>
+<span class="fc" id="L561">      HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; oldRel =</span>
+<span class="fc" id="L562">        (HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt;) SerializationUtils.clone(newRel);</span>
+<span class="fc" id="L563">      changed = false;</span>
+<span class="fc bfc" id="L564" title="All 2 branches covered.">      for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; r : oldRel.entrySet()) {</span>
+<span class="fc" id="L565">        ComparableExpression key = r.getKey();</span>
+<span class="fc bfc" id="L566" title="All 2 branches covered.">        for (ComparableExpression value : r.getValue()) {</span>
+<span class="fc" id="L567">          newRel.putIfAbsent(key, new HashSet&lt;&gt;());</span>
+<span class="pc bpc" id="L568" title="1 of 4 branches missed.">          changed = newRel.get(key).add(value) || changed;</span>
+<span class="fc bfc" id="L569" title="All 2 branches covered.">          if (oldRel.containsKey(value)) {</span>
+<span class="fc bfc" id="L570" title="All 4 branches covered.">            changed = newRel.get(key).addAll(oldRel.get(value)) || changed;</span>
+          }
+<span class="fc" id="L572">        }</span>
+<span class="fc" id="L573">      }</span>
+<span class="fc" id="L574">    }</span>
+<span class="fc" id="L575">    return newRel;</span>
+  }
+
+  /**
+   * Composition of two relations
+   *
+   * @param rel1 first relation
+   * @param rel2 second relation
+   * @return composition of both
+   */
+  private HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; composition(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel1,
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; rel2) {
+
+<span class="fc" id="L589">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; newRel = new HashMap&lt;&gt;();</span>
+    // (a,b) in rel1, (b,c) in rel2 =&gt; put (a,c) into newRel
+<span class="fc bfc" id="L591" title="All 2 branches covered.">    for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; r1 : rel1.entrySet()) {</span>
+<span class="fc" id="L592">      ComparableExpression key = r1.getKey();</span>
+<span class="fc bfc" id="L593" title="All 2 branches covered.">      for (ComparableExpression oldValue : r1.getValue()) {</span>
+        // transitive relation?
+<span class="fc bfc" id="L595" title="All 2 branches covered.">        if (rel2.containsKey(oldValue)) {</span>
+<span class="fc" id="L596">          HashSet&lt;ComparableExpression&gt; newValues = rel2.get(oldValue);</span>
+<span class="fc" id="L597">          newRel.putIfAbsent(key, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L598">          newRel.get(key).addAll(newValues);</span>
+        }
+<span class="fc" id="L600">      }</span>
+<span class="fc" id="L601">    }</span>
+<span class="fc" id="L602">    return newRel;</span>
+  }
+
+  /**
+   * Unites relations
+   *
+   * @param relations relations to unite
+   * @return united relation
+   */
+  private HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; union(
+    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt;... relations) {
+<span class="fc" id="L613">    HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; newRel = new HashMap&lt;&gt;();</span>
+    // add all relations from the array to newRel
+<span class="fc bfc" id="L615" title="All 2 branches covered.">    for (HashMap&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; relation : relations) {</span>
+<span class="fc bfc" id="L616" title="All 2 branches covered.">      for (Map.Entry&lt;ComparableExpression, HashSet&lt;ComparableExpression&gt;&gt; entry : relation.entrySet()) {</span>
+<span class="fc" id="L617">        ComparableExpression key = entry.getKey();</span>
+<span class="fc" id="L618">        HashSet&lt;ComparableExpression&gt; values = entry.getValue();</span>
+<span class="fc" id="L619">        newRel.putIfAbsent(key, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L620">        newRel.get(key).addAll(values);</span>
+<span class="fc" id="L621">      }</span>
+    }
+<span class="fc" id="L623">    return newRel;</span>
+  }
+
+  /**
+   * Checks whether a clause is relevant, i.e. it has size 1 and does not contain
+   * MIN/MAX or duration
+   *
+   * @param clause clause to check
+   * @return true iff clause is relevant
+   */
+  private boolean isRelevantClause(CNFElement clause) {
+<span class="fc bfc" id="L634" title="All 4 branches covered.">    return clause.size() == 1 &amp;&amp; !isMinMax(clause.getPredicates().get(0)) &amp;&amp;</span>
+<span class="fc bfc" id="L635" title="All 2 branches covered.">      !isDuration(clause.getPredicates().get(0));</span>
+  }
+
+  /**
+   * Checks whether a given wrapped comparison contains a MIN or MAX expression
+   *
+   * @param comp comparison expression to check for MIN/MAX
+   * @return true iff comp contains MIN or MAX
+   */
+  private boolean isMinMax(ComparisonExpression comp) {
+<span class="fc bfc" id="L645" title="All 2 branches covered.">    return comp.getLhs() instanceof MinTimePointComparable ||</span>
+<span class="fc bfc" id="L646" title="All 2 branches covered.">      comp.getLhs() instanceof MaxTimePointComparable ||</span>
+<span class="pc bpc" id="L647" title="1 of 2 branches missed.">      comp.getRhs() instanceof MinTimePointComparable ||</span>
+<span class="pc bpc" id="L648" title="1 of 2 branches missed.">      comp.getRhs() instanceof MaxTimePointComparable;</span>
+  }
+
+  /**
+   * Checks if a comparison contains a duration
+   *
+   * @param comp comparison
+   * @return true iff comp contains a duration
+   */
+  private boolean isDuration(ComparisonExpression comp) {
+<span class="fc bfc" id="L658" title="All 2 branches covered.">    return comp.getLhs() instanceof DurationComparable ||</span>
+<span class="fc bfc" id="L659" title="All 2 branches covered.">      comp.getRhs() instanceof DurationComparable ||</span>
+<span class="pc bpc" id="L660" title="1 of 2 branches missed.">      comp.getLhs() instanceof TimeConstantComparable ||</span>
+<span class="pc bpc" id="L661" title="1 of 2 branches missed.">      comp.getRhs() instanceof TimeConstantComparable;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

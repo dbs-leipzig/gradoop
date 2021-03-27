@@ -20,14 +20,15 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.Literal}
  */
 public class LiteralComparable extends QueryComparable {
   /**
@@ -40,9 +41,9 @@ public class LiteralComparable extends QueryComparable {
    *
    * @param literal the wrapped literal
    */
-<span class="fc" id="L43">  public LiteralComparable(Literal literal) {</span>
-<span class="fc" id="L44">    this.literal = literal;</span>
-<span class="fc" id="L45">  }</span>
+<span class="fc" id="L44">  public LiteralComparable(Literal literal) {</span>
+<span class="fc" id="L45">    this.literal = literal;</span>
+<span class="fc" id="L46">  }</span>
 
   /**
    * Returns the value of the literal.
@@ -50,7 +51,7 @@ public class LiteralComparable extends QueryComparable {
    * @return literal value
    */
   public Object getValue() {
-<span class="nc" id="L53">    return literal.getValue();</span>
+<span class="nc" id="L54">    return literal.getValue();</span>
   }
 
   /**
@@ -62,36 +63,41 @@ public class LiteralComparable extends QueryComparable {
    */
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-<span class="fc" id="L65">    return PropertyValue.create(literal.getValue());</span>
+<span class="fc" id="L66">    return PropertyValue.create(literal.getValue());</span>
   }
 
   @Override
   public PropertyValue evaluate(GraphElement element) {
-<span class="fc" id="L70">    return PropertyValue.create(literal.getValue());</span>
+<span class="fc" id="L71">    return PropertyValue.create(literal.getValue());</span>
   }
 
   @Override
   public Set&lt;String&gt; getPropertyKeys(String variable) {
-<span class="fc" id="L75">    return new HashSet&lt;&gt;(0);</span>
+<span class="fc" id="L76">    return new HashSet&lt;&gt;(0);</span>
+  }
+
+  @Override
+  public ComparableExpression getWrappedComparable() {
+<span class="nc" id="L81">    return literal;</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L81">      return true;</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L87">      return true;</span>
     }
-<span class="pc bpc" id="L83" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L84">      return false;</span>
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L90">      return false;</span>
     }
 
-<span class="fc" id="L87">    LiteralComparable that = (LiteralComparable) o;</span>
+<span class="fc" id="L93">    LiteralComparable that = (LiteralComparable) o;</span>
 
-<span class="fc" id="L89">    return Objects.equals(literal, that.literal);</span>
+<span class="fc" id="L95">    return Objects.equals(literal, that.literal);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L94" title="All 2 branches missed.">    return literal != null ? literal.hashCode() : 0;</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">    return literal != null ? literal.hashCode() : 0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

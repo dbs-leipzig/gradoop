@@ -110,9 +110,9 @@ import static java.util.Objects.requireNonNull;
   @Override
   public LogicalGraphLayout&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt; fromCollections(
     Collection&lt;TemporalVertex&gt; vertices, Collection&lt;TemporalEdge&gt; edges) {
-<span class="nc" id="L113">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
-<span class="nc" id="L114">    requireNonNull(edges, &quot;Temporal edge collection is null.&quot;);</span>
-<span class="nc" id="L115">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
+<span class="fc" id="L113">    requireNonNull(vertices, &quot;Temporal vertex collection is null.&quot;);</span>
+<span class="fc" id="L114">    requireNonNull(edges, &quot;Temporal edge collection is null.&quot;);</span>
+<span class="fc" id="L115">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
   }
 
   @Override

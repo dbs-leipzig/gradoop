@@ -36,10 +36,10 @@
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.GDLHandler;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.model.Graph;
-<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.s1ck.gdl.model.GraphElement;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.gdl.GDLHandler;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.gdl.exceptions.BailSyntaxErrorStrategy;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.gdl.model.Graph;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.gdl.model.GraphElement;
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
 <a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> java.io.InputStream;
@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * Creates collections of graphs, vertices and edges from a given GDL script.</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * @see &lt;a href="https://github.com/s1ck/gdl"&gt;GDL on GitHub&lt;/a&gt;</em>
+<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * @see &lt;a href="https://github.com/dbs-leipzig/gdl"&gt;GDL on GitHub&lt;/a&gt;</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; graph head type</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; vertex type</em>
@@ -466,11 +466,11 @@
 <a name="456" href="#456">456</a> <em class="jxr_javadoccomment">   * Initializes vertices and their cache.</em>
 <a name="457" href="#457">457</a> <em class="jxr_javadoccomment">   */</em>
 <a name="458" href="#458">458</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertices() {
-<a name="459" href="#459">459</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {
+<a name="459" href="#459">459</a>     <strong class="jxr_keyword">for</strong> (org.gradoop.gdl.model.Vertex v : gdlHandler.getVertices()) {
 <a name="460" href="#460">460</a>       initVertex(v);
 <a name="461" href="#461">461</a>     }
 <a name="462" href="#462">462</a> 
-<a name="463" href="#463">463</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {
+<a name="463" href="#463">463</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.gradoop.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {
 <a name="464" href="#464">464</a>       updateVertexCache(e.getKey(), e.getValue());
 <a name="465" href="#465">465</a>     }
 <a name="466" href="#466">466</a>   }
@@ -479,11 +479,11 @@
 <a name="469" href="#469">469</a> <em class="jxr_javadoccomment">   * Initializes edges and their cache.</em>
 <a name="470" href="#470">470</a> <em class="jxr_javadoccomment">   */</em>
 <a name="471" href="#471">471</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdges() {
-<a name="472" href="#472">472</a>     <strong class="jxr_keyword">for</strong> (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {
+<a name="472" href="#472">472</a>     <strong class="jxr_keyword">for</strong> (org.gradoop.gdl.model.Edge e : gdlHandler.getEdges()) {
 <a name="473" href="#473">473</a>       initEdge(e);
 <a name="474" href="#474">474</a>     }
 <a name="475" href="#475">475</a> 
-<a name="476" href="#476">476</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {
+<a name="476" href="#476">476</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;String, org.gradoop.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {
 <a name="477" href="#477">477</a>       updateEdgeCache(e.getKey(), e.getValue());
 <a name="478" href="#478">478</a>     }
 <a name="479" href="#479">479</a>   }
@@ -508,7 +508,7 @@
 <a name="498" href="#498">498</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL Loader</em>
 <a name="499" href="#499">499</a> <em class="jxr_javadoccomment">   * @return vertex</em>
 <a name="500" href="#500">500</a> <em class="jxr_javadoccomment">   */</em>
-<a name="501" href="#501">501</a>   <strong class="jxr_keyword">private</strong> V initVertex(org.s1ck.gdl.model.Vertex v) {
+<a name="501" href="#501">501</a>   <strong class="jxr_keyword">private</strong> V initVertex(org.gradoop.gdl.model.Vertex v) {
 <a name="502" href="#502">502</a>     V vertex;
 <a name="503" href="#503">503</a>     <strong class="jxr_keyword">if</strong> (!vertexIds.containsKey(v.getId())) {
 <a name="504" href="#504">504</a>       vertex = elementFactoryProvider.getVertexFactory().createVertex(
@@ -530,7 +530,7 @@
 <a name="520" href="#520">520</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
 <a name="521" href="#521">521</a> <em class="jxr_javadoccomment">   * @return edge</em>
 <a name="522" href="#522">522</a> <em class="jxr_javadoccomment">   */</em>
-<a name="523" href="#523">523</a>   <strong class="jxr_keyword">private</strong> E initEdge(org.s1ck.gdl.model.Edge e) {
+<a name="523" href="#523">523</a>   <strong class="jxr_keyword">private</strong> E initEdge(org.gradoop.gdl.model.Edge e) {
 <a name="524" href="#524">524</a>     E edge;
 <a name="525" href="#525">525</a>     <strong class="jxr_keyword">if</strong> (!edgeIds.containsKey(e.getId())) {
 <a name="526" href="#526">526</a>       edge = elementFactoryProvider.getEdgeFactory().createEdge(
@@ -565,7 +565,7 @@
 <a name="555" href="#555">555</a> <em class="jxr_javadoccomment">   * @param variable vertex variable used in GDL script</em>
 <a name="556" href="#556">556</a> <em class="jxr_javadoccomment">   * @param v vertex from GDL loader</em>
 <a name="557" href="#557">557</a> <em class="jxr_javadoccomment">   */</em>
-<a name="558" href="#558">558</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
+<a name="558" href="#558">558</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateVertexCache(String variable, org.gradoop.gdl.model.Vertex v) {
 <a name="559" href="#559">559</a>     vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
 <a name="560" href="#560">560</a>   }
 <a name="561" href="#561">561</a> 
@@ -575,7 +575,7 @@
 <a name="565" href="#565">565</a> <em class="jxr_javadoccomment">   * @param variable edge variable used in the GDL script</em>
 <a name="566" href="#566">566</a> <em class="jxr_javadoccomment">   * @param e edge from GDL loader</em>
 <a name="567" href="#567">567</a> <em class="jxr_javadoccomment">   */</em>
-<a name="568" href="#568">568</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
+<a name="568" href="#568">568</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> updateEdgeCache(String variable, org.gradoop.gdl.model.Edge e) {
 <a name="569" href="#569">569</a>     edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
 <a name="570" href="#570">570</a>   }
 <a name="571" href="#571">571</a> 

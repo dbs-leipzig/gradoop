@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalElementStats.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo</a> &gt; <span class="el_source">TemporalElementStats.java</span></div><h1>TemporalElementStats.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo;
+
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Basic statistical information about temporal elements with a certain label.
+ * Uses reservoir sampling for bigger amounts of data,
+ * so that statistics may only be estimated based on a sample(!)
+ */
+public class TemporalElementStats implements Serializable {
+
+  /**
+   * Default Number of bins used for temporal estimations
+   */
+  public static final int DEFAULT_NUM_BINS = 100;
+  /**
+   * Samples vertices
+   */
+  private final ReservoirSampler&lt;TemporalElement&gt; sampler;
+  /**
+   * The label of the vertices/edges
+   */
+  private String label;
+  /**
+   * number of elements in the sample
+   */
+  private long elementCount;
+  /**
+   * Bins to estimate distributions of tx_from, tx_to, val_from, val_to values
+   */
+  private Binning[] estimatedTimeBins;
+  /**
+   * Holds mean and variance of tx durations
+   */
+  private double[] txDurationStats;
+  /**
+   * Holds mean and variance of val durations
+   */
+  private double[] valDurationStats;
+  /**
+   * Holds mean, variance and prob. that val_from=TemporalElement.DEFAULT_TIME_FROM
+   */
+  private double[] valFromStats;
+  /**
+   * Holds mean, variance and prob. that tx_from=TemporalElement.DEFAULT_TIME_FROM
+   */
+  private double[] txFromStats;
+  /**
+   * Holds mean, variance and prob. that val_to=TemporalElement.DEFAULT_TIME_TO
+   */
+  private double[] valToStats;
+  /**
+   * Holds mean, variance and prob. that tx_to=TemporalElement.DEFAULT_TIME_TO
+   */
+  private double[] txToStats;
+  /**
+   * list of numerical properties
+   */
+  private Set&lt;String&gt; numericalProperties;
+  /**
+   * list of categorical properties
+   */
+  private Set&lt;String&gt; categoricalProperties;
+  /**
+   * estimations of the probability that a vertex has a certain property with a
+   * certain PropertyValue.
+   * This only refers to categorical, i.e. non-numeric properties.
+   * The estimations are only computed on the reservoir sample!
+   */
+  private Map&lt;String, Map&lt;PropertyValue, Double&gt;&gt; categoricalSelectivityEstimation;
+  /**
+   * Holds for every numerical property an estimation of its mean and variance, based
+   * on the reservoir sample
+   */
+  private Map&lt;String, Double[]&gt; numericalPropertyStatsEstimation;
+  /**
+   * Holds for every numerical property an estimation of its probability to occur
+   * in an element
+   */
+  private Map&lt;String, Double&gt; numericalOccurrenceEstimation;
+  /**
+   * flag indicates that temporal statistics should be recomputed as the reservoir sample
+   * changed since the last computation.
+   */
+  private boolean recomputeTemporalDataFlag;
+  /**
+   * flag indicates that property statistics should be recomputed as the reservoir sample
+   * changed since the last computation.
+   */
+  private boolean recomputePropertyDataFlag;
+
+  /**
+   * Creates a element statistics object and set the size of the reservoir sample to compute
+   * the statistics. The numerical and categorical properties are set by the user.
+   * Omitted properties are ignored, always assigned the probability 0.5
+   *
+   * @param reservoirSampleSize   size of reservoir sample
+   * @param numericalProperties   list of numerical properties to consider
+   * @param categoricalProperties list of categorical properties to consider
+   */
+  public TemporalElementStats(int reservoirSampleSize, Set&lt;String&gt; numericalProperties,
+                              Set&lt;String&gt; categoricalProperties) {
+<span class="fc" id="L130">    this(reservoirSampleSize);</span>
+<span class="fc" id="L131">    this.numericalProperties = numericalProperties;</span>
+<span class="fc" id="L132">    this.categoricalProperties = categoricalProperties;</span>
+<span class="fc" id="L133">  }</span>
+
+  /**
+   * Creates a element statistics object and set the size of the reservoir sample to compute
+   * the statistics. The numerical and categorical properties are determined
+   * automatically later (possibly not working very good), all properties are
+   * considered.
+   *
+   * @param reservoirSampleSize size of reservoir sample
+   */
+<span class="fc" id="L143">  public TemporalElementStats(int reservoirSampleSize) {</span>
+<span class="fc" id="L144">    label = &quot;&quot;;</span>
+<span class="fc" id="L145">    elementCount = 0;</span>
+<span class="fc" id="L146">    estimatedTimeBins = new Binning[]{};</span>
+<span class="fc" id="L147">    categoricalSelectivityEstimation = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L148">    numericalPropertyStatsEstimation = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L149">    numericalOccurrenceEstimation = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L150">    recomputeTemporalDataFlag = false;</span>
+<span class="fc" id="L151">    recomputePropertyDataFlag = false;</span>
+<span class="fc" id="L152">    valFromStats = new double[]{};</span>
+<span class="fc" id="L153">    txFromStats = new double[]{};</span>
+<span class="fc" id="L154">    valToStats = new double[]{};</span>
+<span class="fc" id="L155">    txToStats = new double[]{};</span>
+<span class="fc" id="L156">    txDurationStats = new double[]{};</span>
+<span class="fc" id="L157">    valDurationStats = new double[]{};</span>
+<span class="fc" id="L158">    sampler = new ReservoirSampler&lt;&gt;(reservoirSampleSize);</span>
+<span class="fc" id="L159">  }</span>
+
+  /**
+   * Creates a element statistics object that uses a reservoir sample of default size
+   * {@code SimpleElementStats.DEFAULT_SAMPLE_SIZE} to compute the statistics
+   * All properties will be considered, their type (numerical/categorical) detected
+   * automatically (may not work very good).
+   */
+  public TemporalElementStats() {
+<span class="fc" id="L168">    this(ReservoirSampler.DEFAULT_SAMPLE_SIZE);</span>
+<span class="fc" id="L169">  }</span>
+
+  /**
+   * Creates an element statistics object that uses a reservoir sample of default size.
+   * Numerical and categorical properties to consider are given explicitly
+   *
+   * @param numericalProperties   numerical properties to consider
+   * @param categoricalProperties categorical properties to consider
+   */
+  public TemporalElementStats(Set&lt;String&gt; numericalProperties, Set&lt;String&gt; categoricalProperties) {
+<span class="fc" id="L179">    this(ReservoirSampler.DEFAULT_SAMPLE_SIZE, numericalProperties, categoricalProperties);</span>
+<span class="fc" id="L180">  }</span>
+
+
+  /**
+   * Updates the statistics by adding a new element's data
+   *
+   * @param element the element to include in the stats
+   * @return true iff the element was actually included in the reservoir sample
+   */
+  public boolean addElement(TemporalElement element) {
+<span class="fc" id="L190">    elementCount++;</span>
+
+<span class="fc" id="L192">    boolean changed = sampler.updateSample(element);</span>
+    // set recompute flags, if the element was actually added
+<span class="pc bpc" id="L194" title="1 of 4 branches missed.">    recomputeTemporalDataFlag = recomputeTemporalDataFlag || changed;</span>
+<span class="pc bpc" id="L195" title="1 of 4 branches missed.">    recomputePropertyDataFlag = recomputePropertyDataFlag || changed;</span>
+<span class="fc" id="L196">    return changed;</span>
+
+  }
+
+  /**
+   * Returns the binning estimations for tx_from, tx_to, val_from, val_to depending on
+   * the vertices that are currently in the reservoir sample
+   *
+   * @return binning estimations for temporal data
+   */
+  public Binning[] getEstimatedTimeBins() {
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    if (recomputeTemporalDataFlag) {</span>
+<span class="fc" id="L208">      computeTemporalEstimations();</span>
+    }
+<span class="fc" id="L210">    return estimatedTimeBins.clone();</span>
+  }
+
+  /**
+   * Initializes or updates all temporal estimations (dependent on the current reservoir
+   * sample)
+   */
+  private void computeTemporalEstimations() {
+<span class="fc" id="L218">    long now = new TimeLiteral(&quot;now&quot;).getMilliseconds();</span>
+
+<span class="fc" id="L220">    List&lt;TemporalElement&gt; reservoirSample = sampler.getReservoirSample();</span>
+<span class="fc" id="L221">    int sampleSize = reservoirSample.size();</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">    if (sampleSize == 0) {</span>
+<span class="nc" id="L223">      return;</span>
+    }
+
+<span class="fc" id="L226">    int numBins = Math.min(DEFAULT_NUM_BINS, sampleSize);</span>
+
+    // sample size must be a multiple of the number of bins
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">    if (sampleSize % numBins != 0) {</span>
+<span class="nc" id="L230">      reservoirSample = reservoirSample.subList(0,</span>
+        sampleSize - sampleSize % numBins);
+    }
+
+    // lists collecting all values for each time property, i.e.
+    // TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
+<span class="fc" id="L236">    ArrayList&lt;Long&gt; allTxFroms = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L237">    ArrayList&lt;Long&gt; allTxTos = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L238">    ArrayList&lt;Long&gt; allValFroms = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L239">    ArrayList&lt;Long&gt; allValTos = new ArrayList&lt;Long&gt;();</span>
+
+    // lists collecting only those values for each time property unequal to
+    // TemporalElement.DEFAULT_TIME_FROM/MAX_VALUE, too
+<span class="fc" id="L243">    ArrayList&lt;Long&gt; txFroms = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L244">    ArrayList&lt;Long&gt; txTos = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L245">    ArrayList&lt;Long&gt; valFroms = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L246">    ArrayList&lt;Long&gt; valTos = new ArrayList&lt;Long&gt;();</span>
+
+<span class="fc" id="L248">    List&lt;Long&gt; valDurations = new ArrayList&lt;Long&gt;();</span>
+<span class="fc" id="L249">    List&lt;Long&gt; txDurations = new ArrayList&lt;Long&gt;();</span>
+
+    // count, how often to values are TemporalElement.DEFAULT_TIME_TO
+<span class="fc" id="L252">    int txToMaxCount = 0;</span>
+<span class="fc" id="L253">    int valToMaxCount = 0;</span>
+    // count, how often from values are TemporalElement.DEFAULT_TIME_FROM
+<span class="fc" id="L255">    int txFromMinCount = 0;</span>
+<span class="fc" id="L256">    int valFromMinCount = 0;</span>
+
+<span class="fc bfc" id="L258" title="All 2 branches covered.">    for (TemporalElement element : reservoirSample) {</span>
+      // collect all relevant temporal properties from the reservoir
+<span class="fc" id="L260">      long txFrom = element.getTxFrom();</span>
+<span class="fc" id="L261">      long txTo = element.getTxTo();</span>
+<span class="fc" id="L262">      allTxFroms.add(txFrom);</span>
+<span class="fc" id="L263">      allTxTos.add(txTo);</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">      if (txFrom &gt; TemporalElement.DEFAULT_TIME_FROM) {</span>
+<span class="fc" id="L265">        txFroms.add(txFrom);</span>
+      } else {
+<span class="nc" id="L267">        txFromMinCount++;</span>
+      }
+<span class="fc bfc" id="L269" title="All 2 branches covered.">      if (txTo == TemporalElement.DEFAULT_TIME_TO) {</span>
+<span class="fc" id="L270">        txToMaxCount += 1;</span>
+<span class="fc" id="L271">        txDurations.add(now - txFrom);</span>
+      } else {
+<span class="fc" id="L273">        txTos.add(txTo);</span>
+<span class="fc" id="L274">        txDurations.add(txTo - txFrom);</span>
+      }
+
+<span class="fc" id="L277">      long valFrom = element.getValidFrom();</span>
+<span class="fc" id="L278">      long valTo = element.getValidTo();</span>
+<span class="fc" id="L279">      allValFroms.add(valFrom);</span>
+<span class="fc" id="L280">      allValTos.add(valTo);</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">      if (valFrom &gt; TemporalElement.DEFAULT_TIME_FROM) {</span>
+<span class="fc" id="L282">        valFroms.add(valFrom);</span>
+      } else {
+<span class="nc" id="L284">        valFromMinCount++;</span>
+      }
+<span class="fc bfc" id="L286" title="All 2 branches covered.">      if (valTo == TemporalElement.DEFAULT_TIME_TO) {</span>
+<span class="fc" id="L287">        valToMaxCount += 1;</span>
+<span class="fc" id="L288">        valDurations.add(now - valFrom);</span>
+      } else {
+<span class="fc" id="L290">        valTos.add(valTo);</span>
+<span class="fc" id="L291">        valDurations.add(valTo - valFrom);</span>
+      }
+
+<span class="fc" id="L294">    }</span>
+
+    // statistics for temporal properties (without binning)
+<span class="fc" id="L297">    double txFromMean = mean(txFroms);</span>
+<span class="fc" id="L298">    double txFromVariance = variance(txFroms, txFromMean);</span>
+<span class="fc" id="L299">    double txFromMinEstimation = (double) txFromMinCount / (double) sampleSize;</span>
+<span class="fc" id="L300">    txFromStats = new double[]{txFromMean, txFromVariance, txFromMinEstimation};</span>
+
+<span class="fc" id="L302">    double valFromMean = mean(valFroms);</span>
+<span class="fc" id="L303">    double valFromVariance = variance(valFroms, valFromMean);</span>
+<span class="fc" id="L304">    double valFromMinEstimation = (double) valFromMinCount / (double) sampleSize;</span>
+<span class="fc" id="L305">    valFromStats = new double[]{valFromMean, valFromVariance, valFromMinEstimation};</span>
+
+<span class="fc" id="L307">    double txToMean = mean(txTos);</span>
+<span class="fc" id="L308">    double txToVariance = variance(txTos, txToMean);</span>
+<span class="fc" id="L309">    double txToMaxEstimation = (double) txToMaxCount / (double) sampleSize;</span>
+<span class="fc" id="L310">    txToStats = new double[]{txToMean, txToVariance, txToMaxEstimation};</span>
+
+<span class="fc" id="L312">    double valToMean = mean(valTos);</span>
+<span class="fc" id="L313">    double valToVariance = variance(valTos, valToMean);</span>
+<span class="fc" id="L314">    double valToMaxEstimation = (double) valToMaxCount / (double) sampleSize;</span>
+<span class="fc" id="L315">    valToStats = new double[]{valToMean, valToVariance, valToMaxEstimation};</span>
+
+    // create binnings for the temporal properties
+<span class="fc" id="L318">    estimatedTimeBins = new Binning[]{</span>
+      new Binning(allTxFroms, numBins),
+      new Binning(allTxTos, numBins),
+      new Binning(allValFroms, numBins),
+      new Binning(allValTos, numBins)
+    };
+
+    // determine means and variances of the durations
+<span class="fc" id="L326">    double txDurationMean = mean(txDurations);</span>
+<span class="fc" id="L327">    double txDurationVar = variance(txDurations, txDurationMean);</span>
+<span class="fc" id="L328">    txDurationStats = new double[]{txDurationMean, txDurationVar};</span>
+
+<span class="fc" id="L330">    double valDurationMean = mean(valDurations);</span>
+<span class="fc" id="L331">    double valDurationVar = variance(valDurations, valDurationMean);</span>
+<span class="fc" id="L332">    valDurationStats = new double[]{valDurationMean, valDurationVar};</span>
+
+<span class="fc" id="L334">    recomputeTemporalDataFlag = false;</span>
+<span class="fc" id="L335">  }</span>
+
+  /**
+   * Calculates the mean of a list of doubles
+   *
+   * @param ls list of doubles to calculate the mean of
+   * @return mean
+   */
+  private double mean(List&lt;Long&gt; ls) {
+<span class="fc" id="L344">    double mean = 0.;</span>
+<span class="fc bfc" id="L345" title="All 2 branches covered.">    for (Long l : ls) {</span>
+<span class="fc" id="L346">      mean += (double) l / ls.size();</span>
+<span class="fc" id="L347">    }</span>
+<span class="fc" id="L348">    return mean;</span>
+  }
+
+  /**
+   * Calculates the variance of a list of doubles, given its mean
+   *
+   * @param ls   list to calculate variance of
+   * @param mean mean of the list
+   * @return variance
+   */
+  private double variance(List&lt;Long&gt; ls, double mean) {
+<span class="fc" id="L359">    double var = 0.;</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">    for (Long l : ls) {</span>
+<span class="fc" id="L361">      var += (l - mean) * (l - mean) * (1. / ls.size());</span>
+<span class="fc" id="L362">    }</span>
+<span class="fc" id="L363">    return var;</span>
+  }
+
+
+  /**
+   * Initializes or updates all property related estimations (dependent on the current reservoir
+   * sample)
+   */
+  private void computePropertyEstimations() {
+<span class="fc" id="L372">    List&lt;TemporalElement&gt; reservoirSample = sampler.getReservoirSample();</span>
+<span class="fc" id="L373">    int sampleSize = reservoirSample.size();</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">    if (sampleSize == 0) {</span>
+<span class="nc" id="L375">      return;</span>
+    }
+
+    // classify all property values, if not already done
+<span class="pc bpc" id="L379" title="1 of 4 branches missed.">    if (categoricalProperties == null || numericalProperties == null) {</span>
+<span class="fc" id="L380">      detectPropertyTypes(reservoirSample);</span>
+    }
+    // these maps collect all property values in the sample
+<span class="fc" id="L383">    HashMap&lt;String, List&lt;PropertyValue&gt;&gt; categoricalData = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L384">    HashMap&lt;String, List&lt;PropertyValue&gt;&gt; numericalData = new HashMap&lt;&gt;();</span>
+
+    // add element data to the corresponding map
+<span class="fc bfc" id="L387" title="All 2 branches covered.">    for (TemporalElement element : reservoirSample) {</span>
+<span class="fc bfc" id="L388" title="All 2 branches covered.">      if (element.getPropertyKeys() == null) {</span>
+<span class="fc" id="L389">        continue;</span>
+      }
+<span class="fc bfc" id="L391" title="All 2 branches covered.">      for (String key : element.getPropertyKeys()) {</span>
+<span class="fc" id="L392">        PropertyValue value = element.getPropertyValue(key);</span>
+        HashMap&lt;String, List&lt;PropertyValue&gt;&gt; data;
+        // no outlier, i.e. NULL, NaN etc.?
+<span class="pc bpc" id="L395" title="1 of 4 branches missed.">        if (numericalProperties.contains(key) &amp;&amp; value.isNumber()) {</span>
+<span class="fc" id="L396">          data = numericalData;</span>
+<span class="fc bfc" id="L397" title="All 2 branches covered.">        } else if (categoricalProperties.contains(key)) {</span>
+<span class="fc" id="L398">          data = categoricalData;</span>
+        } else {
+          continue;
+        }
+
+<span class="fc" id="L403">        data.putIfAbsent(key, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L404">        data.get(key).add(value);</span>
+<span class="fc" id="L405">      }</span>
+<span class="fc" id="L406">    }</span>
+<span class="fc" id="L407">    computeCategoricalEstimations(categoricalData, sampleSize);</span>
+<span class="fc" id="L408">    computeNumericalEstimations(numericalData, sampleSize);</span>
+<span class="fc" id="L409">    recomputePropertyDataFlag = false;</span>
+<span class="fc" id="L410">  }</span>
+
+  /**
+   * Tries to automatically detect which properties are numerical and categorical.
+   * Sets {@code numericalProperties} and {@code categoricalProperties} accordingly.
+   *
+   * @param reservoirSample the list of elements to use for the detection
+   */
+  private void detectPropertyTypes(List&lt;TemporalElement&gt; reservoirSample) {
+<span class="fc" id="L419">    numericalProperties = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L420">    categoricalProperties = new HashSet&lt;&gt;();</span>
+    // maps count which property is considered numerical/categorical how often
+<span class="fc" id="L422">    HashMap&lt;String, Integer&gt; numerical = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L423">    HashMap&lt;String, Integer&gt; categorical = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L424" title="All 2 branches covered.">    for (TemporalElement element : reservoirSample) {</span>
+<span class="fc bfc" id="L425" title="All 2 branches covered.">      if (element.getPropertyKeys() == null) {</span>
+<span class="fc" id="L426">        continue;</span>
+      }
+<span class="fc bfc" id="L428" title="All 2 branches covered.">      for (String key : element.getPropertyKeys()) {</span>
+<span class="fc" id="L429">        PropertyValue value = element.getPropertyValue(key);</span>
+<span class="fc bfc" id="L430" title="All 2 branches covered.">        if (value.isNumber()) {</span>
+<span class="fc" id="L431">          numerical.put(key, numerical.getOrDefault(key, 0) + 1);</span>
+        } else {
+<span class="fc" id="L433">          categorical.put(key, categorical.getOrDefault(key, 0) + 1);</span>
+        }
+<span class="fc" id="L435">      }</span>
+<span class="fc" id="L436">    }</span>
+    // check which property is of what type using a threshold
+<span class="fc" id="L438">    double thresh = 0.9;</span>
+<span class="fc" id="L439">    HashSet&lt;String&gt; allProperties = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L440">    allProperties.addAll(numerical.keySet());</span>
+<span class="fc" id="L441">    allProperties.addAll(categorical.keySet());</span>
+<span class="fc bfc" id="L442" title="All 2 branches covered.">    for (String property : allProperties) {</span>
+<span class="fc" id="L443">      int countNumerical = numerical.getOrDefault(property, 0);</span>
+<span class="fc" id="L444">      int countCategorical = categorical.getOrDefault(property, 0);</span>
+<span class="fc" id="L445">      int countOverall = countCategorical + countNumerical;</span>
+      // which type?
+<span class="fc bfc" id="L447" title="All 2 branches covered.">      if ((double) countNumerical / (double) countOverall &gt;= thresh) {</span>
+<span class="fc" id="L448">        numericalProperties.add(property);</span>
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">      } else if ((double) countCategorical / (double) countOverall &gt;= thresh) {</span>
+<span class="fc" id="L450">        categoricalProperties.add(property);</span>
+      }
+      // else, the property is too ambiguous and simply ignored
+<span class="fc" id="L453">    }</span>
+<span class="fc" id="L454">  }</span>
+
+  /**
+   * Returns the label of the elements
+   *
+   * @return label of the elements
+   */
+  public String getLabel() {
+<span class="fc" id="L462">    return label;</span>
+  }
+
+  /**
+   * sets the label
+   *
+   * @param label label
+   */
+  public void setLabel(String label) {
+<span class="fc" id="L471">    this.label = label;</span>
+<span class="fc" id="L472">  }</span>
+
+  /**
+   * Initializes or updates the selectivity estimation for categorical properties
+   *
+   * @param data       map from categorical property names to a list of their respective
+   *                   values in the sample
+   * @param sampleSize size of the sample
+   */
+  private void computeCategoricalEstimations(Map&lt;String, List&lt;PropertyValue&gt;&gt; data, int sampleSize) {
+<span class="fc" id="L482">    categoricalSelectivityEstimation = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L484" title="All 2 branches covered.">    for (Map.Entry&lt;String, List&lt;PropertyValue&gt;&gt; entry : data.entrySet()) {</span>
+<span class="fc" id="L485">      Map&lt;PropertyValue, Double&gt; selectivityMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L487" title="All 2 branches covered.">      for (PropertyValue value : entry.getValue()) {</span>
+<span class="fc" id="L488">        selectivityMap.put(value,</span>
+<span class="fc" id="L489">          selectivityMap.getOrDefault(value, 0.) + 1. / sampleSize);</span>
+<span class="fc" id="L490">      }</span>
+
+<span class="fc" id="L492">      categoricalSelectivityEstimation.put(entry.getKey(), selectivityMap);</span>
+<span class="fc" id="L493">    }</span>
+
+<span class="fc" id="L495">  }</span>
+
+  /**
+   * Initializes or updates the estimations for numerical properties
+   * All of them are considered to be normally distributed
+   *
+   * @param data       map from numerical property names to a list of their respective
+   *                   values in the sample
+   * @param sampleSize size of the sample
+   */
+  private void computeNumericalEstimations(Map&lt;String, List&lt;PropertyValue&gt;&gt; data, int sampleSize) {
+<span class="fc" id="L506">    numericalOccurrenceEstimation = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L507">    numericalPropertyStatsEstimation = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L508" title="All 2 branches covered.">    for (Map.Entry&lt;String, List&lt;PropertyValue&gt;&gt; entry : data.entrySet()) {</span>
+<span class="fc" id="L509">      List&lt;PropertyValue&gt; values = data.get(entry.getKey());</span>
+
+      // estimate how often the property occurs
+<span class="fc" id="L512">      numericalOccurrenceEstimation.put(entry.getKey(),</span>
+<span class="fc" id="L513">        (double) values.size() / sampleSize);</span>
+
+      // cast all values to doubles
+<span class="fc" id="L516">      List&lt;Double&gt; doubleValues = values.stream()</span>
+<span class="fc" id="L517">        .map(this::propertyValueToDouble)</span>
+<span class="fc" id="L518">        .collect(Collectors.toList());</span>
+
+      // compute mean and variance for the property
+<span class="fc" id="L521">      Double sum = doubleValues.stream().reduce(0., Double::sum);</span>
+<span class="fc" id="L522">      Double mean = sum / values.size();</span>
+<span class="fc" id="L523">      Double variance = doubleValues.stream()</span>
+<span class="fc" id="L524">        .reduce(0., (i, j) -&gt; i + ((j - mean) * (j - mean) * (1. / values.size())));</span>
+
+<span class="fc" id="L526">      numericalPropertyStatsEstimation.put(entry.getKey(), new Double[]{mean, variance});</span>
+<span class="fc" id="L527">    }</span>
+<span class="fc" id="L528">  }</span>
+
+  /**
+   * Converts a numerical PropertyValue to its value as a double
+   *
+   * @param value PropertyValue to convert
+   * @return double representation of value
+   */
+  private double propertyValueToDouble(PropertyValue value) {
+<span class="pc bpc" id="L537" title="1 of 2 branches missed.">    if (value.isNumber()) {</span>
+<span class="fc" id="L538">      return ((Number) value.getObject()).doubleValue();</span>
+    }
+<span class="nc" id="L540">    return 0.;</span>
+  }
+
+  /**
+   * Returns a map that maps every numerical property to an estimation of its mean and variance
+   * based on the current reservoir sample
+   *
+   * @return map of property names to double arrays. Every array is of the form {mean, variance}.
+   */
+  public Map&lt;String, Double[]&gt; getNumericalPropertyStatsEstimation() {
+<span class="fc bfc" id="L550" title="All 2 branches covered.">    if (recomputePropertyDataFlag) {</span>
+<span class="fc" id="L551">      computePropertyEstimations();</span>
+    }
+<span class="fc" id="L553">    return numericalPropertyStatsEstimation;</span>
+  }
+
+  /**
+   * Returns a map that maps every numerical property to an estimation of the probability of
+   * its occurrence (based on the current reservoir sample)
+   *
+   * @return map of property name to probability of its occurence
+   */
+  public Map&lt;String, Double&gt; getNumericalOccurrenceEstimation() {
+<span class="fc bfc" id="L563" title="All 2 branches covered.">    if (recomputePropertyDataFlag) {</span>
+<span class="fc" id="L564">      computePropertyEstimations();</span>
+    }
+<span class="fc" id="L566">    return numericalOccurrenceEstimation;</span>
+  }
+
+  /**
+   * Returns a map that maps categorical property names to
+   * estimations of the probability that an element has this property with a
+   * certain PropertyValue.
+   * The map is only computed on the sample, so that not every possible property value is
+   * included!
+   *
+   * @return map of property name to a map from property values to their estimated selectivity
+   */
+  public Map&lt;String, Map&lt;PropertyValue, Double&gt;&gt; getCategoricalSelectivityEstimation() {
+<span class="fc bfc" id="L579" title="All 2 branches covered.">    if (recomputePropertyDataFlag) {</span>
+<span class="fc" id="L580">      computePropertyEstimations();</span>
+    }
+<span class="fc" id="L582">    return categoricalSelectivityEstimation;</span>
+  }
+
+  /**
+   * Returns the number of elements in the sample
+   *
+   * @return number of elements in the sample
+   */
+  public Long getElementCount() {
+<span class="fc" id="L591">    return elementCount;</span>
+  }
+
+  /**
+   * Return the statistics for tx time durations. Recomputes all temporal estimations if
+   * necessary.
+   *
+   * @return statistics for tx time durations in the form {mean, variance}
+   */
+  public double[] getTxDurationStats() {
+<span class="fc bfc" id="L601" title="All 2 branches covered.">    if (recomputeTemporalDataFlag) {</span>
+<span class="fc" id="L602">      computeTemporalEstimations();</span>
+    }
+<span class="fc" id="L604">    return txDurationStats.clone();</span>
+  }
+
+  /**
+   * Return the statistics for valid time durations. Recomputes all temporal estimations if
+   * necessary.
+   *
+   * @return statistics for valid time durations in the form {mean, variance}
+   */
+  public double[] getValDurationStats() {
+<span class="fc bfc" id="L614" title="All 2 branches covered.">    if (recomputeTemporalDataFlag) {</span>
+<span class="fc" id="L615">      computeTemporalEstimations();</span>
+    }
+<span class="fc" id="L617">    return valDurationStats.clone();</span>
+  }
+
+  /**
+   * Returns the sample
+   *
+   * @return sample
+   */
+  public List&lt;TemporalElement&gt; getSample() {
+<span class="fc" id="L626">    return sampler.getReservoirSample();</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L631">    return sampler.hashCode();</span>
+  }
+
+  /**
+   * Returns the (not binning-based) statistics for temporal properties.
+   * They are arrays of the form {mean, variance, prob. that
+   * from=TemporalElement.DEFAULT_TIME_FROM / to=TemporalElement.DEFAULT_TIME_TO}
+   *
+   * @param property temporal property
+   * @return statistics array for the property
+   */
+  public double[] getTemporalPropertyStats(TimeSelector.TimeField property) {
+<span class="fc bfc" id="L643" title="All 2 branches covered.">    if (recomputeTemporalDataFlag) {</span>
+<span class="fc" id="L644">      computeTemporalEstimations();</span>
+    }
+<span class="fc bfc" id="L646" title="All 2 branches covered.">    if (property == TimeSelector.TimeField.TX_FROM) {</span>
+<span class="fc" id="L647">      return txFromStats.clone();</span>
+<span class="fc bfc" id="L648" title="All 2 branches covered.">    } else if (property == TimeSelector.TimeField.TX_TO) {</span>
+<span class="fc" id="L649">      return txToStats.clone();</span>
+<span class="fc bfc" id="L650" title="All 2 branches covered.">    } else if (property == TimeSelector.TimeField.VAL_FROM) {</span>
+<span class="fc" id="L651">      return valFromStats.clone();</span>
+    } else {
+<span class="fc" id="L653">      return valToStats.clone();</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

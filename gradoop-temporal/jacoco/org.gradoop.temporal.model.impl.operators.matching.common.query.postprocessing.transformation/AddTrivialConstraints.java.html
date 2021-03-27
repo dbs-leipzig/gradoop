@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddTrivialConstraints.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">AddTrivialConstraints.java</span></div><h1>AddTrivialConstraints.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeLiteralComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeSelectorComparable;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.util.ComparisonUtil;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Adds constraints a.tx_from&lt;=a.tx_to and a.val_from&lt;=a.val_to
+ * for every variable a.
+ * A constraint a.tx_from&lt;=a.tx_to is only added, if a selector
+ * a.tx_from or a.tx_to is found within the singleton clauses of the CNF (analogously for val)
+ */
+<span class="fc" id="L49">public class AddTrivialConstraints implements QueryTransformation {</span>
+
+  @Override
+  public CNF transformCNF(CNF cnf) throws QueryContradictoryException {
+    // determine all variables of interest for tx and val intervals
+<span class="fc" id="L54">    List&lt;Set&lt;String&gt;&gt; variableSets = getNecessaryFields(cnf);</span>
+<span class="fc" id="L55">    Set&lt;String&gt; txVars = variableSets.get(0);</span>
+<span class="fc" id="L56">    Set&lt;String&gt; valVars = variableSets.get(1);</span>
+
+    // add trivial constraints a.tx_from &lt;= a.tx_to, if necessary
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    for (String variable : txVars) {</span>
+<span class="fc" id="L60">      cnf = addSingletonClause(cnf, new Comparison(</span>
+        new TimeSelector(variable, TimeSelector.TimeField.TX_FROM),
+        LTE, new TimeSelector(variable, TimeSelector.TimeField.TX_TO)
+      ));
+<span class="fc" id="L64">    }</span>
+
+    // add trivial constraints a.val_from &lt;= a.val_to, if necessary
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (String variable : valVars) {</span>
+<span class="fc" id="L68">      cnf = addSingletonClause(cnf, new Comparison(</span>
+        new TimeSelector(variable, TimeSelector.TimeField.VAL_FROM),
+        LTE, new TimeSelector(variable, TimeSelector.TimeField.VAL_TO)
+      ));
+<span class="fc" id="L72">    }</span>
+
+    // add all &quot;&lt;&quot; relations between literals that occur in singleton clauses
+<span class="fc" id="L75">    ArrayList&lt;TimeLiteral&gt; literals = new ArrayList&lt;&gt;(getNecessaryLiterals(cnf));</span>
+<span class="fc" id="L76">    literals.sort(new Comparator&lt;TimeLiteral&gt;() {</span>
+      @Override
+      public int compare(TimeLiteral timeLiteral, TimeLiteral t1) {
+<span class="fc" id="L79">        return Long.compare(timeLiteral.getMilliseconds(), t1.getMilliseconds());</span>
+      }
+    });
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    for (int i = 0; i &lt; literals.size(); i++) {</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">      for (int j = i + 1; j &lt; literals.size(); j++) {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (literals.get(i).getMilliseconds() == literals.get(j).getMilliseconds()) {</span>
+<span class="nc" id="L85">          continue;</span>
+        }
+<span class="fc" id="L87">        cnf = addSingletonClause(cnf, new Comparison(</span>
+<span class="fc" id="L88">          literals.get(i), LT, literals.get(j)</span>
+        ));
+      }
+    }
+<span class="fc" id="L92">    return cnf;</span>
+  }
+
+  /**
+   * Adds a singleton clause to an existing CNF
+   *
+   * @param cnf        CNF
+   * @param comparison comparison that makes up the single clause to add
+   * @return CNF with singleton clause appended
+   */
+  private CNF addSingletonClause(CNF cnf, Comparison comparison) {
+<span class="fc" id="L103">    return cnf.and(new CNF(Collections.singletonList(</span>
+<span class="fc" id="L104">      new CNFElement(Collections.singletonList(</span>
+        new ComparisonExpression(comparison, new ComparableTPGMFactory())))
+    )));
+  }
+
+  /**
+   * Generates a set of variables for transaction times and valid times.
+   * A variable is included in the set for transaction times, iff
+   * a selector a.tx_(from/to) occurs in a singleton CNF clause.
+   * (analogously for valid times)
+   *
+   * @param cnf CNF
+   * @return list containing set of tx variables at index 0, set of
+   * val variables at index 1
+   */
+  private List&lt;Set&lt;String&gt;&gt; getNecessaryFields(CNF cnf) {
+<span class="fc" id="L120">    HashSet&lt;String&gt; txSet = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L121">    HashSet&lt;String&gt; valSet = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    for (CNFElement clause : cnf.getPredicates()) {</span>
+
+      // only temporal singleton clauses are relevant
+<span class="fc bfc" id="L125" title="All 4 branches covered.">      if (clause.size() != 1 || !ComparisonUtil.isTemporal(clause.getPredicates().get(0))) {</span>
+<span class="fc" id="L126">        continue;</span>
+      } else {
+
+        // unwrap the comparison...
+<span class="fc" id="L130">        QueryComparable[] comparables = new QueryComparable[]{</span>
+<span class="fc" id="L131">          clause.getPredicates().get(0).getLhs(),</span>
+<span class="fc" id="L132">          clause.getPredicates().get(0).getRhs()</span>
+        };
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        for (QueryComparable comparable : comparables) {</span>
+          // ...and check it for time selectors
+<span class="fc bfc" id="L136" title="All 2 branches covered.">          if (comparable instanceof TimeSelectorComparable) {</span>
+<span class="fc" id="L137">            TimeSelector selector = (TimeSelector)</span>
+<span class="fc" id="L138">              comparable.getWrappedComparable();</span>
+<span class="fc" id="L139">            String variable = selector.getVariable();</span>
+            // add the variable to the corresponding set(s)
+<span class="fc" id="L141">            TimeSelector.TimeField field = selector.getTimeProp();</span>
+<span class="fc bfc" id="L142" title="All 4 branches covered.">            if (field == TimeSelector.TimeField.TX_FROM ||</span>
+              field == TimeSelector.TimeField.TX_TO) {
+<span class="fc" id="L144">              txSet.add(variable);</span>
+            } else {
+<span class="fc" id="L146">              valSet.add(variable);</span>
+            }
+          }
+        }
+      }
+<span class="fc" id="L151">    }</span>
+<span class="fc" id="L152">    return new ArrayList&lt;&gt;(Arrays.asList(txSet, valSet));</span>
+  }
+
+  /**
+   * Finds all time literals that are included in necessary comparisons, i.e.
+   * comparisons that make up a single cnf clause
+   *
+   * @param cnf CNF to search for necessary time literals
+   * @return list of time literals that are included in necessary comparisons
+   */
+  private Set&lt;TimeLiteral&gt; getNecessaryLiterals(CNF cnf) {
+<span class="fc" id="L163">    HashSet&lt;TimeLiteral&gt; literals = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    for (CNFElement clause : cnf.getPredicates()) {</span>
+      // only temporal singleton clauses are relevant
+<span class="fc bfc" id="L166" title="All 4 branches covered.">      if (clause.size() != 1 || !(ComparisonUtil.isTemporal(clause.getPredicates().get(0)))) {</span>
+<span class="fc" id="L167">        continue;</span>
+      } else {
+        // check the clause for literals and add them to the set
+<span class="fc" id="L170">        ComparisonExpression comparison = clause.getPredicates().get(0);</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (comparison.getLhs() instanceof TimeLiteralComparable) {</span>
+<span class="fc" id="L172">          literals.add((TimeLiteral) (comparison.getLhs()).getWrappedComparable());</span>
+        }
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (comparison.getRhs() instanceof TimeLiteralComparable) {</span>
+<span class="fc" id="L175">          literals.add((TimeLiteral) (comparison.getRhs()).getWrappedComparable());</span>
+        }
+      }
+<span class="fc" id="L178">    }</span>
+<span class="fc" id="L179">    return literals;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

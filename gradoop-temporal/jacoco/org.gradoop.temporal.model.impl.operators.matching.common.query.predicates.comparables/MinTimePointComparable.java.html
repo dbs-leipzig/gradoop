@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MinTimePointComparable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables</a> &gt; <span class="el_source">MinTimePointComparable.java</span></div><h1>MinTimePointComparable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
+
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Wraps a {@link org.gradoop.gdl.model.comparables.time.MinTimePoint}
+ */
+public class MinTimePointComparable extends TemporalComparable {
+
+  /**
+   * The wrapped MinTimePoint
+   */
+  private MinTimePoint minTimePoint;
+  /**
+   * Wrappers for the arguments
+   */
+  private ArrayList&lt;QueryComparable&gt; args;
+
+  /**
+   * Creates a new wrapper.
+   *
+   * @param minTimePoint the wrapped MinTimePoint.
+   */
+<span class="fc" id="L51">  public MinTimePointComparable(MinTimePoint minTimePoint) {</span>
+<span class="fc" id="L52">    this.minTimePoint = minTimePoint;</span>
+<span class="fc" id="L53">    args = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (TimePoint arg : minTimePoint.getArgs()) {</span>
+<span class="fc" id="L55">      args.add(ComparableFactory.createComparableFrom(arg));</span>
+<span class="fc" id="L56">    }</span>
+<span class="fc" id="L57">  }</span>
+
+  public ArrayList&lt;QueryComparable&gt; getArgs() {
+<span class="fc" id="L60">    return args;</span>
+  }
+
+  public void setArgs(
+    ArrayList&lt;QueryComparable&gt; args) {
+<span class="nc" id="L65">    this.args = args;</span>
+<span class="nc" id="L66">  }</span>
+
+  public MinTimePoint getMinTimePoint() {
+<span class="nc" id="L69">    return minTimePoint;</span>
+  }
+
+  public void setMinTimePoint(MinTimePoint minTimePoint) {
+<span class="nc" id="L73">    this.minTimePoint = minTimePoint;</span>
+<span class="nc" id="L74">  }</span>
+
+  @Override
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+<span class="fc" id="L78">    long min = TemporalElement.DEFAULT_TIME_TO;</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    for (QueryComparable arg : args) {</span>
+<span class="fc" id="L80">      long argValue = arg.evaluate(embedding, metaData).getLong();</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">      if (argValue &lt; min) {</span>
+<span class="fc" id="L82">        min = argValue;</span>
+      }
+<span class="fc" id="L84">    }</span>
+<span class="fc" id="L85">    return PropertyValue.create(min);</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(GraphElement element) {
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">    if (minTimePoint.getVariables().size() &gt; 1) {</span>
+<span class="nc" id="L91">      throw new UnsupportedOperationException(&quot;can not evaluate an expression with &gt;1 variable on&quot; +</span>
+        &quot; a single GraphElement!&quot;);
+    }
+<span class="fc" id="L94">    long min = TemporalElement.DEFAULT_TIME_TO;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    for (QueryComparable arg : args) {</span>
+<span class="fc" id="L96">      long argValue = arg.evaluate(element).getLong();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      if (argValue &lt; min) {</span>
+<span class="fc" id="L98">        min = argValue;</span>
+      }
+<span class="fc" id="L100">    }</span>
+<span class="fc" id="L101">    return PropertyValue.create(min);</span>
+  }
+
+  @Override
+  public Set&lt;String&gt; getPropertyKeys(String variable) {
+<span class="fc" id="L106">    HashSet&lt;String&gt; keys = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">    for (QueryComparable comp: getArgs()) {</span>
+<span class="fc" id="L108">      keys.addAll(comp.getPropertyKeys(variable));</span>
+<span class="fc" id="L109">    }</span>
+<span class="fc" id="L110">    return keys;</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L116">      return true;</span>
+    }
+<span class="nc bnc" id="L118" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L119">      return false;</span>
+    }
+
+<span class="nc" id="L122">    MinTimePointComparable that = (MinTimePointComparable) o;</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (that.args.size() != args.size()) {</span>
+<span class="nc" id="L124">      return false;</span>
+    }
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    for (QueryComparable arg : args) {</span>
+<span class="nc" id="L128">      boolean foundMatch = false;</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">      for (QueryComparable candidate : that.args) {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (arg.equals(candidate)) {</span>
+<span class="nc" id="L131">          foundMatch = true;</span>
+<span class="nc" id="L132">          break;</span>
+        }
+<span class="nc" id="L134">      }</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">      if (!foundMatch) {</span>
+<span class="nc" id="L136">        return false;</span>
+      }
+<span class="nc" id="L138">    }</span>
+<span class="nc" id="L139">    return true;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    return minTimePoint != null ? minTimePoint.hashCode() : 0;</span>
+  }
+
+  @Override
+  public TimePoint getWrappedComparable() {
+<span class="fc" id="L149">    return minTimePoint;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

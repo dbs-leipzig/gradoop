@@ -26,10 +26,10 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
-import org.s1ck.gdl.model.Graph;
-import org.s1ck.gdl.model.GraphElement;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.exceptions.BailSyntaxErrorStrategy;
+import org.gradoop.gdl.model.Graph;
+import org.gradoop.gdl.model.GraphElement;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Creates collections of graphs, vertices and edges from a given GDL script.
  *
- * @see &lt;a href=&quot;https://github.com/s1ck/gdl&quot;&gt;GDL on GitHub&lt;/a&gt;
+ * @see &lt;a href=&quot;https://github.com/dbs-leipzig/gdl&quot;&gt;GDL on GitHub&lt;/a&gt;
  *
  * @param &lt;G&gt; graph head type
  * @param &lt;V&gt; vertex type
@@ -456,11 +456,11 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * Initializes vertices and their cache.
    */
   private void initVertices() {
-<span class="fc bfc" id="L459" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">    for (org.gradoop.gdl.model.Vertex v : gdlHandler.getVertices()) {</span>
 <span class="fc" id="L460">      initVertex(v);</span>
 <span class="fc" id="L461">    }</span>
 
-<span class="fc bfc" id="L463" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {</span>
+<span class="fc bfc" id="L463" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.gradoop.gdl.model.Vertex&gt; e : gdlHandler.getVertexCache().entrySet()) {</span>
 <span class="fc" id="L464">      updateVertexCache(e.getKey(), e.getValue());</span>
 <span class="fc" id="L465">    }</span>
 <span class="fc" id="L466">  }</span>
@@ -469,11 +469,11 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * Initializes edges and their cache.
    */
   private void initEdges() {
-<span class="fc bfc" id="L472" title="All 2 branches covered.">    for (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">    for (org.gradoop.gdl.model.Edge e : gdlHandler.getEdges()) {</span>
 <span class="fc" id="L473">      initEdge(e);</span>
 <span class="fc" id="L474">    }</span>
 
-<span class="fc bfc" id="L476" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.s1ck.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">    for (Map.Entry&lt;String, org.gradoop.gdl.model.Edge&gt; e : gdlHandler.getEdgeCache().entrySet()) {</span>
 <span class="fc" id="L477">      updateEdgeCache(e.getKey(), e.getValue());</span>
 <span class="fc" id="L478">    }</span>
 <span class="fc" id="L479">  }</span>
@@ -498,7 +498,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param v vertex from GDL Loader
    * @return vertex
    */
-  private V initVertex(org.s1ck.gdl.model.Vertex v) {
+  private V initVertex(org.gradoop.gdl.model.Vertex v) {
     V vertex;
 <span class="fc bfc" id="L503" title="All 2 branches covered.">    if (!vertexIds.containsKey(v.getId())) {</span>
 <span class="fc" id="L504">      vertex = elementFactoryProvider.getVertexFactory().createVertex(</span>
@@ -520,7 +520,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param e edge from GDL loader
    * @return edge
    */
-  private E initEdge(org.s1ck.gdl.model.Edge e) {
+  private E initEdge(org.gradoop.gdl.model.Edge e) {
     E edge;
 <span class="fc bfc" id="L525" title="All 2 branches covered.">    if (!edgeIds.containsKey(e.getId())) {</span>
 <span class="fc" id="L526">      edge = elementFactoryProvider.getEdgeFactory().createEdge(</span>
@@ -555,7 +555,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param variable vertex variable used in GDL script
    * @param v vertex from GDL loader
    */
-  private void updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
+  private void updateVertexCache(String variable, org.gradoop.gdl.model.Vertex v) {
 <span class="fc" id="L559">    vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));</span>
 <span class="fc" id="L560">  }</span>
 
@@ -565,7 +565,7 @@ public class AsciiGraphLoader&lt;G extends GraphHead, V extends Vertex, E extend
    * @param variable edge variable used in the GDL script
    * @param e edge from GDL loader
    */
-  private void updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
+  private void updateEdgeCache(String variable, org.gradoop.gdl.model.Edge e) {
 <span class="fc" id="L569">    edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));</span>
 <span class="fc" id="L570">  }</span>
 

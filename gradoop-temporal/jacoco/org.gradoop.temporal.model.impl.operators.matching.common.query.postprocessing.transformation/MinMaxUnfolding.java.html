@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MinMaxUnfolding.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation</a> &gt; <span class="el_source">MinMaxUnfolding.java</span></div><h1>MinMaxUnfolding.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation;
+
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.QueryTransformation;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.ComparableTPGMFactory;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.time.MaxTimePoint;
+import org.gradoop.gdl.model.comparables.time.MinTimePoint;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.gradoop.gdl.utils.Comparator.LTE;
+
+/**
+ * Reformulates certain expressions involving MIN and MAX elements, according to the following rules:
+ * &lt;ul&gt;
+ * &lt;li&gt; a singleton clause [MAX(a,b,c) &lt; / &lt;= x] is reformulated to
+ * [a &lt; / &lt;= x] AND [b &lt; / &lt;= x] AND [c &lt; / &lt;= x] &lt;/li&gt;
+ * &lt;li&gt; a n-ary disjunctive clause [comp_1,...,comp_(i-1), MIN(a,b,c) &lt; / &lt;= x, comp_(i+1),...,comp_n]
+ * is reformulated to
+ * [comp_1,...,comp_(i-1), a &lt; / &lt;= x, b &lt; / &lt;= x, c &lt; / &lt;= x, comp_(i+1),...,comp_n] &lt;/li&gt;
+ * &lt;li&gt; a n-ary disjunctive clause [comp_1,...,comp_(i-1), x &lt; / &lt;= MAX(a,b,c), comp_(i+1),...,comp_n]
+ * is reformulated to
+ * [comp_1,...,comp_(i-1), x &lt; / &lt;= a, x &lt; / &lt;= b, x &lt; / &lt;= c, comp_(i+1),...,comp_n] &lt;/li&gt;
+ * &lt;li&gt; a unary clause [x &lt; / &lt;= MIN(a,b,c)] is reformulated to
+ * [x &lt; / &lt;= a] AND [x &lt; / &lt;= b] AND [x &lt; / &lt;= c] &lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * These rules are applied exhaustively.
+ * !!! This class assumes input CNFs to be normalized, i.e. not to contain &gt; or &gt;= !!!
+ */
+<span class="fc" id="L54">public class MinMaxUnfolding implements QueryTransformation {</span>
+
+  @Override
+  public CNF transformCNF(CNF cnf) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (cnf.getPredicates().size() == 0) {</span>
+<span class="fc" id="L59">      return cnf;</span>
+    } else {
+      // apply transformations exhaustively
+      CNF oldCNF;
+<span class="fc" id="L63">      CNF newCNF = cnf;</span>
+      do {
+<span class="fc" id="L65">        oldCNF = newCNF;</span>
+<span class="fc" id="L66">        newCNF = newCNF.getPredicates().stream()</span>
+<span class="fc" id="L67">          .map(this::unfoldNext)</span>
+<span class="fc" id="L68">          .reduce(CNF::and).get();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">      } while (!newCNF.equals(oldCNF));</span>
+<span class="fc" id="L70">      return newCNF;</span>
+    }
+  }
+
+  /**
+   * Applies the rules to a single clause (not necessarily exhaustive, several calls may be necessary)
+   *
+   * @param clause clause to apply the rules to
+   * @return transformed clause
+   */
+  private CNF unfoldNext(CNFElement clause) {
+    // determine whether clause is singleton or not and and trigger the corresponding rule applications
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    if (clause.getPredicates().size() &gt; 1) {</span>
+<span class="fc" id="L83">      return new CNF(</span>
+<span class="fc" id="L84">        clause.getPredicates().stream()</span>
+          // no conjunctions within a disjunctive clause
+<span class="fc" id="L86">          .map(comp -&gt; unfoldNext(comp, false))</span>
+<span class="fc" id="L87">          .reduce(CNF::or)</span>
+<span class="fc" id="L88">          .get()</span>
+      );
+    } else {
+<span class="fc" id="L91">      return unfoldNext(clause.getPredicates().get(0), true);</span>
+    }
+  }
+
+  /**
+   * Applies the rules to a single comparison (not necessarily exhaustive), depending
+   * on whether the comparison is part of a singleton clause or a n-ary one (n&gt;1).
+   *
+   * @param comp              comparison to apply the rules to
+   * @param allowConjunctions true iff the result is allowed to be a n-ary conjunction (n &gt; 1)
+   * @return transformed comparison as a CNF
+   */
+  private CNF unfoldNext(ComparisonExpression comp, boolean allowConjunctions) {
+    // unwrap comparison
+<span class="fc" id="L105">    ComparableExpression lhs = comp.getLhs().getWrappedComparable();</span>
+<span class="fc" id="L106">    Comparator comparator = comp.getComparator();</span>
+<span class="fc" id="L107">    ComparableExpression rhs = comp.getRhs().getWrappedComparable();</span>
+
+    // apply rules to comparison
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    if (lhs instanceof MinTimePoint) {</span>
+<span class="fc bfc" id="L111" title="All 4 branches covered.">      if (comparator == Comparator.LT || comparator == LTE) {</span>
+<span class="fc" id="L112">        return exists(((MinTimePoint) lhs).getArgs(), comparator, rhs);</span>
+      }
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    } else if (lhs instanceof MaxTimePoint) {</span>
+<span class="fc bfc" id="L115" title="All 4 branches covered.">      if (comparator == Comparator.LT || comparator == LTE) {</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (allowConjunctions) {</span>
+<span class="fc" id="L117">          return forAll(((MaxTimePoint) lhs).getArgs(), comparator, rhs);</span>
+        }
+      }
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    } else if (rhs instanceof MinTimePoint) {</span>
+<span class="fc bfc" id="L121" title="All 4 branches covered.">      if (comparator == Comparator.LT || comparator == Comparator.LTE) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (allowConjunctions) {</span>
+<span class="fc" id="L123">          return forAll(lhs, comparator, ((MinTimePoint) rhs).getArgs());</span>
+        }
+      }
+<span class="fc bfc" id="L126" title="All 2 branches covered.">    } else if (rhs instanceof MaxTimePoint) {</span>
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">      if (comparator == Comparator.LT || comparator == Comparator.LTE) {</span>
+<span class="fc" id="L128">        return exists(lhs, comparator, ((MaxTimePoint) rhs).getArgs());</span>
+      }
+    }
+
+<span class="fc" id="L132">    return new CNF(new ArrayList&lt;&gt;(</span>
+<span class="fc" id="L133">      Collections.singletonList(new CNFElement(new ArrayList&lt;&gt;(Collections.singletonList(comp))))));</span>
+
+  }
+
+  /**
+   * Realizes an &quot;exists&quot; predicate as CNF.
+   * E.g., {@code exists((a,b,c), &lt;=, x)} would yield
+   * a &lt;= x OR b &lt;= x OR c &lt;= x
+   *
+   * @param args       left hand side, domain of the &quot;exists&quot;
+   * @param comparator comparator
+   * @param rhs        right hand side
+   * @return &quot;exists&quot; predicate as CNF
+   */
+  private CNF exists(List&lt;TimePoint&gt; args, Comparator comparator, ComparableExpression rhs) {
+<span class="fc" id="L148">    List&lt;ComparisonExpression&gt; comparisons = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">    for (TimePoint arg : args) {</span>
+<span class="fc" id="L150">      comparisons.add(new ComparisonExpression(new Comparison(arg, comparator, rhs),</span>
+        new ComparableTPGMFactory()));
+<span class="fc" id="L152">    }</span>
+<span class="fc" id="L153">    CNFElement singleClause = new CNFElement(comparisons);</span>
+<span class="fc" id="L154">    return new CNF(new ArrayList&lt;&gt;(Collections.singletonList(singleClause)));</span>
+  }
+
+  /**
+   * Realizes an &quot;exists&quot; predicate as CNF.
+   * E.g., {@code exists(x, &lt;= (a,b,c)} would yield
+   * x &lt;= a OR x &lt;= b OR x &lt;= c
+   *
+   * @param lhs        left hand side
+   * @param comparator comparator
+   * @param args       right hand side, domain of the &quot;exists&quot;
+   * @return &quot;exists&quot; predicate as CNF
+   */
+  private CNF exists(ComparableExpression lhs, Comparator comparator, List&lt;TimePoint&gt; args) {
+<span class="fc" id="L168">    List&lt;ComparisonExpression&gt; comparisons = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    for (TimePoint arg : args) {</span>
+<span class="fc" id="L170">      comparisons.add(new ComparisonExpression(new Comparison(lhs, comparator, arg),</span>
+        new ComparableTPGMFactory()));
+<span class="fc" id="L172">    }</span>
+<span class="fc" id="L173">    return new CNF(new ArrayList&lt;&gt;(Collections.singletonList(new CNFElement(comparisons))));</span>
+  }
+
+  /**
+   * Realizes a &quot;forall&quot; predicate as CNF.
+   * E.g., {@code forAll((a,b,c), &lt;= x)} would yield
+   * a &lt;= x AND b &lt;= x AND c &lt;= x
+   *
+   * @param args       left hand side, domain of the &quot;forall&quot;
+   * @param comparator comparator
+   * @param rhs        right hand side
+   * @return &quot;forall&quot; predicate as CNF
+   */
+  private CNF forAll(List&lt;TimePoint&gt; args, Comparator comparator, ComparableExpression rhs) {
+<span class="fc" id="L187">    List&lt;CNFElement&gt; clauses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">    for (TimePoint arg : args) {</span>
+<span class="fc" id="L189">      clauses.add(new CNFElement(new ArrayList&lt;&gt;(Collections.singletonList(new ComparisonExpression(</span>
+        new Comparison(arg, comparator, rhs),
+        new ComparableTPGMFactory()
+      )))));
+<span class="fc" id="L193">    }</span>
+<span class="fc" id="L194">    return new CNF(clauses);</span>
+  }
+
+  /**
+   * Realizes a &quot;forall&quot; predicate as CNF.
+   * E.g., {@code forAll(x, &lt;=, (a,b,c))} would yield
+   * x &lt;= a AND x &lt;= b AND x &lt;= c
+   *
+   * @param lhs        left hand side
+   * @param comparator comparator
+   * @param args       right hand side, domain of the &quot;forall&quot;
+   * @return &quot;forall&quot; predicate as CNF
+   */
+  private CNF forAll(ComparableExpression lhs, Comparator comparator, List&lt;TimePoint&gt; args) {
+<span class="fc" id="L208">    List&lt;CNFElement&gt; clauses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">    for (TimePoint arg : args) {</span>
+<span class="fc" id="L210">      clauses.add(new CNFElement(new ArrayList&lt;&gt;(Collections.singletonList(new ComparisonExpression(</span>
+        new Comparison(lhs, comparator, arg),
+        new ComparableTPGMFactory()
+      )))));
+<span class="fc" id="L214">    }</span>
+<span class="fc" id="L215">    return new CNF(clauses);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

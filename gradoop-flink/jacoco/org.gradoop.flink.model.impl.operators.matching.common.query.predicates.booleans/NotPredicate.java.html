@@ -17,20 +17,21 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
+ * Wraps a {@link org.gradoop.gdl.model.predicates.booleans.Not} predicate
  */
 public class NotPredicate extends QueryPredicate {
 
@@ -40,98 +41,118 @@ public class NotPredicate extends QueryPredicate {
   private final Not not;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Create a new wrapper
+   *
    * @param not the wrapped not predicate
    */
-<span class="fc" id="L46">  public NotPredicate(Not not) {</span>
-<span class="fc" id="L47">    this.not = not;</span>
-<span class="fc" id="L48">  }</span>
+  public NotPredicate(Not not) {
+<span class="fc" id="L54">    this(not, null);</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Create a new wrapper
+   *
+   * @param not the wrapped not predicate
+   * @param comparableFactory factory for comparables
+   */
+<span class="fc" id="L63">  public NotPredicate(Not not, QueryComparableFactory comparableFactory) {</span>
+<span class="fc" id="L64">    this.not = not;</span>
+<span class="fc" id="L65">    this.comparableFactory = comparableFactory;</span>
+<span class="fc" id="L66">  }</span>
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   @Override
   public CNF asCNF() {
-<span class="fc" id="L56">    Predicate expression = not.getArguments()[0];</span>
+<span class="fc" id="L75">    Predicate expression = not.getArguments()[0];</span>
 
-<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (expression.getClass() == Comparison.class) {</span>
-<span class="fc" id="L59">      CNF cnf = new CNF();</span>
-<span class="fc" id="L60">      CNFElement cnfElement = new CNFElement();</span>
-<span class="fc" id="L61">      cnfElement.addPredicate(new ComparisonExpression(invertComparison((Comparison) expression)));</span>
-<span class="fc" id="L62">      cnf.addPredicate(cnfElement);</span>
-<span class="fc" id="L63">      return cnf;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (expression.getClass() == Comparison.class) {</span>
+<span class="fc" id="L78">      CNF cnf = new CNF();</span>
+<span class="fc" id="L79">      CNFElement cnfElement = new CNFElement();</span>
+<span class="fc" id="L80">      cnfElement.addPredicate(new ComparisonExpression(</span>
+<span class="fc" id="L81">        invertComparison((Comparison) expression), comparableFactory));</span>
+<span class="fc" id="L82">      cnf.addPredicate(cnfElement);</span>
+<span class="fc" id="L83">      return cnf;</span>
 
-<span class="fc bfc" id="L65" title="All 2 branches covered.">    } else if (expression.getClass() == Not.class) {</span>
-<span class="fc" id="L66">      return QueryPredicate.createFrom(expression.getArguments()[0]).asCNF();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    } else if (expression.getClass() == Not.class) {</span>
+<span class="fc" id="L86">      return QueryPredicate.createFrom(expression.getArguments()[0], comparableFactory).asCNF();</span>
 
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    } else if (expression.getClass() == And.class) {</span>
-<span class="fc" id="L69">      Predicate[] otherArguments = expression.getArguments();</span>
-<span class="fc" id="L70">      Or or = new Or(</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">    } else if (expression.getClass() == And.class) {</span>
+<span class="fc" id="L89">      Predicate[] otherArguments = expression.getArguments();</span>
+<span class="fc" id="L90">      Or or = new Or(</span>
         new Not(otherArguments[0]),
-        new Not(otherArguments[0])
+        new Not(otherArguments[1])
       );
-<span class="fc" id="L74">      return QueryPredicate.createFrom(or).asCNF();</span>
+<span class="fc" id="L94">      return QueryPredicate.createFrom(or, comparableFactory).asCNF();</span>
 
-<span class="fc bfc" id="L76" title="All 2 branches covered.">    } else if (expression.getClass() == Or.class) {</span>
-<span class="fc" id="L77">      Predicate[] otherArguments = expression.getArguments();</span>
-<span class="fc" id="L78">      And and = new And(</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    } else if (expression.getClass() == Or.class) {</span>
+<span class="fc" id="L97">      Predicate[] otherArguments = expression.getArguments();</span>
+<span class="fc" id="L98">      And and = new And(</span>
         new Not(otherArguments[0]),
         new Not(otherArguments[1])
       );
 
-<span class="fc" id="L83">      return QueryPredicate.createFrom(and).asCNF();</span>
+<span class="fc" id="L103">      return QueryPredicate.createFrom(and, comparableFactory).asCNF();</span>
 
     } else {
-<span class="fc" id="L86">      Predicate[] otherArguments = expression.getArguments();</span>
-<span class="fc" id="L87">      Or or = new Or(</span>
+<span class="fc" id="L106">      Predicate[] otherArguments = expression.getArguments();</span>
+<span class="fc" id="L107">      Or or = new Or(</span>
         new And(
           otherArguments[0],
           otherArguments[1]),
         new And(
           new Not(otherArguments[0]),
-          new Not(otherArguments[0]))
+          new Not(otherArguments[1]))
       );
 
-<span class="fc" id="L96">      return QueryPredicate.createFrom(or).asCNF();</span>
+<span class="fc" id="L116">      return QueryPredicate.createFrom(or, comparableFactory).asCNF();</span>
     }
   }
 
   /**
    * Invert a comparison
    * eg NOT(a &gt; b) == (a &lt;= b)
+   *
    * @param comparison the comparison that will be inverted
    * @return inverted comparison
    */
   private Comparison invertComparison(
     Comparison comparison) {
-<span class="fc" id="L108">    ComparableExpression[] arguments = comparison.getComparableExpressions();</span>
-<span class="fc" id="L109">    Comparator op = comparison.getComparator();</span>
+<span class="fc" id="L129">    ComparableExpression[] arguments = comparison.getComparableExpressions();</span>
+<span class="fc" id="L130">    Comparator op = comparison.getComparator();</span>
 
-<span class="fc" id="L111">    return new Comparison(</span>
+<span class="fc" id="L132">    return new Comparison(</span>
       arguments[0],
-<span class="fc" id="L113">      op.getInverse(),</span>
+<span class="fc" id="L134">      op.getInverse(),</span>
       arguments[1]
     );
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="nc bnc" id="L120" title="All 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L121">      return true;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L142">      return true;</span>
     }
-<span class="nc bnc" id="L123" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L124">      return false;</span>
+<span class="nc bnc" id="L144" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L145">      return false;</span>
     }
 
-<span class="nc" id="L127">    NotPredicate that = (NotPredicate) o;</span>
+<span class="nc" id="L148">    NotPredicate that = (NotPredicate) o;</span>
 
-<span class="nc" id="L129">    return Objects.equals(not, that.not);</span>
+<span class="nc" id="L150">    return Objects.equals(not, that.not);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L134" title="All 2 branches missed.">    return not != null ? not.hashCode() : 0;</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">    return not != null ? not.hashCode() : 0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

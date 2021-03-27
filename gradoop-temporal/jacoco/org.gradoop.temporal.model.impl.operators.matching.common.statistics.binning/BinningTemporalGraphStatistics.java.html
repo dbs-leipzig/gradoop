@@ -1,0 +1,1073 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BinningTemporalGraphStatistics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning</a> &gt; <span class="el_source">BinningTemporalGraphStatistics.java</span></div><h1>BinningTemporalGraphStatistics.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.Binning;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojo.TemporalElementStats;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+import org.gradoop.gdl.model.comparables.time.TimeSelector;
+import org.gradoop.gdl.utils.Comparator;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_FROM;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.TX_TO;
+import static org.gradoop.gdl.model.comparables.time.TimeSelector.TimeField.VAL_FROM;
+import static org.gradoop.gdl.utils.Comparator.EQ;
+import static org.gradoop.gdl.utils.Comparator.GT;
+import static org.gradoop.gdl.utils.Comparator.GTE;
+import static org.gradoop.gdl.utils.Comparator.LT;
+import static org.gradoop.gdl.utils.Comparator.LTE;
+import static org.gradoop.gdl.utils.Comparator.NEQ;
+
+/**
+ * Wraps for a graph a set of {@link TemporalElementStats}, one for each combination
+ * (vertex / edge) x (label).
+ * Provides methods to estimate the probability that comparisons hold, based on
+ * the wrapped statistics.
+ */
+@SuppressWarnings(&quot;CanBeFinal&quot;)
+public class BinningTemporalGraphStatistics extends TemporalGraphStatistics implements Serializable {
+
+  /**
+   * A value to return for a probability close to 0
+   */
+  static final double VERY_LOW_PROB = 0.001;
+
+  /**
+   * A value to return for a probability close to 1
+   */
+  static final double VERY_HIGH_PROB = 0.999;
+
+  /**
+   * Statistics for every vertex label
+   */
+  private final Map&lt;String, TemporalElementStats&gt; vertexStats;
+
+  /**
+   * Statistics for every edge label
+   */
+  private final Map&lt;String, TemporalElementStats&gt; edgeStats;
+
+  /**
+   * Overall vertex count in the graph (exact)
+   */
+  private Long vertexCount;
+
+  /**
+   * Overall edge count in the graph (exact)
+   */
+  private Long edgeCount;
+
+  /**
+   * Maps edge labels to a very rough estimation of their number of distinct
+   * source vertices.
+   */
+  private Map&lt;String, Long&gt; distinctSourceCount;
+
+  /**
+   * Maps edge labels to a very rough estimation of their number of distinct
+   * target vertices.
+   */
+  private Map&lt;String, Long&gt; distinctTargetCount;
+
+  /**
+   * Set of properties to consider in the estimations.
+   * If null, all properties are considered.
+   */
+  private Set&lt;String&gt; relevantProperties;
+
+  /**
+   * Creates new graph statistics
+   *
+   * @param vertexStats        list of vertex statistics (one element for each label)
+   * @param edgeStats          list of edge statistics (one element for each label)
+   * @param relevantProperties properties to consider
+   */
+  protected BinningTemporalGraphStatistics(List&lt;TemporalElementStats&gt; vertexStats,
+                                           List&lt;TemporalElementStats&gt; edgeStats,
+<span class="fc" id="L116">                                           Set&lt;String&gt; relevantProperties) {</span>
+<span class="fc" id="L117">    this.vertexStats = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L118">    this.edgeStats = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L119">    this.vertexCount = 0L;</span>
+<span class="fc" id="L120">    this.edgeCount = 0L;</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    for (TemporalElementStats edgeStat : edgeStats) {</span>
+<span class="fc" id="L122">      this.edgeStats.put(edgeStat.getLabel(), edgeStat);</span>
+<span class="fc" id="L123">      this.edgeCount += edgeStat.getElementCount();</span>
+<span class="fc" id="L124">    }</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">    for (TemporalElementStats vertexStat : vertexStats) {</span>
+<span class="fc" id="L126">      this.vertexStats.put(vertexStat.getLabel(), vertexStat);</span>
+<span class="fc" id="L127">      this.vertexCount += vertexStat.getElementCount();</span>
+<span class="fc" id="L128">    }</span>
+<span class="fc" id="L129">    this.relevantProperties = relevantProperties;</span>
+<span class="fc" id="L130">    initDistinctVertices();</span>
+<span class="fc" id="L131">  }</span>
+
+  /**
+   * Initializes the statistics for distinct vertices
+   */
+  private void initDistinctVertices() {
+<span class="fc" id="L137">    this.distinctSourceCount = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L138">    this.distinctTargetCount = new HashMap&lt;&gt;();</span>
+
+    // for every type of edge...
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    for (Map.Entry&lt;String, TemporalElementStats&gt; entries : edgeStats.entrySet()) {</span>
+<span class="fc" id="L142">      TemporalElementStats stats = edgeStats.get(entries.getKey());</span>
+<span class="fc" id="L143">      List&lt;TemporalElement&gt; sample = stats.getSample();</span>
+<span class="fc" id="L144">      int sampleSize = sample.size();</span>
+      // ...extract source and target vertex IDs of the edges...
+<span class="fc" id="L146">      HashSet&lt;GradoopId&gt; sourceIds = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L147">      HashSet&lt;GradoopId&gt; targetIds = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">      for (TemporalElement edge : sample) {</span>
+<span class="fc" id="L149">        sourceIds.add(((TemporalEdge) edge).getSourceId());</span>
+<span class="fc" id="L150">        targetIds.add(((TemporalEdge) edge).getTargetId());</span>
+<span class="fc" id="L151">      }</span>
+      // ... and estimate distinct source and target vertices naively
+<span class="fc" id="L153">      long sourceEstimation = sourceIds.size() *</span>
+<span class="fc" id="L154">        (stats.getElementCount() / sampleSize);</span>
+<span class="fc" id="L155">      long targetEstimation = targetIds.size() *</span>
+<span class="fc" id="L156">        (stats.getElementCount() / sampleSize);</span>
+<span class="fc" id="L157">      distinctSourceCount.put(entries.getKey(), sourceEstimation);</span>
+<span class="fc" id="L158">      distinctTargetCount.put(entries.getKey(), targetEstimation);</span>
+<span class="fc" id="L159">    }</span>
+<span class="fc" id="L160">  }</span>
+
+  /**
+   * Returns the vertex statistics list
+   *
+   * @return vertex statistics list
+   */
+  public Map&lt;String, TemporalElementStats&gt; getVertexStats() {
+<span class="fc" id="L168">    return vertexStats;</span>
+  }
+
+  /**
+   * Returns the edge statistics list
+   *
+   * @return edge statistics list
+   */
+  public Map&lt;String, TemporalElementStats&gt; getEdgeStats() {
+<span class="fc" id="L177">    return edgeStats;</span>
+  }
+
+  @Override
+  public long getVertexCount(String label) {
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (label.isEmpty()) {</span>
+<span class="fc" id="L183">      return getVertexCount();</span>
+    }
+<span class="fc bfc" id="L185" title="All 2 branches covered.">    if (vertexStats.containsKey(label)) {</span>
+<span class="fc" id="L186">      return vertexStats.get(label).getElementCount();</span>
+    }
+<span class="fc" id="L188">    return 0;</span>
+  }
+
+  @Override
+  public long getVertexCount() {
+<span class="fc" id="L193">    return vertexCount;</span>
+  }
+
+  @Override
+  public long getEdgeCount(String label) {
+<span class="fc bfc" id="L198" title="All 2 branches covered.">    if (label.isEmpty()) {</span>
+<span class="fc" id="L199">      return edgeCount;</span>
+    }
+<span class="fc bfc" id="L201" title="All 2 branches covered.">    if (edgeStats.containsKey(label)) {</span>
+<span class="fc" id="L202">      return edgeStats.get(label).getElementCount();</span>
+    }
+<span class="fc" id="L204">    return 0;</span>
+  }
+
+  @Override
+  public long getEdgeCount() {
+<span class="fc" id="L209">    return edgeCount;</span>
+  }
+
+  @Override
+  public long getDistinctSourceVertexCount(String edgeLabel) {
+<span class="fc" id="L214">    return distinctSourceCount.getOrDefault(edgeLabel, 0L);</span>
+  }
+
+  @Override
+  public long getDistinctSourceVertexCount() {
+<span class="fc" id="L219">    return distinctSourceCount.values().stream().reduce(0L, Long::sum);</span>
+  }
+
+  @Override
+  public long getDistinctTargetVertexCount() {
+<span class="fc" id="L224">    return distinctTargetCount.values().stream().reduce(0L, Long::sum);</span>
+  }
+
+  @Override
+  public long getDistinctTargetVertexCount(String edgeLabel) {
+<span class="fc" id="L229">    return distinctTargetCount.getOrDefault(edgeLabel, 0L);</span>
+  }
+
+  @Override
+  public double estimateTemporalProb(ElementType type1, Optional&lt;String&gt; label1,
+                                     TimeSelector.TimeField field1, Comparator comp, Long value) {
+    // no further estimations for = and !=
+<span class="fc bfc" id="L236" title="All 2 branches covered.">    if (comp == EQ) {</span>
+<span class="fc" id="L237">      return VERY_LOW_PROB;</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">    } else if (comp == Comparator.NEQ) {</span>
+<span class="nc" id="L239">      return VERY_HIGH_PROB;</span>
+    }
+    // &lt;, &lt;=, &gt;=, &gt;
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    if (!(label1.isPresent())) {</span>
+<span class="fc" id="L243">      return estimateTemporalProb(type1, field1, comp, value);</span>
+    } else {
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">      TemporalElementStats elementStats = (type1 == ElementType.VERTEX) ?</span>
+<span class="pc" id="L246">        vertexStats.getOrDefault(label1.get(), null) :</span>
+<span class="pc" id="L247">        edgeStats.getOrDefault(label1.get(), null);</span>
+      // label not in keys
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">      if (elementStats == null) {</span>
+<span class="nc" id="L250">        return VERY_LOW_PROB;</span>
+      }
+<span class="fc" id="L252">      Binning bins = getBins(elementStats, field1);</span>
+<span class="fc" id="L253">      return estimateFromBins(bins, comp, value);</span>
+    }
+  }
+
+  @Override
+  public double estimateTemporalProb(ElementType type1, Optional&lt;String&gt; label1,
+                                     TimeSelector.TimeField field1, Comparator comp, ElementType type2,
+                                     Optional&lt;String&gt; label2, TimeSelector.TimeField field2) {
+    // no further estimations for = and !=
+<span class="fc bfc" id="L262" title="All 2 branches covered.">    if (comp == EQ) {</span>
+<span class="fc" id="L263">      return VERY_LOW_PROB;</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">    } else if (comp == Comparator.NEQ) {</span>
+<span class="fc" id="L265">      return VERY_HIGH_PROB;</span>
+    }
+    // stats for lhs (can be more than one, if no label is specified)
+    List&lt;TemporalElementStats&gt; statsLhs;
+    // same for rhs
+    List&lt;TemporalElementStats&gt; statsRhs;
+
+    // determine relevant statistics for rhs and lhs
+<span class="fc bfc" id="L273" title="All 2 branches covered.">    if (!(label1.isPresent())) {</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">      statsLhs = type1 == ElementType.VERTEX ?</span>
+<span class="fc" id="L275">        new ArrayList&lt;&gt;(vertexStats.values()) :</span>
+<span class="fc" id="L276">        new ArrayList&lt;&gt;(edgeStats.values());</span>
+    } else {
+<span class="fc bfc" id="L278" title="All 2 branches covered.">      statsLhs = type1 == ElementType.VERTEX ?</span>
+        new ArrayList&lt;&gt;(
+<span class="fc" id="L280">          Collections.singletonList(vertexStats.getOrDefault(label1.get(), null))) :</span>
+        new ArrayList&lt;&gt;(
+<span class="fc" id="L282">          Collections.singletonList(edgeStats.getOrDefault(label1.get(), null)));</span>
+      // label not in the DB
+<span class="fc bfc" id="L284" title="All 2 branches covered.">      if (statsLhs.get(0) == null) {</span>
+<span class="fc" id="L285">        return 0.;</span>
+      }
+    }
+    // same for rhs
+<span class="fc bfc" id="L289" title="All 2 branches covered.">    if (!(label2.isPresent())) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">      statsRhs = type2 == ElementType.VERTEX ?</span>
+<span class="fc" id="L291">        new ArrayList&lt;&gt;(vertexStats.values()) :</span>
+<span class="fc" id="L292">        new ArrayList&lt;&gt;(edgeStats.values());</span>
+    } else {
+<span class="fc bfc" id="L294" title="All 2 branches covered.">      statsRhs = type2 == ElementType.VERTEX ?</span>
+        new ArrayList&lt;&gt;(
+<span class="fc" id="L296">          Collections.singletonList(vertexStats.getOrDefault(label2.get(), null))) :</span>
+        new ArrayList&lt;&gt;(
+<span class="fc" id="L298">          Collections.singletonList(edgeStats.getOrDefault(label2.get(), null)));</span>
+      // label not in the DB
+<span class="fc bfc" id="L300" title="All 2 branches covered.">      if (statsRhs.get(0) == null) {</span>
+<span class="fc" id="L301">        return 0.;</span>
+      }
+    }
+<span class="fc" id="L304">    return estimateTimeSelectorComparison(statsLhs, field1, comp, statsRhs, field2);</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison between two time selectors holds
+   * Both selectors are described by the statistics that are relevant for them
+   * (one statistic if label was specified, more than one if not).
+   *
+   * @param statsLhs   list of statistics for the lhs
+   * @param fieldLhs   lhs time field (tx_from, tx_to, val_from, val_to)
+   * @param comparator comparator of the comparison
+   * @param statsRhs   list of statistics for the rhs
+   * @param fieldRhs   rhs time field
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateTimeSelectorComparison(List&lt;TemporalElementStats&gt; statsLhs,
+                                                TimeSelector.TimeField fieldLhs,
+                                                Comparator comparator, List&lt;TemporalElementStats&gt; statsRhs,
+                                                TimeSelector.TimeField fieldRhs) {
+    // count overall number of elements for both sides
+<span class="fc" id="L324">    long lhsOverallCount = statsLhs.stream()</span>
+<span class="fc" id="L325">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L326">      .reduce(Long::sum)</span>
+<span class="fc" id="L327">      .orElse(0L);</span>
+<span class="fc" id="L328">    long rhsOverallCount = statsRhs.stream()</span>
+<span class="fc" id="L329">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L330">      .reduce(Long::sum)</span>
+<span class="fc" id="L331">      .orElse(0L);</span>
+<span class="fc" id="L332">    double sum = 0.;</span>
+
+<span class="fc bfc" id="L334" title="All 2 branches covered.">    for (TemporalElementStats lhs : statsLhs) {</span>
+<span class="fc" id="L335">      double lhsWeight = (double) lhs.getElementCount() / lhsOverallCount;</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">      for (TemporalElementStats rhs : statsRhs) {</span>
+<span class="fc" id="L337">        double rhsWeight = (double) rhs.getElementCount() / rhsOverallCount;</span>
+<span class="fc" id="L338">        sum += lhsWeight * rhsWeight *</span>
+<span class="fc" id="L339">          estimateTimeSelectorComparison(lhs, fieldLhs, comparator, rhs, fieldRhs);</span>
+<span class="fc" id="L340">      }</span>
+<span class="fc" id="L341">    }</span>
+<span class="fc" id="L342">    return sum;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison between two time selectors holds
+   * Both selectors are described by the statistics that are relevant for them
+   * (one statistic for both lhs and rhs).
+   *
+   * @param statsLhs   statistics for the lhs
+   * @param fieldLhs   lhs time field (tx_from, tx_to, val_from, val_to)
+   * @param comparator comparator of the comparison
+   * @param statsRhs   statistics for the rhs
+   * @param fieldRhs   rhs time field
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateTimeSelectorComparison(TemporalElementStats statsLhs,
+                                                TimeSelector.TimeField fieldLhs,
+                                                Comparator comparator, TemporalElementStats statsRhs,
+                                                TimeSelector.TimeField fieldRhs) {
+
+<span class="fc" id="L362">    double sum = 0.;</span>
+
+    // first, compare without considering Long.MIN values, TemporalElement.DEFAULT_TIME_TO values
+
+<span class="fc" id="L366">    double[] lhs = statsLhs.getTemporalPropertyStats(fieldLhs);</span>
+<span class="fc" id="L367">    double[] rhs = statsRhs.getTemporalPropertyStats(fieldRhs);</span>
+<span class="fc" id="L368">    double lhsMean = lhs[0];</span>
+<span class="fc" id="L369">    double lhsVariance = lhs[1];</span>
+<span class="fc" id="L370">    double lhsExtreme = lhs[2];</span>
+<span class="fc" id="L371">    double rhsMean = rhs[0];</span>
+<span class="fc" id="L372">    double rhsVariance = rhs[1];</span>
+<span class="fc" id="L373">    double rhsExtreme = rhs[2];</span>
+    // probability that both lhs and rhs not TemporalElement.DEFAULT_TIME_FROM or
+    // TemporalElement.DEFAULT_TIME_TO
+<span class="fc" id="L376">    double probBothNotExtreme = (1 - lhsExtreme) * (1 - rhsExtreme);</span>
+    // distribution for difference between lhs and rhs values
+<span class="fc" id="L378">    NormalDistribution diffDist = new NormalDistribution(lhsMean - rhsMean,</span>
+<span class="fc" id="L379">      Math.max(lhsVariance + rhsVariance, VERY_LOW_PROB));</span>
+
+    // P(lhs &lt; rhs)
+<span class="fc" id="L382">    double probNotExtremeLTE = diffDist.cumulativeProbability(0.);</span>
+    // P(lhs = rhs)
+<span class="fc" id="L384">    double probNotExtremeEQ = diffDist.probability(0.);</span>
+    // P(lhs comp rhs)
+<span class="fc" id="L386">    double probCompNotExtreme = 0.;</span>
+
+<span class="fc bfc" id="L388" title="All 2 branches covered.">    if (comparator == LTE) {</span>
+<span class="fc" id="L389">      probCompNotExtreme = probNotExtremeLTE;</span>
+<span class="fc bfc" id="L390" title="All 2 branches covered.">    } else if (comparator == LT) {</span>
+<span class="fc" id="L391">      probCompNotExtreme = probNotExtremeLTE - probNotExtremeEQ;</span>
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">    } else if (comparator == EQ) {</span>
+<span class="nc" id="L393">      probCompNotExtreme = probNotExtremeEQ;</span>
+<span class="pc bpc" id="L394" title="1 of 2 branches missed.">    } else if (comparator == NEQ) {</span>
+<span class="nc" id="L395">      probCompNotExtreme = 1. - probNotExtremeEQ;</span>
+<span class="fc bfc" id="L396" title="All 2 branches covered.">    } else if (comparator == GTE) {</span>
+<span class="fc" id="L397">      probCompNotExtreme = 1. - (probNotExtremeLTE - probNotExtremeEQ);</span>
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">    } else if (comparator == GT) {</span>
+<span class="fc" id="L399">      probCompNotExtreme = 1. - probNotExtremeLTE;</span>
+    }
+
+<span class="fc" id="L402">    sum += probBothNotExtreme * probCompNotExtreme;</span>
+
+    // also consider cases in which one or both sides have extreme values
+<span class="fc" id="L405">    double probCompExtreme = 0.;</span>
+    // lhs from
+<span class="fc bfc" id="L407" title="All 4 branches covered.">    if (fieldLhs == TX_FROM || fieldLhs == VAL_FROM) {</span>
+      // rhs from
+<span class="fc bfc" id="L409" title="All 4 branches covered.">      if (fieldRhs == TX_FROM || fieldRhs == VAL_FROM) {</span>
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">        if (comparator == EQ) {</span>
+<span class="nc" id="L411">          probCompExtreme = lhsExtreme * rhsExtreme;</span>
+<span class="pc bpc" id="L412" title="1 of 2 branches missed.">        } else if (comparator == NEQ) {</span>
+<span class="nc" id="L413">          probCompExtreme = (1 - lhsExtreme) * rhsExtreme + lhsExtreme * (1 - rhsExtreme);</span>
+<span class="fc bfc" id="L414" title="All 2 branches covered.">        } else if (comparator == LTE) {</span>
+<span class="fc" id="L415">          probCompExtreme = lhsExtreme;</span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">        } else if (comparator == LT) {</span>
+<span class="fc" id="L417">          probCompExtreme = lhsExtreme * (1 - rhsExtreme);</span>
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">        } else if (comparator == GTE) {</span>
+<span class="nc" id="L419">          probCompExtreme = rhsExtreme;</span>
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">        } else if (comparator == GT) {</span>
+<span class="fc" id="L421">          probCompExtreme = (1 - lhsExtreme) * rhsExtreme;</span>
+        }
+      } else {
+        // rhs to
+<span class="pc bpc" id="L425" title="1 of 6 branches missed.">        if (comparator == NEQ || comparator == LT || comparator == LTE) {</span>
+<span class="fc" id="L426">          probCompExtreme = lhsExtreme * rhsExtreme + (1 - lhsExtreme) * rhsExtreme +</span>
+            lhsExtreme * (1 - rhsExtreme);
+        } //for all other comparators 0, if lhs and/or rhs extreme
+      }
+    } else { // lhs to
+      // rhs from
+<span class="fc bfc" id="L432" title="All 4 branches covered.">      if (fieldRhs == TX_FROM || fieldRhs == VAL_FROM) {</span>
+<span class="pc bpc" id="L433" title="3 of 6 branches missed.">        if (comparator == NEQ || comparator == GT || comparator == GTE) {</span>
+<span class="nc" id="L434">          probCompExtreme = lhsExtreme * rhsExtreme + (1 - lhsExtreme) * rhsExtreme +</span>
+            lhsExtreme * (1 - rhsExtreme);
+        } // for all other comparators 0, if lhs and/or rhs extreme
+      } else {
+        // rhs to
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">        if (comparator == EQ) {</span>
+<span class="nc" id="L440">          probCompExtreme = lhsExtreme * rhsExtreme;</span>
+<span class="pc bpc" id="L441" title="1 of 2 branches missed.">        } else if (comparator == NEQ) {</span>
+<span class="nc" id="L442">          probCompExtreme = (1 - lhsExtreme) * rhsExtreme + lhsExtreme * (1 - rhsExtreme);</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">        } else if (comparator == LTE) {</span>
+<span class="fc" id="L444">          probCompExtreme = rhsExtreme;</span>
+<span class="fc bfc" id="L445" title="All 2 branches covered.">        } else if (comparator == LT) {</span>
+<span class="fc" id="L446">          probCompExtreme = (1 - lhsExtreme) * rhsExtreme;</span>
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">        } else if (comparator == GTE) {</span>
+<span class="fc" id="L448">          probCompExtreme = lhsExtreme;</span>
+<span class="nc bnc" id="L449" title="All 2 branches missed.">        } else if (comparator == GT) {</span>
+<span class="nc" id="L450">          probCompExtreme = lhsExtreme * (1 - rhsExtreme);</span>
+        }
+      }
+    }
+
+<span class="fc" id="L455">    sum += probCompExtreme;</span>
+
+<span class="fc" id="L457">    return sum;</span>
+  }
+
+
+  @Override
+  public double estimateDurationProb(ElementType type, Optional&lt;String&gt; label, Comparator comp,
+                                     boolean transaction, Long value) {
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">    Map&lt;String, TemporalElementStats&gt; statsMap = (type == ElementType.VERTEX) ? vertexStats : edgeStats;</span>
+<span class="fc bfc" id="L465" title="All 2 branches covered.">    List&lt;TemporalElementStats&gt; relevantStats = label.isPresent() ?</span>
+<span class="fc" id="L466">      new ArrayList&lt;&gt;(Collections.singletonList(statsMap.get(label.get()))) :</span>
+<span class="fc" id="L467">      new ArrayList&lt;&gt;(statsMap.values());</span>
+
+<span class="fc" id="L469">    double sum = 0.;</span>
+<span class="fc" id="L470">    long numElements = 0;</span>
+<span class="fc bfc" id="L471" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+<span class="fc" id="L472">      numElements += stat.getElementCount();</span>
+<span class="fc" id="L473">    }</span>
+
+<span class="fc bfc" id="L475" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+
+<span class="fc bfc" id="L477" title="All 2 branches covered.">      double[] durationStats = transaction ?</span>
+<span class="fc" id="L478">        stat.getTxDurationStats() : stat.getValDurationStats();</span>
+<span class="fc" id="L479">      NormalDistribution durationDist = new NormalDistribution(</span>
+<span class="fc" id="L480">        durationStats[0], Math.max(Math.sqrt(durationStats[1]), VERY_LOW_PROB));</span>
+<span class="fc" id="L481">      double estimation = 0.;</span>
+
+<span class="fc bfc" id="L483" title="All 2 branches covered.">      if (comp == EQ) {</span>
+<span class="fc" id="L484">        estimation = durationDist.density(value);</span>
+<span class="fc bfc" id="L485" title="All 2 branches covered.">      } else if (comp == NEQ) {</span>
+<span class="fc" id="L486">        estimation = 1. - durationDist.density(value);</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">      } else if (comp == LTE) {</span>
+<span class="fc" id="L488">        estimation = durationDist.cumulativeProbability(value);</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">      } else if (comp == LT) {</span>
+<span class="fc" id="L490">        estimation = durationDist.cumulativeProbability(value) -</span>
+<span class="fc" id="L491">          durationDist.density(value);</span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">      } else if (comp == GT) {</span>
+<span class="fc" id="L493">        estimation = 1 - durationDist.cumulativeProbability(value);</span>
+<span class="pc bpc" id="L494" title="1 of 2 branches missed.">      } else if (comp == GTE) {</span>
+<span class="fc" id="L495">        estimation = 1 - (durationDist.cumulativeProbability(value)) +</span>
+<span class="fc" id="L496">          durationDist.density(value);</span>
+      }
+<span class="fc" id="L498">      sum += estimation * ((double) stat.getElementCount() / numElements);</span>
+<span class="fc" id="L499">    }</span>
+<span class="fc" id="L500">    return sum;</span>
+  }
+
+  @Override
+  public double estimateDurationProb(ElementType type1, Optional&lt;String&gt; label1, boolean transaction1,
+                                     Comparator comp, ElementType type2, Optional&lt;String&gt; label2,
+                                     boolean transaction2) {
+<span class="fc bfc" id="L507" title="All 2 branches covered.">    Map&lt;String, TemporalElementStats&gt; statsMapLhs = (type1 == ElementType.VERTEX) ? vertexStats : edgeStats;</span>
+<span class="fc bfc" id="L508" title="All 2 branches covered.">    List&lt;TemporalElementStats&gt; relevantStatsLhs = label1.isPresent() ?</span>
+<span class="fc" id="L509">      new ArrayList&lt;&gt;(Collections.singletonList(statsMapLhs.get(label1.get()))) :</span>
+<span class="fc" id="L510">      new ArrayList&lt;&gt;(statsMapLhs.values());</span>
+
+<span class="fc bfc" id="L512" title="All 2 branches covered.">    Map&lt;String, TemporalElementStats&gt; statsMapRhs = (type2 == ElementType.VERTEX) ? vertexStats : edgeStats;</span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">    List&lt;TemporalElementStats&gt; relevantStatsRhs = label2.isPresent() ?</span>
+<span class="fc" id="L514">      new ArrayList&lt;&gt;(Collections.singletonList(statsMapRhs.get(label2.get()))) :</span>
+<span class="fc" id="L515">      new ArrayList&lt;&gt;(statsMapRhs.values());</span>
+
+<span class="fc" id="L517">    double sum = 0.;</span>
+<span class="fc" id="L518">    long numElements = 0;</span>
+<span class="fc bfc" id="L519" title="All 2 branches covered.">    for (TemporalElementStats statL : relevantStatsLhs) {</span>
+<span class="fc bfc" id="L520" title="All 2 branches covered.">      for (TemporalElementStats statR : relevantStatsRhs) {</span>
+<span class="fc" id="L521">        numElements += statL.getElementCount() * statR.getElementCount();</span>
+<span class="fc" id="L522">      }</span>
+<span class="fc" id="L523">    }</span>
+
+<span class="fc bfc" id="L525" title="All 2 branches covered.">    for (TemporalElementStats statLhs : relevantStatsLhs) {</span>
+<span class="fc" id="L526">      long countLhs = statLhs.getElementCount();</span>
+
+<span class="fc bfc" id="L528" title="All 2 branches covered.">      for (TemporalElementStats statRhs : relevantStatsRhs) {</span>
+<span class="fc" id="L529">        long countRhs = statRhs.getElementCount();</span>
+
+<span class="fc bfc" id="L531" title="All 2 branches covered.">        double[] durationStatsLhs = transaction1 ?</span>
+<span class="fc" id="L532">          statLhs.getTxDurationStats() : statLhs.getValDurationStats();</span>
+<span class="fc bfc" id="L533" title="All 2 branches covered.">        double[] durationStatsRhs = transaction2 ?</span>
+<span class="fc" id="L534">          statRhs.getTxDurationStats() : statRhs.getValDurationStats();</span>
+
+        // distribution of differences (LHS - RHS)
+<span class="fc" id="L537">        NormalDistribution diffDist = new NormalDistribution(</span>
+          durationStatsLhs[0] - durationStatsRhs[0],
+<span class="fc" id="L539">          Math.max(Math.sqrt(durationStatsLhs[1] + durationStatsRhs[1]), VERY_LOW_PROB));</span>
+
+<span class="fc" id="L541">        double estimation = 0.;</span>
+
+<span class="fc bfc" id="L543" title="All 2 branches covered.">        if (comp == EQ) {</span>
+<span class="fc" id="L544">          estimation = diffDist.density(0);</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">        } else if (comp == NEQ) {</span>
+<span class="fc" id="L546">          estimation = 1. - diffDist.density(0);</span>
+<span class="fc bfc" id="L547" title="All 2 branches covered.">        } else if (comp == LTE) {</span>
+<span class="fc" id="L548">          estimation = diffDist.cumulativeProbability(0);</span>
+<span class="fc bfc" id="L549" title="All 2 branches covered.">        } else if (comp == LT) {</span>
+<span class="fc" id="L550">          estimation = diffDist.cumulativeProbability(0) -</span>
+<span class="fc" id="L551">            diffDist.density(0);</span>
+<span class="fc bfc" id="L552" title="All 2 branches covered.">        } else if (comp == GT) {</span>
+<span class="fc" id="L553">          estimation = 1 - diffDist.cumulativeProbability(0);</span>
+<span class="pc bpc" id="L554" title="1 of 2 branches missed.">        } else if (comp == GTE) {</span>
+<span class="fc" id="L555">          estimation = 1 - (diffDist.cumulativeProbability(0)) +</span>
+<span class="fc" id="L556">            diffDist.density(0);</span>
+        }
+
+<span class="fc" id="L559">        sum += estimation * ((double) countLhs * (double) countRhs) / (double) numElements;</span>
+<span class="fc" id="L560">      }</span>
+<span class="fc" id="L561">    }</span>
+<span class="fc" id="L562">    return sum;</span>
+  }
+
+  @Override
+  public double estimatePropertyProb(ElementType type, Optional&lt;String&gt; label, String property,
+                                     Comparator comp, PropertyValue value) {
+<span class="fc bfc" id="L568" title="All 2 branches covered.">    Map&lt;String, TemporalElementStats&gt; statsMap = type == ElementType.VERTEX ?</span>
+      vertexStats : edgeStats;
+
+    List&lt;TemporalElementStats&gt; relevantStats;
+<span class="fc bfc" id="L572" title="All 2 branches covered.">    if (label.isPresent()) {</span>
+<span class="pc bpc" id="L573" title="1 of 2 branches missed.">      if (statsMap.containsKey(label.get())) {</span>
+<span class="fc" id="L574">        relevantStats = new ArrayList&lt;&gt;(Collections.singletonList(statsMap.get(label.get())));</span>
+      } else {
+<span class="nc" id="L576">        return VERY_LOW_PROB;</span>
+      }
+    } else {
+<span class="fc" id="L579">      relevantStats = new ArrayList&lt;&gt;(statsMap.values());</span>
+    }
+
+
+<span class="fc bfc" id="L583" title="All 2 branches covered.">    if (value.isNumber()) {</span>
+<span class="fc" id="L584">      return estimateNumericalPropertyProb(relevantStats, property, comp, value);</span>
+    } else {
+<span class="fc" id="L586">      return estimateCategoricalPropertyProb(relevantStats, property, comp, value);</span>
+    }
+
+  }
+
+  @Override
+  public double estimatePropertyProb(ElementType type1, Optional&lt;String&gt; label1, String property1,
+                                     Comparator comp,
+                                     ElementType type2, Optional&lt;String&gt; label2, String property2) {
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">    Map&lt;String, TemporalElementStats&gt; statsMap1 = type1 == ElementType.VERTEX ? vertexStats : edgeStats;</span>
+<span class="fc bfc" id="L596" title="All 2 branches covered.">    List&lt;TemporalElementStats&gt; relevantStats1 = label1.isPresent() ?</span>
+<span class="fc" id="L597">      new ArrayList&lt;&gt;(Collections.singletonList(statsMap1.get(label1.get()))) :</span>
+<span class="fc" id="L598">      new ArrayList&lt;&gt;(statsMap1.values());</span>
+<span class="pc bpc" id="L599" title="1 of 2 branches missed.">    Map&lt;String, TemporalElementStats&gt; statsMap2 = type2 == ElementType.VERTEX ? vertexStats : edgeStats;</span>
+<span class="fc bfc" id="L600" title="All 2 branches covered.">    List&lt;TemporalElementStats&gt; relevantStats2 = label2.isPresent() ?</span>
+<span class="fc" id="L601">      new ArrayList&lt;&gt;(Collections.singletonList(statsMap2.get(label2.get()))) :</span>
+<span class="fc" id="L602">      new ArrayList&lt;&gt;(statsMap1.values());</span>
+
+    // check if numerical or categorical
+<span class="fc" id="L605">    boolean numerical1 = false;</span>
+<span class="fc" id="L606">    boolean numerical2 = false;</span>
+<span class="fc bfc" id="L607" title="All 2 branches covered.">    for (TemporalElementStats s : relevantStats1) {</span>
+<span class="fc bfc" id="L608" title="All 2 branches covered.">      if (s.getNumericalPropertyStatsEstimation().containsKey(property1)) {</span>
+<span class="fc" id="L609">        numerical1 = true;</span>
+      }
+<span class="fc" id="L611">    }</span>
+<span class="fc bfc" id="L612" title="All 2 branches covered.">    for (TemporalElementStats s : relevantStats2) {</span>
+<span class="fc bfc" id="L613" title="All 2 branches covered.">      if (s.getNumericalPropertyStatsEstimation().containsKey(property2)) {</span>
+<span class="fc" id="L614">        numerical2 = true;</span>
+      }
+<span class="fc" id="L616">    }</span>
+
+<span class="fc bfc" id="L618" title="All 2 branches covered.">    if (isPropertyRelevant(property1) != isPropertyRelevant(property2)) {</span>
+<span class="fc" id="L619">      return 0.5;</span>
+    }
+
+<span class="fc bfc" id="L622" title="All 2 branches covered.">    if (numerical1 != numerical2) {</span>
+      // numerical properties can not be compared to categorical.
+<span class="fc" id="L624">      return 0.;</span>
+<span class="fc bfc" id="L625" title="All 2 branches covered.">    } else if (!numerical1) {</span>
+<span class="fc" id="L626">      return estimateCategoricalPropertyProb(relevantStats1, property1, comp,</span>
+        relevantStats2, property2);
+    } else {
+<span class="fc" id="L629">      return estimateNumericalPropertyProb(relevantStats1, property1, comp,</span>
+        relevantStats2, property2);
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison on numerical property data holds.
+   * RHS and LHS elements are described by a list of element statistics
+   * Note that the method assumes lhs and rhs to be independent, i.e. a call
+   * does not yield a reasonable value for comparing the same property of the
+   * exact same element.
+   *
+   * @param relevantStats1 statistics for lhs elements
+   * @param property1      lhs property to compare
+   * @param comp           comparator
+   * @param relevantStats2 statistics for the rhs elements
+   * @param property2      rhs property to compare
+   * @return estimation of probability that the comparison holds
+   */
+  private double estimateNumericalPropertyProb(List&lt;TemporalElementStats&gt; relevantStats1, String property1,
+                                               Comparator comp, List&lt;TemporalElementStats&gt; relevantStats2,
+                                               String property2) {
+<span class="fc" id="L651">    long count1 = relevantStats1.stream()</span>
+<span class="fc" id="L652">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L653">      .reduce(0L, Long::sum);</span>
+<span class="fc" id="L654">    long count2 = relevantStats2.stream()</span>
+<span class="fc" id="L655">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L656">      .reduce(0L, Long::sum);</span>
+<span class="fc" id="L657">    long totalCount = count1 * count2;</span>
+
+<span class="fc" id="L659">    double outerSum = 0.;</span>
+<span class="fc bfc" id="L660" title="All 2 branches covered.">    for (TemporalElementStats s1 : relevantStats1) {</span>
+<span class="fc" id="L661">      double innerSum = 0.;</span>
+<span class="fc bfc" id="L662" title="All 2 branches covered.">      for (TemporalElementStats s2 : relevantStats2) {</span>
+<span class="fc" id="L663">        double prob = estimateNumericalPropertyProb(s1, property1, comp, s2, property2);</span>
+<span class="fc" id="L664">        double weight = ((double) s1.getElementCount() * s2.getElementCount()) /</span>
+          totalCount;
+<span class="fc" id="L666">        innerSum += prob * weight;</span>
+<span class="fc" id="L667">      }</span>
+<span class="fc" id="L668">      outerSum += innerSum;</span>
+<span class="fc" id="L669">    }</span>
+<span class="fc" id="L670">    return outerSum;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison between numerical properties holds.
+   * LHS and RHS are described by one statistics element. They are assumed to be
+   * independent, otherwise the estimation may not be reasonable.
+   *
+   * @param stats1    lhs statistics
+   * @param property1 lhs property to compare
+   * @param comp      comparator
+   * @param stats2    rhs statistics
+   * @param property2 rhs property to compare
+   * @return estimation of probability that the comparison holds
+   */
+  private double estimateNumericalPropertyProb(TemporalElementStats stats1, String property1,
+                                               Comparator comp,
+                                               TemporalElementStats stats2, String property2) {
+<span class="fc" id="L688">    Map&lt;String, Double[]&gt; map1 = stats1.getNumericalPropertyStatsEstimation();</span>
+<span class="fc" id="L689">    Map&lt;String, Double[]&gt; map2 = stats2.getNumericalPropertyStatsEstimation();</span>
+<span class="fc" id="L690">    Double[] propStats1 = map1.getOrDefault(property1, null);</span>
+<span class="fc" id="L691">    Double[] propStats2 = map2.getOrDefault(property2, null);</span>
+<span class="pc bpc" id="L692" title="1 of 4 branches missed.">    if (propStats1 == null || propStats2 == null) {</span>
+<span class="fc" id="L693">      return 0.0001;</span>
+    }
+<span class="fc" id="L695">    double occurrence = stats1.getNumericalOccurrenceEstimation()</span>
+<span class="fc" id="L696">      .getOrDefault(property1, 0.) *</span>
+<span class="fc" id="L697">      stats2.getNumericalOccurrenceEstimation().getOrDefault(property2, 0.);</span>
+    // assuming both properties are normally distributed,
+    // their difference is also normally distributed
+<span class="fc" id="L700">    NormalDistribution differenceDist = new NormalDistribution(</span>
+<span class="fc" id="L701">      propStats1[0] - propStats2[0],</span>
+<span class="fc" id="L702">      Math.max(Math.sqrt(propStats1[1] + propStats2[1]), VERY_LOW_PROB));</span>
+
+<span class="fc bfc" id="L704" title="All 2 branches covered.">    if (comp == EQ) {</span>
+<span class="fc" id="L705">      return occurrence * differenceDist.density(0.);</span>
+<span class="fc bfc" id="L706" title="All 2 branches covered.">    } else if (comp == NEQ) {</span>
+<span class="fc" id="L707">      return occurrence * (1. - differenceDist.density(0.));</span>
+<span class="fc bfc" id="L708" title="All 2 branches covered.">    } else if (comp == LTE) {</span>
+<span class="fc" id="L709">      return occurrence * (differenceDist.cumulativeProbability(0.));</span>
+<span class="fc bfc" id="L710" title="All 2 branches covered.">    } else if (comp == LT) {</span>
+<span class="fc" id="L711">      return occurrence * (differenceDist.cumulativeProbability(0.) -</span>
+<span class="fc" id="L712">        differenceDist.density(0.));</span>
+<span class="fc bfc" id="L713" title="All 2 branches covered.">    } else if (comp == GTE) {</span>
+<span class="fc" id="L714">      return occurrence * (1. - differenceDist.cumulativeProbability(0.) +</span>
+<span class="fc" id="L715">        differenceDist.density(0.));</span>
+    } else {
+      //GT
+<span class="fc" id="L718">      return occurrence * (1. - differenceDist.cumulativeProbability(0.));</span>
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison between categorical property values holds.
+   * LHS and RHS are described by lists of stats
+   *
+   * @param relevantStats1 lhs statistics
+   * @param property1      lhs property to compare
+   * @param comp           comparator
+   * @param relevantStats2 rhs statistics
+   * @param property2      rhs property to compare
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateCategoricalPropertyProb(List&lt;TemporalElementStats&gt; relevantStats1, String property1,
+                                                 Comparator comp,
+                                                 List&lt;TemporalElementStats&gt; relevantStats2,
+                                                 String property2) {
+<span class="fc" id="L737">    long count1 = relevantStats1.stream()</span>
+<span class="fc" id="L738">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L739">      .reduce(0L, Long::sum);</span>
+<span class="fc" id="L740">    long count2 = relevantStats2.stream()</span>
+<span class="fc" id="L741">      .map(TemporalElementStats::getElementCount)</span>
+<span class="fc" id="L742">      .reduce(0L, Long::sum);</span>
+<span class="fc" id="L743">    long totalCount = count1 * count2;</span>
+
+
+<span class="fc" id="L746">    double outerSum = 0.;</span>
+<span class="fc bfc" id="L747" title="All 2 branches covered.">    for (TemporalElementStats s1 : relevantStats1) {</span>
+<span class="fc" id="L748">      double innerSum = 0.;</span>
+<span class="fc bfc" id="L749" title="All 2 branches covered.">      for (TemporalElementStats s2 : relevantStats2) {</span>
+<span class="fc" id="L750">        double prob = estimateCategoricalPropertyProb(s1, property1, comp, s2, property2);</span>
+<span class="fc" id="L751">        double weight = ((double) s1.getElementCount() * s2.getElementCount()) /</span>
+          totalCount;
+<span class="fc" id="L753">        innerSum += prob * weight;</span>
+<span class="fc" id="L754">      }</span>
+<span class="fc" id="L755">      outerSum += innerSum;</span>
+<span class="fc" id="L756">    }</span>
+<span class="fc" id="L757">    return outerSum;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison between categorical properties holds.
+   * LHS and RHS are both described by a statistics element.
+   *
+   * @param stats1    lhs statistics
+   * @param property1 lhs property to compare
+   * @param comp      comparator
+   * @param stats2    rhs statistics
+   * @param property2 rhs property to compare
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateCategoricalPropertyProb(TemporalElementStats stats1, String property1,
+                                                 Comparator comp,
+                                                 TemporalElementStats stats2, String property2) {
+<span class="fc" id="L774">    Map&lt;String, Map&lt;PropertyValue, Double&gt;&gt; map1 =</span>
+<span class="fc" id="L775">      stats1.getCategoricalSelectivityEstimation();</span>
+<span class="fc" id="L776">    Map&lt;String, Map&lt;PropertyValue, Double&gt;&gt; map2 =</span>
+<span class="fc" id="L777">      stats2.getCategoricalSelectivityEstimation();</span>
+<span class="fc" id="L778">    Map&lt;PropertyValue, Double&gt; propStats1 = map1.getOrDefault(property1, null);</span>
+<span class="fc" id="L779">    Map&lt;PropertyValue, Double&gt; propStats2 = map2.getOrDefault(property2, null);</span>
+    // property not sampled or not considered
+<span class="fc bfc" id="L781" title="All 4 branches covered.">    if (propStats1 == null || propStats2 == null) {</span>
+      // property not considered =&gt; return 0.5
+<span class="pc bpc" id="L783" title="1 of 4 branches missed.">      if (!isPropertyRelevant(property1) &amp;&amp; !isPropertyRelevant(property2)) {</span>
+<span class="fc" id="L784">        return 0.5;</span>
+      } else {
+        // property not sampled =&gt; very rare =&gt; return very small value
+<span class="fc" id="L787">        return 0.0001;</span>
+      }
+    }
+<span class="fc bfc" id="L790" title="All 4 branches covered.">    if (comp == EQ || comp == NEQ) {</span>
+<span class="fc" id="L791">      double sum = 0.;</span>
+<span class="fc bfc" id="L792" title="All 2 branches covered.">      for (Map.Entry&lt;PropertyValue, Double&gt; entry1 : propStats1.entrySet()) {</span>
+<span class="fc" id="L793">        double val1Selectivity = entry1.getValue();</span>
+<span class="fc bfc" id="L794" title="All 2 branches covered.">        for (Map.Entry&lt;PropertyValue, Double&gt; entry2 : propStats2.entrySet()) {</span>
+<span class="fc bfc" id="L795" title="All 2 branches covered.">          if (entry1.getKey().equals(entry2.getKey())) {</span>
+<span class="fc" id="L796">            double val2Selectivity = entry2.getValue();</span>
+<span class="fc" id="L797">            sum += val1Selectivity * val2Selectivity;</span>
+          }
+<span class="fc" id="L799">        }</span>
+<span class="fc" id="L800">      }</span>
+<span class="fc bfc" id="L801" title="All 2 branches covered.">      return comp == EQ ? sum : 1. - sum;</span>
+    } else {
+      // shouldn't happen, categorical variables can only be compared with EQ or NEQ
+<span class="fc" id="L804">      return 0.;</span>
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison between a categorical property value
+   * and a constant holds
+   *
+   * @param relevantStats statistics for the lhs (the elements that can have the
+   *                      property in question)
+   * @param property      the property
+   * @param comp          comparator of the comparison
+   * @param value         rhs of the comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateCategoricalPropertyProb(List&lt;TemporalElementStats&gt; relevantStats, String property,
+                                                 Comparator comp, PropertyValue value) {
+<span class="pc bpc" id="L821" title="1 of 4 branches missed.">    if (comp != EQ &amp;&amp; comp != NEQ) {</span>
+<span class="nc" id="L822">      return 0.;</span>
+    }
+<span class="fc" id="L824">    long overallCount = 0L;</span>
+<span class="fc" id="L825">    boolean found = false;</span>
+<span class="fc bfc" id="L826" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+<span class="fc" id="L827">      overallCount += stat.getElementCount();</span>
+<span class="fc bfc" id="L828" title="All 2 branches covered.">      if (stat.getCategoricalSelectivityEstimation().containsKey(property)) {</span>
+<span class="fc" id="L829">        found = true;</span>
+      }
+<span class="fc" id="L831">    }</span>
+    // property not sampled or not considered
+<span class="fc bfc" id="L833" title="All 2 branches covered.">    if (!found) {</span>
+      // not relevant/considered =&gt; simply return 0.5
+<span class="fc bfc" id="L835" title="All 2 branches covered.">      if (!isPropertyRelevant(property)) {</span>
+<span class="fc" id="L836">        return 0.5;</span>
+      } else {
+        // not sampled =&gt; very rare or not even there =&gt; return very small value
+<span class="fc" id="L839">        return 0.0001;</span>
+      }
+    }
+
+<span class="fc" id="L843">    double prob = 0.;</span>
+<span class="fc bfc" id="L844" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+<span class="pc bpc" id="L845" title="1 of 2 branches missed.">      if (!stat.getCategoricalSelectivityEstimation().containsKey(property)) {</span>
+        // not sampled ? ....
+<span class="nc" id="L847">        double factor = 0.0001;</span>
+        // ...or just excluded/not relevant?
+<span class="nc bnc" id="L849" title="All 2 branches missed.">        if (!isPropertyRelevant(property)) {</span>
+<span class="nc" id="L850">          factor = 0.5;</span>
+        }
+<span class="nc" id="L852">        prob += factor * ((double) stat.getElementCount() / overallCount);</span>
+<span class="nc" id="L853">        continue;</span>
+      }
+<span class="fc" id="L855">      prob += stat.getCategoricalSelectivityEstimation()</span>
+<span class="fc" id="L856">        .get(property)</span>
+<span class="fc" id="L857">        .getOrDefault(value, 0.0001) *</span>
+<span class="fc" id="L858">        ((double) stat.getElementCount() / overallCount);</span>
+<span class="fc" id="L859">    }</span>
+<span class="fc bfc" id="L860" title="All 2 branches covered.">    if (comp == EQ) {</span>
+<span class="fc" id="L861">      return prob;</span>
+    } else {
+      //NEQ
+<span class="fc" id="L864">      return 1 - prob;</span>
+    }
+  }
+
+  /**
+   * Estimates the probability that a comparison between a numerical property value
+   * and a numerical constant holds
+   *
+   * @param relevantStats statistics for the lhs (the elements that can have the
+   *                      property in question)
+   * @param property      the property
+   * @param comp          comparator of the comparison
+   * @param value         rhs of the comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateNumericalPropertyProb(List&lt;TemporalElementStats&gt; relevantStats, String property,
+                                               Comparator comp, PropertyValue value) {
+<span class="fc" id="L881">    long overallCount = 0L;</span>
+<span class="fc bfc" id="L882" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+<span class="fc" id="L883">      overallCount += stat.getElementCount();</span>
+<span class="fc" id="L884">    }</span>
+<span class="fc" id="L885">    double sum = 0.;</span>
+<span class="fc bfc" id="L886" title="All 2 branches covered.">    for (TemporalElementStats stat : relevantStats) {</span>
+<span class="fc" id="L887">      sum += estimateNumericalPropertyProb(stat, property, comp, value) *</span>
+<span class="fc" id="L888">        (((double) stat.getElementCount() / overallCount));</span>
+<span class="fc" id="L889">    }</span>
+<span class="fc" id="L890">    return sum;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison between a numerical property value
+   * and a numerical constant holds for one type of element
+   *
+   * @param stat          statistics for the lhs
+   * @param property      the property
+   * @param comp          comparator of the comparison
+   * @param value         rhs of the comparison
+   * @return estimation of the probability that the comparison holds
+   */
+  private double estimateNumericalPropertyProb(TemporalElementStats stat, String property,
+                                               Comparator comp, PropertyValue value) {
+    // property not sampled or not considered
+<span class="fc bfc" id="L906" title="All 2 branches covered.">    if (!stat.getNumericalPropertyStatsEstimation().containsKey(property)) {</span>
+      // if property not excluded, return very small value
+      // if excluded, it is irrelevant, return 0.5
+<span class="fc bfc" id="L909" title="All 2 branches covered.">      return isPropertyRelevant(property) ? 0.0001 : 0.5;</span>
+    }
+<span class="fc" id="L911">    Double[] propertyStats = stat.getNumericalPropertyStatsEstimation().get(property);</span>
+<span class="fc" id="L912">    NormalDistribution dist = new NormalDistribution(propertyStats[0],</span>
+<span class="fc" id="L913">      Math.max(Math.sqrt(propertyStats[1]), VERY_LOW_PROB));</span>
+<span class="fc" id="L914">    double doubleValue = ((Number) value.getObject()).doubleValue();</span>
+<span class="fc" id="L915">    double occurenceProb = stat.getNumericalOccurrenceEstimation().get(property);</span>
+<span class="fc bfc" id="L916" title="All 2 branches covered.">    if (comp == EQ) {</span>
+<span class="fc" id="L917">      return VERY_LOW_PROB * occurenceProb;</span>
+<span class="fc bfc" id="L918" title="All 2 branches covered.">    } else if (comp == NEQ) {</span>
+<span class="fc" id="L919">      return (1. - VERY_LOW_PROB) * occurenceProb;</span>
+<span class="fc bfc" id="L920" title="All 2 branches covered.">    } else if (comp == LTE) {</span>
+<span class="fc" id="L921">      return dist.cumulativeProbability(doubleValue) * occurenceProb;</span>
+<span class="fc bfc" id="L922" title="All 2 branches covered.">    } else if (comp == LT) {</span>
+<span class="fc" id="L923">      return occurenceProb * (dist.cumulativeProbability(doubleValue) - VERY_LOW_PROB);</span>
+<span class="fc bfc" id="L924" title="All 2 branches covered.">    } else if (comp == GTE) {</span>
+<span class="fc" id="L925">      return occurenceProb *</span>
+<span class="fc" id="L926">        (1. - dist.cumulativeProbability(doubleValue) + VERY_LOW_PROB);</span>
+    } else {
+      //GT
+<span class="fc" id="L929">      return occurenceProb * (1. - dist.cumulativeProbability(doubleValue));</span>
+    }
+  }
+
+  /**
+   * Estimates probability of a comparison for elements without label (i.e. probability is determined
+   * over all vertices/edges)
+   *
+   * @param type1  type of the comparison's lhs (vertex/edge)
+   * @param field1 field of the lhs (tx_from, tx_to, valid_from, valid_to)
+   * @param comp   comparator
+   * @param value  rhs (constant value)
+   * @return estimation of probability that the specified comparison holds
+   */
+  private double estimateTemporalProb(ElementType type1, TimeSelector.TimeField field1,
+                                      Comparator comp, Long value) {
+<span class="fc" id="L945">    double sum = 0.;</span>
+<span class="fc bfc" id="L946" title="All 2 branches covered.">    Map&lt;String, TemporalElementStats&gt; stats = type1 == ElementType.VERTEX ?</span>
+      vertexStats : edgeStats;
+
+<span class="fc bfc" id="L949" title="All 2 branches covered.">    Long overallCount = type1 == ElementType.VERTEX ? vertexCount : edgeCount;</span>
+<span class="fc bfc" id="L950" title="All 2 branches covered.">    for (TemporalElementStats elementStat : stats.values()) {</span>
+<span class="fc" id="L951">      Binning bins = getBins(elementStat, field1);</span>
+<span class="fc" id="L952">      sum += estimateFromBins(bins, comp, value) *</span>
+<span class="fc" id="L953">        (elementStat.getElementCount() / (double) overallCount);</span>
+<span class="fc" id="L954">    }</span>
+<span class="fc" id="L955">    return sum;</span>
+  }
+
+  /**
+   * Estimates the probability that a comparison holds using bin statistics
+   *
+   * @param bins  the bins that describe the lhs of the comparison
+   * @param comp  comparator, not EQ or NEQ
+   * @param value rhs of the comparison
+   * @return estimation of probability that the comparison holds
+   */
+  private double estimateFromBins(Binning bins, Comparator comp, Long value) {
+<span class="fc" id="L967">    int[] valueBins = findBins(bins, value);</span>
+<span class="fc" id="L968">    int numBins = bins.getBins().length;</span>
+
+<span class="fc bfc" id="L970" title="All 2 branches covered.">    if (comp == Comparator.LT) {</span>
+<span class="fc" id="L971">      return ((double) valueBins[0]) / ((double) numBins);</span>
+<span class="fc bfc" id="L972" title="All 2 branches covered.">    } else if (comp == LTE) {</span>
+<span class="fc" id="L973">      return ((double) valueBins[1]) / ((double) numBins);</span>
+<span class="fc bfc" id="L974" title="All 2 branches covered.">    } else if (comp == Comparator.GT) {</span>
+      // 1 - LTE estimation
+<span class="fc" id="L976">      return 1 - ((double) valueBins[1]) / ((double) numBins);</span>
+    } else {
+      // 1- LT estimation for GTE
+<span class="fc" id="L979">      return 1 - ((double) valueBins[0]) / ((double) numBins);</span>
+    }
+  }
+
+  /**
+   * Checks whether a property key should be considered.
+   * This is the case iff no property keys to consider are specified
+   * (then all are relevant) or the set of specified relevant key contains the property
+   *
+   * @param property property to check for relevance
+   * @return true iff property should be considered for estimations
+   */
+  private boolean isPropertyRelevant(String property) {
+<span class="fc bfc" id="L992" title="All 4 branches covered.">    return relevantProperties == null || relevantProperties.contains(property);</span>
+  }
+
+  /**
+   * Finds the bins in which a value falls
+   *
+   * @param bins  bins to search for the value
+   * @param value value to search
+   * @return integer array containing the lowest suitable bin index and the highest.
+   * A value can fall into more than one bin in a row, as the bins are equal width.
+   * E.g., binning a sequence {@code 1,2,2,3} into 4 bins would yield 2 suitable bins
+   * for the value {@code 2}
+   */
+  private int[] findBins(Binning bins, Long value) {
+<span class="fc" id="L1006">    Long[] binReps = bins.getBins();</span>
+<span class="fc" id="L1007">    int bin = Arrays.binarySearch(binReps, value);</span>
+<span class="fc bfc" id="L1008" title="All 2 branches covered.">    if (bin &lt; 0) {</span>
+<span class="fc" id="L1009">      bin = -bin;</span>
+    }
+<span class="fc" id="L1011">    bin = Math.min(bin, binReps.length - 1);</span>
+    // bins are equal size, so the same bin could occur more than once
+    // the lowest bin in which value fits
+<span class="fc" id="L1014">    int minBin = bin;</span>
+    // the &quot;highest&quot; bin in which value fits
+<span class="fc" id="L1016">    int maxBin = bin;</span>
+<span class="fc bfc" id="L1017" title="All 4 branches covered.">    while (minBin &gt;= 0 &amp;&amp; matchesBin(binReps, value, minBin)) {</span>
+<span class="fc" id="L1018">      minBin--;</span>
+    }
+<span class="fc" id="L1020">    minBin++;</span>
+<span class="fc bfc" id="L1021" title="All 4 branches covered.">    while (maxBin &lt; binReps.length &amp;&amp; matchesBin(binReps, value, maxBin)) {</span>
+<span class="fc" id="L1022">      maxBin++;</span>
+    }
+<span class="fc" id="L1024">    maxBin--;</span>
+<span class="fc" id="L1025">    return new int[]{minBin, maxBin};</span>
+  }
+
+  /**
+   * Checks whether a suitable bin was found for a value.
+   *
+   * @param arr   the array of bins
+   * @param value the value to search
+   * @param index index of the potentially suitable bin
+   * @return true iff index denotes a suitable bin for value
+   */
+  private boolean matchesBin(Long[] arr, Long value, int index) {
+<span class="pc bpc" id="L1037" title="1 of 2 branches missed.">    if (arr.length == 1) {</span>
+<span class="nc" id="L1038">      return true;</span>
+    }
+<span class="fc bfc" id="L1040" title="All 2 branches covered.">    if (index == arr.length - 1) {</span>
+<span class="fc bfc" id="L1041" title="All 2 branches covered.">      return value &gt;= arr[index];</span>
+<span class="fc bfc" id="L1042" title="All 2 branches covered.">    } else if (index == 0) {</span>
+<span class="pc bpc" id="L1043" title="1 of 2 branches missed.">      return value &lt; arr[index + 1];</span>
+    } else {
+<span class="fc bfc" id="L1045" title="All 2 branches covered.">      boolean lowerCond = value &gt;= arr[index];</span>
+<span class="fc bfc" id="L1046" title="All 4 branches covered.">      boolean upperCond = value.equals(TemporalElement.DEFAULT_TIME_TO) ? value &lt;= arr[index + 1] :</span>
+<span class="fc bfc" id="L1047" title="All 2 branches covered.">        value &lt; arr[index + 1];</span>
+<span class="fc bfc" id="L1048" title="All 4 branches covered.">      return lowerCond &amp;&amp; upperCond;</span>
+    }
+  }
+
+  /**
+   * Auxiliary method to get the bin for a certain time field (tx_from, tx_to, valid_from, valid_to)
+   *
+   * @param elementStats element statistics from which to retrieve the bin
+   * @param field1       time field
+   * @return binning statistics for the time field
+   */
+  private Binning getBins(TemporalElementStats elementStats, TimeSelector.TimeField field1) {
+<span class="fc bfc" id="L1060" title="All 2 branches covered.">    if (field1 == TimeSelector.TimeField.TX_FROM) {</span>
+<span class="fc" id="L1061">      return elementStats.getEstimatedTimeBins()[0];</span>
+<span class="fc bfc" id="L1062" title="All 2 branches covered.">    } else if (field1 == TX_TO) {</span>
+<span class="fc" id="L1063">      return elementStats</span>
+<span class="fc" id="L1064">        .getEstimatedTimeBins()[1];</span>
+<span class="fc bfc" id="L1065" title="All 2 branches covered.">    } else if (field1 == TimeSelector.TimeField.VAL_FROM) {</span>
+<span class="fc" id="L1066">      return elementStats.getEstimatedTimeBins()[2];</span>
+    } else {
+<span class="fc" id="L1068">      return elementStats.getEstimatedTimeBins()[3];</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

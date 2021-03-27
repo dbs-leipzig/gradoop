@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DurationComparable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables</a> &gt; <span class="el_source">DurationComparable.java</span></div><h1>DurationComparable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables;
+
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util.ComparableFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalElement;
+import org.gradoop.gdl.model.comparables.time.Duration;
+import org.gradoop.gdl.model.comparables.time.TimeLiteral;
+import org.gradoop.gdl.model.comparables.time.TimePoint;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Wraps a {@link org.gradoop.gdl.model.comparables.time.Duration}
+ */
+public class DurationComparable extends TemporalComparable {
+
+  /**
+   * The wrapped duration
+   */
+  private final Duration duration;
+  /**
+   * the from value of the interval
+   */
+  private final TemporalComparable from;
+  /**
+   * the to value of the interval
+   */
+  private final TemporalComparable to;
+  /**
+   * Long describing the system time of the query
+   */
+  private final Long now;
+
+  /**
+   * Creates a new wrapper
+   *
+   * @param duration the Duration to be wrapped
+   */
+  public DurationComparable(Duration duration) {
+<span class="fc" id="L59">    this(duration, new TimeLiteral(&quot;now&quot;));</span>
+<span class="fc" id="L60">  }</span>
+
+  /**
+   * Creates a new wrapper
+   *
+   * @param duration the duration to be wrapped
+   * @param now system time of the query
+   */
+<span class="fc" id="L68">  public DurationComparable(Duration duration, TimeLiteral now) {</span>
+<span class="fc" id="L69">    this.duration = duration;</span>
+<span class="fc" id="L70">    this.from = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getFrom());</span>
+<span class="fc" id="L71">    this.to = (TemporalComparable) ComparableFactory.createComparableFrom(duration.getTo());</span>
+<span class="fc" id="L72">    this.now = now.getMilliseconds();</span>
+<span class="fc" id="L73">  }</span>
+
+  public Duration getDuration() {
+<span class="nc" id="L76">    return duration;</span>
+  }
+
+  public TemporalComparable getFrom() {
+<span class="nc" id="L80">    return from;</span>
+  }
+
+  public TemporalComparable getTo() {
+<span class="nc" id="L84">    return to;</span>
+  }
+
+  public Long getNow() {
+<span class="nc" id="L88">    return now;</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    long toLong = to.evaluate(embedding, metaData).getLong() == TemporalElement.DEFAULT_TIME_TO ?</span>
+<span class="pc" id="L94">      now : to.evaluate(embedding, metaData).getLong();</span>
+<span class="fc" id="L95">    return PropertyValue.create(toLong -</span>
+<span class="fc" id="L96">      from.evaluate(embedding, metaData).getLong());</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(GraphElement element) {
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    long toLong = to.evaluate(element).getLong() == TemporalElement.DEFAULT_TIME_TO ?</span>
+<span class="pc" id="L102">      now : to.evaluate(element).getLong();</span>
+<span class="fc" id="L103">    return PropertyValue.create(toLong -</span>
+<span class="fc" id="L104">      from.evaluate(element).getLong());</span>
+  }
+
+  @Override
+  public Set&lt;String&gt; getPropertyKeys(String variable) {
+<span class="fc" id="L109">    HashSet&lt;String&gt; keys = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L110">    keys.addAll(from.getPropertyKeys(variable));</span>
+<span class="fc" id="L111">    keys.addAll(to.getPropertyKeys(variable));</span>
+<span class="fc" id="L112">    return keys;</span>
+  }
+
+
+  @Override
+  public TimePoint getWrappedComparable() {
+<span class="fc" id="L118">    return duration;</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L124">      return true;</span>
+    }
+<span class="nc bnc" id="L126" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L127">      return false;</span>
+    }
+
+<span class="nc" id="L130">    DurationComparable that = (DurationComparable) o;</span>
+<span class="nc bnc" id="L131" title="All 4 branches missed.">    return that.from.equals(from) &amp;&amp; that.to.equals(to);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L136">    return duration.hashCode();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

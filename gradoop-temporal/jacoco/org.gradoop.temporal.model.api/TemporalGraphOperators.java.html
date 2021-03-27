@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
@@ -28,6 +29,10 @@ import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.dummy.DummyTemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.CypherTemporalPatternMatching;
 import org.gradoop.temporal.model.impl.operators.snapshot.Snapshot;
 import org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValidity;
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
@@ -54,7 +59,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate) {
-<span class="fc" id="L57">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L62">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -67,7 +72,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-<span class="fc" id="L70">    return callForGraph(new Snapshot(predicate, dimension));</span>
+<span class="fc" id="L75">    return callForGraph(new Snapshot(predicate, dimension));</span>
   }
 
   /**
@@ -80,7 +85,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see AsOf
    */
   default TemporalGraph asOf(long timestamp) {
-<span class="fc" id="L83">    return snapshot(new AsOf(timestamp));</span>
+<span class="fc" id="L88">    return snapshot(new AsOf(timestamp));</span>
   }
 
   /**
@@ -88,13 +93,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code FROM fromTimestamp TO toTimestamp} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see FromTo
    */
   default TemporalGraph fromTo(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L97">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L102">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -102,13 +107,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code BETWEEN fromTimestamp AND toTimestamp} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see Between
    */
   default TemporalGraph between(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L111">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L116">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -116,13 +121,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code CONTAINED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see ContainedIn
    */
   default TemporalGraph containedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L125">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L130">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -130,13 +135,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code VALID DURING (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see ValidDuring
    */
   default TemporalGraph validDuring(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L139">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L144">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -144,13 +149,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code CREATED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see CreatedIn
    */
   default TemporalGraph createdIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L153">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L158">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -158,13 +163,13 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@code DELETED IN (fromTimestamp, toTimestamp)} where both values are timestamps in milliseconds.
    *
    * @param fromTimestamp the from timestamp in milliseconds to query
-   * @param toTimestamp the to timestamp in milliseconds to query
+   * @param toTimestamp   the to timestamp in milliseconds to query
    * @return the snapshot as a temporal graph
    * @see Snapshot
    * @see DeletedIn
    */
   default TemporalGraph deletedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L167">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L172">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -195,7 +200,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot) {
-<span class="fc" id="L198">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L203">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -217,18 +222,120 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * The resulting graph will not be verified, i.e. dangling edges could occur. Use the
    * {@code verify()} operator to validate the graph. The graph head is preserved.
    *
-   * @param firstSnapshot The predicate used to determine the first snapshot.
+   * @param firstSnapshot  The predicate used to determine the first snapshot.
    * @param secondSnapshot The predicate used to determine the second snapshot.
-   * @param dimension The time dimension that will be considered by the predicates.
+   * @param dimension      The time dimension that will be considered by the predicates.
    * @return A temporal graph containing the union of vertex and edge sets of both snapshots, defined by the
    * given two predicate functions. A property with key {@link Diff#PROPERTY_KEY} is set on each graph
    * element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
-    TimeDimension dimension) {
-<span class="fc" id="L229">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
+                             TimeDimension dimension) {
+<span class="fc" id="L234">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
   }
 
+  /**
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the graph
+   * elements is attached to the resulting vertices.
+   * &lt;p&gt;
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #temporalQuery(String, TemporalGraphStatistics)} to provide statistics for the
+   * query planner.
+   *
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery) {
+<span class="nc" id="L250">    return temporalQuery(temporalGdlQuery, new DummyTemporalGraphStatistics());</span>
+  }
+
+  /**
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
+   * &lt;p&gt;
+   * Note, that this method used no statistics about the data graph which may result in bad runtime
+   * performance. Use {@link #temporalQuery(String, String, TemporalGraphStatistics)} to provide statistics
+   * for the query planner.
+   * &lt;p&gt;
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * &lt;br&gt;
+   * {@code graph.query(
+   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)}
+   * &lt;p&gt;
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
+   * @return graph collection containing the output of the construct pattern
+   */
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern) {
+<span class="nc" id="L277">    return temporalQuery(temporalGdlQuery, constructionPattern, new DummyTemporalGraphStatistics());</span>
+  }
+
+  /**
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
+   *
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param graphStatistics statistics about the data graph
+   * @return graph collection containing matching subgraphs
+   */
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery,
+    TemporalGraphStatistics graphStatistics) {
+<span class="nc" id="L291">    return temporalQuery(temporalGdlQuery, null, graphStatistics);</span>
+  }
+
+  /**
+   * Evaluates the given query using the Temporal-GDL query engine. The engine uses default morphism
+   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of the data graph
+   * elements is attached to the resulting vertices.
+   * &lt;p&gt;
+   * In addition, the operator can be supplied with a construction pattern allowing the creation of new graph
+   * elements based on variable bindings of the match pattern. Consider the following example:
+   * &lt;br&gt;
+   * {@code graph.query(
+   * &quot;MATCH (a:Author)-[:WROTE]-&gt;(:Paper)&lt;-[:WROTE]-(b:Author) WHERE a &lt;&gt; b&quot;,
+   * &quot;(a)-[:CO_AUTHOR]-&gt;(b)&quot;)}
+   * &lt;p&gt;
+   * The query pattern is looking for pairs of authors that worked on the same paper.
+   * The construction pattern defines a new edge of type CO_AUTHOR between the two entities.
+   *
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
+   * @param graphStatistics Statistics about the data graph
+   * @return graph collection containing the output of the construct pattern
+   */
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
+    TemporalGraphStatistics graphStatistics) {
+<span class="nc" id="L316">    return temporalQuery(temporalGdlQuery, constructionPattern, true, MatchStrategy.HOMOMORPHISM,</span>
+      MatchStrategy.ISOMORPHISM, graphStatistics);
+  }
+
+  /**
+   * Evaluates the given query using the Temporal-GDL query engine.
+   *
+   * @param temporalGdlQuery A Temporal-GDL query as {@link String}
+   * @param constructionPattern Construction pattern in Temporal-GDL format
+   * @param attachData attach original vertex and edge data to the result
+   * @param vertexStrategy morphism setting for vertex mapping
+   * @param edgeStrategy morphism setting for edge mapping
+   * @param stats statistics about the data graph
+   * @return graph collection containing the output of the construct pattern or a graph collection containing
+   *         matching subgraphs if the construction pattern is {@code null}.
+   */
+  default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
+    boolean attachData, MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    TemporalGraphStatistics stats) {
+<span class="nc" id="L335">    return callForCollection(</span>
+      new CypherTemporalPatternMatching(temporalGdlQuery, constructionPattern, attachData, vertexStrategy,
+        edgeStrategy, stats, new CNFPostProcessing()));
+  }
   //----------------------------------------------------------------------------
   // Utilities
   //----------------------------------------------------------------------------
@@ -251,7 +358,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return This graph with invalid or dangling edges removed.
    */
   default TemporalGraph updateEdgeValidity() {
-<span class="nc" id="L254">    return callForGraph(new VerifyAndUpdateEdgeValidity());</span>
+<span class="nc" id="L361">    return callForGraph(new VerifyAndUpdateEdgeValidity());</span>
   }
 
 }

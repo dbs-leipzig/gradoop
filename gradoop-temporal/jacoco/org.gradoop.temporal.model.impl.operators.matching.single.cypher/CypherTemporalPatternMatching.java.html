@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CypherTemporalPatternMatching.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.matching.single.cypher</a> &gt; <span class="el_source">CypherTemporalPatternMatching.java</span></div><h1>CypherTemporalPatternMatching.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.matching.single.cypher;
+
+import com.google.common.collect.Sets;
+import org.apache.flink.api.java.DataSet;
+import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.debug.PrintEmbedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.add.AddEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectEmbeddingsElements;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.TemporalQueryHandler;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
+import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.exceptions.QueryContradictoryException;
+import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
+import org.gradoop.temporal.model.impl.operators.matching.single.TemporalPatternMatching;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions.ElementsFromEmbeddingTPGM;
+import org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.planner.greedy.GreedyPlanner;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Set;
+
+import static com.google.common.collect.Sets.difference;
+import static com.google.common.collect.Sets.intersection;
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
+
+/**
+ * Implementation of a query engine based on the Cypher graph query language.
+ */
+public class CypherTemporalPatternMatching
+  extends TemporalPatternMatching&lt;TemporalGraphHead, TemporalGraph, TemporalGraphCollection&gt; {
+
+  /**
+   * Logger
+   */
+<span class="fc" id="L60">  private static final Logger LOG = Logger.getLogger(CypherTemporalPatternMatching.class);</span>
+  /**
+   * Construction pattern for result transformation.
+   */
+  private final String constructionPattern;
+  /**
+   * Morphism strategy for vertex mappings
+   */
+  private final MatchStrategy vertexStrategy;
+  /**
+   * Morphism strategy for edge mappings
+   */
+  private final MatchStrategy edgeStrategy;
+  /**
+   * Statistics about the data graph
+   */
+  private final TemporalGraphStatistics graphStatistics;
+
+  /**
+   * Instantiates a new operator.
+   *
+   * @param query           Cypher query string
+   * @param attachData      true, if original data shall be attached to the result
+   * @param vertexStrategy  morphism strategy for vertex mappings
+   * @param edgeStrategy    morphism strategy for edge mappings
+   * @param graphStatistics statistics about the data graph
+   * @param postprocessor   postprocessing pipeline for the query CNF
+   */
+  public CypherTemporalPatternMatching(String query, boolean attachData,
+                                       MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+                                       TemporalGraphStatistics graphStatistics,
+                                       CNFPostProcessing postprocessor) {
+<span class="fc" id="L92">    this(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics, postprocessor);</span>
+<span class="fc" id="L93">  }</span>
+
+  /**
+   * Instantiates a new operator.
+   *
+   * @param query               Cypher query string
+   * @param constructionPattern Construction pattern
+   * @param attachData          true, if original data shall be attached to the result
+   * @param vertexStrategy      morphism strategy for vertex mappings
+   * @param edgeStrategy        morphism strategy for edge mappings
+   * @param graphStatistics     statistics about the data graph
+   * @param postprocessor       postprocessing pipeline for the query CNF
+   */
+  public CypherTemporalPatternMatching(String query, String constructionPattern, boolean attachData,
+                                       MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+                                       TemporalGraphStatistics graphStatistics,
+                                       CNFPostProcessing postprocessor) {
+<span class="fc" id="L110">    super(query, attachData, postprocessor, LOG);</span>
+<span class="fc" id="L111">    this.constructionPattern = constructionPattern;</span>
+<span class="fc" id="L112">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L113">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L114">    this.graphStatistics = graphStatistics;</span>
+<span class="fc" id="L115">  }</span>
+
+  @Override
+  protected TemporalGraphCollection executeForVertex(TemporalGraph graph) {
+<span class="fc" id="L119">    return executeForPattern(graph);</span>
+  }
+
+  @Override
+  protected TemporalGraphCollection executeForPattern(TemporalGraph graph) {
+    // Query planning
+<span class="fc" id="L125">    TemporalQueryHandler queryHandler = getQueryHandler();</span>
+<span class="fc" id="L126">    QueryPlan plan =</span>
+<span class="fc" id="L127">      new GreedyPlanner&lt;&gt;(graph, queryHandler, graphStatistics, vertexStrategy, edgeStrategy).plan()</span>
+<span class="fc" id="L128">        .getQueryPlan();</span>
+
+    // Query execution
+<span class="fc" id="L131">    DataSet&lt;Embedding&gt; embeddings = plan.execute();</span>
+
+<span class="fc" id="L133">    EmbeddingMetaData embeddingMetaData = plan.getRoot().getEmbeddingMetaData();</span>
+
+<span class="fc" id="L135">    embeddings =</span>
+<span class="fc" id="L136">      log(embeddings, new PrintEmbedding(embeddingMetaData),</span>
+<span class="fc" id="L137">        getVertexMapping(), getEdgeMapping());</span>
+
+    // Pattern construction (if necessary)
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">    DataSet&lt;Element&gt; finalElements = this.constructionPattern != null ?</span>
+<span class="pc" id="L141">      constructFinalElements(graph, embeddings, embeddingMetaData) :</span>
+<span class="fc" id="L142">      embeddings.flatMap(</span>
+        new ElementsFromEmbeddingTPGM&lt;TemporalGraphHead, TemporalVertex, TemporalEdge&gt;(
+<span class="fc" id="L144">          graph.getFactory().getGraphHeadFactory(),</span>
+<span class="fc" id="L145">          graph.getFactory().getVertexFactory(),</span>
+<span class="fc" id="L146">          graph.getFactory().getEdgeFactory(),</span>
+          embeddingMetaData,
+<span class="fc" id="L148">          queryHandler.getSourceTargetVariables()));</span>
+
+    // Post processing
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    TemporalGraphCollection graphCollection = doAttachData() ?</span>
+<span class="pc" id="L152">      PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :</span>
+<span class="pc" id="L153">      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);</span>
+
+<span class="fc" id="L155">    return graphCollection;</span>
+  }
+
+  @Override
+  protected TemporalGraphCollection emptyCollection(TemporalGraph graph) {
+<span class="fc" id="L160">    return graph.getCollectionFactory().createEmptyCollection();</span>
+  }
+
+  /**
+   * Method to construct final embedded elements
+   *
+   * @param graph             Used logical graph
+   * @param embeddings        embeddings
+   * @param embeddingMetaData Meta information
+   * @return New set of EmbeddingElements
+   */
+  private DataSet&lt;Element&gt; constructFinalElements(TemporalGraph graph, DataSet&lt;Embedding&gt; embeddings,
+                                                  EmbeddingMetaData embeddingMetaData) {
+
+<span class="nc" id="L174">    TemporalQueryHandler constructionPatternHandler = null;</span>
+    try {
+      // no postprocessing needed, construction pattern is not a query
+<span class="nc" id="L177">      constructionPatternHandler = new TemporalQueryHandler(</span>
+        this.constructionPattern, new CNFPostProcessing(new ArrayList&lt;&gt;()));
+      // will never happen, as the construction pattern does not contain conditions
+<span class="nc" id="L180">    } catch (QueryContradictoryException e) {</span>
+<span class="nc" id="L181">      e.printStackTrace();</span>
+<span class="nc" id="L182">    }</span>
+<span class="nc" id="L183">    Objects.requireNonNull(constructionPatternHandler).updateGeneratedVariableNames(n -&gt; &quot;_&quot; + n);</span>
+
+<span class="nc" id="L185">    Set&lt;String&gt; queryVars = Sets.newHashSet(embeddingMetaData.getVariables());</span>
+<span class="nc" id="L186">    Set&lt;String&gt; constructionVars = constructionPatternHandler.getAllVariables();</span>
+<span class="nc" id="L187">    Set&lt;String&gt; existingVars = intersection(queryVars, constructionVars).immutableCopy();</span>
+<span class="nc" id="L188">    Set&lt;String&gt; newVars = difference(constructionVars, queryVars).immutableCopy();</span>
+
+<span class="nc" id="L190">    EmbeddingMetaData newMetaData = computeNewMetaData(</span>
+      embeddingMetaData, constructionPatternHandler, existingVars, newVars);
+
+    // project existing embedding elements to new embeddings
+<span class="nc" id="L194">    ProjectEmbeddingsElements projectedEmbeddings =</span>
+      new ProjectEmbeddingsElements(embeddings, existingVars, embeddingMetaData, newMetaData);
+    // add new embedding elements
+<span class="nc" id="L197">    AddEmbeddingsElements addEmbeddingsElements =</span>
+<span class="nc" id="L198">      new AddEmbeddingsElements(projectedEmbeddings.evaluate(), newVars.size());</span>
+
+<span class="nc" id="L200">    return addEmbeddingsElements.evaluate().flatMap(</span>
+      new ElementsFromEmbeddingTPGM&lt;&gt;(
+<span class="nc" id="L202">        graph.getFactory().getGraphHeadFactory(),</span>
+<span class="nc" id="L203">        graph.getFactory().getVertexFactory(),</span>
+<span class="nc" id="L204">        graph.getFactory().getEdgeFactory(),</span>
+        newMetaData,
+<span class="nc" id="L206">        constructionPatternHandler.getSourceTargetVariables(),</span>
+<span class="nc" id="L207">        constructionPatternHandler.getLabelsForVariables(newVars)));</span>
+  }
+
+  /**
+   * Compute new meta information
+   *
+   * @param metaData             old meta information
+   * @param returnPatternHandler pattern handler
+   * @param existingVariables    old variables
+   * @param newVariables         new variables
+   * @return new EmbeddingMetaData
+   */
+  private EmbeddingMetaData computeNewMetaData(EmbeddingMetaData metaData,
+                                                   TemporalQueryHandler returnPatternHandler,
+                                                   Set&lt;String&gt; existingVariables, Set&lt;String&gt; newVariables) {
+    // update meta data
+<span class="nc" id="L223">    EmbeddingMetaData newMetaData = new EmbeddingMetaData();</span>
+
+    // case 1: Filter existing embeddings based on return pattern
+<span class="nc bnc" id="L226" title="All 2 branches missed.">    for (String var : existingVariables) {</span>
+<span class="nc" id="L227">      newMetaData.setEntryColumn(var, metaData.getEntryType(var), newMetaData.getEntryCount());</span>
+<span class="nc" id="L228">    }</span>
+
+    // case 2: Add new vertices and edges
+<span class="nc bnc" id="L231" title="All 2 branches missed.">    for (String var : newVariables) {</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">      EmbeddingMetaData.EntryType type = returnPatternHandler.isEdge(var) ?</span>
+        EmbeddingMetaData.EntryType.EDGE :
+        EmbeddingMetaData.EntryType.VERTEX;
+
+<span class="nc" id="L236">      newMetaData.setEntryColumn(var, type, newMetaData.getEntryCount());</span>
+<span class="nc" id="L237">    }</span>
+<span class="nc" id="L238">    return newMetaData;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
