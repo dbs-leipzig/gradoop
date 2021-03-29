@@ -24,7 +24,7 @@ help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
-* [Exploration and Analysis of Temporal Property Graphs, EDBT Demo, March 2021](https://dbs.uni-leipzig.de/file/EDBT21_Demo_Gradoop_camera_ready_v1.pdf)
+* [Exploration and Analysis of Temporal Property Graphs, EDBT Demo, March 2021](https://dbs.uni-leipzig.de/file/EDBT_DEMO_Rost_2021_published.pdf)
 * [Graph Sampling with Distributed In-Memory Dataflow Systems, BTW, March 2021](https://dbs.uni-leipzig.de/file/A3-21.pdf)
 * [Evolution Analysis of Large Graphs with Gradoop, ECML PKDD LEG Workshop, September 2019](https://dbs.uni-leipzig.de/file/LEGECML-PKDD_2019_paper_9.pdf)
 * [Gradoop @Gridka Keynote Distributed Graph Analytics, August 2019](https://indico.scc.kit.edu/event/460/contributions/5772/attachments/2873/4171/gradoop_gridka19.pdf)
