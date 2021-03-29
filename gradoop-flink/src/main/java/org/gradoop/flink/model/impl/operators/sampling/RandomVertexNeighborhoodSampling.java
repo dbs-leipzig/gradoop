@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,9 +117,8 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
       .filter(new EdgesWithSampledVerticesFilter(neighborType))
       .map(new Value0Of3<>());
 
-    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges);
-
-    graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);
+    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges)
+      .callForGraph(new FilterVerticesWithDegreeOtherThanGiven<>(0L));
 
     return graph;
   }

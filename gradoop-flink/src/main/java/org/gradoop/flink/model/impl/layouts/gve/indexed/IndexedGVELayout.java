@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.layouts.gve.GVELayout;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * Like {@link GVELayout}, this layout separated between graph head, vertex and edge layouts. In
+ * This layout separated between graph head, vertex and edge layouts. In
  * addition, the datasets are separated by labels and accesses by known labels are much more
  * efficient as they avoid duplicating rows during program execution.
  */
-public class IndexedGVELayout extends GVELayout implements
+public class IndexedGVELayout implements
   LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>,
   GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
   /**
@@ -53,20 +54,16 @@ public class IndexedGVELayout extends GVELayout implements
    * @param vertices mapping from label to vertices
    * @param edges mapping from label to edges
    */
-  IndexedGVELayout(Map<String, DataSet<EPGMGraphHead>> graphHeads,
-    Map<String, DataSet<EPGMVertex>> vertices,
+  IndexedGVELayout(Map<String, DataSet<EPGMGraphHead>> graphHeads, Map<String, DataSet<EPGMVertex>> vertices,
     Map<String, DataSet<EPGMEdge>> edges) {
-    super(
-      graphHeads.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during graph head union")),
-      vertices.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during vertex union")),
-      edges.values().stream().reduce(DataSet::union)
-        .orElseThrow(() -> new RuntimeException("Error during edge union"))
-    );
-    this.graphHeads = graphHeads;
-    this.vertices = vertices;
-    this.edges = edges;
+    this.graphHeads = Objects.requireNonNull(graphHeads);
+    this.vertices = Objects.requireNonNull(vertices);
+    this.edges = Objects.requireNonNull(edges);
+  }
+
+  @Override
+  public boolean isGVELayout() {
+    return false;
   }
 
   @Override
@@ -75,13 +72,47 @@ public class IndexedGVELayout extends GVELayout implements
   }
 
   @Override
+  public boolean isTransactionalLayout() {
+    return false;
+  }
+
+  @Override
+  public DataSet<EPGMGraphHead> getGraphHead() {
+    return getGraphHeads();
+  }
+
+  @Override
+  public DataSet<EPGMGraphHead> getGraphHeads() {
+    return graphHeads.values().stream().reduce(DataSet::union)
+      .orElseThrow(() -> new RuntimeException("Error during graph head union."));
+  }
+
+  @Override
   public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return graphHeads.get(label);
   }
 
   @Override
+  public DataSet<GraphTransaction> getGraphTransactions() {
+    throw new UnsupportedOperationException(
+      "Converting a indexed graph to graph transactions is not supported yet.");
+  }
+
+  @Override
+  public DataSet<EPGMVertex> getVertices() {
+    return vertices.values().stream().reduce(DataSet::union)
+      .orElseThrow(() -> new RuntimeException("Error during vertex union."));
+  }
+
+  @Override
   public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return vertices.get(label);
+  }
+
+  @Override
+  public DataSet<EPGMEdge> getEdges() {
+    return edges.values().stream().reduce(DataSet::union)
+      .orElseThrow(() -> new RuntimeException("Error during edge union"));
   }
 
   @Override

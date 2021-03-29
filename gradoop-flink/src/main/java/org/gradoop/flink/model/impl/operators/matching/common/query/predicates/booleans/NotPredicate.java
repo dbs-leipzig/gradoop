@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,21 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparableFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import java.util.Objects;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
+ * Wraps a {@link org.gradoop.gdl.model.predicates.booleans.Not} predicate
  */
 public class NotPredicate extends QueryPredicate {
 
@@ -40,15 +41,33 @@ public class NotPredicate extends QueryPredicate {
   private final Not not;
 
   /**
+   * Optional factory for creating QueryComparables
+   */
+  private final QueryComparableFactory comparableFactory;
+
+  /**
    * Create a new wrapper
+   *
    * @param not the wrapped not predicate
    */
   public NotPredicate(Not not) {
+    this(not, null);
+  }
+
+  /**
+   * Create a new wrapper
+   *
+   * @param not the wrapped not predicate
+   * @param comparableFactory factory for comparables
+   */
+  public NotPredicate(Not not, QueryComparableFactory comparableFactory) {
     this.not = not;
+    this.comparableFactory = comparableFactory;
   }
 
   /**
    * Converts the predicate into conjunctive normal form
+   *
    * @return predicate in cnf
    */
   @Override
@@ -58,20 +77,21 @@ public class NotPredicate extends QueryPredicate {
     if (expression.getClass() == Comparison.class) {
       CNF cnf = new CNF();
       CNFElement cnfElement = new CNFElement();
-      cnfElement.addPredicate(new ComparisonExpression(invertComparison((Comparison) expression)));
+      cnfElement.addPredicate(new ComparisonExpression(
+        invertComparison((Comparison) expression), comparableFactory));
       cnf.addPredicate(cnfElement);
       return cnf;
 
     } else if (expression.getClass() == Not.class) {
-      return QueryPredicate.createFrom(expression.getArguments()[0]).asCNF();
+      return QueryPredicate.createFrom(expression.getArguments()[0], comparableFactory).asCNF();
 
     } else if (expression.getClass() == And.class) {
       Predicate[] otherArguments = expression.getArguments();
       Or or = new Or(
         new Not(otherArguments[0]),
-        new Not(otherArguments[0])
+        new Not(otherArguments[1])
       );
-      return QueryPredicate.createFrom(or).asCNF();
+      return QueryPredicate.createFrom(or, comparableFactory).asCNF();
 
     } else if (expression.getClass() == Or.class) {
       Predicate[] otherArguments = expression.getArguments();
@@ -80,7 +100,7 @@ public class NotPredicate extends QueryPredicate {
         new Not(otherArguments[1])
       );
 
-      return QueryPredicate.createFrom(and).asCNF();
+      return QueryPredicate.createFrom(and, comparableFactory).asCNF();
 
     } else {
       Predicate[] otherArguments = expression.getArguments();
@@ -90,16 +110,17 @@ public class NotPredicate extends QueryPredicate {
           otherArguments[1]),
         new And(
           new Not(otherArguments[0]),
-          new Not(otherArguments[0]))
+          new Not(otherArguments[1]))
       );
 
-      return QueryPredicate.createFrom(or).asCNF();
+      return QueryPredicate.createFrom(or, comparableFactory).asCNF();
     }
   }
 
   /**
    * Invert a comparison
    * eg NOT(a > b) == (a <= b)
+   *
    * @param comparison the comparison that will be inverted
    * @return inverted comparison
    */

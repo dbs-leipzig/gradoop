@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,9 +87,9 @@ public class GellyTriangleCountingTest extends GradoopFlinkTestBase {
     LogicalGraph trianglesDirectedGraph = loader.getLogicalGraphByVariable("trianglesDirected");
     LogicalGraph trianglesUndirectedGraph = loader.getLogicalGraphByVariable("trianglesUndirected");
 
-    tripletGraph = tripletGraph.callForGraph(new GellyTriangleCounting());
-    trianglesDirectedGraph = trianglesDirectedGraph.callForGraph(new GellyTriangleCounting());
-    trianglesUndirectedGraph = trianglesUndirectedGraph.callForGraph(new GellyTriangleCounting());
+    tripletGraph = tripletGraph.callForGraph(new GellyTriangleCounting<>());
+    trianglesDirectedGraph = trianglesDirectedGraph.callForGraph(new GellyTriangleCounting<>());
+    trianglesUndirectedGraph = trianglesUndirectedGraph.callForGraph(new GellyTriangleCounting<>());
 
     assertEquals("Wrong number of triangles for triplet, should be 0L", 0L,
       tripletGraph.getGraphHead().collect().get(0).getPropertyValue(
@@ -104,7 +104,7 @@ public class GellyTriangleCountingTest extends GradoopFlinkTestBase {
         GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
     LogicalGraph socialGraph = getSocialNetworkLoader().getLogicalGraph();
-    socialGraph = socialGraph.callForGraph(new GellyTriangleCounting());
+    socialGraph = socialGraph.callForGraph(new GellyTriangleCounting<>());
 
     assertEquals("Wrong number of triangles for social graph, should be 8L", 8L,
       socialGraph.getGraphHead().collect().get(0).getPropertyValue(

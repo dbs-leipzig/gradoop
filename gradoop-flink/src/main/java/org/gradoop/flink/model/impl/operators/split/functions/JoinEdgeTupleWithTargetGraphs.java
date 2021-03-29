@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,25 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Join edge tuples with the graph sets of their targets
+ * Join edge tuples with the graph sets of their targets.
  *
- * @param <E> EPGM edge type
+ * @param <E> Edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f2")
-public class JoinEdgeTupleWithTargetGraphs<E extends EPGMEdge>
-  implements JoinFunction
-  <Tuple2<E, GradoopIdSet>, Tuple2<GradoopId, GradoopIdSet>,
-    Tuple3<E, GradoopIdSet, GradoopIdSet>> {
+public class JoinEdgeTupleWithTargetGraphs<E extends Edge>
+  implements JoinFunction<Tuple2<E, GradoopIdSet>, Tuple2<GradoopId, GradoopIdSet>,
+  Tuple3<E, GradoopIdSet, GradoopIdSet>> {
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple3<E, GradoopIdSet, GradoopIdSet> reuseTuple =
-    new Tuple3<>();
+  private final Tuple3<E, GradoopIdSet, GradoopIdSet> reuseTuple = new Tuple3<>();
 
   @Override
   public Tuple3<E, GradoopIdSet, GradoopIdSet> join(

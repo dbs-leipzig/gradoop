@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.util;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
@@ -25,6 +26,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.temporal.model.api.functions.TimeIntervalExtractor;
@@ -92,6 +94,12 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    */
   protected static final Long CURRENT_TIME = System.currentTimeMillis();
 
+  /**
+   * Path to the Citibike Temporal-GDL file.
+   */
+  public static final String TEMPORAL_GDL_CITIBIKE_PATH = TemporalGradoopTestBase.class
+    .getResource("/data/patternmatchingtest/citibikesample.gdl").getPath();
+
   @Override
   protected TemporalGradoopConfig getConfig() {
     if (config == null) {
@@ -139,7 +147,6 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
   /**
    * Convert some graph to a {@link TemporalGraph}.
    *
-   * @see org.gradoop.temporal.model.impl.TemporalGraphFactory#fromNonTemporalGraph(BaseGraph)
    * @param graph The graph.
    * @return The resulting temporal graph.
    */
@@ -364,4 +371,60 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
       throw new IllegalArgumentException("Failed to parse date.", pe);
     }
   }
+
+  /**
+   * Loads citibike sample dataset as temporal graph.
+   * Uses {@code start} and {@code end} edge properties to set {@code valid_from}/{@code tx_from}
+   * and {@code valid_to}/{@code tx_to} values.
+   *
+   * @return temporal citibike sample graph
+   * @throws Exception on failure
+   */
+  public TemporalGraph loadCitibikeSample() throws Exception {
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
+    loader.initDatabaseFromFile(TEMPORAL_GDL_CITIBIKE_PATH);
+    return transformToTemporalGraph(loader.getLogicalGraph());
+  }
+
+  /**
+   * Given a logical graph, this method transforms it to a temporal graph.
+   * {@code start} and {@code end} values are extracted from the edges (= "trips")
+   * and used to set {@code valid_from}/{@code tx_from} and {@code valid_to}/{@code tx_to}
+   * values.
+   *
+   * @param logicalGraph the logical graph to transform
+   * @return logical graph transformed to temporal graph
+   */
+  protected TemporalGraph transformToTemporalGraph(LogicalGraph logicalGraph) {
+    TemporalGraph tg = toTemporalGraph(logicalGraph);
+    return tg.getFactory().fromDataSets(
+      tg.getVertices().map(vertexTransform),
+      tg.getEdges().map(edgeTransform));
+  }
+
+  /**
+   * Set the edge's {@code valid_from} and {@code tx_from} according to the {@code start}
+   * property and the edge's {@code valid_to} and {@code tx_to} according to the
+   * {@code end} property. Both properties are retained.
+   */
+  protected static final MapFunction<TemporalEdge, TemporalEdge> edgeTransform = value -> {
+    long start = value.getPropertyValue("start").getLong();
+    long end = value.getPropertyValue("end").getLong();
+    value.setValidTime(new Tuple2<>(start, end));
+    value.setTransactionTime(new Tuple2<>(start, end));
+    return value;
+  };
+
+  /**
+   * Set the vertex {@code valid_from} and {@code tx_from} according to the {@code start}
+   * property and the vertice's {@code valid_to} and {@code tx_to} according to the
+   * {@code end} property. Both properties are retained.
+   */
+  protected static final MapFunction<TemporalVertex, TemporalVertex> vertexTransform = value -> {
+    long start = value.getPropertyValue("start").getLong();
+    long end = value.getPropertyValue("end").getLong();
+    value.setValidTime(new Tuple2<>(start, end));
+    value.setTransactionTime(new Tuple2<>(start, end));
+    return value;
+  };
 }

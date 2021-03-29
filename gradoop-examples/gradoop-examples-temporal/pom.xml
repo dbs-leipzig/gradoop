@@ -8,7 +8,7 @@
     <parent>
         <artifactId>gradoop-examples</artifactId>
         <groupId>org.gradoop</groupId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>gradoop-examples-temporal</artifactId>
@@ -103,7 +103,7 @@
                                     <include>org.apache.flink:flink-java</include>
                                     <!-- others -->
                                     <include>org.apache.hbase:hbase-common</include>
-                                    <include>com.github.s1ck:gdl</include>
+                                    <include>org.gradoop:gradoop-gdl</include>
                                     <include>org.antlr:antlr4-runtime</include>
                                     <include>me.lemire.integercompression:*</include>
                                     <include>com.google.guava:*</include>

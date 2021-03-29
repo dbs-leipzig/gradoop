@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+
+import static java.util.Objects.deepEquals;
 
 /**
  * Input embeddings are extended by an empty path and an additional entry which equals the entry at
@@ -50,7 +51,7 @@ public class AdoptEmptyPaths extends RichFlatMapFunction<Embedding, Embedding> {
   @Override
   public void flatMap(Embedding value, Collector<Embedding> out) {
     if (closingColumn >= 0 &&
-      !ArrayUtils.isEquals(value.getRawId(expandColumn), value.getRawId(closingColumn))) {
+      !deepEquals(value.getRawId(expandColumn), value.getRawId(closingColumn))) {
       return;
     }
 

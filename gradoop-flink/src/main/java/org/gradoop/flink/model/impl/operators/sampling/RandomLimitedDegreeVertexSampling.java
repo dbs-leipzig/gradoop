@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,11 +116,11 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-    graph = new DistinctVertexDegrees(
+    graph = graph.callForGraph(new DistinctVertexDegrees<>(
       SamplingConstants.DEGREE_PROPERTY_KEY,
       SamplingConstants.IN_DEGREE_PROPERTY_KEY,
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
-      true).execute(graph);
+      true));
 
     DataSet<EPGMVertex> newVertices = graph.getVertices()
       .filter(new LimitedDegreeVertexRandomFilter<>(

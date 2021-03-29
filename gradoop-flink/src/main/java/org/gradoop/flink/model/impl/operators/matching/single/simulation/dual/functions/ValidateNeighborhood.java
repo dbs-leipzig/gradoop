@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
-  .IdPair;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.IdPair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util.MessageType;
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 import java.util.Collection;
 import java.util.List;

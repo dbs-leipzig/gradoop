@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,11 @@ public class PageRankSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-    LogicalGraph pageRankGraph = new PageRank(
+    LogicalGraph pageRankGraph = graph.callForGraph(new PageRank<>(
       SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
       dampeningFactor,
       maxIteration,
-      true).execute(graph);
+      true));
 
     graph = graph.getFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());

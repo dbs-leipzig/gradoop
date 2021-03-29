@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   public void testImportVertexWithHeader() throws Exception {
     String csvPath = MinimalCSVImporterTest.class.getResource("/csv/input.csv").getPath();
 
-    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig())
+      .checkReoccurringHeader();
 
     DataSet<EPGMVertex> importVertex = importVertexImporter.getLogicalGraph().getVertices();
 
@@ -78,7 +79,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   public void testImportGraphCollection() throws Exception {
     String csvPath = MinimalCSVImporterTest.class.getResource("/csv/input.csv").getPath();
 
-    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig())
+      .checkReoccurringHeader();
 
     DataSet<EPGMVertex> importVertex = importVertexImporter.getGraphCollection().getVertices();
 
@@ -104,7 +106,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
 
-    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames, false);
+    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames);
     DataSet<EPGMVertex> importVertex = importer.getLogicalGraph().getVertices();
 
     List<EPGMVertex> lv = new ArrayList<>();
@@ -125,8 +127,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     // Create an empty file
     File emptyFile = File.createTempFile("empty-csv", null);
 
-    DataSource importer =
-      new MinimalCSVImporter(emptyFile.getPath(), DELIMITER, getConfig(), false);
+    DataSource importer = new MinimalCSVImporter(emptyFile.getPath(), DELIMITER, getConfig());
 
     checkExceptions(importer, emptyFile);
   }
@@ -144,8 +145,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     fileWriter.write(System.getProperty("line.separator"));
     fileWriter.close();
 
-    DataSource importer =
-      new MinimalCSVImporter(emptyFile.getPath(), DELIMITER, getConfig(), false);
+    DataSource importer = new MinimalCSVImporter(emptyFile.getPath(), DELIMITER, getConfig());
 
     checkExceptions(importer, emptyFile);
   }
@@ -163,7 +163,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
 
-    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig())
+      .checkReoccurringHeader();
     LogicalGraph resultGraph = importVertexImporter.getLogicalGraph();
 
     LogicalGraph expectedGraph = loader.getLogicalGraphByVariable("expected");
@@ -188,8 +189,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
 
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
-    DataSource importVertexImporter =
-      new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames, false);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames);
     LogicalGraph resultGraph = importVertexImporter.getLogicalGraph();
 
     LogicalGraph expectedGraph = loader.getLogicalGraphByVariable("expected");
@@ -211,13 +211,13 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     //set the first line of the file as column property names and check file of reoccurring and skip
     //header row as vertex
-    DataSource importerWithHeader =
-      new MinimalCSVImporter(csvPathWithHeader, DELIMITER, getConfig(), true);
+    DataSource importerWithHeader = new MinimalCSVImporter(csvPathWithHeader, DELIMITER, getConfig())
+      .checkReoccurringHeader();
 
     //read all rows of the csv files as vertices
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
     DataSource importerWithoutHeader =
-      new MinimalCSVImporter(csvPathWithoutHeader, DELIMITER, getConfig(), columnNames, false);
+      new MinimalCSVImporter(csvPathWithoutHeader, DELIMITER, getConfig(), columnNames);
 
     LogicalGraph resultWithHeader = importerWithHeader.getLogicalGraph();
     LogicalGraph resultWithoutHeader = importerWithoutHeader.getLogicalGraph();
@@ -239,7 +239,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
 
-    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
+    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig()).checkReoccurringHeader();
     LogicalGraph result = importer.getLogicalGraph();
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
@@ -247,7 +247,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if no property will be created if a row contains empty entries .
+   * Test if no property will be created if a row contains empty entries.
    *
    * @throws Exception on failure
    */
@@ -256,7 +256,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     String csvPath = MinimalCSVImporterTest.class
       .getResource("/csv/inputEmptyPropertyValues.csv").getPath();
 
-    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
+    DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig()).checkReoccurringHeader();
     LogicalGraph result = importer.getLogicalGraph();
 
     List<EPGMVertex> lv = new ArrayList<>();
@@ -279,6 +279,25 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
         fail();
       }
     }
+  }
+
+  /**
+   * Test if delimiters in quoted CSV fields are ignored.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testQuotedFields() throws Exception {
+    String csvPath = MinimalCSVImporterTest.class.getResource("/csv/inputQuoted.csv").getPath();
+    String gdlPath = MinimalCSVImporterTest.class.getResource("/csv/expectedQuoted.gdl").getPath();
+
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
+    DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig())
+      .checkReoccurringHeader().parseQuotedStrings().quoteCharacter('"');
+    LogicalGraph resultGraph = importVertexImporter.getLogicalGraph();
+    LogicalGraph expectedGraph = loader.getLogicalGraphByVariable("expected");
+
+    collectAndAssertTrue(expectedGraph.equalsByElementData(resultGraph));
   }
 
   /**

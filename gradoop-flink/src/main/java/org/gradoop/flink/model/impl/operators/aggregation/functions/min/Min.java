@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,19 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Interface of aggregate functions that determine a minimal value.
+ * Interface of aggregate functions that determine a minimal value.<br>
+ * This aggregation supports numerical property value types (short, int, long, float, double, big decimal) and
+ * date and datetime types.
  */
 public interface Min extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
+    // If both values are of either type date or datetime, use the corresponding utility class.
+    if (PropertyValueUtils.Date.isDateOrDateTime(aggregate) &&
+      PropertyValueUtils.Date.isDateOrDateTime(increment)) {
+      return PropertyValueUtils.Date.min(aggregate, increment);
+    }
     return PropertyValueUtils.Numeric.min(aggregate, increment);
   }
 }

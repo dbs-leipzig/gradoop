@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,20 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Reads a vertex property and stores it to an edge property, using the given property key.
  * If the edge already has this property, compare the edge value to the vertex value and store the
  * smaller property value.
+ *
+ * @param <V> Gradoop vertex type.
+ * @param <E> Gradoop edge type.
  */
-public class VertexPropertyToEdgePropertyJoin implements JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge> {
+public class VertexPropertyToEdgePropertyJoin<V extends Vertex, E extends Edge>
+  implements JoinFunction<E, V, E> {
 
   /**
    * Property key to store the property.
@@ -42,7 +46,7 @@ public class VertexPropertyToEdgePropertyJoin implements JoinFunction<EPGMEdge, 
   }
 
   @Override
-  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
+  public E join(E edge, V vertex) throws Exception {
     PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);
     if (edge.hasProperty(propertyKey)) {
       if (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) < 0) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
-import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.exceptions.BailSyntaxErrorStrategy;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.GraphElement;
-import org.s1ck.gdl.model.Vertex;
+import org.gradoop.gdl.GDLHandler;
+import org.gradoop.gdl.exceptions.BailSyntaxErrorStrategy;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.GraphElement;
+import org.gradoop.gdl.model.Vertex;
+
 
 import java.util.Collection;
 import java.util.Collections;
@@ -664,5 +665,13 @@ public class QueryHandler {
     }
     vertexCache = Collections.unmodifiableMap(newVertexCache);
     edgeCache = Collections.unmodifiableMap(newEdgeCache);
+  }
+
+  /**
+   * Returns the GDL handler
+   * @return GDL handler
+   */
+  public GDLHandler getGdlHandler() {
+    return gdlHandler;
   }
 }

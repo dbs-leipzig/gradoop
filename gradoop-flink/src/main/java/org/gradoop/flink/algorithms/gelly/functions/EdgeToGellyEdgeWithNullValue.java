@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
+ * Maps Gradoop edge to a Gelly edge consisting of Gradoop source and target
  * identifier and {@link NullValue} as edge value.
+ *
+ * @param <E> Gradoop edge type.
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
-public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> {
+public class EdgeToGellyEdgeWithNullValue<E extends Edge> implements EdgeToGellyEdge<E, NullValue> {
   /**
    * Reduce object instantiations
    */
@@ -40,10 +42,9 @@ public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> 
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(EPGMEdge epgmEdge)
-      throws Exception {
-    reuseEdge.setSource(epgmEdge.getSourceId());
-    reuseEdge.setTarget(epgmEdge.getTargetId());
+  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(E edge) throws Exception {
+    reuseEdge.setSource(edge.getSourceId());
+    reuseEdge.setTarget(edge.getTargetId());
     return reuseEdge;
   }
 }

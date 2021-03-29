@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.gradoop.flink.model.impl.operators.aggregation.functions.average.Average.IGNORED_VALUE;
@@ -41,6 +44,8 @@ import static org.gradoop.temporal.model.api.TimeDimension.VALID_TIME;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_FROM;
 import static org.gradoop.temporal.model.impl.pojo.TemporalElement.DEFAULT_TIME_TO;
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * Test for the {@link AverageDuration} aggregate function.
@@ -187,18 +192,90 @@ public class AverageDurationTest extends TemporalGradoopTestBase {
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
     DataSet<TemporalEdge> edges = getExecutionEnvironment().fromElements(e1, e2, e3, e4, e5);
     TemporalGraph result = graphFactory.fromDataSets(vertices, edges)
-      .aggregate(new AverageDuration("avgDurTx", TRANSACTION_TIME),
-        new AverageDuration("avgDurValid", VALID_TIME),
+      .aggregate(
+        new AverageDuration("avgDurTx", TRANSACTION_TIME),
+        new AverageDuration("avgDurVal", VALID_TIME),
         new AverageVertexDuration("avgVertexDurTx", TRANSACTION_TIME),
-        new AverageVertexDuration("avgVertexDurValid", VALID_TIME),
+        new AverageVertexDuration("avgVertexDurVal", VALID_TIME),
         new AverageEdgeDuration("avgEdgeDurTx", TRANSACTION_TIME),
-        new AverageEdgeDuration("avgEdgeDurValid", VALID_TIME));
+        new AverageEdgeDuration("avgEdgeDurVal", VALID_TIME),
+        new AverageDuration("avgDurTxMillis", TRANSACTION_TIME, ChronoUnit.MILLIS),
+        new AverageDuration("avgDurValMillis", VALID_TIME, ChronoUnit.MILLIS),
+        new AverageDuration("avgDurTxSec", TRANSACTION_TIME, ChronoUnit.SECONDS),
+        new AverageDuration("avgDurValSec", VALID_TIME, ChronoUnit.SECONDS),
+        new AverageDuration("avgDurTxMin", TRANSACTION_TIME, ChronoUnit.MINUTES),
+        new AverageDuration("avgDurValMin", VALID_TIME, ChronoUnit.MINUTES),
+        new AverageDuration("avgDurTxHr", TRANSACTION_TIME, ChronoUnit.HOURS),
+        new AverageDuration("avgDurValHr", VALID_TIME, ChronoUnit.HOURS),
+        new AverageDuration("avgDurTxDays", TRANSACTION_TIME, ChronoUnit.DAYS),
+        new AverageDuration("avgDurValDays", VALID_TIME, ChronoUnit.DAYS),
+        new AverageDuration(TRANSACTION_TIME, ChronoUnit.SECONDS),
+        new AverageDuration(VALID_TIME, ChronoUnit.SECONDS));
     Properties headProperties = result.getGraphHead().collect().get(0).getProperties();
+    assertNotNull(headProperties);
     assertEquals(18.5d, headProperties.get("avgDurTx").getDouble(), 1e-7d);
-    assertEquals(12.d, headProperties.get("avgDurValid").getDouble(), 1e-7d);
+    assertEquals(12.d, headProperties.get("avgDurVal").getDouble(), 1e-7d);
     assertEquals(2.d, headProperties.get("avgVertexDurTx").getDouble(), 1e-7d);
-    assertEquals(5.d, headProperties.get("avgVertexDurValid").getDouble(), 1e-7d);
+    assertEquals(5.d, headProperties.get("avgVertexDurVal").getDouble(), 1e-7d);
     assertEquals(35.d, headProperties.get("avgEdgeDurTx").getDouble(), 1e-7d);
-    assertEquals(19.d, headProperties.get("avgEdgeDurValid").getDouble(), 1e-7d);
+    assertEquals(19.d, headProperties.get("avgEdgeDurVal").getDouble(), 1e-7d);
+
+    assertEquals(18.5d, headProperties.get("avgDurTxMillis").getDouble(), 1e-7d);
+    assertEquals(12.d, headProperties.get("avgDurValMillis").getDouble(), 1e-7d);
+    assertEquals(18.5e-3, headProperties.get("avgDurTxSec").getDouble(), 1e-7d);
+    assertEquals(12e-3d, headProperties.get("avgDurValSec").getDouble(), 1e-7d);
+    assertEquals(18.5e-3 / 60, headProperties.get("avgDurTxMin").getDouble(), 1e-7d);
+    assertEquals(12e-3d / 60, headProperties.get("avgDurValMin").getDouble(), 1e-7d);
+    assertEquals(18.5e-3 / 3600, headProperties.get("avgDurTxHr").getDouble(), 1e-7d);
+    assertEquals(12e-3d / 3600, headProperties.get("avgDurValHr").getDouble(), 1e-7d);
+    assertEquals(18.5e-3 / (3600 * 24), headProperties.get("avgDurTxDays").getDouble(), 1e-7d);
+    assertEquals(12e-3d / (3600 * 24), headProperties.get("avgDurValDays").getDouble(), 1e-7d);
+
+    assertTrue(headProperties.containsKey("avgDuration_VALID_TIME_Seconds"));
+    assertEquals(12e-3d, headProperties.get("avgDuration_VALID_TIME_Seconds").getDouble(), 1e-7d);
+    assertTrue(headProperties.containsKey("avgDuration_TRANSACTION_TIME_Seconds"));
+    assertEquals(18.5e-3, headProperties.get("avgDuration_TRANSACTION_TIME_Seconds").getDouble(), 1e-7d);
   }
+
+  /**
+   * Provides a tuple of input, time unit and output elements to test the
+   * {@link AverageDuration#postAggregate(PropertyValue)} function.
+   * <br>
+   * Provided params:
+   * <ol start="0">
+   * <li>The simulated aggregated value</li>
+   * <li>The temporal unit to use</li>
+   * <li>Expected output of {@link AverageDuration#postAggregate(PropertyValue)}</li>
+   * </ol>
+   *
+   * @return Object[][]
+   */
+  @DataProvider(name = "postAggTemporalUnits")
+  public static Object[][] postAggregateParameters() {
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(123456789L * 2),
+      PropertyValue.create(2L));
+    return new Object[][] {
+      new Object[] {PropertyValue.create(list), ChronoUnit.MILLIS, PropertyValue.create((double) 123456789)},
+      new Object[] {PropertyValue.create(list), ChronoUnit.SECONDS, PropertyValue.create(123456.789)},
+      new Object[] {PropertyValue.create(list), ChronoUnit.MINUTES, PropertyValue.create((double) 123456789 / (1000 * 60))},
+      new Object[] {PropertyValue.create(list), ChronoUnit.HOURS, PropertyValue.create((double) 123456789 / (1000 * 60 * 60))},
+      new Object[] {PropertyValue.create(list), ChronoUnit.DAYS, PropertyValue.create((double) 123456789 / (1000 * 60 * 60 * 24))}
+    };
+  }
+
+  /**
+   * Tests the function {@link AverageDuration#postAggregate(PropertyValue)}.
+   *
+   * @param aggregatedValue the value returned from the aggregate function as input for the post processing
+   * @param temporalUnit the temporal unit to use
+   * @param expectedOutputValue the expected result of the post processing
+   */
+  @Test(dataProvider = "postAggTemporalUnits")
+  public void testPostAggregateWithTimeUnits(PropertyValue aggregatedValue, TemporalUnit temporalUnit,
+    PropertyValue expectedOutputValue) {
+    AverageDuration averageDuration = new AverageDuration("myKey", VALID_TIME, temporalUnit);
+    PropertyValue resultValue = averageDuration.postAggregate(aggregatedValue);
+    assertEquals(expectedOutputValue, resultValue);
+  }
+
 }

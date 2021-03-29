@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class HITSTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("input");
     LogicalGraph expectedResult = getLoaderFromString(expectedResultString)
       .getLogicalGraphByVariable("input");
-    LogicalGraph result = input.callForGraph(new HITS("aScore", "hScore", 1));
+    LogicalGraph result = input.callForGraph(new HITS<>("aScore", "hScore", 1));
 
     collectAndAssertTrue(result.equalsByData(expectedResult));
   }

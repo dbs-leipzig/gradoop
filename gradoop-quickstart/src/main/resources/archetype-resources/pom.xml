@@ -93,8 +93,8 @@
                                 <includes>
                                     <include>${project.groupId}:${project.artifactId}</include>
                                     <include>org.gradoop:*</include>
-                                    <include>commons-lang:commons-lang</include>
-                                    <include>com.github.s1ck:gdl</include>
+                                    <include>org.apache.commons:commons-lang3</include>
+                                    <include>org.gradoop:gradoop-gdl</include>
                                     <include>com.google.guava:guava</include>
                                     <include>me.lemire.integercompression:*</include>
                                     <include>org.antlr:antlr4-runtime</include>
