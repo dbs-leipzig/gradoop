@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testFullyConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("clique");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);
@@ -96,7 +96,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testNonConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("nonConnected");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);
@@ -114,7 +114,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   public void testHalfConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("halfConnected");
-    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
+    LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient<>());
     validateGraphProperties(result);
 
     EPGMGraphHead head = result.getGraphHead().collect().get(0);

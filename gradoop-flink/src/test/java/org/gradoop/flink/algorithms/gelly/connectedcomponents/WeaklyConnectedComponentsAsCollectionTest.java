@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class WeaklyConnectedComponentsAsCollectionTest extends GradoopFlinkTestB
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     GraphCollection result = input
-      .callForCollection(new WeaklyConnectedComponentsAsCollection(propertyKey, 10));
+      .callForCollection(new WeaklyConnectedComponentsAsCollection<>(propertyKey, 10));
     GraphCollection components = input.splitBy("component");
 
     collectAndAssertTrue(result.equalsByGraphElementIds(components));

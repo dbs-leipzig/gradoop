@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,36 +20,38 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Initializes a new graph head from a given GradoopId.
+ *
+ * @param <G> Graph head type
  */
-public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, EPGMGraphHead>,
-  ResultTypeQueryable<EPGMGraphHead> {
+public class InitGraphHead<G extends GraphHead>
+  implements MapFunction<Tuple1<GradoopId>, G>, ResultTypeQueryable<G> {
   /**
-   * EPGMGraphHeadFactory
+   * GraphHeadFactory
    */
-  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
    *
-   * @param epgmGraphHeadFactory graph head factory
+   * @param graphHeadFactory graph head factory
    */
-  public InitGraphHead(GraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory) {
-    this.graphHeadFactory = epgmGraphHeadFactory;
+  public InitGraphHead(GraphHeadFactory<G> graphHeadFactory) {
+    this.graphHeadFactory = graphHeadFactory;
   }
 
   @Override
-  public EPGMGraphHead map(Tuple1<GradoopId> idTuple) {
+  public G map(Tuple1<GradoopId> idTuple) {
     return graphHeadFactory.initGraphHead(idTuple.f0);
   }
 
   @Override
-  public TypeInformation<EPGMGraphHead> getProducedType() {
+  public TypeInformation<G> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 
 /**
- * Convert class I to a Gelly EPGMVertex with K key and VV value.
+ * Convert input to a Gelly Vertex with K key and VV value.
  *
  * @param <I>   Input type.
  * @param <K>   Key type of the output gelly vertex.

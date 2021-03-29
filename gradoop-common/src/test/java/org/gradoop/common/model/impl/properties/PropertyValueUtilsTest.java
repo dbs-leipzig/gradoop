@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.gradoop.common.model.impl.properties;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.gradoop.common.GradoopTestUtils.*;
@@ -991,6 +993,133 @@ public class PropertyValueUtilsTest {
         .createFromTypeValueBytes(new byte[] {type},
           Arrays.copyOfRange(propertyValue.getRawBytes(),
             1, propertyValue.getRawBytes().length)));
+    }
+  }
+
+  /**
+   * Test class for {@link PropertyValueUtils.Date}
+   */
+  public static class DateTest {
+
+    private final PropertyValue date1 = PropertyValue.create(LocalDate.of(2020, 1, 16));
+    private final PropertyValue date2 = PropertyValue.create(LocalDate.of(2020, 1, 17));
+    private final PropertyValue dateTime1 = PropertyValue.create(LocalDateTime.of(2020, 1, 16, 12, 10, 55));
+    private final PropertyValue dateTime2 = PropertyValue.create(LocalDateTime.of(2020, 1, 16, 12, 10, 56));
+
+    @Test
+    public void testMin() {
+      PropertyValue p;
+
+      // Compare two dates
+      p = PropertyValueUtils.Date.min(date1, date2);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+
+      p = PropertyValueUtils.Date.min(date2, date1);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+
+      p = PropertyValueUtils.Date.min(date1, date1);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+
+      // Compare two date times
+      p = PropertyValueUtils.Date.min(dateTime1, dateTime2);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      p = PropertyValueUtils.Date.min(dateTime2, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      p = PropertyValueUtils.Date.min(dateTime1, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      // Compare a date with date time
+      p = PropertyValueUtils.Date.min(date1, dateTime1);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+
+      p = PropertyValueUtils.Date.min(date2, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      p = PropertyValueUtils.Date.min(dateTime2, date2);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime2, p);
+
+      p = PropertyValueUtils.Date.min(dateTime1, date1);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+    }
+
+    @Test(expectedExceptions = { IllegalArgumentException.class })
+    public void testMinTypeException() {
+      PropertyValueUtils.Date.min(date1, PropertyValue.create(5));
+    }
+
+    @Test
+    public void testMax() {
+      PropertyValue p;
+
+      // Compare two dates
+      p = PropertyValueUtils.Date.max(date1, date2);
+      assertTrue(p.isDate());
+      assertEquals(date2, p);
+
+      p = PropertyValueUtils.Date.max(date2, date1);
+      assertTrue(p.isDate());
+      assertEquals(date2, p);
+
+      p = PropertyValueUtils.Date.max(date1, date1);
+      assertTrue(p.isDate());
+      assertEquals(date1, p);
+
+      // Compare two date times
+      p = PropertyValueUtils.Date.max(dateTime1, dateTime2);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime2, p);
+
+      p = PropertyValueUtils.Date.max(dateTime2, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime2, p);
+
+      p = PropertyValueUtils.Date.max(dateTime1, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      // Compare a date with date time
+      p = PropertyValueUtils.Date.max(date1, dateTime1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+
+      p = PropertyValueUtils.Date.max(date2, dateTime1);
+      assertTrue(p.isDate());
+      assertEquals(date2, p);
+
+      p = PropertyValueUtils.Date.max(dateTime2, date2);
+      assertTrue(p.isDate());
+      assertEquals(date2, p);
+
+      p = PropertyValueUtils.Date.max(dateTime1, date1);
+      assertTrue(p.isDateTime());
+      assertEquals(dateTime1, p);
+    }
+
+    @Test(expectedExceptions = { IllegalArgumentException.class })
+    public void testMaxTypeException() {
+      PropertyValueUtils.Date.max(date1, PropertyValue.create(5));
+    }
+
+    @Test
+    public void testIisDateOrDateTime() {
+      assertTrue(PropertyValueUtils.Date.isDateOrDateTime(date1));
+      assertTrue(PropertyValueUtils.Date.isDateOrDateTime(date2));
+      assertTrue(PropertyValueUtils.Date.isDateOrDateTime(dateTime1));
+      assertTrue(PropertyValueUtils.Date.isDateOrDateTime(dateTime2));
+      assertFalse(PropertyValueUtils.Date.isDateOrDateTime(PropertyValue.create(5)));
+      assertFalse(PropertyValueUtils.Date.isDateOrDateTime(PropertyValue.create("date")));
     }
   }
 }

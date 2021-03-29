@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
         " \"bvalue\"}) " + "]" +
 
-        "graphWithA:G {graphWithA : \"graph\"}[(a:A {atype : \"avalue\"})]" +
+        "graphWithA:G {graphWithA : \"graph\"}[(a)]" +
 
         "aggregatedASource:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(:G {graphWithA : \"graph\"})-[:AlphaEdge {alphatype : \"alphavalue\"}]->(:B {btype : " +
@@ -254,10 +254,9 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "ab_edgeWithAlpha:G {ab_edgeWithAlpha : \"graph\"}[" +
         "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype :" +
         " \"bvalue\"}) " + "]" + "" + "ab_edgeWithBeta:G {ab_edgeWithBeta : \"graph\"}[" +
-        "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
-        "\"bvalue\"}) " + "]" + "" + "ab_edgeWithBeta_loop:G {ab_edgeWithAlpha : \"graph\"}[" +
-        "(g2:G {ab_edgeWithBeta : \"graph\"})-[:AlphaEdge {alphatype : \"alphavalue\"}]->(g2:G " +
-        "{ab_edgeWithBeta : \"graph\"}) " + "]");
+        "(a)-[beta:BetaEdge {betatype : \"betavalue\"}]->(b) " +
+        "]" + "" + "ab_edgeWithBeta_loop:G {ab_edgeWithAlpha : \"graph\"}[" +
+        "(g2:G {ab_edgeWithBeta : \"graph\"})-[:AlphaEdge {alphatype : \"alphavalue\"}]->(g2)]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("ab_edgeWithAlpha");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("ab_edgeWithBeta");
     VertexFusion f = new VertexFusion();
@@ -331,7 +330,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("abcdGraph:G {abcdGraph : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
-      "(b:B {btype : \"bvalue\"})-[g:GammaEdge {gtype : \"gvalue\"}]->(c:C {ctype : \"cvalue\"}) " +
+      "(b)-[g:GammaEdge {gtype : \"gvalue\"}]->(c:C {ctype : \"cvalue\"}) " +
       "]" + "" + "abdGraph:G {abcdGraph : \"graph\"}[(:G {abcdGraph : \"graph\"})]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("abcdGraph");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("abcdGraph");
@@ -351,21 +350,19 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("semicomplex:G {semicomplex : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
-      "(b:B {btype : \"bvalue\"})-[l:loop {ltype : \"lvalue\"}]->(b:B {btype : \"bvalue\"})  " +
-      "(b:B {btype : \"bvalue\"})-->(c:C {ctype : \"cvalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-->(e:E {etype : \"evalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(d:D {dtype : " +
-      "\"dvalue\"})  " + "(d:D {dtype : \"dvalue\"})-->(e:E {etype : \"evalue\"}) " + "]" + "" +
+      "(b)-[l:loop {ltype : \"lvalue\"}]->(b)  " +
+      "(b)-->(c:C {ctype : \"cvalue\"})  " +
+      "(c)-->(e:E {etype : \"evalue\"})  " +
+      "(c)-[beta:BetaEdge {betatype : \"betavalue\"}]->(d:D {dtype : " +
+      "\"dvalue\"})  " + "(d)-->(e) " + "]" + "" +
       "looplessPattern:G {looplessPattern : \"graph\"}[" +
-      "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"})  " + "(d:D {dtype : \"dvalue\"})" + "]" + "" +
+      "(a)-[alpha]->(b)  " + "(d)" + "]" + "" +
       "firstmatch:G {semicomplex : \"graph\"}[" +
       "(g2:G {looplessPattern : \"graph\"})-->(c2:C {ctype : \"cvalue\"})  " +
-      "(g2:G {looplessPattern : \"graph\"})-->(e2:E {etype : \"evalue\"})  " +
-      "(g2:G {looplessPattern : \"graph\"})-[:loop {ltype : \"lvalue\"}]->(g2:G {looplessPattern " +
-      ": \"graph\"})  " +
-      "(c2:C {ctype : \"cvalue\"})-[:BetaEdge {betatype : \"betavalue\"}]->(g2:G {looplessPattern" +
-      " : \"graph\"})  " + "(c2:C {ctype : \"cvalue\"})-->(e2:E {etype : \"evalue\"}) " + "]" + "");
+      "(g2)-->(e2:E {etype : \"evalue\"})  " +
+      "(g2)-[:loop {ltype : \"lvalue\"}]->(g2)  " +
+      "(c2)-[:BetaEdge {betatype : \"betavalue\"}]->(g2)  " +
+      "(c2)-->(e2) " + "]" + "");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("semicomplex");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("looplessPattern");
     VertexFusion f = new VertexFusion();
@@ -384,21 +381,20 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("tricky:G {tricky : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
-      "(d:D {dtype : \"dvalue\"})-[l:loop {ltype : \"lvalue\"}]->(b:B {btype : \"bvalue\"})  " +
-      "(b:B {btype : \"bvalue\"})-->(c:C {ctype : \"cvalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-->(e:E {etype : \"evalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(d:D {dtype : " +
-      "\"dvalue\"})  " + "(d:D {dtype : \"dvalue\"})-->(e:E {etype : \"evalue\"}) " + "]" + "" +
+      "(d:D {dtype : \"dvalue\"})-[l:loop {ltype : \"lvalue\"}]->(b)  " +
+      "(b)-->(c:C {ctype : \"cvalue\"})  " +
+      "(c)-->(e:E {etype : \"evalue\"})  " +
+      "(c)-[beta:BetaEdge {betatype : \"betavalue\"}]->(d)  " +
+      "(d)-->(e)]" +
       "looplessPattern:G {looplessPattern : \"graph\"}[" +
-      "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"})  " + "(d:D {dtype : \"dvalue\"})" + "]" + "" +
+      "(a)-[alpha]->(b)  " +
+      "(d)]" +
       "thirdmatch:G {tricky : \"graph\"}[" +
       "(g2:G {looplessPattern : \"graph\"})-->(c2:C {ctype : \"cvalue\"})  " +
-      "(g2:G {looplessPattern : \"graph\"})-->(e2:E {etype : \"evalue\"})  " +
-      "(g2:G {looplessPattern : \"graph\"})-[:loop {ltype : \"lvalue\"}]->(g2:G {looplessPattern " +
-      ": \"graph\"})  " +
-      "(c2:C {ctype : \"cvalue\"})-[:BetaEdge {betatype : \"betavalue\"}]->(g2:G {looplessPattern" +
-      " : \"graph\"})  " + "(c2:C {ctype : \"cvalue\"})-->(e2:E {etype : \"evalue\"}) " + "]" + "");
+      "(g2)-->(e2:E {etype : \"evalue\"})  " +
+      "(g2)-[:loop {ltype : \"lvalue\"}]->(g2)" +
+      "(c2)-[:BetaEdge {betatype : \"betavalue\"}]->(g2)  " +
+      "(c2)-->(e2) " + "]" + "");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("tricky");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("looplessPattern");
     VertexFusion f = new VertexFusion();
@@ -416,17 +412,15 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"})  " +
-      "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"})  " +
-      "(a:A {atype : \"avalue\"})-[l:loop {ltype : \"lvalue\"}]->(c:C {ctype : \"cvalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-[g:GammaEdge {gtype : \"gvalue\"}]->(d:D {dtype : \"dvalue\"}) " +
+      "(a)-[beta:BetaEdge {betatype : \"betavalue\"}]->(b)  " +
+      "(a)-[l:loop {ltype : \"lvalue\"}]->(c:C {ctype : \"cvalue\"})  " +
+      "(c)-[g:GammaEdge {gtype : \"gvalue\"}]->(d:D {dtype : \"dvalue\"}) " +
       "]" + "" + "pattern:G {pattern : \"graph\"}[" +
-      "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"}) " + "]" + "" + "source_fusewith_pattern:G {source : \"graph\"}[" +
-      "(k2:G {pattern : \"graph\"})-[:BetaEdge {betatype : \"betavalue\"}]->(k2:G {pattern : " +
-      "\"graph\"})  " +
-      "(k2:G {pattern : \"graph\"})-[:loop {ltype : \"lvalue\"}]->(c2:C {ctype : \"cvalue\"}) " +
-      "(c2:C {ctype : \"cvalue\"})-[:GammaEdge {gtype : \"gvalue\"}]->(d2:D {dtype : \"dvalue\"})" +
+      "(a)-[alpha]->(b) " +
+      "]" + "" + "source_fusewith_pattern:G {source : \"graph\"}[" +
+      "(k2:G {pattern : \"graph\"})-[:BetaEdge {betatype : \"betavalue\"}]->(k2)  " +
+      "(k2)-[:loop {ltype : \"lvalue\"}]->(c2:C {ctype : \"cvalue\"}) " +
+      "(c2)-[:GammaEdge {gtype : \"gvalue\"}]->(d2:D {dtype : \"dvalue\"})" +
       " " + "]" + "");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("source");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("pattern");
@@ -445,13 +439,11 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString("pattern:G {pattern : \"graph\"}[" +
       "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
       "\"bvalue\"}) " + "]" + "" + "source:G {source : \"graph\"}[" +
-      "(a:A {atype : \"avalue\"})-[alpha:AlphaEdge {alphatype : \"alphavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"})  " +
-      "(a:A {atype : \"avalue\"})-[beta:BetaEdge {betatype : \"betavalue\"}]->(b:B {btype : " +
-      "\"bvalue\"})  " +
-      "(a:A {atype : \"avalue\"})-[l:loop {ltype : \"lvalue\"}]->(c:C {ctype : \"cvalue\"})  " +
-      "(c:C {ctype : \"cvalue\"})-[g:GammaEdge {gtype : \"gvalue\"}]->(d:D {dtype : \"dvalue\"}) " +
-      "]" + "" + "pattern_fusewith_source:G {pattern : \"graph\"}[(u:G {source : \"graph\"})]");
+      "(a)-[alpha]->(b)  " +
+      "(a)-[beta:BetaEdge {betatype : \"betavalue\"}]->(b)  " +
+      "(a)-[l:loop {ltype : \"lvalue\"}]->(c:C {ctype : \"cvalue\"})  " +
+      "(c)-[g:GammaEdge {gtype : \"gvalue\"}]->(d:D {dtype : \"dvalue\"}) " +
+      "]" + "pattern_fusewith_source:G {pattern : \"graph\"}[(u:G {source : \"graph\"})]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("pattern");
     LogicalGraph patternGraph = loader.getLogicalGraphByVariable("source");
     VertexFusion f = new VertexFusion();

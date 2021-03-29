@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
-import org.s1ck.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wraps a {@link org.s1ck.gdl.model.comparables.Literal}
+ * Wraps a {@link org.gradoop.gdl.model.comparables.Literal}
  */
 public class LiteralComparable extends QueryComparable {
   /**
@@ -73,6 +74,11 @@ public class LiteralComparable extends QueryComparable {
   @Override
   public Set<String> getPropertyKeys(String variable) {
     return new HashSet<>(0);
+  }
+
+  @Override
+  public ComparableExpression getWrappedComparable() {
+    return literal;
   }
 
   @Override

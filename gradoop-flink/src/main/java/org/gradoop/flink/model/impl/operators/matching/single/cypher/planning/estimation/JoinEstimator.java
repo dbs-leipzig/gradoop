@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.LeafNode;
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 import java.util.Collection;
 import java.util.HashMap;

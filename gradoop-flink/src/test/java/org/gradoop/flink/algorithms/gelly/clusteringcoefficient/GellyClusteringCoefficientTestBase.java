@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
@@ -73,7 +78,13 @@ public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTes
    *
    * @return The clustering coefficient algorithm wrapper
    */
-  public abstract ClusteringCoefficientBase getCCAlgorithm();
+  public abstract <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  ClusteringCoefficientBase<G, V, E, LG, GC> getCCAlgorithm();
 
   /**
    * Checks if clustering coefficient properties are written

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Join function to receive structural information of the graph.
  * Builds edge triples with long id's.
+ *
+ * @param <E> Gradoop Edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f1->f1", "f0->f2"})
 @FunctionAnnotation.ForwardedFieldsSecond("targetId->f3")
-public class CreateLongSourceIds
-  implements JoinFunction<Tuple2<Long, GradoopId>, EPGMEdge, Tuple4<Long, GradoopId, Long, GradoopId>> {
+public class CreateLongSourceIds<E extends Edge>
+  implements JoinFunction<Tuple2<Long, GradoopId>, E, Tuple4<Long, GradoopId, Long, GradoopId>> {
 
   /**
    * Reuse object.
@@ -51,7 +53,7 @@ public class CreateLongSourceIds
    * @return tuple {@code <vertexID<Long>,vertexID<GradoopID>,sourceID<Long>,targetID<GradoopID>>}
    */
   @Override
-  public Tuple4<Long, GradoopId, Long, GradoopId> join(Tuple2<Long, GradoopId> tuple, EPGMEdge edge) {
+  public Tuple4<Long, GradoopId, Long, GradoopId> join(Tuple2<Long, GradoopId> tuple, E edge) {
     reuse.f0 = tuple.f0;
     reuse.f1 = tuple.f1;
     reuse.f2 = tuple.f0;

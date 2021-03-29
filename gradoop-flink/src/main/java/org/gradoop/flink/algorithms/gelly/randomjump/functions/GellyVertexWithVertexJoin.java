@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,38 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Joins a Gelly result vertex with an EPGM vertex. Assigning a boolean property value from the
- * Gelly vertex to the EPGM vertex, determining if this vertex was visited.
+ * Joins a Gelly result vertex with an Gradoop Vertex. Assigning a boolean property value from the
+ * Gelly vertex to the Gradoop Vertex, determining if this vertex was visited.
+ *
+ * @param <V> Gradoop Vertex type
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
-public class GellyVertexWithEPGMVertexJoin implements
-  JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, EPGMVertex, EPGMVertex> {
+public class GellyVertexWithVertexJoin<V extends Vertex>
+  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, V, V> {
 
   /**
-   * Key for the boolean property value to assign to the EPGM vertex.
+   * Key for the boolean property value to assign to the Gradoop vertex.
    */
   private final String propertyKey;
 
   /**
-   * Creates an instance of GellyVertexWithEPGMVertexJoin with a given key for
-   * the boolean property value.
+   * Creates an instance of GellyVertexWithVertexJoin with a given key for the boolean property value.
    *
    * @param propertyKey Key for the boolean property value.
    */
-  public GellyVertexWithEPGMVertexJoin(String propertyKey) {
+  public GellyVertexWithVertexJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex,
-    EPGMVertex epgmVertex) throws Exception {
-    epgmVertex.setProperty(propertyKey, gellyVertex.getValue().f0);
-    return epgmVertex;
+  public V join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex, V vertex)
+    throws Exception {
+    vertex.setProperty(propertyKey, gellyVertex.getValue().f0);
+    return vertex;
   }
 }

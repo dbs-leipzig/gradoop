@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,11 @@ public class BasicPatternsData {
     "s5[(:A)-[:a]->(:B)-[:c]->(:E)]";
 
   public static final String FSM_PARALLEL_EDGES =
-    "g1[(v1:A)-[:a]->(:A)-[:a]->(v1:A)]" +
-    "g2[(v2:A)-[:a]->(:A)-[:a]->(v2:A)]" +
+    "g1[(v1:A)-[:a]->(:A)-[:a]->(v1)]" +
+    "g2[(v2:A)-[:a]->(:A)-[:a]->(v2)]" +
     "g3[(:A)-[:a]->(:A)-[:a]->(:A)]" +
     "s1[(:A)-[:a]->(:A)]" +
-    "s2[(v3:A)-[:a]->(:A)-[:a]->(v3:A)]";
+    "s2[(v3:A)-[:a]->(:A)-[:a]->(v3)]";
 
   public static final String FSM_LOOP =
     "g1[(v1:A)-[:a]->(v1)-[:a]->(:A)]" +
@@ -47,33 +47,33 @@ public class BasicPatternsData {
     "g3[(v3:A)-[:a]->(v3)-[:a]->(:A)]" +
     "g4[(:A)-[:a]->(:A)-[:a]->(:A)]" +
     "s1[(:A)-[:a]->(:A)]" +
-    "s2[(v3:A)-[:a]->(v3)]" +
+    "s2[(v3)-[:a]->(v3)]" +
     "s3[(v4:A)-[:a]->(v4)-[:a]->(:A)]";
 
   public static final String FSM_DIAMOND =
-    "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
-    "g2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
-    "g3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+    "g1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1)-[:a]->(v3:A)-[:a]->(v4)]" +
+    "g2[(v1)-[:a]->(v2)-[:a]->(v4),(v1)-[:a]->(v3)-[:a]->(v4)]" +
+    "g3[(v1)-[:a]->(v2)-[:a]->(v4),(v1)-[:a]->(v3)-[:a]->(v4)]" +
 
-    "s1[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)-[:a]->(v4:A)]" +
+    "s1[(v1)-[:a]->(v2)-[:a]->(v4),(v1)-[:a]->(v3)-[:a]->(v4)]" +
 
-    "s2[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),(v1:A)-[:a]->(v3:A)             ]" +
-    "s3[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A),             (v3:A)-[:a]->(v4:A)]" +
-    "s4[(v1:A)-[:a]->(v2:A)-[:a]->(v4:A)                                 ]" +
-    "s5[(v1:A)-[:a]->(v2:A)             ,(v1:A)-[:a]->(v3:A)             ]" +
-    "s6[             (v2:A)-[:a]->(v4:A),             (v3:A)-[:a]->(v4:A)]" +
-    "s7[(v1:A)-[:a]->(v2:A)                                              ]";
+    "s2[(v1)-[:a]->(v2)-[:a]->(v4),(v1)-[:a]->(v3)             ]" +
+    "s3[(v1)-[:a]->(v2)-[:a]->(v4),             (v3)-[:a]->(v4)]" +
+    "s4[(v1)-[:a]->(v2)-[:a]->(v4)                                 ]" +
+    "s5[(v1)-[:a]->(v2)             ,(v1)-[:a]->(v3)             ]" +
+    "s6[             (v2)-[:a]->(v4),             (v3)-[:a]->(v4)]" +
+    "s7[(v1)-[:a]->(v2)                                              ]";
 
   public static final String FSM_CIRCLE_WITH_BRANCH =
     "g1[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
-    "g2[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
-    "g3[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
+    "g2[(v1)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
+    "g3[(v1)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
 
-    "s1[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
-    "s2[(v1:A)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)           ]" +
-    "s3[(v1:A)-[:a]->(:A)-[:a]->(:A)       (v1)-[:b]->(:B)]" +
-    "s4[(v1:A)-[:a]->(:A)       (:A)-[:a]->(v1)-[:b]->(:B)]" +
-    "s5[             (:A)-[:a]->(:A)-[:a]->(v1:A)-[:b]->(:B)]" +
+    "s1[(v1)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
+    "s2[(v1)-[:a]->(:A)-[:a]->(:A)-[:a]->(v1)           ]" +
+    "s3[(v1)-[:a]->(:A)-[:a]->(:A)       (v1)-[:b]->(:B)]" +
+    "s4[(v1)-[:a]->(:A)       (:A)-[:a]->(v1)-[:b]->(:B)]" +
+    "s5[             (:A)-[:a]->(:A)-[:a]->(v1)-[:b]->(:B)]" +
 
     "s6[(:A)-[:a]->(:A)-[:a]->(:A)]" +
     "s7[(:A)-[:a]->(:A)-[:b]->(:B)]" +
@@ -84,9 +84,9 @@ public class BasicPatternsData {
 
   public static final String MULTI_LABELED_CIRCLE =
     "g1[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
-    "g2[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
+    "g2[(v)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
 
-    "s1[(v:A)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
+    "s1[(v)-[:a]->(:B)-[:a]->(:C)-[:a]->(v)]" +
 
     "s2[(:A)-[:a]->(:B)-[:a]->(:C)]" +
     "s3[(:B)-[:a]->(:C)-[:a]->(:A)]" +

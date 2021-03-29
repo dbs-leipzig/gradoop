@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,20 @@ package org.gradoop.flink.model.impl.operators.tostring.functions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR;
+
 /**
  * generates a string representation fo an outgoing adjacency list
  */
-public class OutgoingAdjacencyList
-  implements GroupReduceFunction<EdgeString, VertexString> {
+public class OutgoingAdjacencyList implements GroupReduceFunction<EdgeString, VertexString> {
 
   @Override
   public void reduce(Iterable<EdgeString> outgoingEdgeLabels,
@@ -49,7 +50,7 @@ public class OutgoingAdjacencyList
         first = false;
       }
 
-      adjacencyListEntries.add("\n  -" + edgeString.getEdgeLabel() + "->" +
+      adjacencyListEntries.add(LINE_SEPARATOR + "  -" + edgeString.getEdgeLabel() + "->" +
         edgeString.getTargetLabel());
     }
 

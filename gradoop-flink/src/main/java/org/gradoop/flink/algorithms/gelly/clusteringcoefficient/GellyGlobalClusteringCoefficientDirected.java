@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,33 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.library.clustering.directed.GlobalClusteringCoefficient;
 import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
  * Gradoop EPGM model wrapper for Flink Gellys implementation of the global clustering coefficient
  * algorithm for directed graphs
  * {@link org.apache.flink.graph.library.clustering.directed.GlobalClusteringCoefficient}.
- * Returns the initial {@link LogicalGraph} with global value written to the graph head.
+ * Returns the initial {@link BaseGraph} with global value written to the graph head.
+ *
+ * @param <G>  Gradoop graph head type.
+ * @param <V>  Gradoop vertex type.
+ * @param <E>  Gradoop edge type.
+ * @param <LG> Gradoop type of the graph.
+ * @param <GC> Gradoop type of the graph collection.
  */
-public class GellyGlobalClusteringCoefficientDirected extends ClusteringCoefficientBase {
+public class GellyGlobalClusteringCoefficientDirected<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends ClusteringCoefficientBase<G, V, E, LG, GC> {
 
   /**
    * Creates an instance of the GellyGlobalClusteringCoefficientDirected wrapper class.
@@ -41,14 +55,8 @@ public class GellyGlobalClusteringCoefficientDirected extends ClusteringCoeffici
     super();
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * Calls Flink Gelly algorithms to compute the global clustering coefficient for a directed graph.
-   */
   @Override
-  protected LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)
-    throws Exception {
+  protected LG executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph) throws Exception {
 
     GlobalClusteringCoefficient global = new org.apache.flink.graph.library.clustering.directed
       .GlobalClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph);
@@ -57,8 +65,8 @@ public class GellyGlobalClusteringCoefficientDirected extends ClusteringCoeffici
 
     double globalValue = global.getResult().getGlobalClusteringCoefficientScore();
 
-    DataSet<EPGMGraphHead> resultHead = currentGraph.getGraphHead()
-      .map(new WritePropertyToGraphHeadMap(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,
+    DataSet<G> resultHead = currentGraph.getGraphHead()
+      .map(new WritePropertyToGraphHeadMap<>(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,
         PropertyValue.create(globalValue)));
 
     return currentGraph.getFactory().fromDataSets(

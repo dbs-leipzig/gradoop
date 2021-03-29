@@ -7,12 +7,12 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.2</version>
+    <version>0.6.0</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
     <description>GRADOOP : Graph Analytics on Hadoop</description>
-    <inceptionYear>2014 - 2020</inceptionYear>
+    <inceptionYear>2014 - 2021</inceptionYear>
 
     <organization>
         <name>University of Leipzig</name>
@@ -157,16 +157,17 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.commons-lang.version>2.6</dep.commons-lang.version>
-        <dep.flink.version>1.7.2</dep.flink.version>
-        <dep.gdl.version>0.3.2</dep.gdl.version>
+        <dep.commons-lang.version>3.11</dep.commons-lang.version>
+        <dep.flink.version>1.9.3</dep.flink.version>
+        <dep.gradoop.gdl.version>0.5.2</dep.gradoop.gdl.version>
         <dep.guava.version>11.0.2</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
-        <dep.junit.version>4.12</dep.junit.version>
+        <dep.junit.version>4.13.1</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
+        <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
         <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
@@ -620,8 +621,8 @@
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-shaded-hadoop2</artifactId>
-                <version>${dep.flink.version}</version>
+                <artifactId>flink-shaded-hadoop-2</artifactId>
+                <version>${dep.flink-shaded.version}</version>
             </dependency>
 
             <!-- Accumulo -->
@@ -658,9 +659,9 @@
 
             <!-- Others -->
             <dependency>
-                <groupId>com.github.s1ck</groupId>
-                <artifactId>gdl</artifactId>
-                <version>${dep.gdl.version}</version>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-gdl</artifactId>
+                <version>${dep.gradoop.gdl.version}</version>
             </dependency>
 
             <dependency>
@@ -688,8 +689,8 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
                 <version>${dep.commons-lang.version}</version>
             </dependency>
 

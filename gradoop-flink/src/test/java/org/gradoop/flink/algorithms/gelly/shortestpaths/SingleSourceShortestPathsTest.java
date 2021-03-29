@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     EPGMVertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
     GradoopId srcVertexIdDouble = srcVertexDouble.getId();
 
-    LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths(srcVertexIdDouble,
+    LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths<>(srcVertexIdDouble,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expectDouble = loaderDouble.getLogicalGraphByVariable("result");
 
@@ -102,7 +102,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     EPGMVertex srcVertex = loader.getVertexByVariable("v0");
     GradoopId srcVertexId = srcVertex.getId();
 
-    LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths(srcVertexId,
+    LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths<>(srcVertexId,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 

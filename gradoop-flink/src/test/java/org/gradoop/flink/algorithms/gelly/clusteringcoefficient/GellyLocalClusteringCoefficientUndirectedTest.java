@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.List;
@@ -30,8 +35,14 @@ public class GellyLocalClusteringCoefficientUndirectedTest
   extends GellyClusteringCoefficientTestBase {
 
   @Override
-  public ClusteringCoefficientBase getCCAlgorithm() {
-    return new GellyLocalClusteringCoefficientUndirected();
+  public <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  ClusteringCoefficientBase<G, V, E, LG, GC> getCCAlgorithm() {
+    return new GellyLocalClusteringCoefficientUndirected<>();
   }
 
   @Override

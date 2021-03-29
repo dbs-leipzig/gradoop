@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,11 @@ public class CanonicalAdjacencyMatrixBuilder<
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   implements UnaryBaseGraphCollectionToValueOperator<GC, DataSet<String>> {
+
+  /**
+   * Character used to separate lines. Should be the same regardless of OS.
+   */
+  public static final Character LINE_SEPARATOR = '\n';
 
   /**
    * function describing string representation of graph heads

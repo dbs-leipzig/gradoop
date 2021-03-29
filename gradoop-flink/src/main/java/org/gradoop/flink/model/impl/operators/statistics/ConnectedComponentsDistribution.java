@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,13 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.AnnotateWeaklyConnectedComponents;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccEdges;
 import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccVertices;
@@ -30,9 +34,20 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.GetConnectedC
  * {@link AnnotateWeaklyConnectedComponents} of Flinks ConnectedComponents.
  * Returns a {@code Tuple3<String, Long, Long>}, containing the component id and the number of
  * graph elements (vertices and edges) associated with it.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class ConnectedComponentsDistribution
-  implements UnaryGraphToValueOperator<DataSet<Tuple3<String, Long, Long>>> {
+public class ConnectedComponentsDistribution<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToValueOperator<LG, DataSet<Tuple3<String, Long, Long>>> {
 
   /**
    * Property key to store the component id.
@@ -97,9 +112,9 @@ public class ConnectedComponentsDistribution
   }
 
   @Override
-  public DataSet<Tuple3<String, Long, Long>> execute(LogicalGraph graph) {
+  public DataSet<Tuple3<String, Long, Long>> execute(LG graph) {
 
-    LogicalGraph graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents(
+    LG graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents<>(
       propertyKey, maxIterations, annotateEdges));
 
     graphWithWccIds = graphWithWccIds.aggregate(new AggregateListOfWccVertices(propertyKey));
@@ -108,6 +123,6 @@ public class ConnectedComponentsDistribution
     }
 
     return graphWithWccIds.getGraphHead().flatMap(
-      new GetConnectedComponentDistributionFlatMap(propertyKey, annotateEdges));
+      new GetConnectedComponentDistributionFlatMap<>(propertyKey, annotateEdges));
   }
 }
