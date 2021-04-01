@@ -19,8 +19,10 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
@@ -201,7 +203,8 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
    *
    * @return The sampling operator
    */
-  public abstract SamplingAlgorithm getSamplingOperator();
+  public abstract SamplingAlgorithm<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getSamplingOperator();
 
   /**
    * Common test-case.

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Random;
 
@@ -25,10 +25,9 @@ import java.util.Random;
  * A degree-dependent value is taken into account to have a bias towards high-degree vertices.
  * The assumption is that a property of vertices degree and max degree.
  *
- * @param <V> EPGM vertex type
+ * @param <V> The vertex type.
  */
-public class NonUniformVertexRandomFilter<V extends EPGMVertex>
-implements FilterFunction<V> {
+public class NonUniformVertexRandomFilter<V extends Vertex> implements FilterFunction<V> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */

@@ -17,28 +17,30 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
- * A map from a vertex to its degree
+ * A map from a vertex to its degree.
+ *
+ * @param <V> The vertex type.
  */
-public class VertexToDegreeMap implements MapFunction<EPGMVertex, Tuple1<Long>> {
+public class VertexToDegreeMap<V extends Vertex> implements MapFunction<V, Tuple1<Long>> {
   /**
-   * The property name for degree
+   * The property name of the property that holds the degree value as string.
    */
   private String nameOfDegreeProperty;
 
   /**
-   * Constructor
+   * Creates an instance of this map transformation.
    *
-   * @param nameOfDegreeProperty the property name for degree
+   * @param nameOfDegreeProperty the property name of the property that holds the degree value as string
    */
   public VertexToDegreeMap(String nameOfDegreeProperty) {
     this.nameOfDegreeProperty = nameOfDegreeProperty;
   }
 
   @Override
-  public Tuple1<Long> map(EPGMVertex vertex) {
+  public Tuple1<Long> map(V vertex) {
     return new Tuple1<>(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));
   }
 }

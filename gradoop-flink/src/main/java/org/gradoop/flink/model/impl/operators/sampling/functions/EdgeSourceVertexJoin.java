@@ -18,22 +18,25 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins to get the edge source:<br>
  * {@code (edge),(vertex) -> (edge,edge.targetId,(bool)vertex[propertyKey])}
+ *
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"*->f0", "id->f1"})
 @FunctionAnnotation.ReadFieldsSecond("properties")
-public class EdgeSourceVertexJoin
-  implements JoinFunction<EPGMEdge, EPGMVertex, Tuple3<EPGMEdge, GradoopId, Boolean>> {
+public class EdgeSourceVertexJoin<V extends Vertex, E extends Edge>
+  implements JoinFunction<E, V, Tuple3<E, GradoopId, Boolean>> {
   /**
    * Reduce object instantiations
    */
-  private Tuple3<EPGMEdge, GradoopId, Boolean> reuse;
+  private Tuple3<E, GradoopId, Boolean> reuse;
 
   /**
    * Property key of marked value
@@ -51,7 +54,7 @@ public class EdgeSourceVertexJoin
   }
 
   @Override
-  public Tuple3<EPGMEdge, GradoopId, Boolean> join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
+  public Tuple3<E, GradoopId, Boolean> join(E edge, V vertex) throws Exception {
     reuse.f0 = edge;
     reuse.f1 = edge.getTargetId();
     reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();

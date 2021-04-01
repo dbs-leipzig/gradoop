@@ -18,8 +18,10 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.junit.runners.Parameterized;
@@ -29,6 +31,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 
+/**
+ * Tests class {@link RandomLimitedDegreeVertexSampling}.
+ */
 public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
@@ -47,8 +52,9 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
   }
 
   @Override
-  public SamplingAlgorithm getSamplingOperator() {
-    return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
+  public SamplingAlgorithm<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getSamplingOperator() {
+    return new RandomLimitedDegreeVertexSampling<>(sampleSize, seed, degreeThreshold, degreeType);
   }
 
   @Override
@@ -90,7 +96,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
    * @return List of parameters
    */
   @Parameterized.Parameters(name = "{index}: {0}")
-  public static Iterable data() {
+  public static Iterable<String[]> data() {
     return Arrays.asList(new String[] {
       "With seed and the sum of in- and out-degree with value = 3",
       "-4181668494294894490",
