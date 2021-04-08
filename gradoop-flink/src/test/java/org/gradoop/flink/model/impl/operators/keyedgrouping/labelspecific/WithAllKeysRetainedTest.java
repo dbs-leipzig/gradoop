@@ -15,17 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
 
-import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.functions.KeyFunction;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.CompositeKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.LabelKeyFunction;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.keys.PropertyKeyFunction;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.gradoop.common.GradoopTestUtils.BIG_DECIMAL_VAL_7;
 import static org.gradoop.common.GradoopTestUtils.KEY_0;
@@ -33,15 +29,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test for the {@link WithAllKeysSetToDefault} filter function.
+ * Test for the {@link WithAllKeysRetained} filter function.
  */
-public class WithAllKeysSetToDefaultTest extends GradoopFlinkTestBase {
-
-  /**
-   * A key function that can not be used with the filter function.
-   */
-  private final KeyFunction<Element, Tuple> invalidKeyFunction = new CompositeKeyFunction<>(
-    Collections.emptyList());
+public class WithAllKeysRetainedTest extends GradoopFlinkTestBase {
 
   /**
    * A key function that can be used with the filter function.
@@ -54,20 +44,11 @@ public class WithAllKeysSetToDefaultTest extends GradoopFlinkTestBase {
   private final PropertyKeyFunction<Element> validKeyFunction2 = new PropertyKeyFunction<>(KEY_0);
 
   /**
-   * Test if the constructor throws an {@link IllegalArgumentException} when a non-supported function
-   * is supplied.
-   */
-  @Test(expected = IllegalArgumentException.class)
-  public void testConstructorWithInvalidKey() {
-    new WithAllKeysSetToDefault<>(Arrays.asList(validKeyFunction, invalidKeyFunction));
-  }
-
-  /**
    * Test if the filter works as expected.
    */
   @Test
   public void testFilter() {
-    final WithAllKeysSetToDefault<Element> filter = new WithAllKeysSetToDefault<>(Arrays.asList(
+    final WithAllKeysRetained<Element> filter = new WithAllKeysRetained<>(Arrays.asList(
       validKeyFunction, validKeyFunction2));
     final Element vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
     assertTrue(filter.filter(vertex));

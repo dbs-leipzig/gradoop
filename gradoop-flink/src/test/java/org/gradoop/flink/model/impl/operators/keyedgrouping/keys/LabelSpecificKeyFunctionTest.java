@@ -23,6 +23,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -240,24 +241,24 @@ public class LabelSpecificKeyFunctionTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if the {@link LabelSpecificKeyFunction#isDefaultKey(Object)} method works as expected.
+   * Test if the {@link LabelSpecificKeyFunction#retainElement(Element)} method works as expected.
    */
   @Test
-  public void testIsDefaultKey() {
+  public void testElementRetention() {
     // The default values are set initially, check them for each label
     final EPGMVertex vertex = getConfig().getLogicalGraphFactory().getVertexFactory().createVertex();
     for (String label : Arrays.asList("a", "b", "c", "")) {
       vertex.setLabel(label);
       assertTrue("Default key check fail for label: " + label,
-        testFunction.isDefaultKey(testFunction.getKey(vertex)));
+        testFunction.retainElement(vertex));
     }
     // Changing the values on the vertex should only affect the result when the key function corresponding
     // to the value is used. We check this by setting the property for label "c" to a non-default value.
     vertex.setProperty("forC", PropertyValue.create(GradoopTestUtils.BIG_DECIMAL_VAL_7));
     vertex.setLabel("a");
-    assertTrue(testFunction.isDefaultKey(testFunction.getKey(vertex)));
+    assertTrue(testFunction.retainElement(vertex));
     vertex.setLabel("c");
-    assertFalse(testFunction.isDefaultKey(testFunction.getKey(vertex)));
+    assertFalse(testFunction.retainElement(vertex));
   }
 
   /**

@@ -25,7 +25,7 @@ import java.util.Objects;
  * @param <E> The type of the object from which the grouping key is extracted.
  * @param <K> The type of the extracted key.
  */
-public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K>, DefaultKeyCheckable {
+public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K> {
 
   /**
    * Get the default key value for all elements.
@@ -40,11 +40,11 @@ public interface KeyFunctionWithDefaultValue<E, K> extends KeyFunction<E, K>, De
    * The default implementation of this method compares the key to the default key provided by this class
    * using {@link Objects#deepEquals(Object, Object)}.
    *
-   * @param key The key to check.
+   * @param element The key to check.
    * @return {@code true}, if the key is a default key for this key-function.
    */
   @Override
-  default boolean isDefaultKey(Object key) {
-    return Objects.deepEquals(getDefaultKey(), key);
+  default boolean retainElement(E element) {
+    return Objects.deepEquals(getDefaultKey(), getKey(element));
   }
 }

@@ -17,13 +17,11 @@ package org.gradoop.flink.model.impl.operators.keyedgrouping.keys;
 
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.junit.Test;
@@ -33,7 +31,6 @@ import java.util.Arrays;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test for the {@link CompositeKeyFunctionWithDefaultValues}.
@@ -103,19 +100,5 @@ public class CompositeKeyFunctionWithDefaultValuesTest extends KeyFunctionTestBa
     getInstance().addKeyToElement(vertex, Tuple2.of(testValue.getRawBytes(), testLabel));
     assertEquals(testValue, vertex.getPropertyValue(propertyKey));
     assertEquals(testLabel, vertex.getLabel());
-  }
-
-  /**
-   * Test for the {@link CompositeKeyFunctionWithDefaultValues#isDefaultKey(Object)} function.
-   */
-  @Test
-  public void testIsDefaultKey() {
-    KeyFunction<Element, Tuple> keyFunction = getInstance();
-    assertTrue(keyFunction instanceof DefaultKeyCheckable);
-    DefaultKeyCheckable toTest = (DefaultKeyCheckable) keyFunction;
-    assertFalse("wrong type", toTest.isDefaultKey(1L));
-    assertFalse("wrong arity", toTest.isDefaultKey(
-      Tuple3.of(PropertyValue.NULL_VALUE.getRawBytes(), "", "")));
-    assertTrue(toTest.isDefaultKey(Tuple2.of(PropertyValue.NULL_VALUE.getRawBytes(), "")));
   }
 }

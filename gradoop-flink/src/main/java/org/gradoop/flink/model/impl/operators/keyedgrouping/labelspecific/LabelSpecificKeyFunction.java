@@ -20,7 +20,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -31,15 +30,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
  * A grouping key function that extracts grouping keys only for specific labels.
+ * It wraps a map of labels and key functions and returns a tuple of keys as key.
+ * <p>
+ * The first position of the tuple represents the label of the element (stored as index).
+ * Each other position corresponds to a label.
+ * <p>
+ * The position corresponding to the element label contains a combined key for that label.
+ * Every other position contains default values.
+ * If the element label is not represented in the tuple, a key function representing
+ * the default label group is used.
  *
  * @param <T> The type of the elements to group.
  */
-public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<T, Tuple>,
-  DefaultKeyCheckable {
+public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<T, Tuple> {
 
   /**
    * A label used to identify the default groups.
@@ -51,7 +59,9 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
   public static final String DEFAULT_GROUP_LABEL = Grouping.DEFAULT_VERTEX_LABEL_GROUP;
 
   /**
-   * A map assigning an internally used number to each label.
+   * A map assigning an index to each label.
+   * It encodes the position of labels in {@code targetLabels}
+   * and of corresponding key functions in {@code keyFunctions}.
    */
   private final Map<String, Integer> labelToIndex;
 
@@ -93,15 +103,18 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
     }
     final int totalLabels = Objects.requireNonNull(labelsWithKeys).size();
     if (totalLabels + 1 > Tuple.MAX_ARITY) {
-      throw new IllegalArgumentException("Too many labels. Tuple arity exceeded: " + (totalLabels + 1) +
-        " (max.: " + Tuple.MAX_ARITY + ")");
+      throw new IllegalArgumentException(
+        String.format("Too many labels. Tuple arity exceeded: %d (max.: %d)",
+          totalLabels + 1, Tuple.MAX_ARITY));
     }
+
     int labelNr = 1;
     labelToIndex = new HashMap<>();
     // The list needs to be filled initially, the set(int,Object) function will fail otherwise.
     keyFunctions = new ArrayList<>(Collections.nCopies(totalLabels, null));
     targetLabels = new String[totalLabels];
-    for (Map.Entry<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
+
+    for (Entry<String, List<KeyFunctionWithDefaultValue<T, ?>>> labelToKeys : labelsWithKeys.entrySet()) {
       final String key = labelToKeys.getKey();
       final List<KeyFunctionWithDefaultValue<T, ?>> keysForLabel = labelToKeys.getValue();
       if (key.equals(defaultGroupLabel)) {
@@ -116,8 +129,9 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
         keysForLabel.get(0) : new CompositeKeyFunctionWithDefaultValues<>(keysForLabel));
       labelNr++;
     }
+
     if (labelToSuperLabel != null) {
-      for (Map.Entry<String, String> labelUpdateEntry : labelToSuperLabel.entrySet()) {
+      for (Entry<String, String> labelUpdateEntry : labelToSuperLabel.entrySet()) {
         Integer index = labelToIndex.get(labelUpdateEntry.getKey());
         if (index == null) {
           continue;
@@ -130,12 +144,9 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
 
   @Override
   public Tuple getKey(T element) {
-    Integer index = labelToIndex.get(element.getLabel());
+    Integer index = labelToIndex.getOrDefault(element.getLabel(), 0);
     for (int i = 0; i < keyFunctions.size(); i++) {
       reuseTuple.setField(keyFunctions.get(i).getDefaultKey(), 1 + i);
-    }
-    if (index == null) {
-      index = 0;
     }
     // The index is used to identify the key function, the 0th position in the tuple set to that index.
     reuseTuple.setField(keyFunctions.get(index).getKey(element), 1 + index);
@@ -166,15 +177,8 @@ public class LabelSpecificKeyFunction<T extends Element> implements KeyFunction<
   }
 
   @Override
-  public boolean isDefaultKey(Object key) {
-    if (!(key instanceof Tuple)) {
-      return false;
-    }
-    Tuple keyTuple = (Tuple) key;
-    if (keyTuple.getArity() != (1 + keyFunctions.size())) {
-      return false;
-    }
-    Integer index = keyTuple.getField(0);
-    return keyFunctions.get(index).isDefaultKey(keyTuple.getField(1 + index));
+  public boolean retainElement(T element) {
+    Integer index = labelToIndex.getOrDefault(element.getLabel(), 0);
+    return keyFunctions.get(index).retainElement(element);
   }
 }

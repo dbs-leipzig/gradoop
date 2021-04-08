@@ -21,7 +21,6 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.KeyFunction;
-import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +34,6 @@ import java.util.Objects;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * A base class for key-function tests. This provides some common tests that should pass by all keys to be
@@ -88,22 +86,6 @@ public abstract class KeyFunctionTestBase<E, K> extends GradoopFlinkTestBase {
     assertNotNull("Type information provided by the key fuction was null.", type);
     assertTrue("Type is not a valid key type.", type.isKeyType());
     assertNotEquals("Key type has no fields.", 0, type.getTotalFields());
-  }
-
-  /**
-   * Check if the default key value has the correct type.<p>
-   * This test will only run if the key function has a default key.
-   *
-   * @throws IOException when serialization of a key fails.
-   */
-  @Test
-  public void checkDefaultKey() throws IOException {
-    KeyFunction<E, K> function = getInstance();
-    assumeTrue(function instanceof KeyFunctionWithDefaultValue);
-    KeyFunctionWithDefaultValue<E, K> withDefaultValue = (KeyFunctionWithDefaultValue<E, K>) function;
-    K defaultKey = withDefaultValue.getDefaultKey();
-    checkKeyType(withDefaultValue.getType(), defaultKey);
-    assertTrue(withDefaultValue.isDefaultKey(defaultKey));
   }
 
   /**

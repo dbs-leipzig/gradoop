@@ -81,4 +81,9 @@ public class CompositeKeyFunction<T> implements KeyFunction<T, Tuple> {
     }
     return new TupleTypeInfo<>(types);
   }
+
+  @Override
+  public boolean retainElement(T element) {
+    return componentFunctions.stream().allMatch(k -> k.retainElement(element));
+  }
 }

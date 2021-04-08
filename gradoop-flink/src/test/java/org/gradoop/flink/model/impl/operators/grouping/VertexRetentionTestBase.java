@@ -117,6 +117,39 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
   }
 
   /**
+   * Tests correct retention of a vertex with a null property.
+   *
+   * @throws Exception if collecting result values fails
+   */
+  @Test
+  public void testRetentionNullProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: NULL})" + // group
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {a: NULL, count: 1L})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(getStrategy())
+      .retainVerticesWithoutGroup()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("a")
+      .addVertexAggregateFunction(new Count())
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct retention of a vertex with multiple properties.
    *

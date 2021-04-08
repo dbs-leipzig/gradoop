@@ -26,7 +26,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -46,7 +45,7 @@ import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceEdge
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceVertexTuples;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdField;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdFieldAndMarkTuple;
-import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.WithAllKeysSetToDefault;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.WithAllKeysRetained;
 
 import java.util.Collections;
 import java.util.List;
@@ -144,7 +143,7 @@ public class KeyedGrouping<
     DataSet<V> vertices = graph.getVertices();
     DataSet<V> ungrouped = vertices;
     if (retainUngroupedVertices) {
-      final FilterFunction<V> retentionSelector = new WithAllKeysSetToDefault<>(vertexGroupingKeys);
+      final FilterFunction<V> retentionSelector = new WithAllKeysRetained<>(vertexGroupingKeys);
       ungrouped = ungrouped.filter(retentionSelector);
       vertices = vertices.filter(new Not<>(retentionSelector));
     }
@@ -153,6 +152,7 @@ public class KeyedGrouping<
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
         GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));
+
     /* Extract a mapping from vertex-ID to super-vertex-ID from the result of the vertex-reduce step. */
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId = verticesWithSuperVertex
       .filter(new Not<>(new FilterSuperVertices<>()))
@@ -274,19 +274,21 @@ public class KeyedGrouping<
 
   /**
    * Enable or disable vertex retention.
+   * Vertices will be retained, if all key functions return true for
+   * {@link KeyFunction#retainElement(Object)}.
+   * For example {@code KeyFunctionWithDefaultValue} returns true,
+   * if the extracted key equals the default key.
    * <p>
-   * Enabling this features requires that all vertex keys implement {@link DefaultKeyCheckable}.
+   * Retained vertices will not be grouped and returned without modifications.
+   * Edges between retained vertices will not be grouped and returned without modifications.
+   * Edges between retained vertices and grouped vertices will be grouped.
    * <p>
    * This is disabled per default.
    *
    * @param retainVertices Should vertices be retained?
    * @return This operator.
-   * @throws IllegalArgumentException When any vertex key function is not supported for this feature.
    */
   public KeyedGrouping<G, V, E, LG, GC> setRetainUngroupedVertices(boolean retainVertices) {
-    if (retainVertices) {
-      WithAllKeysSetToDefault.checkKeySupport(vertexGroupingKeys);
-    }
     this.retainUngroupedVertices = retainVertices;
     return this;
   }

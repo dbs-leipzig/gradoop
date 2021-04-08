@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific;
 
-import org.gradoop.flink.model.api.functions.DefaultKeyCheckable;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
@@ -27,7 +26,7 @@ import java.util.Objects;
  *
  * @param <E> The type of the elements to filter.
  */
-public class WithAllKeysSetToDefault<E> implements CombinableFilter<E> {
+public class WithAllKeysRetained<E> implements CombinableFilter<E> {
 
   /**
    * The keys to check on each element.
@@ -39,35 +38,12 @@ public class WithAllKeysSetToDefault<E> implements CombinableFilter<E> {
    *
    * @param keys The list of key functions to check.
    */
-  public WithAllKeysSetToDefault(List<KeyFunction<E, ?>> keys) {
-    checkKeySupport(keys);
+  public WithAllKeysRetained(List<KeyFunction<E, ?>> keys) {
     this.keys = Objects.requireNonNull(keys);
   }
 
   @Override
   public boolean filter(E value) {
-    for (KeyFunction<E, ?> key : keys) {
-      final Object extractedKey = key.getKey(value);
-      if (!((DefaultKeyCheckable) key).isDefaultKey(extractedKey)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Check if keys functions are supported with this filter function.
-   *
-   * @param keys The key functions to check.
-   * @param <E> The type of the key functions.
-   * @throws IllegalArgumentException When any key function is not supported by this filter.
-   */
-  public static <E> void checkKeySupport(List<KeyFunction<E, ?>> keys) {
-    for (KeyFunction<E, ?> key : keys) {
-      if (!(key instanceof DefaultKeyCheckable)) {
-        throw new IllegalArgumentException("Key function " + key.getClass().getName() +
-          " does not implement " + DefaultKeyCheckable.class.getName());
-      }
-    }
+    return keys.stream().allMatch(k -> k.retainElement(value));
   }
 }
