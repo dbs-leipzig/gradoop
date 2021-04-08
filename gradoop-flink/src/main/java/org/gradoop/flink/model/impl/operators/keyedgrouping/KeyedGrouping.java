@@ -103,7 +103,7 @@ public class KeyedGrouping<
   private boolean useGroupCombine = true;
 
   /**
-   * Should vertices with all default keys be kept as is?
+   * Should vertices without groups be retained in the result as is.
    */
   private boolean retainUngroupedVertices = false;
 
@@ -137,8 +137,8 @@ public class KeyedGrouping<
   @Override
   public LG execute(LG graph) {
     /* First we create tuple representations of each vertex.
-       If retention of ungrouped vertices is enabled, we filter out vertices with unset keys prior to this
-       step. Those tuples will then be grouped by the respective key fields (the fields containing the values
+       If retention of ungrouped vertices is enabled, we filter out retained vertices prior to this step.
+       Those tuples will then be grouped by the respective key fields (the fields containing the values
        extracted by the key functions) and reduced to assign a super vertex and to calculate aggregates. */
     DataSet<V> vertices = graph.getVertices();
     DataSet<V> ungrouped = vertices;
@@ -147,6 +147,8 @@ public class KeyedGrouping<
       ungrouped = ungrouped.filter(retentionSelector);
       vertices = vertices.filter(new Not<>(retentionSelector));
     }
+
+    /* Group vertices and create super-vertices. Do not yet remove the input vertices. */
     DataSet<Tuple> verticesWithSuperVertex = vertices
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .groupBy(getInternalVertexGroupingKeys())

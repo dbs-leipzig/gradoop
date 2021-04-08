@@ -253,7 +253,7 @@ public class LabelSpecificKeyFunctionTest extends GradoopFlinkTestBase {
         testFunction.retainElement(vertex));
     }
     // Changing the values on the vertex should only affect the result when the key function corresponding
-    // to the value is used. We check this by setting the property for label "c" to a non-default value.
+    // to the value is used. We check this by setting the property for label "c" to any value.
     vertex.setProperty("forC", PropertyValue.create(GradoopTestUtils.BIG_DECIMAL_VAL_7));
     vertex.setLabel("a");
     assertTrue(testFunction.retainElement(vertex));

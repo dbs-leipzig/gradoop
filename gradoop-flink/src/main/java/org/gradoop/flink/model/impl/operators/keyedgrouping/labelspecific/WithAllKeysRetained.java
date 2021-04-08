@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A filter function selecting elements with all values set to a default value.
+ * A filter function selecting elements where all keys vote to retain it.
  *
  * @param <E> The type of the elements to filter.
  */

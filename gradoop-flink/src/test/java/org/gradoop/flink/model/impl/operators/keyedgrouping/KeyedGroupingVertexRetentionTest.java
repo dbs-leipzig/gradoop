@@ -25,14 +25,9 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.VertexRetentionTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.gradoop.flink.model.impl.operators.keyedgrouping.GroupingKeys.property;
 
 /**
  * Tests if {@link KeyedGrouping#setRetainUngroupedVertices(boolean)} works as expected.
@@ -177,6 +172,8 @@ public class KeyedGroupingVertexRetentionTest extends VertexRetentionTestBase {
 
   /**
    * Test label specific grouping with vertex retention enabled.
+   * The expected result is different here (v7), since vertices with only one of two properties set
+   * are also grouped together.
    *
    * @throws Exception when the execution in Flink fails.
    */
@@ -192,6 +189,7 @@ public class KeyedGroupingVertexRetentionTest extends VertexRetentionTestBase {
       "(v6:A {})" +
       "(v7:A {a : 1})" +
       "(v8:A {a : 1, b : 2})" +
+      "(v9:A {a : NULL, b : NULL})" +
       "]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
@@ -207,6 +205,7 @@ public class KeyedGroupingVertexRetentionTest extends VertexRetentionTestBase {
         "(v06:A)" +
         "(v07:A {a : 1, b : NULL, count : 1L})" +
         "(v08:A {a : 1, b : 2, count: 1L})" +
+        "(v09:A {a : NULL, b : NULL, count: 1L})" +
         "]");
 
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -222,26 +221,5 @@ public class KeyedGroupingVertexRetentionTest extends VertexRetentionTestBase {
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
-  }
-
-  /**
-   * Test if edges are properly updates when the source or target vertex was retained.
-   *
-   * @throws Exception when the execution in Flink fails.
-   */
-  @Test
-  public void testEdgeUpdateWithRetainedSourceOrTarget() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
-      "(retained:Retained {otherprop: 1L})-[e:edge]->(notretained:NotRetained {prop: 1L, otherprop: 1L})" +
-      "-[:otherEdge {otherprop: 1L}]->(:NotRetained2 {prop:1L, otherprop: 2L})-[e2:edge2]->" +
-      "(retained2:RetainedTarget {otherprop: 2L})" +
-      "] expected [" +
-      "(retained)-->(resv {prop: 1L})-->(resv)-->(retained2)" +
-      "]");
-    LogicalGraph res = loader.getLogicalGraphByVariable("input").callForGraph(
-      new KeyedGrouping<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>(
-      singletonList(property("prop")), emptyList(), emptyList(), emptyList())
-      .setRetainUngroupedVertices(true));
-    collectAndAssertTrue(res.equalsByData(loader.getLogicalGraphByVariable("expected")));
   }
 }
