@@ -974,8 +974,6 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "A", Arrays.asList("a", "b"),
         Collections.singletonList(new Count()))
-      .addVertexLabelGroup("C", "C", Collections.singletonList("a"),
-        Collections.singletonList(new Count()))
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
