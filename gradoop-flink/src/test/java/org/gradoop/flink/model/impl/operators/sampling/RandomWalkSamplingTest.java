@@ -15,12 +15,18 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-
+/**
+ * Test class for {@link RandomWalkSampling}.
+ */
 public class RandomWalkSamplingTest extends ParameterizedTestForGraphSampling {
 
   public RandomWalkSamplingTest(String testName, String seed, String sampleSize) {
@@ -28,8 +34,9 @@ public class RandomWalkSamplingTest extends ParameterizedTestForGraphSampling {
   }
 
   @Override
-  public SamplingAlgorithm getSamplingOperator() {
-    return new RandomWalkSampling(sampleSize, numberOfStartVertices);
+  public SamplingAlgorithm<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getSamplingOperator() {
+    return new RandomWalkSampling<>(sampleSize, numberOfStartVertices);
   }
 
   @Override
@@ -42,7 +49,7 @@ public class RandomWalkSamplingTest extends ParameterizedTestForGraphSampling {
    * @return List of parameters
    */
   @Parameterized.Parameters(name = "{index}: {0}")
-  public static Iterable data() {
+  public static Iterable<String[]> data() {
     return Arrays.asList(new String[] {
       "RandomWalkSamplingTest with seed",
       "-4181668494294894490",
