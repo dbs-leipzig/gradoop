@@ -16,21 +16,30 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
  * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
  * chosen vertices of a given relative amount. Retains all edges which source- and
  * target-vertices were chosen. There may retain some unconnected vertices in the sampled graph.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class RandomVertexSampling extends SamplingAlgorithm {
+public class RandomVertexSampling<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SamplingAlgorithm<G, V, E, LG, GC> {
   /**
    * Relative amount of nodes in the result graph
    */
@@ -63,19 +72,8 @@ public class RandomVertexSampling extends SamplingAlgorithm {
   }
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
-
-    DataSet<EPGMVertex> newVertices = graph.getVertices()
-      .filter(new RandomFilter<>(sampleSize, randomSeed));
-
-    DataSet<EPGMEdge> newEdges = graph.getEdges()
-      .join(newVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(newVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    return graph.getFactory().fromDataSets(newVertices, newEdges);
+  public LG sample(LG graph) {
+    DataSet<V> newVertices = graph.getVertices().filter(new RandomFilter<>(sampleSize, randomSeed));
+    return graph.getFactory().fromDataSets(newVertices, graph.getEdges()).verify();
   }
 }

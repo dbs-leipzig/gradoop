@@ -45,6 +45,7 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -289,6 +290,17 @@ public interface BaseGraphOperators<
       edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
+  }
+
+  /**
+   * Creates a new graph from a chosen subset of nodes and their associated edges, depending on the given
+   * sampling algorithm.
+   *
+   * @param algorithm used sampling algorithm
+   * @return graph with a subset of nodes and their associated edges
+   */
+  default LG sample(SamplingAlgorithm<G, V, E, LG, GC> algorithm) {
+    return callForGraph(algorithm);
   }
 
   /**
