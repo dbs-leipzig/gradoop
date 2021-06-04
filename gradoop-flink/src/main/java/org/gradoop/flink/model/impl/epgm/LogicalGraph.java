@@ -32,7 +32,6 @@ import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -138,11 +137,6 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  @Override
-  public LogicalGraph sample(SamplingAlgorithm algorithm) {
-    return callForGraph(algorithm);
-  }
 
   @Override
   public GraphCollection groupVerticesByRollUp(

@@ -16,9 +16,11 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
@@ -34,8 +36,19 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomVertex;
  * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
  * chosen vertices of a given relative amount and includes all neighbors of those vertices in the
  * sampling. All edges which source- and target-vertices were chosen are sampled, too.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
+public class RandomVertexNeighborhoodSampling<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SamplingAlgorithm<G, V, E, LG, GC> {
 
   /**
    * Relative amount of vertices in the result graph
@@ -102,19 +115,19 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
   }
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
+  public LG sample(LG graph) {
 
-    DataSet<EPGMVertex> sampledVertices = graph.getVertices()
-      .map(new RandomVertex(sampleSize, randomSeed, SamplingConstants.PROPERTY_KEY_SAMPLED));
+    DataSet<V> sampledVertices = graph.getVertices()
+      .map(new RandomVertex<>(sampleSize, randomSeed, SamplingConstants.PROPERTY_KEY_SAMPLED));
 
-    DataSet<EPGMEdge> newEdges = graph.getEdges()
+    DataSet<E> newEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
+      .with(new EdgeSourceVertexJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
-      .with(new EdgeTargetVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
-      .filter(new EdgesWithSampledVerticesFilter(neighborType))
+      .with(new EdgeTargetVertexJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED))
+      .filter(new EdgesWithSampledVerticesFilter<>(neighborType))
       .map(new Value0Of3<>());
 
     graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges)

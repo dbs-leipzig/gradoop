@@ -23,7 +23,6 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,14 +36,6 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Creates a new graph from a randomly chosen subset of nodes and their associated edges.
-   *
-   * @param algorithm used sampling algorithm
-   * @return logical graph with random nodes and their associated edges
-   */
-  LogicalGraph sample(SamplingAlgorithm algorithm);
 
   /**
    * Generates all combinations of the supplied vertex grouping keys according to the definition of
