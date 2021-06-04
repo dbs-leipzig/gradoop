@@ -57,11 +57,12 @@ public class BuildTemporalDegreeTree
     Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> left,
     Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> right) throws Exception {
 
+    // Elements are grouped on the gradoop id (f0) so the interval (f2,f3) of both elements have to be equal
     if (!left.f2.equals(right.f2) || !left.f3.equals(right.f3)) {
       throw new RuntimeException("Something went wrong on grouping.");
     }
 
-    // putt all elements of the right into the left tree
+    // Put all elements of the right into the left tree and return the left one as merged tree
     for (Map.Entry<Long, Integer> entry : right.f1.entrySet()) {
       if (left.f1.get(entry.getKey()) == null) {
         left.f1.put(entry.getKey(), entry.getValue());
