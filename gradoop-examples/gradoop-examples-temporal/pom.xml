@@ -68,6 +68,10 @@
             <groupId>org.gradoop</groupId>
             <artifactId>gradoop-temporal</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_2.11</artifactId>
+        </dependency>
     </dependencies>
 
 
