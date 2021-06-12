@@ -16,15 +16,17 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Random;
 
 /**
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class RandomVertex implements MapFunction&lt;EPGMVertex, EPGMVertex&gt; {
+public class RandomVertex&lt;V extends Vertex&gt; implements MapFunction&lt;V, V&gt; {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -45,20 +47,20 @@ public class RandomVertex implements MapFunction&lt;EPGMVertex, EPGMVertex&gt; {
    * @param randomSeed random seed (can be 0)
    * @param samplingKey the name of property for sampled vertices
    */
-<span class="fc" id="L48">  public RandomVertex(float sampleSize, long randomSeed, String samplingKey) {</span>
-<span class="fc" id="L49">    this.samplingKey = samplingKey;</span>
-<span class="fc" id="L50">    this.sampleSize = sampleSize;</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();</span>
-<span class="fc" id="L52">  }</span>
+<span class="fc" id="L50">  public RandomVertex(float sampleSize, long randomSeed, String samplingKey) {</span>
+<span class="fc" id="L51">    this.samplingKey = samplingKey;</span>
+<span class="fc" id="L52">    this.sampleSize = sampleSize;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();</span>
+<span class="fc" id="L54">  }</span>
 
   @Override
-  public EPGMVertex map(EPGMVertex vertex) throws Exception {
-<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (randomGenerator.nextFloat() &lt;= sampleSize) {</span>
-<span class="fc" id="L57">      vertex.setProperty(samplingKey, true);</span>
+  public V map(V vertex) throws Exception {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (randomGenerator.nextFloat() &lt;= sampleSize) {</span>
+<span class="fc" id="L59">      vertex.setProperty(samplingKey, true);</span>
     } else {
-<span class="fc" id="L59">      vertex.setProperty(samplingKey, false);</span>
+<span class="fc" id="L61">      vertex.setProperty(samplingKey, false);</span>
     }
-<span class="fc" id="L61">    return vertex;</span>
+<span class="fc" id="L63">    return vertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

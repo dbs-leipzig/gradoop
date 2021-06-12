@@ -16,9 +16,11 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -29,8 +31,20 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  * Computes an edge sampling of the graph (new graph head will be generated). Retains randomly
  * chosen edges of a given relative amount and their associated source- and target-vertices. No
  * unconnected vertices will retain in the sampled graph.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class RandomEdgeSampling extends SamplingAlgorithm {
+public class RandomEdgeSampling&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SamplingAlgorithm&lt;G, V, E, LG, GC&gt; {
+
   /**
    * Relative amount of edges in the result graph
    */
@@ -48,8 +62,8 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
    * @param sampleSize relative sample size, e.g. 0.5
    */
   public RandomEdgeSampling(float sampleSize) {
-<span class="nc" id="L51">    this(sampleSize, 0L);</span>
-<span class="nc" id="L52">  }</span>
+<span class="nc" id="L65">    this(sampleSize, 0L);</span>
+<span class="nc" id="L66">  }</span>
 
   /**
    * Creates new RandomEdgeSampling instance.
@@ -57,30 +71,30 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
    * @param sampleSize relative sample size, e.g. 0.5
    * @param randomSeed random seed value (can be 0)
    */
-<span class="fc" id="L60">  public RandomEdgeSampling(float sampleSize, long randomSeed) {</span>
-<span class="fc" id="L61">    this.sampleSize = sampleSize;</span>
-<span class="fc" id="L62">    this.randomSeed = randomSeed;</span>
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L74">  public RandomEdgeSampling(float sampleSize, long randomSeed) {</span>
+<span class="fc" id="L75">    this.sampleSize = sampleSize;</span>
+<span class="fc" id="L76">    this.randomSeed = randomSeed;</span>
+<span class="fc" id="L77">  }</span>
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
-<span class="fc" id="L67">    DataSet&lt;EPGMEdge&gt; newEdges = graph.getEdges().filter(new RandomFilter&lt;&gt;(sampleSize, randomSeed));</span>
+  public LG sample(LG graph) {
+<span class="fc" id="L81">    DataSet&lt;E&gt; newEdges = graph.getEdges().filter(new RandomFilter&lt;&gt;(sampleSize, randomSeed));</span>
 
-<span class="fc" id="L69">    DataSet&lt;EPGMVertex&gt; newSourceVertices = graph.getVertices()</span>
-<span class="fc" id="L70">      .join(newEdges)</span>
-<span class="fc" id="L71">      .where(new Id&lt;&gt;()).equalTo(new SourceId&lt;&gt;())</span>
-<span class="fc" id="L72">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L73">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L83">    DataSet&lt;V&gt; newSourceVertices = graph.getVertices()</span>
+<span class="fc" id="L84">      .join(newEdges)</span>
+<span class="fc" id="L85">      .where(new Id&lt;&gt;()).equalTo(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L86">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L87">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L75">    DataSet&lt;EPGMVertex&gt; newTargetVertices = graph.getVertices()</span>
-<span class="fc" id="L76">      .join(newEdges)</span>
-<span class="fc" id="L77">      .where(new Id&lt;&gt;()).equalTo(new TargetId&lt;&gt;())</span>
-<span class="fc" id="L78">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L79">      .distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L89">    DataSet&lt;V&gt; newTargetVertices = graph.getVertices()</span>
+<span class="fc" id="L90">      .join(newEdges)</span>
+<span class="fc" id="L91">      .where(new Id&lt;&gt;()).equalTo(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L92">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L93">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L81">    DataSet&lt;EPGMVertex&gt; newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L95">    DataSet&lt;V&gt; newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L83">    return graph.getFactory().fromDataSets(newVertices, newEdges);</span>
+<span class="fc" id="L97">    return graph.getFactory().fromDataSets(newVertices, newEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

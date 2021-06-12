@@ -15,32 +15,47 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
  * Computes an edge sampling of the graph (new graph head will be generated). First selects
  * randomly chosen vertices of a given relative amount and all edges which source- and
  * target-vertices were chosen. Then randomly chooses edges from this set of edges and their
  * associated source- and target-vertices. No unconnected vertices will retain in the sampled graph.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class RandomVertexEdgeSampling extends SamplingAlgorithm {
+public class RandomVertexEdgeSampling&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SamplingAlgorithm&lt;G, V, E, LG, GC&gt; {
 
   /**
    * The sampling type enum
    */
-<span class="fc" id="L31">  public enum VertexEdgeSamplingType {</span>
+<span class="fc" id="L46">  public enum VertexEdgeSamplingType {</span>
     /**
      * Simple version (uniform version for both vertices and edges)
      */
-<span class="fc" id="L35">    SimpleVersion,</span>
+<span class="fc" id="L50">    SimpleVersion,</span>
     /**
      * Nonuniform vertex sampling and then uniform edge sampling
      */
-<span class="fc" id="L39">    NonuniformVersion,</span>
+<span class="fc" id="L54">    NonuniformVersion,</span>
     /**
      * Nonuniform vertex sampling and sample sizes add up to 1
      */
-<span class="fc" id="L43">    NonuniformHybridVersion,</span>
+<span class="fc" id="L58">    NonuniformHybridVersion,</span>
   }
 
   /**
@@ -71,8 +86,8 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
    * @param sampleSize relative sample size for edges and vertices
    */
   public RandomVertexEdgeSampling(float sampleSize) {
-<span class="nc" id="L74">    this(sampleSize, sampleSize, 0L, VertexEdgeSamplingType.SimpleVersion);</span>
-<span class="nc" id="L75">  }</span>
+<span class="nc" id="L89">    this(sampleSize, sampleSize, 0L, VertexEdgeSamplingType.SimpleVersion);</span>
+<span class="nc" id="L90">  }</span>
 
   /**
    * Creates new RandomVertexEdgeSampling instance.
@@ -81,8 +96,8 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
    * @param edgeSampleSize relative sample size for edges
    */
   public RandomVertexEdgeSampling(float vertexSampleSize, float edgeSampleSize) {
-<span class="nc" id="L84">    this(vertexSampleSize, edgeSampleSize, 0L, VertexEdgeSamplingType.SimpleVersion);</span>
-<span class="nc" id="L85">  }</span>
+<span class="nc" id="L99">    this(vertexSampleSize, edgeSampleSize, 0L, VertexEdgeSamplingType.SimpleVersion);</span>
+<span class="nc" id="L100">  }</span>
 
   /**
    * Creates new RandomVertexEdgeSampling instance.
@@ -93,8 +108,8 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
    */
   public RandomVertexEdgeSampling(float vertexSampleSize, float edgeSampleSize,
                                   VertexEdgeSamplingType vertexEdgeSamplingType) {
-<span class="nc" id="L96">    this(vertexSampleSize, edgeSampleSize, 0L, vertexEdgeSamplingType);</span>
-<span class="nc" id="L97">  }</span>
+<span class="nc" id="L111">    this(vertexSampleSize, edgeSampleSize, 0L, vertexEdgeSamplingType);</span>
+<span class="nc" id="L112">  }</span>
 
   /**
    * Creates new RandomVertexEdgeSampling instance.
@@ -105,34 +120,34 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
    * @param vertexEdgeSamplingType type of sampling
    */
   public RandomVertexEdgeSampling(float vertexSampleSize, float edgeSampleSize, long randomSeed,
-<span class="fc" id="L108">                                  VertexEdgeSamplingType vertexEdgeSamplingType) {</span>
-<span class="fc" id="L109">    this.vertexSampleSize = vertexSampleSize;</span>
-<span class="fc" id="L110">    this.edgeSampleSize = edgeSampleSize;</span>
-<span class="fc" id="L111">    this.randomSeed = randomSeed;</span>
-<span class="fc" id="L112">    this.vertexEdgeSamplingType = vertexEdgeSamplingType;</span>
-<span class="fc" id="L113">  }</span>
+<span class="fc" id="L123">                                  VertexEdgeSamplingType vertexEdgeSamplingType) {</span>
+<span class="fc" id="L124">    this.vertexSampleSize = vertexSampleSize;</span>
+<span class="fc" id="L125">    this.edgeSampleSize = edgeSampleSize;</span>
+<span class="fc" id="L126">    this.randomSeed = randomSeed;</span>
+<span class="fc" id="L127">    this.vertexEdgeSamplingType = vertexEdgeSamplingType;</span>
+<span class="fc" id="L128">  }</span>
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
+  public LG sample(LG graph) {
 
-<span class="pc bpc" id="L118" title="1 of 4 branches missed.">    switch (vertexEdgeSamplingType) {</span>
+<span class="pc bpc" id="L133" title="1 of 4 branches missed.">    switch (vertexEdgeSamplingType) {</span>
     case SimpleVersion:
-<span class="fc" id="L120">      graph = new RandomVertexSampling(vertexSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L121">      graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L122">      break;</span>
+<span class="fc" id="L135">      graph = graph.callForGraph(new RandomVertexSampling&lt;&gt;(vertexSampleSize, randomSeed));</span>
+<span class="fc" id="L136">      graph = graph.callForGraph(new RandomEdgeSampling&lt;&gt;(edgeSampleSize, randomSeed));</span>
+<span class="fc" id="L137">      break;</span>
     case NonuniformVersion:
-<span class="fc" id="L124">      graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L125">      graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L126">      break;</span>
+<span class="fc" id="L139">      graph = graph.callForGraph(new RandomNonUniformVertexSampling&lt;&gt;(vertexSampleSize, randomSeed));</span>
+<span class="fc" id="L140">      graph = graph.callForGraph(new RandomEdgeSampling&lt;&gt;(edgeSampleSize, randomSeed));</span>
+<span class="fc" id="L141">      break;</span>
     case NonuniformHybridVersion:
-<span class="fc" id="L128">      graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L129">      graph = new RandomEdgeSampling(1 - vertexSampleSize, randomSeed).execute(graph);</span>
-<span class="fc" id="L130">      break;</span>
+<span class="fc" id="L143">      graph = graph.callForGraph(new RandomNonUniformVertexSampling&lt;&gt;(vertexSampleSize, randomSeed));</span>
+<span class="fc" id="L144">      graph = graph.callForGraph(new RandomEdgeSampling&lt;&gt;(1 - vertexSampleSize, randomSeed));</span>
+<span class="fc" id="L145">      break;</span>
     default:
       break;
     }
 
-<span class="fc" id="L135">    return graph;</span>
+<span class="fc" id="L150">    return graph;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Random;
 
@@ -25,10 +25,9 @@ import java.util.Random;
  * A degree-dependent value is taken into account to have a bias towards high-degree vertices.
  * The assumption is that a property of vertices degree and max degree.
  *
- * @param &lt;V&gt; EPGM vertex type
+ * @param &lt;V&gt; The vertex type.
  */
-public class NonUniformVertexRandomFilter&lt;V extends EPGMVertex&gt;
-implements FilterFunction&lt;V&gt; {
+public class NonUniformVertexRandomFilter&lt;V extends Vertex&gt; implements FilterFunction&lt;V&gt; {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -55,18 +54,18 @@ implements FilterFunction&lt;V&gt; {
    * @param propertyNameOfMaxDegree property name of max degree
    */
   public NonUniformVertexRandomFilter(float sampleSize, long randomSeed,
-<span class="fc" id="L58">    String propertyNameOfDegree, String propertyNameOfMaxDegree) {</span>
-<span class="fc" id="L59">    threshold = sampleSize;</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();</span>
-<span class="fc" id="L61">    this.propertyNameOfDegree = propertyNameOfDegree;</span>
-<span class="fc" id="L62">    this.propertyNameofMaxDegree = propertyNameOfMaxDegree;</span>
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L57">    String propertyNameOfDegree, String propertyNameOfMaxDegree) {</span>
+<span class="fc" id="L58">    threshold = sampleSize;</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();</span>
+<span class="fc" id="L60">    this.propertyNameOfDegree = propertyNameOfDegree;</span>
+<span class="fc" id="L61">    this.propertyNameofMaxDegree = propertyNameOfMaxDegree;</span>
+<span class="fc" id="L62">  }</span>
 
   @Override
   public boolean filter(V vertex) throws Exception {
-<span class="fc" id="L67">    long degree = vertex.getPropertyValue(propertyNameOfDegree).getLong();</span>
-<span class="fc" id="L68">    long maxDegree = vertex.getPropertyValue(propertyNameofMaxDegree).getLong();</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">    return randomGenerator.nextFloat() &lt;= (degree / (double) maxDegree) * threshold;</span>
+<span class="fc" id="L66">    long degree = vertex.getPropertyValue(propertyNameOfDegree).getLong();</span>
+<span class="fc" id="L67">    long maxDegree = vertex.getPropertyValue(propertyNameofMaxDegree).getLong();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    return randomGenerator.nextFloat() &lt;= (degree / (double) maxDegree) * threshold;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

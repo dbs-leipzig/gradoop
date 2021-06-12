@@ -17,29 +17,31 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
- * A map from a vertex to its degree
+ * A map from a vertex to its degree.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class VertexToDegreeMap implements MapFunction&lt;EPGMVertex, Tuple1&lt;Long&gt;&gt; {
+public class VertexToDegreeMap&lt;V extends Vertex&gt; implements MapFunction&lt;V, Tuple1&lt;Long&gt;&gt; {
   /**
-   * The property name for degree
+   * The property name of the property that holds the degree value as string.
    */
   private String nameOfDegreeProperty;
 
   /**
-   * Constructor
+   * Creates an instance of this map transformation.
    *
-   * @param nameOfDegreeProperty the property name for degree
+   * @param nameOfDegreeProperty the property name of the property that holds the degree value as string
    */
-<span class="fc" id="L36">  public VertexToDegreeMap(String nameOfDegreeProperty) {</span>
-<span class="fc" id="L37">    this.nameOfDegreeProperty = nameOfDegreeProperty;</span>
-<span class="fc" id="L38">  }</span>
+<span class="fc" id="L38">  public VertexToDegreeMap(String nameOfDegreeProperty) {</span>
+<span class="fc" id="L39">    this.nameOfDegreeProperty = nameOfDegreeProperty;</span>
+<span class="fc" id="L40">  }</span>
 
   @Override
-  public Tuple1&lt;Long&gt; map(EPGMVertex vertex) {
-<span class="fc" id="L42">    return new Tuple1&lt;&gt;(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));</span>
+  public Tuple1&lt;Long&gt; map(V vertex) {
+<span class="fc" id="L44">    return new Tuple1&lt;&gt;(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

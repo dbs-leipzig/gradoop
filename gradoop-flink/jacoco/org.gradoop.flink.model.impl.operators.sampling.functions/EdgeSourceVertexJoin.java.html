@@ -18,22 +18,25 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins to get the edge source:&lt;br&gt;
  * {@code (edge),(vertex) -&gt; (edge,edge.targetId,(bool)vertex[propertyKey])}
+ *
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
  */
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;*-&gt;f0&quot;, &quot;id-&gt;f1&quot;})
 @FunctionAnnotation.ReadFieldsSecond(&quot;properties&quot;)
-public class EdgeSourceVertexJoin
-  implements JoinFunction&lt;EPGMEdge, EPGMVertex, Tuple3&lt;EPGMEdge, GradoopId, Boolean&gt;&gt; {
+public class EdgeSourceVertexJoin&lt;V extends Vertex, E extends Edge&gt;
+  implements JoinFunction&lt;E, V, Tuple3&lt;E, GradoopId, Boolean&gt;&gt; {
   /**
    * Reduce object instantiations
    */
-  private Tuple3&lt;EPGMEdge, GradoopId, Boolean&gt; reuse;
+  private Tuple3&lt;E, GradoopId, Boolean&gt; reuse;
 
   /**
    * Property key of marked value
@@ -45,17 +48,17 @@ public class EdgeSourceVertexJoin
    *
    * @param propertyKey vertex property key
    */
-<span class="fc" id="L48">  public EdgeSourceVertexJoin(String propertyKey) {</span>
-<span class="fc" id="L49">    this.reuse = new Tuple3&lt;&gt;();</span>
-<span class="fc" id="L50">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L51">  }</span>
+<span class="fc" id="L51">  public EdgeSourceVertexJoin(String propertyKey) {</span>
+<span class="fc" id="L52">    this.reuse = new Tuple3&lt;&gt;();</span>
+<span class="fc" id="L53">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L54">  }</span>
 
   @Override
-  public Tuple3&lt;EPGMEdge, GradoopId, Boolean&gt; join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
-<span class="fc" id="L55">    reuse.f0 = edge;</span>
-<span class="fc" id="L56">    reuse.f1 = edge.getTargetId();</span>
-<span class="fc" id="L57">    reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();</span>
-<span class="fc" id="L58">    return reuse;</span>
+  public Tuple3&lt;E, GradoopId, Boolean&gt; join(E edge, V vertex) throws Exception {
+<span class="fc" id="L58">    reuse.f0 = edge;</span>
+<span class="fc" id="L59">    reuse.f1 = edge.getTargetId();</span>
+<span class="fc" id="L60">    reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();</span>
+<span class="fc" id="L61">    return reuse;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

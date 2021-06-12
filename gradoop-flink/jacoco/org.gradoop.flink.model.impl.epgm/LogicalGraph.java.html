@@ -32,7 +32,6 @@ import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -72,12 +71,12 @@ public class LogicalGraph implements
    * @param config the Gradoop Flink configuration
    */
   LogicalGraph(LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; layout,
-<span class="fc" id="L75">    GradoopFlinkConfig config) {</span>
-<span class="fc" id="L76">    Objects.requireNonNull(layout);</span>
-<span class="fc" id="L77">    Objects.requireNonNull(config);</span>
-<span class="fc" id="L78">    this.layout = layout;</span>
-<span class="fc" id="L79">    this.config = config;</span>
-<span class="fc" id="L80">  }</span>
+<span class="fc" id="L74">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L75">    Objects.requireNonNull(layout);</span>
+<span class="fc" id="L76">    Objects.requireNonNull(config);</span>
+<span class="fc" id="L77">    this.layout = layout;</span>
+<span class="fc" id="L78">    this.config = config;</span>
+<span class="fc" id="L79">  }</span>
 
   //----------------------------------------------------------------------------
   // Data methods
@@ -85,54 +84,54 @@ public class LogicalGraph implements
 
   @Override
   public GradoopFlinkConfig getConfig() {
-<span class="fc" id="L88">    return config;</span>
+<span class="fc" id="L87">    return config;</span>
   }
 
   @Override
   public BaseGraphFactory&lt;
     EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getFactory() {
-<span class="fc" id="L94">    return config.getLogicalGraphFactory();</span>
+<span class="fc" id="L93">    return config.getLogicalGraphFactory();</span>
   }
 
   @Override
   public BaseGraphCollectionFactory&lt;
     EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getCollectionFactory() {
-<span class="fc" id="L100">    return config.getGraphCollectionFactory();</span>
+<span class="fc" id="L99">    return config.getGraphCollectionFactory();</span>
   }
 
   @Override
   public boolean isGVELayout() {
-<span class="nc" id="L105">    return layout.isGVELayout();</span>
+<span class="nc" id="L104">    return layout.isGVELayout();</span>
   }
 
   @Override
   public boolean isIndexedGVELayout() {
-<span class="nc" id="L110">    return layout.isIndexedGVELayout();</span>
+<span class="nc" id="L109">    return layout.isIndexedGVELayout();</span>
   }
 
   @Override
   public DataSet&lt;EPGMGraphHead&gt; getGraphHead() {
-<span class="fc" id="L115">    return layout.getGraphHead();</span>
+<span class="fc" id="L114">    return layout.getGraphHead();</span>
   }
 
   @Override
   public DataSet&lt;EPGMVertex&gt; getVertices() {
-<span class="fc" id="L120">    return layout.getVertices();</span>
+<span class="fc" id="L119">    return layout.getVertices();</span>
   }
 
   @Override
   public DataSet&lt;EPGMVertex&gt; getVerticesByLabel(String label) {
-<span class="fc" id="L125">    return layout.getVerticesByLabel(label);</span>
+<span class="fc" id="L124">    return layout.getVerticesByLabel(label);</span>
   }
 
   @Override
   public DataSet&lt;EPGMEdge&gt; getEdges() {
-<span class="fc" id="L130">    return layout.getEdges();</span>
+<span class="fc" id="L129">    return layout.getEdges();</span>
   }
 
   @Override
   public DataSet&lt;EPGMEdge&gt; getEdgesByLabel(String label) {
-<span class="fc" id="L135">    return layout.getEdgesByLabel(label);</span>
+<span class="fc" id="L134">    return layout.getEdgesByLabel(label);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -140,19 +139,14 @@ public class LogicalGraph implements
   //----------------------------------------------------------------------------
 
   @Override
-  public LogicalGraph sample(SamplingAlgorithm algorithm) {
-<span class="nc" id="L144">    return callForGraph(algorithm);</span>
-  }
-
-  @Override
   public GraphCollection groupVerticesByRollUp(
     List&lt;String&gt; vertexGroupingKeys, List&lt;AggregateFunction&gt; vertexAggregateFunctions,
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions) {
-<span class="pc bpc" id="L151" title="2 of 4 branches missed.">    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {</span>
-<span class="nc" id="L152">      throw new IllegalArgumentException(&quot;Missing vertex grouping key(s).&quot;);</span>
+<span class="pc bpc" id="L145" title="2 of 4 branches missed.">    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {</span>
+<span class="nc" id="L146">      throw new IllegalArgumentException(&quot;Missing vertex grouping key(s).&quot;);</span>
     }
 
-<span class="fc" id="L155">    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
+<span class="fc" id="L149">    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
       edgeGroupingKeys, edgeAggregateFunctions));
   }
 
@@ -160,11 +154,11 @@ public class LogicalGraph implements
   public GraphCollection groupEdgesByRollUp(
     List&lt;String&gt; vertexGroupingKeys, List&lt;AggregateFunction&gt; vertexAggregateFunctions,
     List&lt;String&gt; edgeGroupingKeys, List&lt;AggregateFunction&gt; edgeAggregateFunctions) {
-<span class="pc bpc" id="L163" title="2 of 4 branches missed.">    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {</span>
-<span class="nc" id="L164">      throw new IllegalArgumentException(&quot;Missing edge grouping key(s).&quot;);</span>
+<span class="pc bpc" id="L157" title="2 of 4 branches missed.">    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {</span>
+<span class="nc" id="L158">      throw new IllegalArgumentException(&quot;Missing edge grouping key(s).&quot;);</span>
     }
 
-<span class="fc" id="L167">    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
+<span class="fc" id="L161">    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,</span>
       edgeGroupingKeys, edgeAggregateFunctions));
   }
 
@@ -174,19 +168,19 @@ public class LogicalGraph implements
 
   @Override
   public &lt;T&gt; T callForValue(UnaryBaseGraphToValueOperator&lt;LogicalGraph, T&gt; operator) {
-<span class="fc" id="L177">    return operator.execute(this);</span>
+<span class="fc" id="L171">    return operator.execute(this);</span>
   }
 
   @Override
   public &lt;T&gt; T callForValue(BinaryBaseGraphToValueOperator&lt;LogicalGraph, T&gt; operator,
                             LogicalGraph otherGraph) {
-<span class="fc" id="L183">    return operator.execute(this, otherGraph);</span>
+<span class="fc" id="L177">    return operator.execute(this, otherGraph);</span>
   }
 
   @Override
   public LogicalGraph callForGraph(GraphsToGraphOperator operator,
     LogicalGraph... otherGraphs) {
-<span class="nc" id="L189">    return operator.execute(this, otherGraphs);</span>
+<span class="nc" id="L183">    return operator.execute(this, otherGraphs);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -195,13 +189,13 @@ public class LogicalGraph implements
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
-<span class="fc" id="L198">    dataSink.write(this);</span>
-<span class="fc" id="L199">  }</span>
+<span class="fc" id="L192">    dataSink.write(this);</span>
+<span class="fc" id="L193">  }</span>
 
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-<span class="nc" id="L203">    dataSink.write(this, overWrite);</span>
-<span class="nc" id="L204">  }</span>
+<span class="nc" id="L197">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L198">  }</span>
 
   /**
    * Prints the GDL formatted graph to the standard output.
@@ -209,7 +203,7 @@ public class LogicalGraph implements
    * @throws Exception forwarded from dataset print
    */
   public void print() throws Exception {
-<span class="nc" id="L212">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L213">  }</span>
+<span class="nc" id="L206">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L207">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

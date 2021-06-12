@@ -16,14 +16,16 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Retains all vertices with a PageRank-score greater or equal/smaller than a given
  * sampling threshold - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
-public class PageRankResultVertexFilter implements FilterFunction&lt;EPGMVertex&gt; {
+public class PageRankResultVertexFilter&lt;V extends Vertex&gt; implements FilterFunction&lt;V&gt; {
 
   /**
    * Sampling threshold for PageRankScore
@@ -51,24 +53,24 @@ public class PageRankResultVertexFilter implements FilterFunction&lt;EPGMVertex&
    *                                in case all vertices got the same PageRank-score.
    */
   public PageRankResultVertexFilter(double threshold, boolean sampleGreaterThanThreshold,
-<span class="fc" id="L54">    boolean keepVerticesIfSameScore) {</span>
-<span class="fc" id="L55">    this.threshold = threshold;</span>
-<span class="fc" id="L56">    this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;</span>
-<span class="fc" id="L57">    this.keepVerticesIfSameScore = keepVerticesIfSameScore;</span>
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L56">    boolean keepVerticesIfSameScore) {</span>
+<span class="fc" id="L57">    this.threshold = threshold;</span>
+<span class="fc" id="L58">    this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;</span>
+<span class="fc" id="L59">    this.keepVerticesIfSameScore = keepVerticesIfSameScore;</span>
+<span class="fc" id="L60">  }</span>
 
   @Override
-  public boolean filter(EPGMVertex v) throws Exception {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {</span>
-<span class="fc" id="L63">      double pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)</span>
-<span class="fc" id="L64">        .getDouble();</span>
-<span class="fc bfc" id="L65" title="All 2 branches covered.">      if (sampleGreaterThanThreshold) {</span>
-<span class="fc bfc" id="L66" title="All 2 branches covered.">        return pr &gt; threshold;</span>
+  public boolean filter(V vertex) throws Exception {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (vertex.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {</span>
+<span class="fc" id="L65">      double pr = vertex.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)</span>
+<span class="fc" id="L66">        .getDouble();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (sampleGreaterThanThreshold) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        return pr &gt; threshold;</span>
       } else {
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        return pr &lt;= threshold;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        return pr &lt;= threshold;</span>
       }
     } else {
-<span class="fc" id="L71">      return keepVerticesIfSameScore;</span>
+<span class="fc" id="L73">      return keepVerticesIfSameScore;</span>
     }
   }
 }

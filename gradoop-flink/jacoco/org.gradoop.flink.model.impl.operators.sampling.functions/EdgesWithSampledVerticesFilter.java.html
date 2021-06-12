@@ -18,14 +18,16 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 
 /**
  * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
  * property for sampling, we consider that vertex as not sampled.
+ *
+ * @param &lt;E&gt; The edge type.
  */
-public class EdgesWithSampledVerticesFilter
-  implements FilterFunction&lt;Tuple3&lt;EPGMEdge, Boolean, Boolean&gt;&gt; {
+public class EdgesWithSampledVerticesFilter&lt;E extends Edge&gt;
+  implements FilterFunction&lt;Tuple3&lt;E, Boolean, Boolean&gt;&gt; {
 
   /**
    * Type of neighborhood
@@ -37,29 +39,33 @@ public class EdgesWithSampledVerticesFilter
    *
    * @param neighborType type of neighborhood
    */
-<span class="fc" id="L40">  public EdgesWithSampledVerticesFilter(Neighborhood neighborType) {</span>
-<span class="fc" id="L41">    this.neighborType = neighborType;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L42">  public EdgesWithSampledVerticesFilter(Neighborhood neighborType) {</span>
+<span class="fc" id="L43">    this.neighborType = neighborType;</span>
+<span class="fc" id="L44">  }</span>
 
   @Override
-  public boolean filter(Tuple3&lt;EPGMEdge, Boolean, Boolean&gt; tuple) {
+  public boolean filter(Tuple3&lt;E, Boolean, Boolean&gt; tuple) {
 
-<span class="fc" id="L47">    boolean isSourceVertexMarked = tuple.f1;</span>
-<span class="fc" id="L48">    boolean isTargetVertexMarked = tuple.f2;</span>
+<span class="fc" id="L49">    boolean isSourceVertexMarked = tuple.f1;</span>
+<span class="fc" id="L50">    boolean isTargetVertexMarked = tuple.f2;</span>
 
     boolean filter;
 
-<span class="pc bpc" id="L52" title="1 of 4 branches missed.">    switch (neighborType) {</span>
-<span class="fc bfc" id="L53" title="All 4 branches covered.">    case BOTH:  filter = isSourceVertexMarked || isTargetVertexMarked;</span>
-<span class="fc" id="L54">    break;</span>
-<span class="fc" id="L55">    case IN:    filter = isTargetVertexMarked;</span>
-<span class="fc" id="L56">    break;</span>
-<span class="fc" id="L57">    case OUT:   filter = isSourceVertexMarked;</span>
-<span class="fc" id="L58">    break;</span>
-<span class="nc" id="L59">    default: throw new UnsupportedTypeException(&quot;NeighborType needs to be BOTH, IN or OUT&quot;);</span>
+<span class="pc bpc" id="L54" title="1 of 4 branches missed.">    switch (neighborType) {</span>
+    case BOTH:
+<span class="fc bfc" id="L56" title="All 4 branches covered.">      filter = isSourceVertexMarked || isTargetVertexMarked;</span>
+<span class="fc" id="L57">      break;</span>
+    case IN:
+<span class="fc" id="L59">      filter = isTargetVertexMarked;</span>
+<span class="fc" id="L60">      break;</span>
+    case OUT:
+<span class="fc" id="L62">      filter = isSourceVertexMarked;</span>
+<span class="fc" id="L63">      break;</span>
+    default:
+<span class="nc" id="L65">      throw new UnsupportedTypeException(&quot;NeighborType needs to be BOTH, IN or OUT&quot;);</span>
     }
 
-<span class="fc" id="L62">    return filter;</span>
+<span class="fc" id="L68">    return filter;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

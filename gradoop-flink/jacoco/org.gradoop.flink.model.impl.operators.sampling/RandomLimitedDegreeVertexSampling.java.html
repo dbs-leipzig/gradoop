@@ -16,15 +16,13 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.LimitedDegreeVertexRandomFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
@@ -34,8 +32,19 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
  * with a degree greater than a given degree threshold and degree type. Also retains randomly
  * chosen vertices with a degree smaller or equal this threshold. Retains all edges which source-
  * and target-vertices were chosen.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
-public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
+public class RandomLimitedDegreeVertexSampling&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends SamplingAlgorithm&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Relative amount of vertices in the result graph
@@ -66,8 +75,8 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
    * @param sampleSize relative sample size, e.g. 0.5
    */
   public RandomLimitedDegreeVertexSampling(float sampleSize) {
-<span class="nc" id="L69">    this(sampleSize, 0L);</span>
-<span class="nc" id="L70">  }</span>
+<span class="nc" id="L78">    this(sampleSize, 0L);</span>
+<span class="nc" id="L79">  }</span>
 
   /**
    * Creates new RandomLimitedDegreeVertexSampling instance.
@@ -75,12 +84,12 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
    * @param sampleSize relative sample size, e.g. 0.5
    * @param randomSeed random seed value (can be {@code null})
    */
-<span class="nc" id="L78">  public RandomLimitedDegreeVertexSampling(float sampleSize, long randomSeed) {</span>
-<span class="nc" id="L79">    this.sampleSize = sampleSize;</span>
-<span class="nc" id="L80">    this.randomSeed = randomSeed;</span>
-<span class="nc" id="L81">    this.degreeThreshold = 2L;</span>
-<span class="nc" id="L82">    this.degreeType = VertexDegree.BOTH;</span>
-<span class="nc" id="L83">  }</span>
+<span class="nc" id="L87">  public RandomLimitedDegreeVertexSampling(float sampleSize, long randomSeed) {</span>
+<span class="nc" id="L88">    this.sampleSize = sampleSize;</span>
+<span class="nc" id="L89">    this.randomSeed = randomSeed;</span>
+<span class="nc" id="L90">    this.degreeThreshold = 2L;</span>
+<span class="nc" id="L91">    this.degreeType = VertexDegree.BOTH;</span>
+<span class="nc" id="L92">  }</span>
 
   /**
    * Creates new RandomLimitedDegreeVertexSampling instance.
@@ -91,12 +100,12 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
    * @param degreeType type of degree for sampling, e.g. VertexDegree.DegreeType.InputDegree
    */
   public RandomLimitedDegreeVertexSampling(float sampleSize, long randomSeed, long degreeThreshold,
-<span class="fc" id="L94">    VertexDegree degreeType) {</span>
-<span class="fc" id="L95">    this.sampleSize = sampleSize;</span>
-<span class="fc" id="L96">    this.randomSeed = randomSeed;</span>
-<span class="fc" id="L97">    this.degreeThreshold = degreeThreshold;</span>
-<span class="fc" id="L98">    this.degreeType = degreeType;</span>
-<span class="fc" id="L99">  }</span>
+<span class="fc" id="L103">    VertexDegree degreeType) {</span>
+<span class="fc" id="L104">    this.sampleSize = sampleSize;</span>
+<span class="fc" id="L105">    this.randomSeed = randomSeed;</span>
+<span class="fc" id="L106">    this.degreeThreshold = degreeThreshold;</span>
+<span class="fc" id="L107">    this.degreeType = degreeType;</span>
+<span class="fc" id="L108">  }</span>
 
   /**
    * Creates new RandomLimitedDegreeVertexSampling instance.
@@ -106,38 +115,29 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
    * @param degreeType type of degree for sampling, e.g. VertexDegree.DegreeType.InputDegree
    */
   public RandomLimitedDegreeVertexSampling(float sampleSize, long degreeThreshold,
-<span class="nc" id="L109">    VertexDegree degreeType) {</span>
-<span class="nc" id="L110">    this.sampleSize = sampleSize;</span>
-<span class="nc" id="L111">    this.randomSeed = 0L;</span>
-<span class="nc" id="L112">    this.degreeThreshold = degreeThreshold;</span>
-<span class="nc" id="L113">    this.degreeType = degreeType;</span>
-<span class="nc" id="L114">  }</span>
+<span class="nc" id="L118">    VertexDegree degreeType) {</span>
+<span class="nc" id="L119">    this.sampleSize = sampleSize;</span>
+<span class="nc" id="L120">    this.randomSeed = 0L;</span>
+<span class="nc" id="L121">    this.degreeThreshold = degreeThreshold;</span>
+<span class="nc" id="L122">    this.degreeType = degreeType;</span>
+<span class="nc" id="L123">  }</span>
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
+  public LG sample(LG graph) {
 
-<span class="fc" id="L119">    graph = graph.callForGraph(new DistinctVertexDegrees&lt;&gt;(</span>
+<span class="fc" id="L128">    graph = graph.callForGraph(new DistinctVertexDegrees&lt;&gt;(</span>
       SamplingConstants.DEGREE_PROPERTY_KEY,
       SamplingConstants.IN_DEGREE_PROPERTY_KEY,
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true));
 
-<span class="fc" id="L125">    DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()</span>
-<span class="fc" id="L126">      .filter(new LimitedDegreeVertexRandomFilter&lt;&gt;(</span>
-        sampleSize, randomSeed, degreeThreshold, degreeType))
-<span class="fc" id="L128">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.DEGREE_PROPERTY_KEY))</span>
-<span class="fc" id="L129">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))</span>
-<span class="fc" id="L130">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));</span>
+<span class="fc" id="L134">    DataSet&lt;V&gt; newVertices = graph.getVertices()</span>
+<span class="fc" id="L135">      .filter(new LimitedDegreeVertexRandomFilter&lt;&gt;(sampleSize, randomSeed, degreeThreshold, degreeType))</span>
+<span class="fc" id="L136">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.DEGREE_PROPERTY_KEY))</span>
+<span class="fc" id="L137">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))</span>
+<span class="fc" id="L138">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));</span>
 
-<span class="fc" id="L132">    DataSet&lt;EPGMEdge&gt; newEdges = graph.getEdges()</span>
-<span class="fc" id="L133">      .join(newVertices)</span>
-<span class="fc" id="L134">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L135">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L136">      .join(newVertices)</span>
-<span class="fc" id="L137">      .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L138">      .with(new LeftSide&lt;&gt;());</span>
-
-<span class="fc" id="L140">    return graph.getFactory().fromDataSets(newVertices, newEdges);</span>
+<span class="fc" id="L140">    return graph.getFactory().fromDataSets(newVertices, graph.getEdges()).verify();</span>
   }
 
 }
