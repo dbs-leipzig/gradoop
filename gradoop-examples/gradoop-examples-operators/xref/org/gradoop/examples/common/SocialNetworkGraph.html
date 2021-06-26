@@ -65,11 +65,11 @@
 <a name="55" href="#55">55</a>        <span class="jxr_string">"(gdbs)-[:hasMember]-&gt;(bob)"</span> +
 <a name="56" href="#56">56</a>        <span class="jxr_string">"(gps)-[:hasModerator {since:2013}]-&gt;(dave)"</span> +
 <a name="57" href="#57">57</a>        <span class="jxr_string">"(gps)-[:hasMember]-&gt;(dave)"</span> +
-<a name="58" href="#58">58</a>        <span class="jxr_string">"(gps)-[:hasMember]-&gt;(carol)-[ckd]-&gt;(dave)"</span> +
+<a name="58" href="#58">58</a>        <span class="jxr_string">"(gps)-[:hasMember]-&gt;(carol)-[ckd: knows {since:2014}]-&gt;(dave)"</span> +
 <a name="59" href="#59">59</a>        <span class="jxr_string">"(databases)&lt;-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]-&gt;(graphs)&lt;-[ghtg2:hasTag]-(gps)-[ghth:hasTag]-&gt;(hadoop)"</span> +
 <a name="60" href="#60">60</a>        <span class="jxr_string">"(eve)-[eka:knows {since:2013}]-&gt;(alice)-[akb:knows {since:2014}]-&gt;(bob)"</span> +
 <a name="61" href="#61">61</a>        <span class="jxr_string">"(eve)-[ekb:knows {since:2015}]-&gt;(bob)-[bka:knows {since:2014}]-&gt;(alice)"</span> +
-<a name="62" href="#62">62</a>        <span class="jxr_string">"(frank)-[fkc:knows {since:2015}]-&gt;(carol)-[ckd:knows {since:2014}]-&gt;(dave)"</span> +
+<a name="62" href="#62">62</a>        <span class="jxr_string">"(frank)-[fkc:knows {since:2015}]-&gt;(carol)-[ckd]-&gt;(dave)"</span> +
 <a name="63" href="#63">63</a>        <span class="jxr_string">"(frank)-[fkd:knows {since:2015}]-&gt;(dave)-[dkc:knows {since:2014}]-&gt;(carol)"</span> +
 <a name="64" href="#64">64</a>        <span class="jxr_string">"(alice)-[akb]-&gt;(bob)-[bkc:knows {since:2013}]-&gt;(carol)-[ckd]-&gt;(dave)"</span> +
 <a name="65" href="#65">65</a>        <span class="jxr_string">"(alice)&lt;-[bka]-(bob)&lt;-[ckb:knows {since:2013}]-(carol)&lt;-[dkc]-(dave)"</span> +
