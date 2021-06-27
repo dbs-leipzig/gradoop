@@ -45,7 +45,9 @@ public class UpdateIdField<T extends Tuple> implements JoinFunction<T, Tuple2<Gr
 
   @Override
   public T join(T inputTuple, Tuple2<GradoopId, GradoopId> updateValue) throws Exception {
-    inputTuple.setField(updateValue.f1, index);
+    if (updateValue != null) {
+      inputTuple.setField(updateValue.f1, index);
+    }
     return inputTuple;
   }
 }

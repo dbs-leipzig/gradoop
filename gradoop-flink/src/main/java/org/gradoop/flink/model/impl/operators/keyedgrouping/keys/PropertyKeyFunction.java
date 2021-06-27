@@ -66,4 +66,9 @@ public class PropertyKeyFunction<T extends Attributed> implements KeyFunctionWit
   public byte[] getDefaultKey() {
     return PropertyValue.NULL_VALUE.getRawBytes();
   }
+
+  @Override
+  public boolean retainElement(T element) {
+    return !element.hasProperty(propertyKey);
+  }
 }

@@ -43,4 +43,18 @@ public abstract class GroupingConstants {
    * The number of reserved fields in the tuple-representation of an edge.
    */
   public static final int EDGE_TUPLE_RESERVED = 2;
+  /**
+   * The number of additionally reserved fields in the tuple-representation of an edge.
+   */
+  public static final int EDGE_DEFAULT_OFFSET = 0;
+  /**
+   * The number of additionally reserved fields in the tuple-representation of an edge, when retention of
+   * ungrouped vertices is enabled.
+   */
+  public static final int EDGE_RETENTION_OFFSET = 1;
+  /**
+   * The index of the ID in the tuple-representation of an edge. This will <b>only</b> be available
+   * if retention of ungrouped vertices is enabled.
+   */
+  public static final int EDGE_TUPLE_ID = 0;
 }
