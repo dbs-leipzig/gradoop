@@ -99,7 +99,7 @@ public class SnapshotTest extends TemporalGradoopTestBase {
       {new AsOf(3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
       {new Between(2L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
       {new ContainedIn(0L, 5L), TimeDimension.VALID_TIME, new String[] {V4}, new String[] {E3, E5}},
-      {new CreatedIn(2L, 5L), TimeDimension.VALID_TIME, new String[] {V3, V4}, new String[] {E4, E5}},
+      {new CreatedIn(2L, 5L), TimeDimension.VALID_TIME, new String[] {V3, V4}, new String[] {E3, E4, E5}},
       {new DeletedIn(6L, 10L), TimeDimension.VALID_TIME, new String[] {V3, V5}, new String[] {E2, E4}},
       {new FromTo(1L, 3L), TimeDimension.VALID_TIME, new String[] {V1, V2, V5}, new String[] {E1}},
       {new ValidDuring(3L, 8L), TimeDimension.VALID_TIME, new String[] {V1, V2, V3, V5}, new String[] {E1}},
