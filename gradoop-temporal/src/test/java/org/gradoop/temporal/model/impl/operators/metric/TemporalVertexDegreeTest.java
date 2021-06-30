@@ -61,36 +61,105 @@ public class TemporalVertexDegreeTest extends TemporalGradoopTestBase {
    */
   private static final HashMap<String, List<Tuple3<Long, Long, Integer>>> EXPECTED_BOTH_DEGREES =
     new HashMap<>();
+  /**
+   * The expected in-degrees for each vertex label.
+   */
+  private static final HashMap<String, List<Tuple3<Long, Long, Integer>>> EXPECTED_IN_DEGREES_DEF =
+    new HashMap<>();
+  /**
+   * The expected out-degrees for each vertex label.
+   */
+  private static final HashMap<String, List<Tuple3<Long, Long, Integer>>> EXPECTED_OUT_DEGREES_DEF =
+    new HashMap<>();
+  /**
+   * The expected degrees for each vertex label.
+   */
+  private static final HashMap<String, List<Tuple3<Long, Long, Integer>>> EXPECTED_BOTH_DEGREES_DEF =
+    new HashMap<>();
 
   static {
-    // IN DEGREES
-    EXPECTED_IN_DEGREES.put(V1, Collections.singletonList(new Tuple3<>(Long.MIN_VALUE, Long.MAX_VALUE, 0)));
-    EXPECTED_IN_DEGREES.put(V2, Collections.singletonList(new Tuple3<>(0L, Long.MAX_VALUE, 1)));
-    EXPECTED_IN_DEGREES
-      .put(V3, Arrays.asList(new Tuple3<>(3L, 6L, 0), new Tuple3<>(6L, 7L, 1), new Tuple3<>(7L, 9L, 0)));
-    EXPECTED_IN_DEGREES.put(V4, Collections.singletonList(new Tuple3<>(4L, 5L, 1)));
-    EXPECTED_IN_DEGREES.put(V5, Arrays
-      .asList(new Tuple3<>(1L, 4L, 0), new Tuple3<>(4L, 5L, 2), new Tuple3<>(5L, 6L, 1),
+    // IN DEGREES with vertex time included
+    EXPECTED_IN_DEGREES.put(V1,
+      Collections.singletonList(new Tuple3<>(Long.MIN_VALUE, Long.MAX_VALUE, 0)));
+    EXPECTED_IN_DEGREES.put(V2,
+      Collections.singletonList(new Tuple3<>(0L, Long.MAX_VALUE, 1)));
+    EXPECTED_IN_DEGREES.put(V3,
+      Arrays.asList(new Tuple3<>(3L, 6L, 0), new Tuple3<>(6L, 7L, 1), new Tuple3<>(7L, 9L, 0)));
+    EXPECTED_IN_DEGREES.put(V4,
+      Collections.singletonList(new Tuple3<>(4L, 5L, 1)));
+    EXPECTED_IN_DEGREES.put(V5,
+      Arrays.asList(new Tuple3<>(1L, 4L, 0), new Tuple3<>(4L, 5L, 2), new Tuple3<>(5L, 6L, 1),
         new Tuple3<>(6L, 9L, 0)));
 
-    // OUT DEGREES
-    EXPECTED_OUT_DEGREES
-      .put(V1, Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 0L, 0), new Tuple3<>(0L, Long.MAX_VALUE, 1)));
+    // IN DEGREES without vertex time included
+    EXPECTED_IN_DEGREES_DEF.put(V1,
+      Collections.singletonList(new Tuple3<>(Long.MIN_VALUE, Long.MAX_VALUE, 0)));
+    EXPECTED_IN_DEGREES_DEF.put(V2,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 0L, 0), new Tuple3<>(0L, Long.MAX_VALUE, 1)));
+    EXPECTED_IN_DEGREES_DEF.put(V3,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 6L, 0), new Tuple3<>(6L, 7L, 1),
+        new Tuple3<>(7L, Long.MAX_VALUE, 0)));
+    EXPECTED_IN_DEGREES_DEF.put(V4,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 5L, 1),
+        new Tuple3<>(5L, Long.MAX_VALUE, 0)));
+    EXPECTED_IN_DEGREES_DEF.put(V5,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 5L, 2), new Tuple3<>(5L, 6L, 1),
+        new Tuple3<>(6L, Long.MAX_VALUE, 0)));
+
+    // OUT DEGREES with vertex time included
+    EXPECTED_OUT_DEGREES.put(V1,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 0L, 0), new Tuple3<>(0L, Long.MAX_VALUE, 1)));
     EXPECTED_OUT_DEGREES.put(V2,
       Arrays.asList(new Tuple3<>(0L, 6L, 0), new Tuple3<>(6L, 7L, 1), new Tuple3<>(7L, Long.MAX_VALUE, 0)));
-    EXPECTED_OUT_DEGREES
-      .put(V3, Arrays.asList(new Tuple3<>(3L, 4L, 0), new Tuple3<>(4L, 6L, 1), new Tuple3<>(6L, 9L, 0)));
-    EXPECTED_OUT_DEGREES.put(V4, Collections.singletonList(new Tuple3<>(4L, 5L, 2)));
-    EXPECTED_OUT_DEGREES.put(V5, Collections.singletonList(new Tuple3<>(1L, 9L, 0)));
+    EXPECTED_OUT_DEGREES.put(V3,
+      Arrays.asList(new Tuple3<>(3L, 4L, 0), new Tuple3<>(4L, 6L, 1), new Tuple3<>(6L, 9L, 0)));
+    EXPECTED_OUT_DEGREES.put(V4,
+      Collections.singletonList(new Tuple3<>(4L, 5L, 2)));
+    EXPECTED_OUT_DEGREES.put(V5,
+      Collections.singletonList(new Tuple3<>(1L, 9L, 0)));
 
-    // BOTH DEGREES
-    EXPECTED_BOTH_DEGREES.put(V1, EXPECTED_OUT_DEGREES.get(V1));
+    // OUT DEGREES without vertex time included
+    EXPECTED_OUT_DEGREES_DEF.put(V1,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 0L, 0), new Tuple3<>(0L, Long.MAX_VALUE, 1)));
+    EXPECTED_OUT_DEGREES_DEF.put(V2,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 6L, 0), new Tuple3<>(6L, 7L, 1),
+        new Tuple3<>(7L, Long.MAX_VALUE, 0)));
+    EXPECTED_OUT_DEGREES_DEF.put(V3,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 6L, 1),
+        new Tuple3<>(6L, Long.MAX_VALUE, 0)));
+    EXPECTED_OUT_DEGREES_DEF.put(V4,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 5L, 2),
+        new Tuple3<>(5L, Long.MAX_VALUE, 0)));
+    EXPECTED_OUT_DEGREES_DEF.put(V5,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 1L, 0), new Tuple3<>(1L, 9L, 0),
+        new Tuple3<>(9L, Long.MAX_VALUE, 0)));
+
+    // BOTH DEGREES with vertex time included
+    EXPECTED_BOTH_DEGREES.put(V1,
+      EXPECTED_OUT_DEGREES.get(V1));
     EXPECTED_BOTH_DEGREES.put(V2,
       Arrays.asList(new Tuple3<>(0L, 6L, 1), new Tuple3<>(6L, 7L, 2), new Tuple3<>(7L, Long.MAX_VALUE, 1)));
-    EXPECTED_BOTH_DEGREES
-      .put(V3, Arrays.asList(new Tuple3<>(3L, 4L, 0), new Tuple3<>(4L, 7L, 1), new Tuple3<>(7L, 9L, 0)));
-    EXPECTED_BOTH_DEGREES.put(V4, Collections.singletonList(new Tuple3<>(4L, 5L, 3)));
-    EXPECTED_BOTH_DEGREES.put(V5, EXPECTED_IN_DEGREES.get(V5));
+    EXPECTED_BOTH_DEGREES.put(V3,
+      Arrays.asList(new Tuple3<>(3L, 4L, 0), new Tuple3<>(4L, 7L, 1), new Tuple3<>(7L, 9L, 0)));
+    EXPECTED_BOTH_DEGREES.put(V4,
+      Collections.singletonList(new Tuple3<>(4L, 5L, 3)));
+    EXPECTED_BOTH_DEGREES.put(V5,
+      EXPECTED_IN_DEGREES.get(V5));
+
+    // BOTH DEGREES without vertex time included
+    EXPECTED_BOTH_DEGREES_DEF.put(V1,
+      EXPECTED_OUT_DEGREES_DEF.get(V1));
+    EXPECTED_BOTH_DEGREES_DEF.put(V2,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 0L, 0), new Tuple3<>(0L, 6L, 1), new Tuple3<>(6L, 7L, 2),
+        new Tuple3<>(7L, Long.MAX_VALUE, 1)));
+    EXPECTED_BOTH_DEGREES_DEF.put(V3,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 7L, 1),
+        new Tuple3<>(7L, Long.MAX_VALUE, 0)));
+    EXPECTED_BOTH_DEGREES_DEF.put(V4,
+      Arrays.asList(new Tuple3<>(Long.MIN_VALUE, 4L, 0), new Tuple3<>(4L, 5L, 3),
+        new Tuple3<>(5L, Long.MAX_VALUE, 0)));
+    EXPECTED_BOTH_DEGREES_DEF.put(V5,
+      EXPECTED_IN_DEGREES_DEF.get(V5));
   }
 
   /**
@@ -99,9 +168,14 @@ public class TemporalVertexDegreeTest extends TemporalGradoopTestBase {
   @Parameterized.Parameter(0)
   public VertexDegree degreeType;
   /**
-   * The expected degree evolution fo the given type.
+   * The flag to enable vertex time consideration.
    */
   @Parameterized.Parameter(1)
+  public boolean enableVertexTime;
+  /**
+   * The expected degree evolution fo the given type.
+   */
+  @Parameterized.Parameter(2)
   public HashMap<String, List<Tuple3<Long, Long, Integer>>> expectedDegrees;
 
   /**
@@ -119,12 +193,15 @@ public class TemporalVertexDegreeTest extends TemporalGradoopTestBase {
    *
    * @return three different vertex degree types with its corresponding expected degree evolution.
    */
-  @Parameterized.Parameters(name = "Test degree type {0}")
+  @Parameterized.Parameters(name = "Test degree type {0} with vertex time: {1}")
   public static Iterable<Object[]> parameters() {
     return Arrays.asList(
-      new Object[] {VertexDegree.IN, EXPECTED_IN_DEGREES},
-      new Object[] {VertexDegree.OUT, EXPECTED_OUT_DEGREES},
-      new Object[] {VertexDegree.BOTH, EXPECTED_BOTH_DEGREES});
+      new Object[] {VertexDegree.IN, true, EXPECTED_IN_DEGREES},
+      new Object[] {VertexDegree.OUT, true, EXPECTED_OUT_DEGREES},
+      new Object[] {VertexDegree.BOTH, true, EXPECTED_BOTH_DEGREES},
+      new Object[] {VertexDegree.IN, false, EXPECTED_IN_DEGREES_DEF},
+      new Object[] {VertexDegree.OUT, false, EXPECTED_OUT_DEGREES_DEF},
+      new Object[] {VertexDegree.BOTH, false, EXPECTED_BOTH_DEGREES_DEF});
   }
 
   /**
@@ -156,6 +233,7 @@ public class TemporalVertexDegreeTest extends TemporalGradoopTestBase {
     HashMap<String, List<Tuple3<Long, Long, Integer>>> labelDegreeMap = new HashMap<>();
 
     TemporalVertexDegree operator = new TemporalVertexDegree(degreeType, TimeDimension.VALID_TIME);
+    operator.setIncludeVertexTime(enableVertexTime);
     final DataSet<Tuple4<GradoopId, Long, Long, Integer>> resultDataSet = testGraph.callForValue(operator);
 
     resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));

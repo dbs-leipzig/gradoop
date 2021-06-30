@@ -30,37 +30,49 @@ import java.util.TreeMap;
  * A group reduce and reduce function collecting all edge time intervals of a vertex id to build a tree data
  * structure.
  */
-public class BuildTemporalDegreeTree
-  implements GroupReduceFunction<Tuple3<GradoopId, Long, Long>, Tuple2<GradoopId, TreeMap<Long, Integer>>>,
+public class BuildTemporalDegreeTree implements
+  GroupReduceFunction<Tuple3<GradoopId, Long, Long>, Tuple2<GradoopId, TreeMap<Long, Integer>>>,
   ReduceFunction<Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long>> {
+
+  /**
+   * Definition of the TreeMap here to reduce object instantiations.
+   */
+  private final TreeMap<Long, Integer> degreeTreeMap;
+
+  /**
+   * Creates an instance of this reduce function class.
+   */
+  public BuildTemporalDegreeTree() {
+    this.degreeTreeMap = new TreeMap<>();
+  }
 
   @Override
   public void reduce(Iterable<Tuple3<GradoopId, Long, Long>> iterable,
     Collector<Tuple2<GradoopId, TreeMap<Long, Integer>>> collector) throws Exception {
 
-    TreeMap<Long, Integer> root = new TreeMap<>();
+    // Clear the tree
+    this.degreeTreeMap.clear();
+
     GradoopId vertexId = null;
 
     for (Tuple3<GradoopId, Long, Long> entity : iterable) {
+      // since we group on the id, we just need it once
       if (vertexId == null) {
         vertexId = entity.f0;
       }
       // add time interval to tree map
-      root.put(entity.f1, root.get(entity.f1) == null ? 1 : root.get(entity.f1) + 1);
-      root.put(entity.f2, root.get(entity.f2) == null ? -1 : root.get(entity.f2) - 1);
+      degreeTreeMap
+        .put(entity.f1, degreeTreeMap.get(entity.f1) == null ? 1 : degreeTreeMap.get(entity.f1) + 1);
+      degreeTreeMap
+        .put(entity.f2, degreeTreeMap.get(entity.f2) == null ? -1 : degreeTreeMap.get(entity.f2) - 1);
     }
-    collector.collect(new Tuple2<>(vertexId, root));
+    collector.collect(new Tuple2<>(vertexId, degreeTreeMap));
   }
 
   @Override
   public Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> reduce(
     Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> left,
     Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> right) throws Exception {
-
-    // Elements are grouped on the gradoop id (f0) so the interval (f2,f3) of both elements have to be equal
-    if (!left.f2.equals(right.f2) || !left.f3.equals(right.f3)) {
-      throw new RuntimeException("Something went wrong on grouping.");
-    }
 
     // Put all elements of the right into the left tree and return the left one as merged tree
     for (Map.Entry<Long, Integer> entry : right.f1.entrySet()) {

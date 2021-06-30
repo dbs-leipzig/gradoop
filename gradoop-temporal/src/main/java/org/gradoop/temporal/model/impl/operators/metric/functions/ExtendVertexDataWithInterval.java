@@ -36,7 +36,14 @@ public class ExtendVertexDataWithInterval
   /**
    * Reduce object instantiations.
    */
-  private final Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> reuse = new Tuple4<>();
+  private final Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> reuse;
+
+  /**
+   * Creates an instance of this join function.
+   */
+  public ExtendVertexDataWithInterval() {
+    this.reuse = new Tuple4<>();
+  }
 
   @Override
   public Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> join(

@@ -17,6 +17,7 @@ package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -25,12 +26,14 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.CalculateDegreesFromTree;
+import org.gradoop.temporal.model.impl.operators.metric.functions.CalculateDegreesDefaultTimesFlatMap;
+import org.gradoop.temporal.model.impl.operators.metric.functions.CalculateDegreesFlatMap;
 import org.gradoop.temporal.model.impl.operators.metric.functions.ExtendVertexDataWithInterval;
 import org.gradoop.temporal.model.impl.operators.metric.functions.ExtractIdIntervalMap;
 import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
 
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * A TPGM operator calculating the evolution of vertex degrees for all vertices of the graph. The result is a
@@ -59,6 +62,14 @@ public class TemporalVertexDegree
   private final VertexDegree degreeType;
 
   /**
+   * A flag to decide whether to include the vertex interval as lower and upper bounds for the first and
+   * last degree period. If set to false, the first degree period starts at
+   * {@link org.gradoop.temporal.model.impl.pojo.TemporalElement#DEFAULT_TIME_FROM} and the last degree period
+   * ends at {@link org.gradoop.temporal.model.impl.pojo.TemporalElement#DEFAULT_TIME_TO}.
+   */
+  private boolean includeVertexTime = true;
+
+  /**
    * Creates an instance of this temporal vertex degree operator.
    *
    * @param degreeType the degree type to consider
@@ -69,26 +80,46 @@ public class TemporalVertexDegree
     this.dimension = Objects.requireNonNull(dimension);
   }
 
+  /**
+   * Configure the operator to consider or not the vertex time by calculating the degree evolution.
+   *
+   * @param includeVertexTime true, iff the vertex time is used as lower and upper bounds for the first and
+   *                          last degree period. Note that this requires a join.
+   */
+  public void setIncludeVertexTime(boolean includeVertexTime) {
+    this.includeVertexTime = includeVertexTime;
+  }
+
   @Override
   public DataSet<Tuple4<GradoopId, Long, Long, Integer>> execute(TemporalGraph graph) {
-    DataSet<Tuple3<GradoopId, Long, Long>> vertexIdInterval = graph.getVertices()
-      .map(new ExtractIdIntervalMap(dimension));
 
-    return graph.getEdges()
+    DataSet<Tuple2<GradoopId, TreeMap<Long, Integer>>> edgesWithTrees = graph.getEdges()
       // 1) Extract vertex id(s) and corresponding time intervals
       .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
       // 2) Group them by the vertex id
       .groupBy(0)
       // 3) For each vertex id, build a degree tree data structure
-      .reduceGroup(new BuildTemporalDegreeTree())
-      // 4) Join the vertices to get each vertex interval
-      .join(vertexIdInterval)
-      .where(0).equalTo(0)
-      .with(new ExtendVertexDataWithInterval())
-      // 5) Since join leads to possible divided groups, we need to group again
-      .groupBy(0)
-      .reduce(new BuildTemporalDegreeTree())
-      // 6) For each vertex, calculate the degree evolution and output a tuple {v_id, t_from, t_to, degree}
-      .flatMap(new CalculateDegreesFromTree());
+      .reduceGroup(new BuildTemporalDegreeTree());
+
+    if (includeVertexTime) {
+      // The time information of the vertex must be included, therefore we need to join.
+      DataSet<Tuple3<GradoopId, Long, Long>> vertexIdInterval = graph.getVertices()
+        .map(new ExtractIdIntervalMap(dimension));
+
+      return edgesWithTrees
+        // 4) Join the vertices to get each vertex interval
+        .join(vertexIdInterval)
+        .where(0).equalTo(0)
+        .with(new ExtendVertexDataWithInterval())
+        // 5) Since join leads to possible divided groups, we need to group again
+        .groupBy(0)
+        .reduce(new BuildTemporalDegreeTree())
+        // 6) For each vertex, calculate the degree evolution and output a tuple {v_id, t_from, t_to, degree}
+        .flatMap(new CalculateDegreesFlatMap());
+    } else {
+      return edgesWithTrees
+        // 4) For each vertex, calculate the degree evolution and output a tuple {v_id, t_from, t_to, degree}
+        .flatMap(new CalculateDegreesDefaultTimesFlatMap());
+    }
   }
 }

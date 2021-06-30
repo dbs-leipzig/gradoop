@@ -29,11 +29,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test class for {@link CalculateDegreesFromTree}.
+ * Test class for {@link CalculateDegreesFlatMap}.
  */
-public class CalculateDegreesFromTreeTest {
+public class CalculateDegreesFlatMapTest {
 
-  CalculateDegreesFromTree flatMapToTest = new CalculateDegreesFromTree();
+  CalculateDegreesFlatMap flatMapToTest = new CalculateDegreesFlatMap();
   List<Tuple4<GradoopId, Long, Long, Integer>> list = new ArrayList<>();
   Collector<Tuple4<GradoopId,  Long, Long, Integer>> collector = new ListCollector<>(list);
 

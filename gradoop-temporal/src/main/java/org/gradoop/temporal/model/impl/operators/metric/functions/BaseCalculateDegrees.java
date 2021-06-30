@@ -15,7 +15,6 @@
  */
 package org.gradoop.temporal.model.impl.operators.metric.functions;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -24,12 +23,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * A flat map function calculating the resulting degree values for each vertex id by its corresponding degree
- * tree instance.
+ * Base class for calculating the degree evolution by the given degree tree.
  */
-public class CalculateDegreesFromTree
-  implements FlatMapFunction<Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long>,
-  Tuple4<GradoopId, Long, Long, Integer>> {
+public abstract class BaseCalculateDegrees {
 
   /**
    * Exception message string.
@@ -39,22 +35,31 @@ public class CalculateDegreesFromTree
     "check the temporal integrity of your graph in the given time domain. The operator " +
     "TemporalGraph#updateEdgeValidity() can be used to update an edges validity to ensure its integrity.";
 
-  @Override
-  public void flatMap(Tuple4<GradoopId, TreeMap<Long, Integer>, Long, Long> vertexData,
-    Collector<Tuple4<GradoopId, Long, Long, Integer>> collector) throws Exception {
+  /**
+   * Function calculates and collects the degree evolution for a given vertex and degree tree. It uses the
+   * from and to times of the vertex. If these times are not known, default timestamps can be used.
+   *
+   * @param vertexId the vertex id
+   * @param degreeTree the degree tree of that vertex
+   * @param vertexFromTime the from time of that vertex
+   * @param vertexToTime the to time of that vertex
+   * @param collector the collector that collects the resulting degree tuples
+   */
+  protected void calculateDegreeAndCollect(GradoopId vertexId, TreeMap<Long, Integer> degreeTree,
+    Long vertexFromTime, Long vertexToTime, Collector<Tuple4<GradoopId, Long, Long, Integer>> collector) {
 
     // we store for each timestamp the current degree
-    Integer degree = 0;
+    int degree = 0;
 
     // first degree 0 is from t_from(v) to the first occurrence of a start timestamp
-    Long lastTimestamp = vertexData.f2;
+    Long lastTimestamp = vertexFromTime;
 
-    for (Map.Entry<Long, Integer> entry :vertexData.f1.entrySet()) {
+    for (Map.Entry<Long, Integer> entry : degreeTree.entrySet()) {
       // check integrity
       if (lastTimestamp > entry.getKey()) {
         // This should not happen, seems that a temporal constraint is violated
         throw new IllegalArgumentException(String.format(TEMPORAL_VIOLATION_MSG, lastTimestamp,
-          entry.getKey(), vertexData.f0));
+          entry.getKey(), vertexId));
       }
 
       if (lastTimestamp.equals(entry.getKey())) {
@@ -65,7 +70,7 @@ public class CalculateDegreesFromTree
 
       // The payload is 0, means the degree does not change and the intervals can be merged
       if (entry.getValue() != 0) {
-        collector.collect(new Tuple4<>(vertexData.f0, lastTimestamp, entry.getKey(), degree));
+        collector.collect(new Tuple4<>(vertexId, lastTimestamp, entry.getKey(), degree));
         degree += entry.getValue();
         // remember the last timestamp since it is the first one of the next interval
         lastTimestamp = entry.getKey();
@@ -73,12 +78,12 @@ public class CalculateDegreesFromTree
     }
 
     // last degree is 0 from last occurence of timestamp to t_to(v)
-    if (lastTimestamp < vertexData.f3) {
-      collector.collect(new Tuple4<>(vertexData.f0, lastTimestamp, vertexData.f3, degree));
-    } else if (lastTimestamp > vertexData.f3) {
+    if (lastTimestamp < vertexToTime) {
+      collector.collect(new Tuple4<>(vertexId, lastTimestamp, vertexToTime, degree));
+    } else if (lastTimestamp > vertexToTime) {
       // This should not happen, seems that a temporal constraint is violated
-      throw new IllegalArgumentException(String.format(TEMPORAL_VIOLATION_MSG, lastTimestamp,
-        vertexData.f3, vertexData.f0));
+      throw new IllegalArgumentException(String.format(TEMPORAL_VIOLATION_MSG, lastTimestamp, vertexToTime,
+        vertexId));
     } // else, the ending bound of the vertex interval equals the last timestamp of the edges
   }
 }
