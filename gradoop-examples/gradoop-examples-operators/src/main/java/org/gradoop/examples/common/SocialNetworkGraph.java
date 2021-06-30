@@ -55,11 +55,11 @@ public class SocialNetworkGraph {
       "(gdbs)-[:hasMember]->(bob)" +
       "(gps)-[:hasModerator {since:2013}]->(dave)" +
       "(gps)-[:hasMember]->(dave)" +
-      "(gps)-[:hasMember]->(carol)-[ckd]->(dave)" +
+      "(gps)-[:hasMember]->(carol)-[ckd: knows {since:2014}]->(dave)" +
       "(databases)<-[ghtd:hasTag]-(gdbs)-[ghtg1:hasTag]->(graphs)<-[ghtg2:hasTag]-(gps)-[ghth:hasTag]->(hadoop)" +
       "(eve)-[eka:knows {since:2013}]->(alice)-[akb:knows {since:2014}]->(bob)" +
       "(eve)-[ekb:knows {since:2015}]->(bob)-[bka:knows {since:2014}]->(alice)" +
-      "(frank)-[fkc:knows {since:2015}]->(carol)-[ckd:knows {since:2014}]->(dave)" +
+      "(frank)-[fkc:knows {since:2015}]->(carol)-[ckd]->(dave)" +
       "(frank)-[fkd:knows {since:2015}]->(dave)-[dkc:knows {since:2014}]->(carol)" +
       "(alice)-[akb]->(bob)-[bkc:knows {since:2013}]->(carol)-[ckd]->(dave)" +
       "(alice)<-[bka]-(bob)<-[ckb:knows {since:2013}]-(carol)<-[dkc]-(dave)" +
