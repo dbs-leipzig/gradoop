@@ -1,4 +1,4 @@
-package org.gradoop.examples.kMeans;
+package org.gradoop.flink.model.impl.operators.kmeans;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -21,6 +21,7 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
 
 public class KMeans<
         G extends GraphHead,
@@ -48,8 +49,8 @@ public class KMeans<
         );
 
         DataSet<Point> points = spatialVertices.map(v -> {
-            double lat = v.getPropertyValue(LAT).getDouble();
-            double lon = v.getPropertyValue(LONG).getDouble();
+            double lat = Double.parseDouble(v.getPropertyValue(LAT).getString());
+            double lon = Double.parseDouble(v.getPropertyValue(LONG).getString());
             return new Point(lat, lon);
         });
 
@@ -86,14 +87,12 @@ public class KMeans<
 
         DataSet<Tuple2<Centroid, Point>> clusteredPoints = points.map(new SelectNearestCenter()).withBroadcastSet(finalCentroids, "centroids");
 
+        /*
         DataSet<Tuple2<V, Tuple2<Centroid, Point>>> joinedVertices =
-                logicalGraph.getVertices().join(clusteredPoints).where(new KeySelector<V, Point>() {
-                    @Override
-                    public Point getKey(V v) throws Exception {
-                        double lat = v.getPropertyValue("lat").getDouble();
-                        double lon = v.getPropertyValue("long").getDouble();
-                        return new Point(lat, lon);
-                    }
+                logicalGraph.getVertices().join(clusteredPoints).where((KeySelector<V, Point>) v -> {
+                    double lat = v.getPropertyValue("lat").getDouble();
+                    double lon = v.getPropertyValue("long").getDouble();
+                    return new Point(lat, lon);
                 }).equalTo(1);
 
         DataSet<V> newVertices = joinedVertices.map(new VertexPostProcessingMap<>());
@@ -102,11 +101,35 @@ public class KMeans<
                 .fromDataSets(logicalGraph.getGraphHead(), newVertices, logicalGraph.getEdges())
                 .verify();
 
+         */
+
+        try {
+            clusteredPoints.map(new printable()).print();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            System.out.println("Printed Stacktrace");
+        }
+        return logicalGraph;
+
     }
 
 
-    public static class Point implements Serializable {
+    public static class Point implements Serializable, KeySelector{
         double lat,lon;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Point point = (Point) o;
+            return Double.compare(point.lat, lat) == 0 && Double.compare(point.lon, lon) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(lat, lon);
+        }
 
         public Point(){}
 
@@ -131,6 +154,12 @@ public class KMeans<
             return this;
         }
 
+
+        @Override
+        public Double getKey(Object o) throws Exception {
+            Point point = (Point) o;
+            return point.lat + point.lon;
+        }
     }
 
     public static class Centroid extends Point {
@@ -199,7 +228,7 @@ public class KMeans<
         }
     }
     /** Computes new centroid from coordinate sum and count of points. */
-    @FunctionAnnotation.ForwardedFields("0->id")
+    //@FunctionAnnotation.ForwardedFields("0->f0")
     public static final class CentroidAverager
             implements MapFunction<Tuple3<Integer, Point, Long>, Centroid> {
         @Override
@@ -226,6 +255,14 @@ public class KMeans<
                 vertex.setProperty("cluster_id", PropertyValue.create(t2.f1.f0.id));
             }
             return vertex;
+        }
+    }
+
+    static final class printable implements MapFunction<Tuple2<Centroid, Point>, Tuple3<Integer, Double, Double>> {
+
+        @Override
+        public Tuple3<Integer, Double, Double> map(Tuple2<Centroid, Point> centroidPointTuple2) throws Exception {
+            return new Tuple3<>(centroidPointTuple2.f0.id, centroidPointTuple2.f1.lat, centroidPointTuple2.f1.lon);
         }
     }
 
