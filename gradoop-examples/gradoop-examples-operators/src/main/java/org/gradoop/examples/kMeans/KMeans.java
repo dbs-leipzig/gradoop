@@ -55,7 +55,7 @@ public class KMeans<
 
 
         DataSet<Tuple2<Long, Point>> indexingPoints = DataSetUtils.zipWithIndex(points.first(centroids));
-        DataSet<Centroid> firstCentroids = indexingPoints.map(t -> new Centroid(Math.toIntExact(t.f0), t.f1.lat, t.f1.lon));
+        DataSet<Centroid> firstCentroids = indexingPoints.map(t-> new Centroid(Math.toIntExact(t.f0), t.f1.lat, t.f1.lon));
 
         /*
         IterativeDataSet iteriert über ein DatenSet und führt die danach aufgeführten Operationen aus.
@@ -65,9 +65,21 @@ public class KMeans<
         IterativeDataSet<Centroid> loop = firstCentroids.iterate(iterations);
 
         DataSet<Centroid> newCentroids = points
+                /*
+                Assigns a centroid to every vertex
+                 */
                 .map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
+                /*
+                Adds a Countappender to every Mapping and changes first value from centroidObject to CentroidId
+                 */
                 .map(new CountAppender())
+                /*
+                Groups mapping by id and sums up points of every centroid, for every addition the counts increments
+                 */
                 .groupBy(0).reduce(new CentroidAccumulator())
+                /*
+                Divides summed up points through its counter and assigns the cluster a new centroid
+                 */
                 .map(new CentroidAverager());
 
         DataSet<Centroid> finalCentroids = loop.closeWith(newCentroids);
