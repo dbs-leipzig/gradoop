@@ -1,5 +1,7 @@
 package org.gradoop.flink.model.impl.operators.kmeans.util;
 
+import java.util.Objects;
+
 public class Centroid extends Point {
 
     private int id;
@@ -18,6 +20,20 @@ public class Centroid extends Point {
 
     public int getId() {
         return this.id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Centroid centroid = (Centroid) o;
+        return id == centroid.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id);
     }
 
 }
