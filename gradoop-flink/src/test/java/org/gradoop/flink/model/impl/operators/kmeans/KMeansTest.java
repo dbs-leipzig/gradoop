@@ -2,6 +2,7 @@ package org.gradoop.flink.model.impl.operators.kmeans;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -136,14 +137,21 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
     @Test
     public void testKMeansAlgorithm() throws Exception {
         LogicalGraph logicalGraph = getLoaderFromString(inputGdlGraph).getLogicalGraphByVariable("g");
-        DataSet<V> vertices = new KMeans(3, 3).execute(logicalGraph).getVertices();
+        LogicalGraph output = (LogicalGraph) new KMeans(3, 3, "lat", "long").execute(logicalGraph);
+        DataSet<V> vertices = (DataSet<V>) output.getVertices();
 
         List<String> test = vertices.map(v -> {
-            String s=v.getProperties().toString() + "\n";
-            return s;
+           String s = v.getProperties().toString()+"\n";
+           return s;
         }).collect();
 
-        System.out.println(test.toString());
+        System.out.println(test);
+
+
+
+
+
+        //System.out.println(test.toString());
 
 
 

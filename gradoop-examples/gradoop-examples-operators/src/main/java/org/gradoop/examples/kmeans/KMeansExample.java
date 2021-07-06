@@ -17,7 +17,7 @@ public class KMeansExample {
 
         LogicalGraph cityBikeGraph = csvDataSource.getLogicalGraph();
 
-        KMeans kmeans = new KMeans<>(3, 3);
+        KMeans kmeans = new KMeans<>(3, 3, "lat", "long");
 
         kmeans.execute(cityBikeGraph).toString();
     }
