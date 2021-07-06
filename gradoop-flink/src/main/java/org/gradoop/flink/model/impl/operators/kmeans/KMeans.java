@@ -26,16 +26,21 @@ public class KMeans<
 
     private final int iterations;
     private final int centroids;
+    private final String LAT;
+    private final String LONG;
 
-    public KMeans(int iterations, int centroids) {
+    public KMeans(int iterations, int centroids, String propertyNameOne, String propertyNameTwo) {
         this.iterations = iterations;
         this.centroids = centroids;
+        this.LAT = propertyNameOne;
+        this.LONG = propertyNameTwo;
     }
 
     @Override
     public LG execute(LG logicalGraph) {
-        final String LAT = "lat";
-        final String LONG = "long";
+
+        final String LAT = this.LAT;
+        final String LONG = this.LONG;
 
         DataSet<V> spatialVertices = logicalGraph.getVertices().filter(
                 v -> v.hasProperty(LAT) && v.hasProperty(LONG)
