@@ -1,7 +1,6 @@
 package org.gradoop.flink.model.impl.operators.kmeans.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
@@ -9,19 +8,28 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 
 import java.util.Collection;
 
-@FunctionAnnotation.ForwardedFields("*->1")
+/**
+ * Assigns the nearest centroid to a point.
+ */
 public class SelectNearestCenter
         extends RichMapFunction<Point, Tuple2<Centroid, Point>> {
 
     private Collection<Centroid> centroids;
-    /** Reads the centroid values from a broadcast variable into a collection. */
+    /**
+     * Reads the centroid values from a broadcast variable into a collection.
+     */
     @Override
     public void open(Configuration parameters) throws Exception {
         this.centroids = getRuntimeContext().getBroadcastVariable("centroids");
     }
 
+    /**
+     * Searches the nearest centroid for a given point out of all centroids.
+     * @param p         Given point
+     * @return          Returns a tuple containing the point and its nearest centroid
+     */
     @Override
-    public Tuple2<Centroid, Point> map(Point p) throws Exception {
+    public Tuple2<Centroid, Point> map(Point p){
         double minDistance = Double.MAX_VALUE;
         Centroid closestCentroid = null;
         // check all cluster centers
