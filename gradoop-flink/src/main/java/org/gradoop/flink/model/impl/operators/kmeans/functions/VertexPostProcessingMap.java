@@ -9,10 +9,17 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
 
 public class VertexPostProcessingMap<V extends Vertex>
         implements MapFunction<Tuple2<V, Tuple2<Centroid, String>>, V> {
-    final String LAT = "lat";
-    final String LONG = "long";
-    final String LAT_ORIGIN = LAT + "_origin";
-    final String LONG_ORIGIN = LONG + "_origin";
+    private String LAT;
+    private String LONG;
+    private String LAT_ORIGIN;
+    private String LONG_ORIGIN;
+
+    public VertexPostProcessingMap(String LAT, String LONG) {
+        this.LAT = LAT;
+        this.LONG = LONG;
+        this.LAT_ORIGIN = LAT + "_origin";
+        this.LONG_ORIGIN = LONG + "_origin";
+    }
 
     @Override
     public V map (Tuple2<V, Tuple2<Centroid, String>> t2) throws Exception {
@@ -23,8 +30,8 @@ public class VertexPostProcessingMap<V extends Vertex>
             vertex.removeProperty(LAT);
             vertex.removeProperty(LONG);
             String[] latAndLon = t2.f1.f1.split(";");
-            vertex.setProperty("cluster_lat", PropertyValue.create(Double.parseDouble(latAndLon[0])));
-            vertex.setProperty("cluster_long", PropertyValue.create(Double.parseDouble(latAndLon[1])));
+            vertex.setProperty("cluster_"+LAT, PropertyValue.create(Double.parseDouble(latAndLon[0])));
+            vertex.setProperty("cluster_"+LONG, PropertyValue.create(Double.parseDouble(latAndLon[1])));
             vertex.setProperty("cluster_id", PropertyValue.create(t2.f1.f0.getId()));
         }
         return vertex;

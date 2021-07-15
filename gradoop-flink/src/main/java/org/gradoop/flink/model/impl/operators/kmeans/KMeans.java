@@ -15,6 +15,18 @@ import org.gradoop.flink.model.impl.operators.kmeans.functions.*;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 
+/**
+ * Takes a logical graph, an user defined amount of iterations and centroids, and the property names
+ * of the vertex that are used for the clustering as input. Adds the clusterId, together with the
+ * cluster coordinates to the properties of the vertex. Returns the logical graph with modified
+ * vertex properties.
+ * @param <G> The graph head type.
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
+ */
+
 
 public class KMeans<
         G extends GraphHead,
@@ -24,6 +36,14 @@ public class KMeans<
         GC extends BaseGraphCollection<G,V,E,LG,GC>
         > implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
+    /**
+     * Initializes iterations, centroids and properties to use
+     *
+     * @param iterations       Amount of times the algorithm iterates over the vertices
+     * @param centroids        Amount of centroids the vertices get assigned to
+     * @param LAT              First spatial property used for the clustering
+     * @param LONG             Second spatial property used for the clustering
+     */
     private final int iterations;
     private final int centroids;
     private final String LAT;
@@ -91,7 +111,7 @@ public class KMeans<
                     return lat+";"+lon;
                 }).equalTo(1);
 
-        DataSet<V> newVertices = joinedVertices.map(new VertexPostProcessingMap<>());
+        DataSet<V> newVertices = joinedVertices.map(new VertexPostProcessingMap<>(LAT, LONG));
 
 
         return logicalGraph.getFactory()
