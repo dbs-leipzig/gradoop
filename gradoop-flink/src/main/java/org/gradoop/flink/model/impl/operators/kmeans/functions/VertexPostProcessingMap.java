@@ -24,7 +24,7 @@ public class VertexPostProcessingMap<V extends Vertex>
             vertex.removeProperty(LONG);
             String[] latAndLon = t2.f1.f1.split(";");
             vertex.setProperty("cluster_lat", PropertyValue.create(Double.parseDouble(latAndLon[0])));
-            vertex.setProperty("cluster_lon", PropertyValue.create(Double.parseDouble(latAndLon[1])));
+            vertex.setProperty("cluster_long", PropertyValue.create(Double.parseDouble(latAndLon[1])));
             vertex.setProperty("cluster_id", PropertyValue.create(t2.f1.f0.getId()));
         }
         return vertex;

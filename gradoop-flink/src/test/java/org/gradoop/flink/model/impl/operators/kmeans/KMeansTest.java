@@ -139,22 +139,12 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
         LogicalGraph logicalGraph = getLoaderFromString(inputGdlGraph).getLogicalGraphByVariable("g");
         LogicalGraph output = (LogicalGraph) new KMeans(3, 3, "lat", "long").execute(logicalGraph);
         DataSet<V> vertices = (DataSet<V>) output.getVertices();
+        DataSet<V> comparisonVertices = vertices.filter(vertex ->
+            vertex.hasProperty("cluster_lat") && vertex.hasProperty("cluster_long") &&
+                    vertex.hasProperty("cluster_id") && vertex.hasProperty("long_origin") && vertex.hasProperty("lat_origin")
+        );
 
-        List<String> test = vertices.map(v -> {
-           String s = v.getProperties().toString()+"\n";
-           return s;
-        }).collect();
-
-        System.out.println(test);
-
-
-
-
-
-        //System.out.println(test.toString());
-
-
-
+        assertTrue(comparisonVertices.collect().size() == vertices.collect().size());
 
     }
 }
