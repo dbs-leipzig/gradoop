@@ -60,11 +60,9 @@ public class BuildTemporalDegreeTree implements
       if (vertexId == null) {
         vertexId = entity.f0;
       }
-      // add time interval to tree map
-      degreeTreeMap
-        .put(entity.f1, degreeTreeMap.get(entity.f1) == null ? 1 : degreeTreeMap.get(entity.f1) + 1);
-      degreeTreeMap
-        .put(entity.f2, degreeTreeMap.get(entity.f2) == null ? -1 : degreeTreeMap.get(entity.f2) - 1);
+      // add time interval to tree map - increment for start timestamp, decrement for end timestamp
+      degreeTreeMap.merge(entity.f1, 1, Integer::sum);
+      degreeTreeMap.merge(entity.f2, -1, Integer::sum);
     }
     collector.collect(new Tuple2<>(vertexId, degreeTreeMap));
   }
@@ -79,7 +77,7 @@ public class BuildTemporalDegreeTree implements
       if (left.f1.get(entry.getKey()) == null) {
         left.f1.put(entry.getKey(), entry.getValue());
       } else {
-        left.f1.replace(entry.getKey(), left.f1.get(entry.getKey()) + entry.getValue());
+        left.f1.merge(entry.getKey(), entry.getValue(), Integer::sum);
       }
     }
 

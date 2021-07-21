@@ -67,7 +67,7 @@ public class TemporalVertexDegree
    * {@link org.gradoop.temporal.model.impl.pojo.TemporalElement#DEFAULT_TIME_FROM} and the last degree period
    * ends at {@link org.gradoop.temporal.model.impl.pojo.TemporalElement#DEFAULT_TIME_TO}.
    */
-  private boolean includeVertexTime = true;
+  private boolean includeVertexTime = false;
 
   /**
    * Creates an instance of this temporal vertex degree operator.
@@ -118,7 +118,8 @@ public class TemporalVertexDegree
         .flatMap(new CalculateDegreesFlatMap());
     } else {
       return edgesWithTrees
-        // 4) For each vertex, calculate the degree evolution and output a tuple {v_id, t_from, t_to, degree}
+        // 4/7) For each vertex, calculate the degree evolution and output a tuple
+        // {v_id, t_from, t_to, degree}
         .flatMap(new CalculateDegreesDefaultTimesFlatMap());
     }
   }

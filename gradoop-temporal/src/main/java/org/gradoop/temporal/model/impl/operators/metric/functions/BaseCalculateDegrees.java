@@ -30,7 +30,7 @@ public abstract class BaseCalculateDegrees {
   /**
    * Exception message string.
    */
-  private static final String TEMPORAL_VIOLATION_MSG = "Last timestamp [%d] is not smaller that the " +
+  private static final String TEMPORAL_VIOLATION_MSG = "Last timestamp [%d] is not smaller than the " +
     "current [%d] for vertex with id [%s]. A chronological order of timestamps is mandatory. Please " +
     "check the temporal integrity of your graph in the given time domain. The operator " +
     "TemporalGraph#updateEdgeValidity() can be used to update an edges validity to ensure its integrity.";
