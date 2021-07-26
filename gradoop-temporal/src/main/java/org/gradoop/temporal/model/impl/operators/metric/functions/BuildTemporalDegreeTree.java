@@ -74,13 +74,8 @@ public class BuildTemporalDegreeTree implements
 
     // Put all elements of the right into the left tree and return the left one as merged tree
     for (Map.Entry<Long, Integer> entry : right.f1.entrySet()) {
-      if (left.f1.get(entry.getKey()) == null) {
-        left.f1.put(entry.getKey(), entry.getValue());
-      } else {
-        left.f1.merge(entry.getKey(), entry.getValue(), Integer::sum);
-      }
+      left.f1.merge(entry.getKey(), entry.getValue(), Integer::sum);
     }
-
     return left;
   }
 }
