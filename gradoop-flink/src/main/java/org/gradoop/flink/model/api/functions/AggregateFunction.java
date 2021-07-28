@@ -81,4 +81,17 @@ public interface AggregateFunction extends Serializable {
   default PropertyValue postAggregate(PropertyValue result) {
     return result;
   }
+
+  /**
+   * Add result to aggregated element.
+   *
+   * @param element aggregated element to add result to
+   * @param aggregate aggregation result
+   * @param <E> element type
+   * @return aggregated element
+   */
+  default <E extends Element> E applyResult(E element, PropertyValue aggregate) {
+    element.setProperty(getAggregatePropertyKey(), aggregate);
+    return element;
+  }
 }

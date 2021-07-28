@@ -23,7 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -37,11 +36,6 @@ public class SetAggregateProperties<G extends GraphHead>
   implements CoGroupFunction<G, Tuple2<GradoopId, Map<String, PropertyValue>>, G> {
 
   /**
-   * default values used to replace aggregate values in case of NULL.
-   */
-  private final Map<String, PropertyValue> defaultValues;
-
-  /**
    * Aggregate functions from the aggregation step.
    */
   private final Set<AggregateFunction> aggregateFunctions;
@@ -52,14 +46,7 @@ public class SetAggregateProperties<G extends GraphHead>
    * @param aggregateFunctions aggregate functions
    */
   public SetAggregateProperties(final Set<AggregateFunction> aggregateFunctions) {
-
-    defaultValues = new HashMap<>();
     this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
-
-    for (AggregateFunction func : aggregateFunctions) {
-      Objects.requireNonNull(func);
-      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
-    }
   }
 
   @Override
@@ -74,13 +61,17 @@ public class SetAggregateProperties<G extends GraphHead>
         for (AggregateFunction function : aggregateFunctions) {
           values.computeIfPresent(function.getAggregatePropertyKey(),
             (k, v) -> function.postAggregate(v));
+          function.applyResult(leftElem, values.getOrDefault(function.getAggregatePropertyKey(),
+            AggregateUtil.getDefaultAggregate(function)));
         }
-        values.forEach(leftElem::setProperty);
         out.collect(leftElem);
         rightEmpty = false;
       }
+      // For example if the graph is empty
       if (rightEmpty) {
-        defaultValues.forEach(leftElem::setProperty);
+        for (AggregateFunction function : aggregateFunctions) {
+          function.applyResult(leftElem, AggregateUtil.getDefaultAggregate(function));
+        }
         out.collect(leftElem);
       }
     }

@@ -16,6 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
@@ -41,6 +42,16 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    * Selects the field of the temporal element to consider.
    */
   private final TimeDimension.Field field;
+
+  /**
+   * Selects which time-dimension the resulting value is written to.
+   */
+  private TimeDimension resultTimeDimension = null;
+
+  /**
+   * Selects the field the resulting value is written to.
+   */
+  private TimeDimension.Field resultField = null;
 
   /**
    * The property value that is considered as the default 'from' value of this aggregate function.
@@ -132,8 +143,37 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       (value.equals(defaultFromValue) || value.equals(defaultToValue));
   }
 
+  /**
+   * Time dimension and field to write the result to.
+   * Passing null defaults to adding a property value instead.
+   *
+   * @param timeDimension time dimension
+   * @param field field
+   * @return this
+   */
+  public AbstractTimeAggregateFunction writeResultTo(TimeDimension timeDimension, TimeDimension.Field field) {
+    this.resultTimeDimension = timeDimension;
+    this.resultField = field;
+    return this;
+  }
+
   @Override
   public String toString() {
     return String.format("%s(%s.%s)", getClass().getSimpleName(), timeDimension, field);
+  }
+
+  @Override
+  public <E extends Element> E applyResult(E element, PropertyValue aggregate) {
+    if (resultTimeDimension == null || resultField == null) {
+      return super.applyResult(element, aggregate);
+    }
+    if (!(element instanceof TemporalElement)) {
+      throw new IllegalArgumentException("Cannot write time value to non-temporal element.");
+    }
+
+    TemporalElement temporalElement = (TemporalElement) element;
+    temporalElement.setTime(aggregate.getLong(), resultTimeDimension, resultField);
+
+    return (E) temporalElement;
   }
 }

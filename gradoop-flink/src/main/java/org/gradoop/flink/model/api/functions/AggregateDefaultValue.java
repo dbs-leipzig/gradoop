@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.api.functions;
 
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -23,7 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * is no such vertex than one can specify 0 which will be returned instead of
  * NULL.
  */
-public interface AggregateDefaultValue {
+public interface AggregateDefaultValue extends AggregateFunction {
 
   /**
    * Defines the default value.
@@ -31,4 +32,10 @@ public interface AggregateDefaultValue {
    * @return default value.
    */
   PropertyValue getDefaultValue();
+
+  @Override
+  default <E extends Element> E applyResult(E element, PropertyValue aggregate) {
+    element.setProperty(getAggregatePropertyKey(), aggregate.isNull() ? getDefaultValue() : aggregate);
+    return element;
+  }
 }

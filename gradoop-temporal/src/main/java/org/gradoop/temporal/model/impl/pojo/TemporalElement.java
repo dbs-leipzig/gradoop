@@ -142,6 +142,44 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
+   * Set time value by dimension and field.
+   *
+   * @param time time value
+   * @param dimension time dimension
+   * @param field time field
+   */
+  public void setTime(Long time, TimeDimension dimension, TimeDimension.Field field) {
+    switch (Objects.requireNonNull(dimension)) {
+    case VALID_TIME:
+      switch (Objects.requireNonNull(field)) {
+      case FROM:
+        setValidFrom(time);
+        break;
+      case TO:
+        setValidTo(time);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown field [" + field + "].");
+      }
+      break;
+    case TRANSACTION_TIME:
+      switch (Objects.requireNonNull(field)) {
+      case FROM:
+        setTxFrom(time);
+        break;
+      case TO:
+        setTxTo(time);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown field [" + field + "].");
+      }
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
+    }
+  }
+
+  /**
    * Get the beginning of the elements validity as unix timestamp in milliseconds.
    *
    * @return the beginning of the elements validity as unix timestamp in milliseconds
