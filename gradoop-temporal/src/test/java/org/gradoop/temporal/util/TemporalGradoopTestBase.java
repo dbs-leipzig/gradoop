@@ -292,7 +292,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
     TemporalVertex v5 = createVertex(V5, 3, 8, 1, 9);
     TemporalEdge e1 = createEdge(E1, v1, v2, 0, MAX_VALUE, 0, MAX_VALUE);
     TemporalEdge e2 = createEdge(E2, v2, v3, 1, 2, 6, 7);
-    TemporalEdge e3 = createEdge(E3, v4, v5, 3, 4, 1, 1);
+    TemporalEdge e3 = createEdge(E3, v4, v5, 3, 4, 4, 5);
     TemporalEdge e4 = createEdge(E4, v3, v5, 6, 7, 4, 6);
     TemporalEdge e5 = createEdge(E5, v4, v4, 2, 6, 4, 5);
     DataSet<TemporalVertex> vertices = getExecutionEnvironment().fromElements(v1, v2, v3, v4, v5);
