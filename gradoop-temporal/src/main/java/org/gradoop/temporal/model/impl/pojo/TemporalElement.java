@@ -108,14 +108,14 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    */
   public void setTransactionTime(long transactionTime, TimeDimension.Field field) {
     switch (Objects.requireNonNull(field)) {
-      case FROM:
-        setTxFrom(transactionTime);
-        break;
-      case TO:
-        setTxTo(transactionTime);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown field [" + field + "].");
+    case FROM:
+      setTxFrom(transactionTime);
+      break;
+    case TO:
+      setTxTo(transactionTime);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown field [" + field + "].");
     }
   }
 
@@ -149,16 +149,16 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param validTime time value
    * @param field time field
    */
-  public void setValueTime(long validTime, TimeDimension.Field field) {
+  public void setValidTime(long validTime, TimeDimension.Field field) {
     switch (Objects.requireNonNull(field)) {
-      case FROM:
-        setValidFrom(validTime);
-        break;
-      case TO:
-        setValidTo(validTime);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown field [" + field + "].");
+    case FROM:
+      setValidFrom(validTime);
+      break;
+    case TO:
+      setValidTo(validTime);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown field [" + field + "].");
     }
   }
 

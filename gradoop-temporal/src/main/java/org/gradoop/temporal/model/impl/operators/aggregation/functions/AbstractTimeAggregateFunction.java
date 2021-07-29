@@ -155,7 +155,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
     }
 
     TemporalElement temporalElement = (TemporalElement) element;
-    temporalElement.setValueTime(aggregate.getLong(), resultValidTimeField);
+    temporalElement.setValidTime(aggregate.getLong(), resultValidTimeField);
 
     return (E) temporalElement;
   }
