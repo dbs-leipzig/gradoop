@@ -101,6 +101,25 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
+   * Set transaction time by field.
+   *
+   * @param transactionTime time value
+   * @param field time field
+   */
+  public void setTransactionTime(long transactionTime, TimeDimension.Field field) {
+    switch (Objects.requireNonNull(field)) {
+      case FROM:
+        setTxFrom(transactionTime);
+        break;
+      case TO:
+        setTxTo(transactionTime);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown field [" + field + "].");
+    }
+  }
+
+  /**
    * Get the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
    *
    * @return a {@link Tuple2} representing the valid time interval
@@ -125,6 +144,25 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
+   * Set value time by field.
+   *
+   * @param validTime time value
+   * @param field time field
+   */
+  public void setValueTime(long validTime, TimeDimension.Field field) {
+    switch (Objects.requireNonNull(field)) {
+      case FROM:
+        setValidFrom(validTime);
+        break;
+      case TO:
+        setValidTo(validTime);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown field [" + field + "].");
+    }
+  }
+
+  /**
    * Get the time tuple (from, to) regarding to the given {@link TimeDimension}.
    *
    * @param dimension the time dimension of the returned values
@@ -136,44 +174,6 @@ public abstract class TemporalElement extends EPGMElement implements Element {
       return this.validTime;
     case TRANSACTION_TIME:
       return this.transactionTime;
-    default:
-      throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
-    }
-  }
-
-  /**
-   * Set time value by dimension and field.
-   *
-   * @param time time value
-   * @param dimension time dimension
-   * @param field time field
-   */
-  public void setTime(Long time, TimeDimension dimension, TimeDimension.Field field) {
-    switch (Objects.requireNonNull(dimension)) {
-    case VALID_TIME:
-      switch (Objects.requireNonNull(field)) {
-      case FROM:
-        setValidFrom(time);
-        break;
-      case TO:
-        setValidTo(time);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown field [" + field + "].");
-      }
-      break;
-    case TRANSACTION_TIME:
-      switch (Objects.requireNonNull(field)) {
-      case FROM:
-        setTxFrom(time);
-        break;
-      case TO:
-        setTxTo(time);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown field [" + field + "].");
-      }
-      break;
     default:
       throw new IllegalArgumentException("Unknown dimension [" + dimension + "].");
     }

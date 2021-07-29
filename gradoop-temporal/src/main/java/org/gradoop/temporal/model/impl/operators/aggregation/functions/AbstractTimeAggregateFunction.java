@@ -44,14 +44,9 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   private final TimeDimension.Field field;
 
   /**
-   * Selects which time-dimension the resulting value is written to.
+   * Selects the field the resulting value is written to. Defaults to property value if null.
    */
-  private TimeDimension resultTimeDimension = null;
-
-  /**
-   * Selects the field the resulting value is written to.
-   */
-  private TimeDimension.Field resultField = null;
+  private TimeDimension.Field resultValidTimeField = null;
 
   /**
    * The property value that is considered as the default 'from' value of this aggregate function.
@@ -88,17 +83,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    final Tuple2<Long, Long> timeInterval;
-    switch (timeDimension) {
-    case TRANSACTION_TIME:
-      timeInterval = element.getTransactionTime();
-      break;
-    case VALID_TIME:
-      timeInterval = element.getValidTime();
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown dimension [" + timeDimension + "].");
-    }
+    final Tuple2<Long, Long> timeInterval = element.getTimeByDimension(timeDimension);
     switch (field) {
     case FROM:
       return PropertyValue.create(timeInterval.f0);
@@ -144,16 +129,14 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   }
 
   /**
-   * Time dimension and field to write the result to.
+   * Valid time field to write the aggregation result to.
    * Passing null defaults to adding a property value instead.
    *
-   * @param timeDimension time dimension
    * @param field field
    * @return this
    */
-  public AbstractTimeAggregateFunction writeResultTo(TimeDimension timeDimension, TimeDimension.Field field) {
-    this.resultTimeDimension = timeDimension;
-    this.resultField = field;
+  public AbstractTimeAggregateFunction setAsValidTime(TimeDimension.Field field) {
+    this.resultValidTimeField = field;
     return this;
   }
 
@@ -164,7 +147,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
 
   @Override
   public <E extends Element> E applyResult(E element, PropertyValue aggregate) {
-    if (resultTimeDimension == null || resultField == null) {
+    if (resultValidTimeField == null) {
       return super.applyResult(element, aggregate);
     }
     if (!(element instanceof TemporalElement)) {
@@ -172,7 +155,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
     }
 
     TemporalElement temporalElement = (TemporalElement) element;
-    temporalElement.setTime(aggregate.getLong(), resultTimeDimension, resultField);
+    temporalElement.setValueTime(aggregate.getLong(), resultValidTimeField);
 
     return (E) temporalElement;
   }
