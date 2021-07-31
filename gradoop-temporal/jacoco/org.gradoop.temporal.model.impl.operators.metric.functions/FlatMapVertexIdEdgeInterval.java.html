@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FlatMapVertexIdEdgeInterval.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric.functions</a> &gt; <span class="el_source">FlatMapVertexIdEdgeInterval.java</span></div><h1>FlatMapVertexIdEdgeInterval.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
+import org.gradoop.temporal.model.api.TimeDimension;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+
+import java.util.Objects;
+
+/**
+ * A flat map function extracting the id and temporal interval from an {@link TemporalEdge} instance.
+ */
+@FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
+public class FlatMapVertexIdEdgeInterval implements FlatMapFunction&lt;TemporalEdge, Tuple3&lt;GradoopId, Long, Long&gt;&gt; {
+
+  /**
+   * The time dimension to consider.
+   */
+  private final TimeDimension timeDimension;
+
+  /**
+   * The degree type to consider.
+   */
+  private final VertexDegree degreeType;
+
+  /**
+   * Creates an instance of this flat map transformation.
+   *
+   * @param timeDimension the time dimension to consider
+   * @param degreeType the degree type to consider
+   */
+<span class="fc" id="L51">  public FlatMapVertexIdEdgeInterval(TimeDimension timeDimension, VertexDegree degreeType) {</span>
+<span class="fc" id="L52">    this.timeDimension = Objects.requireNonNull(timeDimension);</span>
+<span class="fc" id="L53">    this.degreeType = Objects.requireNonNull(degreeType);</span>
+<span class="fc" id="L54">  }</span>
+
+  @Override
+  public void flatMap(TemporalEdge temporalEdge, Collector&lt;Tuple3&lt;GradoopId, Long, Long&gt;&gt; collector) throws
+    Exception {
+<span class="fc" id="L59">    Long from = timeDimension</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">      .equals(TimeDimension.VALID_TIME) ? temporalEdge.getValidFrom() : temporalEdge.getTxFrom();</span>
+<span class="fc" id="L61">    Long to = timeDimension</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">      .equals(TimeDimension.VALID_TIME) ? temporalEdge.getValidTo() : temporalEdge.getTxTo();</span>
+<span class="pc bpc" id="L63" title="1 of 4 branches missed.">    switch (degreeType) {</span>
+    case IN:
+<span class="fc" id="L65">      collector.collect(new Tuple3&lt;&gt;(temporalEdge.getTargetId(), from, to));</span>
+<span class="fc" id="L66">      break;</span>
+    case OUT:
+<span class="fc" id="L68">      collector.collect(new Tuple3&lt;&gt;(temporalEdge.getSourceId(), from, to));</span>
+<span class="fc" id="L69">      break;</span>
+    case BOTH:
+<span class="fc" id="L71">      collector.collect(new Tuple3&lt;&gt;(temporalEdge.getTargetId(), from, to));</span>
+<span class="fc" id="L72">      collector.collect(new Tuple3&lt;&gt;(temporalEdge.getSourceId(), from, to));</span>
+<span class="fc" id="L73">      break;</span>
+    default:
+<span class="nc" id="L75">      throw new IllegalArgumentException(&quot;Invalid vertex degree type [&quot; + degreeType + &quot;].&quot;);</span>
+    }
+<span class="fc" id="L77">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

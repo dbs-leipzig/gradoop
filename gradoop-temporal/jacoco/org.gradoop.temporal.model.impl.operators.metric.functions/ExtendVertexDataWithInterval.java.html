@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExtendVertexDataWithInterval.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric.functions</a> &gt; <span class="el_source">ExtendVertexDataWithInterval.java</span></div><h1>ExtendVertexDataWithInterval.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.util.TreeMap;
+
+/**
+ * Join function that extends the calculated degree tree for each vertex with the time interval of the vertex.
+ */
+@FunctionAnnotation.ForwardedFieldsFirst(&quot;f0; f1&quot;)
+@FunctionAnnotation.ForwardedFieldsSecond(&quot;f1-&gt;f2;f2-&gt;f3&quot;)
+public class ExtendVertexDataWithInterval
+  implements JoinFunction&lt;Tuple2&lt;GradoopId, TreeMap&lt;Long, Integer&gt;&gt;, Tuple3&lt;GradoopId, Long, Long&gt;,
+  Tuple4&lt;GradoopId, TreeMap&lt;Long, Integer&gt;, Long, Long&gt;&gt; {
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple4&lt;GradoopId, TreeMap&lt;Long, Integer&gt;, Long, Long&gt; reuse;
+
+  /**
+   * Creates an instance of this join function.
+   */
+<span class="fc" id="L44">  public ExtendVertexDataWithInterval() {</span>
+<span class="fc" id="L45">    this.reuse = new Tuple4&lt;&gt;();</span>
+<span class="fc" id="L46">  }</span>
+
+  @Override
+  public Tuple4&lt;GradoopId, TreeMap&lt;Long, Integer&gt;, Long, Long&gt; join(
+    Tuple2&lt;GradoopId, TreeMap&lt;Long, Integer&gt;&gt; left,
+    Tuple3&lt;GradoopId, Long, Long&gt; right) throws Exception {
+
+<span class="fc" id="L53">    reuse.f0 = left.f0;</span>
+<span class="fc" id="L54">    reuse.f1 = left.f1;</span>
+<span class="fc" id="L55">    reuse.f2 = right.f1;</span>
+<span class="fc" id="L56">    reuse.f3 = right.f2;</span>
+
+<span class="fc" id="L58">    return reuse;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

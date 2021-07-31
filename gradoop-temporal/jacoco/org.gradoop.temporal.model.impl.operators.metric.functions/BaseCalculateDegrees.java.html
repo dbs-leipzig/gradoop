@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseCalculateDegrees.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric.functions</a> &gt; <span class="el_source">BaseCalculateDegrees.java</span></div><h1>BaseCalculateDegrees.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric.functions;
+
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * Base class for calculating the degree evolution by the given degree tree.
+ */
+<span class="fc" id="L28">public abstract class BaseCalculateDegrees {</span>
+
+  /**
+   * Exception message string.
+   */
+  private static final String TEMPORAL_VIOLATION_MSG = &quot;Last timestamp [%d] is not smaller than the &quot; +
+    &quot;current [%d] for vertex with id [%s]. A chronological order of timestamps is mandatory. Please &quot; +
+    &quot;check the temporal integrity of your graph in the given time domain. The operator &quot; +
+    &quot;TemporalGraph#updateEdgeValidity() can be used to update an edges validity to ensure its integrity.&quot;;
+
+  /**
+   * Function calculates and collects the degree evolution for a given vertex and degree tree. It uses the
+   * from and to times of the vertex. If these times are not known, default timestamps can be used.
+   *
+   * @param vertexId the vertex id
+   * @param degreeTree the degree tree of that vertex
+   * @param vertexFromTime the from time of that vertex
+   * @param vertexToTime the to time of that vertex
+   * @param collector the collector that collects the resulting degree tuples
+   */
+  protected void calculateDegreeAndCollect(GradoopId vertexId, TreeMap&lt;Long, Integer&gt; degreeTree,
+    Long vertexFromTime, Long vertexToTime, Collector&lt;Tuple4&lt;GradoopId, Long, Long, Integer&gt;&gt; collector) {
+
+    // we store for each timestamp the current degree
+<span class="fc" id="L52">    int degree = 0;</span>
+
+    // first degree 0 is from t_from(v) to the first occurrence of a start timestamp
+<span class="fc" id="L55">    Long lastTimestamp = vertexFromTime;</span>
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    for (Map.Entry&lt;Long, Integer&gt; entry : degreeTree.entrySet()) {</span>
+      // check integrity
+<span class="fc bfc" id="L59" title="All 2 branches covered.">      if (lastTimestamp &gt; entry.getKey()) {</span>
+        // This should not happen, seems that a temporal constraint is violated
+<span class="fc" id="L61">        throw new IllegalArgumentException(String.format(TEMPORAL_VIOLATION_MSG, lastTimestamp,</span>
+<span class="fc" id="L62">          entry.getKey(), vertexId));</span>
+      }
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">      if (lastTimestamp.equals(entry.getKey())) {</span>
+        // First timestamp in tree is equal to the lower interval bound of the vertex
+<span class="fc" id="L67">        degree += entry.getValue();</span>
+<span class="fc" id="L68">        continue;</span>
+      }
+
+      // The payload is 0, means the degree does not change and the intervals can be merged
+<span class="fc bfc" id="L72" title="All 2 branches covered.">      if (entry.getValue() != 0) {</span>
+<span class="fc" id="L73">        collector.collect(new Tuple4&lt;&gt;(vertexId, lastTimestamp, entry.getKey(), degree));</span>
+<span class="fc" id="L74">        degree += entry.getValue();</span>
+        // remember the last timestamp since it is the first one of the next interval
+<span class="fc" id="L76">        lastTimestamp = entry.getKey();</span>
+      }
+<span class="fc" id="L78">    }</span>
+
+    // last degree is 0 from last occurence of timestamp to t_to(v)
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (lastTimestamp &lt; vertexToTime) {</span>
+<span class="fc" id="L82">      collector.collect(new Tuple4&lt;&gt;(vertexId, lastTimestamp, vertexToTime, degree));</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    } else if (lastTimestamp &gt; vertexToTime) {</span>
+      // This should not happen, seems that a temporal constraint is violated
+<span class="fc" id="L85">      throw new IllegalArgumentException(String.format(TEMPORAL_VIOLATION_MSG, lastTimestamp, vertexToTime,</span>
+        vertexId));
+    } // else, the ending bound of the vertex interval equals the last timestamp of the edges
+<span class="fc" id="L88">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
