@@ -348,8 +348,9 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
   }
 
   /**
-   * Grouping operator that considers valid values.
-   * The resulting valid times will be computed by min/max aggregations.
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
    *
    * @param vertexGroupingKeys property keys to group vertices
    * @return summary graph
@@ -360,8 +361,9 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
   }
 
   /**
-   * Grouping operator that considers valid values.
-   * The resulting valid times will be computed by min/max aggregations.
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
    *
    * @param vertexGroupingKeys property keys to group vertices
    * @param edgeGroupingKeys   property keys to group edges
@@ -374,8 +376,9 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
   }
 
   /**
-   * Grouping operator that considers valid values.
-   * The resulting valid times will be computed by min/max aggregations.
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
    *
    * @param vertexGroupingKeys       property keys to group vertices
    * @param vertexAggregateFunctions aggregate functions to apply on super vertices
