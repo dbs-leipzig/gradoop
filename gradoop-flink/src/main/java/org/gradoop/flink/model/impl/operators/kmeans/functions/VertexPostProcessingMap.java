@@ -21,14 +21,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
+import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 
 /**
  * Extends the properties of the vertices by the clusterId and the spatial properties of the cluster
  *
  * @param <V> The vertex type
  */
-public class VertexPostProcessingMap<V extends Vertex> implements
-  MapFunction<Tuple2<V, Tuple2<Centroid, String>>, V> {
+public class VertexPostProcessingMap<V extends Vertex>
+        implements MapFunction<Tuple2<V, Tuple2<Centroid, Point>>, V> {
 
   /**
    * First spatial property name of the vertex
@@ -71,16 +72,14 @@ public class VertexPostProcessingMap<V extends Vertex> implements
    * @return Returns the vertex with extended attributes
    */
   @Override
-  public V map(Tuple2<V, Tuple2<Centroid, String>> t2) {
+  public V map(Tuple2<V, Tuple2<Centroid, Point>> t2) {
     V vertex = t2.f0;
     if (vertex.hasProperty(lat) && vertex.hasProperty(lat)) {
-      vertex.setProperty(latOrigin, vertex.getPropertyValue(lat));
-      vertex.setProperty(lonOrigin, vertex.getPropertyValue(lon));
-      vertex.removeProperty(lat);
-      vertex.removeProperty(lon);
-      String[] latAndLon = t2.f1.f1.split(";");
-      vertex.setProperty("cluster_" + lat, PropertyValue.create(Double.parseDouble(latAndLon[0])));
-      vertex.setProperty("cluster_" + lon, PropertyValue.create(Double.parseDouble(latAndLon[1])));
+      Point point = t2.f1.f1;
+      double latitude = point.getLat();
+      double longitude = point.getLon();
+      vertex.setProperty("cluster_" + lat, latitude);
+      vertex.setProperty("cluster_" + lon, longitude);
       vertex.setProperty("cluster_id", PropertyValue.create(t2.f1.f0.getId()));
     }
     return vertex;

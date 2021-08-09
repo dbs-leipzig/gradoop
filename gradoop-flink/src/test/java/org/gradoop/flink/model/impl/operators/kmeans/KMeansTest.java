@@ -146,8 +146,8 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
     DataSet<V> vertices = (DataSet<V>) output.getVertices();
     DataSet<V> comparisonVertices = vertices.filter(
       vertex -> vertex.hasProperty("cluster_lat") && vertex.hasProperty("cluster_long") &&
-        vertex.hasProperty("cluster_id") && vertex.hasProperty("long_origin") &&
-        vertex.hasProperty("lat_origin"));
+        vertex.hasProperty("cluster_id") && vertex.hasProperty("long") &&
+        vertex.hasProperty("lat"));
 
     assertTrue(comparisonVertices.collect().size() == vertices.collect().size());
 

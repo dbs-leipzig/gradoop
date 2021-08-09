@@ -22,7 +22,6 @@ import java.util.Objects;
 /**
  * Point class that can we created by defining its coordinates.
  */
-
 public class Point implements Serializable {
 
   /**
@@ -47,7 +46,6 @@ public class Point implements Serializable {
    * @param lat First spatial property of the point
    * @param lon Second spatial property of thw point
    */
-
   public Point(double lat, double lon) {
     this.lat = lat;
     this.lon = lon;
@@ -82,7 +80,6 @@ public class Point implements Serializable {
    * @param val Value the points is divided by
    * @return Returns the point with its divided latitude and longitude
    */
-
   public Point div(long val) {
     lat /= val;
     lon /= val;
@@ -94,7 +91,6 @@ public class Point implements Serializable {
    *
    * @return Returns the value of the latitude
    */
-
   public Double getLat() {
     return this.lat;
   }
@@ -106,6 +102,24 @@ public class Point implements Serializable {
    */
   public double getLon() {
     return this.lon;
+  }
+
+  /**
+   * Sets Latitude
+   *
+   * @param lat New value for lat
+   */
+  public void setLat(double lat) {
+    this.lat = lat;
+  }
+
+  /**
+   * Sets Longitude
+   *
+   * @param lon New value for lon
+   */
+  public void setLon(double lon) {
+    this.lon = lon;
   }
 
 

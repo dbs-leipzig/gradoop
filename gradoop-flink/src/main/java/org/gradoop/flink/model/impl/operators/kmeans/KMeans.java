@@ -31,9 +31,10 @@ import org.gradoop.flink.model.impl.operators.kmeans.functions.VertexPostProcess
 import org.gradoop.flink.model.impl.operators.kmeans.functions.CountAppender;
 import org.gradoop.flink.model.impl.operators.kmeans.functions.CentroidAccumulator;
 import org.gradoop.flink.model.impl.operators.kmeans.functions.CentroidAverager;
-import org.gradoop.flink.model.impl.operators.kmeans.functions.PointToKey;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
+
+import java.util.Objects;
 
 /**
  * Takes a logical graph, an user defined amount of iterations and centroids, and the property names
@@ -47,13 +48,11 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
  * @param <LG> The type of the graph.
  * @param <GC> The type of the graph collection.
  */
-
-
 public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
   UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
-   * Amount if times the algorithm iterates over the vertices
+   * Number of iterations
    */
   private final int iterations;
 
@@ -62,43 +61,45 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG ex
    */
   private final int centroids;
 
-  /**
-   * First spatial property used for the clustering
+  /**ng
+   * Name of the first spatial property used for the clustering
    */
-  private final String latName;
+  private final String firstPropertyName;
 
   /**
-   * Second spatial property used for the clustering
+   * Name of the second spatial property used for the clustering
    */
-  private final String lonName;
+  private final String secondPropertyName;
 
   /**
    * Constructor to create an instance of KMeans
    *
-   * @param iterations        Amount of times the algorithm iterates over the the vertices
+   * @param iterations        Number of iterations, e.g., 10
    * @param centroids         Amount of centroids that are determined by the algorithm
    * @param propertyNameOne   First spatial property name of the vertices
    * @param propertyNameTwo   Second spatial property name of the vertices
    */
   public KMeans(int iterations, int centroids, String propertyNameOne, String propertyNameTwo) {
+    Objects.requireNonNull(propertyNameOne);
+    Objects.requireNonNull(propertyNameTwo);
     this.iterations = iterations;
     this.centroids = centroids;
-    this.latName = propertyNameOne;
-    this.lonName = propertyNameTwo;
+    this.firstPropertyName = propertyNameOne;
+    this.secondPropertyName = propertyNameTwo;
   }
 
   @Override
   public LG execute(LG logicalGraph) {
 
-    final String lat = this.latName;
-    final String lon = this.lonName;
+    final String lat = this.firstPropertyName;
+    final String lon = this.secondPropertyName;
 
     DataSet<V> spatialVertices =
       logicalGraph.getVertices().filter(v -> v.hasProperty(lat) && v.hasProperty(lon));
 
     DataSet<Point> points = spatialVertices.map(v -> {
-      double latValue = Double.parseDouble(v.getPropertyValue(lat).toString());
-      double lonValue = Double.parseDouble(v.getPropertyValue(lon).toString());
+      double latValue = ((Number) v.getPropertyValue(lat).getObject()).doubleValue();
+      double lonValue = ((Number) v.getPropertyValue(lon).getObject()).doubleValue();
       return new Point(latValue, lonValue);
     });
 
@@ -129,21 +130,18 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG ex
     DataSet<Tuple2<Centroid, Point>> clusteredPoints =
       points.map(new SelectNearestCenter()).withBroadcastSet(finalCentroids, "centroids");
 
-    DataSet<Tuple2<Centroid, String>> clusteredPointsLatAndLon = clusteredPoints.map(new PointToKey());
-
-
-    DataSet<Tuple2<V, Tuple2<Centroid, String>>> joinedVertices =
-      logicalGraph.getVertices().join(clusteredPointsLatAndLon).where((KeySelector<V, String>) v -> {
-        double latValue = Double.parseDouble(v.getPropertyValue(lat).toString());
-        double lonValue = Double.parseDouble(v.getPropertyValue(lon).toString());
-        return latValue + ";" + lonValue;
+    DataSet<Tuple2<V, Tuple2<Centroid, Point>>> joinedVertices =
+      logicalGraph.getVertices().join(clusteredPoints).where((KeySelector<V, Point>) v -> {
+        double latValue = ((Number) v.getPropertyValue(lat).getObject()).doubleValue();
+        double lonValue = ((Number) v.getPropertyValue(lon).getObject()).doubleValue();
+        return new Point(latValue, lonValue);
       }).equalTo(1);
 
     DataSet<V> newVertices = joinedVertices.map(new VertexPostProcessingMap<>(lat, lon));
 
 
     return logicalGraph.getFactory()
-      .fromDataSets(logicalGraph.getGraphHead(), newVertices, logicalGraph.getEdges()).verify();
+      .fromDataSets(logicalGraph.getGraphHead(), newVertices, logicalGraph.getEdges());
 
 
   }

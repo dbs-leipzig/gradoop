@@ -51,7 +51,6 @@ public class Centroid extends Point {
    * @param id The unique id assigned to the centroid
    * @param p  The point defining the coordinates of the centroid
    */
-
   public Centroid(int id, Point p) {
     super(p.getLat(), p.getLon());
     this.id = id;
