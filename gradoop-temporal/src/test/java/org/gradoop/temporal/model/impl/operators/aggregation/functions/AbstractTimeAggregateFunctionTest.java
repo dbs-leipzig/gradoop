@@ -59,7 +59,7 @@ public class AbstractTimeAggregateFunctionTest extends TemporalGradoopTestBase {
     // Create a mock of the abstract function. (The first constructor parameter, the property key,
     // is irrelevant for this test.
     TemporalAggregateFunction mock = mock(AbstractTimeAggregateFunction.class, withSettings()
-      .useConstructor("", interval, field).defaultAnswer(CALLS_REAL_METHODS));
+      .useConstructor(interval, field, "").defaultAnswer(CALLS_REAL_METHODS));
     PropertyValue increment = mock.getIncrement(testElement);
     assertTrue(increment.isLong());
     assertEquals(expectedValue, increment.getLong());
