@@ -392,14 +392,14 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
     List<AggregateFunction> edgeAggregateFunctions) {
     // Add min/max valid time aggregations that will result in the new valid times
     List<AggregateFunction> tempVertexAgg = new ArrayList<>(vertexAggregateFunctions);
-    tempVertexAgg.add(new MinVertexTime("", TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
+    tempVertexAgg.add(new MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
       .setAsValidTime(TimeDimension.Field.FROM));
-    tempVertexAgg.add(new MaxVertexTime("", TimeDimension.VALID_TIME, TimeDimension.Field.TO)
+    tempVertexAgg.add(new MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)
       .setAsValidTime(TimeDimension.Field.TO));
     List<AggregateFunction> tempEdgeAgg = new ArrayList<>(edgeAggregateFunctions);
-    tempEdgeAgg.add(new MinEdgeTime("", TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
+    tempEdgeAgg.add(new MinEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
       .setAsValidTime(TimeDimension.Field.FROM));
-    tempEdgeAgg.add(new MaxEdgeTime("", TimeDimension.VALID_TIME, TimeDimension.Field.TO)
+    tempEdgeAgg.add(new MaxEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)
       .setAsValidTime(TimeDimension.Field.TO));
 
     return callForGraph(new KeyedGrouping<>(vertexGroupingKeys, tempVertexAgg, edgeGroupingKeys,

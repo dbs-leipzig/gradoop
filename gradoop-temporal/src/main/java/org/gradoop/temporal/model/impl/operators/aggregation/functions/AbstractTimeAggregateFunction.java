@@ -63,12 +63,12 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   /**
    * Sets attributes used to initialize this aggregate function.
    *
+   * @param timeDimension The time dimension type to consider.
+   * @param field The field of the time-dimension to consider.
    * @param aggregatePropertyKey The aggregate property key.
-   * @param timeDimension        The time dimension type to consider.
-   * @param field                The field of the time-dimension to consider.
    */
-  public AbstractTimeAggregateFunction(String aggregatePropertyKey, TimeDimension timeDimension,
-    TimeDimension.Field field) {
+  public AbstractTimeAggregateFunction(TimeDimension timeDimension, TimeDimension.Field field,
+    String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.timeDimension = Objects.requireNonNull(timeDimension);
     this.field = Objects.requireNonNull(field);

@@ -67,10 +67,10 @@ public class TemporalAggregationExample {
     bikeGraph
       // apply four aggregate functions to get the earliest and latest start and end of a duration
       .aggregate(
-        new MinVertexTime("earliestStart", TimeDimension.VALID_TIME, TimeDimension.Field.FROM),
-        new MinVertexTime("earliestEnd", TimeDimension.VALID_TIME, TimeDimension.Field.TO),
-        new MaxVertexTime("lastStart", TimeDimension.VALID_TIME, TimeDimension.Field.FROM),
-        new MaxVertexTime("lastEnd", TimeDimension.VALID_TIME, TimeDimension.Field.TO))
+        new MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM, "earliestStart"),
+        new MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO, "earliestEnd"),
+        new MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM, "lastStart"),
+        new MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO, "lastEnd"))
       // since the aggregated values are 'long' values, we transform them into 'LocalDateTime' values
       .transformGraphHead(
         new TransformLongPropertiesToDateTime<>("earliestStart", "earliestEnd", "lastStart", "lastEnd"))
