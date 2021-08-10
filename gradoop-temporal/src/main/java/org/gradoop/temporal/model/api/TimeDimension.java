@@ -25,32 +25,13 @@ public enum TimeDimension {
    * The transaction time dimension of a temporal element, i.e. the time interval in which the element is
    * considered part of the graph store. This interval should be maintained by the system.
    */
-  TRANSACTION_TIME("tx"),
+  TRANSACTION_TIME,
   /**
    * The valid time dimension of a temporal element, i.e. the time in which the element's data is considered
    * valid in the application context. Validity is therefore depending on the data itself and maintained by
    * the user.
    */
-  VALID_TIME("valid");
-
-  /**
-   * Label used for string representations.
-   */
-  private final String label;
-
-  /**
-   * Private constructor.
-   *
-   * @param label label used for string representations
-   */
-  TimeDimension(String label) {
-    this.label = label;
-  }
-
-  @Override
-  public String toString() {
-    return label;
-  }
+  VALID_TIME;
 
   /**
    * Fields accessible in a time interval.
@@ -63,11 +44,6 @@ public enum TimeDimension {
     /**
      * The end of the interval.
      */
-    TO;
-
-    @Override
-    public String toString() {
-      return name().toLowerCase();
-    }
+    TO
   }
 }
