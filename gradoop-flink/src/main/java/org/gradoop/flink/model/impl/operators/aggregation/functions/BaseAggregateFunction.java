@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 public abstract class BaseAggregateFunction implements AggregateFunction {
   /**
-   * Key of the aggregate property.
+   * The key of the property where the aggregated result is saved.
    */
   private String aggregatePropertyKey;
 

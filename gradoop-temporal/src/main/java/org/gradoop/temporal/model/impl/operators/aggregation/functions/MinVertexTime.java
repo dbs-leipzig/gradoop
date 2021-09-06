@@ -40,7 +40,7 @@ public class MinVertexTime extends MinTime implements VertexAggregateFunction {
    *
    * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
-   * @param aggregatePropertyKey The aggregate property key.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
    */
   public MinVertexTime(TimeDimension dimension, TimeDimension.Field field, String aggregatePropertyKey) {
     super(dimension, field, aggregatePropertyKey);

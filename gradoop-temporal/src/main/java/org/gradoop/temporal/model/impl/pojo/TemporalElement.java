@@ -101,25 +101,6 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
-   * Set transaction time by field.
-   *
-   * @param transactionTime time value
-   * @param field time field
-   */
-  public void setTransactionTime(long transactionTime, TimeDimension.Field field) {
-    switch (Objects.requireNonNull(field)) {
-    case FROM:
-      setTxFrom(transactionTime);
-      break;
-    case TO:
-      setTxTo(transactionTime);
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown field [" + field + "].");
-    }
-  }
-
-  /**
    * Get the valid time tuple (valid-from, valid-to). Needed because of Flink's POJO rules.
    *
    * @return a {@link Tuple2} representing the valid time interval

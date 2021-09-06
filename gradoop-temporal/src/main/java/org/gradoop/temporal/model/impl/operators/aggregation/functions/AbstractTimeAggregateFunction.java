@@ -65,7 +65,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    *
    * @param timeDimension The time dimension type to consider.
    * @param field The field of the time-dimension to consider.
-   * @param aggregatePropertyKey The aggregate property key.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
    */
   public AbstractTimeAggregateFunction(TimeDimension timeDimension, TimeDimension.Field field,
     String aggregatePropertyKey) {
