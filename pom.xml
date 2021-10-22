@@ -178,7 +178,7 @@
 
         <plugin.maven-compiler.version>3.8.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
-        <plugin.maven-spotbugs.version>3.1.11</plugin.maven-spotbugs.version>
+        <plugin.maven-spotbugs.version>4.3.0</plugin.maven-spotbugs.version>
         <plugin.maven-jar.version>3.1.1</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
         <plugin.maven-resource.version>3.1.0</plugin.maven-resource.version>

@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
     <Match>
-        <Class name="org.gradoop.common.model.impl.id.GradoopId" />
-        <Method name="toByteArray" />
-        <Bug pattern="EI_EXPOSE_REP" />
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_EXPOSE_REP,DMI_RANDOM_USED_ONLY_ONCE"/>
     </Match>
     <Match>
-        <Class name="org.gradoop.common.model.impl.properties.bytes.Bytes" />
-        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
-    </Match>
-    <Match>
-        <Class name="org.gradoop.common.model.impl.properties.bytes.Bytes$ByteArrayComparator" />
-        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE" />
-    </Match>
-    <Match>
-        <Class name="org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding"/>
-        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class name="org.gradoop.common.model.impl.properties.bytes.Bytes$ByteArrayComparator"/>
+        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
     </Match>
 </FindBugsFilter>
