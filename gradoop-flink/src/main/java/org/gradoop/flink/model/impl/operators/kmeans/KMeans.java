@@ -48,7 +48,8 @@ import java.util.Objects;
  * @param <LG> The type of the graph.
  * @param <GC> The type of the graph collection.
  */
-public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
+public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge
+  , LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
   UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
@@ -103,7 +104,6 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG ex
       return new Point(latValue, lonValue);
     });
 
-
     DataSet<Tuple2<Long, Point>> indexingPoints = DataSetUtils.zipWithIndex(points.first(centroids));
     DataSet<Centroid> firstCentroids =
       indexingPoints.map(t -> new Centroid(Math.toIntExact(t.f0), t.f1.getLat(), t.f1.getLon()));
@@ -139,10 +139,8 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge, LG ex
 
     DataSet<V> newVertices = joinedVertices.map(new VertexPostProcessingMap<>(lat, lon));
 
-
     return logicalGraph.getFactory()
       .fromDataSets(logicalGraph.getGraphHead(), newVertices, logicalGraph.getEdges());
-
 
   }
 }

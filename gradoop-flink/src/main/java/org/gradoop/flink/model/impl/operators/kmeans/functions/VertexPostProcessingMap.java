@@ -74,7 +74,7 @@ public class VertexPostProcessingMap<V extends Vertex>
   @Override
   public V map(Tuple2<V, Tuple2<Centroid, Point>> t2) {
     V vertex = t2.f0;
-    if (vertex.hasProperty(lat) && vertex.hasProperty(lat)) {
+    if (vertex.hasProperty(lat) && vertex.hasProperty(lon)) {
       Point point = t2.f1.f1;
       double latitude = point.getLat();
       double longitude = point.getLon();
