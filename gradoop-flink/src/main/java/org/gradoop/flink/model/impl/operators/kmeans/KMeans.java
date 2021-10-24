@@ -48,8 +48,8 @@ import java.util.Objects;
  * @param <LG> The type of the graph.
  * @param <GC> The type of the graph collection.
  */
-public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge
-  , LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
+public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
   UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
