@@ -39,8 +39,8 @@ import java.util.Objects;
 /**
  * Takes a logical graph, an user defined amount of iterations and centroids, and the property names
  * of the vertex that are used for the clustering as input. Adds the clusterId, together with the
- * cluster coordinates to the properties of the vertex. Returns the logical graph with modified
- * vertex properties.
+ * cluster coordinates to the properties of the vertex. The datatype of the properties can be any numeric
+ * value. Returns the logical graph with modified vertex properties.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -75,7 +75,7 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
   /**
    * Constructor to create an instance of KMeans
    *
-   * @param iterations        Number of iterations, e.g., 10
+   * @param iterations        Number of iterations, e.g., 20
    * @param centroids         Amount of centroids that are determined by the algorithm
    * @param propertyNameOne   First spatial property name of the vertices
    * @param propertyNameTwo   Second spatial property name of the vertices
@@ -111,19 +111,20 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
     IterativeDataSet<Centroid> loop = firstCentroids.iterate(iterations);
 
     DataSet<Centroid> newCentroids = points
-      /*
-      Assigns a centroid to every vertex
-       */.map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
+
+      //Assigns a centroid to every vertex
+        .map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
       /*
       Adds a CountAppender to every Mapping and changes first value from centroidObject to
       CentroidId
-       */.map(new CountAppender())
-      /*
-      Groups mapping by id and sums up points of every centroid. For every addition the count increments
-       */.groupBy(0).reduce(new CentroidAccumulator())
-      /*
-      Divides summed up points through its counter and assigns the cluster a new centroid
-       */.map(new CentroidAverager());
+       */
+        .map(new CountAppender())
+
+      //Groups mapping by id and sums up points of every centroid. For every addition the count increments
+        .groupBy(0).reduce(new CentroidAccumulator())
+
+      //Divides summed up points through its counter and assigns the cluster a new centroid
+        .map(new CentroidAverager());
 
     DataSet<Centroid> finalCentroids = loop.closeWith(newCentroids);
 

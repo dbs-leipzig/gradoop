@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 /**
  * Computes the average value of the points coordinates assigned to the same centroid.
  */
-
 public class CentroidAverager implements MapFunction<Tuple3<Integer, Point, Long>, Centroid> {
 
   /**

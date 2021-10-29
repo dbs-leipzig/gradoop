@@ -20,5 +20,4 @@
  * returns the logical graph and extends the properties of its vertices by a clusterId and the spatial
  * attributes of the cluster
  */
-
 package org.gradoop.flink.model.impl.operators.kmeans;

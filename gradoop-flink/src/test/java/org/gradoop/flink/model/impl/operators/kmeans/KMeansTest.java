@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.kmeans;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -86,16 +87,15 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
 
     inputGdlGraph =
       "g[" + "(c1:Coordinate {lat: 10.0, long: 15.0})" + "(c2:Coordinate {lat: 20.0, long: 20.0})" +
-        "(c3:Coordinate {lat: 25.0, long: 30.0})" + "(c4:Coordinate {lat: 20.0, long: 10.0})" +
-        "(c5:Coordinate {lat: 25.0, long: 15.0})" + "(c6:Coordinate {lat: 30.0, long: 20.0})" +
+        "(c3:Coordinate {lat: 25.012F, long: 30.012F})" + "(c4:Coordinate {lat: 20L, long: 10L})" +
+        "(c5:Coordinate {lat: 25, long: 15})" + "(c6:Coordinate {lat: 30.0, long: 20.0})" +
         "(c7:Coordinate {lat: 35.0, long: 25.0})" + "(c8:Coordinate {lat: 40.0, long: 30.0})" +
         "(c9:Coordinate {lat: 10.0, long: 10.0})" + "(c10:Coordinate {lat: 10.0, long: 30.0})" +
         "(c11:Coordinate {lat: 20.0, long: 40.0})" + "(c12:Coordinate {lat: 5.0, long: 10.0})" + "]";
   }
 
-  /*
-  Unit Tests
-   */
+
+  //Unit Tests
   @Test
   public void testSelectNearestCenter() throws Exception {
 
@@ -109,40 +109,46 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
   @Test
   public void testCountAppender() throws Exception {
     List<Tuple3<Integer, Point, Long>> nearestCenterWithAppendedCounter =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids").map(new CountAppender())
+      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+        .map(new CountAppender())
         .collect();
 
-    assertTrue(expectedNearestCenterWithAppendedCounter.size() == nearestCenterWithAppendedCounter.size() &&
+    assertTrue(expectedNearestCenterWithAppendedCounter.size() ==
+      nearestCenterWithAppendedCounter.size() &&
       expectedNearestCenterWithAppendedCounter.containsAll(nearestCenterWithAppendedCounter));
   }
 
   @Test
   public void testCentroidAccumulator() throws Exception {
     List<Tuple3<Integer, Point, Long>> centroidsWithAccumulatedPoints =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids").map(new CountAppender())
+      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+        .map(new CountAppender())
         .groupBy(0).reduce(new CentroidAccumulator()).collect();
 
-    assertTrue(expectedCentroidsWithAccumulatedPoints.size() == centroidsWithAccumulatedPoints.size() &&
+    assertTrue(expectedCentroidsWithAccumulatedPoints.size() ==
+      centroidsWithAccumulatedPoints.size() &&
       expectedCentroidsWithAccumulatedPoints.containsAll(centroidsWithAccumulatedPoints));
   }
 
   @Test
   public void testCentroidAverager() throws Exception {
     List<Centroid> averageCentroids =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids").map(new CountAppender())
+      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+        .map(new CountAppender())
         .groupBy(0).reduce(new CentroidAccumulator()).map(new CentroidAverager()).collect();
 
     assertTrue(expectedAverageCentroids.size() == averageCentroids.size() &&
       expectedAverageCentroids.containsAll(averageCentroids));
   }
 
-  /*
-  Integration Test
-   */
+
+  //Integration Test
   @Test
   public void testKMeansAlgorithm() throws Exception {
     LogicalGraph logicalGraph = getLoaderFromString(inputGdlGraph).getLogicalGraphByVariable("g");
-    LogicalGraph output = (LogicalGraph) new KMeans(3, 3, "lat", "long").execute(logicalGraph);
+    LogicalGraph output =
+      (LogicalGraph) new KMeans(20, 3, "lat", "long")
+        .execute(logicalGraph);
     DataSet<V> vertices = (DataSet<V>) output.getVertices();
     DataSet<V> comparisonVertices = vertices.filter(
       vertex -> vertex.hasProperty("cluster_lat") && vertex.hasProperty("cluster_long") &&
@@ -150,6 +156,18 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
         vertex.hasProperty("lat"));
 
     assertTrue(comparisonVertices.collect().size() == vertices.collect().size());
+
+    //Mapping function to see the values of the vertex properties
+    DataSet<String> properties = vertices.map(
+      (MapFunction<V, String>) vertex -> vertex.getPropertyValue("cluster_lat").toString() + " " +
+        vertex.getPropertyValue("cluster_long").toString() + " " +
+        vertex.getPropertyValue("cluster_id").toString() + " " +
+        vertex.getPropertyValue("long").toString() + " " +
+        vertex.getPropertyValue("lat").toString());
+
+    for (String s : properties.collect()) {
+      System.out.println(s);
+    }
 
   }
 }

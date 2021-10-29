@@ -34,6 +34,11 @@ public class SelectNearestCenter extends RichMapFunction<Point, Tuple2<Centroid,
   private Collection<Centroid> centroids;
 
   /**
+   * Closest centroid for a given point
+   */
+  private Centroid closestCentroid;
+
+  /**
    * Reads the centroid values from a broadcast variable into a collection.
    */
   @Override
@@ -50,7 +55,6 @@ public class SelectNearestCenter extends RichMapFunction<Point, Tuple2<Centroid,
   @Override
   public Tuple2<Centroid, Point> map(Point p) {
     double minDistance = Double.MAX_VALUE;
-    Centroid closestCentroid = null;
     // check all cluster centers
     for (Centroid centroid : centroids) {
       // compute distance

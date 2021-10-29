@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Point class that can we created by defining its coordinates.
+ * Point class that can be created by defining its coordinates.
  */
 public class Point implements Serializable {
 

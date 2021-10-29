@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.kmeans.functions;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 
@@ -23,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
  * Sums up the points that are assigned to the same centroid. Counts how many were points summed up for
  * every centroid.
  */
-
+@FunctionAnnotation.ForwardedFields("0")
 public class CentroidAccumulator implements ReduceFunction<Tuple3<Integer, Point, Long>> {
 
   /**

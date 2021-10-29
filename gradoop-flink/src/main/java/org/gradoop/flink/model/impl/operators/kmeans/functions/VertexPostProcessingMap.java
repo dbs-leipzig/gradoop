@@ -57,7 +57,6 @@ public class VertexPostProcessingMap<V extends Vertex>
    * @param lat First spatial property name of the vertex
    * @param lon Second spatial property name of the vertex
    */
-
   public VertexPostProcessingMap(String lat, String lon) {
     this.lat = lat;
     this.lon = lon;
