@@ -28,8 +28,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class JoinEstimatorTest extends EstimatorTestBase {
 
@@ -56,7 +55,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(24L));
+    assertEquals(24L, estimator.getCardinality());
   }
 
   @Test
@@ -82,7 +81,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(3L));
+    assertEquals(3L, estimator.getCardinality());
   }
 
   @Test
@@ -108,7 +107,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
   }
 
   @Test
@@ -132,9 +131,9 @@ public class JoinEstimatorTest extends EstimatorTestBase {
 
     JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
     estimator.visit(nemJoin);
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
   }
 
   @Test
@@ -158,9 +157,9 @@ public class JoinEstimatorTest extends EstimatorTestBase {
 
     JoinEstimator estimator = new JoinEstimator(queryHandler, STATS);
     estimator.visit(neJoin);
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
     estimator.visit(nemJoin);
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
   }
 
   @Test
@@ -186,7 +185,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
     // 24 1-edge paths + 10 2-edge paths
-    assertThat(estimator.getCardinality(), is(34L));
+    assertEquals(34L, estimator.getCardinality());
   }
 
   @Test
@@ -212,7 +211,7 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(neJoin);
     estimator.visit(nemJoin);
 
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
   }
 
   @Test
@@ -249,6 +248,6 @@ public class JoinEstimatorTest extends EstimatorTestBase {
     estimator.visit(ne1mJoin);
     estimator.visit(ne1Join);
 
-    assertThat(estimator.getCardinality(), is(30L));
+    assertEquals(30L, estimator.getCardinality());
   }
 }

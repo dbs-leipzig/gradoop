@@ -30,8 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class EmbeddingTestUtils {
@@ -47,9 +46,9 @@ public class EmbeddingTestUtils {
   public static void assertEmbedding(Embedding embedding,
     List<GradoopId> expectedEntries, List<PropertyValue> expectedProperties) {
     expectedEntries.forEach(entry ->
-      assertThat(embedding.getId(expectedEntries.indexOf(entry)), is(entry)));
+      assertEquals(entry, embedding.getId(expectedEntries.indexOf(entry))));
     expectedProperties.forEach(value ->
-      assertThat(embedding.getProperty(expectedProperties.indexOf(value)), is(value)));
+      assertEquals(value, embedding.getProperty(expectedProperties.indexOf(value))));
   }
 
   /**

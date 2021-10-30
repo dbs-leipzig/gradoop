@@ -31,9 +31,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
@@ -78,7 +76,7 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     List<Embedding> result = new FilterEmbeddingsNode(mockChild, filterPredicate).execute().collect();
 
-    assertThat(result.size(), is(1));
+    assertEquals(1, result.size());
     assertTrue(result.get(0).getId(0).equals(vertexAId));
     assertTrue(result.get(0).getId(1).equals(vertexBId));
     assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(42)));
