@@ -37,7 +37,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     elementEstimator.visit(node);
 
     assertEquals(11L, elementEstimator.getCardinality());
-    assertEquals(1d, elementEstimator.getSelectivity());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -52,7 +52,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     elementEstimator.visit(node);
 
     assertEquals(3L, elementEstimator.getCardinality());
-    assertEquals(1d, elementEstimator.getSelectivity());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     elementEstimator.visit(node);
 
     assertEquals(24L, elementEstimator.getCardinality());
-    assertEquals(1d, elementEstimator.getSelectivity());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -84,6 +84,6 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     elementEstimator.visit(node);
 
     assertEquals(10L, elementEstimator.getCardinality());
-    assertEquals(1d, elementEstimator.getSelectivity());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 }
