@@ -23,13 +23,15 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
 import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 
+import java.util.Objects;
+
 /**
  * Extends the properties of the vertices by the clusterId and the spatial properties of the cluster
  *
  * @param <V> The vertex type
  */
 public class VertexPostProcessingMap<V extends Vertex>
-        implements MapFunction<Tuple2<V, Tuple2<Centroid, Point>>, V> {
+  implements MapFunction<Tuple2<V, Tuple2<Centroid, Point>>, V> {
 
   /**
    * First spatial property name of the vertex
@@ -42,26 +44,14 @@ public class VertexPostProcessingMap<V extends Vertex>
   private String lon;
 
   /**
-   * First spatial property name of the vertex extended by 'origin'
-   */
-  private String latOrigin;
-
-  /**
-   * Second spatial property name of the vertex extended by 'origin'
-   */
-  private String lonOrigin;
-
-  /**
    * Initializes a VertexProcessingMap instance with the spatial property names of the vertices
    *
    * @param lat First spatial property name of the vertex
    * @param lon Second spatial property name of the vertex
    */
   public VertexPostProcessingMap(String lat, String lon) {
-    this.lat = lat;
-    this.lon = lon;
-    this.latOrigin = lat + "_origin";
-    this.lonOrigin = lon + "_origin";
+    this.lat = Objects.requireNonNull(lat);
+    this.lon = Objects.requireNonNull(lon);
   }
 
   /**
@@ -83,6 +73,4 @@ public class VertexPostProcessingMap<V extends Vertex>
     }
     return vertex;
   }
-
-
 }

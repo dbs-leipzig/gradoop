@@ -36,6 +36,6 @@ public class CountAppender implements MapFunction<Tuple2<Centroid, Point>, Tuple
    */
   @Override
   public Tuple3<Integer, Point, Long> map(Tuple2<Centroid, Point> centroidWithAssignedPoint) {
-    return new Tuple3(centroidWithAssignedPoint.f0.getId(), centroidWithAssignedPoint.f1, 1L);
+    return new Tuple3<>(centroidWithAssignedPoint.f0.getId(), centroidWithAssignedPoint.f1, 1L);
   }
 }

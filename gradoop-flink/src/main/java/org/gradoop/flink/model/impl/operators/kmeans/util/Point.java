@@ -21,6 +21,8 @@ import java.util.Objects;
 
 /**
  * Point class that can be created by defining its coordinates.
+ * Extends the existing code snippet from GitHub repository
+ * https://github.com/TU-Berlin-DIMA/flink-tutorial.git
  */
 public class Point implements Serializable {
 

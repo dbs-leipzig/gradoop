@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.kmeans;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -31,59 +31,30 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Test of {@link KMeans}.
+ */
 public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
 
-  private List<Tuple2<Centroid, Point>> expectedNearestCenter = new ArrayList<>();
-  private List<Tuple3<Integer, Point, Long>> expectedNearestCenterWithAppendedCounter = new ArrayList<>();
-  private List<Tuple3<Integer, Point, Long>> expectedCentroidsWithAccumulatedPoints = new ArrayList<>();
-  private List<Centroid> expectedAverageCentroids = new ArrayList<>();
-  String inputGdlGraph;
-
-  // init execution environment
-  ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-  DataSet<Point> points = env
-    .fromElements(new Point(20.0, 10.0), new Point(25.0, 15.0), new Point(30.0, 20.0), new Point(35.0, 25.0),
-      new Point(40.0, 30.0), new Point(10.0, 10.0), new Point(10.0, 30.0), new Point(20.0, 40.0),
-      new Point(5.0, 10.0));
-
-  DataSet<Centroid> centroids = env
-    .fromElements(new Centroid(1, new Point(10.0, 15.0)), new Centroid(2, new Point(20.0, 20.0)),
-      new Centroid(3, new Point(25.0, 30.0)));
+  private String inputGdlGraph;
+  private ExecutionEnvironment env = super.getExecutionEnvironment();
+  private DataSet<Point> points;
+  private DataSet<Centroid> centroids;
 
   @Before
   public void setUpTestVariables() {
 
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)), new Point(20.0, 10.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)), new Point(25.0, 15.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)), new Point(30.0, 20.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)), new Point(35.0, 25.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)), new Point(40.0, 30.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(1, new Point(10.0, 15.0)), new Point(10.0, 10.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)), new Point(10.0, 30.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)), new Point(20.0, 40.0)));
-    expectedNearestCenter.add(new Tuple2<>(new Centroid(1, new Point(10.0, 15.0)), new Point(5.0, 10.0)));
+    points = env.fromElements(new Point(20.0, 10.0), new Point(25.0, 15.0),
+            new Point(30.0, 20.0), new Point(35.0, 25.0),
+            new Point(40.0, 30.0), new Point(10.0, 10.0),
+            new Point(10.0, 30.0), new Point(20.0, 40.0),
+            new Point(5.0, 10.0));
 
-
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(20.0, 10.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(25.0, 15.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(30.0, 20.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(35.0, 25.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(40.0, 30.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(1, new Point(10.0, 10.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(10.0, 30.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(20.0, 40.0), 1L));
-    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(1, new Point(5.0, 10.0), 1L));
-
-    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(1, new Point(15.0, 20.0), 2L));
-    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(2, new Point(85.0, 75.0), 4L));
-    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(3, new Point(95.0, 95.0), 3L));
-
-    expectedAverageCentroids.add(new Centroid(1, new Point(7.5, 10.0)));
-    expectedAverageCentroids.add(new Centroid(2, new Point(21.25, 18.75)));
-    expectedAverageCentroids.add(new Centroid(3, new Point(31.666666666666668, 31.666666666666668)));
+    centroids = env.fromElements(new Centroid(1, new Point(10.0, 15.0)),
+            new Centroid(2, new Point(20.0, 20.0)),
+            new Centroid(3, new Point(25.0, 30.0)));
 
     inputGdlGraph =
       "g[" + "(c1:Coordinate {lat: 10.0, long: 15.0})" + "(c2:Coordinate {lat: 20.0, long: 20.0})" +
@@ -94,13 +65,39 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
         "(c11:Coordinate {lat: 20.0, long: 40.0})" + "(c12:Coordinate {lat: 5.0, long: 10.0})" + "]";
   }
 
-
-  //Unit Tests
+  /*
+  Unit Tests
+   */
   @Test
   public void testSelectNearestCenter() throws Exception {
 
-    List<Tuple2<Centroid, Point>> nearestCenter =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids").collect();
+    List<Tuple2<Centroid, Point>> expectedNearestCenter = new ArrayList<>();
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)),
+            new Point(20.0, 10.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)),
+            new Point(25.0, 15.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)),
+            new Point(30.0, 20.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)),
+            new Point(35.0, 25.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)),
+            new Point(40.0, 30.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(1, new Point(10.0, 15.0)),
+            new Point(10.0, 10.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(2, new Point(20.0, 20.0)),
+            new Point(10.0, 30.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(3, new Point(25.0, 30.0)),
+            new Point(20.0, 40.0)));
+    expectedNearestCenter.add(new Tuple2<>(new Centroid(1, new Point(10.0, 15.0)),
+            new Point(5.0, 10.0)));
+
+    List<Tuple2<Centroid, Point>> nearestCenter = new ArrayList<>();
+
+    points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids").output(
+      new LocalCollectionOutputFormat<>(nearestCenter)
+    );
+
+    getExecutionEnvironment().execute();
 
     assertTrue(expectedNearestCenter.size() == nearestCenter.size() &&
       expectedNearestCenter.containsAll(nearestCenter));
@@ -108,10 +105,24 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
 
   @Test
   public void testCountAppender() throws Exception {
-    List<Tuple3<Integer, Point, Long>> nearestCenterWithAppendedCounter =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
-        .map(new CountAppender())
-        .collect();
+
+    List<Tuple3<Integer, Point, Long>> expectedNearestCenterWithAppendedCounter = new ArrayList<>();
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(20.0, 10.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(25.0, 15.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(30.0, 20.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(35.0, 25.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(40.0, 30.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(1, new Point(10.0, 10.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(2, new Point(10.0, 30.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(3, new Point(20.0, 40.0), 1L));
+    expectedNearestCenterWithAppendedCounter.add(new Tuple3<>(1, new Point(5.0, 10.0), 1L));
+
+    List<Tuple3<Integer, Point, Long>> nearestCenterWithAppendedCounter = new ArrayList<>();
+
+    points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+      .map(new CountAppender()).output(new LocalCollectionOutputFormat<>(nearestCenterWithAppendedCounter));
+
+    getExecutionEnvironment().execute();
 
     assertTrue(expectedNearestCenterWithAppendedCounter.size() ==
       nearestCenterWithAppendedCounter.size() &&
@@ -120,10 +131,19 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
 
   @Test
   public void testCentroidAccumulator() throws Exception {
-    List<Tuple3<Integer, Point, Long>> centroidsWithAccumulatedPoints =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
-        .map(new CountAppender())
-        .groupBy(0).reduce(new CentroidAccumulator()).collect();
+
+    List<Tuple3<Integer, Point, Long>> expectedCentroidsWithAccumulatedPoints = new ArrayList<>();
+    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(1, new Point(15.0, 20.0), 2L));
+    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(2, new Point(85.0, 75.0), 4L));
+    expectedCentroidsWithAccumulatedPoints.add(new Tuple3<>(3, new Point(95.0, 95.0), 3L));
+
+    List<Tuple3<Integer, Point, Long>> centroidsWithAccumulatedPoints = new ArrayList<>();
+
+    points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+      .map(new CountAppender()).groupBy(0).reduce(new CentroidAccumulator())
+      .output(new LocalCollectionOutputFormat<>(centroidsWithAccumulatedPoints));
+
+    getExecutionEnvironment().execute();
 
     assertTrue(expectedCentroidsWithAccumulatedPoints.size() ==
       centroidsWithAccumulatedPoints.size() &&
@@ -132,17 +152,26 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
 
   @Test
   public void testCentroidAverager() throws Exception {
-    List<Centroid> averageCentroids =
-      points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
-        .map(new CountAppender())
-        .groupBy(0).reduce(new CentroidAccumulator()).map(new CentroidAverager()).collect();
+
+    List<Centroid> expectedAverageCentroids = new ArrayList<>();
+    expectedAverageCentroids.add(new Centroid(1, new Point(7.5, 10.0)));
+    expectedAverageCentroids.add(new Centroid(2, new Point(21.25, 18.75)));
+    expectedAverageCentroids.add(new Centroid(3, new Point(31.666666666666668, 31.666666666666668)));
+    List<Centroid> averageCentroids = new ArrayList<>();
+
+    points.map(new SelectNearestCenter()).withBroadcastSet(centroids, "centroids")
+      .map(new CountAppender()).groupBy(0).reduce(new CentroidAccumulator()).map(new CentroidAverager())
+      .output(new LocalCollectionOutputFormat<>(averageCentroids));
+
+    getExecutionEnvironment().execute();
 
     assertTrue(expectedAverageCentroids.size() == averageCentroids.size() &&
       expectedAverageCentroids.containsAll(averageCentroids));
   }
 
-
-  //Integration Test
+  /*
+  Integration Test
+   */
   @Test
   public void testKMeansAlgorithm() throws Exception {
     LogicalGraph logicalGraph = getLoaderFromString(inputGdlGraph).getLogicalGraphByVariable("g");
@@ -155,19 +184,14 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
         vertex.hasProperty("cluster_id") && vertex.hasProperty("long") &&
         vertex.hasProperty("lat"));
 
-    assertTrue(comparisonVertices.collect().size() == vertices.collect().size());
+    List<V> verticesList = new ArrayList<>();
+    List<V> comparisonVerticesList = new ArrayList<>();
 
-    //Mapping function to see the values of the vertex properties
-    DataSet<String> properties = vertices.map(
-      (MapFunction<V, String>) vertex -> vertex.getPropertyValue("cluster_lat").toString() + " " +
-        vertex.getPropertyValue("cluster_long").toString() + " " +
-        vertex.getPropertyValue("cluster_id").toString() + " " +
-        vertex.getPropertyValue("long").toString() + " " +
-        vertex.getPropertyValue("lat").toString());
+    vertices.output(new LocalCollectionOutputFormat<>(verticesList));
+    comparisonVertices.output(new LocalCollectionOutputFormat<>(comparisonVerticesList));
 
-    for (String s : properties.collect()) {
-      System.out.println(s);
-    }
+    getExecutionEnvironment().execute();
 
+    assertTrue(comparisonVerticesList.size() == verticesList.size());
   }
 }

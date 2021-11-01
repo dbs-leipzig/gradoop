@@ -34,7 +34,7 @@ public class Centroid extends Point {
   }
 
   /**
-   * Constructor to create an instance of centroid with an id, a latitude and a longitude
+   * Creates an instance of a centroid with an id, a latitude, and a longitude
    *
    * @param id  The unique id assigned to this centroid
    * @param lat The latitude of the centroid
@@ -46,7 +46,7 @@ public class Centroid extends Point {
   }
 
   /**
-   * Consructor to create an instance of centroid with an id and a point
+   * Creates an instance of a centroid with an id and a point
    *
    * @param id The unique id assigned to the centroid
    * @param p  The point defining the coordinates of the centroid

@@ -37,7 +37,7 @@ import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
 import java.util.Objects;
 
 /**
- * Takes a logical graph, an user defined amount of iterations and centroids, and the property names
+ * Takes a logical graph, a user-defined amount of iterations and centroids, and the property names
  * of the vertex that are used for the clustering as input. Adds the clusterId, together with the
  * cluster coordinates to the properties of the vertex. The datatype of the properties can be any numeric
  * value. Returns the logical graph with modified vertex properties.
@@ -49,8 +49,8 @@ import java.util.Objects;
  * @param <GC> The type of the graph collection.
  */
 public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
-  LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>> implements
-  UnaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
+        implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Number of iterations
@@ -62,7 +62,7 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
    */
   private final int centroids;
 
-  /**ng
+  /**
    * Name of the first spatial property used for the clustering
    */
   private final String firstPropertyName;
@@ -81,12 +81,10 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
    * @param propertyNameTwo   Second spatial property name of the vertices
    */
   public KMeans(int iterations, int centroids, String propertyNameOne, String propertyNameTwo) {
-    Objects.requireNonNull(propertyNameOne);
-    Objects.requireNonNull(propertyNameTwo);
     this.iterations = iterations;
     this.centroids = centroids;
-    this.firstPropertyName = propertyNameOne;
-    this.secondPropertyName = propertyNameTwo;
+    this.firstPropertyName = Objects.requireNonNull(propertyNameOne);
+    this.secondPropertyName = Objects.requireNonNull(propertyNameTwo);
   }
 
   @Override
@@ -112,18 +110,15 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
 
     DataSet<Centroid> newCentroids = points
 
-      //Assigns a centroid to every vertex
+      // Assigns a centroid to every vertex
         .map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
-      /*
-      Adds a CountAppender to every Mapping and changes first value from centroidObject to
-      CentroidId
-       */
+      // Add value 1 to prepare for grouping
         .map(new CountAppender())
 
-      //Groups mapping by id and sums up points of every centroid. For every addition the count increments
+      // Groups mapping by id and sums up points of every centroid. For every addition the count increments
         .groupBy(0).reduce(new CentroidAccumulator())
 
-      //Divides summed up points through its counter and assigns the cluster a new centroid
+      // Divides summed up points through its counter and assigns the cluster a new centroid
         .map(new CentroidAverager());
 
     DataSet<Centroid> finalCentroids = loop.closeWith(newCentroids);
