@@ -50,7 +50,7 @@ import java.util.Objects;
  */
 public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>, GC extends BaseGraphCollection<G, V, E, LG, GC>>
-        implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Number of iterations
@@ -109,17 +109,17 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
     IterativeDataSet<Centroid> loop = firstCentroids.iterate(iterations);
 
     DataSet<Centroid> newCentroids = points
-
       // Assigns a centroid to every vertex
-        .map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
+      .map(new SelectNearestCenter()).withBroadcastSet(loop, "centroids")
+
       // Add value 1 to prepare for grouping
-        .map(new CountAppender())
+      .map(new CountAppender())
 
       // Groups mapping by id and sums up points of every centroid. For every addition the count increments
-        .groupBy(0).reduce(new CentroidAccumulator())
+      .groupBy(0).reduce(new CentroidAccumulator())
 
       // Divides summed up points through its counter and assigns the cluster a new centroid
-        .map(new CentroidAverager());
+      .map(new CentroidAverager());
 
     DataSet<Centroid> finalCentroids = loop.closeWith(newCentroids);
 
@@ -137,6 +137,5 @@ public class KMeans<G extends GraphHead, V extends Vertex, E extends Edge,
 
     return logicalGraph.getFactory()
       .fromDataSets(logicalGraph.getGraphHead(), newVertices, logicalGraph.getEdges());
-
   }
 }

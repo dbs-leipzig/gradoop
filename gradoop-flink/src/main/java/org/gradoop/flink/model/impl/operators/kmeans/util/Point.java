@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.kmeans.util;
 
-
 import java.io.Serializable;
 import java.util.Objects;
 

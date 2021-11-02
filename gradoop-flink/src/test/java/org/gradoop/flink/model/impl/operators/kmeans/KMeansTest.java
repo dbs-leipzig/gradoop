@@ -16,43 +16,49 @@
 package org.gradoop.flink.model.impl.operators.kmeans;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.kmeans.util.*;
-import org.gradoop.flink.model.impl.operators.kmeans.functions.*;
+import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
+import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
+import org.gradoop.flink.model.impl.operators.kmeans.functions.CentroidAccumulator;
+import org.gradoop.flink.model.impl.operators.kmeans.functions.SelectNearestCenter;
+import org.gradoop.flink.model.impl.operators.kmeans.functions.CountAppender;
+import org.gradoop.flink.model.impl.operators.kmeans.functions.CentroidAverager;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Test of {@link KMeans}.
  */
-public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
+public class KMeansTest extends GradoopFlinkTestBase {
 
   private String inputGdlGraph;
-  private ExecutionEnvironment env = super.getExecutionEnvironment();
   private DataSet<Point> points;
   private DataSet<Centroid> centroids;
 
   @Before
   public void setUpTestVariables() {
 
-    points = env.fromElements(new Point(20.0, 10.0), new Point(25.0, 15.0),
+    points = getExecutionEnvironment().fromElements(new Point(20.0, 10.0), new Point(25.0, 15.0),
             new Point(30.0, 20.0), new Point(35.0, 25.0),
             new Point(40.0, 30.0), new Point(10.0, 10.0),
             new Point(10.0, 30.0), new Point(20.0, 40.0),
             new Point(5.0, 10.0));
 
-    centroids = env.fromElements(new Centroid(1, new Point(10.0, 15.0)),
+    centroids = getExecutionEnvironment().fromElements(new Centroid(1, new Point(10.0, 15.0)),
             new Centroid(2, new Point(20.0, 20.0)),
             new Centroid(3, new Point(25.0, 30.0)));
 
@@ -176,22 +182,22 @@ public class KMeansTest<V extends Vertex> extends GradoopFlinkTestBase {
   public void testKMeansAlgorithm() throws Exception {
     LogicalGraph logicalGraph = getLoaderFromString(inputGdlGraph).getLogicalGraphByVariable("g");
     LogicalGraph output =
-      (LogicalGraph) new KMeans(20, 3, "lat", "long")
+      new KMeans<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>(20, 3, "lat", "long")
         .execute(logicalGraph);
-    DataSet<V> vertices = (DataSet<V>) output.getVertices();
-    DataSet<V> comparisonVertices = vertices.filter(
+    DataSet<EPGMVertex> vertices = output.getVertices();
+    DataSet<EPGMVertex> comparisonVertices = vertices.filter(
       vertex -> vertex.hasProperty("cluster_lat") && vertex.hasProperty("cluster_long") &&
         vertex.hasProperty("cluster_id") && vertex.hasProperty("long") &&
         vertex.hasProperty("lat"));
 
-    List<V> verticesList = new ArrayList<>();
-    List<V> comparisonVerticesList = new ArrayList<>();
+    List<EPGMVertex> verticesList = new ArrayList<>();
+    List<EPGMVertex> comparisonVerticesList = new ArrayList<>();
 
     vertices.output(new LocalCollectionOutputFormat<>(verticesList));
     comparisonVertices.output(new LocalCollectionOutputFormat<>(comparisonVerticesList));
 
     getExecutionEnvironment().execute();
 
-    assertTrue(comparisonVerticesList.size() == verticesList.size());
+    assertEquals(comparisonVerticesList.size(), verticesList.size());
   }
 }
