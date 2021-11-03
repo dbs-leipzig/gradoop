@@ -40,7 +40,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
       .collect()
       .get(0);
 
-    assertEquals(11L, (long)vertexCount);
+    assertEquals(11L, (long) vertexCount);
   }
 
   @Test
@@ -52,7 +52,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
       .collect()
       .get(0);
 
-    assertEquals(24L, (long)edgeCount);
+    assertEquals(24L, (long) edgeCount);
   }
 
   @Test
@@ -69,9 +69,9 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(3L, (long)cache.get("Tag"));
-    assertEquals(2L, (long)cache.get("Forum"));
-    assertEquals(6L, (long)cache.get("Person"));
+    assertEquals(3L, (long) cache.get("Tag"));
+    assertEquals(2L, (long) cache.get("Forum"));
+    assertEquals(6L, (long) cache.get("Person"));
   }
 
   @Test
@@ -88,11 +88,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(4L, (long)cache.get("hasTag"));
-    assertEquals(4L, (long)cache.get("hasInterest"));
-    assertEquals(2L, (long)cache.get("hasModerator"));
-    assertEquals(4L, (long)cache.get("hasMember"));
-    assertEquals(10L, (long)cache.get("knows"));
+    assertEquals(4L, (long) cache.get("hasTag"));
+    assertEquals(4L, (long) cache.get("hasInterest"));
+    assertEquals(2L, (long) cache.get("hasModerator"));
+    assertEquals(4L, (long) cache.get("hasMember"));
+    assertEquals(10L, (long) cache.get("knows"));
   }
 
   @Test
@@ -172,10 +172,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(1L, (long)cache.get(2L));
-    assertEquals(4L, (long)cache.get(3L));
-    assertEquals(2L, (long)cache.get(5L));
-    assertEquals(4L, (long)cache.get(6L));
+    assertEquals(1L, (long) cache.get(2L));
+    assertEquals(4L, (long) cache.get(3L));
+    assertEquals(2L, (long) cache.get(5L));
+    assertEquals(4L, (long) cache.get(6L));
   }
 
   @Test
@@ -192,10 +192,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(3L, (long)cache.get(0L));
-    assertEquals(4L, (long)cache.get(2L));
-    assertEquals(2L, (long)cache.get(3L));
-    assertEquals(2L, (long)cache.get(5L));
+    assertEquals(3L, (long) cache.get(0L));
+    assertEquals(4L, (long) cache.get(2L));
+    assertEquals(2L, (long) cache.get(3L));
+    assertEquals(2L, (long) cache.get(5L));
   }
 
   @Test
@@ -212,10 +212,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(4L, (long)cache.get(0L));
-    assertEquals(1L, (long)cache.get(2L));
-    assertEquals(2L, (long)cache.get(3L));
-    assertEquals(4L, (long)cache.get(4L));
+    assertEquals(4L, (long) cache.get(0L));
+    assertEquals(1L, (long) cache.get(2L));
+    assertEquals(2L, (long) cache.get(3L));
+    assertEquals(4L, (long) cache.get(4L));
   }
 
   @Test
@@ -227,7 +227,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
       .collect()
       .get(0);
 
-    assertEquals(8L, (long)result);
+    assertEquals(8L, (long) result);
   }
 
   @Test
@@ -239,7 +239,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
       .collect()
       .get(0);
 
-    assertEquals(7L, (long)result);
+    assertEquals(7L, (long) result);
   }
 
   @Test
@@ -256,11 +256,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(4L, (long)cache.get("hasInterest"));
-    assertEquals(2L, (long)cache.get("hasModerator"));
-    assertEquals(6L, (long)cache.get("knows"));
-    assertEquals(2L, (long)cache.get("hasTag"));
-    assertEquals(2L, (long)cache.get("hasMember"));
+    assertEquals(4L, (long) cache.get("hasInterest"));
+    assertEquals(2L, (long) cache.get("hasModerator"));
+    assertEquals(6L, (long) cache.get("knows"));
+    assertEquals(2L, (long) cache.get("hasTag"));
+    assertEquals(2L, (long) cache.get("hasMember"));
   }
 
   @Test
@@ -277,11 +277,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(2L, (long)cache.get("hasInterest"));
-    assertEquals(2L, (long)cache.get("hasModerator"));
-    assertEquals(4L, (long)cache.get("knows"));
-    assertEquals(3L, (long)cache.get("hasTag"));
-    assertEquals(4L, (long)cache.get("hasMember"));
+    assertEquals(2L, (long) cache.get("hasInterest"));
+    assertEquals(2L, (long) cache.get("hasModerator"));
+    assertEquals(4L, (long) cache.get("knows"));
+    assertEquals(3L, (long) cache.get("hasTag"));
+    assertEquals(4L, (long) cache.get("hasMember"));
   }
 
   @Test
@@ -298,11 +298,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(2L, (long)cache.get(Tuple2.of("Forum", "hasModerator")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Forum", "hasTag")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Person", "hasInterest")));
+    assertEquals(2L, (long) cache.get(Tuple2.of("Forum", "hasModerator")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Forum", "hasTag")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Person", "hasInterest")));
     assertEquals(10L, (long) cache.get(Tuple2.of("Person", "knows")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Forum", "hasMember")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Forum", "hasMember")));
   }
 
   @Test
@@ -319,11 +319,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertEquals(4L, (long)cache.get(Tuple2.of("Tag", "hasTag")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Tag", "hasInterest")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Tag", "hasTag")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Tag", "hasInterest")));
     assertEquals(10L,(long) cache.get(Tuple2.of("Person", "knows")));
-    assertEquals(2L, (long)cache.get(Tuple2.of("Person", "hasModerator")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Person", "hasMember")));
+    assertEquals(2L, (long) cache.get(Tuple2.of("Person", "hasModerator")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Person", "hasMember")));
   }
 
 
@@ -340,8 +340,8 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
     assertEquals(2, result.size());
-    assertEquals(3L, (long)cache.get(Tuple2.of("knows", "since")));
-    assertEquals(1L, (long)cache.get(Tuple2.of("hasModerator", "since")));
+    assertEquals(3L, (long) cache.get(Tuple2.of("knows", "since")));
+    assertEquals(1L, (long) cache.get(Tuple2.of("hasModerator", "since")));
   }
 
   @Test
@@ -358,14 +358,14 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     assertEquals(8, result.size());
 
-    assertEquals(6L, (long)cache.get(Tuple2.of("Person", "name")));
-    assertEquals(2L, (long)cache.get(Tuple2.of("Person", "gender")));
-    assertEquals(3L, (long)cache.get(Tuple2.of("Person", "city")));
-    assertEquals(4L, (long)cache.get(Tuple2.of("Person", "age")));
-    assertEquals(1L, (long)cache.get(Tuple2.of("Person", "speaks")));
-    assertEquals(1L, (long)cache.get(Tuple2.of("Person", "locIP")));
-    assertEquals(3L, (long)cache.get(Tuple2.of("Tag", "name")));
-    assertEquals(2L, (long)cache.get(Tuple2.of("Forum", "title")));
+    assertEquals(6L, (long) cache.get(Tuple2.of("Person", "name")));
+    assertEquals(2L, (long) cache.get(Tuple2.of("Person", "gender")));
+    assertEquals(3L, (long) cache.get(Tuple2.of("Person", "city")));
+    assertEquals(4L, (long) cache.get(Tuple2.of("Person", "age")));
+    assertEquals(1L, (long) cache.get(Tuple2.of("Person", "speaks")));
+    assertEquals(1L, (long) cache.get(Tuple2.of("Person", "locIP")));
+    assertEquals(3L, (long) cache.get(Tuple2.of("Tag", "name")));
+    assertEquals(2L, (long) cache.get(Tuple2.of("Forum", "title")));
   }
 
   @Test
@@ -381,7 +381,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
     assertEquals(1, result.size());
-    assertEquals(3L, (long)cache.get("since"));
+    assertEquals(3L, (long) cache.get("since"));
   }
 
   @Test
@@ -398,12 +398,12 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     assertEquals(7, result.size());
 
-    assertEquals(9L, (long)cache.get("name"));
-    assertEquals(2L, (long)cache.get("gender"));
-    assertEquals(3L, (long)cache.get("city"));
-    assertEquals(4L, (long)cache.get("age"));
-    assertEquals(1L, (long)cache.get("speaks"));
-    assertEquals(1L, (long)cache.get("locIP"));
-    assertEquals(2L, (long)cache.get("title"));
+    assertEquals(9L, (long) cache.get("name"));
+    assertEquals(2L, (long) cache.get("gender"));
+    assertEquals(3L, (long) cache.get("city"));
+    assertEquals(4L, (long) cache.get("age"));
+    assertEquals(1L, (long) cache.get("speaks"));
+    assertEquals(1L, (long) cache.get("locIP"));
+    assertEquals(2L, (long) cache.get("title"));
   }
 }

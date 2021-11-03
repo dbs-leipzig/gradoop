@@ -44,7 +44,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertEquals(11L, (long)statistics.getVertexCount());
+    assertEquals(11L, statistics.getVertexCount());
   }
 
 

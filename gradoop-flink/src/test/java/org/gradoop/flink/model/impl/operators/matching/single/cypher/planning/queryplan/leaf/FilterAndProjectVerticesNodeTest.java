@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
 
@@ -75,6 +76,6 @@ public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
     List<Embedding> filteredVertices = node.execute().collect();
 
     assertEquals(1, filteredVertices.size());
-    assertEquals(true, filteredVertices.get(0).getId(0).equals(vertex1Id));
+    assertTrue(filteredVertices.get(0).getId(0).equals(vertex1Id));
   }
 }
