@@ -110,10 +110,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> dist.put(e.getCount(), dist.getOrDefault(e.getCount(), 0) + 1));
 
     assertEquals(4, dist.size());
-    assertEquals(1, (int)dist.get(2L));
-    assertEquals(4, (int)dist.get(3L));
-    assertEquals(2, (int)dist.get(5L));
-    assertEquals(4, (int)dist.get(6L));
+    assertEquals(1, (int) dist.get(2L));
+    assertEquals(4, (int) dist.get(3L));
+    assertEquals(2, (int) dist.get(5L));
+    assertEquals(4, (int) dist.get(6L));
   }
 
   @Test
@@ -131,10 +131,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> dist.put(e.getCount(), dist.getOrDefault(e.getCount(), 0) + 1));
 
     assertEquals(4, dist.size());
-    assertEquals(3, (int)dist.get(0L));
-    assertEquals(4, (int)dist.get(2L));
-    assertEquals(2, (int)dist.get(3L));
-    assertEquals(2, (int)dist.get(5L));
+    assertEquals(3, (int) dist.get(0L));
+    assertEquals(4, (int) dist.get(2L));
+    assertEquals(2, (int) dist.get(3L));
+    assertEquals(2, (int) dist.get(5L));
   }
 
   @Test
@@ -152,10 +152,10 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> dist.put(e.getCount(), dist.getOrDefault(e.getCount(), 0) + 1));
 
     assertEquals(4, dist.size());
-    assertEquals(4, (int)dist.get(0L));
-    assertEquals(1, (int)dist.get(2L));
-    assertEquals(2, (int)dist.get(3L));
-    assertEquals(4, (int)dist.get(4L));
+    assertEquals(4, (int) dist.get(0L));
+    assertEquals(1, (int) dist.get(2L));
+    assertEquals(2, (int) dist.get(3L));
+    assertEquals(4, (int) dist.get(4L));
   }
 
   @Test
@@ -321,7 +321,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     assertEquals(4L, (long) cache.get(Tuple2.of("Tag", "hasTag")));
     assertEquals(4L, (long) cache.get(Tuple2.of("Tag", "hasInterest")));
-    assertEquals(10L,(long) cache.get(Tuple2.of("Person", "knows")));
+    assertEquals(10L, (long) cache.get(Tuple2.of("Person", "knows")));
     assertEquals(2L, (long) cache.get(Tuple2.of("Person", "hasModerator")));
     assertEquals(4L, (long) cache.get(Tuple2.of("Person", "hasMember")));
   }

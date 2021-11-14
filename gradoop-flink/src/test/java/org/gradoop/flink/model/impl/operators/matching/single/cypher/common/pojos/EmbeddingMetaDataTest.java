@@ -301,11 +301,11 @@ public class EmbeddingMetaDataTest {
     metaData3.setEntryColumn("b", EntryType.VERTEX, 0);
     metaData3.setPropertyColumn("b", "age", 0);
 
-    assertTrue(metaData1.equals(metaData1));
-    assertTrue(metaData1.equals(metaData2));
-    assertTrue(metaData2.equals(metaData1));
-    assertFalse(metaData2.equals(metaData3));
-    assertFalse(metaData3.equals(metaData2));
+    assertEquals(metaData1, metaData1);
+    assertEquals(metaData1, metaData2);
+    assertEquals(metaData2, metaData1);
+    assertNotEquals(metaData2, metaData3);
+    assertNotEquals(metaData3, metaData2);
   }
 
   @Test

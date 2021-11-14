@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
 
@@ -99,8 +98,8 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     List<Embedding> filteredEdges = node.execute().collect();
 
     assertEquals(1, filteredEdges.size());
-    assertTrue(filteredEdges.get(0).getId(0).equals(sourceId));
-    assertTrue(filteredEdges.get(0).getId(1).equals(edge1Id));
-    assertTrue(filteredEdges.get(0).getId(2).equals(targetId));
+    assertEquals(sourceId, filteredEdges.get(0).getId(0));
+    assertEquals(edge1Id, filteredEdges.get(0).getId(1));
+    assertEquals(targetId, filteredEdges.get(0).getId(2));
   }
 }

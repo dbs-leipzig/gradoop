@@ -44,7 +44,7 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     FilterEmbeddingsNode node = new FilterEmbeddingsNode(mockNode, new CNF());
 
-    assertTrue(mockNode.getEmbeddingMetaData().equals(node.getEmbeddingMetaData()));
+    assertEquals(node.getEmbeddingMetaData(), mockNode.getEmbeddingMetaData());
   }
 
   @Test
@@ -77,9 +77,9 @@ public class FilterEmbeddingsNodeTest extends GradoopFlinkTestBase {
     List<Embedding> result = new FilterEmbeddingsNode(mockChild, filterPredicate).execute().collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(vertexAId));
-    assertTrue(result.get(0).getId(1).equals(vertexBId));
-    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(42)));
-    assertTrue(result.get(0).getProperty(1).equals(PropertyValue.create(23)));
+    assertEquals(vertexAId, result.get(0).getId(0));
+    assertEquals(vertexBId, result.get(0).getId(1));
+    assertEquals(PropertyValue.create(42), result.get(0).getProperty(0));
+    assertEquals(PropertyValue.create(23), result.get(0).getProperty(1));
   }
 }
