@@ -21,8 +21,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class FilterEstimatorTest extends EstimatorTestBase {
 
@@ -37,8 +36,8 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(11L));
-    assertThat(elementEstimator.getSelectivity(), is(1d));
+    assertEquals(11L, elementEstimator.getCardinality());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -52,8 +51,8 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(3L));
-    assertThat(elementEstimator.getSelectivity(), is(1d));
+    assertEquals(3L, elementEstimator.getCardinality());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -68,8 +67,8 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(24L));
-    assertThat(elementEstimator.getSelectivity(), is(1d));
+    assertEquals(24L, elementEstimator.getCardinality());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 
   @Test
@@ -84,7 +83,7 @@ public class FilterEstimatorTest extends EstimatorTestBase {
     FilterEstimator elementEstimator = new FilterEstimator(queryHandler, STATS);
     elementEstimator.visit(node);
 
-    assertThat(elementEstimator.getCardinality(), is(10L));
-    assertThat(elementEstimator.getSelectivity(), is(1d));
+    assertEquals(10L, elementEstimator.getCardinality());
+    assertEquals(1d, elementEstimator.getSelectivity(), 0);
   }
 }

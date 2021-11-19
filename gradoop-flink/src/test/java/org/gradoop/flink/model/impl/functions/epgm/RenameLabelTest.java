@@ -25,11 +25,9 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 public class RenameLabelTest extends GradoopFlinkTestBase {
 
@@ -52,8 +50,8 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(graphHead, graphHead);
 
     assertEquals(newLabel, graphHead.getLabel());
-    assertThat(graphHead.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
-    assertThat(graphHead.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", graphHead.getPropertyValue("k1").toString());
+    assertEquals("v2", graphHead.getPropertyValue("k2").toString());
   }
 
   @Test
@@ -77,8 +75,8 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(edge, edge);
 
     assertEquals(newLabel, edge.getLabel());
-    assertThat(edge.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
-    assertThat(edge.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", edge.getPropertyValue("k1").toString());
+    assertEquals("v2", edge.getPropertyValue("k2").toString());
   }
 
   @Test
@@ -100,7 +98,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     renameFunction.apply(vertex, vertex);
 
     assertEquals(newLabel, vertex.getLabel());
-    assertThat(vertex.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
-    assertThat(vertex.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", vertex.getPropertyValue("k1").toString());
+    assertEquals("v2", vertex.getPropertyValue("k2").toString());
   }
 }

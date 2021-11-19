@@ -29,8 +29,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class QueryEngineITTests extends GradoopFlinkTestBase {
 
@@ -93,8 +92,8 @@ public class QueryEngineITTests extends GradoopFlinkTestBase {
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     PlanTableEntry planTableEntry = planner.plan();
-    assertThat(planTableEntry.getEstimatedCardinality(), is(estimatedCardinality));
+    assertEquals(estimatedCardinality, planTableEntry.getEstimatedCardinality());
     List<Embedding> result = planTableEntry.getQueryPlan().execute().collect();
-    assertThat(result.size(), is(exactCardinality));
+    assertEquals(exactCardinality, result.size());
   }
 }

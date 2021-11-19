@@ -25,15 +25,11 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
-import org.hamcrest.core.Is;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
@@ -52,11 +48,11 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     ProjectEmbeddingsNode node = new ProjectEmbeddingsNode(mockNode, projectedKeys);
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
-    assertThat(outputMetaData.getEntryCount(), is(2));
-    assertThat(outputMetaData.getEntryColumn("a"), is(0));
-    assertThat(outputMetaData.getEntryColumn("b"), is(1));
-    assertThat(outputMetaData.getPropertyCount(), is(1));
-    assertThat(outputMetaData.getPropertyColumn("a", "age"), is(0));
+    assertEquals(2, outputMetaData.getEntryCount());
+    assertEquals(0, outputMetaData.getEntryColumn("a"));
+    assertEquals(1, outputMetaData.getEntryColumn("b"));
+    assertEquals(1, outputMetaData.getPropertyCount());
+    assertEquals(0, outputMetaData.getPropertyColumn("a", "age"));
   }
 
   @Test
@@ -82,10 +78,10 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     List<Embedding> result = new ProjectEmbeddingsNode(mockChild, projectedKeys).execute().collect();
 
-    Assert.assertThat(result.size(), Is.is(1));
+    assertEquals(1, result.size());
     assertEquals(result.get(0).getId(0), vertexAId);
     assertEquals(result.get(0).getId(1), vertexBId);
-    assertThat(result.get(0).getProperties().size(), is(1));
+    assertEquals(1, result.get(0).getProperties().size());
     assertEquals(result.get(0).getProperty(0), PropertyValue.create(42));
   }
 }

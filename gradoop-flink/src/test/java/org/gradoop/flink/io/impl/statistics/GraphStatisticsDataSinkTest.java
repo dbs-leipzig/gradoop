@@ -15,8 +15,7 @@
  */
 package org.gradoop.flink.io.impl.statistics;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -45,7 +44,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getVertexCount(), is(11L));
+    assertEquals(11L, statistics.getVertexCount());
   }
 
 
@@ -63,7 +62,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getEdgeCount(), is(24L));
+    assertEquals(24L, statistics.getEdgeCount());
   }
 
   @Test
@@ -79,9 +78,9 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getVertexCount("Person"), is(6L));
-    assertThat(statistics.getVertexCount("Forum"), is(2L));
-    assertThat(statistics.getVertexCount("Tag"), is(3L));
+    assertEquals(6L, statistics.getVertexCount("Person"));
+    assertEquals(2L, statistics.getVertexCount("Forum"));
+    assertEquals(3L, statistics.getVertexCount("Tag"));
   }
 
   @Test
@@ -97,11 +96,11 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getEdgeCount("hasInterest"), is(4L));
-    assertThat(statistics.getEdgeCount("hasModerator"), is(2L));
-    assertThat(statistics.getEdgeCount("knows"), is(10L));
-    assertThat(statistics.getEdgeCount("hasTag"), is(4L));
-    assertThat(statistics.getEdgeCount("hasMember"), is(4L));
+    assertEquals(4L, statistics.getEdgeCount("hasInterest"));
+    assertEquals(2L, statistics.getEdgeCount("hasModerator"));
+    assertEquals(10L, statistics.getEdgeCount("knows"));
+    assertEquals(4L, statistics.getEdgeCount("hasTag"));
+    assertEquals(4L, statistics.getEdgeCount("hasMember"));
   }
 
   @Test
@@ -117,11 +116,11 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getEdgeCountBySource("Forum", "hasMember"), is(4L));
-    assertThat(statistics.getEdgeCountBySource("Forum", "hasModerator"), is(2L));
-    assertThat(statistics.getEdgeCountBySource("Forum", "hasTag"), is(4L));
-    assertThat(statistics.getEdgeCountBySource("Person", "hasInterest"), is(4L));
-    assertThat(statistics.getEdgeCountBySource("Person", "knows"), is(10L));
+    assertEquals(4L, statistics.getEdgeCountBySource("Forum", "hasMember"));
+    assertEquals(2L, statistics.getEdgeCountBySource("Forum", "hasModerator"));
+    assertEquals(4L, statistics.getEdgeCountBySource("Forum", "hasTag"));
+    assertEquals(4L, statistics.getEdgeCountBySource("Person", "hasInterest"));
+    assertEquals(10L, statistics.getEdgeCountBySource("Person", "knows"));
   }
 
   @Test
@@ -137,11 +136,11 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getEdgeCountByTarget("Tag", "hasTag"), is(4L));
-    assertThat(statistics.getEdgeCountByTarget("Tag", "hasInterest"), is(4L));
-    assertThat(statistics.getEdgeCountByTarget("Person", "knows"), is(10L));
-    assertThat(statistics.getEdgeCountByTarget("Person", "hasMember"), is(4L));
-    assertThat(statistics.getEdgeCountByTarget("Person", "hasModerator"), is(2L));
+    assertEquals(4L, statistics.getEdgeCountByTarget("Tag", "hasTag"));
+    assertEquals(4L, statistics.getEdgeCountByTarget("Tag", "hasInterest"));
+    assertEquals(10L, statistics.getEdgeCountByTarget("Person", "knows"));
+    assertEquals(4L, statistics.getEdgeCountByTarget("Person", "hasMember"));
+    assertEquals(2L, statistics.getEdgeCountByTarget("Person", "hasModerator"));
   }
 
   @Test
@@ -157,7 +156,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctSourceVertexCount(), is(8L));
+    assertEquals(8L, statistics.getDistinctSourceVertexCount());
   }
 
   @Test
@@ -173,7 +172,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctTargetVertexCount(), is(7L));
+    assertEquals(7L, statistics.getDistinctTargetVertexCount());
   }
 
   @Test
@@ -189,11 +188,11 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctSourceVertexCount("hasInterest"), is(4L));
-    assertThat(statistics.getDistinctSourceVertexCount("hasModerator"), is(2L));
-    assertThat(statistics.getDistinctSourceVertexCount("knows"), is(6L));
-    assertThat(statistics.getDistinctSourceVertexCount("hasTag"), is(2L));
-    assertThat(statistics.getDistinctSourceVertexCount("hasMember"), is(2L));
+    assertEquals(4L, statistics.getDistinctSourceVertexCount("hasInterest"));
+    assertEquals(2L, statistics.getDistinctSourceVertexCount("hasModerator"));
+    assertEquals(6L, statistics.getDistinctSourceVertexCount("knows"));
+    assertEquals(2L, statistics.getDistinctSourceVertexCount("hasTag"));
+    assertEquals(2L, statistics.getDistinctSourceVertexCount("hasMember"));
   }
 
   @Test
@@ -209,11 +208,11 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctTargetVertexCount("hasInterest"), is(2L));
-    assertThat(statistics.getDistinctTargetVertexCount("hasModerator"), is(2L));
-    assertThat(statistics.getDistinctTargetVertexCount("knows"), is(4L));
-    assertThat(statistics.getDistinctTargetVertexCount("hasMember"), is(4L));
-    assertThat(statistics.getDistinctTargetVertexCount("hasTag"), is(3L));
+    assertEquals(2L, statistics.getDistinctTargetVertexCount("hasInterest"));
+    assertEquals(2L, statistics.getDistinctTargetVertexCount("hasModerator"));
+    assertEquals(4L, statistics.getDistinctTargetVertexCount("knows"));
+    assertEquals(4L, statistics.getDistinctTargetVertexCount("hasMember"));
+    assertEquals(3L, statistics.getDistinctTargetVertexCount("hasTag"));
   }
 
   @Test
@@ -228,8 +227,8 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctEdgeProperties("knows", "since"), is(3L));
-    assertThat(statistics.getDistinctEdgeProperties("hasModerator", "since"), is(1L));
+    assertEquals(3L, statistics.getDistinctEdgeProperties("knows", "since"));
+    assertEquals(1L, statistics.getDistinctEdgeProperties("hasModerator", "since"));
   }
 
   @Test
@@ -245,14 +244,14 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctVertexProperties("Person", "name"), is(6L));
-    assertThat(statistics.getDistinctVertexProperties("Person", "gender"), is(2L));
-    assertThat(statistics.getDistinctVertexProperties("Person", "city"), is(3L));
-    assertThat(statistics.getDistinctVertexProperties("Person", "age"), is(4L));
-    assertThat(statistics.getDistinctVertexProperties("Person", "speaks"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties("Person", "locIP"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties("Tag", "name"), is(3L));
-    assertThat(statistics.getDistinctVertexProperties("Forum", "title"), is(2L));
+    assertEquals(6L, statistics.getDistinctVertexProperties("Person", "name"));
+    assertEquals(2L, statistics.getDistinctVertexProperties("Person", "gender"));
+    assertEquals(3L, statistics.getDistinctVertexProperties("Person", "city"));
+    assertEquals(4L, statistics.getDistinctVertexProperties("Person", "age"));
+    assertEquals(1L, statistics.getDistinctVertexProperties("Person", "speaks"));
+    assertEquals(1L, statistics.getDistinctVertexProperties("Person", "locIP"));
+    assertEquals(3L, statistics.getDistinctVertexProperties("Tag", "name"));
+    assertEquals(2L, statistics.getDistinctVertexProperties("Forum", "title"));
   }
 
   @Test
@@ -268,7 +267,7 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctEdgeProperties("since"), is(3L));
+    assertEquals(3L, statistics.getDistinctEdgeProperties("since"));
   }
 
   @Test
@@ -284,13 +283,13 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctVertexProperties("name"),    is(9L));
-    assertThat(statistics.getDistinctVertexProperties("gender"),  is(2L));
-    assertThat(statistics.getDistinctVertexProperties("city"),    is(3L));
-    assertThat(statistics.getDistinctVertexProperties("age"),     is(4L));
-    assertThat(statistics.getDistinctVertexProperties("speaks"),  is(1L));
-    assertThat(statistics.getDistinctVertexProperties("locIP"),   is(1L));
-    assertThat(statistics.getDistinctVertexProperties("title"),   is(2L));
+    assertEquals(9L, statistics.getDistinctVertexProperties("name"));
+    assertEquals(2L, statistics.getDistinctVertexProperties("gender"));
+    assertEquals(3L, statistics.getDistinctVertexProperties("city"));
+    assertEquals(4L, statistics.getDistinctVertexProperties("age"));
+    assertEquals(1L, statistics.getDistinctVertexProperties("speaks"));
+    assertEquals(1L, statistics.getDistinctVertexProperties("locIP"));
+    assertEquals(2L, statistics.getDistinctVertexProperties("title"));
   }
 
 }

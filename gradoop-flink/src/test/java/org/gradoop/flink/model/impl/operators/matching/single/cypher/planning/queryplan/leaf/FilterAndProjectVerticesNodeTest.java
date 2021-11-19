@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
 
@@ -45,8 +44,8 @@ public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
       null, variable, new CNF(), Sets.newHashSet());
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(variable), is(0));
-    assertThat(node.getEmbeddingMetaData().getPropertyKeys(variable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(variable));
+    assertEquals(0, node.getEmbeddingMetaData().getPropertyKeys(variable).size());
   }
 
   @Test
@@ -75,7 +74,7 @@ public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
       vertices, "n", filterPredicate, projectionKeys);
     List<Embedding> filteredVertices = node.execute().collect();
 
-    assertThat(filteredVertices.size(), is(1));
-    assertThat(filteredVertices.get(0).getId(0).equals(vertex1Id), is(true));
+    assertEquals(1, filteredVertices.size());
+    assertEquals(vertex1Id, filteredVertices.get(0).getId(0));
   }
 }
