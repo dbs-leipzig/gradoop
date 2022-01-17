@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 
@@ -28,7 +29,7 @@ public class PrintEdgeStep<K> extends Printer<EdgeStep<K>, K> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintEdgeStep.class);
+  private static final Logger LOG = LogManager.getLogger(PrintEdgeStep.class);
 
   /**
    * Constructor

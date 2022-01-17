@@ -16,10 +16,10 @@
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
-  .Message;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 
 /**
@@ -30,7 +30,7 @@ public class PrintMessage extends Printer<Message, GradoopId> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintMessage.class);
+  private static final Logger LOG = LogManager.getLogger(PrintMessage.class);
 
   /**
    * Constructor

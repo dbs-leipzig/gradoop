@@ -22,7 +22,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public abstract class Printer<IN, K> extends RichMapFunction<IN, IN> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(Printer.class);
+  private static final Logger LOG = LogManager.getLogger(Printer.class);
   /**
    * Mapping {@code gradoopId -> propertyValue}
    *

@@ -17,7 +17,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -62,7 +63,7 @@ public class CypherPatternMatching<
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(CypherPatternMatching.class);
+  private static final Logger LOG = LogManager.getLogger(CypherPatternMatching.class);
   /**
    * Construction pattern for result transformation.
    */

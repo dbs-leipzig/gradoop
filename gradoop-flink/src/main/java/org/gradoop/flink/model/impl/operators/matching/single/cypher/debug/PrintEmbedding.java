@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
@@ -33,7 +34,7 @@ public class PrintEmbedding extends Printer<Embedding, GradoopId> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintEmbedding.class);
+  private static final Logger LOG = LogManager.getLogger(PrintEmbedding.class);
   /**
    * Meta data describing the current embedding.
    */

@@ -17,7 +17,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.debug;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.IterationRuntimeContext;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 
 /**
@@ -30,7 +31,7 @@ public class PrintIdWithCandidates<K extends Comparable<K>>
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(PrintIdWithCandidates.class);
+  private static Logger LOG = LogManager.getLogger(PrintIdWithCandidates.class);
   /**
    * Constructor
    */

@@ -16,7 +16,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
@@ -31,7 +32,7 @@ public class PrintEmbeddingWithTiePoint<K> extends Printer<EmbeddingWithTiePoint
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintEmbeddingWithTiePoint.class);
+  private static final Logger LOG = LogManager.getLogger(PrintEmbeddingWithTiePoint.class);
 
   /**
    * Constructor

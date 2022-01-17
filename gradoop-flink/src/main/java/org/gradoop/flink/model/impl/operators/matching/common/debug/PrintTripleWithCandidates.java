@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ public class PrintTripleWithCandidates<K> extends Printer<TripleWithCandidates<K
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintTripleWithCandidates.class);
+  private static final Logger LOG = LogManager.getLogger(PrintTripleWithCandidates.class);
 
   /**
    * Constructor
