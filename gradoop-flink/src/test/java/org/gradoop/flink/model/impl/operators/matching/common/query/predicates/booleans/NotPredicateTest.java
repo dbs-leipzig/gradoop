@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.junit.Test;
-import org.s1ck.gdl.model.comparables.ComparableExpression;
-import org.s1ck.gdl.model.comparables.Literal;
-import org.s1ck.gdl.model.predicates.Predicate;
-import org.s1ck.gdl.model.predicates.booleans.And;
-import org.s1ck.gdl.model.predicates.booleans.Not;
-import org.s1ck.gdl.model.predicates.booleans.Or;
-import org.s1ck.gdl.model.predicates.booleans.Xor;
-import org.s1ck.gdl.model.predicates.expressions.Comparison;
-import org.s1ck.gdl.utils.Comparator;
+import org.gradoop.gdl.model.comparables.ComparableExpression;
+import org.gradoop.gdl.model.comparables.Literal;
+import org.gradoop.gdl.model.predicates.Predicate;
+import org.gradoop.gdl.model.predicates.booleans.And;
+import org.gradoop.gdl.model.predicates.booleans.Not;
+import org.gradoop.gdl.model.predicates.booleans.Or;
+import org.gradoop.gdl.model.predicates.booleans.Xor;
+import org.gradoop.gdl.model.predicates.expressions.Comparison;
+import org.gradoop.gdl.utils.Comparator;
 
 import static org.junit.Assert.assertEquals;
 

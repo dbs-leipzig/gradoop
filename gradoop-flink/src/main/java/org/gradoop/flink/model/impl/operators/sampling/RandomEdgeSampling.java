@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -29,8 +31,20 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
  * Computes an edge sampling of the graph (new graph head will be generated). Retains randomly
  * chosen edges of a given relative amount and their associated source- and target-vertices. No
  * unconnected vertices will retain in the sampled graph.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class RandomEdgeSampling extends SamplingAlgorithm {
+public class RandomEdgeSampling<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SamplingAlgorithm<G, V, E, LG, GC> {
+
   /**
    * Relative amount of edges in the result graph
    */
@@ -63,22 +77,22 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
   }
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
-    DataSet<EPGMEdge> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
+  public LG sample(LG graph) {
+    DataSet<E> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
 
-    DataSet<EPGMVertex> newSourceVertices = graph.getVertices()
+    DataSet<V> newSourceVertices = graph.getVertices()
       .join(newEdges)
       .where(new Id<>()).equalTo(new SourceId<>())
       .with(new LeftSide<>())
       .distinct(new Id<>());
 
-    DataSet<EPGMVertex> newTargetVertices = graph.getVertices()
+    DataSet<V> newTargetVertices = graph.getVertices()
       .join(newEdges)
       .where(new Id<>()).equalTo(new TargetId<>())
       .with(new LeftSide<>())
       .distinct(new Id<>());
 
-    DataSet<EPGMVertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
+    DataSet<V> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
 
     return graph.getFactory().fromDataSets(newVertices, newEdges);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Random;
 
 /**
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
+ *
+ * @param <V> The vertex type.
  */
-public class RandomVertex implements MapFunction<EPGMVertex, EPGMVertex> {
+public class RandomVertex<V extends Vertex> implements MapFunction<V, V> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -52,7 +54,7 @@ public class RandomVertex implements MapFunction<EPGMVertex, EPGMVertex> {
   }
 
   @Override
-  public EPGMVertex map(EPGMVertex vertex) throws Exception {
+  public V map(V vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {
       vertex.setProperty(samplingKey, true);
     } else {

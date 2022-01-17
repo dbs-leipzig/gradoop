@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 

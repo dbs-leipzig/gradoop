@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandi
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
 
-import org.s1ck.gdl.model.Edge;
+import org.gradoop.gdl.model.Edge;
 
 /**
  * Takes a vertex-edge pair and the corresponding target vertex as input and evaluates, if the triple matches

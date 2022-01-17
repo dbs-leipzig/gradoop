@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.Utils;
+import org.apache.flink.api.java.io.TupleCsvInputFormat;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,6 +39,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
@@ -43,34 +49,43 @@ public class MinimalCSVImporter implements DataSource {
   /**
    * Token delimiter of the CSV file.
    */
-  private String tokenSeparator;
+  private final String tokenSeparator;
 
   /**
    * Path to the csv file.
    */
-  private String path;
+  private final String path;
 
   /**
    * The charset used in the csv file, e.g., "UTF-8".
    */
-  private String charset;
+  private String charset = "UTF-8";
 
   /**
    * The property names for all columns in the file. If {@code null}, the first line will be
    * interpreted as header row.
    */
-  private List<String> columnNames;
+  private final List<String> columnNames;
 
   /**
-   * Flag to specify if each row of the file should be checked for reoccurring of the column
-   * property names.
+   * Flag to specify if each row of the file should be checked for reoccurring of the column property names.
    */
-  private boolean checkReoccurringHeader;
+  private boolean checkReoccurringHeader = false;
+
+  /**
+   * Flag to specify if quoted strings should be considered. Will escape delimiters inside quoted strings.
+   */
+  private boolean parseQuotedStrings = false;
+
+  /**
+   * Character used to quote strings.
+   */
+  private char quoteCharacter = '"';
 
   /**
    * Gradoop Flink configuration.
    */
-  private GradoopFlinkConfig config;
+  private final GradoopFlinkConfig config;
 
   /**
    * Create a new MinimalCSVImporter instance by the given parameters.
@@ -79,49 +94,68 @@ public class MinimalCSVImporter implements DataSource {
    * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig configuration
    * @param columnNames property identifiers for each column
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names
    */
   public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            List<String> columnNames, boolean checkReoccurringHeader) {
-    this(path, tokenSeparator, config, checkReoccurringHeader);
-    this.columnNames = Objects.requireNonNull(columnNames);
+                            List<String> columnNames) {
+    this.path = Objects.requireNonNull(path);
+    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);
+    this.config = Objects.requireNonNull(config);
+    this.columnNames = columnNames;
   }
 
   /**
-   * Create a new MinimalCSVImporter instance by the given parameters.
-   * Use the UTF-8 charset as default. The first line of the file will be set as the property
-   * names for each column.
-   *
-   * @param path the path to the csv file
-   * @param tokenSeparator the token delimiter of the csv file
-   * @param config GradoopFlinkConfig configuration
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names.
-   */
-  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            boolean checkReoccurringHeader) {
-    this(path, tokenSeparator, config, "UTF-8", checkReoccurringHeader);
-  }
-
-  /**
-   * Create a new MinimalCSVImporter with a user set charset. The first line of the file
+   * Create a new MinimalCSVImporter instance by the given parameters. The first line of the file
    * will set as the property names for each column.
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig configuration
-   * @param charset the charset used in the csv file
-   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names.
    */
-  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
-                            String charset, boolean checkReoccurringHeader) {
-    this.path = Objects.requireNonNull(path);
-    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);
-    this.config = Objects.requireNonNull(config);
-    this.charset = Objects.requireNonNull(charset);
-    this.checkReoccurringHeader = checkReoccurringHeader;
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config) {
+    this(path, tokenSeparator, config, null);
+  }
+
+  /**
+   * Set charset of CSV file. UTF-8 is used as default.
+   *
+   * @param charset the charset used in the csv file, e.g., "UTF-8"
+   * @return this
+   */
+  public MinimalCSVImporter setCharset(String charset) {
+    this.charset = charset;
+    return this;
+  }
+
+  /**
+   * Set checkReoccurringHeader flag.
+   * Each row of the file will be checked for reoccurrence of the column property names.
+   *
+   * @return this
+   */
+  public MinimalCSVImporter checkReoccurringHeader() {
+    this.checkReoccurringHeader = true;
+    return this;
+  }
+
+  /**
+   * Set parseQuotedStrings flag. Delimiters in quoted fields will be escaped.
+   *
+   * @return this
+   */
+  public MinimalCSVImporter parseQuotedStrings() {
+    this.parseQuotedStrings = true;
+    return this;
+  }
+
+  /**
+   * Set quoteCharacter.
+   *
+   * @param quoteCharacter character used to quote fields
+   * @return this
+   */
+  public MinimalCSVImporter quoteCharacter(char quoteCharacter) {
+    this.quoteCharacter = quoteCharacter;
+    return this;
   }
 
   /**
@@ -161,11 +195,39 @@ public class MinimalCSVImporter implements DataSource {
    * @return a {@link DataSet} of all vertices from one specific file
    */
   private DataSet<EPGMVertex> readCSVFile(List<String> propertyNames, boolean checkReoccurringHeader) {
-    return config.getExecutionEnvironment()
-      .readTextFile(path)
-      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))
+    Class<String>[] types = IntStream.range(0, propertyNames.size())
+      .mapToObj(i -> String.class)
+      .<Class<String>>toArray(Class[]::new);
+
+    return getCSVReader(config.getExecutionEnvironment(), path, types)
+      .flatMap(new CsvRowToProperties<>(propertyNames, checkReoccurringHeader))
+      .filter(p -> !p.isEmpty())
       .map(new PropertiesToVertex<>(config.getLogicalGraphFactory().getVertexFactory()))
       .returns(config.getLogicalGraphFactory().getVertexFactory().getType());
+  }
+
+  /**
+   * Create CSVReader for the provided types.
+   * Flinks CSVReader builder does not support tuples of dynamic length.
+   *
+   * @param env execution environment
+   * @param filename path of csv file
+   * @param fieldTypes array of types
+   * @return csv reader returning a tuple of fieldTypes
+   */
+  private org.apache.flink.api.java.operators.DataSource<Tuple> getCSVReader(ExecutionEnvironment env,
+    String filename, Class<?>[] fieldTypes) {
+    TupleTypeInfo<Tuple> typeInfo = TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(fieldTypes);
+    TupleCsvInputFormat<Tuple> inputFormat = new TupleCsvInputFormat<>(
+      new org.apache.flink.core.fs.Path(filename), typeInfo);
+    inputFormat.setCharset(this.charset);
+    inputFormat.setFieldDelimiter(this.tokenSeparator);
+    inputFormat.setSkipFirstLineAsHeader(false);
+    if (this.parseQuotedStrings) {
+      inputFormat.enableQuotedStringParsing(this.quoteCharacter);
+    }
+    return new org.apache.flink.api.java.operators.DataSource<>(env, inputFormat, typeInfo,
+      Utils.getCallLocationName());
   }
 
   /**

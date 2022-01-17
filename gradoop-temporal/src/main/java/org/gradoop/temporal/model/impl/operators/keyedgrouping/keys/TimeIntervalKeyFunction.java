@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.temporal.model.impl.operators.keyedgrouping.keys;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.flink.model.api.functions.KeyFunction;
+import org.gradoop.flink.model.api.functions.KeyFunctionWithDefaultValue;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.pojo.TemporalElement;
 
@@ -30,7 +30,7 @@ import java.util.Objects;
  * @param <T> The type of the temporal elements.
  */
 public class TimeIntervalKeyFunction<T extends TemporalElement>
-  implements KeyFunction<T, Tuple2<Long, Long>> {
+  implements KeyFunctionWithDefaultValue<T, Tuple2<Long, Long>> {
 
   /**
    * The time dimension to extract from.
@@ -57,6 +57,11 @@ public class TimeIntervalKeyFunction<T extends TemporalElement>
       throw new UnsupportedOperationException("Time dimension not supported by this element: " +
         timeDimension);
     }
+  }
+
+  @Override
+  public Tuple2<Long, Long> getDefaultKey() {
+    return new Tuple2<>(Long.MIN_VALUE, Long.MAX_VALUE);
   }
 
   @Override

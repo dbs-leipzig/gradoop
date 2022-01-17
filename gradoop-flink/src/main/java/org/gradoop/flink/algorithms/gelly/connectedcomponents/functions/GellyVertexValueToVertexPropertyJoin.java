@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Stores the gelly vertex value (a {@link GradoopId}) as property with the given property key in
  * the gradoop vertex.
+ *
+ * @param <V> Gradoop Vertex type
  */
-public class GellyVertexValueToVertexPropertyJoin
-  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, GradoopId>, EPGMVertex, EPGMVertex> {
+public class GellyVertexValueToVertexPropertyJoin<V extends Vertex>
+  implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, GradoopId>, V, V> {
 
   /**
    * Property key to store the gelly vertex value.
@@ -41,9 +43,8 @@ public class GellyVertexValueToVertexPropertyJoin
   }
 
   @Override
-  public EPGMVertex join(org.apache.flink.graph.Vertex<GradoopId, GradoopId> gellyVertex,
-    EPGMVertex gradoopVertex) {
-    gradoopVertex.setProperty(propertyKey, gellyVertex.getValue());
-    return gradoopVertex;
+  public V join(org.apache.flink.graph.Vertex<GradoopId, GradoopId> gellyVertex, V vertex) {
+    vertex.setProperty(propertyKey, gellyVertex.getValue());
+    return vertex;
   }
 }

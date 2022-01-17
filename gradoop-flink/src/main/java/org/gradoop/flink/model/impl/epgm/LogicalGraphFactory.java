@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,12 +95,6 @@ public class LogicalGraphFactory
   public LogicalGraph fromDataSets(DataSet<EPGMGraphHead> graphHead, DataSet<EPGMVertex> vertices,
     DataSet<EPGMEdge> edges) {
     return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
-  }
-
-  @Override
-  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<EPGMVertex>> vertices,
-    Map<String, DataSet<EPGMEdge>> edges) {
-    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
   }
 
   @Override

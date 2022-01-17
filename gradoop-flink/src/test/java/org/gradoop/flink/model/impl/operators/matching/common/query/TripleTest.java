@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query;
 
 import org.junit.Test;
-import org.s1ck.gdl.model.Edge;
-import org.s1ck.gdl.model.Vertex;
+import org.gradoop.gdl.model.Edge;
+import org.gradoop.gdl.model.Vertex;
 
 import static org.junit.Assert.*;
 

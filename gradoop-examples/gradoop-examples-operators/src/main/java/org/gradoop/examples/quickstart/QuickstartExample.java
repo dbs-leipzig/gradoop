@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A self contained quickstart example on how to use a composition of gradoop operators.
- * */
+ */
 public class QuickstartExample {
 
   /**
@@ -86,7 +86,8 @@ public class QuickstartExample {
     workGraph.print();
 
     // execute WCC
-    GraphCollection workspaces = new WeaklyConnectedComponentsAsCollection(5).execute(workGraph);
+    GraphCollection workspaces = workGraph
+      .callForCollection(new WeaklyConnectedComponentsAsCollection<>(5));
 
     System.out.println("CONNECTED_COMPONENTS_GRAPH");
     workspaces.print();

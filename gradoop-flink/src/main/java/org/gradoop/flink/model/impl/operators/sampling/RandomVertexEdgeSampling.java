@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,30 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
  * Computes an edge sampling of the graph (new graph head will be generated). First selects
  * randomly chosen vertices of a given relative amount and all edges which source- and
  * target-vertices were chosen. Then randomly chooses edges from this set of edges and their
  * associated source- and target-vertices. No unconnected vertices will retain in the sampled graph.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class RandomVertexEdgeSampling extends SamplingAlgorithm {
+public class RandomVertexEdgeSampling<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SamplingAlgorithm<G, V, E, LG, GC> {
 
   /**
    * The sampling type enum
@@ -113,20 +128,20 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
   }
 
   @Override
-  public LogicalGraph sample(LogicalGraph graph) {
+  public LG sample(LG graph) {
 
     switch (vertexEdgeSamplingType) {
     case SimpleVersion:
-      graph = new RandomVertexSampling(vertexSampleSize, randomSeed).execute(graph);
-      graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);
+      graph = graph.callForGraph(new RandomVertexSampling<>(vertexSampleSize, randomSeed));
+      graph = graph.callForGraph(new RandomEdgeSampling<>(edgeSampleSize, randomSeed));
       break;
     case NonuniformVersion:
-      graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);
-      graph = new RandomEdgeSampling(edgeSampleSize, randomSeed).execute(graph);
+      graph = graph.callForGraph(new RandomNonUniformVertexSampling<>(vertexSampleSize, randomSeed));
+      graph = graph.callForGraph(new RandomEdgeSampling<>(edgeSampleSize, randomSeed));
       break;
     case NonuniformHybridVersion:
-      graph = new RandomNonUniformVertexSampling(vertexSampleSize, randomSeed).execute(graph);
-      graph = new RandomEdgeSampling(1 - vertexSampleSize, randomSeed).execute(graph);
+      graph = graph.callForGraph(new RandomNonUniformVertexSampling<>(vertexSampleSize, randomSeed));
+      graph = graph.callForGraph(new RandomEdgeSampling<>(1 - vertexSampleSize, randomSeed));
       break;
     default:
       break;

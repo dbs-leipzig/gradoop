@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Retains all vertices with a PageRank-score greater or equal/smaller than a given
  * sampling threshold - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
+ *
+ * @param <V> The vertex type.
  */
-public class PageRankResultVertexFilter implements FilterFunction<EPGMVertex> {
+public class PageRankResultVertexFilter<V extends Vertex> implements FilterFunction<V> {
 
   /**
    * Sampling threshold for PageRankScore
@@ -58,9 +60,9 @@ public class PageRankResultVertexFilter implements FilterFunction<EPGMVertex> {
   }
 
   @Override
-  public boolean filter(EPGMVertex v) throws Exception {
-    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
-      double pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
+  public boolean filter(V vertex) throws Exception {
+    if (vertex.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
+      double pr = vertex.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
         .getDouble();
       if (sampleGreaterThanThreshold) {
         return pr > threshold;

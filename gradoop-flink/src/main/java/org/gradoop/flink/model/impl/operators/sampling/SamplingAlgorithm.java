@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,31 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 
 /**
  * Abstract class to provide methods for sampling algorithms.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
+public abstract class SamplingAlgorithm<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LG execute(LG graph) {
     return sample(graph);
   }
 
@@ -34,5 +49,5 @@ public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
    * @param graph graph that will be sampled of
    * @return sampled graph
    */
-  protected abstract LogicalGraph sample(LogicalGraph graph);
+  protected abstract LG sample(LG graph);
 }

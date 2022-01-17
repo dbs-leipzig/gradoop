@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import java.util.Collection;
  * Used the {@link AsciiGraphLoader} to generate instances of
  * {@link LogicalGraph} and {@link GraphCollection} from GDL.
  *
- * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
+ * @see <a href="https://github.com/dbs-leipzig/gdl">GDL on GitHub</a>
  */
 public class FlinkAsciiGraphLoader {
 

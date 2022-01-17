@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,16 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 
 /**
  * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
  * property for sampling, we consider that vertex as not sampled.
+ *
+ * @param <E> The edge type.
  */
-public class EdgesWithSampledVerticesFilter
-  implements FilterFunction<Tuple3<EPGMEdge, Boolean, Boolean>> {
+public class EdgesWithSampledVerticesFilter<E extends Edge>
+  implements FilterFunction<Tuple3<E, Boolean, Boolean>> {
 
   /**
    * Type of neighborhood
@@ -42,7 +44,7 @@ public class EdgesWithSampledVerticesFilter
   }
 
   @Override
-  public boolean filter(Tuple3<EPGMEdge, Boolean, Boolean> tuple) {
+  public boolean filter(Tuple3<E, Boolean, Boolean> tuple) {
 
     boolean isSourceVertexMarked = tuple.f1;
     boolean isTargetVertexMarked = tuple.f2;
@@ -50,13 +52,17 @@ public class EdgesWithSampledVerticesFilter
     boolean filter;
 
     switch (neighborType) {
-    case BOTH:  filter = isSourceVertexMarked || isTargetVertexMarked;
-    break;
-    case IN:    filter = isTargetVertexMarked;
-    break;
-    case OUT:   filter = isSourceVertexMarked;
-    break;
-    default: throw new UnsupportedTypeException("NeighborType needs to be BOTH, IN or OUT");
+    case BOTH:
+      filter = isSourceVertexMarked || isTargetVertexMarked;
+      break;
+    case IN:
+      filter = isTargetVertexMarked;
+      break;
+    case OUT:
+      filter = isSourceVertexMarked;
+      break;
+    default:
+      throw new UnsupportedTypeException("NeighborType needs to be BOTH, IN or OUT");
     }
 
     return filter;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class EmbeddingTestUtils {
@@ -47,9 +46,9 @@ public class EmbeddingTestUtils {
   public static void assertEmbedding(Embedding embedding,
     List<GradoopId> expectedEntries, List<PropertyValue> expectedProperties) {
     expectedEntries.forEach(entry ->
-      assertThat(embedding.getId(expectedEntries.indexOf(entry)), is(entry)));
+      assertEquals(entry, embedding.getId(expectedEntries.indexOf(entry))));
     expectedProperties.forEach(value ->
-      assertThat(embedding.getProperty(expectedProperties.indexOf(value)), is(value)));
+      assertEquals(value, embedding.getProperty(expectedProperties.indexOf(value))));
   }
 
   /**

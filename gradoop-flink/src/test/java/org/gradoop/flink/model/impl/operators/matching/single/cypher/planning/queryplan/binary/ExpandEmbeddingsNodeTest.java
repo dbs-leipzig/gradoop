@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.gradoop.common.GradoopTestUtils.call;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.*;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
@@ -58,14 +57,14 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
 
-    assertThat(outputMetaData.getEntryCount(), is(3));
-    assertThat(outputMetaData.getEntryColumn("v1"), is(0));
-    assertThat(outputMetaData.getEntryColumn("e1"), is(1));
-    assertThat(outputMetaData.getEntryColumn("v2"), is(2));
-    assertThat(outputMetaData.getEntryType("v1"), is(EntryType.VERTEX));
-    assertThat(outputMetaData.getEntryType("e1"), is(EntryType.PATH));
-    assertThat(outputMetaData.getEntryType("v2"), is(EntryType.VERTEX));
-    assertThat(outputMetaData.getDirection("e1"), is(ExpandDirection.OUT));
+    assertEquals(3, outputMetaData.getEntryCount());
+    assertEquals(0, outputMetaData.getEntryColumn("v1"));
+    assertEquals(1, outputMetaData.getEntryColumn("e1"));
+    assertEquals(2, outputMetaData.getEntryColumn("v2"));
+    assertEquals(EntryType.VERTEX, outputMetaData.getEntryType("v1"));
+    assertEquals(EntryType.PATH, outputMetaData.getEntryType("e1"));
+    assertEquals(EntryType.VERTEX, outputMetaData.getEntryType("v2"));
+    assertEquals(ExpandDirection.OUT, outputMetaData.getDirection("e1"));
   }
 
   @Test
@@ -91,12 +90,10 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
       0, 10, ExpandDirection.OUT,
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(ExpandEmbeddingsNode.class, node, "getDistinctVertexColumns",
-      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}),
-      is(asList(0, 2, 4)));
-    assertThat(call(ExpandEmbeddingsNode.class, node, "getDistinctEdgeColumns",
-      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}),
-      is(asList(1, 3)));
+    assertEquals(asList(0, 2, 4), call(ExpandEmbeddingsNode.class, node, "getDistinctVertexColumns",
+      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}));
+    assertEquals(asList(1, 3), call(ExpandEmbeddingsNode.class, node, "getDistinctEdgeColumns",
+      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -123,12 +120,10 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
       0, 10, ExpandDirection.OUT,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
-    assertThat(call(ExpandEmbeddingsNode.class, node, "getDistinctVertexColumns",
-      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}),
-      is(asList()));
-    assertThat(call(ExpandEmbeddingsNode.class, node, "getDistinctEdgeColumns",
-      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}),
-      is(asList()));
+    assertEquals(asList(), call(ExpandEmbeddingsNode.class, node, "getDistinctVertexColumns",
+      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}));
+    assertEquals(asList(), call(ExpandEmbeddingsNode.class, node, "getDistinctEdgeColumns",
+      new Class<?>[] {EmbeddingMetaData.class}, new Object[]{leftInputMetaData}));
   }
 
   @Test
@@ -185,15 +180,15 @@ public class ExpandEmbeddingsNodeTest extends GradoopFlinkTestBase {
      * ---------------------------------------------------
      */
     List<Embedding> result = node.execute().collect();
-    assertThat(result.size(), is(1));
+    assertEquals(1, result.size());
     Embedding embedding = result.get(0);
-    assertThat(embedding.getId(0), is(a));
-    assertThat(embedding.getIdList(1).size(), is(5));
-    assertThat(embedding.getIdList(1).get(0), is(b));
-    assertThat(embedding.getIdList(1).get(1), is(c));
-    assertThat(embedding.getIdList(1).get(2), is(d));
-    assertThat(embedding.getIdList(1).get(3), is(e));
-    assertThat(embedding.getIdList(1).get(4), is(f));
-    assertThat(embedding.getId(2), is(g));
+    assertEquals(a, embedding.getId(0));
+    assertEquals(5, embedding.getIdList(1).size());
+    assertEquals(b, embedding.getIdList(1).get(0));
+    assertEquals(c, embedding.getIdList(1).get(1));
+    assertEquals(d, embedding.getIdList(1).get(2));
+    assertEquals(e, embedding.getIdList(1).get(3));
+    assertEquals(f, embedding.getIdList(1).get(4));
+    assertEquals(g, embedding.getId(2));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Writes the PageRank-scores stored in the graphHead to all vertices.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
  */
-public class AddPageRankScoresToVertexCrossFunction
-  implements CrossFunction<EPGMVertex, EPGMGraphHead, EPGMVertex> {
+public class AddPageRankScoresToVertexCrossFunction<V extends Vertex, G extends GraphHead>
+  implements CrossFunction<V, G, V> {
 
   @Override
-  public EPGMVertex cross(EPGMVertex vertex, EPGMGraphHead graphHead) {
+  public V cross(V vertex, G graphHead) {
     double min = graphHead.getPropertyValue(
       SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
     double max = graphHead.getPropertyValue(

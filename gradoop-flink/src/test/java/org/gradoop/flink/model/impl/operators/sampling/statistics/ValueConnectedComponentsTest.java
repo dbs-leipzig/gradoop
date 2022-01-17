@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,8 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
     LogicalGraph graph = loader.getLogicalGraphByVariable("g");
 
     // execute Gelly ConnectedComponents.
-    DataSet<Tuple2<Long, Long>> cComponents =
-      new ConnectedComponentsDistributionAsValues(Integer.MAX_VALUE).execute(graph);
+    DataSet<Tuple2<Long, Long>> cComponents = graph.callForValue(
+      new ConnectedComponentsDistributionAsValues<>(Integer.MAX_VALUE));
 
     List<Tuple2<Long, Long>> vertexComponentList = new ArrayList<>();
     cComponents.output(new LocalCollectionOutputFormat<>(vertexComponentList));

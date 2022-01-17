@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,17 +88,6 @@ public interface BaseGraphFactory<
    * @return Logical graph
    */
   LG fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
-
-  /**
-   * Creates a logical graph from the given datasets. A new graph head is created and all vertices
-   * and edges are assigned to that graph head.
-   *
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return Logical graph
-   */
-  LG fromIndexedDataSets(Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
 
   /**
    * Creates a logical graph from the given datasets. The method assumes that all vertices and

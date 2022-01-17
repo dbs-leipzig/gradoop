@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,14 +36,6 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Creates a new graph from a randomly chosen subset of nodes and their associated edges.
-   *
-   * @param algorithm used sampling algorithm
-   * @return logical graph with random nodes and their associated edges
-   */
-  LogicalGraph sample(SamplingAlgorithm algorithm);
 
   /**
    * Generates all combinations of the supplied vertex grouping keys according to the definition of
@@ -81,16 +72,6 @@ public interface LogicalGraphOperators
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Splits the graph into multiple logical graphs using the property value
-   * which is assigned to the given property key. Vertices and edges that do
-   * not have this property will be removed from the resulting collection.
-   *
-   * @param propertyKey split property key
-   * @return graph collection
-   */
-  GraphCollection splitBy(String propertyKey);
 
   /**
    * Creates a logical graph from that graph and other graphs using the given operator.

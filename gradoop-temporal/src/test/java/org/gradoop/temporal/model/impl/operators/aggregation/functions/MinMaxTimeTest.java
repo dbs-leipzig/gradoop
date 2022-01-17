@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
       {TRANSACTION_TIME, FROM, 6L,        0L, 3L,        MIN_VALUE, 6L,        MIN_VALUE},
       {TRANSACTION_TIME, TO,   MAX_VALUE, 2L, MAX_VALUE, 7L,        MAX_VALUE, 2L},
       {VALID_TIME,       FROM, 6L,        0L, 4L,        0L,        6L,        0L},
-      {VALID_TIME,       TO,   7L,        1L, 9L,        5L,        9L,        1L}
+      {VALID_TIME,       TO,   7L,        5L, 9L,        5L,        9L,        5L}
     };
   }
 

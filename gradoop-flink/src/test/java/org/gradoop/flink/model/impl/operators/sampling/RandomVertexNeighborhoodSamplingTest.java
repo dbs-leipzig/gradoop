@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.junit.runners.Parameterized;
@@ -38,14 +42,14 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
   }
 
   @Override
-  public SamplingAlgorithm getSamplingOperator() {
-    return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
+  public SamplingAlgorithm<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getSamplingOperator() {
+    return new RandomVertexNeighborhoodSampling<>(sampleSize, seed, neighborType);
   }
 
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
   }
-
 
   /**
    * Parameters called when running the test
@@ -53,7 +57,7 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
    * @return List of parameters
    */
   @Parameterized.Parameters(name = "{index}: {0}")
-  public static Iterable data() {
+  public static Iterable<String[]> data() {
     return Arrays.asList(new String[] {
       "VertexNeighborhoodSamplingTest with seed and both neighborhood",
       "-4181668494294894490",

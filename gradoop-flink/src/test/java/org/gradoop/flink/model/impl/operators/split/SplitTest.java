@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result =
-      input.callForCollection(new Split(SplitTest::getSplitValues));
+      input.callForCollection(new Split<>(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -102,7 +102,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(SplitTest::getSplitValues));
+      .callForCollection(new Split<>(SplitTest::getSplitValues));
 
     GraphCollection expectation = loader.getGraphCollectionByVariables(
       "graph1", "graph2", "graph3");
@@ -137,7 +137,7 @@ public class SplitTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     GraphCollection result = input
-      .callForCollection(new Split(SplitTest::getSplitValues));
+      .callForCollection(new Split<>(SplitTest::getSplitValues));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables("graph1", "graph2")));
@@ -158,10 +158,10 @@ public class SplitTest extends GradoopFlinkTestBase {
           "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
           "]" +
           "g2 [" +
-          "(v0)-[e0:sameAs {id : 0, sim : \"0.91\"}]->(v1)" +
-          "(v0)-[e1:sameAs {id : 1, sim : \"0.3\"}]->(v2)" +
-          "(v2)-[e2:sameAs {id : 2, sim : \"0.1\"}]->(v1)" +
-          "(v2)-[e3:sameAs {id : 3, sim : \"0.99\"}]->(v3)" +
+          "(v0)-[e0]->(v1)" +
+          "(v0)-[e1]->(v2)" +
+          "(v2)-[e2]->(v1)" +
+          "(v2)-[e3]->(v3)" +
           "]"
       );
 

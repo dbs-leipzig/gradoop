@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.algorithms.gelly.randomjump.KRandomJumpGellyVCI;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -33,8 +35,19 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 /**
  * Computes a random walk sampling of the graph (new graph head will be generated). Retains visited
  * vertices and edges where source and target vertex has been sampled.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class RandomWalkSampling extends SamplingAlgorithm {
+public class RandomWalkSampling<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SamplingAlgorithm<G, V, E, LG, GC> {
 
   /**
    * Sample size
@@ -52,7 +65,6 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * Max iteration count
    */
   private final int maxIteration;
-
 
   /**
    * Constructor to create an instance of RandomWalk sampling
@@ -75,8 +87,8 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * @param jumpProbability         probability to jump instead of walk
    * @param maxIteration            max gelly iteration count
    */
-  public RandomWalkSampling(float sampleSize, int numberOfStartVertices,
-    float jumpProbability, int maxIteration) {
+  public RandomWalkSampling(float sampleSize, int numberOfStartVertices, float jumpProbability,
+    int maxIteration) {
 
     this.sampleSize = sampleSize;
     this.numberOfStartVertices = numberOfStartVertices;
@@ -85,22 +97,22 @@ public class RandomWalkSampling extends SamplingAlgorithm {
   }
 
   @Override
-  protected LogicalGraph sample(LogicalGraph graph) {
+  protected LG sample(LG graph) {
 
-    LogicalGraph gellyResult = new KRandomJumpGellyVCI(numberOfStartVertices, maxIteration,
-      jumpProbability, sampleSize).execute(graph);
+    LG gellyResult = graph.callForGraph(
+      new KRandomJumpGellyVCI<>(numberOfStartVertices, maxIteration, jumpProbability, sampleSize));
 
-    DataSet<EPGMVertex> sampledVertices = gellyResult.getVertices()
+    DataSet<V> sampledVertices = gellyResult.getVertices()
       .filter(new ByProperty<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
-    DataSet<EPGMEdge> sampledEdges = graph.getEdges()
+    DataSet<E> sampledEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
+      .with(new EdgeSourceVertexJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
-      .with(new EdgeTargetVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
-      .filter(new EdgesWithSampledVerticesFilter(Neighborhood.BOTH))
+      .with(new EdgeTargetVertexJoin<>(SamplingConstants.PROPERTY_KEY_SAMPLED))
+      .filter(new EdgesWithSampledVerticesFilter<>(Neighborhood.BOTH))
       .map(new Value0Of3<>());
 
     return graph.getFactory().fromDataSets(sampledVertices, sampledEdges);

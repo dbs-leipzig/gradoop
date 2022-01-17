@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,8 @@ public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    LogicalGraph outputGraph =
-      input.callForGraph(new DistinctVertexDegrees("degree", "inDegree", "outDegree", false));
+    LogicalGraph outputGraph = input.callForGraph(new DistinctVertexDegrees<>(
+      "degree", "inDegree", "outDegree", false));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 
     collectAndAssertTrue(outputGraph.equalsByData(expect));

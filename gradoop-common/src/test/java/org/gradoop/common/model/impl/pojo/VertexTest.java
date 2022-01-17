@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
-import org.hamcrest.core.Is;
 import org.testng.annotations.Test;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class VertexTest {
@@ -32,9 +30,9 @@ public class VertexTest {
   public void createWithIDTest() {
     GradoopId vertexID = GradoopId.get();
     Vertex v = new EPGMVertexFactory().initVertex(vertexID);
-    assertThat(v.getId(), is(vertexID));
-    assertThat(v.getPropertyCount(), is(0));
-    assertThat(v.getGraphCount(), is(0));
+    assertEquals(vertexID, v.getId());
+    assertEquals(0, v.getPropertyCount());
+    assertEquals(0, v.getGraphCount());
   }
 
   @Test
@@ -55,12 +53,12 @@ public class VertexTest {
     Vertex vertex = new EPGMVertexFactory()
       .initVertex(vertexID, label, props, graphIds);
 
-    assertThat(vertex.getId(), is(vertexID));
+    assertEquals(vertexID, vertex.getId());
     assertEquals(label, vertex.getLabel());
-    assertThat(vertex.getPropertyCount(), is(2));
-    assertThat(vertex.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
-    assertThat(vertex.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
-    assertThat(vertex.getGraphCount(), is(2));
+    assertEquals(2, vertex.getPropertyCount());
+    assertEquals("v1", vertex.getPropertyValue("k1").getString());
+    assertEquals("v2", vertex.getPropertyValue("k2").getString());
+    assertEquals(2, vertex.getGraphCount());
     assertTrue(vertex.getGraphIds().contains(graphId1));
     assertTrue(vertex.getGraphIds().contains(graphId2));
   }
@@ -69,7 +67,7 @@ public class VertexTest {
   public void createWithMissingLabelTest() {
     GradoopId vertexID = GradoopId.get();
     Vertex v = new EPGMVertexFactory().initVertex(vertexID);
-    assertThat(v.getLabel(), is(GradoopConstants.DEFAULT_VERTEX_LABEL));
+    assertEquals(GradoopConstants.DEFAULT_VERTEX_LABEL, v.getLabel());
   }
 
   @Test(expectedExceptions = NullPointerException.class)

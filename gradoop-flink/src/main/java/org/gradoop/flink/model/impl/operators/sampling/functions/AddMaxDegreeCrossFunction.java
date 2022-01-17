@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
- * Add the max degree to all vertices
+ * A cross function that adds the max degree to all vertices.
+ *
+ * @param <V> The vertex type.
  */
-public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, EPGMVertex, EPGMVertex> {
+public class AddMaxDegreeCrossFunction<V extends Vertex> implements CrossFunction<Tuple1<Long>, V, V> {
 
   /**
    * Name of the property for maximum degree
@@ -30,7 +32,7 @@ public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, EP
   private String nameOfMaxDegreeProperty;
 
   /**
-   * Constructor
+   * Creates an instance of this cross function.
    *
    * @param nameOfMaxDegreeProperty name of the property for maximum degree
    */
@@ -39,7 +41,7 @@ public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, EP
   }
 
   @Override
-  public EPGMVertex cross(Tuple1<Long> longTuple1, EPGMVertex vertex) {
+  public V cross(Tuple1<Long> longTuple1, V vertex) {
     vertex.setProperty(nameOfMaxDegreeProperty, longTuple1.f0);
     return vertex;
   }

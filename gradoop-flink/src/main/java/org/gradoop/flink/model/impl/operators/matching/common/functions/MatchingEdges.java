@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2020 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
   /**
    * Query edges to match against.
    */
-  private transient Collection<org.s1ck.gdl.model.Edge> queryEdges;
+  private transient Collection<org.gradoop.gdl.model.Edge> queryEdges;
   /**
    * Constructor
    *
