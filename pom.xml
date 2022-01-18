@@ -160,7 +160,7 @@
         <dep.commons-lang.version>3.11</dep.commons-lang.version>
         <dep.flink.version>1.9.3</dep.flink.version>
         <dep.gradoop.gdl.version>0.5.2</dep.gradoop.gdl.version>
-        <dep.guava.version>24.1.1-jre</dep.guava.version>
+        <dep.guava.version>14.0</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.13.1</dep.junit.version>
