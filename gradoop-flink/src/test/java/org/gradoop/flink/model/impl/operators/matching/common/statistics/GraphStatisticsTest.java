@@ -17,8 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public abstract class GraphStatisticsTest {
   /**
@@ -28,175 +27,151 @@ public abstract class GraphStatisticsTest {
 
   @Test
   public void testGetVertexCount() throws Exception {
-    assertThat(TEST_STATISTICS.getVertexCount(), is(11L));
+    assertEquals(11L, TEST_STATISTICS.getVertexCount());
   }
 
   @Test
   public void testGetEdgeCount() throws Exception {
-    assertThat(TEST_STATISTICS.getEdgeCount(), is(24L));
+    assertEquals(24L, TEST_STATISTICS.getEdgeCount());
   }
 
   @Test
   public void testGetVertexCountByLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getVertexCount("Person"), is(6L));
-    assertThat(TEST_STATISTICS.getVertexCount("Forum"), is(2L));
-    assertThat(TEST_STATISTICS.getVertexCount("Tag"), is(3L));
+    assertEquals(6L, TEST_STATISTICS.getVertexCount("Person"));
+    assertEquals(2L, TEST_STATISTICS.getVertexCount("Forum"));
+    assertEquals(3L, TEST_STATISTICS.getVertexCount("Tag"));
     // nonexistent vertex label
-    assertThat(TEST_STATISTICS.getVertexCount("Foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getVertexCount("Foo"));
   }
 
   @Test
   public void testGetEdgeCountByLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getEdgeCount("hasInterest"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCount("hasModerator"), is(2L));
-    assertThat(TEST_STATISTICS.getEdgeCount("knows"), is(10L));
-    assertThat(TEST_STATISTICS.getEdgeCount("hasTag"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCount("hasMember"), is(4L));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCount("hasInterest"));
+    assertEquals(2L, TEST_STATISTICS.getEdgeCount("hasModerator"));
+    assertEquals(10L, TEST_STATISTICS.getEdgeCount("knows"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCount("hasTag"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCount("hasMember"));
     // nonexistent edge label
-    assertThat(TEST_STATISTICS.getEdgeCount("foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getEdgeCount("foo"));
   }
 
   @Test
   public void testGetEdgeCountBySourceVertexAndEdgeLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Forum", "hasMember"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Forum", "hasModerator"), is(2L));
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Forum", "hasTag"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Person", "hasInterest"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Person", "knows"), is(10L));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountBySource("Forum", "hasMember"));
+    assertEquals(2L, TEST_STATISTICS.getEdgeCountBySource("Forum", "hasModerator"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountBySource("Forum", "hasTag"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountBySource("Person", "hasInterest"));
+    assertEquals(10L, TEST_STATISTICS.getEdgeCountBySource("Person", "knows"));
     // nonexistent edge label
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Person", "foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getEdgeCountBySource("Person", "foo"));
     // nonexistent vertex label
-    assertThat(TEST_STATISTICS.getEdgeCountBySource("Foo", "knows"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getEdgeCountBySource("Foo", "knows"));
   }
 
   @Test
   public void testGetEdgeCountByTargetVertexAndEdgeLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Tag", "hasTag"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Tag", "hasInterest"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Person", "knows"), is(10L));
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Person", "hasMember"), is(4L));
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Person", "hasModerator"), is(2L));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountByTarget("Tag", "hasTag"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountByTarget("Tag", "hasInterest"));
+    assertEquals(10L, TEST_STATISTICS.getEdgeCountByTarget("Person", "knows"));
+    assertEquals(4L, TEST_STATISTICS.getEdgeCountByTarget("Person", "hasMember"));
+    assertEquals(2L, TEST_STATISTICS.getEdgeCountByTarget("Person", "hasModerator"));
     // nonexistent edge label
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Tag", "foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getEdgeCountByTarget("Tag", "foo"));
     // nonexistent vertex label
-    assertThat(TEST_STATISTICS.getEdgeCountByTarget("Foo", "hasTag"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getEdgeCountByTarget("Foo", "hasTag"));
   }
 
   @Test
   public void testGetDistinctSourceVertexCount() throws Exception {
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount(), is(8L));
+    assertEquals(8L, TEST_STATISTICS.getDistinctSourceVertexCount());
   }
 
   @Test
   public void testGetDistinctTargetVertexCount() throws Exception {
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount(), is(7L));
+    assertEquals(7L, TEST_STATISTICS.getDistinctTargetVertexCount());
   }
 
   @Test
   public void testGetDistinctSourceVertexCountByEdgeLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("hasInterest"), is(4L));
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("hasModerator"), is(2L));
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("knows"), is(6L));
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("hasTag"), is(2L));
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("hasMember"), is(2L));
+    assertEquals(4L, TEST_STATISTICS.getDistinctSourceVertexCount("hasInterest"));
+    assertEquals(2L, TEST_STATISTICS.getDistinctSourceVertexCount("hasModerator"));
+    assertEquals(6L, TEST_STATISTICS.getDistinctSourceVertexCount("knows"));
+    assertEquals(2L, TEST_STATISTICS.getDistinctSourceVertexCount("hasTag"));
+    assertEquals(2L, TEST_STATISTICS.getDistinctSourceVertexCount("hasMember"));
     // nonexistent edge label
-    assertThat(TEST_STATISTICS.getDistinctSourceVertexCount("foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getDistinctSourceVertexCount("foo"));
   }
 
   @Test
   public void testDistinctTargetVertexCountByEdgeLabel() throws Exception {
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("hasInterest"), is(2L));
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("hasModerator"), is(2L));
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("knows"), is(4L));
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("hasMember"), is(4L));
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("hasTag"), is(3L));
+    assertEquals(2L, TEST_STATISTICS.getDistinctTargetVertexCount("hasInterest"));
+    assertEquals(2L, TEST_STATISTICS.getDistinctTargetVertexCount("hasModerator"));
+    assertEquals(4L, TEST_STATISTICS.getDistinctTargetVertexCount("knows"));
+    assertEquals(4L, TEST_STATISTICS.getDistinctTargetVertexCount("hasMember"));
+    assertEquals(3L, TEST_STATISTICS.getDistinctTargetVertexCount("hasTag"));
     // nonexistent edge label
-    assertThat(TEST_STATISTICS.getDistinctTargetVertexCount("foo"), is(0L));
+    assertEquals(0L, TEST_STATISTICS.getDistinctTargetVertexCount("foo"));
   }
 
   @Test
   public void testDistinctPropertyValuesByEdgeLabelAndPropertyName() throws Exception {
-    assertThat(
-      TEST_STATISTICS.getDistinctEdgeProperties("knows", "since"),
-      is(6L));
-    assertThat(
-      TEST_STATISTICS.getDistinctEdgeProperties("hasModerator", "since"),
-      is(3L));
+    assertEquals(6L, TEST_STATISTICS.getDistinctEdgeProperties("knows", "since"));
+    assertEquals(3L, TEST_STATISTICS.getDistinctEdgeProperties("hasModerator", "since"));
     // nonexistent edge label
-    assertThat(
-      TEST_STATISTICS.getDistinctEdgeProperties("foo", "bar"),
-      is(0L));
+    assertEquals(0L, TEST_STATISTICS.getDistinctEdgeProperties("foo", "bar"));
   }
 
   @Test
   public void testDistinctPropertyValuesByVertexLabelAndPropertyName() throws Exception {
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "name"),
-      is(6L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "gender"),
-      is(2L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "city"),
-      is(3L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "age"),
-      is(4L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "speaks"),
-      is(1L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Person", "locIP"),
-      is(1L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Tag", "name"),
-      is(3L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("Forum", "title"),
-      is(2L));
+    assertEquals(6L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "name"));
+    assertEquals(2L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "gender"));
+    assertEquals(3L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "city"));
+    assertEquals(4L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "age"));
+    assertEquals(1L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "speaks"));
+    assertEquals(1L,
+            TEST_STATISTICS.getDistinctVertexProperties("Person", "locIP"));
+    assertEquals(3L,
+            TEST_STATISTICS.getDistinctVertexProperties("Tag", "name"));
+    assertEquals(2L,
+            TEST_STATISTICS.getDistinctVertexProperties("Forum", "title"));
     // nonexistent edge label
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("foo", "bar"),
-      is(0L));
+    assertEquals(0L,
+            TEST_STATISTICS.getDistinctVertexProperties("foo", "bar"));
   }
 
   @Test
   public void testDistinctEdgePropertyValuesByPropertyName() throws Exception {
-    assertThat(TEST_STATISTICS.getDistinctEdgeProperties("since"),
-      is(9L));
+    assertEquals(9L,
+            TEST_STATISTICS.getDistinctEdgeProperties("since"));
     // nonexistent edge label
-    assertThat(
-      TEST_STATISTICS.getDistinctEdgeProperties("bar"),
-      is(0L));
+    assertEquals(0L,
+            TEST_STATISTICS.getDistinctEdgeProperties("bar"));
   }
 
   @Test
   public void testDistinctVertexPropertyValuesByPropertyName() throws Exception {
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("name"),
-      is(9L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("gender"),
-      is(2L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("city"),
-      is(3L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("age"),
-      is(4L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("speaks"),
-      is(1L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("locIP"),
-      is(1L));
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("title"),
-      is(2L));
+    assertEquals(9L,
+            TEST_STATISTICS.getDistinctVertexProperties("name"));
+    assertEquals(2L,
+            TEST_STATISTICS.getDistinctVertexProperties("gender"));
+    assertEquals(3L,
+            TEST_STATISTICS.getDistinctVertexProperties("city"));
+    assertEquals(4L,
+            TEST_STATISTICS.getDistinctVertexProperties("age"));
+    assertEquals(1L,
+            TEST_STATISTICS.getDistinctVertexProperties("speaks"));
+    assertEquals(1L,
+            TEST_STATISTICS.getDistinctVertexProperties("locIP"));
+    assertEquals(2L,
+            TEST_STATISTICS.getDistinctVertexProperties("title"));
     // nonexistent edge label
-    assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties("bar"),
-      is(0L));
+    assertEquals(0L,
+            TEST_STATISTICS.getDistinctVertexProperties("bar"));
   }
 
 }
