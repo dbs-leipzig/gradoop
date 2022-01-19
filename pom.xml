@@ -160,7 +160,7 @@
         <dep.commons-lang.version>3.11</dep.commons-lang.version>
         <dep.flink.version>1.9.3</dep.flink.version>
         <dep.gradoop.gdl.version>0.5.2</dep.gradoop.gdl.version>
-        <dep.guava.version>11.0.2</dep.guava.version>
+        <dep.guava.version>14.0</dep.guava.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.13.1</dep.junit.version>
@@ -168,7 +168,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
-        <dep.log4j.version>1.2.17</dep.log4j.version>
+        <dep.log4j.version>2.17.1</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
         <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
         <dep.testng.version>6.14.3</dep.testng.version>
@@ -619,7 +619,7 @@
                 <version>${dep.flink.version}</version>
             </dependency>
 
-            <dependency>
+           <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-shaded-hadoop-2</artifactId>
                 <version>${dep.flink-shaded.version}</version>
@@ -677,8 +677,14 @@
             </dependency>
 
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${dep.log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
                 <version>${dep.log4j.version}</version>
             </dependency>
 
