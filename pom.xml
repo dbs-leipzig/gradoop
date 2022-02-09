@@ -155,7 +155,7 @@
         <license.licenseName>apache_v2</license.licenseName>
 
         <!-- alpha order require -->
-        <dep.accumulo.version>1.9.0</dep.accumulo.version>
+        <dep.accumulo.version>1.10.1</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.commons-lang.version>3.11</dep.commons-lang.version>
         <dep.flink.version>1.9.3</dep.flink.version>
