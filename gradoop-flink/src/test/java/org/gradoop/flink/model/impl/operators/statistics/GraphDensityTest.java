@@ -46,6 +46,6 @@ public class GraphDensityTest extends GradoopFlinkTestBase {
     // density should not be 0
     assertTrue("Graph density is 0", density > 0.);
     // density for social network graph should be (24 / 11 * 10) = 0.21818...
-    assertEquals("Computed graph density is incorrect", (24d / 110d), density, 0.0);
+    assertEquals("Computed graph density is incorrect", 24d / 110d, density, 0.0);
   }
 }

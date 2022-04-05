@@ -105,7 +105,7 @@ public class GroupDegreeTreesToAggregateDegrees
       case AVG:
         opt = vertexDegrees.values().stream().reduce(Math::addExact);
         opt.ifPresent(integer -> collector.collect(
-          new Tuple2<>(timePoint, (int) Math.ceil( (double) integer / (double) numberOfVertices))));
+          new Tuple2<>(timePoint, (int) Math.ceil((double) integer / (double) numberOfVertices))));
         break;
       default:
         throw new IllegalArgumentException("Aggregate type not specified.");

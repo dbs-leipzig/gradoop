@@ -35,7 +35,7 @@ public class TransformDeltaToAbsoluteDegreeTree
   /**
    * To reduce object instantiations.
    */
-  TreeMap<Long, Integer> absoluteDegreeTree;
+  private TreeMap<Long, Integer> absoluteDegreeTree;
 
   @Override
   public Tuple2<GradoopId, TreeMap<Long, Integer>> map(
