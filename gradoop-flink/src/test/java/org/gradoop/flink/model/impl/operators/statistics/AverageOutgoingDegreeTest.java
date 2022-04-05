@@ -13,37 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.AverageDegree;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test-class for average degree computation.
+ * Test-class for average outgoing degree computation.
  */
-public class AverageDegreeTest extends GradoopFlinkTestBase {
+public class AverageOutgoingDegreeTest extends GradoopFlinkTestBase {
 
   /**
-   * Tests the computation of the average degree for a logical graph
+   * Tests the computation of the average outgoing degree for a logical graph
    *
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testAverageDegree() throws Exception {
+  public void testAverageOutgoingDegree() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    long averageDegree = graph.callForGraph(new AverageDegree())
+    long averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
       .getGraphHead()
       .collect()
       .get(0)
-      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_DEGREE).getLong();
+      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE).getLong();
 
-    // average degree for social network graph should be (48 / 11) = 4.3636... -> 5
-    assertEquals("Computed average degree is incorrect", 5L, averageDegree);
+    // average outgoing degree for social network graph should be (24 / 11) = 2.1818... -> 3
+    assertEquals("Computed average outgoing degree is incorrect", 3L, averageOutgoingDegree);
   }
 }

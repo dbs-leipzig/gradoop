@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.AverageOutgoingDegree;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Test-class for average outgoing degree computation.
+ * Test-class for graph density computation.
  */
-public class AverageOutgoingDegreeTest extends GradoopFlinkTestBase {
+public class GraphDensityTest extends GradoopFlinkTestBase {
 
   /**
-   * Tests the computation of the average outgoing degree for a logical graph
+   * Tests the computation of graph density for a logical graph
    *
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testAverageOutgoingDegree() throws Exception {
+  public void testGraphDensity() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    long averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
+    double density = graph.callForGraph(new GraphDensity())
       .getGraphHead()
       .collect()
       .get(0)
-      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE).getLong();
+      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble();
 
-    // average outgoing degree for social network graph should be (24 / 11) = 2.1818... -> 3
-    assertEquals("Computed average outgoing degree is incorrect", 3L, averageOutgoingDegree);
+    // density should not be 0
+    assertTrue("Graph density is 0", density > 0.);
+    // density for social network graph should be (24 / 11 * 10) = 0.21818...
+    assertEquals("Computed graph density is incorrect", (24d / 110d), density, 0.0);
   }
 }
