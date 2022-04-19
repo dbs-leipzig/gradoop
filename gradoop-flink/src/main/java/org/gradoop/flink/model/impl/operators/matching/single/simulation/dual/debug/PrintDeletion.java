@@ -15,11 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
-  .Deletion;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 
 /**
  * Debug output for {@link Deletion}.
@@ -29,7 +30,7 @@ public class PrintDeletion extends Printer<Deletion, GradoopId> {
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(PrintDeletion.class);
+  private static final Logger LOG = LogManager.getLogger(PrintDeletion.class);
 
   /**
    * Constructor

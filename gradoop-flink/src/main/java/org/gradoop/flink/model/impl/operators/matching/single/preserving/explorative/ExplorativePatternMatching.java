@@ -21,7 +21,8 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -85,7 +86,7 @@ public class ExplorativePatternMatching<
   /**
    * Logger
    */
-  private static final Logger LOG = Logger.getLogger(ExplorativePatternMatching.class);
+  private static final Logger LOG = LogManager.getLogger(ExplorativePatternMatching.class);
   /**
    * Holds information on how to traverse the graph.
    */
