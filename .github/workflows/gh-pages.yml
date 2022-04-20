@@ -1,4 +1,4 @@
-name: Deploy Snapshot JavaDoc to GitHub Pages
+name: Deploy GitHub Pages
 
 on:
   workflow_dispatch
@@ -21,8 +21,11 @@ jobs:
         with:
           java-version: 1.8
 
+      - name: Build Project
+        run: mvn clean install
+
       - name: Build JavaDoc
-        run: mvn clean site site:stage -Pjavadoc
+        run: mvn site site:stage -Pjavadoc -DskipTests
 
       - name: Deploy to gh-pages
         run: mvn scm-publish:publish-scm -Pjavadoc
