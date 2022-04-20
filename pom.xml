@@ -281,7 +281,7 @@
                         <inherited>false</inherited>
                         <configuration>
                             <serverId>github</serverId>
-                            <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
+                            <pubScmUrl>scm:git:https://github.com/ChrizZz110/gradoop.git</pubScmUrl>
                             <scmBranch>gh-pages</scmBranch>
                             <checkinComment>Updated Site via Maven</checkinComment>
                             <content>${project.build.directory}/staging</content>

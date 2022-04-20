@@ -1,0 +1,28 @@
+name: Deploy Snapshot JavaDoc to GitHub Pages
+
+on:
+  workflow_dispatch
+  # Run weekly on sunday at 22:00 UTC (arbitrary)
+  #schedule:
+  #  - cron: '00 22 * * SUN'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: develop
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Build JavaDoc
+        run: mvn clean site site:stage -Pjavadoc
+
+      - name: Deploy to gh-pages
+        run: mvn scm-publish:publish-scm -Pjavadoc
