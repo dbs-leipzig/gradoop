@@ -137,7 +137,7 @@
         </site>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/org/gradoop</url>
         </snapshotRepository>
         <repository>
             <id>release_artifacts_gradoop</id>
@@ -189,7 +189,6 @@
         <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
-        <plugin.maven-scm-publish.version>3.0.0</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
         <plugin.maven-wagon-ssh.version>3.0.0</plugin.maven-wagon-ssh.version>
     </properties>
@@ -274,28 +273,6 @@
                                 <version>${plugin.maven-wagon-ssh.version}</version>
                             </dependency>
                         </dependencies>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-scm-publish-plugin</artifactId>
-                        <version>${plugin.maven-scm-publish.version}</version>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <serverId>github</serverId>
-                            <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
-                            <scmBranch>gh-pages</scmBranch>
-                            <checkinComment>Updated Site via Maven</checkinComment>
-                            <content>${project.build.directory}/staging</content>
-                            <siteOutputEncoding>UTF-8</siteOutputEncoding>
-                            <tryUpdate>true</tryUpdate>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>publish-scm</goal>
-                                </goals>
-                                <phase>site-deploy</phase>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
