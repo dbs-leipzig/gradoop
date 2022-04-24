@@ -39,13 +39,13 @@ public class HBasePropReg&lt;T extends Element&gt; extends PropReg&lt;HBaseEleme
    * @param reg label regex
    */
   public HBasePropReg(@Nonnull String key, @Nonnull Pattern reg) {
-<span class="nc" id="L42">    super(key, reg);</span>
-<span class="nc" id="L43">  }</span>
+<span class="fc" id="L42">    super(key, reg);</span>
+<span class="fc" id="L43">  }</span>
 
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
-<span class="nc" id="L48">    return HBaseFilterUtils.getPropRegFilter(getKey(), getReg(), negate);</span>
+<span class="fc" id="L48">    return HBaseFilterUtils.getPropRegFilter(getKey(), getReg(), negate);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

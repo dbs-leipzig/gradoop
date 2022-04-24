@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Point.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.kmeans.util</a> &gt; <span class="el_source">Point.java</span></div><h1>Point.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.kmeans.util;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+ * Point class that can be created by defining its coordinates.
+ * Extends the existing code snippet from GitHub repository
+ * https://github.com/TU-Berlin-DIMA/flink-tutorial.git
+ */
+public class Point implements Serializable {
+
+  /**
+   * Latitude coordinate of the point
+   */
+  private double lat;
+
+  /**
+   * Longitude coordinate of the point
+   */
+  private double lon;
+
+  /**
+   * Empty constructor of Point class
+   */
+<span class="fc" id="L41">  public Point() {</span>
+<span class="fc" id="L42">  }</span>
+
+  /**
+   * Creates a point with the coordinates assigned to it.
+   *
+   * @param lat First spatial property of the point
+   * @param lon Second spatial property of thw point
+   */
+<span class="fc" id="L50">  public Point(double lat, double lon) {</span>
+<span class="fc" id="L51">    this.lat = lat;</span>
+<span class="fc" id="L52">    this.lon = lon;</span>
+<span class="fc" id="L53">  }</span>
+
+  /**
+   * Defines how to sum up two points. Done by summing up the latitudes and longitudes of each point.
+   *
+   * @param other Point that is added
+   * @return Returns a point with the summed up longitudes and latitudes
+   */
+  public Point add(Point other) {
+<span class="fc" id="L62">    this.lat += other.getLat();</span>
+<span class="fc" id="L63">    this.lon += other.getLon();</span>
+<span class="fc" id="L64">    return this;</span>
+  }
+
+  /**
+   * Computes the euclidean distance between two points.
+   *
+   * @param other Point to which the distance is computed
+   * @return Returns the euclidean distance between the two points
+   */
+  public double euclideanDistance(Point other) {
+<span class="fc" id="L74">    return Math.sqrt(</span>
+<span class="fc" id="L75">      (lat - other.getLat()) * (lat - other.getLat()) + (lon - other.getLon()) * (lon - other.getLon()));</span>
+  }
+
+  /**
+   * Defines how a point is divided by a value. Done by dividing the latitude and longitude by the value.
+   *
+   * @param val Value the points is divided by
+   * @return Returns the point with its divided latitude and longitude
+   */
+  public Point div(long val) {
+<span class="fc" id="L85">    lat /= val;</span>
+<span class="fc" id="L86">    lon /= val;</span>
+<span class="fc" id="L87">    return this;</span>
+  }
+
+  /**
+   * Gets the latitude.
+   *
+   * @return Returns the value of the latitude
+   */
+  public Double getLat() {
+<span class="fc" id="L96">    return this.lat;</span>
+  }
+
+  /**
+   * Gets Longitude
+   *
+   * @return Returns the value of the longitude
+   */
+  public double getLon() {
+<span class="fc" id="L105">    return this.lon;</span>
+  }
+
+  /**
+   * Sets Latitude
+   *
+   * @param lat New value for lat
+   */
+  public void setLat(double lat) {
+<span class="nc" id="L114">    this.lat = lat;</span>
+<span class="nc" id="L115">  }</span>
+
+  /**
+   * Sets Longitude
+   *
+   * @param lon New value for lon
+   */
+  public void setLon(double lon) {
+<span class="nc" id="L123">    this.lon = lon;</span>
+<span class="nc" id="L124">  }</span>
+
+
+  /**
+   * Equals method implemented to compare two points.
+   *
+   * @param o Other point this point is compared to
+   * @return Returns if the points are equal
+   */
+  @Override
+  public boolean equals(Object o) {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L136">      return true;</span>
+    }
+<span class="pc bpc" id="L138" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L139">      return false;</span>
+    }
+<span class="fc" id="L141">    Point point = (Point) o;</span>
+<span class="pc bpc" id="L142" title="1 of 4 branches missed.">    return Double.compare(point.getLat(), lat) == 0 &amp;&amp; Double.compare(point.getLon(), lon) == 0;</span>
+  }
+
+  /**
+   * HashCode method implemented to compare two points.
+   *
+   * @return Returns a unique hash for this instance of point.
+   */
+  @Override
+  public int hashCode() {
+<span class="fc" id="L152">    return Objects.hash(lat, lon);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

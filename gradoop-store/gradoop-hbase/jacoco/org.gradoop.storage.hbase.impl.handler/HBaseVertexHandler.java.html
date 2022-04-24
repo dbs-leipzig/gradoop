@@ -66,50 +66,50 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    *
    * @param vertexFactory used to create runtime vertex data objects
    */
-<span class="nc" id="L69">  public HBaseVertexHandler(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
-<span class="nc" id="L70">    this.vertexFactory = vertexFactory;</span>
-<span class="nc" id="L71">  }</span>
+<span class="fc" id="L69">  public HBaseVertexHandler(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
+<span class="fc" id="L70">    this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L71">  }</span>
 
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
-<span class="nc" id="L76">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));</span>
-<span class="nc" id="L77">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));</span>
-<span class="nc" id="L78">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">    if (isPreSplitRegions()) {</span>
-<span class="nc" id="L80">      admin.createTable(</span>
+<span class="fc" id="L76">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));</span>
+<span class="fc" id="L77">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));</span>
+<span class="fc" id="L78">    tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (isPreSplitRegions()) {</span>
+<span class="fc" id="L80">      admin.createTable(</span>
         tableDescriptor,
-<span class="nc" id="L82">        RegionSplitter.getInstance().getStartKey(),</span>
-<span class="nc" id="L83">        RegionSplitter.getInstance().getEndKey(),</span>
-<span class="nc" id="L84">        RegionSplitter.getInstance().getNumberOfRegions());</span>
+<span class="fc" id="L82">        RegionSplitter.getInstance().getStartKey(),</span>
+<span class="fc" id="L83">        RegionSplitter.getInstance().getEndKey(),</span>
+<span class="fc" id="L84">        RegionSplitter.getInstance().getNumberOfRegions());</span>
     } else {
-<span class="nc" id="L86">      admin.createTable(tableDescriptor);</span>
+<span class="fc" id="L86">      admin.createTable(tableDescriptor);</span>
     }
-<span class="nc" id="L88">  }</span>
+<span class="fc" id="L88">  }</span>
 
   @Override
   public Put writeVertex(Put put, Vertex vertexData) {
-<span class="nc" id="L92">    writeLabel(put, vertexData);</span>
-<span class="nc" id="L93">    writeProperties(put, vertexData);</span>
-<span class="nc" id="L94">    writeGraphIds(put, vertexData);</span>
-<span class="nc" id="L95">    return put;</span>
+<span class="fc" id="L92">    writeLabel(put, vertexData);</span>
+<span class="fc" id="L93">    writeProperties(put, vertexData);</span>
+<span class="fc" id="L94">    writeGraphIds(put, vertexData);</span>
+<span class="fc" id="L95">    return put;</span>
   }
 
   @Override
   public EPGMVertex readVertex(final Result res) {
-<span class="nc" id="L100">    return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),</span>
-<span class="nc" id="L101">      readGraphIds(res));</span>
+<span class="fc" id="L100">    return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),</span>
+<span class="fc" id="L101">      readGraphIds(res));</span>
   }
 
   @Override
   public VertexHandler applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query) {
-<span class="nc" id="L106">    this.vertexQuery = query;</span>
-<span class="nc" id="L107">    return this;</span>
+<span class="fc" id="L106">    this.vertexQuery = query;</span>
+<span class="fc" id="L107">    return this;</span>
   }
 
   @Override
   public ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; getQuery() {
-<span class="nc" id="L112">    return this.vertexQuery;</span>
+<span class="fc" id="L112">    return this.vertexQuery;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

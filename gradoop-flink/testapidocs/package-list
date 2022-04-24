@@ -48,6 +48,7 @@ org.gradoop.flink.model.impl.operators.grouping
 org.gradoop.flink.model.impl.operators.intersection
 org.gradoop.flink.model.impl.operators.keyedgrouping.functions
 org.gradoop.flink.model.impl.operators.keyedgrouping.keys
+org.gradoop.flink.model.impl.operators.kmeans
 org.gradoop.flink.model.impl.operators.layouting
 org.gradoop.flink.model.impl.operators.layouting.functions
 org.gradoop.flink.model.impl.operators.layouting.util

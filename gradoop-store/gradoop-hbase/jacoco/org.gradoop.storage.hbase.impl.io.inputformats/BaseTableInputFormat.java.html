@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  *
  * @param &lt;E&gt; type of element
  */
-<span class="nc" id="L34">abstract class BaseTableInputFormat&lt;E extends Element&gt; extends TableInputFormat&lt;Tuple1&lt;E&gt;&gt; {</span>
+<span class="fc" id="L34">abstract class BaseTableInputFormat&lt;E extends Element&gt; extends TableInputFormat&lt;Tuple1&lt;E&gt;&gt; {</span>
 
   /**
    * Attach a HBase filter represented by the given query to the given scan instance.
@@ -45,21 +45,21 @@ import javax.annotation.Nonnull;
     @Nonnull Scan scan,
     boolean isSpreadingByteUsed) {
 
-<span class="nc" id="L48">    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);</span>
+<span class="fc" id="L48">    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);</span>
 
-<span class="nc bnc" id="L50" title="All 4 branches missed.">    if (query.getQueryRanges() != null &amp;&amp; !query.getQueryRanges().isEmpty()) {</span>
-<span class="nc" id="L51">      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges(),</span>
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">    if (query.getQueryRanges() != null &amp;&amp; !query.getQueryRanges().isEmpty()) {</span>
+<span class="fc" id="L51">      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges(),</span>
         isSpreadingByteUsed));
     }
 
-<span class="nc bnc" id="L55" title="All 2 branches missed.">    if (query.getFilterPredicate() != null) {</span>
-<span class="nc" id="L56">      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    if (query.getFilterPredicate() != null) {</span>
+<span class="fc" id="L56">      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));</span>
     }
 
     // if there are filters inside the root list, add it to the Scan object
-<span class="nc bnc" id="L60" title="All 2 branches missed.">    if (!conjunctFilters.getFilters().isEmpty()) {</span>
-<span class="nc" id="L61">      scan.setFilter(conjunctFilters);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (!conjunctFilters.getFilters().isEmpty()) {</span>
+<span class="fc" id="L61">      scan.setFilter(conjunctFilters);</span>
     }
-<span class="nc" id="L63">  }</span>
+<span class="fc" id="L63">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
@@ -28,7 +29,7 @@ public class PrintVertexStep&lt;K&gt; extends Printer&lt;VertexStep&lt;K&gt;, K&
   /**
    * Logger
    */
-<span class="fc" id="L31">  private static Logger LOG = Logger.getLogger(PrintVertexStep.class);</span>
+<span class="fc" id="L32">  private static Logger LOG = LogManager.getLogger(PrintVertexStep.class);</span>
 
   /**
    * Constructor
@@ -37,17 +38,17 @@ public class PrintVertexStep&lt;K&gt; extends Printer&lt;VertexStep&lt;K&gt;, K&
    * @param prefix      prefix for debug string
    */
   public PrintVertexStep(boolean isIterative, String prefix) {
-<span class="fc" id="L40">    super(isIterative, prefix);</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L41">    super(isIterative, prefix);</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
   protected String getDebugString(VertexStep&lt;K&gt; vertexStep) {
-<span class="nc" id="L45">    return String.format(&quot;(%s)&quot;, vertexMap.get(vertexStep.getVertexId()));</span>
+<span class="nc" id="L46">    return String.format(&quot;(%s)&quot;, vertexMap.get(vertexStep.getVertexId()));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L50">    return LOG;</span>
+<span class="nc" id="L51">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

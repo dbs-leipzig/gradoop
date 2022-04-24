@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
@@ -33,7 +34,7 @@ public class PrintEmbedding extends Printer&lt;Embedding, GradoopId&gt; {
   /**
    * Logger
    */
-<span class="fc" id="L36">  private static final Logger LOG = Logger.getLogger(PrintEmbedding.class);</span>
+<span class="fc" id="L37">  private static final Logger LOG = LogManager.getLogger(PrintEmbedding.class);</span>
   /**
    * Meta data describing the current embedding.
    */
@@ -44,45 +45,45 @@ public class PrintEmbedding extends Printer&lt;Embedding, GradoopId&gt; {
    *
    * @param embeddingMetaData meta data for the embedding to print
    */
-<span class="fc" id="L47">  public PrintEmbedding(EmbeddingMetaData embeddingMetaData) {</span>
-<span class="fc" id="L48">    this.embeddingMetaData = embeddingMetaData;</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L48">  public PrintEmbedding(EmbeddingMetaData embeddingMetaData) {</span>
+<span class="fc" id="L49">    this.embeddingMetaData = embeddingMetaData;</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
   protected String getDebugString(Embedding embedding) {
-<span class="nc" id="L53">    String vertexMapping = embeddingMetaData.getVertexVariables().stream()</span>
-<span class="nc" id="L54">      .map(var -&gt; String.format(&quot;%s : %s&quot;, var,</span>
-<span class="nc" id="L55">        vertexMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))</span>
-<span class="nc" id="L56">      .collect(Collectors.joining(&quot;, &quot;));</span>
+<span class="nc" id="L54">    String vertexMapping = embeddingMetaData.getVertexVariables().stream()</span>
+<span class="nc" id="L55">      .map(var -&gt; String.format(&quot;%s : %s&quot;, var,</span>
+<span class="nc" id="L56">        vertexMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))</span>
+<span class="nc" id="L57">      .collect(Collectors.joining(&quot;, &quot;));</span>
 
-<span class="nc" id="L58">    String edgeMapping = embeddingMetaData.getEdgeVariables().stream()</span>
-<span class="nc" id="L59">      .map(var -&gt; String.format(&quot;%s : %s&quot;, var,</span>
-<span class="nc" id="L60">        edgeMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))</span>
-<span class="nc" id="L61">      .collect(Collectors.joining(&quot;, &quot;));</span>
+<span class="nc" id="L59">    String edgeMapping = embeddingMetaData.getEdgeVariables().stream()</span>
+<span class="nc" id="L60">      .map(var -&gt; String.format(&quot;%s : %s&quot;, var,</span>
+<span class="nc" id="L61">        edgeMap.get(embedding.getId(embeddingMetaData.getEntryColumn(var)))))</span>
+<span class="nc" id="L62">      .collect(Collectors.joining(&quot;, &quot;));</span>
 
-<span class="nc" id="L63">    String pathMapping = embeddingMetaData.getPathVariables().stream()</span>
-<span class="nc" id="L64">      .map(var -&gt; {</span>
-<span class="nc" id="L65">        List&lt;GradoopId&gt; path = embedding.getIdList(embeddingMetaData.getEntryColumn(var));</span>
-<span class="nc" id="L66">        List&lt;PropertyValue&gt; ids = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        for (int i = 0; i &lt; path.size(); i++) {</span>
-<span class="nc bnc" id="L68" title="All 2 branches missed.">          if (i % 2 == 0) { // edge</span>
-<span class="nc" id="L69">            ids.add(edgeMap.get(path.get(i)));</span>
+<span class="nc" id="L64">    String pathMapping = embeddingMetaData.getPathVariables().stream()</span>
+<span class="nc" id="L65">      .map(var -&gt; {</span>
+<span class="nc" id="L66">        List&lt;GradoopId&gt; path = embedding.getIdList(embeddingMetaData.getEntryColumn(var));</span>
+<span class="nc" id="L67">        List&lt;PropertyValue&gt; ids = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        for (int i = 0; i &lt; path.size(); i++) {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">          if (i % 2 == 0) { // edge</span>
+<span class="nc" id="L70">            ids.add(edgeMap.get(path.get(i)));</span>
           } else {
-<span class="nc" id="L71">            ids.add(vertexMap.get(path.get(i)));</span>
+<span class="nc" id="L72">            ids.add(vertexMap.get(path.get(i)));</span>
           }
         }
-<span class="nc" id="L74">        return String.format(&quot;%s : %s&quot;, var, ids);</span>
+<span class="nc" id="L75">        return String.format(&quot;%s : %s&quot;, var, ids);</span>
       })
-<span class="nc" id="L76">      .collect(Collectors.joining(&quot;, &quot;));</span>
+<span class="nc" id="L77">      .collect(Collectors.joining(&quot;, &quot;));</span>
 
-<span class="nc" id="L78">    return String.format(&quot;vertex-mapping: {%s}, edge-mapping: {%s}, path-mapping: {%s}&quot;,</span>
+<span class="nc" id="L79">    return String.format(&quot;vertex-mapping: {%s}, edge-mapping: {%s}, path-mapping: {%s}&quot;,</span>
       vertexMapping, edgeMapping, pathMapping);
   }
 
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L85">    return LOG;</span>
+<span class="nc" id="L86">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

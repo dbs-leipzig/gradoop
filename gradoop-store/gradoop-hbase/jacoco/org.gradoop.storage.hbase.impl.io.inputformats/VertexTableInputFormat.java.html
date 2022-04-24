@@ -43,10 +43,10 @@ public class VertexTableInputFormat extends BaseTableInputFormat&lt;EPGMVertex&g
    * @param vertexHandler   vertex data handler
    * @param vertexTableName vertex data table name
    */
-<span class="nc" id="L46">  public VertexTableInputFormat(VertexHandler vertexHandler, String vertexTableName) {</span>
-<span class="nc" id="L47">    this.vertexHandler = vertexHandler;</span>
-<span class="nc" id="L48">    this.vertexTableName = vertexTableName;</span>
-<span class="nc" id="L49">  }</span>
+<span class="fc" id="L46">  public VertexTableInputFormat(VertexHandler vertexHandler, String vertexTableName) {</span>
+<span class="fc" id="L47">    this.vertexHandler = vertexHandler;</span>
+<span class="fc" id="L48">    this.vertexTableName = vertexTableName;</span>
+<span class="fc" id="L49">  }</span>
 
   /**
    * Get the scanner instance. If a query was applied to the elementHandler,
@@ -56,24 +56,24 @@ public class VertexTableInputFormat extends BaseTableInputFormat&lt;EPGMVertex&g
    */
   @Override
   protected Scan getScanner() {
-<span class="nc" id="L59">    Scan scan = new Scan();</span>
-<span class="nc" id="L60">    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);</span>
+<span class="fc" id="L59">    Scan scan = new Scan();</span>
+<span class="fc" id="L60">    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);</span>
 
-<span class="nc bnc" id="L62" title="All 2 branches missed.">    if (vertexHandler.getQuery() != null) {</span>
-<span class="nc" id="L63">      attachFilter(vertexHandler.getQuery(), scan, vertexHandler.isSpreadingByteUsed());</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (vertexHandler.getQuery() != null) {</span>
+<span class="fc" id="L63">      attachFilter(vertexHandler.getQuery(), scan, vertexHandler.isSpreadingByteUsed());</span>
     }
 
-<span class="nc" id="L66">    return scan;</span>
+<span class="fc" id="L66">    return scan;</span>
   }
 
   @Override
   protected String getTableName() {
-<span class="nc" id="L71">    return vertexTableName;</span>
+<span class="fc" id="L71">    return vertexTableName;</span>
   }
 
   @Override
   protected Tuple1&lt;EPGMVertex&gt; mapResultToTuple(Result result) {
-<span class="nc" id="L76">    return new Tuple1&lt;&gt;(vertexHandler.readVertex(result));</span>
+<span class="fc" id="L76">    return new Tuple1&lt;&gt;(vertexHandler.readVertex(result));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

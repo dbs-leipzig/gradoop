@@ -37,28 +37,28 @@ import java.util.Map;
  * Handler is used to write label and properties into HBase tables. This is
  * used by graphs and vertices.
  */
-<span class="nc" id="L40">public abstract class HBaseElementHandler implements ElementHandler {</span>
+<span class="fc" id="L40">public abstract class HBaseElementHandler implements ElementHandler {</span>
   /**
    * Byte representation of the meta column family.
    */
-<span class="nc" id="L44">  static final byte[] CF_META_BYTES = Bytes.toBytes(HBaseConstants.CF_META);</span>
+<span class="fc" id="L44">  static final byte[] CF_META_BYTES = Bytes.toBytes(HBaseConstants.CF_META);</span>
 
   /**
    * Byte representation of the label column identifier.
    */
-<span class="nc" id="L49">  private static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);</span>
+<span class="fc" id="L49">  private static final byte[] COL_LABEL_BYTES = Bytes.toBytes(HBaseConstants.COL_LABEL);</span>
 
   /**
    * Byte representation of the property type column family.
    */
-<span class="nc" id="L54">  private static final byte[] CF_PROPERTY_TYPE_BYTES =</span>
-<span class="nc" id="L55">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_TYPE);</span>
+<span class="fc" id="L54">  private static final byte[] CF_PROPERTY_TYPE_BYTES =</span>
+<span class="fc" id="L55">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_TYPE);</span>
 
   /**
    * Byte representation of the property value column family.
    */
-<span class="nc" id="L60">  private static final byte[] CF_PROPERTY_VALUE_BYTES =</span>
-<span class="nc" id="L61">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_VALUE);</span>
+<span class="fc" id="L60">  private static final byte[] CF_PROPERTY_VALUE_BYTES =</span>
+<span class="fc" id="L61">    Bytes.toBytes(HBaseConstants.CF_PROPERTY_VALUE);</span>
 
   /**
    * Flag to identify if a pre-splitting of HBase regions should be used
@@ -76,89 +76,89 @@ import java.util.Map;
    */
   @Override
   public byte[] getRowKey(@Nonnull final GradoopId elementId) {
-<span class="nc bnc" id="L79" title="All 2 branches missed.">    return useSpreadingByte ?</span>
-<span class="nc" id="L80">      RowKeyDistributor.getInstance().getDistributedKey(elementId.toByteArray()) :</span>
-<span class="nc" id="L81">      elementId.toByteArray();</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    return useSpreadingByte ?</span>
+<span class="fc" id="L80">      RowKeyDistributor.getInstance().getDistributedKey(elementId.toByteArray()) :</span>
+<span class="fc" id="L81">      elementId.toByteArray();</span>
   }
 
   @Override
   public GradoopId readId(@Nonnull final Result res) {
-<span class="nc bnc" id="L86" title="All 2 branches missed.">    if (useSpreadingByte) {</span>
-<span class="nc" id="L87">      return GradoopId.fromByteArray(RowKeyDistributor.getInstance().getOriginalKey(res.getRow()));</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    if (useSpreadingByte) {</span>
+<span class="fc" id="L87">      return GradoopId.fromByteArray(RowKeyDistributor.getInstance().getOriginalKey(res.getRow()));</span>
     } else {
-<span class="nc" id="L89">      return GradoopId.fromByteArray(res.getRow());</span>
+<span class="fc" id="L89">      return GradoopId.fromByteArray(res.getRow());</span>
     }
   }
 
   @Override
   public Put writeLabel(final Put put, final Element entity) {
-<span class="nc bnc" id="L95" title="All 2 branches missed.">    return (entity.getLabel() == null) ? put :</span>
-<span class="nc" id="L96">      put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    return (entity.getLabel() == null) ? put :</span>
+<span class="fc" id="L96">      put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));</span>
   }
 
   @Override
   public Put writeProperty(final Put put, Property property) {
-<span class="nc" id="L101">    byte[] type = PropertyValueUtils.BytesUtils.getTypeByte(property.getValue());</span>
-<span class="nc" id="L102">    byte[] bytesWithoutType = PropertyValueUtils.BytesUtils.getRawBytesWithoutType(property.getValue());</span>
-<span class="nc" id="L103">    put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);</span>
-<span class="nc" id="L104">    put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);</span>
-<span class="nc" id="L105">    return put;</span>
+<span class="fc" id="L101">    byte[] type = PropertyValueUtils.BytesUtils.getTypeByte(property.getValue());</span>
+<span class="fc" id="L102">    byte[] bytesWithoutType = PropertyValueUtils.BytesUtils.getRawBytesWithoutType(property.getValue());</span>
+<span class="fc" id="L103">    put.addColumn(CF_PROPERTY_TYPE_BYTES, Bytes.toBytes(property.getKey()), type);</span>
+<span class="fc" id="L104">    put.addColumn(CF_PROPERTY_VALUE_BYTES, Bytes.toBytes(property.getKey()), bytesWithoutType);</span>
+<span class="fc" id="L105">    return put;</span>
   }
 
   @Override
   public Put writeProperties(final Put put, final Element entity) {
-<span class="nc bnc" id="L110" title="All 4 branches missed.">    if (entity.getProperties() != null &amp;&amp; entity.getPropertyCount() &gt; 0) {</span>
-<span class="nc bnc" id="L111" title="All 2 branches missed.">      for (Property property : entity.getProperties()) {</span>
-<span class="nc" id="L112">        writeProperty(put, property);</span>
-<span class="nc" id="L113">      }</span>
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">    if (entity.getProperties() != null &amp;&amp; entity.getPropertyCount() &gt; 0) {</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">      for (Property property : entity.getProperties()) {</span>
+<span class="fc" id="L112">        writeProperty(put, property);</span>
+<span class="fc" id="L113">      }</span>
     }
-<span class="nc" id="L115">    return put;</span>
+<span class="fc" id="L115">    return put;</span>
   }
 
   @Override
   public String readLabel(final Result res) {
-<span class="nc" id="L120">    return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));</span>
+<span class="fc" id="L120">    return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));</span>
   }
 
   @Override
   public Properties readProperties(final Result res) {
-<span class="nc" id="L125">    Properties properties = Properties.create();</span>
+<span class="fc" id="L125">    Properties properties = Properties.create();</span>
 
     // Get Map&lt;Qualifier, Value&gt; which is Map&lt;PropertyKey, TypeByte&gt;
-<span class="nc" id="L128">    Map&lt;byte[], byte[]&gt; typeFamilyMap = res.getFamilyMap(CF_PROPERTY_TYPE_BYTES);</span>
+<span class="fc" id="L128">    Map&lt;byte[], byte[]&gt; typeFamilyMap = res.getFamilyMap(CF_PROPERTY_TYPE_BYTES);</span>
     // Get Map&lt;Qualifier, Value&gt; which is Map&lt;PropertyKey, ValueBytesWithoutType&gt;
-<span class="nc" id="L130">    Map&lt;byte[], byte[]&gt; valueFamilyMap = res.getFamilyMap(CF_PROPERTY_VALUE_BYTES);</span>
+<span class="fc" id="L130">    Map&lt;byte[], byte[]&gt; valueFamilyMap = res.getFamilyMap(CF_PROPERTY_VALUE_BYTES);</span>
 
-<span class="nc bnc" id="L132" title="All 2 branches missed.">    for (Map.Entry&lt;byte[], byte[]&gt; propertyColumn : typeFamilyMap.entrySet()) {</span>
-<span class="nc" id="L133">      properties.set(</span>
-<span class="nc" id="L134">        Bytes.toString(propertyColumn.getKey()),</span>
-<span class="nc" id="L135">        PropertyValueUtils.BytesUtils.createFromTypeValueBytes(</span>
-<span class="nc" id="L136">          propertyColumn.getValue(),</span>
-<span class="nc" id="L137">          valueFamilyMap.get(propertyColumn.getKey())));</span>
-<span class="nc" id="L138">    }</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (Map.Entry&lt;byte[], byte[]&gt; propertyColumn : typeFamilyMap.entrySet()) {</span>
+<span class="fc" id="L133">      properties.set(</span>
+<span class="fc" id="L134">        Bytes.toString(propertyColumn.getKey()),</span>
+<span class="fc" id="L135">        PropertyValueUtils.BytesUtils.createFromTypeValueBytes(</span>
+<span class="fc" id="L136">          propertyColumn.getValue(),</span>
+<span class="fc" id="L137">          valueFamilyMap.get(propertyColumn.getKey())));</span>
+<span class="fc" id="L138">    }</span>
 
-<span class="nc" id="L140">    return properties;</span>
+<span class="fc" id="L140">    return properties;</span>
   }
 
   @Override
   public boolean isPreSplitRegions() {
-<span class="nc" id="L145">    return this.usePreSplitRegions;</span>
+<span class="fc" id="L145">    return this.usePreSplitRegions;</span>
   }
 
   @Override
   public void setPreSplitRegions(boolean usePreSplitRegions) {
-<span class="nc" id="L150">    this.usePreSplitRegions = usePreSplitRegions;</span>
-<span class="nc" id="L151">  }</span>
+<span class="fc" id="L150">    this.usePreSplitRegions = usePreSplitRegions;</span>
+<span class="fc" id="L151">  }</span>
 
   @Override
   public boolean isSpreadingByteUsed() {
-<span class="nc" id="L155">    return this.useSpreadingByte;</span>
+<span class="fc" id="L155">    return this.useSpreadingByte;</span>
   }
 
   @Override
   public void setSpreadingByteUsage(boolean useSpreadingByte) {
-<span class="nc" id="L160">    this.useSpreadingByte = useSpreadingByte;</span>
-<span class="nc" id="L161">  }</span>
+<span class="fc" id="L160">    this.useSpreadingByte = useSpreadingByte;</span>
+<span class="fc" id="L161">  }</span>
 
   @Override
   public List&lt;byte[]&gt; getPossibleRowKeys(@Nonnull final GradoopId elementId) {

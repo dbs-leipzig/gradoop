@@ -16,7 +16,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
 
@@ -31,14 +32,14 @@ public class PrintEmbeddingWithTiePoint&lt;K&gt; extends Printer&lt;EmbeddingWit
   /**
    * Logger
    */
-<span class="fc" id="L34">  private static final Logger LOG = Logger.getLogger(PrintEmbeddingWithTiePoint.class);</span>
+<span class="fc" id="L35">  private static final Logger LOG = LogManager.getLogger(PrintEmbeddingWithTiePoint.class);</span>
 
   /**
    * Constructor
    */
   public PrintEmbeddingWithTiePoint() {
-<span class="fc" id="L40">    this(false, &quot;&quot;);</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L41">    this(false, &quot;&quot;);</span>
+<span class="fc" id="L42">  }</span>
 
   /**
    * Constructor
@@ -46,8 +47,8 @@ public class PrintEmbeddingWithTiePoint&lt;K&gt; extends Printer&lt;EmbeddingWit
    * @param isIterative true, if used in iterative context
    */
   public PrintEmbeddingWithTiePoint(boolean isIterative) {
-<span class="nc" id="L49">    this(isIterative, &quot;&quot;);</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L50">    this(isIterative, &quot;&quot;);</span>
+<span class="nc" id="L51">  }</span>
 
   /**
    * Constructor
@@ -56,8 +57,8 @@ public class PrintEmbeddingWithTiePoint&lt;K&gt; extends Printer&lt;EmbeddingWit
    * @param prefix      prefix for debug string
    */
   public PrintEmbeddingWithTiePoint(boolean isIterative, String prefix) {
-<span class="fc" id="L59">    super(isIterative, prefix);</span>
-<span class="fc" id="L60">  }</span>
+<span class="fc" id="L60">    super(isIterative, prefix);</span>
+<span class="fc" id="L61">  }</span>
 
   /**
    * Constructor
@@ -66,22 +67,22 @@ public class PrintEmbeddingWithTiePoint&lt;K&gt; extends Printer&lt;EmbeddingWit
    * @param prefix          prefix for debug string
    */
   public PrintEmbeddingWithTiePoint(int iterationNumber, String prefix) {
-<span class="fc" id="L69">    super(iterationNumber, prefix);</span>
-<span class="fc" id="L70">  }</span>
+<span class="fc" id="L70">    super(iterationNumber, prefix);</span>
+<span class="fc" id="L71">  }</span>
 
   @Override
   protected String getDebugString(EmbeddingWithTiePoint&lt;K&gt; embedding) {
-<span class="nc" id="L74">    return String.format(&quot;(([%s],[%s]),%s)&quot;,</span>
-<span class="nc" id="L75">      StringUtils.join(convertList(Arrays.asList(</span>
-<span class="nc" id="L76">        embedding.getEmbedding().getVertexMapping()), true), ','),</span>
-<span class="nc" id="L77">      StringUtils.join(convertList(Arrays.asList(</span>
-<span class="nc" id="L78">        embedding.getEmbedding().getEdgeMapping()), false), ','),</span>
-<span class="nc" id="L79">      vertexMap.get(embedding.getTiePointId()));</span>
+<span class="nc" id="L75">    return String.format(&quot;(([%s],[%s]),%s)&quot;,</span>
+<span class="nc" id="L76">      StringUtils.join(convertList(Arrays.asList(</span>
+<span class="nc" id="L77">        embedding.getEmbedding().getVertexMapping()), true), ','),</span>
+<span class="nc" id="L78">      StringUtils.join(convertList(Arrays.asList(</span>
+<span class="nc" id="L79">        embedding.getEmbedding().getEdgeMapping()), false), ','),</span>
+<span class="nc" id="L80">      vertexMap.get(embedding.getTiePointId()));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L84">    return LOG;</span>
+<span class="nc" id="L85">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -17,7 +17,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.debug;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.IterationRuntimeContext;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
 
 /**
@@ -30,21 +31,21 @@ public class PrintIdWithCandidates&lt;K extends Comparable&lt;K&gt;&gt;
   /**
    * Logger
    */
-<span class="nc" id="L33">  private static Logger LOG = Logger.getLogger(PrintIdWithCandidates.class);</span>
+<span class="nc" id="L34">  private static Logger LOG = LogManager.getLogger(PrintIdWithCandidates.class);</span>
   /**
    * Constructor
    */
   public PrintIdWithCandidates() {
-<span class="nc" id="L38">    this(false, &quot;&quot;);</span>
-<span class="nc" id="L39">  }</span>
+<span class="nc" id="L39">    this(false, &quot;&quot;);</span>
+<span class="nc" id="L40">  }</span>
   /**
    * Constructor
    *
    * @param prefix debug string prefix
    */
   public PrintIdWithCandidates(String prefix) {
-<span class="nc" id="L46">    this(false, prefix);</span>
-<span class="nc" id="L47">  }</span>
+<span class="nc" id="L47">    this(false, prefix);</span>
+<span class="nc" id="L48">  }</span>
   /**
    * Constructor
    *
@@ -52,20 +53,20 @@ public class PrintIdWithCandidates&lt;K extends Comparable&lt;K&gt;&gt;
    * @param prefix      debug string prefix
    */
   public PrintIdWithCandidates(boolean isIterative, String prefix) {
-<span class="nc" id="L55">    super(isIterative, prefix);</span>
-<span class="nc" id="L56">  }</span>
+<span class="nc" id="L56">    super(isIterative, prefix);</span>
+<span class="nc" id="L57">  }</span>
 
   @Override
   protected String getDebugString(IdWithCandidates&lt;K&gt; t) {
-<span class="nc" id="L60">    return String.format(&quot;(%s,[%s])&quot;,</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">      vertexMap.containsKey(t.getId()) ?</span>
-<span class="nc" id="L62">        vertexMap.get(t.getId()) : edgeMap.get(t.getId()),</span>
-<span class="nc" id="L63">      StringUtils.join(t.getCandidates(), ','));</span>
+<span class="nc" id="L61">    return String.format(&quot;(%s,[%s])&quot;,</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">      vertexMap.containsKey(t.getId()) ?</span>
+<span class="nc" id="L63">        vertexMap.get(t.getId()) : edgeMap.get(t.getId()),</span>
+<span class="nc" id="L64">      StringUtils.join(t.getCandidates(), ','));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L68">    return LOG;</span>
+<span class="nc" id="L69">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

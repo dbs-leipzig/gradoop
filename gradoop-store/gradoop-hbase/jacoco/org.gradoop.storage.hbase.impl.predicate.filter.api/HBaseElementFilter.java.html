@@ -36,19 +36,19 @@ public interface HBaseElementFilter&lt;T extends Element&gt;
   @Nonnull
   @Override
   default HBaseElementFilter&lt;T&gt; or(@Nonnull HBaseElementFilter&lt;T&gt; another) {
-<span class="nc" id="L39">    return Or.create(this, another);</span>
+<span class="fc" id="L39">    return Or.create(this, another);</span>
   }
 
   @Nonnull
   @Override
   default HBaseElementFilter&lt;T&gt; and(@Nonnull HBaseElementFilter&lt;T&gt; another) {
-<span class="nc" id="L45">    return And.create(this, another);</span>
+<span class="fc" id="L45">    return And.create(this, another);</span>
   }
 
   @Nonnull
   @Override
   default HBaseElementFilter&lt;T&gt; negate() {
-<span class="nc" id="L51">    return Not.of(this);</span>
+<span class="fc" id="L51">    return Not.of(this);</span>
   }
 
   /**

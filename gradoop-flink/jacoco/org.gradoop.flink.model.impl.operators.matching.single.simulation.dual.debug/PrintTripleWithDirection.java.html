@@ -16,7 +16,8 @@
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.TripleWithDirection;
@@ -24,14 +25,12 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tu
 /**
  * Debug output for {@link TripleWithDirection}.
  */
-public class PrintTripleWithDirection
-  extends Printer&lt;TripleWithDirection, GradoopId&gt; {
+public class PrintTripleWithDirection extends Printer&lt;TripleWithDirection, GradoopId&gt; {
 
   /**
    * Logger
    */
-<span class="nc" id="L33">  private static final Logger LOG = Logger</span>
-<span class="nc" id="L34">    .getLogger(PrintTripleWithDirection.class);</span>
+<span class="nc" id="L33">  private static final Logger LOG = LogManager.getLogger(PrintTripleWithDirection.class);</span>
 
   /**
    * Constructor
@@ -40,22 +39,22 @@ public class PrintTripleWithDirection
    * @param prefix prefix for output
    */
   public PrintTripleWithDirection(boolean isIterative, String prefix) {
-<span class="nc" id="L43">    super(isIterative, prefix);</span>
-<span class="nc" id="L44">  }</span>
+<span class="nc" id="L42">    super(isIterative, prefix);</span>
+<span class="nc" id="L43">  }</span>
 
   @Override
   protected String getDebugString(TripleWithDirection t) {
-<span class="nc" id="L48">    return String.format(&quot;(%s,%s,%s,%s,[%s])&quot;,</span>
-<span class="nc" id="L49">      edgeMap.get(t.getEdgeId()),</span>
-<span class="nc" id="L50">      vertexMap.get(t.getSourceId()),</span>
-<span class="nc" id="L51">      vertexMap.get(t.getTargetId()),</span>
-<span class="nc" id="L52">      t.isOutgoing(),</span>
-<span class="nc" id="L53">      StringUtils.join(t.getCandidates(), ','));</span>
+<span class="nc" id="L47">    return String.format(&quot;(%s,%s,%s,%s,[%s])&quot;,</span>
+<span class="nc" id="L48">      edgeMap.get(t.getEdgeId()),</span>
+<span class="nc" id="L49">      vertexMap.get(t.getSourceId()),</span>
+<span class="nc" id="L50">      vertexMap.get(t.getTargetId()),</span>
+<span class="nc" id="L51">      t.isOutgoing(),</span>
+<span class="nc" id="L52">      StringUtils.join(t.getCandidates(), ','));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L58">    return LOG;</span>
+<span class="nc" id="L57">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

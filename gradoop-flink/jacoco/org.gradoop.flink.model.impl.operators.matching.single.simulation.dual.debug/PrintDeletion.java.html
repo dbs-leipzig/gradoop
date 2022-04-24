@@ -15,11 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
-import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
-  .Deletion;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 
 /**
  * Debug output for {@link Deletion}.
@@ -29,7 +30,7 @@ public class PrintDeletion extends Printer&lt;Deletion, GradoopId&gt; {
   /**
    * Logger
    */
-<span class="fc" id="L32">  private static final Logger LOG = Logger.getLogger(PrintDeletion.class);</span>
+<span class="fc" id="L33">  private static final Logger LOG = LogManager.getLogger(PrintDeletion.class);</span>
 
   /**
    * Constructor
@@ -38,21 +39,21 @@ public class PrintDeletion extends Printer&lt;Deletion, GradoopId&gt; {
    * @param prefix prefix for output
    */
   public PrintDeletion(boolean isIterative, String prefix) {
-<span class="fc" id="L41">    super(isIterative, prefix);</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L42">    super(isIterative, prefix);</span>
+<span class="fc" id="L43">  }</span>
 
   @Override
   protected String getDebugString(Deletion d) {
-<span class="nc" id="L46">    return String.format(&quot;(%s,%s,%s,%s)&quot;,</span>
-<span class="nc" id="L47">      vertexMap.get(d.getRecipientId()),</span>
-<span class="nc" id="L48">      vertexMap.get(d.getSenderId()),</span>
-<span class="nc" id="L49">      d.getDeletion(),</span>
-<span class="nc" id="L50">      d.getMessageType());</span>
+<span class="nc" id="L47">    return String.format(&quot;(%s,%s,%s,%s)&quot;,</span>
+<span class="nc" id="L48">      vertexMap.get(d.getRecipientId()),</span>
+<span class="nc" id="L49">      vertexMap.get(d.getSenderId()),</span>
+<span class="nc" id="L50">      d.getDeletion(),</span>
+<span class="nc" id="L51">      d.getMessageType());</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L55">    return LOG;</span>
+<span class="nc" id="L56">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

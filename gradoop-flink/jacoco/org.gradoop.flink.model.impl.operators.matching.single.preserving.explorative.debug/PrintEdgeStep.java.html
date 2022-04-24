@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 
@@ -28,7 +29,7 @@ public class PrintEdgeStep&lt;K&gt; extends Printer&lt;EdgeStep&lt;K&gt;, K&gt; 
   /**
    * Logger
    */
-<span class="fc" id="L31">  private static final Logger LOG = Logger.getLogger(PrintEdgeStep.class);</span>
+<span class="fc" id="L32">  private static final Logger LOG = LogManager.getLogger(PrintEdgeStep.class);</span>
 
   /**
    * Constructor
@@ -37,20 +38,20 @@ public class PrintEdgeStep&lt;K&gt; extends Printer&lt;EdgeStep&lt;K&gt;, K&gt; 
    * @param prefix      prefix for debug string
    */
   public PrintEdgeStep(boolean isIterative, String prefix) {
-<span class="fc" id="L40">    super(isIterative, prefix);</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L41">    super(isIterative, prefix);</span>
+<span class="fc" id="L42">  }</span>
 
   @Override
   protected String getDebugString(EdgeStep&lt;K&gt; edgeStep) {
-<span class="nc" id="L45">    return String.format(&quot;(%s,%s,%s)&quot;,</span>
-<span class="nc" id="L46">      edgeMap.get(edgeStep.getEdgeId()),</span>
-<span class="nc" id="L47">      vertexMap.get(edgeStep.getTiePoint()),</span>
-<span class="nc" id="L48">      vertexMap.get(edgeStep.getNextId()));</span>
+<span class="nc" id="L46">    return String.format(&quot;(%s,%s,%s)&quot;,</span>
+<span class="nc" id="L47">      edgeMap.get(edgeStep.getEdgeId()),</span>
+<span class="nc" id="L48">      vertexMap.get(edgeStep.getTiePoint()),</span>
+<span class="nc" id="L49">      vertexMap.get(edgeStep.getNextId()));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L53">    return LOG;</span>
+<span class="nc" id="L54">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

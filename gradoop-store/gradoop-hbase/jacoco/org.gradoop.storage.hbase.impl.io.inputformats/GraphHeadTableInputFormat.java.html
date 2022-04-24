@@ -44,10 +44,10 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat&lt;EPGMGraph
    * @param graphHeadTableName graph data table name
    */
   public GraphHeadTableInputFormat(GraphHeadHandler graphHeadHandler,
-<span class="nc" id="L47">    String graphHeadTableName) {</span>
-<span class="nc" id="L48">    this.graphHeadHandler = graphHeadHandler;</span>
-<span class="nc" id="L49">    this.graphHeadTableName = graphHeadTableName;</span>
-<span class="nc" id="L50">  }</span>
+<span class="fc" id="L47">    String graphHeadTableName) {</span>
+<span class="fc" id="L48">    this.graphHeadHandler = graphHeadHandler;</span>
+<span class="fc" id="L49">    this.graphHeadTableName = graphHeadTableName;</span>
+<span class="fc" id="L50">  }</span>
 
   /**
    * Get the scanner instance. If a query was applied to the elementHandler,
@@ -57,24 +57,24 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat&lt;EPGMGraph
    */
   @Override
   protected Scan getScanner() {
-<span class="nc" id="L60">    Scan scan = new Scan();</span>
-<span class="nc" id="L61">    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);</span>
+<span class="fc" id="L60">    Scan scan = new Scan();</span>
+<span class="fc" id="L61">    scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);</span>
 
-<span class="nc bnc" id="L63" title="All 2 branches missed.">    if (graphHeadHandler.getQuery() != null) {</span>
-<span class="nc" id="L64">      attachFilter(graphHeadHandler.getQuery(), scan, graphHeadHandler.isSpreadingByteUsed());</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (graphHeadHandler.getQuery() != null) {</span>
+<span class="fc" id="L64">      attachFilter(graphHeadHandler.getQuery(), scan, graphHeadHandler.isSpreadingByteUsed());</span>
     }
 
-<span class="nc" id="L67">    return scan;</span>
+<span class="fc" id="L67">    return scan;</span>
   }
 
   @Override
   protected String getTableName() {
-<span class="nc" id="L72">    return graphHeadTableName;</span>
+<span class="fc" id="L72">    return graphHeadTableName;</span>
   }
 
   @Override
   protected Tuple1&lt;EPGMGraphHead&gt; mapResultToTuple(Result result) {
-<span class="nc" id="L77">    return new Tuple1&lt;&gt;(graphHeadHandler.readGraphHead(result));</span>
+<span class="fc" id="L77">    return new Tuple1&lt;&gt;(graphHeadHandler.readGraphHead(result));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

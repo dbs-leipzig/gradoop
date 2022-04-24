@@ -91,22 +91,22 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
     String graphTableName,
     String vertexTableName,
     String edgeTableName
-<span class="nc" id="L94">  ) {</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">    checkArgument(!StringUtils.isEmpty(graphTableName),</span>
+<span class="fc" id="L94">  ) {</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(graphTableName),</span>
       &quot;Graph table name was null or empty&quot;);
-<span class="nc bnc" id="L97" title="All 2 branches missed.">    checkArgument(!StringUtils.isEmpty(vertexTableName),</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(vertexTableName),</span>
       &quot;Vertex table name was null or empty&quot;);
-<span class="nc bnc" id="L99" title="All 2 branches missed.">    checkArgument(!StringUtils.isEmpty(edgeTableName),</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(edgeTableName),</span>
       &quot;Edge table name was null or empty&quot;);
 
-<span class="nc" id="L102">    this.graphTableName = graphTableName;</span>
-<span class="nc" id="L103">    this.vertexTableName = vertexTableName;</span>
-<span class="nc" id="L104">    this.edgeTableName = edgeTableName;</span>
+<span class="fc" id="L102">    this.graphTableName = graphTableName;</span>
+<span class="fc" id="L103">    this.vertexTableName = vertexTableName;</span>
+<span class="fc" id="L104">    this.edgeTableName = edgeTableName;</span>
 
-<span class="nc" id="L106">    this.graphHeadHandler = checkNotNull(graphHeadHandler, &quot;GraphHeadHandler was null&quot;);</span>
-<span class="nc" id="L107">    this.vertexHandler = checkNotNull(vertexHandler, &quot;VertexHandler was null&quot;);</span>
-<span class="nc" id="L108">    this.edgeHandler = checkNotNull(edgeHandler, &quot;EdgeHandler was null&quot;);</span>
-<span class="nc" id="L109">  }</span>
+<span class="fc" id="L106">    this.graphHeadHandler = checkNotNull(graphHeadHandler, &quot;GraphHeadHandler was null&quot;);</span>
+<span class="fc" id="L107">    this.vertexHandler = checkNotNull(vertexHandler, &quot;VertexHandler was null&quot;);</span>
+<span class="fc" id="L108">    this.edgeHandler = checkNotNull(edgeHandler, &quot;EdgeHandler was null&quot;);</span>
+<span class="fc" id="L109">  }</span>
 
   /**
    * Creates a new Configuration.
@@ -122,13 +122,13 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
     String vertexTableName,
     String edgeTableName
   ) {
-<span class="nc" id="L125">    this(config.getGraphHeadHandler(),</span>
-<span class="nc" id="L126">      config.getVertexHandler(),</span>
-<span class="nc" id="L127">      config.getEdgeHandler(),</span>
+<span class="fc" id="L125">    this(config.getGraphHeadHandler(),</span>
+<span class="fc" id="L126">      config.getVertexHandler(),</span>
+<span class="fc" id="L127">      config.getEdgeHandler(),</span>
       graphTableName,
       vertexTableName,
       edgeTableName);
-<span class="nc" id="L131">  }</span>
+<span class="fc" id="L131">  }</span>
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -137,11 +137,11 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return Default Gradoop HBase configuration.
    */
   public static GradoopHBaseConfig getDefaultConfig() {
-<span class="nc" id="L140">    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new EPGMGraphHeadFactory());</span>
-<span class="nc" id="L141">    VertexHandler vertexHandler = new HBaseVertexHandler(new EPGMVertexFactory());</span>
-<span class="nc" id="L142">    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EPGMEdgeFactory());</span>
+<span class="fc" id="L140">    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new EPGMGraphHeadFactory());</span>
+<span class="fc" id="L141">    VertexHandler vertexHandler = new HBaseVertexHandler(new EPGMVertexFactory());</span>
+<span class="fc" id="L142">    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EPGMEdgeFactory());</span>
 
-<span class="nc" id="L144">    return new GradoopHBaseConfig(</span>
+<span class="fc" id="L144">    return new GradoopHBaseConfig(</span>
       graphHeadHandler,
       vertexHandler,
       edgeHandler,
@@ -167,7 +167,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
     String vertexTableName,
     String edgeTableName
   ) {
-<span class="nc" id="L170">    return new GradoopHBaseConfig(gradoopConfig, graphTableName, vertexTableName, edgeTableName);</span>
+<span class="fc" id="L170">    return new GradoopHBaseConfig(gradoopConfig, graphTableName, vertexTableName, edgeTableName);</span>
   }
 
   /**
@@ -176,7 +176,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return vertex table name
    */
   public TableName getVertexTableName() {
-<span class="nc" id="L179">    return TableName.valueOf(vertexTableName);</span>
+<span class="fc" id="L179">    return TableName.valueOf(vertexTableName);</span>
   }
 
   /**
@@ -185,7 +185,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return edge table name
    */
   public TableName getEdgeTableName() {
-<span class="nc" id="L188">    return TableName.valueOf(edgeTableName);</span>
+<span class="fc" id="L188">    return TableName.valueOf(edgeTableName);</span>
   }
 
   /**
@@ -194,7 +194,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return graph table name
    */
   public TableName getGraphTableName() {
-<span class="nc" id="L197">    return TableName.valueOf(graphTableName);</span>
+<span class="fc" id="L197">    return TableName.valueOf(graphTableName);</span>
   }
 
   /**
@@ -203,7 +203,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return graph head handler
    */
   public GraphHeadHandler getGraphHeadHandler() {
-<span class="nc" id="L206">    return graphHeadHandler;</span>
+<span class="fc" id="L206">    return graphHeadHandler;</span>
   }
 
   /**
@@ -212,7 +212,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return vertex handler
    */
   public VertexHandler getVertexHandler() {
-<span class="nc" id="L215">    return vertexHandler;</span>
+<span class="fc" id="L215">    return vertexHandler;</span>
   }
 
   /**
@@ -221,7 +221,7 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return edge handler
    */
   public EdgeHandler getEdgeHandler() {
-<span class="nc" id="L224">    return edgeHandler;</span>
+<span class="fc" id="L224">    return edgeHandler;</span>
   }
 
   /**
@@ -236,11 +236,11 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return this modified config
    */
   public GradoopHBaseConfig enablePreSplitRegions(final int numberOfRegions) {
-<span class="nc" id="L239">    RegionSplitter.getInstance().setNumberOfRegions(numberOfRegions);</span>
-<span class="nc" id="L240">    this.vertexHandler.setPreSplitRegions(true);</span>
-<span class="nc" id="L241">    this.edgeHandler.setPreSplitRegions(true);</span>
-<span class="nc" id="L242">    this.graphHeadHandler.setPreSplitRegions(true);</span>
-<span class="nc" id="L243">    return this;</span>
+<span class="fc" id="L239">    RegionSplitter.getInstance().setNumberOfRegions(numberOfRegions);</span>
+<span class="fc" id="L240">    this.vertexHandler.setPreSplitRegions(true);</span>
+<span class="fc" id="L241">    this.edgeHandler.setPreSplitRegions(true);</span>
+<span class="fc" id="L242">    this.graphHeadHandler.setPreSplitRegions(true);</span>
+<span class="fc" id="L243">    return this;</span>
   }
 
   /**
@@ -256,11 +256,11 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return this modified config
    */
   public GradoopHBaseConfig useSpreadingByte(final int bucketCount) {
-<span class="nc" id="L259">    RowKeyDistributor.getInstance().setBucketCount((byte) bucketCount);</span>
-<span class="nc" id="L260">    this.vertexHandler.setSpreadingByteUsage(true);</span>
-<span class="nc" id="L261">    this.edgeHandler.setSpreadingByteUsage(true);</span>
-<span class="nc" id="L262">    this.graphHeadHandler.setSpreadingByteUsage(true);</span>
-<span class="nc" id="L263">    return this;</span>
+<span class="fc" id="L259">    RowKeyDistributor.getInstance().setBucketCount((byte) bucketCount);</span>
+<span class="fc" id="L260">    this.vertexHandler.setSpreadingByteUsage(true);</span>
+<span class="fc" id="L261">    this.edgeHandler.setSpreadingByteUsage(true);</span>
+<span class="fc" id="L262">    this.graphHeadHandler.setSpreadingByteUsage(true);</span>
+<span class="fc" id="L263">    return this;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

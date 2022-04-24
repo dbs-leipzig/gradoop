@@ -50,25 +50,25 @@ public class BuildEdgeMutation extends RichMapFunction&lt;EPGMEdge, Tuple2&lt;Gr
    *
    * @param edgeHandler edge data handler
    */
-<span class="nc" id="L53">  public BuildEdgeMutation(EdgeHandler edgeHandler) {</span>
-<span class="nc" id="L54">    this.edgeHandler = edgeHandler;</span>
-<span class="nc" id="L55">  }</span>
+<span class="fc" id="L53">  public BuildEdgeMutation(EdgeHandler edgeHandler) {</span>
+<span class="fc" id="L54">    this.edgeHandler = edgeHandler;</span>
+<span class="fc" id="L55">  }</span>
 
   @Override
   public Tuple2&lt;GradoopId, Mutation&gt; map(EPGMEdge edge) throws Exception {
-<span class="nc" id="L59">    GradoopId key = edge.getId();</span>
-<span class="nc" id="L60">    Put put = new Put(edgeHandler.getRowKey(edge.getId()));</span>
-<span class="nc" id="L61">    put = edgeHandler.writeEdge(put, edge);</span>
+<span class="fc" id="L59">    GradoopId key = edge.getId();</span>
+<span class="fc" id="L60">    Put put = new Put(edgeHandler.getRowKey(edge.getId()));</span>
+<span class="fc" id="L61">    put = edgeHandler.writeEdge(put, edge);</span>
 
-<span class="nc" id="L63">    reuseTuple.f0 = key;</span>
-<span class="nc" id="L64">    reuseTuple.f1 = put;</span>
-<span class="nc" id="L65">    return reuseTuple;</span>
+<span class="fc" id="L63">    reuseTuple.f0 = key;</span>
+<span class="fc" id="L64">    reuseTuple.f1 = put;</span>
+<span class="fc" id="L65">    return reuseTuple;</span>
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="nc" id="L70">    super.open(parameters);</span>
-<span class="nc" id="L71">    reuseTuple = new Tuple2&lt;&gt;();</span>
-<span class="nc" id="L72">  }</span>
+<span class="fc" id="L70">    super.open(parameters);</span>
+<span class="fc" id="L71">    reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L72">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

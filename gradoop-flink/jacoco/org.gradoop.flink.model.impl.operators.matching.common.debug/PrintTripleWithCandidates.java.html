@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 import java.util.Arrays;
@@ -29,13 +30,13 @@ public class PrintTripleWithCandidates&lt;K&gt; extends Printer&lt;TripleWithCan
   /**
    * Logger
    */
-<span class="fc" id="L32">  private static final Logger LOG = Logger.getLogger(PrintTripleWithCandidates.class);</span>
+<span class="fc" id="L33">  private static final Logger LOG = LogManager.getLogger(PrintTripleWithCandidates.class);</span>
 
   /**
    * Constructor
    */
-<span class="nc" id="L37">  public PrintTripleWithCandidates() {</span>
-<span class="nc" id="L38">  }</span>
+<span class="nc" id="L38">  public PrintTripleWithCandidates() {</span>
+<span class="nc" id="L39">  }</span>
 
   /**
    * Creates a new printer.
@@ -44,8 +45,8 @@ public class PrintTripleWithCandidates&lt;K&gt; extends Printer&lt;TripleWithCan
    * @param prefix prefix for output
    */
   public PrintTripleWithCandidates(boolean isIterative, String prefix) {
-<span class="nc" id="L47">    super(isIterative, prefix);</span>
-<span class="nc" id="L48">  }</span>
+<span class="nc" id="L48">    super(isIterative, prefix);</span>
+<span class="nc" id="L49">  }</span>
 
   /**
    * Constructor
@@ -54,21 +55,21 @@ public class PrintTripleWithCandidates&lt;K&gt; extends Printer&lt;TripleWithCan
    * @param prefix          prefix for debug string
    */
   public PrintTripleWithCandidates(int iterationNumber, String prefix) {
-<span class="fc" id="L57">    super(iterationNumber, prefix);</span>
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L58">    super(iterationNumber, prefix);</span>
+<span class="fc" id="L59">  }</span>
 
   @Override
   protected String getDebugString(TripleWithCandidates&lt;K&gt; t) {
-<span class="nc" id="L62">    return String.format(&quot;(%s,%s,%s,%s)&quot;,</span>
-<span class="nc" id="L63">      edgeMap.get(t.getEdgeId()),</span>
-<span class="nc" id="L64">      vertexMap.get(t.getSourceId()),</span>
-<span class="nc" id="L65">      vertexMap.get(t.getTargetId()),</span>
-<span class="nc" id="L66">      Arrays.toString(t.getCandidates()));</span>
+<span class="nc" id="L63">    return String.format(&quot;(%s,%s,%s,%s)&quot;,</span>
+<span class="nc" id="L64">      edgeMap.get(t.getEdgeId()),</span>
+<span class="nc" id="L65">      vertexMap.get(t.getSourceId()),</span>
+<span class="nc" id="L66">      vertexMap.get(t.getTargetId()),</span>
+<span class="nc" id="L67">      Arrays.toString(t.getCandidates()));</span>
   }
 
   @Override
   protected Logger getLogger() {
-<span class="nc" id="L71">    return LOG;</span>
+<span class="nc" id="L72">    return LOG;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

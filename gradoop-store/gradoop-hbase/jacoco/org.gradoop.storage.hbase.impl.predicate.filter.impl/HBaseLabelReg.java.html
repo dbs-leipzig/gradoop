@@ -38,13 +38,13 @@ public class HBaseLabelReg&lt;T extends Element&gt; extends LabelReg&lt;HBaseEle
    * @param reg label regex pattern
    */
   public HBaseLabelReg(Pattern reg) {
-<span class="nc" id="L41">    super(reg);</span>
-<span class="nc" id="L42">  }</span>
+<span class="fc" id="L41">    super(reg);</span>
+<span class="fc" id="L42">  }</span>
 
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
-<span class="nc" id="L47">    return HBaseFilterUtils.getLabelRegFilter(getReg(), negate);</span>
+<span class="fc" id="L47">    return HBaseFilterUtils.getLabelRegFilter(getReg(), negate);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VertexPostProcessingMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.kmeans.functions</a> &gt; <span class="el_source">VertexPostProcessingMap.java</span></div><h1>VertexPostProcessingMap.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.kmeans.functions;
+
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.kmeans.util.Centroid;
+import org.gradoop.flink.model.impl.operators.kmeans.util.Point;
+
+import java.util.Objects;
+
+/**
+ * Extends the properties of the vertices by the clusterId and the spatial properties of the cluster
+ *
+ * @param &lt;V&gt; The vertex type
+ */
+public class VertexPostProcessingMap&lt;V extends Vertex&gt;
+  implements MapFunction&lt;Tuple2&lt;V, Tuple2&lt;Centroid, Point&gt;&gt;, V&gt; {
+
+  /**
+   * First spatial property name of the vertex
+   */
+  private String lat;
+
+  /**
+   * Second spatial property name of the vertex
+   */
+  private String lon;
+
+  /**
+   * Initializes a VertexProcessingMap instance with the spatial property names of the vertices
+   *
+   * @param lat First spatial property name of the vertex
+   * @param lon Second spatial property name of the vertex
+   */
+<span class="fc" id="L52">  public VertexPostProcessingMap(String lat, String lon) {</span>
+<span class="fc" id="L53">    this.lat = Objects.requireNonNull(lat);</span>
+<span class="fc" id="L54">    this.lon = Objects.requireNonNull(lon);</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Extends the vertex attributes by the clusterId and its spatial properties
+   *
+   * @param t2 Tuple of the vertex and a tuple containing its centroid and the unique vertex key
+   * @return Returns the vertex with extended attributes
+   */
+  @Override
+  public V map(Tuple2&lt;V, Tuple2&lt;Centroid, Point&gt;&gt; t2) {
+<span class="fc" id="L65">    V vertex = t2.f0;</span>
+<span class="pc bpc" id="L66" title="2 of 4 branches missed.">    if (vertex.hasProperty(lat) &amp;&amp; vertex.hasProperty(lon)) {</span>
+<span class="fc" id="L67">      Point point = t2.f1.f1;</span>
+<span class="fc" id="L68">      double latitude = point.getLat();</span>
+<span class="fc" id="L69">      double longitude = point.getLon();</span>
+<span class="fc" id="L70">      vertex.setProperty(&quot;cluster_&quot; + lat, latitude);</span>
+<span class="fc" id="L71">      vertex.setProperty(&quot;cluster_&quot; + lon, longitude);</span>
+<span class="fc" id="L72">      vertex.setProperty(&quot;cluster_id&quot;, PropertyValue.create(t2.f1.f0.getId()));</span>
+    }
+<span class="fc" id="L74">    return vertex;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

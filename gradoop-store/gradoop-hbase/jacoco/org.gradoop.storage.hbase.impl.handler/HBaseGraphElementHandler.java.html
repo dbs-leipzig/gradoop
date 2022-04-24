@@ -26,39 +26,39 @@ import org.gradoop.storage.hbase.impl.api.GraphElementHandler;
 /**
  * Handler class for entities that are contained in logical graphs (i.e., vertex and edge data).
  */
-<span class="nc" id="L29">public abstract class HBaseGraphElementHandler extends HBaseElementHandler</span>
+<span class="fc" id="L29">public abstract class HBaseGraphElementHandler extends HBaseElementHandler</span>
   implements GraphElementHandler {
   /**
    * Byte representation of the graphs column identifier.
    */
-<span class="nc" id="L34">  private static final byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);</span>
+<span class="fc" id="L34">  private static final byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);</span>
 
   @Override
   public Put writeGraphIds(Put put, GraphElement graphElement) {
-<span class="nc bnc" id="L38" title="All 2 branches missed.">    if (graphElement.getGraphCount() &gt; 0) {</span>
-<span class="nc" id="L39">      put = put.addColumn(</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">    if (graphElement.getGraphCount() &gt; 0) {</span>
+<span class="fc" id="L39">      put = put.addColumn(</span>
         CF_META_BYTES,
         COL_GRAPHS_BYTES,
-<span class="nc" id="L42">        graphElement.getGraphIds().toByteArray()</span>
+<span class="fc" id="L42">        graphElement.getGraphIds().toByteArray()</span>
       );
     }
 
-<span class="nc" id="L46">    return put;</span>
+<span class="fc" id="L46">    return put;</span>
   }
 
   @Override
   public GradoopIdSet readGraphIds(Result res) {
-<span class="nc" id="L51">    byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);</span>
+<span class="fc" id="L51">    byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);</span>
 
     GradoopIdSet graphIds;
 
-<span class="nc bnc" id="L55" title="All 2 branches missed.">    if (graphBytes != null) {</span>
-<span class="nc" id="L56">      graphIds = GradoopIdSet.fromByteArray(graphBytes);</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    if (graphBytes != null) {</span>
+<span class="fc" id="L56">      graphIds = GradoopIdSet.fromByteArray(graphBytes);</span>
     } else {
-<span class="nc" id="L58">      graphIds = new GradoopIdSet();</span>
+<span class="fc" id="L58">      graphIds = new GradoopIdSet();</span>
     }
 
-<span class="nc" id="L61">    return graphIds;</span>
+<span class="fc" id="L61">    return graphIds;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

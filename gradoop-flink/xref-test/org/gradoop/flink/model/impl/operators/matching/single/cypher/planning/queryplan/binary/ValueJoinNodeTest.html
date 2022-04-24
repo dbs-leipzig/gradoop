@@ -48,207 +48,207 @@
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.call;
 <a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEmbedding;
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
-<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.hamcrest.CoreMatchers.is;
-<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.hamcrest.MatcherAssert.assertThat;
-<a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNodeTest.html">ValueJoinNodeTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
-<a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>    @Test
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitialization() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="48" href="#48">48</a>      EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="49" href="#49">49</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
-<a name="50" href="#50">50</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
-<a name="51" href="#51">51</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
-<a name="52" href="#52">52</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="53" href="#53">53</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>, 1);
-<a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>      EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="56" href="#56">56</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 0);
-<a name="57" href="#57">57</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 1);
-<a name="58" href="#58">58</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 2);
-<a name="59" href="#59">59</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="60" href="#60">60</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>, 1);
-<a name="61" href="#61">61</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>, 2);
-<a name="62" href="#62">62</a>  
-<a name="63" href="#63">63</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> leftMockNode = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
-<a name="64" href="#64">64</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> rightMockNode = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
-<a name="65" href="#65">65</a>  
-<a name="66" href="#66">66</a>      ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftMockNode, rightMockNode,
-<a name="67" href="#67">67</a>        singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>)),
-<a name="68" href="#68">68</a>        MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
-<a name="69" href="#69">69</a>  
-<a name="70" href="#70">70</a>      EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
-<a name="71" href="#71">71</a>  
-<a name="72" href="#72">72</a>      assertThat(outputMetaData.getEntryCount(), is(6));
-<a name="73" href="#73">73</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"v1"</span>), is(0));
-<a name="74" href="#74">74</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"e1"</span>), is(1));
-<a name="75" href="#75">75</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"v2"</span>), is(2));
-<a name="76" href="#76">76</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"v3"</span>), is(3));
-<a name="77" href="#77">77</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"e2"</span>), is(4));
-<a name="78" href="#78">78</a>      assertThat(outputMetaData.getEntryColumn(<span class="jxr_string">"v4"</span>), is(5));
-<a name="79" href="#79">79</a>  
-<a name="80" href="#80">80</a>      assertThat(outputMetaData.getPropertyCount(), is(5));
-<a name="81" href="#81">81</a>      assertThat(outputMetaData.getPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>), is(0));
-<a name="82" href="#82">82</a>      assertThat(outputMetaData.getPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>), is(1));
-<a name="83" href="#83">83</a>      assertThat(outputMetaData.getPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>), is(2));
-<a name="84" href="#84">84</a>      assertThat(outputMetaData.getPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>), is(3));
-<a name="85" href="#85">85</a>      assertThat(outputMetaData.getPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>), is(4));
-<a name="86" href="#86">86</a>    }
-<a name="87" href="#87">87</a>  
-<a name="88" href="#88">88</a>    @SuppressWarnings(<span class="jxr_string">"ArraysAsListWithZeroOrOneArgument"</span>)
-<a name="89" href="#89">89</a>    @Test
-<a name="90" href="#90">90</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetJoinProperties() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="91" href="#91">91</a>      EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="92" href="#92">92</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
-<a name="93" href="#93">93</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
-<a name="94" href="#94">94</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
-<a name="95" href="#95">95</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="96" href="#96">96</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>, 1);
-<a name="97" href="#97">97</a>  
-<a name="98" href="#98">98</a>      EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="99" href="#99">99</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 0);
-<a name="100" href="#100">100</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 1);
-<a name="101" href="#101">101</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 2);
-<a name="102" href="#102">102</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="103" href="#103">103</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>, 1);
-<a name="104" href="#104">104</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>, 2);
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
-<a name="107" href="#107">107</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
-<a name="108" href="#108">108</a> 
-<a name="109" href="#109">109</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
-<a name="110" href="#110">110</a>       singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>)),
-<a name="111" href="#111">111</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
-<a name="112" href="#112">112</a> 
-<a name="113" href="#113">113</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getJoinPropertiesLeft"</span>), is(asList(0)));
-<a name="114" href="#114">114</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getJoinPropertiesRight"</span>), is(asList(2)));
-<a name="115" href="#115">115</a>   }
-<a name="116" href="#116">116</a> 
-<a name="117" href="#117">117</a>   @Test
-<a name="118" href="#118">118</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetDistinctColumnsIsomorphism() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="119" href="#119">119</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="120" href="#120">120</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
-<a name="121" href="#121">121</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
-<a name="122" href="#122">122</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
-<a name="123" href="#123">123</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 3);
-<a name="124" href="#124">124</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 4);
-<a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="127" href="#127">127</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 0);
-<a name="128" href="#128">128</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e3"</span>, EntryType.EDGE, 1);
-<a name="129" href="#129">129</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v5"</span>, EntryType.VERTEX, 2);
-<a name="130" href="#130">130</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e4"</span>, EntryType.EDGE, 3);
-<a name="131" href="#131">131</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v6"</span>, EntryType.VERTEX, 4);
-<a name="132" href="#132">132</a> 
-<a name="133" href="#133">133</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
-<a name="134" href="#134">134</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
-<a name="135" href="#135">135</a> 
-<a name="136" href="#136">136</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
-<a name="137" href="#137">137</a>       Lists.newArrayList(), Lists.newArrayList(),
-<a name="138" href="#138">138</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
-<a name="139" href="#139">139</a> 
-<a name="140" href="#140">140</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsLeft"</span>), is(asList(0, 2, 4)));
-<a name="141" href="#141">141</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsRight"</span>), is(asList(0, 2, 4)));
-<a name="142" href="#142">142</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsLeft"</span>), is(asList(1, 3)));
-<a name="143" href="#143">143</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsRight"</span>), is(asList(1, 3)));
-<a name="144" href="#144">144</a>   }
-<a name="145" href="#145">145</a> 
-<a name="146" href="#146">146</a>   @SuppressWarnings(<span class="jxr_string">"ArraysAsListWithZeroOrOneArgument"</span>)
-<a name="147" href="#147">147</a>   @Test
-<a name="148" href="#148">148</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetDistinctColumnsHomomorphism() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="149" href="#149">149</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="150" href="#150">150</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
-<a name="151" href="#151">151</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
-<a name="152" href="#152">152</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
-<a name="153" href="#153">153</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 3);
-<a name="154" href="#154">154</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 4);
-<a name="155" href="#155">155</a> 
-<a name="156" href="#156">156</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="157" href="#157">157</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 0);
-<a name="158" href="#158">158</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e3"</span>, EntryType.EDGE, 1);
-<a name="159" href="#159">159</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v5"</span>, EntryType.VERTEX, 2);
-<a name="160" href="#160">160</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e4"</span>, EntryType.EDGE, 3);
-<a name="161" href="#161">161</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v6"</span>, EntryType.VERTEX, 4);
-<a name="162" href="#162">162</a> 
-<a name="163" href="#163">163</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
-<a name="164" href="#164">164</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
-<a name="165" href="#165">165</a> 
-<a name="166" href="#166">166</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
-<a name="167" href="#167">167</a>       Lists.newArrayList(), Lists.newArrayList(),
-<a name="168" href="#168">168</a>       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
-<a name="169" href="#169">169</a> 
-<a name="170" href="#170">170</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsLeft"</span>), is(asList()));
-<a name="171" href="#171">171</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsRight"</span>), is(asList()));
-<a name="172" href="#172">172</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsLeft"</span>), is(asList()));
-<a name="173" href="#173">173</a>     assertThat(call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsRight"</span>), is(asList()));
-<a name="174" href="#174">174</a>   }
-<a name="175" href="#175">175</a> 
-<a name="176" href="#176">176</a>   @Test
-<a name="177" href="#177">177</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testExecute() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="178" href="#178">178</a>     GradoopId a = GradoopId.get();
-<a name="179" href="#179">179</a>     GradoopId b = GradoopId.get();
-<a name="180" href="#180">180</a>     GradoopId c = GradoopId.get();
-<a name="181" href="#181">181</a>     GradoopId d = GradoopId.get();
-<a name="182" href="#182">182</a>     GradoopId e = GradoopId.get();
-<a name="183" href="#183">183</a>     GradoopId f = GradoopId.get();
-<a name="184" href="#184">184</a>     GradoopId g = GradoopId.get();
-<a name="185" href="#185">185</a>     GradoopId h = GradoopId.get();
-<a name="186" href="#186">186</a> 
-<a name="187" href="#187">187</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="188" href="#188">188</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
-<a name="189" href="#189">189</a>     leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="190" href="#190">190</a> 
-<a name="191" href="#191">191</a>     Embedding embedding1 = createEmbedding(singletonList(Pair.of(a, singletonList(42))));
-<a name="192" href="#192">192</a>     Embedding embedding2 = createEmbedding(singletonList(Pair.of(b, singletonList(21))));
-<a name="193" href="#193">193</a> 
-<a name="194" href="#194">194</a>     DataSet&lt;Embedding&gt; leftEmbeddings = getExecutionEnvironment()
-<a name="195" href="#195">195</a>       .fromElements(embedding1, embedding2);
-<a name="196" href="#196">196</a> 
-<a name="197" href="#197">197</a>     <em class="jxr_comment">/*</em>
-<a name="198" href="#198">198</a> <em class="jxr_comment">     * ----------------------------------</em>
-<a name="199" href="#199">199</a> <em class="jxr_comment">     * |  v2   | e1    | v3    | v3.age |</em>
-<a name="200" href="#200">200</a> <em class="jxr_comment">     * ----------------------------------</em>
-<a name="201" href="#201">201</a> <em class="jxr_comment">     * | id(c) | id(d) | id(e) |  42    | -&gt; Embedding 3</em>
-<a name="202" href="#202">202</a> <em class="jxr_comment">     * ----------------------------------</em>
-<a name="203" href="#203">203</a> <em class="jxr_comment">     * | id(f) | id(g) | id(h) |  21    | -&gt; Embedding 4</em>
-<a name="204" href="#204">204</a> <em class="jxr_comment">     * ----------------------------------</em>
-<a name="205" href="#205">205</a> <em class="jxr_comment">     */</em>
-<a name="206" href="#206">206</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
-<a name="207" href="#207">207</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 0);
-<a name="208" href="#208">208</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
-<a name="209" href="#209">209</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 2);
-<a name="210" href="#210">210</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
-<a name="211" href="#211">211</a> 
-<a name="212" href="#212">212</a>     Embedding embedding3 = createEmbedding(asList(
-<a name="213" href="#213">213</a>       Pair.of(c, emptyList()),
-<a name="214" href="#214">214</a>       Pair.of(d, emptyList()),
-<a name="215" href="#215">215</a>       Pair.of(e, singletonList(42))
-<a name="216" href="#216">216</a>     ));
-<a name="217" href="#217">217</a>     Embedding embedding4 = createEmbedding(asList(
-<a name="218" href="#218">218</a>       Pair.of(f, emptyList()),
-<a name="219" href="#219">219</a>       Pair.of(g, emptyList()),
-<a name="220" href="#220">220</a>       Pair.of(h, singletonList(21))
-<a name="221" href="#221">221</a>     ));
-<a name="222" href="#222">222</a> 
-<a name="223" href="#223">223</a>     DataSet&lt;Embedding&gt; rightEmbeddings = getExecutionEnvironment()
-<a name="224" href="#224">224</a>       .fromElements(embedding3, embedding4);
-<a name="225" href="#225">225</a> 
-<a name="226" href="#226">226</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(leftEmbeddings, leftInputMetaData);
-<a name="227" href="#227">227</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(rightEmbeddings, rightInputMetaData);
-<a name="228" href="#228">228</a> 
-<a name="229" href="#229">229</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
-<a name="230" href="#230">230</a>       singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>)),
-<a name="231" href="#231">231</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
-<a name="232" href="#232">232</a> 
-<a name="233" href="#233">233</a>     List&lt;Embedding&gt; result = node.execute().collect();
-<a name="234" href="#234">234</a>     result.sort(Comparator.comparing(o -&gt; o.getProperty(0))); <em class="jxr_comment">// sort by property value in column 0</em>
-<a name="235" href="#235">235</a> 
-<a name="236" href="#236">236</a>     assertThat(result.size(), is(2));
-<a name="237" href="#237">237</a> 
-<a name="238" href="#238">238</a>     assertEmbedding(result.get(0), asList(b, f, g, h), asList(PropertyValue.create(21), PropertyValue.create(21)));
-<a name="239" href="#239">239</a>     assertEmbedding(result.get(1), asList(a, c, d, e), asList(PropertyValue.create(42), PropertyValue.create(42)));
-<a name="240" href="#240">240</a>   }
-<a name="241" href="#241">241</a> }
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/binary/ValueJoinNodeTest.html">ValueJoinNodeTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
+<a name="44" href="#44">44</a>  
+<a name="45" href="#45">45</a>    @Test
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testMetaDataInitialization() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="47" href="#47">47</a>      EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="48" href="#48">48</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
+<a name="49" href="#49">49</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
+<a name="50" href="#50">50</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
+<a name="51" href="#51">51</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="52" href="#52">52</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>, 1);
+<a name="53" href="#53">53</a>  
+<a name="54" href="#54">54</a>      EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="55" href="#55">55</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 0);
+<a name="56" href="#56">56</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 1);
+<a name="57" href="#57">57</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 2);
+<a name="58" href="#58">58</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="59" href="#59">59</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>, 1);
+<a name="60" href="#60">60</a>      rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>, 2);
+<a name="61" href="#61">61</a>  
+<a name="62" href="#62">62</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> leftMockNode = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
+<a name="63" href="#63">63</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> rightMockNode = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
+<a name="64" href="#64">64</a>  
+<a name="65" href="#65">65</a>      ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftMockNode, rightMockNode,
+<a name="66" href="#66">66</a>        singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>)),
+<a name="67" href="#67">67</a>        MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+<a name="68" href="#68">68</a>  
+<a name="69" href="#69">69</a>      EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
+<a name="70" href="#70">70</a>  
+<a name="71" href="#71">71</a>      assertEquals(6, outputMetaData.getEntryCount());
+<a name="72" href="#72">72</a>      assertEquals(0, outputMetaData.getEntryColumn(<span class="jxr_string">"v1"</span>));
+<a name="73" href="#73">73</a>      assertEquals(1, outputMetaData.getEntryColumn(<span class="jxr_string">"e1"</span>));
+<a name="74" href="#74">74</a>      assertEquals(2, outputMetaData.getEntryColumn(<span class="jxr_string">"v2"</span>));
+<a name="75" href="#75">75</a>      assertEquals(3, outputMetaData.getEntryColumn(<span class="jxr_string">"v3"</span>));
+<a name="76" href="#76">76</a>      assertEquals(4, outputMetaData.getEntryColumn(<span class="jxr_string">"e2"</span>));
+<a name="77" href="#77">77</a>      assertEquals(5, outputMetaData.getEntryColumn(<span class="jxr_string">"v4"</span>));
+<a name="78" href="#78">78</a>  
+<a name="79" href="#79">79</a>      assertEquals(5, outputMetaData.getPropertyCount());
+<a name="80" href="#80">80</a>      assertEquals(0, outputMetaData.getPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>));
+<a name="81" href="#81">81</a>      assertEquals(1, outputMetaData.getPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>));
+<a name="82" href="#82">82</a>      assertEquals(2, outputMetaData.getPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>));
+<a name="83" href="#83">83</a>      assertEquals(3, outputMetaData.getPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>));
+<a name="84" href="#84">84</a>      assertEquals(4, outputMetaData.getPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>));
+<a name="85" href="#85">85</a>    }
+<a name="86" href="#86">86</a>  
+<a name="87" href="#87">87</a>    @SuppressWarnings(<span class="jxr_string">"ArraysAsListWithZeroOrOneArgument"</span>)
+<a name="88" href="#88">88</a>    @Test
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetJoinProperties() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="90" href="#90">90</a>      EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="91" href="#91">91</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
+<a name="92" href="#92">92</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
+<a name="93" href="#93">93</a>      leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
+<a name="94" href="#94">94</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="95" href="#95">95</a>      leftInputMetaData.setPropertyColumn(<span class="jxr_string">"e1"</span>, <span class="jxr_string">"since"</span>, 1);
+<a name="96" href="#96">96</a>  
+<a name="97" href="#97">97</a>      EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="98" href="#98">98</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 0);
+<a name="99" href="#99">99</a>      rightInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 1);
+<a name="100" href="#100">100</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 2);
+<a name="101" href="#101">101</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="102" href="#102">102</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"e2"</span>, <span class="jxr_string">"since"</span>, 1);
+<a name="103" href="#103">103</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>, 2);
+<a name="104" href="#104">104</a> 
+<a name="105" href="#105">105</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
+<a name="106" href="#106">106</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
+<a name="107" href="#107">107</a> 
+<a name="108" href="#108">108</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
+<a name="109" href="#109">109</a>       singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v4"</span>, <span class="jxr_string">"age"</span>)),
+<a name="110" href="#110">110</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+<a name="111" href="#111">111</a> 
+<a name="112" href="#112">112</a>     assertEquals(asList(0), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getJoinPropertiesLeft"</span>));
+<a name="113" href="#113">113</a>     assertEquals(asList(2), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getJoinPropertiesRight"</span>));
+<a name="114" href="#114">114</a>   }
+<a name="115" href="#115">115</a> 
+<a name="116" href="#116">116</a>   @Test
+<a name="117" href="#117">117</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetDistinctColumnsIsomorphism() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="118" href="#118">118</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="119" href="#119">119</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
+<a name="120" href="#120">120</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
+<a name="121" href="#121">121</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
+<a name="122" href="#122">122</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 3);
+<a name="123" href="#123">123</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 4);
+<a name="124" href="#124">124</a> 
+<a name="125" href="#125">125</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="126" href="#126">126</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 0);
+<a name="127" href="#127">127</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e3"</span>, EntryType.EDGE, 1);
+<a name="128" href="#128">128</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v5"</span>, EntryType.VERTEX, 2);
+<a name="129" href="#129">129</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e4"</span>, EntryType.EDGE, 3);
+<a name="130" href="#130">130</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v6"</span>, EntryType.VERTEX, 4);
+<a name="131" href="#131">131</a> 
+<a name="132" href="#132">132</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
+<a name="133" href="#133">133</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
+<a name="134" href="#134">134</a> 
+<a name="135" href="#135">135</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
+<a name="136" href="#136">136</a>       Lists.newArrayList(), Lists.newArrayList(),
+<a name="137" href="#137">137</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+<a name="138" href="#138">138</a> 
+<a name="139" href="#139">139</a>     assertEquals(asList(0, 2, 4), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsLeft"</span>));
+<a name="140" href="#140">140</a>     assertEquals(asList(0, 2, 4), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsRight"</span>));
+<a name="141" href="#141">141</a>     assertEquals(asList(1, 3), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsLeft"</span>));
+<a name="142" href="#142">142</a>     assertEquals(asList(1, 3), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsRight"</span>));
+<a name="143" href="#143">143</a>   }
+<a name="144" href="#144">144</a> 
+<a name="145" href="#145">145</a>   @SuppressWarnings(<span class="jxr_string">"ArraysAsListWithZeroOrOneArgument"</span>)
+<a name="146" href="#146">146</a>   @Test
+<a name="147" href="#147">147</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGetDistinctColumnsHomomorphism() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="148" href="#148">148</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="149" href="#149">149</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
+<a name="150" href="#150">150</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
+<a name="151" href="#151">151</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 2);
+<a name="152" href="#152">152</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"e2"</span>, EntryType.EDGE, 3);
+<a name="153" href="#153">153</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 4);
+<a name="154" href="#154">154</a> 
+<a name="155" href="#155">155</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="156" href="#156">156</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v4"</span>, EntryType.VERTEX, 0);
+<a name="157" href="#157">157</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e3"</span>, EntryType.EDGE, 1);
+<a name="158" href="#158">158</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v5"</span>, EntryType.VERTEX, 2);
+<a name="159" href="#159">159</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e4"</span>, EntryType.EDGE, 3);
+<a name="160" href="#160">160</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v6"</span>, EntryType.VERTEX, 4);
+<a name="161" href="#161">161</a> 
+<a name="162" href="#162">162</a>     PlanNode leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, leftInputMetaData);
+<a name="163" href="#163">163</a>     PlanNode rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(<strong class="jxr_keyword">null</strong>, rightInputMetaData);
+<a name="164" href="#164">164</a> 
+<a name="165" href="#165">165</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
+<a name="166" href="#166">166</a>       Lists.newArrayList(), Lists.newArrayList(),
+<a name="167" href="#167">167</a>       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
+<a name="168" href="#168">168</a> 
+<a name="169" href="#169">169</a>     assertEquals(asList(), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsLeft"</span>));
+<a name="170" href="#170">170</a>     assertEquals(asList(), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctVertexColumnsRight"</span>));
+<a name="171" href="#171">171</a>     assertEquals(asList(), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsLeft"</span>));
+<a name="172" href="#172">172</a>     assertEquals(asList(), call(ValueJoinNode.<strong class="jxr_keyword">class</strong>, node, <span class="jxr_string">"getDistinctEdgeColumnsRight"</span>));
+<a name="173" href="#173">173</a>   }
+<a name="174" href="#174">174</a> 
+<a name="175" href="#175">175</a>   @Test
+<a name="176" href="#176">176</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testExecute() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="177" href="#177">177</a>     GradoopId a = GradoopId.get();
+<a name="178" href="#178">178</a>     GradoopId b = GradoopId.get();
+<a name="179" href="#179">179</a>     GradoopId c = GradoopId.get();
+<a name="180" href="#180">180</a>     GradoopId d = GradoopId.get();
+<a name="181" href="#181">181</a>     GradoopId e = GradoopId.get();
+<a name="182" href="#182">182</a>     GradoopId f = GradoopId.get();
+<a name="183" href="#183">183</a>     GradoopId g = GradoopId.get();
+<a name="184" href="#184">184</a>     GradoopId h = GradoopId.get();
+<a name="185" href="#185">185</a> 
+<a name="186" href="#186">186</a>     EmbeddingMetaData leftInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="187" href="#187">187</a>     leftInputMetaData.setEntryColumn(<span class="jxr_string">"v1"</span>, EntryType.VERTEX, 0);
+<a name="188" href="#188">188</a>     leftInputMetaData.setPropertyColumn(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="189" href="#189">189</a> 
+<a name="190" href="#190">190</a>     Embedding embedding1 = createEmbedding(singletonList(Pair.of(a, singletonList(42))));
+<a name="191" href="#191">191</a>     Embedding embedding2 = createEmbedding(singletonList(Pair.of(b, singletonList(21))));
+<a name="192" href="#192">192</a> 
+<a name="193" href="#193">193</a>     DataSet&lt;Embedding&gt; leftEmbeddings = getExecutionEnvironment()
+<a name="194" href="#194">194</a>       .fromElements(embedding1, embedding2);
+<a name="195" href="#195">195</a> 
+<a name="196" href="#196">196</a>     <em class="jxr_comment">/*</em>
+<a name="197" href="#197">197</a> <em class="jxr_comment">     * ----------------------------------</em>
+<a name="198" href="#198">198</a> <em class="jxr_comment">     * |  v2   | e1    | v3    | v3.age |</em>
+<a name="199" href="#199">199</a> <em class="jxr_comment">     * ----------------------------------</em>
+<a name="200" href="#200">200</a> <em class="jxr_comment">     * | id(c) | id(d) | id(e) |  42    | -&gt; Embedding 3</em>
+<a name="201" href="#201">201</a> <em class="jxr_comment">     * ----------------------------------</em>
+<a name="202" href="#202">202</a> <em class="jxr_comment">     * | id(f) | id(g) | id(h) |  21    | -&gt; Embedding 4</em>
+<a name="203" href="#203">203</a> <em class="jxr_comment">     * ----------------------------------</em>
+<a name="204" href="#204">204</a> <em class="jxr_comment">     */</em>
+<a name="205" href="#205">205</a>     EmbeddingMetaData rightInputMetaData = <strong class="jxr_keyword">new</strong> EmbeddingMetaData();
+<a name="206" href="#206">206</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v2"</span>, EntryType.VERTEX, 0);
+<a name="207" href="#207">207</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"e1"</span>, EntryType.EDGE, 1);
+<a name="208" href="#208">208</a>     rightInputMetaData.setEntryColumn(<span class="jxr_string">"v3"</span>, EntryType.VERTEX, 2);
+<a name="209" href="#209">209</a>     rightInputMetaData.setPropertyColumn(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>, 0);
+<a name="210" href="#210">210</a> 
+<a name="211" href="#211">211</a>     Embedding embedding3 = createEmbedding(asList(
+<a name="212" href="#212">212</a>       Pair.of(c, emptyList()),
+<a name="213" href="#213">213</a>       Pair.of(d, emptyList()),
+<a name="214" href="#214">214</a>       Pair.of(e, singletonList(42))
+<a name="215" href="#215">215</a>     ));
+<a name="216" href="#216">216</a>     Embedding embedding4 = createEmbedding(asList(
+<a name="217" href="#217">217</a>       Pair.of(f, emptyList()),
+<a name="218" href="#218">218</a>       Pair.of(g, emptyList()),
+<a name="219" href="#219">219</a>       Pair.of(h, singletonList(21))
+<a name="220" href="#220">220</a>     ));
+<a name="221" href="#221">221</a> 
+<a name="222" href="#222">222</a>     DataSet&lt;Embedding&gt; rightEmbeddings = getExecutionEnvironment()
+<a name="223" href="#223">223</a>       .fromElements(embedding3, embedding4);
+<a name="224" href="#224">224</a> 
+<a name="225" href="#225">225</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> leftChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(leftEmbeddings, leftInputMetaData);
+<a name="226" href="#226">226</a>     <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a> rightChild = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/MockPlanNode.html">MockPlanNode</a>(rightEmbeddings, rightInputMetaData);
+<a name="227" href="#227">227</a> 
+<a name="228" href="#228">228</a>     ValueJoinNode node = <strong class="jxr_keyword">new</strong> ValueJoinNode(leftChild, rightChild,
+<a name="229" href="#229">229</a>       singletonList(Pair.of(<span class="jxr_string">"v1"</span>, <span class="jxr_string">"age"</span>)), singletonList(Pair.of(<span class="jxr_string">"v3"</span>, <span class="jxr_string">"age"</span>)),
+<a name="230" href="#230">230</a>       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
+<a name="231" href="#231">231</a> 
+<a name="232" href="#232">232</a>     List&lt;Embedding&gt; result = node.execute().collect();
+<a name="233" href="#233">233</a>     result.sort(Comparator.comparing(o -&gt; o.getProperty(0))); <em class="jxr_comment">// sort by property value in column 0</em>
+<a name="234" href="#234">234</a> 
+<a name="235" href="#235">235</a>     assertEquals(2, result.size());
+<a name="236" href="#236">236</a> 
+<a name="237" href="#237">237</a>     assertEmbedding(result.get(0), asList(b, f, g, h), asList(PropertyValue.create(21), PropertyValue.create(21)));
+<a name="238" href="#238">238</a>     assertEmbedding(result.get(1), asList(a, c, d, e), asList(PropertyValue.create(42), PropertyValue.create(42)));
+<a name="239" href="#239">239</a>   }
+<a name="240" href="#240">240</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>
+

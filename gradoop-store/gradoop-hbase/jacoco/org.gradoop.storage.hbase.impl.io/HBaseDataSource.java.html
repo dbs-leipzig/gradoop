@@ -74,8 +74,8 @@ public class HBaseDataSource extends HBaseBase
     @Nonnull HBaseEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig flinkConfig
   ) {
-<span class="nc" id="L77">    this(epgmStore, flinkConfig, null, null, null);</span>
-<span class="nc" id="L78">  }</span>
+<span class="fc" id="L77">    this(epgmStore, flinkConfig, null, null, null);</span>
+<span class="fc" id="L78">  }</span>
 
   /**
    * Private constructor to create a data source instance with predicates.
@@ -93,45 +93,45 @@ public class HBaseDataSource extends HBaseBase
     @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery,
     @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery
   ) {
-<span class="nc" id="L96">    super(epgmStore, flinkConfig);</span>
-<span class="nc" id="L97">    this.graphHeadQuery = graphHeadQuery;</span>
-<span class="nc" id="L98">    this.vertexQuery = vertexQuery;</span>
-<span class="nc" id="L99">    this.edgeQuery = edgeQuery;</span>
-<span class="nc" id="L100">  }</span>
+<span class="fc" id="L96">    super(epgmStore, flinkConfig);</span>
+<span class="fc" id="L97">    this.graphHeadQuery = graphHeadQuery;</span>
+<span class="fc" id="L98">    this.vertexQuery = vertexQuery;</span>
+<span class="fc" id="L99">    this.edgeQuery = edgeQuery;</span>
+<span class="fc" id="L100">  }</span>
 
   @Override
   public LogicalGraph getLogicalGraph() {
-<span class="nc" id="L104">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
+<span class="fc" id="L104">    return getGraphCollection().reduce(new ReduceCombination&lt;&gt;());</span>
   }
 
   @Override
   public GraphCollection getGraphCollection() {
-<span class="nc" id="L109">    GradoopFlinkConfig config = getFlinkConfig();</span>
-<span class="nc" id="L110">    GraphCollectionFactory factory = config.getGraphCollectionFactory();</span>
-<span class="nc" id="L111">    HBaseEPGMStore store = getStore();</span>
+<span class="fc" id="L109">    GradoopFlinkConfig config = getFlinkConfig();</span>
+<span class="fc" id="L110">    GraphCollectionFactory factory = config.getGraphCollectionFactory();</span>
+<span class="fc" id="L111">    HBaseEPGMStore store = getStore();</span>
 
-<span class="nc" id="L113">    DataSet&lt;EPGMGraphHead&gt; graphHeads = config.getExecutionEnvironment()</span>
-<span class="nc" id="L114">      .createInput(new GraphHeadTableInputFormat(</span>
-<span class="nc" id="L115">          getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),</span>
-<span class="nc" id="L116">          store.getGraphHeadName()),</span>
-<span class="nc" id="L117">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())))</span>
-<span class="nc" id="L118">      .map(new ValueOf1&lt;&gt;());</span>
+<span class="fc" id="L113">    DataSet&lt;EPGMGraphHead&gt; graphHeads = config.getExecutionEnvironment()</span>
+<span class="fc" id="L114">      .createInput(new GraphHeadTableInputFormat(</span>
+<span class="fc" id="L115">          getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),</span>
+<span class="fc" id="L116">          store.getGraphHeadName()),</span>
+<span class="fc" id="L117">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())))</span>
+<span class="fc" id="L118">      .map(new ValueOf1&lt;&gt;());</span>
 
-<span class="nc" id="L120">    DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment()</span>
-<span class="nc" id="L121">      .createInput(new VertexTableInputFormat(</span>
-<span class="nc" id="L122">          getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),</span>
-<span class="nc" id="L123">          store.getVertexTableName()),</span>
-<span class="nc" id="L124">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())))</span>
-<span class="nc" id="L125">      .map(new ValueOf1&lt;&gt;());</span>
+<span class="fc" id="L120">    DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment()</span>
+<span class="fc" id="L121">      .createInput(new VertexTableInputFormat(</span>
+<span class="fc" id="L122">          getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),</span>
+<span class="fc" id="L123">          store.getVertexTableName()),</span>
+<span class="fc" id="L124">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())))</span>
+<span class="fc" id="L125">      .map(new ValueOf1&lt;&gt;());</span>
 
-<span class="nc" id="L127">    DataSet&lt;EPGMEdge&gt; edges = config.getExecutionEnvironment()</span>
-<span class="nc" id="L128">      .createInput(new EdgeTableInputFormat(</span>
-<span class="nc" id="L129">          getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),</span>
-<span class="nc" id="L130">          store.getEdgeTableName()),</span>
-<span class="nc" id="L131">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())))</span>
-<span class="nc" id="L132">      .map(new ValueOf1&lt;&gt;());</span>
+<span class="fc" id="L127">    DataSet&lt;EPGMEdge&gt; edges = config.getExecutionEnvironment()</span>
+<span class="fc" id="L128">      .createInput(new EdgeTableInputFormat(</span>
+<span class="fc" id="L129">          getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),</span>
+<span class="fc" id="L130">          store.getEdgeTableName()),</span>
+<span class="fc" id="L131">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())))</span>
+<span class="fc" id="L132">      .map(new ValueOf1&lt;&gt;());</span>
 
-<span class="nc" id="L134">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
+<span class="fc" id="L134">    return factory.fromDataSets(graphHeads, vertices, edges);</span>
   }
 
   @Nonnull
@@ -139,7 +139,7 @@ public class HBaseDataSource extends HBaseBase
   public HBaseDataSource applyGraphPredicate(
     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; query
   ) {
-<span class="nc" id="L142">    return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);</span>
+<span class="fc" id="L142">    return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);</span>
   }
 
   @Nonnull
@@ -147,7 +147,7 @@ public class HBaseDataSource extends HBaseBase
   public HBaseDataSource applyVertexPredicate(
     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query
   ) {
-<span class="nc" id="L150">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);</span>
+<span class="fc" id="L150">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);</span>
   }
 
   @Nonnull
@@ -155,12 +155,12 @@ public class HBaseDataSource extends HBaseBase
   public HBaseDataSource applyEdgePredicate(
     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query
   ) {
-<span class="nc" id="L158">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);</span>
+<span class="fc" id="L158">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);</span>
   }
 
   @Override
   public boolean isFilterPushedDown() {
-<span class="nc bnc" id="L163" title="All 6 branches missed.">    return this.graphHeadQuery != null || this.vertexQuery != null || this.edgeQuery != null;</span>
+<span class="pc bpc" id="L163" title="1 of 6 branches missed.">    return this.graphHeadQuery != null || this.vertexQuery != null || this.edgeQuery != null;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
