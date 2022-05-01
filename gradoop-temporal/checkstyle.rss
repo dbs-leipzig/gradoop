@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2022 University of Leipzig</copyright>
     <item>
-      <title>File: 109,
+      <title>File: 108,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -116,7 +116,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphTest.java">org/gradoop/temporal/model/impl/TemporalGraphTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparableTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/predicates/comparables/MaxTimePointComparableTest.java</a>
                 </td>
                 <td>
                   0
@@ -130,7 +130,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.MaxTimePointComparableTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/predicates/comparables/MaxTimePointComparableTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.TemporalGraphTest.java">org/gradoop/temporal/model/impl/TemporalGraphTest.java</a>
                 </td>
                 <td>
                   0
@@ -172,7 +172,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.isomorphism.IsomorphismComparisonData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/isomorphism/IsomorphismComparisonData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactoryTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/BinningTemporalGraphStatisticsFactoryTest.java</a>
                 </td>
                 <td>
                   0
@@ -186,7 +186,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.BinningTemporalGraphStatisticsFactoryTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/BinningTemporalGraphStatisticsFactoryTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.isomorphism.IsomorphismComparisonData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/isomorphism/IsomorphismComparisonData.java</a>
                 </td>
                 <td>
                   0
@@ -242,7 +242,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismComparisonData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismComparisonData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.AddTrivialConstraintsTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/postprocessing/transformation/AddTrivialConstraintsTest.java</a>
                 </td>
                 <td>
                   0
@@ -256,7 +256,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation.AddTrivialConstraintsTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/postprocessing/transformation/AddTrivialConstraintsTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismComparisonData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismComparisonData.java</a>
                 </td>
                 <td>
                   0
@@ -326,21 +326,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.pojo.TemporalGraphElementTest.java">org/gradoop/temporal/model/impl/pojo/TemporalGraphElementTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismShorterThanData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismShorterThanData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.BaseTemporalPatternMatchingTest.java">org/gradoop/temporal/model/impl/operators/matching/BaseTemporalPatternMatchingTest.java</a>
                 </td>
                 <td>
                   0
@@ -368,21 +354,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.BaseTemporalPatternMatchingTest.java">org/gradoop/temporal/model/impl/operators/matching/BaseTemporalPatternMatchingTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.snapshot.ByTemporalPredicateTest.java">org/gradoop/temporal/model/impl/operators/snapshot/ByTemporalPredicateTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismShorterThanData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismShorterThanData.java</a>
                 </td>
                 <td>
                   0
@@ -410,7 +382,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismSucceedsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismSucceedsData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.BinningTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/BinningTest.java</a>
                 </td>
                 <td>
                   0
@@ -424,7 +396,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.BinningTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/BinningTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismSucceedsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismSucceedsData.java</a>
                 </td>
                 <td>
                   0
@@ -466,7 +438,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismAsOfData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismAsOfData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismPrecedesData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismPrecedesData.java</a>
                 </td>
                 <td>
                   0
@@ -480,7 +452,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismPrecedesData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismPrecedesData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismAsOfData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismAsOfData.java</a>
                 </td>
                 <td>
                   0
@@ -522,7 +494,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismOverlapsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismOverlapsData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.TemporalCSVSourceAndSinkTest.java">org/gradoop/temporal/io/impl/csv/TemporalCSVSourceAndSinkTest.java</a>
                 </td>
                 <td>
                   0
@@ -536,7 +508,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.TemporalCSVSourceAndSinkTest.java">org/gradoop/temporal/io/impl/csv/TemporalCSVSourceAndSinkTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismOverlapsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismOverlapsData.java</a>
                 </td>
                 <td>
                   0
@@ -844,7 +816,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesTest.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectTemporalVerticesTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.indexed.TemporalIndexedCSVDataSinkTest.java">org/gradoop/temporal/io/impl/csv/indexed/TemporalIndexedCSVDataSinkTest.java</a>
                 </td>
                 <td>
                   0
@@ -858,7 +830,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.io.impl.csv.indexed.TemporalIndexedCSVDataSinkTest.java">org/gradoop/temporal/io/impl/csv/indexed/TemporalIndexedCSVDataSinkTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectTemporalVerticesTest.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectTemporalVerticesTest.java</a>
                 </td>
                 <td>
                   0
@@ -886,7 +858,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismLengthAtLeastData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismLengthAtLeastData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.ReservoirSamplerTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/ReservoirSamplerTest.java</a>
                 </td>
                 <td>
                   0
@@ -900,7 +872,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.ReservoirSamplerTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/ReservoirSamplerTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismLengthAtLeastData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismLengthAtLeastData.java</a>
                 </td>
                 <td>
                   0
@@ -970,7 +942,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismContainsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismContainsData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparableTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/predicates/comparables/DurationComparableTest.java</a>
                 </td>
                 <td>
                   0
@@ -984,7 +956,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.DurationComparableTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/predicates/comparables/DurationComparableTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismContainsData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismContainsData.java</a>
                 </td>
                 <td>
                   0
@@ -1432,7 +1404,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismMergeAndJoinData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismMergeAndJoinData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.TemporalElementStatsTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/TemporalElementStatsTest.java</a>
                 </td>
                 <td>
                   0
@@ -1446,7 +1418,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.pojos.TemporalElementStatsTest.java">org/gradoop/temporal/model/impl/operators/matching/common/statistics/binning/pojos/TemporalElementStatsTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismMergeAndJoinData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismMergeAndJoinData.java</a>
                 </td>
                 <td>
                   0
@@ -1559,6 +1531,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.TemporalPatternMatchingIsomorphismTest.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/TemporalPatternMatchingIsomorphismTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.snapshot.SnapshotApiTest.java">org/gradoop/temporal/model/impl/operators/snapshot/SnapshotApiTest.java</a>
                 </td>
                 <td>
                   0

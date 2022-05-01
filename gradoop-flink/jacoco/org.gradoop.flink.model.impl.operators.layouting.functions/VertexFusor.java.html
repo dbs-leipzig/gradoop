@@ -117,7 +117,7 @@ public class VertexFusor {
 <span class="fc" id="L117">    return edges.join(classifiedVertices).where(LEdge.SOURCE_ID_POSITION).equalTo(&quot;0.&quot; + LVertex.ID_POSITION)</span>
 <span class="fc" id="L118">      .join(classifiedVertices).where(&quot;0.&quot; + LEdge.TARGET_ID_POSITION).equalTo(&quot;0.&quot; + LVertex.ID_POSITION)</span>
 <span class="fc" id="L119">      .with(new CandidateGenerator(compareFunction, threshold)).groupBy(&quot;0.0&quot;)</span>
-<span class="pc bpc" id="L120" title="1 of 2 branches missed.">      .reduce((a, b) -&gt; (a.f2 &gt; b.f2) ? a : b).map(c -&gt; new Tuple2&lt;&gt;(c.f0, c.f1))</span>
+<span class="pc bnc" id="L120" title="All 2 branches missed.">      .reduce((a, b) -&gt; (a.f2 &gt; b.f2) ? a : b).map(c -&gt; new Tuple2&lt;&gt;(c.f0, c.f1))</span>
 <span class="fc" id="L121">      .returns(new TypeHint&lt;Tuple2&lt;LVertex, LVertex&gt;&gt;() { });</span>
   }
 
@@ -171,8 +171,8 @@ public class VertexFusor {
 <span class="fc" id="L171">      .with(new JoinFunction&lt;LEdge, Tuple2&lt;LVertex, LVertex&gt;, LEdge&gt;() {</span>
         @Override
         public LEdge join(LEdge lEdge, Tuple2&lt;LVertex, LVertex&gt; lVertexLVertexDoubleTuple3) {
-<span class="fc bfc" id="L174" title="All 2 branches covered.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
-<span class="fc" id="L175">            lEdge.setSourceId(lVertexLVertexDoubleTuple3.f1.getId());</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
+<span class="nc" id="L175">            lEdge.setSourceId(lVertexLVertexDoubleTuple3.f1.getId());</span>
           }
 <span class="fc" id="L177">          return lEdge;</span>
         }
