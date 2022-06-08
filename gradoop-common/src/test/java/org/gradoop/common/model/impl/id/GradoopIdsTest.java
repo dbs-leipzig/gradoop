@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.AssertJUnit.*;
 import static org.testng.Assert.assertNotEquals;
 
@@ -66,7 +64,7 @@ public class GradoopIdsTest {
     GradoopIdSet ids = new GradoopIdSet();
     ids.add(id1);
 
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     assertTrue(ids.contains(id1));
     assertFalse(ids.contains(id2));
   }
@@ -80,13 +78,13 @@ public class GradoopIdsTest {
     GradoopIdSet ids = new GradoopIdSet();
     ids.addAll(Arrays.asList(id1, id2));
 
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
     assertTrue(ids.contains(id1));
     assertTrue(ids.contains(id2));
     assertFalse(ids.contains(id3));
 
     ids.addAll(Arrays.asList(id1, id2));
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
   }
 
   @Test
@@ -100,12 +98,12 @@ public class GradoopIdsTest {
     GradoopIdSet list2 = new GradoopIdSet();
     list2.addAll(list1);
 
-    assertThat(list2.size(), is(2));
+    assertEquals(2, list2.size());
     assertTrue(list2.contains(id1));
     assertTrue(list2.contains(id2));
 
     list2.addAll(list1);
-    assertThat(list2.size(), is(2));
+    assertEquals(2, list2.size());
   }
 
   @Test
@@ -200,7 +198,7 @@ public class GradoopIdsTest {
     DataInputView dataInputView = new DataInputViewStreamWrapper(in);
     idsRead.read(dataInputView);
 
-    assertThat(idsRead.size(), is(2));
+    assertEquals(2, idsRead.size());
     assertTrue(idsRead.contains(id1));
     assertTrue(idsRead.contains(id2));
   }
@@ -240,11 +238,11 @@ public class GradoopIdsTest {
     ids.add(id1);
     ids.add(id2);
 
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
 
     ids.clear();
 
-    assertThat(ids.size(), is(0));
+    assertEquals(0, ids.size());
   }
 
   @Test
@@ -253,13 +251,13 @@ public class GradoopIdsTest {
     GradoopId id2 = GradoopId.get();
 
     GradoopIdSet ids = new GradoopIdSet();
-    assertThat(ids.size(), is(0));
+    assertEquals(0, ids.size());
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     ids.add(id2);
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
   }
 
   @Test
@@ -268,7 +266,7 @@ public class GradoopIdsTest {
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
     GradoopIdSet ids = GradoopIdSet.fromExisting(id1, id2, id3);
-    assertThat(ids.size(), is(3));
+    assertEquals(3, ids.size());
   }
 
   @Test

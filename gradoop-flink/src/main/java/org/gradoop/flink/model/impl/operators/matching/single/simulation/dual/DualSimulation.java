@@ -19,7 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
@@ -72,7 +73,7 @@ public class DualSimulation<
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(DualSimulation.class);
+  private static Logger LOG = LogManager.getLogger(DualSimulation.class);
 
   /**
    * If true, the algorithm uses bulk iteration for the core iteration.

@@ -37,8 +37,7 @@ import static java.util.Collections.singletonList;
 import static org.gradoop.common.GradoopTestUtils.call;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEmbedding;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
@@ -68,19 +67,19 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
 
-    assertThat(outputMetaData.getEntryCount(), is(5));
-    assertThat(outputMetaData.getEntryColumn("v1"), is(0));
-    assertThat(outputMetaData.getEntryColumn("e1"), is(1));
-    assertThat(outputMetaData.getEntryColumn("v2"), is(2));
-    assertThat(outputMetaData.getEntryColumn("e2"), is(3));
-    assertThat(outputMetaData.getEntryColumn("v3"), is(4));
+    assertEquals(5, outputMetaData.getEntryCount());
+    assertEquals(0, outputMetaData.getEntryColumn("v1"));
+    assertEquals(1, outputMetaData.getEntryColumn("e1"));
+    assertEquals(2, outputMetaData.getEntryColumn("v2"));
+    assertEquals(3, outputMetaData.getEntryColumn("e2"));
+    assertEquals(4, outputMetaData.getEntryColumn("v3"));
 
-    assertThat(outputMetaData.getPropertyCount(), is(5));
-    assertThat(outputMetaData.getPropertyColumn("v1", "age"), is(0));
-    assertThat(outputMetaData.getPropertyColumn("e1", "since"), is(1));
-    assertThat(outputMetaData.getPropertyColumn("v2", "age"), is(2));
-    assertThat(outputMetaData.getPropertyColumn("e2", "since"), is(3));
-    assertThat(outputMetaData.getPropertyColumn("v3", "age"), is(4));
+    assertEquals(5, outputMetaData.getPropertyCount());
+    assertEquals(0, outputMetaData.getPropertyColumn("v1", "age"));
+    assertEquals(1, outputMetaData.getPropertyColumn("e1", "since"));
+    assertEquals(2, outputMetaData.getPropertyColumn("v2", "age"));
+    assertEquals(3, outputMetaData.getPropertyColumn("e2", "since"));
+    assertEquals(4, outputMetaData.getPropertyColumn("v3", "age"));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -103,8 +102,8 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v2"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(JoinEmbeddingsNode.class, node, "getJoinColumnsLeft"), is(asList(2)));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getJoinColumnsRight"), is(asList(0)));
+    assertEquals(asList(2), call(JoinEmbeddingsNode.class, node, "getJoinColumnsLeft"));
+    assertEquals(asList(0), call(JoinEmbeddingsNode.class, node, "getJoinColumnsRight"));
   }
 
   @Test
@@ -130,10 +129,10 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2, 4)));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList(2, 4)));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
+    assertEquals(asList(0, 2, 4), call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"));
+    assertEquals(asList(2, 4), call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"));
+    assertEquals(asList(1, 3), call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"));
+    assertEquals(asList(1, 3), call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -160,10 +159,10 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
       singletonList("v3"),
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"), is(asList()));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"), is(asList()));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList()));
-    assertThat(call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"), is(asList()));
+    assertEquals(asList(), call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsLeft"));
+    assertEquals(asList(), call(JoinEmbeddingsNode.class, node, "getDistinctVertexColumnsRight"));
+    assertEquals(asList(), call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsLeft"));
+    assertEquals(asList(), call(JoinEmbeddingsNode.class, node, "getDistinctEdgeColumnsRight"));
   }
 
   @Test
@@ -223,7 +222,7 @@ public class JoinEmbeddingsNodeTest extends GradoopFlinkTestBase {
     List<Embedding> result = node.execute().collect();
     result.sort(Comparator.comparing(o -> o.getProperty(0))); // sort by property value in column 0
 
-    assertThat(result.size(), is(2));
+    assertEquals(2, result.size());
 
     assertEmbedding(result.get(0), asList(b, d, f), asList(PropertyValue.create(23), PropertyValue.create(77)));
     assertEmbedding(result.get(1), asList(a, c, e), asList(PropertyValue.create(42), PropertyValue.create(84)));

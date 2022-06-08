@@ -30,10 +30,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EmbeddingMetaDataTest {
 
@@ -54,20 +51,20 @@ public class EmbeddingMetaDataTest {
 
     EmbeddingMetaData metaData = new EmbeddingMetaData(entryMap, propertyMap, directionMap);
 
-    assertThat(metaData.getEntryCount(), is(3));
-    assertThat(metaData.getEntryColumn("a"), is(0));
-    assertThat(metaData.getEntryColumn("b"), is(1));
-    assertThat(metaData.getEntryColumn("c"), is(2));
-    assertThat(metaData.getEntryType("a"), is(EntryType.VERTEX));
-    assertThat(metaData.getEntryType("b"), is(EntryType.VERTEX));
-    assertThat(metaData.getEntryType("c"), is(EntryType.EDGE));
+    assertEquals(3, metaData.getEntryCount());
+    assertEquals(0, metaData.getEntryColumn("a"));
+    assertEquals(1, metaData.getEntryColumn("b"));
+    assertEquals(2, metaData.getEntryColumn("c"));
+    assertEquals(EntryType.VERTEX, metaData.getEntryType("a"));
+    assertEquals(EntryType.VERTEX, metaData.getEntryType("b"));
+    assertEquals(EntryType.EDGE, metaData.getEntryType("c"));
 
-    assertThat(metaData.getPropertyCount(), is(3));
-    assertThat(metaData.getPropertyColumn("a", "age"), is(0));
-    assertThat(metaData.getPropertyColumn("b", "age"), is(1));
-    assertThat(metaData.getPropertyColumn("c", "since"), is(2));
+    assertEquals(3, metaData.getPropertyCount());
+    assertEquals(0, metaData.getPropertyColumn("a", "age"));
+    assertEquals(1, metaData.getPropertyColumn("b", "age"));
+    assertEquals(2, metaData.getPropertyColumn("c", "since"));
 
-    assertThat(metaData.getDirection("b"), is(ExpandDirection.OUT));
+    assertEquals(ExpandDirection.OUT, metaData.getDirection("b"));
   }
 
   @Test
@@ -83,62 +80,62 @@ public class EmbeddingMetaDataTest {
 
 
     EmbeddingMetaData copy = new EmbeddingMetaData(metaData);
-    assertThat(copy.getEntryColumn("a"), is(0));
-    assertThat(copy.getEntryColumn("e"), is(1));
-    assertThat(copy.getEntryColumn("b"), is(2));
-    assertThat(copy.getEntryColumn("f"), is(3));
-    assertThat(copy.getPropertyColumn("a", "age"), is(0));
-    assertThat(copy.getDirection("f"), is(ExpandDirection.OUT));
+    assertEquals(0, copy.getEntryColumn("a"));
+    assertEquals(1, copy.getEntryColumn("e"));
+    assertEquals(2, copy.getEntryColumn("b"));
+    assertEquals(3, copy.getEntryColumn("f"));
+    assertEquals(0, copy.getPropertyColumn("a", "age"));
+    assertEquals(ExpandDirection.OUT, copy.getDirection("f"));
 
     copy.setEntryColumn("c", EntryType.VERTEX, 4);
-    assertThat(copy.getEntryCount(), is(5));
-    assertThat(metaData.getEntryCount(), is(4));
+    assertEquals(5, copy.getEntryCount());
+    assertEquals(4, metaData.getEntryCount());
 
     copy.setEntryColumn("a", EntryType.VERTEX, 5);
-    assertThat(copy.getEntryColumn("a"), is(5));
-    assertThat(metaData.getEntryColumn("a"), is(0));
+    assertEquals(5, copy.getEntryColumn("a"));
+    assertEquals(0, metaData.getEntryColumn("a"));
 
     copy.setDirection("f", ExpandDirection.IN);
-    assertThat(copy.getDirection("f"), is(ExpandDirection.IN));
-    assertThat(metaData.getDirection("f"), is(ExpandDirection.OUT));
+    assertEquals(ExpandDirection.IN, copy.getDirection("f"));
+    assertEquals(ExpandDirection.OUT, metaData.getDirection("f"));
   }
 
   @Test
   public void testGetEntryCount() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    assertThat(metaData.getEntryCount(), is(0));
+    assertEquals(0, metaData.getEntryCount());
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    assertThat(metaData.getEntryCount(), is(1));
+    assertEquals(1, metaData.getEntryCount());
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    assertThat(metaData.getEntryCount(), is(1));
+    assertEquals(1, metaData.getEntryCount());
     metaData.setEntryColumn("b", EntryType.VERTEX, 1);
-    assertThat(metaData.getEntryCount(), is(2));
+    assertEquals(2, metaData.getEntryCount());
   }
 
   @Test
   public void testGetPropertyCount() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
-    assertThat(metaData.getPropertyCount(), is(0));
+    assertEquals(0, metaData.getPropertyCount());
     metaData.setPropertyColumn("a", "age", 0);
-    assertThat(metaData.getPropertyCount(), is(1));
+    assertEquals(1, metaData.getPropertyCount());
     metaData.setPropertyColumn("a", "age", 0);
-    assertThat(metaData.getPropertyCount(), is(1));
+    assertEquals(1, metaData.getPropertyCount());
     metaData.setPropertyColumn("a", "since", 1);
-    assertThat(metaData.getPropertyCount(), is(2));
+    assertEquals(2, metaData.getPropertyCount());
   }
 
   @Test
   public void testSetEntryColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    assertThat(metaData.getEntryColumn("a"), is(0));
+    assertEquals(0, metaData.getEntryColumn("a"));
   }
 
   @Test
   public void testGetEntryColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
-    assertThat(metaData.getEntryColumn("a"), is(0));
+    assertEquals(0, metaData.getEntryColumn("a"));
   }
 
   @Test
@@ -165,9 +162,9 @@ public class EmbeddingMetaDataTest {
     metaData.setEntryColumn("a", EntryType.VERTEX, 0);
     metaData.setEntryColumn("b", EntryType.EDGE, 1);
     metaData.setEntryColumn("c", EntryType.PATH, 2);
-    assertThat(metaData.getEntryType("a"), is(EntryType.VERTEX));
-    assertThat(metaData.getEntryType("b"), is(EntryType.EDGE));
-    assertThat(metaData.getEntryType("c"), is(EntryType.PATH));
+    assertEquals(EntryType.VERTEX, metaData.getEntryType("a"));
+    assertEquals(EntryType.EDGE, metaData.getEntryType("b"));
+    assertEquals(EntryType.PATH, metaData.getEntryType("c"));
   }
 
   @Test(expected = NoSuchElementException.class)
@@ -180,14 +177,14 @@ public class EmbeddingMetaDataTest {
   public void testSetPropertyColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setPropertyColumn("a", "age", 0);
-    assertThat(metaData.getPropertyColumn("a", "age"), is(0));
+    assertEquals(0, metaData.getPropertyColumn("a", "age"));
   }
 
   @Test
   public void testGetPropertyColumn() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setPropertyColumn("a", "age", 0);
-    assertThat(metaData.getPropertyColumn("a", "age"), is(0));
+    assertEquals(0, metaData.getPropertyColumn("a", "age"));
   }
 
   @Test(expected = NoSuchElementException.class)
@@ -200,7 +197,7 @@ public class EmbeddingMetaDataTest {
   public void testGetDirection() throws Exception {
     EmbeddingMetaData metaData = new EmbeddingMetaData();
     metaData.setDirection("a", ExpandDirection.OUT);
-    assertThat(metaData.getDirection("a"), is(ExpandDirection.OUT));
+    assertEquals(ExpandDirection.OUT, metaData.getDirection("a"));
   }
 
   @Test(expected = NoSuchElementException.class)
@@ -216,7 +213,7 @@ public class EmbeddingMetaDataTest {
     IntStream.range(0, expectedVariables.size())
       .forEach(i -> metaData.setEntryColumn(expectedVariables.get(i), EntryType.EDGE, i));
 
-    assertThat(metaData.getVariables(), is(expectedVariables));
+    assertEquals(expectedVariables, metaData.getVariables());
   }
 
   @Test
@@ -229,7 +226,7 @@ public class EmbeddingMetaDataTest {
     metaData.setPropertyColumn("a", "name", 1);
     metaData.setPropertyColumn("c", "age", 2);
 
-    assertThat(metaData.getVariablesWithProperties(), is(Arrays.asList("a", "c")));
+    assertEquals(Arrays.asList("a", "c"), metaData.getVariablesWithProperties());
   }
 
   @Test
@@ -244,7 +241,7 @@ public class EmbeddingMetaDataTest {
       .filter(var -> inputVariables.indexOf(var) % 2 == 0)
       .collect(Collectors.toList());
 
-    assertThat(metaData.getVertexVariables(), is(expectedVariables));
+    assertEquals(expectedVariables, metaData.getVertexVariables());
   }
 
   @Test
@@ -259,7 +256,7 @@ public class EmbeddingMetaDataTest {
       .filter(var -> inputVariables.indexOf(var) % 2 == 1)
       .collect(Collectors.toList());
 
-    assertThat(metaData.getEdgeVariables(), is(expectedVariables));
+    assertEquals(expectedVariables, metaData.getEdgeVariables());
   }
 
   @Test
@@ -274,7 +271,7 @@ public class EmbeddingMetaDataTest {
       .filter(var -> inputVariables.indexOf(var) % 2 == 1)
       .collect(Collectors.toList());
 
-    assertThat(metaData.getPathVariables(), is(expectedVariables));
+    assertEquals(expectedVariables, metaData.getPathVariables());
   }
 
   @Test
@@ -285,9 +282,9 @@ public class EmbeddingMetaDataTest {
     metaData.setPropertyColumn("a", "type", 2);
     metaData.setPropertyColumn("b", "age", 3);
 
-    assertThat(metaData.getPropertyKeys("a"), is(Arrays.asList("age", "name", "type")));
-    assertThat(metaData.getPropertyKeys("b"), is(Collections.singletonList("age")));
-    assertThat(metaData.getPropertyKeys("c"), is(Collections.emptyList()));
+    assertEquals(Arrays.asList("age", "name", "type"), metaData.getPropertyKeys("a"));
+    assertEquals(Collections.singletonList("age"), metaData.getPropertyKeys("b"));
+    assertEquals(Collections.emptyList(), metaData.getPropertyKeys("c"));
   }
 
   @Test
@@ -304,11 +301,11 @@ public class EmbeddingMetaDataTest {
     metaData3.setEntryColumn("b", EntryType.VERTEX, 0);
     metaData3.setPropertyColumn("b", "age", 0);
 
-    assertTrue(metaData1.equals(metaData1));
-    assertTrue(metaData1.equals(metaData2));
-    assertTrue(metaData2.equals(metaData1));
-    assertFalse(metaData2.equals(metaData3));
-    assertFalse(metaData3.equals(metaData2));
+    assertEquals(metaData1, metaData1);
+    assertEquals(metaData1, metaData2);
+    assertEquals(metaData2, metaData1);
+    assertNotEquals(metaData2, metaData3);
+    assertNotEquals(metaData3, metaData2);
   }
 
   @Test

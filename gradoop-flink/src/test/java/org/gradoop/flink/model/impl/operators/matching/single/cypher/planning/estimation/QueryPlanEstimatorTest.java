@@ -30,8 +30,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.qu
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf.FilterAndProjectVerticesNode;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
@@ -48,11 +47,11 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     QueryPlan queryPlan = new QueryPlan(nNode);
     QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
-    assertThat(estimator.getCardinality(), is(11L));
+    assertEquals(11L, estimator.getCardinality());
 
     queryPlan = new QueryPlan(mNode);
     estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
-    assertThat(estimator.getCardinality(), is(6L));
+    assertEquals(6L, estimator.getCardinality());
   }
 
   @Test
@@ -70,11 +69,11 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     QueryPlan queryPlan = new QueryPlan(eNode);
     QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
-    assertThat(estimator.getCardinality(), is(24L));
+    assertEquals(24L, estimator.getCardinality());
 
     queryPlan = new QueryPlan(fNode);
     estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
-    assertThat(estimator.getCardinality(), is(10L));
+    assertEquals(10L, estimator.getCardinality());
   }
 
   @Test
@@ -102,7 +101,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     QueryPlan plan = new QueryPlan(neJoin);
     QueryPlanEstimator estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(24L));
+    assertEquals(24L, estimator.getCardinality());
 
     // (n)-[e]->(m)
     JoinEmbeddingsNode nemJoin = new JoinEmbeddingsNode(neJoin, mNode, Lists.newArrayList("m"),
@@ -111,7 +110,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     plan = new QueryPlan(nemJoin);
     estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(24L));
+    assertEquals(24L, estimator.getCardinality());
 
     // (n)-[e]->(m)-[f]->
     JoinEmbeddingsNode nemfJoin = new JoinEmbeddingsNode(nemJoin, fNode, Lists.newArrayList("m"),
@@ -120,7 +119,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     plan = new QueryPlan(nemfJoin);
     estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(72L));
+    assertEquals(72L, estimator.getCardinality());
 
     // (n)-[e]->(m)-[f]->(o)
     JoinEmbeddingsNode nemfoJoin = new JoinEmbeddingsNode(nemfJoin, oNode, Lists.newArrayList("o"),
@@ -129,7 +128,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     plan = new QueryPlan(nemfoJoin);
     estimator = new QueryPlanEstimator(plan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(72L));
+    assertEquals(72L, estimator.getCardinality());
   }
 
   @Test
@@ -164,7 +163,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(42L));
+    assertEquals(42L, estimator.getCardinality());
   }
 
   @Test
@@ -183,7 +182,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
 
     QueryPlanEstimator estimator = new QueryPlanEstimator(queryPlan, queryHandler, STATS);
 
-    assertThat(estimator.getCardinality(), is(STATS.getVertexCount() * STATS.getVertexCount()));
+    assertEquals(STATS.getVertexCount() * STATS.getVertexCount(), estimator.getCardinality());
   }
 
 
@@ -226,8 +225,7 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     QueryPlanEstimator ce2dEstimator = new QueryPlanEstimator(ce2dPlan, queryHandler, STATS);
     QueryPlanEstimator crossEstimator = new QueryPlanEstimator(crossPlan, queryHandler, STATS);
 
-    assertThat(crossEstimator.getCardinality(), is(ae1bEstimator.getCardinality() *
-      ce2dEstimator.getCardinality()));
+    assertEquals(ae1bEstimator.getCardinality() * ce2dEstimator.getCardinality(), crossEstimator.getCardinality());
   }
 
 }

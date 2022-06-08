@@ -19,11 +19,8 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
-import org.hamcrest.core.Is;
 import org.testng.annotations.Test;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.AssertJUnit.*;
 import static org.testng.Assert.assertNotEquals;
 
@@ -32,8 +29,8 @@ public class GraphHeadTest {
   public void createWithIDTest() {
     GradoopId graphID = GradoopId.get();
     GraphHead g = new EPGMGraphHeadFactory().initGraphHead(graphID);
-    assertThat(g.getId(), is(graphID));
-    assertThat(g.getPropertyCount(), is(0));
+    assertEquals(graphID, g.getId());
+    assertEquals(0, g.getPropertyCount());
   }
 
   @Test
@@ -46,18 +43,18 @@ public class GraphHeadTest {
 
     GraphHead graphHead = new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
 
-    assertThat(graphHead.getId(), is(graphID));
+    assertEquals(graphID, graphHead.getId());
     assertEquals(label, graphHead.getLabel());
-    assertThat(graphHead.getPropertyCount(), is(2));
-    assertThat(graphHead.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
-    assertThat(graphHead.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
+    assertEquals(2, graphHead.getPropertyCount());
+    assertEquals("v1", graphHead.getPropertyValue("k1").getString());
+    assertEquals("v2", graphHead.getPropertyValue("k2").getString());
   }
 
   @Test
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
     GraphHead g = new EPGMGraphHeadFactory().initGraphHead(graphID);
-    assertThat(g.getLabel(), is(GradoopConstants.DEFAULT_GRAPH_LABEL));
+    assertEquals(GradoopConstants.DEFAULT_GRAPH_LABEL, g.getLabel());
   }
 
   @Test(expectedExceptions = NullPointerException.class)

@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
 
@@ -48,10 +47,10 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
-    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
-    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(2));
-    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(sourceVariable));
+    assertEquals(1, embeddingMetaData.getEntryColumn(edgeVariable));
+    assertEquals(2, embeddingMetaData.getEntryColumn(targetVariable));
+    assertEquals(0, embeddingMetaData.getPropertyKeys(edgeVariable).size());
   }
 
   @Test
@@ -63,10 +62,10 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
       null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
-    assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));
-    assertThat(embeddingMetaData.getEntryColumn(edgeVariable), is(1));
-    assertThat(embeddingMetaData.getEntryColumn(targetVariable), is(0));
-    assertThat(embeddingMetaData.getPropertyKeys(edgeVariable).size(), is(0));
+    assertEquals(0, embeddingMetaData.getEntryColumn(sourceVariable));
+    assertEquals(1, embeddingMetaData.getEntryColumn(edgeVariable));
+    assertEquals(0, embeddingMetaData.getEntryColumn(targetVariable));
+    assertEquals(0, embeddingMetaData.getPropertyKeys(edgeVariable).size());
   }
 
   @Test
@@ -98,9 +97,9 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
 
     List<Embedding> filteredEdges = node.execute().collect();
 
-    assertThat(filteredEdges.size(), is(1));
-    assertThat(filteredEdges.get(0).getId(0).equals(sourceId), is(true));
-    assertThat(filteredEdges.get(0).getId(1).equals(edge1Id), is(true));
-    assertThat(filteredEdges.get(0).getId(2).equals(targetId), is(true));
+    assertEquals(1, filteredEdges.size());
+    assertEquals(sourceId, filteredEdges.get(0).getId(0));
+    assertEquals(edge1Id, filteredEdges.get(0).getId(1));
+    assertEquals(targetId, filteredEdges.get(0).getId(2));
   }
 }

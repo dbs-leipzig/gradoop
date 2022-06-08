@@ -15,7 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradoop.flink.model.impl.operators.matching.common.debug.Printer;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
 
@@ -28,7 +29,7 @@ public class PrintVertexStep<K> extends Printer<VertexStep<K>, K> {
   /**
    * Logger
    */
-  private static Logger LOG = Logger.getLogger(PrintVertexStep.class);
+  private static Logger LOG = LogManager.getLogger(PrintVertexStep.class);
 
   /**
    * Constructor

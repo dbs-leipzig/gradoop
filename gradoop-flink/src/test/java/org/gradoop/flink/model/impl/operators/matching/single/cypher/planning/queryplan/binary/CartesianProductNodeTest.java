@@ -34,8 +34,7 @@ import static org.gradoop.common.GradoopTestUtils.call;
 
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.assertEmbeddingExists;
 import static org.gradoop.flink.model.impl.operators.matching.single.cypher.common.pojos.EmbeddingTestUtils.createEmbedding;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class CartesianProductNodeTest extends GradoopFlinkTestBase {
 
@@ -64,20 +63,20 @@ public class CartesianProductNodeTest extends GradoopFlinkTestBase {
 
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
 
-    assertThat(outputMetaData.getEntryCount(), is(6));
-    assertThat(outputMetaData.getEntryColumn("v1"), is(0));
-    assertThat(outputMetaData.getEntryColumn("e1"), is(1));
-    assertThat(outputMetaData.getEntryColumn("v2"), is(2));
-    assertThat(outputMetaData.getEntryColumn("v3"), is(3));
-    assertThat(outputMetaData.getEntryColumn("e2"), is(4));
-    assertThat(outputMetaData.getEntryColumn("v4"), is(5));
+    assertEquals(6, outputMetaData.getEntryCount());
+    assertEquals(0, outputMetaData.getEntryColumn("v1"));
+    assertEquals(1, outputMetaData.getEntryColumn("e1"));
+    assertEquals(2, outputMetaData.getEntryColumn("v2"));
+    assertEquals(3, outputMetaData.getEntryColumn("v3"));
+    assertEquals(4, outputMetaData.getEntryColumn("e2"));
+    assertEquals(5, outputMetaData.getEntryColumn("v4"));
 
-    assertThat(outputMetaData.getPropertyCount(), is(5));
-    assertThat(outputMetaData.getPropertyColumn("v1", "age"), is(0));
-    assertThat(outputMetaData.getPropertyColumn("e1", "since"), is(1));
-    assertThat(outputMetaData.getPropertyColumn("v3", "age"), is(2));
-    assertThat(outputMetaData.getPropertyColumn("e2", "since"), is(3));
-    assertThat(outputMetaData.getPropertyColumn("v4", "age"), is(4));
+    assertEquals(5, outputMetaData.getPropertyCount());
+    assertEquals(0, outputMetaData.getPropertyColumn("v1", "age"));
+    assertEquals(1, outputMetaData.getPropertyColumn("e1", "since"));
+    assertEquals(2, outputMetaData.getPropertyColumn("v3", "age"));
+    assertEquals(3, outputMetaData.getPropertyColumn("e2", "since"));
+    assertEquals(4, outputMetaData.getPropertyColumn("v4", "age"));
   }
 
   @Test
@@ -102,10 +101,10 @@ public class CartesianProductNodeTest extends GradoopFlinkTestBase {
     CartesianProductNode node = new CartesianProductNode(leftChild, rightChild,
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
-    assertThat(call(CartesianProductNode.class, node, "getDistinctVertexColumnsLeft"), is(asList(0, 2, 4)));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctVertexColumnsRight"), is(asList(0, 2, 4)));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList(1, 3)));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctEdgeColumnsRight"), is(asList(1, 3)));
+    assertEquals(asList(0, 2, 4), call(CartesianProductNode.class, node, "getDistinctVertexColumnsLeft"));
+    assertEquals(asList(0, 2, 4), call(CartesianProductNode.class, node, "getDistinctVertexColumnsRight"));
+    assertEquals(asList(1, 3), call(CartesianProductNode.class, node, "getDistinctEdgeColumnsLeft"));
+    assertEquals(asList(1, 3), call(CartesianProductNode.class, node, "getDistinctEdgeColumnsRight"));
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
@@ -131,10 +130,10 @@ public class CartesianProductNodeTest extends GradoopFlinkTestBase {
     CartesianProductNode node = new CartesianProductNode(leftChild, rightChild,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.HOMOMORPHISM);
 
-    assertThat(call(CartesianProductNode.class, node, "getDistinctVertexColumnsLeft"), is(asList()));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctVertexColumnsRight"), is(asList()));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctEdgeColumnsLeft"), is(asList()));
-    assertThat(call(CartesianProductNode.class, node, "getDistinctEdgeColumnsRight"), is(asList()));
+    assertEquals(asList(), call(CartesianProductNode.class, node, "getDistinctVertexColumnsLeft"));
+    assertEquals(asList(), call(CartesianProductNode.class, node, "getDistinctVertexColumnsRight"));
+    assertEquals(asList(), call(CartesianProductNode.class, node, "getDistinctEdgeColumnsLeft"));
+    assertEquals(asList(), call(CartesianProductNode.class, node, "getDistinctEdgeColumnsRight"));
   }
 
   @Test
@@ -195,7 +194,7 @@ public class CartesianProductNodeTest extends GradoopFlinkTestBase {
 
     DataSet<Embedding> result = node.execute();
 
-    assertThat(result.count(), is(4L));
+    assertEquals(4L, result.count());
 
     assertEmbeddingExists(result, a, f, g, h);
     assertEmbeddingExists(result, b, f, g, h);

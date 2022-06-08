@@ -15,10 +15,8 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 
@@ -32,7 +30,6 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
@@ -57,10 +54,10 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
 
     renameFunction.apply(graphHead, graphHead);
 
-    assertThat(graphHead.getPropertyCount(), is(2));
+    assertEquals(2, graphHead.getPropertyCount());
     assertEquals(label, graphHead.getLabel());
-    assertThat(graphHead.getPropertyValue("new_k1").toString(), Is.<Object>is("v1"));
-    assertThat(graphHead.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", graphHead.getPropertyValue("new_k1").toString());
+    assertEquals("v2", graphHead.getPropertyValue("k2").toString());
     assertNull(graphHead.getPropertyValue("k1"));
   }
 
@@ -86,10 +83,10 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
 
     renameFunction.apply(edge, edge);
 
-    assertThat(edge.getPropertyCount(), is(2));
+    assertEquals(2, edge.getPropertyCount());
     assertEquals(label, edge.getLabel());
-    assertThat(edge.getPropertyValue("new_k1").toString(), Is.<Object>is("v1"));
-    assertThat(edge.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", edge.getPropertyValue("new_k1").toString());
+    assertEquals("v2", edge.getPropertyValue("k2").toString());
     assertNull(edge.getPropertyValue("k1"));
   }
 
@@ -113,10 +110,10 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
 
     renameFunction.apply(vertex, vertex);
 
-    assertThat(vertex.getPropertyCount(), is(2));
+    assertEquals(2, vertex.getPropertyCount());
     assertEquals(label, vertex.getLabel());
-    assertThat(vertex.getPropertyValue("new_k1").toString(), Is.<Object>is("v1"));
-    assertThat(vertex.getPropertyValue("k2").toString(), Is.<Object>is("v2"));
+    assertEquals("v1", vertex.getPropertyValue("new_k1").toString());
+    assertEquals("v2", vertex.getPropertyValue("k2").toString());
     assertNull(vertex.getPropertyValue("k1"));
   }
 }

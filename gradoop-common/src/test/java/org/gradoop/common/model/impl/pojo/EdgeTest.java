@@ -20,11 +20,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
-import org.hamcrest.core.Is;
 import org.testng.annotations.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -36,11 +33,11 @@ public class EdgeTest {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     Edge e = new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
-    assertThat(e.getId(), is(edgeId));
-    assertThat(e.getSourceId(), is(sourceId));
-    assertThat(e.getTargetId(), is(targetId));
-    assertThat(e.getPropertyCount(), is(0));
-    assertThat(e.getGraphCount(), is(0));
+    assertEquals(edgeId, e.getId());
+    assertEquals(sourceId, e.getSourceId());
+    assertEquals(targetId, e.getTargetId());
+    assertEquals(0, e.getPropertyCount());
+    assertEquals(0, e.getGraphCount());
   }
 
   @Test
@@ -58,14 +55,14 @@ public class EdgeTest {
 
     Edge edge = new EPGMEdgeFactory().initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
-    assertThat(edge.getId(), is(edgeId));
+    assertEquals(edgeId, edge.getId());
     assertEquals(label, edge.getLabel());
-    assertThat(edge.getSourceId(), is(sourceId));
-    assertThat(edge.getTargetId(), is(targetId));
-    assertThat(edge.getPropertyCount(), is(2));
-    assertThat(edge.getPropertyValue("k1").getString(), Is.<Object>is("v1"));
-    assertThat(edge.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
-    assertThat(edge.getGraphCount(), is(2));
+    assertEquals(sourceId, edge.getSourceId());
+    assertEquals(targetId, edge.getTargetId());
+    assertEquals(2, edge.getPropertyCount());
+    assertEquals("v1", edge.getPropertyValue("k1").getString());
+    assertEquals("v2", edge.getPropertyValue("k2").getString());
+    assertEquals(2, edge.getGraphCount());
 
     for (GradoopId graphId : graphIds) {
       assertTrue(edge.getGraphIds().contains(graphId));
@@ -79,7 +76,7 @@ public class EdgeTest {
     GradoopId targetId = GradoopId.get();
     Edge e =
       new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
-    assertThat(e.getLabel(), is(GradoopConstants.DEFAULT_EDGE_LABEL));
+    assertEquals(GradoopConstants.DEFAULT_EDGE_LABEL, e.getLabel());
   }
 
   @Test(expectedExceptions = NullPointerException.class)

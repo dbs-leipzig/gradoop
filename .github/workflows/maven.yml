@@ -19,9 +19,9 @@ jobs:
         git init
         git remote add origin https://github.com/cdarlint/winutils
         git config core.sparseCheckout true
-        echo "hadoop-3.2.1" > .git\info\sparse-checkout
+        echo "hadoop-3.2.2" > .git\info\sparse-checkout
         git pull origin master
-        echo "HADOOP_HOME=C:\winutils\hadoop-3.2.1" >> $env:GITHUB_ENV
+        echo "HADOOP_HOME=C:\winutils\hadoop-3.2.2" >> $env:GITHUB_ENV
         echo "PATH=$env:PATH;$env:HADOOP_HOME\bin" >> $env:GITHUB_ENV
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
