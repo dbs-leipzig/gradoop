@@ -136,8 +136,8 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,Ti
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping.keys,TimeStampKeyFunction,53,144,4,25,4,32,4,17,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot,Snapshot,5,46,0,0,2,9,1,2,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.snapshot.functions,ByTemporalPredicate,0,32,0,0,0,6,0,2,0,2
-Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVEdge,20,35,0,0,5,16,5,9,5,9
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVVertex,12,27,0,0,3,12,3,7,3,7
+Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVEdge,20,35,0,0,5,16,5,9,5,9
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.tuples,TemporalCSVGraphHead,8,23,0,0,2,10,2,6,2,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation,BoundsInference,74,1579,23,169,10,262,18,101,0,23
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.transformation,Subsumption.new Comparator() {...},0,33,0,2,0,5,0,3,0,2
