@@ -1,0 +1,19 @@
+[#1559] add unit-tests
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Tue Aug 2 11:06:54 2022 +0200
+#
+# interactive rebase in progress; onto 5f1b5d5a004
+# Last commands done (3 commands done):
+#    reword dc25f24377f add help functions
+#    reword 22c9104636f add unit-tests
+# No commands remaining.
+# You are currently editing a commit while rebasing branch '#1559_min_max_avg_degree_evolution' on '5f1b5d5a004'.
+#
+# Changes to be committed:
+#	new file:   gradoop-temporal/src/test/java/org/gradoop/temporal/model/impl/operators/metric/AvgDegreeEvolutionTest.java
+#	new file:   gradoop-temporal/src/test/java/org/gradoop/temporal/model/impl/operators/metric/MaxDegreeEvolutionTest.java
+#	new file:   gradoop-temporal/src/test/java/org/gradoop/temporal/model/impl/operators/metric/MinDegreeEvolutionTest.java
+#
