@@ -85,7 +85,7 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
     public VertexDegree degreeType;
 
     /**
-     * The expected degree evolution fo the given type.
+     * The expected degree evolution for the given type.
      */
     @Parameterized.Parameter(1)
     public List<Tuple2<Long, Integer>> expectedDegrees;
@@ -109,7 +109,7 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
     }
 
     /**
-     * Set up the test graph an create the id-label mapping.
+     * Set up the test graph and create the id-label mapping.
      *
      * @throws Exception in case of an error
      */

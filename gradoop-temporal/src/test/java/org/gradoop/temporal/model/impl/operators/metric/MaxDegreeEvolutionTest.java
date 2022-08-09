@@ -56,7 +56,7 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
         // IN DEGREES
         EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
         EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 1));
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 2));
+        EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 2)); //4,1
         EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 1));
         EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 1));
         EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 1));
@@ -64,7 +64,7 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
         // OUT DEGREES
         EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
         EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 1));
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 2));
+        EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 2)); //4,1
         EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 1));
         EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 1));
         EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 1));
@@ -72,9 +72,9 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
         // DEGREES
         EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
         EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 1));
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 3));
+        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 3)); // 4,2
         EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 1));
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 2));
+        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 2)); // 6,1
         EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 1));
     }
 
@@ -85,7 +85,7 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
     public VertexDegree degreeType;
 
     /**
-     * The expected degree evolution fo the given type.
+     * The expected degree evolution for the given type.
      */
     @Parameterized.Parameter(1)
     public List<Tuple2<Long, Integer>> expectedDegrees;
@@ -109,7 +109,7 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
     }
 
     /**
-     * Set up the test graph an create the id-label mapping.
+     * Set up the test graph and create the id-label mapping.
      *
      * @throws Exception in case of an error
      */
@@ -137,6 +137,8 @@ public class MaxDegreeEvolutionTest extends TemporalGradoopTestBase {
 
         resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
         getExecutionEnvironment().execute();
+
+        System.out.println(resultCollection);
 
         assertTrue(resultCollection.containsAll(expectedDegrees));
         assertTrue(expectedDegrees.containsAll(resultCollection));

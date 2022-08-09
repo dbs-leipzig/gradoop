@@ -23,6 +23,7 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A group reduce function that merges all Tuples (vId, degreeTree) to a dataset of tuples (time, aggDegree)
@@ -51,7 +52,7 @@ public class GroupDegreeTreesToAggregateDegrees
         List<Tuple1<Long>> tuples;
         try {
             tuples = timePoints.collect();
-            this.timePoints = null;
+            this.timePoints = new TreeSet<>();
 
             for (int i = 0; i < timePoints.count(); i = i + 1) {
                 this.timePoints.add(tuples.get(i).getField(0));
