@@ -54,9 +54,9 @@ public class DegreeRangeEvolutionTest extends TemporalGradoopTestBase {
 
   static {
     // IN DEGREES
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0)); // nov= 4
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 1)); // nov=4, min=0, max=1
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 2)); //
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 1));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 2));
     EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 1));
     EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 1));
     EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 1));
@@ -72,8 +72,8 @@ public class DegreeRangeEvolutionTest extends TemporalGradoopTestBase {
     // DEGREES
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 1));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 2)); //4,3 //flatmap does not work
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 0)); //5,1 // calculates min as 0; the number of vertices not correct
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 3));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 1));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 2));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 1));
   }
@@ -137,8 +137,6 @@ public class DegreeRangeEvolutionTest extends TemporalGradoopTestBase {
 
     resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
     getExecutionEnvironment().execute();
-
-    System.out.println(resultCollection);
 
     assertTrue(resultCollection.containsAll(expectedDegrees));
     assertTrue(expectedDegrees.containsAll(resultCollection));

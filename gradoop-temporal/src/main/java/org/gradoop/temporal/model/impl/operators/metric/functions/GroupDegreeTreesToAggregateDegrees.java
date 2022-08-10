@@ -114,27 +114,27 @@ public class GroupDegreeTreesToAggregateDegrees
       Optional<Integer> opt;
       Optional<Integer> opt2;
       switch (aggregateType) {
-        case MIN:
-          opt = vertexDegrees.values().stream().reduce(Math::min);
-          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-          break;
-        case MAX:
-          opt = vertexDegrees.values().stream().reduce(Math::max);
-          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-          break;
-        case AVG:
-          opt = vertexDegrees.values().stream().reduce(Math::addExact);
-          opt.ifPresent(integer -> collector.collect(
-                new Tuple2<>(timePoint, (int) Math.ceil((double) integer / (double) numberOfVertices))));
-          break;
-        case RANGE:
-          opt = vertexDegrees.values().stream().reduce(Math::max);
-          opt2 = vertexDegrees.values().stream().reduce(Math::min);
-          opt.flatMap(max -> opt2.map(min -> max - min));
-          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-          break;
-        default:
-          throw new IllegalArgumentException("Aggregate type not specified.");
+      case MIN:
+        opt = vertexDegrees.values().stream().reduce(Math::min);
+        opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+        break;
+      case MAX:
+        opt = vertexDegrees.values().stream().reduce(Math::max);
+        opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+        break;
+      case AVG:
+        opt = vertexDegrees.values().stream().reduce(Math::addExact);
+        opt.ifPresent(integer -> collector.collect(
+              new Tuple2<>(timePoint, (int) Math.ceil((double) integer / (double) numberOfVertices))));
+        break;
+      case RANGE:
+        opt = vertexDegrees.values().stream().reduce(Math::max);
+        opt2 = vertexDegrees.values().stream().reduce(Math::min);
+        opt.flatMap(max -> opt2.map(min -> max - min));
+        opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+        break;
+      default:
+        throw new IllegalArgumentException("Aggregate type not specified.");
       }
     }
   }

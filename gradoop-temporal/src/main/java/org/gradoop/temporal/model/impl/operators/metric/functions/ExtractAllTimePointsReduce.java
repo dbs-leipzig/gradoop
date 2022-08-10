@@ -37,8 +37,8 @@ public class ExtractAllTimePointsReduce implements GroupReduceFunction<Tuple2<Gr
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable, Collector<Tuple1<Long>> collector)
-          throws Exception {
+  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+                     Collector<Tuple1<Long>> collector) throws Exception {
     SortedSet<Long> timePoints = new TreeSet<>();
 
     for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
