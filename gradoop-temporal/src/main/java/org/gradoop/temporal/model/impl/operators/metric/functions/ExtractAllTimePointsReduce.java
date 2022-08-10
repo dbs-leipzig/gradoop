@@ -30,20 +30,24 @@ import java.util.TreeSet;
  */
 public class ExtractAllTimePointsReduce implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple1<Long>> {
 
-    public ExtractAllTimePointsReduce() {
+  /**
+   * Creates an instance of the group reduce function.
+   */
+  public ExtractAllTimePointsReduce() {
+  }
+
+  @Override
+  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+                     Collector<Tuple1<Long>> collector) throws Exception {
+    SortedSet<Long> timePoints = new TreeSet<>();
+
+    for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
+      timePoints.addAll(tuple.f1.keySet());
     }
 
-    @Override
-    public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable, Collector<Tuple1<Long>> collector) throws Exception {
-        SortedSet<Long> timePoints = new TreeSet<>();
-
-        for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
-            timePoints.addAll(tuple.f1.keySet());
-        }
-
-        for (Long timePoint: timePoints) {
-            collector.collect(new Tuple1<>(timePoint));
-        }
-
+    for (Long timePoint : timePoints) {
+      collector.collect(new Tuple1<>(timePoint));
     }
+
+  }
 }
