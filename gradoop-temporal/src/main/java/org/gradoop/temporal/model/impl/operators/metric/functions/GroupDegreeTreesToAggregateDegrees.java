@@ -22,114 +22,120 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.TreeMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A group reduce function that merges all Tuples (vId, degreeTree) to a dataset of tuples (time, aggDegree)
  * that represents the aggregated degree value for the whole graph at the given time.
  */
 public class GroupDegreeTreesToAggregateDegrees
-        implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Integer>> {
+      implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Integer>> {
 
-    /**
-     * The aggregate type to use (min,max,avg).
-     */
-    private final AggregateType aggregateType;
-    /**
-     * The timestamps where at least one vertex degree changes.
-     */
-    private final SortedSet<Long> timePoints;
+  /**
+   * The aggregate type to use (min,max,avg).
+   */
+  private final AggregateType aggregateType;
+  /**
+   * The timestamps where at least one vertex degree changes.
+   */
+  private final SortedSet<Long> timePoints;
 
-    /**
-     * Creates an instance of this group reduce function.
-     *
-     * @param aggregateType the aggregate type to use (min,max,avg).
-     */
-    public GroupDegreeTreesToAggregateDegrees(AggregateType aggregateType, DataSet<Tuple1<Long>> timePoints) {
-        this.aggregateType = aggregateType;
+  /**
+   * Creates an instance of this group reduce function.
+   *
+   * @param aggregateType the aggregate type to use (min,max,avg).
+   * @param timePoints the time points were vertex degrees change.
+   */
+  public GroupDegreeTreesToAggregateDegrees(AggregateType aggregateType, DataSet<Tuple1<Long>> timePoints) {
+    this.aggregateType = aggregateType;
 
-        List<Tuple1<Long>> tuples;
-        try {
-            tuples = timePoints.collect();
-            this.timePoints = new TreeSet<>();
+    List<Tuple1<Long>> tuples;
+    try {
+      tuples = timePoints.collect();
+      this.timePoints = new TreeSet<>();
 
-            for (int i = 0; i < timePoints.count(); i = i + 1) {
-                this.timePoints.add(tuples.get(i).getField(0));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+      for (int i = 0; i < timePoints.count(); i = i + 1) {
+        this.timePoints.add(tuples.get(i).getField(0));
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
 
-    @Override
-    public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
-                       Collector<Tuple2<Long, Integer>> collector) throws Exception {
+  }
 
-        // init necessary maps and set
-        HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
-        HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
+  @Override
+  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+                     Collector<Tuple2<Long, Integer>> collector) throws Exception {
 
-        // convert the iterables to a hashmap and remember all possible timestamps
-        for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
-            degreeTrees.put(tuple.f0, tuple.f1);
-        }
+    // init necessary maps and set
+    HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
+    HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
 
-        int numberOfVertices = degreeTrees.size();
-
-        // Add default times
-        timePoints.add(Long.MIN_VALUE);
-
-        for (Long timePoint : timePoints) {
-            // skip last default time
-            if (Long.MAX_VALUE == timePoint) {
-                continue;
-            }
-            // Iterate over all vertices
-            for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
-                // Make sure the vertex is registered in the current vertexDegrees capture
-                if (!vertexDegrees.containsKey(entry.getKey())) {
-                    vertexDegrees.put(entry.getKey(), 0);
-                }
-
-                // Check if timestamp is in tree, if not, take the lower key
-                if (entry.getValue().containsKey(timePoint)) {
-                    vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
-                } else {
-                    Long lowerKey = entry.getValue().lowerKey(timePoint);
-                    if (lowerKey != null) {
-                        vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
-                    }
-                }
-            }
-
-            // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
-            Optional<Integer> opt;
-            Optional<Integer> opt2;
-            switch (aggregateType) {
-                case MIN:
-                    opt = vertexDegrees.values().stream().reduce(Math::min);
-                    opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-                    break;
-                case MAX:
-                    opt = vertexDegrees.values().stream().reduce(Math::max);
-                    opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-                    break;
-                case AVG:
-                    opt = vertexDegrees.values().stream().reduce(Math::addExact);
-                    opt.ifPresent(integer -> collector.collect(
-                            new Tuple2<>(timePoint, (int) Math.ceil((double) integer / (double) numberOfVertices))));
-                    break;
-                case RANGE:
-                    opt = vertexDegrees.values().stream().reduce(Math::max);
-                    opt2 = vertexDegrees.values().stream().reduce(Math::min);
-                    opt.flatMap(max -> opt2.map(min -> max - min));
-                    opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Aggregate type not specified.");
-            }
-        }
+    // convert the iterables to a hashmap and remember all possible timestamps
+    for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
+      degreeTrees.put(tuple.f0, tuple.f1);
     }
+
+    int numberOfVertices = degreeTrees.size();
+
+    // Add default times
+    timePoints.add(Long.MIN_VALUE);
+
+    for (Long timePoint : timePoints) {
+      // skip last default time
+      if (Long.MAX_VALUE == timePoint) {
+        continue;
+      }
+      // Iterate over all vertices
+      for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
+        // Make sure the vertex is registered in the current vertexDegrees capture
+        if (!vertexDegrees.containsKey(entry.getKey())) {
+          vertexDegrees.put(entry.getKey(), 0);
+        }
+
+        // Check if timestamp is in tree, if not, take the lower key
+        if (entry.getValue().containsKey(timePoint)) {
+          vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
+        } else {
+          Long lowerKey = entry.getValue().lowerKey(timePoint);
+          if (lowerKey != null) {
+            vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
+          }
+        }
+      }
+
+      // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
+      Optional<Integer> opt;
+      Optional<Integer> opt2;
+      switch (aggregateType) {
+        case MIN:
+          opt = vertexDegrees.values().stream().reduce(Math::min);
+          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+          break;
+        case MAX:
+          opt = vertexDegrees.values().stream().reduce(Math::max);
+          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+          break;
+        case AVG:
+          opt = vertexDegrees.values().stream().reduce(Math::addExact);
+          opt.ifPresent(integer -> collector.collect(
+                new Tuple2<>(timePoint, (int) Math.ceil((double) integer / (double) numberOfVertices))));
+          break;
+        case RANGE:
+          opt = vertexDegrees.values().stream().reduce(Math::max);
+          opt2 = vertexDegrees.values().stream().reduce(Math::min);
+          opt.flatMap(max -> opt2.map(min -> max - min));
+          opt.ifPresent(integer -> collector.collect(new Tuple2<>(timePoint, integer)));
+          break;
+        default:
+          throw new IllegalArgumentException("Aggregate type not specified.");
+      }
+    }
+  }
 }
