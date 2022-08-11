@@ -42,40 +42,40 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
   /**
    * The expected in-degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Integer>> EXPECTED_IN_DEGREES = new ArrayList<>();
+  private static final List<Tuple2<Long, Double>> EXPECTED_IN_DEGREES = new ArrayList<>();
   /**
    * The expected out-degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Integer>> EXPECTED_OUT_DEGREES = new ArrayList<>();
+  private static final List<Tuple2<Long, Double>> EXPECTED_OUT_DEGREES = new ArrayList<>();
   /**
    * The expected degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Integer>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
+  private static final List<Tuple2<Long, Double>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
 
   static {
     // IN DEGREES
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 1));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 1));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 1));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 1));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 1));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 0.25));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 1.0));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 0.5));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 0.5));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 0.25));
 
     // OUT DEGREES
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 1));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 1));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 1));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 1));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 1));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 0.25));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 1.0));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 0.5));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 0.5));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 0.25));
 
     // DEGREES
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 1));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 2));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 1));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 1));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 1));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 0.4));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 1.6));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 0.8));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 0.8));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 0.4));
   }
 
   /**
@@ -130,9 +130,9 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
    */
   @Test
   public void testAvgDegree() throws Exception {
-    Collection<Tuple2<Long, Integer>> resultCollection = new ArrayList<>();
+    Collection<Tuple2<Long, Double>> resultCollection = new ArrayList<>();
 
-    final DataSet<Tuple2<Long, Integer>> resultDataSet = testGraph
+    final DataSet<Tuple2<Long, Double>> resultDataSet = testGraph
         .callForValue(new AvgDegreeEvolution(degreeType, TimeDimension.VALID_TIME));
 
     resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
