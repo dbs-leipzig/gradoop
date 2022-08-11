@@ -39,108 +39,106 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class DegreeVarianceEvolutionTest extends TemporalGradoopTestBase {
-    /**
-     * The expected in-degrees for each vertex label.
-     */
-    private static final List<Tuple2<Long, Double>> EXPECTED_IN_DEGREES = new ArrayList<>();
-    /**
-     * The expected out-degrees for each vertex label.
-     */
-    private static final List<Tuple2<Long, Double>> EXPECTED_OUT_DEGREES = new ArrayList<>();
-    /**
-     * The expected degrees for each vertex label.
-     */
-    private static final List<Tuple2<Long, Double>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
+  /**
+   * The expected in-degrees for each vertex label.
+   */
+  private static final List<Tuple2<Long, Double>> EXPECTED_IN_DEGREES = new ArrayList<>();
+  /**
+   * The expected out-degrees for each vertex label.
+   */
+  private static final List<Tuple2<Long, Double>> EXPECTED_OUT_DEGREES = new ArrayList<>();
+  /**
+   * The expected degrees for each vertex label.
+   */
+  private static final List<Tuple2<Long, Double>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
 
-    static {
-        // IN DEGREES
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 0.25)); // 0.1875
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 0.56)); // 0.5
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 0.25));
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 0.25));
-        EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 0.1875));
+  static {
+    // IN DEGREES
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 0.1875));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 0.5));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 0.25));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 0.25));
+    EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 0.1875));
 
-        // OUT DEGREES
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 0.25)); // 0.1875
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 0.608)); // 0.5
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 0.25));
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 0.25));
-        EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 0.1875));
+    // OUT DEGREES
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 0.1875));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 0.5));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 0.25));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 0.25));
+    EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 0.1875));
 
-        // DEGREES
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 0.0)); // 0.24000000000000005
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 0.8)); // 0.64
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 0.0)); // 0.16
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 0.5)); // 0.56
-        EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 0.25)); // 0.24000000000000005
-    }
+    // DEGREES
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 0.24000000000000005));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 0.64));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 0.16));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 0.56));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 0.24000000000000005));
+  }
 
-    /**
-     * The degree type to test.
-     */
-    @Parameterized.Parameter(0)
-    public VertexDegree degreeType;
+  /**
+   * The degree type to test.
+   */
+  @Parameterized.Parameter(0)
+  public VertexDegree degreeType;
 
-    /**
-     * The expected degree variance evolution for the given type.
-     */
-    @Parameterized.Parameter(1)
-    public List<Tuple2<Long, Double>> expectedDegrees;
+  /**
+   * The expected degree variance evolution for the given type.
+   */
+  @Parameterized.Parameter(1)
+  public List<Tuple2<Long, Double>> expectedDegrees;
 
-    /**
-     * The temporal graph to test the operator.
-     */
-    TemporalGraph testGraph;
+  /**
+   * The temporal graph to test the operator.
+   */
+  TemporalGraph testGraph;
 
-    /**
-     * The parameters to test the operator.
-     *
-     * @return three different vertex degree types with its corresponding expected degree evolution.
-     */
-    @Parameterized.Parameters(name = "Test degree type {0}.")
-    public static Iterable<Object[]> parameters() {
-        return Arrays.asList(
-                new Object[] {VertexDegree.IN, EXPECTED_IN_DEGREES},
-                new Object[] {VertexDegree.OUT, EXPECTED_OUT_DEGREES},
-                new Object[] {VertexDegree.BOTH, EXPECTED_BOTH_DEGREES});
-    }
+  /**
+   * The parameters to test the operator.
+   *
+   * @return three different vertex degree types with its corresponding expected degree evolution.
+   */
+  @Parameterized.Parameters(name = "Test degree type {0}.")
+  public static Iterable<Object[]> parameters() {
+    return Arrays.asList(
+    new Object[]{VertexDegree.IN, EXPECTED_IN_DEGREES},
+    new Object[]{VertexDegree.OUT, EXPECTED_OUT_DEGREES},
+    new Object[]{VertexDegree.BOTH, EXPECTED_BOTH_DEGREES});
+  }
 
-    /**
-     * Set up the test graph and create the id-label mapping.
-     *
-     * @throws Exception in case of an error
-     */
-    @Before
-    public void setUp() throws Exception {
-        testGraph = getTestGraphWithValues();
-        Collection<Tuple2<GradoopId, String>> idLabelCollection = new HashSet<>();
-        testGraph.getVertices().map(v -> new Tuple2<>(v.getId(), v.getLabel()))
-                .returns(new TypeHint<Tuple2<GradoopId, String>>() {
-                }).output(new LocalCollectionOutputFormat<>(idLabelCollection));
-        getExecutionEnvironment().execute();
-    }
+  /**
+   * Set up the test graph and create the id-label mapping.
+   *
+   * @throws Exception in case of an error
+   */
+  @Before
+  public void setUp() throws Exception {
+    testGraph = getTestGraphWithValues();
+    Collection<Tuple2<GradoopId, String>> idLabelCollection = new HashSet<>();
+    testGraph.getVertices().map(v -> new Tuple2<>(v.getId(), v.getLabel()))
+    .returns(new TypeHint<Tuple2<GradoopId, String>>() {
+    }).output(new LocalCollectionOutputFormat<>(idLabelCollection));
+    getExecutionEnvironment().execute();
+  }
 
-    /**
-     * Test the degree variance evolution operator.
-     *
-     * @throws Exception in case of an error.
-     */
-    @Test
-    public void testDegreeVariance() throws Exception {
-        Collection<Tuple2<Long, Double>> resultCollection = new ArrayList<>();
+  /**
+   * Test the degree variance evolution operator.
+   *
+   * @throws Exception in case of an error.
+   */
+  @Test
+  public void testDegreeVariance() throws Exception {
+    Collection<Tuple2<Long, Double>> resultCollection = new ArrayList<>();
 
-        final DataSet<Tuple2<Long, Double>> resultDataSet = testGraph
-                .callForValue(new DegreeVarianceEvolution(degreeType, TimeDimension.VALID_TIME));
+    final DataSet<Tuple2<Long, Double>> resultDataSet = testGraph
+    .callForValue(new DegreeVarianceEvolution(degreeType, TimeDimension.VALID_TIME));
 
-        resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
-        getExecutionEnvironment().execute();
+    resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
+    getExecutionEnvironment().execute();
 
-        System.out.println(resultCollection);
-
-        assertTrue(resultCollection.containsAll(expectedDegrees));
-        assertTrue(expectedDegrees.containsAll(resultCollection));
-    }
+    assertTrue(resultCollection.containsAll(expectedDegrees));
+    assertTrue(expectedDegrees.containsAll(resultCollection));
+  }
 }
