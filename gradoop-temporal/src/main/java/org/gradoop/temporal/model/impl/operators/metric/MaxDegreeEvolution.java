@@ -16,9 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
@@ -27,11 +25,9 @@ import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTre
 import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
 import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
 import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.ExtractAllTimePointsReduce;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregateType;
 
 import java.util.Objects;
-import java.util.TreeMap;
 
 /**
  * Operator that calculates the maximum degree evolution of all vertices of a temporal graph for the
@@ -64,7 +60,7 @@ public class MaxDegreeEvolution
 
   @Override
   public DataSet<Tuple2<Long, Integer>> execute(TemporalGraph graph) {
-    DataSet<Tuple2<GradoopId, TreeMap<Long, Integer>>> absoluteDegreeTrees = graph.getEdges()
+    return graph.getEdges()
         // 1) Extract vertex id(s) and corresponding time intervals
         .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
         // 2) Group them by the vertex id
@@ -72,16 +68,8 @@ public class MaxDegreeEvolution
         // 3) For each vertex id, build a degree tree data structure
         .reduceGroup(new BuildTemporalDegreeTree())
         // 4) Transform each tree to aggregated evolution
-        .map(new TransformDeltaToAbsoluteDegreeTree());
-
-    DataSet<Tuple1<Long>> timePoints = absoluteDegreeTrees
-        // 5) extract all timestamps where degree of any vertex changes
-        .reduceGroup(new ExtractAllTimePointsReduce())
-        .distinct();
-
-    return absoluteDegreeTrees
-        // 6) Merge trees together and calculate aggregation
-        .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.MAX, timePoints));
-
+        .map(new TransformDeltaToAbsoluteDegreeTree())
+        // 5) Merge trees together and calculate aggregation
+        .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.MAX));
   }
 }
