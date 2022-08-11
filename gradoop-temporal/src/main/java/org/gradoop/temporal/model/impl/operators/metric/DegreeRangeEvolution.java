@@ -16,14 +16,11 @@
 package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.ExtractAllTimePointsReduce;
 import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAggregateDegrees;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregateType;
 import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
@@ -31,7 +28,6 @@ import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalD
 import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
 
 import java.util.Objects;
-import java.util.TreeMap;
 
 /**
  * Operator that calculates the degree range evolution of a temporal graph for the
@@ -61,7 +57,7 @@ public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<Tempo
 
   @Override
   public DataSet<Tuple2<Long, Integer>> execute(TemporalGraph graph) {
-    DataSet<Tuple2<GradoopId, TreeMap<Long, Integer>>> absoluteDegreeTrees = graph.getEdges()
+    return graph.getEdges()
           // 1) Extract vertex id(s) and corresponding time intervals
           .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
           // 2) Group them by the vertex id
@@ -69,16 +65,7 @@ public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<Tempo
           // 3) For each vertex id, build a degree tree data structure
           .reduceGroup(new BuildTemporalDegreeTree())
           // 4) Transform each tree to aggregated evolution
-          .map(new TransformDeltaToAbsoluteDegreeTree());
-
-    DataSet<Tuple1<Long>> timePoints = absoluteDegreeTrees
-          // 5) extract all timestamps where degree of any vertex changes
-          .reduceGroup(new ExtractAllTimePointsReduce())
-          .distinct();
-
-    return absoluteDegreeTrees
-          // join with interval degree mappings
-          // 6) Merge trees together and calculate aggregation
-          .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.RANGE, timePoints));
+          .map(new TransformDeltaToAbsoluteDegreeTree())
+          .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.RANGE));
   }
 }

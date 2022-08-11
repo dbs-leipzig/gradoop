@@ -16,8 +16,6 @@
 package org.gradoop.temporal.model.impl.operators.metric.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -25,7 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import java.util.TreeMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,32 +38,14 @@ public class GroupDegreeTreesToAggregateDegrees
    * The aggregate type to use (min,max,avg).
    */
   private final AggregateType aggregateType;
-  /**
-   * The timestamps where at least one vertex degree changes.
-   */
-  private final SortedSet<Long> timePoints;
 
   /**
    * Creates an instance of this group reduce function.
    *
    * @param aggregateType the aggregate type to use (min,max,avg).
-   * @param timePoints the time points were vertex degrees change.
    */
-  public GroupDegreeTreesToAggregateDegrees(AggregateType aggregateType, DataSet<Tuple1<Long>> timePoints) {
+  public GroupDegreeTreesToAggregateDegrees(AggregateType aggregateType) {
     this.aggregateType = aggregateType;
-
-    List<Tuple1<Long>> tuples;
-    try {
-      tuples = timePoints.collect();
-      this.timePoints = new TreeSet<>();
-
-      for (int i = 0; i < timePoints.count(); i = i + 1) {
-        this.timePoints.add(tuples.get(i).getField(0));
-      }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
   }
 
   @Override
@@ -76,10 +55,12 @@ public class GroupDegreeTreesToAggregateDegrees
     // init necessary maps and set
     HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
     HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
+    SortedSet<Long> timePoints = new TreeSet<>();
 
     // convert the iterables to a hashmap and remember all possible timestamps
     for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
       degreeTrees.put(tuple.f0, tuple.f1);
+      timePoints.addAll(tuple.f1.keySet());
     }
 
     int numberOfVertices = degreeTrees.size();
