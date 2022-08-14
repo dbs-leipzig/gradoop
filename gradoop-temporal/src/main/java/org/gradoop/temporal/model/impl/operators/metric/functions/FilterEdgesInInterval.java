@@ -25,17 +25,14 @@ import java.util.Objects;
  * A filter function that finds all temporal edges that exist within a given time interval.
  */
 public class FilterEdgesInInterval implements FilterFunction<Tuple4<GradoopId, Long, Long, Integer>> {
-
   /**
    * The vertex to be considered.
    */
   private final GradoopId vertexId;
-
   /**
    * The start of the interval.
    */
   private final Long queryFrom;
-
   /**
    * The end of the interval.
    */

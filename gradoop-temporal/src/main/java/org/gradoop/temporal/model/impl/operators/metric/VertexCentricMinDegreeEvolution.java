@@ -15,24 +15,19 @@
  */
 package org.gradoop.temporal.model.impl.operators.metric;
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
-import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
 
 /**
  * A TPGM operator calculating the minimum degree of a given vertex referenced via its {@code vertexId}
  * within a given time interval: start {@code queryFrom}, end {@code queryTo}. The result is a single
- * value (Integer). The logic is implemented in the superclass BaseAggregateDegree.
+ * value (Double). The logic is implemented in the superclass {@link BaseAggregateDegree}.
  * <p>
  * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
  */
-public class VertexCentricMinDegreeEvolution extends BaseAggregateDegree
-        implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple1<Integer>>> {
+public class VertexCentricMinDegreeEvolution extends BaseAggregateDegree {
   /**
    * Creates an instance of this temporal vertex-centric minimum degree aggregation operator.
    *
@@ -46,14 +41,4 @@ public class VertexCentricMinDegreeEvolution extends BaseAggregateDegree
                                          GradoopId vertexId, Long queryFrom, Long queryTo) {
     super(degreeType, dimension, vertexId, queryFrom, queryTo, AggregationType.MIN);
   }
-
-  /**
-   * The execute method calls the method of its superclass, BaseAggregateDegree.
-   * @param graph the temporal graph
-   * @return DataSet containing one Tuple1 containing the minimum degree.
-   */
-  public DataSet<Tuple1<Integer>> execute(TemporalGraph graph) {
-    return super.execute(graph);
-  }
-
 }

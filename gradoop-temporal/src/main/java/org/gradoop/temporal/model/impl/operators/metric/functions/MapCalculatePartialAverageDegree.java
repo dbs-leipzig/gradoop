@@ -27,7 +27,6 @@ import java.util.Objects;
  * overall average degree.
  */
 public class MapCalculatePartialAverageDegree implements MapFunction<Tuple4<GradoopId, Long, Long, Integer>, Tuple2<GradoopId, Long>> {
-
   /**
    * The start of the interval specified by the user.
    */
@@ -50,16 +49,18 @@ public class MapCalculatePartialAverageDegree implements MapFunction<Tuple4<Grad
 
   @Override
   public Tuple2<GradoopId, Long> map(Tuple4<GradoopId, Long, Long, Integer> temporalEdge) throws Exception {
-    if (temporalEdge.f1 < queryFrom && temporalEdge.f2 > queryTo) {
-      temporalEdge.f1 = queryFrom;
-      temporalEdge.f2 = queryTo;
-    } else if (temporalEdge.f1 < queryFrom) {
-      temporalEdge.f1 = queryFrom;
-    } else if (temporalEdge.f2 > queryTo) {
+    if (temporalEdge.f1 < queryFrom) {
+      if (temporalEdge.f2 > queryTo) {
+        temporalEdge.f1 = queryFrom;
+        temporalEdge.f2 = queryTo;
+      } else {
+        temporalEdge.f1 = queryFrom;
+      }
+    }
+    if (temporalEdge.f2 > queryTo) {
       temporalEdge.f2 = queryTo;
     }
     Long lengthOfIntervalTimesDegree = (temporalEdge.f2 - temporalEdge.f1) * temporalEdge.f3;
-    Tuple2<GradoopId, Long> partialAverageDegree = new Tuple2<>(temporalEdge.f0, lengthOfIntervalTimesDegree);
-    return partialAverageDegree;
+    return new Tuple2<>(temporalEdge.f0, lengthOfIntervalTimesDegree);
   }
 }

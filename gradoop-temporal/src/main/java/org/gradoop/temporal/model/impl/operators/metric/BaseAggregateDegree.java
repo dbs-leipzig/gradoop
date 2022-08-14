@@ -26,36 +26,36 @@ import org.gradoop.flink.model.impl.functions.epgm.ByTargetId;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.FilterEdgesInInterval;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
+import org.gradoop.temporal.model.impl.operators.metric.functions.FilterEdgesInInterval;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapDegreeIntegerToDouble;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapCalculatePartialAverageDegree;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapCalculateAverageDegree;
 
 import java.util.Objects;
 
 /**
- * An abstract base class which calculates the minimum or maximum degree of a given vertex referenced via its
- * {@code vertexId} within a given time interval: start {@code queryFrom}, end {@code queryTo}. The result is
- * a single value (Integer) in a DataSet. This class has two subclasses for each aggregation type
- * (min and max).
+ * An abstract base class which calculates the minimum, maximum or average degree of a given vertex
+ * referenced via its {@code vertexId} within a given time interval: start {@code queryFrom},
+ * end {@code queryTo}. The result is a single value (Double) in a DataSet. This class has three
+ * subclasses for each aggregation type (min, max and average).
  * <p>
  * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
  */
 public abstract class BaseAggregateDegree
-        implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple1<Integer>>> {
+        implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple1<Double>>> {
   /**
    * The time dimension that will be considered.
    */
   private final TimeDimension dimension;
-
   /**
    * The degree type (IN, OUT, BOTH);
    */
   private final VertexDegree degreeType;
-
   /**
    * The vertex to be considered.
    */
   private final GradoopId vertexId;
-
   /**
    * The start of the interval specified by the user.
    */
@@ -64,7 +64,6 @@ public abstract class BaseAggregateDegree
    * The end of the interval specified by the user.
    */
   private final Long queryTo;
-
   /**
    * The type of aggregation to be performed (min or max)
    */
@@ -78,7 +77,7 @@ public abstract class BaseAggregateDegree
    * @param vertexId        the id of the vertex to consider
    * @param queryFrom       the start of the interval
    * @param queryTo         the end of the interval
-   * @param aggregationType the type of aggregation (min or max)
+   * @param aggregationType the type of aggregation (min, max or avg)
    */
   public BaseAggregateDegree(VertexDegree degreeType, TimeDimension dimension, GradoopId vertexId,
                              Long queryFrom, Long queryTo, AggregationType aggregationType) {
@@ -91,7 +90,7 @@ public abstract class BaseAggregateDegree
   }
 
   @Override
-  public DataSet<Tuple1<Integer>> execute(TemporalGraph graph) {
+  public DataSet<Tuple1<Double>> execute(TemporalGraph graph) {
 
     // Find relevant subgraph (vertex and all its edges)
     TemporalGraph subGraph1 = graph.edgeInducedSubgraph(new BySourceId<>(vertexId));
@@ -107,20 +106,31 @@ public abstract class BaseAggregateDegree
     switch (aggregationType) {
     case MIN:
       return filteredEdges
-              // Group dataset and find minimum degree
-              .groupBy(0)
-              .aggregate(Aggregations.MIN, 3)
-              // get field 3 which contains the minimum degree -> return Tuple1<Integer>
-              // containing the minimum degree
-              .project(3);
+            // Group dataset and find minimum degree
+            .groupBy(0)
+            .aggregate(Aggregations.MIN, 3)
+            // get field 3 which contains the minimum degree
+            .<Tuple1<Integer>>project(3)
+            // Convert to Double
+            .map(new MapDegreeIntegerToDouble());
     case MAX:
       return filteredEdges
-              // group dataset and find maximum degree
-              .groupBy(0)
-              .aggregate(Aggregations.MAX, 3)
-              // get field 3 which contains the maximum degree -> return Tuple1<Integer>
-              // containing the maximum degree
-              .project(3);
+            // group dataset and find maximum degree
+            .groupBy(0)
+            .aggregate(Aggregations.MAX, 3)
+            // get field 3 which contains the maximum degree
+            .<Tuple1<Integer>>project(3)
+            // Convert to Double
+            .map(new MapDegreeIntegerToDouble());
+    case AVG:
+      return filteredEdges
+            // Map each tuple to an interim result from which we can calculate the overall average degree
+            .map(new MapCalculatePartialAverageDegree(queryFrom, queryTo))
+            // Group dataset and sum all the interim results from before
+            .groupBy(0)
+            .aggregate(Aggregations.SUM, 1)
+            // Now divide this sum by the length of the time interval
+            .map(new MapCalculateAverageDegree(queryFrom, queryTo));
     default:
       throw new IllegalArgumentException("Aggregate type not specified.");
     }

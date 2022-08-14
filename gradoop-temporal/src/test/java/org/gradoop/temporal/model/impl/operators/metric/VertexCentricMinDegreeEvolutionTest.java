@@ -22,123 +22,87 @@ import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.util.TemporalGradoopTestBase;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for {@link VertexCentricMinDegreeEvolution}.
+ */
+@RunWith(Parameterized.class)
 public class VertexCentricMinDegreeEvolutionTest extends TemporalGradoopTestBase {
-
   /**
-   * The expected minimum degrees for this test.
+   * The label of the vertex to test.
    */
-  private static final List<Integer> EXPECTED_MIN_DEGREES = new ArrayList<>();
-
-  static {
-    EXPECTED_MIN_DEGREES.add(0);
-    EXPECTED_MIN_DEGREES.add(0);
-    EXPECTED_MIN_DEGREES.add(1);
-    EXPECTED_MIN_DEGREES.add(0);
-    EXPECTED_MIN_DEGREES.add(3);
-    EXPECTED_MIN_DEGREES.add(0);
-  }
-
+  @Parameterized.Parameter(0)
+  public String vertexLabel;
   /**
    * The degree type to test.
    */
+  @Parameterized.Parameter(1)
   public VertexDegree degreeType;
-
+  /**
+   * The user-defined start of the interval.
+   */
+  @Parameterized.Parameter(2)
+  public Long queryStart;
+  /**
+   * The user-defined end of the interval.
+   */
+  @Parameterized.Parameter(3)
+  public Long queryEnd;
+  /**
+   * The expected minimum degree.
+   */
+  @Parameterized.Parameter(4)
+  public Double expectedMinDegree;
   /**
    * The temporal graph to test the operator.
    */
   TemporalGraph testGraph;
-
-  /**
-   * A list of all vertex-ids.
-   */
-  List<GradoopId> vertexIds;
-
   /**
    * The vertex-id to test.
    */
   GradoopId vertexId;
 
   /**
-   * The user-defined start of the interval.
+   * The parameters to test the operator with the test inputs and the expected results.
    */
-  Long queryStart;
+  @Parameterized.Parameters(name = "Test vertex label {0} with degree type {1}, start: {2}, end: {3}")
+  public static Iterable<Object[]> parameters() {
+    return Arrays.asList(
+          new Object[] {"v1", VertexDegree.OUT, -3L, -1L, 0.0},
+          new Object[] {"v1", VertexDegree.OUT, -2L, 5L, 0.0},
+          new Object[] {"v2", VertexDegree.BOTH, 0L, 10L, 1.0},
+          new Object[] {"v3", VertexDegree.IN, 3L, 6L, 0.0},
+          new Object[] {"v4", VertexDegree.BOTH, 4L, 5L, 3.0},
+          new Object[] {"v5", VertexDegree.IN, 2L, 5L, 0.0}
+    );
+  }
 
   /**
-   * The user-defined end of the interval.
-   */
-  Long queryEnd;
-
-  /**
-   * Set up the test graph and extract all vertex-ids.
+   * Set up the test graph and find the corresponding vertex-id for the label to be tested.
    *
    * @throws Exception in case of an error
    */
   @Before
   public void setUp() throws Exception {
     testGraph = getTestGraphWithValues();
-    vertexIds = testGraph.getVertices().map(v -> v.getId()).collect();
+    vertexId = testGraph.getVerticesByLabel(vertexLabel).collect().get(0).getId();
   }
 
+  /**
+   * Test the vertex-centric minimum degree operator.
+   *
+   * @throws Exception in case of an error
+   */
   @Test
   public void testVertexCentricMinDegree() throws Exception {
-    setUp();
-
-    // Test 1
-    vertexId = vertexIds.get(0);
-    degreeType = VertexDegree.OUT;
-    queryStart = -3L;
-    queryEnd = -1L;
     VertexCentricMinDegreeEvolution operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    Integer result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(0), result);
-
-    // Test 2
-    queryStart = -2L;
-    queryEnd = 5L;
-    operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(1), result);
-
-    // Test 3
-    vertexId = vertexIds.get(1);
-    degreeType = VertexDegree.BOTH;
-    queryStart = 0L;
-    queryEnd = 10L;
-    operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(2), result);
-
-    // Test 4
-    vertexId = vertexIds.get(2);
-    degreeType = VertexDegree.IN;
-    queryStart = 3L;
-    queryEnd = 6L;
-    operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(3), result);
-
-    // Test 5
-    vertexId = vertexIds.get(3);
-    degreeType = VertexDegree.BOTH;
-    queryStart = 4L;
-    queryEnd = 5L;
-    operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(4), result);
-
-    // Test 6
-    vertexId = vertexIds.get(4);
-    degreeType = VertexDegree.IN;
-    queryStart = 2L;
-    queryEnd = 5L;
-    operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
-    result = testGraph.callForValue(operator).collect().get(0).f0;
-    assertEquals(EXPECTED_MIN_DEGREES.get(5), result);
+    Double result = testGraph.callForValue(operator).collect().get(0).f0;
+    assertEquals(expectedMinDegree, result);
   }
 }

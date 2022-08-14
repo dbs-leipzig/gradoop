@@ -26,7 +26,6 @@ import java.util.Objects;
  * A map transformation that helps to calculate the average degree of a vertex.
  */
 public class MapCalculateAverageDegree implements MapFunction<Tuple2<GradoopId, Long>, Tuple1<Double>> {
-
   /**
    * The start of the interval specified by the user.
    */
@@ -50,8 +49,7 @@ public class MapCalculateAverageDegree implements MapFunction<Tuple2<GradoopId, 
   @Override
   public Tuple1<Double> map(Tuple2<GradoopId, Long> aggregatedTuple) throws Exception {
     Double degree = Double.valueOf(aggregatedTuple.f1) /
-            (Double.valueOf(queryTo) - Double.valueOf(queryFrom));
-    Tuple1<Double> result = new Tuple1<>(degree);
-    return result;
+          (Double.valueOf(queryTo) - Double.valueOf(queryFrom));
+    return new Tuple1<>(degree);
   }
 }
