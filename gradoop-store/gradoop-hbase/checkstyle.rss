@@ -46,6 +46,20 @@ under the License.
           <tbody>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelRegTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelRegTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.java">org/gradoop/storage/impl/hbase/GradoopHBaseTestBase.java</a>
                 </td>
                 <td>
@@ -117,20 +131,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseEPGMStoreTest.java">org/gradoop/storage/impl/hbase/HBaseEPGMStoreTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelInTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelInTest.java</a>
                 </td>
                 <td>
                   0
