@@ -16,60 +16,41 @@
 package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAverageDegrees;
-import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
-import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
-
-import java.util.Objects;
+import org.gradoop.temporal.model.impl.operators.metric.functions.AggregateType;
+import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAggregateDegrees;
 
 /**
- * Operator that calculates the average degree evolution of all vertices of a temporal graph for the
- * whole lifetime of the graph. The average value is rounded up to the next integer.
+ * Operator that calculates the evolution of the graph's average degree for the whole lifetime of the graph.
+ * The result is a triple dataset {@link DataSet<Tuple3>} in form {@code <Long, Long, Float>}. It
+ * represents a time interval (first and second element) and the aggregated degree value for this interval
+ * (3rd element).
  */
-public class AvgDegreeEvolution
-    implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple2<Long, Double>>> {
+public class AvgDegreeEvolution extends BaseAggregateDegreeEvolution {
   /**
-   * The time dimension that will be considered.
+   * Creates an instance of this average degree evolution operator using {@link TimeDimension#VALID_TIME}
+   * as default time dimension and {@link VertexDegree#BOTH} as default degree type.
    */
-  private final TimeDimension dimension;
+  public AvgDegreeEvolution() {
+    super();
+  }
 
   /**
-   * The degree type (IN, OUT, BOTH);
-   */
-  private final VertexDegree degreeType;
-
-  /**
-   * Creates an instance of this average degree evolution operator.
+   * Creates an instance of this average degree evolution operator using the given time dimension and
+   * degree type.
    *
-   * @param degreeType the degree type to use (IN, OUT, BOTH).
-   * @param dimension  the time dimension to use (VALID_TIME, TRANSACTION_TIME).
-   *
-   * @throws RuntimeException in case of an error.
+   * @param degreeType the degree type (IN, OUT or BOTH)
+   * @param dimension the time dimension to consider (VALID_TIME or TRANSACTION_TIME)
    */
-  public AvgDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) throws RuntimeException {
-    this.degreeType = Objects.requireNonNull(degreeType);
-    this.dimension = Objects.requireNonNull(dimension);
+  public AvgDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
+    super(degreeType, dimension);
   }
 
   @Override
-  public DataSet<Tuple2<Long, Double>> execute(TemporalGraph graph) {
-    return graph.getEdges()
-        // 1) Extract vertex id(s) and corresponding time intervals
-        .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
-        // 2) Group them by the vertex id
-        .groupBy(0)
-        // 3) For each vertex id, build a degree tree data structure
-        .reduceGroup(new BuildTemporalDegreeTree())
-        // 4) Transform each tree to aggregated evolution
-        .map(new TransformDeltaToAbsoluteDegreeTree())
-        // 5) Merge trees together and calculate aggregation
-        .reduceGroup(new GroupDegreeTreesToAverageDegrees());
-
+  public DataSet<Tuple3<Long, Long, Float>> execute(TemporalGraph graph) {
+    return preProcess(graph).reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.AVG));
   }
 }

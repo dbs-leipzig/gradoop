@@ -19,6 +19,7 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
@@ -42,40 +43,40 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
   /**
    * The expected in-degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Double>> EXPECTED_IN_DEGREES = new ArrayList<>();
+  private static final List<Tuple3<Long, Long, Float>> EXPECTED_IN_DEGREES = new ArrayList<>();
   /**
    * The expected out-degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Double>> EXPECTED_OUT_DEGREES = new ArrayList<>();
+  private static final List<Tuple3<Long, Long, Float>> EXPECTED_OUT_DEGREES = new ArrayList<>();
   /**
    * The expected degrees for each vertex label.
    */
-  private static final List<Tuple2<Long, Double>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
+  private static final List<Tuple3<Long, Long, Float>> EXPECTED_BOTH_DEGREES = new ArrayList<>();
 
   static {
     // IN DEGREES
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(0L, 0.25));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(4L, 1.0));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(5L, 0.5));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(6L, 0.5));
-    EXPECTED_IN_DEGREES.add(new Tuple2<>(7L, 0.25));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(Long.MIN_VALUE, 0L, 0.0f));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(0L, 4L, 0.25f));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(4L, 5L, 1.0f));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(5L, 6L, 0.5f));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(6L, 7L, 0.5f));
+    EXPECTED_IN_DEGREES.add(new Tuple3<>(7L, Long.MAX_VALUE, 0.25f));
 
     // OUT DEGREES
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(0L, 0.25));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(4L, 1.0));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(5L, 0.5));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(6L, 0.5));
-    EXPECTED_OUT_DEGREES.add(new Tuple2<>(7L, 0.25));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(Long.MIN_VALUE, 0L, 0.0f));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(0L, 4L, 0.25f));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(4L, 5L, 1.0f));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(5L, 6L, 0.5f));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(6L, 7L, 0.5f));
+    EXPECTED_OUT_DEGREES.add(new Tuple3<>(7L, Long.MAX_VALUE, 0.25f));
 
     // DEGREES
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0.0));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 0.4));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 1.6));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 0.8));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 0.8));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 0.4));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(Long.MIN_VALUE, 0L, 0.0f));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(0L, 4L, 0.4f));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(4L, 5L, 1.6f));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(5L, 6L, 0.8f));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(6L, 7L, 0.8f));
+    EXPECTED_BOTH_DEGREES.add(new Tuple3<>(7L, Long.MAX_VALUE, 0.4f));
   }
 
   /**
@@ -88,7 +89,7 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
    * The expected degree evolution for the given type.
    */
   @Parameterized.Parameter(1)
-  public List<Tuple2<Long, Integer>> expectedDegrees;
+  public List<Tuple3<Long, Long, Float>> expectedDegrees;
 
   /**
    * The temporal graph to test the operator.
@@ -130,9 +131,9 @@ public class AvgDegreeEvolutionTest extends TemporalGradoopTestBase {
    */
   @Test
   public void testAvgDegree() throws Exception {
-    Collection<Tuple2<Long, Double>> resultCollection = new ArrayList<>();
+    Collection<Tuple3<Long, Long, Float>> resultCollection = new ArrayList<>();
 
-    final DataSet<Tuple2<Long, Double>> resultDataSet = testGraph
+    final DataSet<Tuple3<Long, Long, Float>> resultDataSet = testGraph
         .callForValue(new AvgDegreeEvolution(degreeType, TimeDimension.VALID_TIME));
 
     resultDataSet.output(new LocalCollectionOutputFormat<>(resultCollection));
