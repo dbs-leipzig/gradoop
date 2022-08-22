@@ -41,7 +41,7 @@ import java.util.Objects;
  * <p>
  * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
  */
-public abstract class BaseAggregateDegree
+public abstract class BaseVertexCentricDegreeEvolution
   implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple1<Double>>> {
   /**
    * The time dimension that will be considered.
@@ -78,8 +78,8 @@ public abstract class BaseAggregateDegree
    * @param queryTo         the end of the interval
    * @param aggregationType the type of aggregation (min, max or avg)
    */
-  public BaseAggregateDegree(VertexDegree degreeType, TimeDimension dimension, GradoopId vertexId,
-                             Long queryFrom, Long queryTo, AggregationType aggregationType) {
+  public BaseVertexCentricDegreeEvolution(VertexDegree degreeType, TimeDimension dimension,
+    GradoopId vertexId, Long queryFrom, Long queryTo, AggregationType aggregationType) {
     this.degreeType = Objects.requireNonNull(degreeType);
     this.dimension = Objects.requireNonNull(dimension);
     this.vertexId = Objects.requireNonNull(vertexId);

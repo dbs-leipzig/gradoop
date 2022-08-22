@@ -23,11 +23,11 @@ import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationTyp
 /**
  * A TPGM operator which calculates the average degree of a given vertex referenced via its {@code vertexId}
  * within a given time interval: start {@code queryFrom}, end {@code queryTo}. The result is a single
- * value (Double). The logic is implemented in the superclass {@link BaseAggregateDegree}.
+ * value (Double). The logic is implemented in the superclass {@link BaseVertexCentricDegreeEvolution}.
  * <p>
  * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
  */
-public class VertexCentricAverageDegreeEvolution extends BaseAggregateDegree {
+public class VertexCentricAverageDegreeEvolution extends BaseVertexCentricDegreeEvolution {
   /**
    * Creates an instance of this temporal average vertex degree operator.
    *
