@@ -101,7 +101,8 @@ public class VertexCentricMinDegreeEvolutionTest extends TemporalGradoopTestBase
    */
   @Test
   public void testVertexCentricMinDegree() throws Exception {
-    VertexCentricMinDegreeEvolution operator = new VertexCentricMinDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
+    VertexCentricMinDegreeEvolution operator = new VertexCentricMinDegreeEvolution(degreeType,
+      TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
     Double result = testGraph.callForValue(operator).collect().get(0).f0;
     assertEquals(expectedMinDegree, result);
   }

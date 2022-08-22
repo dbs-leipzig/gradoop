@@ -101,7 +101,8 @@ public class VertexCentricMaxDegreeEvolutionTest extends TemporalGradoopTestBase
    */
   @Test
   public void testVertexCentricMaxDegree() throws Exception {
-    VertexCentricMaxDegreeEvolution operator = new VertexCentricMaxDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
+    VertexCentricMaxDegreeEvolution operator = new VertexCentricMaxDegreeEvolution(degreeType,
+      TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
     Double result = testGraph.callForValue(operator).collect().get(0).f0;
     assertEquals(expectedMaxDegree, result);
   }

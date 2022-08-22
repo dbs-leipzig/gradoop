@@ -38,7 +38,7 @@ public class VertexCentricAverageDegreeEvolution extends BaseAggregateDegree {
    * @param queryTo    the end of the interval
    */
   public VertexCentricAverageDegreeEvolution(VertexDegree degreeType, TimeDimension dimension,
-                                         GradoopId vertexId, Long queryFrom, Long queryTo) {
+                                             GradoopId vertexId, Long queryFrom, Long queryTo) {
     super(degreeType, dimension, vertexId, queryFrom, queryTo, AggregationType.AVG);
   }
 }

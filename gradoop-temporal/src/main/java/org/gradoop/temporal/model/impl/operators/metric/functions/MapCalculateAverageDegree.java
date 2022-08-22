@@ -49,7 +49,7 @@ public class MapCalculateAverageDegree implements MapFunction<Tuple2<GradoopId, 
   @Override
   public Tuple1<Double> map(Tuple2<GradoopId, Long> aggregatedTuple) throws Exception {
     Double degree = Double.valueOf(aggregatedTuple.f1) /
-          (Double.valueOf(queryTo) - Double.valueOf(queryFrom));
+      (Double.valueOf(queryTo) - Double.valueOf(queryFrom));
     return new Tuple1<>(degree);
   }
 }

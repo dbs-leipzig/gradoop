@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.model.impl.operators.metric.functions;
+package org.gradoop.flink.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 
 /**
- * A map function which converts the degree in a Tuple from Integer to Double.
+ * A map function casting each Tuple1 from Integer to Double.
  */
-public class MapDegreeIntegerToDouble implements MapFunction<Tuple1<Integer>, Tuple1<Double>> {
-
+public class CastTuple1IntToDouble implements MapFunction<Tuple1<Integer>, Tuple1<Double>> {
   @Override
-  public Tuple1<Double> map(Tuple1<Integer> degree) throws Exception {
-    int intDegree = degree.f0;
-    Double doubleDegree = (double) intDegree;
-    return new Tuple1<>(doubleDegree);
+  public Tuple1<Double> map(Tuple1<Integer> tuple1) throws Exception {
+    return new Tuple1<>((double) tuple1.f0);
   }
 }

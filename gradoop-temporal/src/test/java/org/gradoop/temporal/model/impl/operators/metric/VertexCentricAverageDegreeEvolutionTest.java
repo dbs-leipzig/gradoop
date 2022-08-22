@@ -101,7 +101,8 @@ public class VertexCentricAverageDegreeEvolutionTest extends TemporalGradoopTest
    */
   @Test
   public void testVertexCentricAverageDegree() throws Exception {
-    VertexCentricAverageDegreeEvolution operator = new VertexCentricAverageDegreeEvolution(degreeType, TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
+    VertexCentricAverageDegreeEvolution operator = new VertexCentricAverageDegreeEvolution(degreeType,
+      TimeDimension.VALID_TIME, vertexId, queryStart, queryEnd);
     Double result = testGraph.callForValue(operator).collect().get(0).f0;
     assertEquals(expectedAvgDegree, result);
   }
