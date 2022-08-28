@@ -58,7 +58,12 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff,Diff,6,69,0,0,2,
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.pojos,EmbeddingTPGMFactory,16,176,2,24,3,30,3,15,1,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf,FilterAndProjectTemporalEdgesNode,9,130,1,5,2,23,3,8,2,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.queryplan.leaf,FilterAndProjectTemporalVerticesNode,6,81,0,0,1,15,1,5,1,5
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,VertexCentricMaxDegreeEvolution,0,9,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,TemporalVertexDegree,0,97,0,2,0,23,0,4,0,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,VertexCentricAverageDegreeEvolution,0,9,0,0,0,2,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,BaseVertexCentricDegreeEvolution,5,147,1,3,1,30,1,4,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,VertexCentricMinDegreeEvolution,0,9,0,0,0,2,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric,BaseVertexCentricDegreeEvolution.new Object() {...},3,23,0,0,0,1,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.api.functions,TemporalAggregateFunction,0,17,0,2,0,4,0,3,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,TemporalElementToCSV,0,28,0,0,0,2,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,CSVLineToTemporalGraphHead,0,54,0,0,0,13,0,2,0,2
@@ -70,12 +75,16 @@ Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,TemporalVertexToTemp
 Gradoop Temporal,org.gradoop.temporal.io.impl.csv.functions,CSVLineToTemporalElement,5,39,2,2,1,7,2,5,0,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.util,ComparableFactory,54,52,8,10,10,11,7,4,1,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,CalculateDegreesDefaultTimesFlatMap,0,15,0,0,0,3,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,MapCalculatePartialAverageDegree,0,63,0,4,0,10,0,4,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,FilterEdgesInInterval,0,47,0,6,0,6,0,5,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,MapCalculateAverageDegree,0,41,0,0,0,7,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,CalculateDegreesFlatMap,0,19,0,0,0,3,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,BuildTemporalDegreeTree,26,57,2,4,4,13,2,4,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,FlatMapVertexIdEdgeInterval,19,77,3,5,1,17,3,4,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,ExtractIdIntervalMap,4,43,2,2,0,8,2,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,ExtendVertexDataWithInterval,0,31,0,0,0,8,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,FlatMapVertexIdEdgeInterval.new Object() {...},3,23,0,0,0,1,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,AggregationType,0,34,0,0,0,4,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.metric.functions,BaseCalculateDegrees,0,132,0,12,0,20,0,8,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning.functions,ElementsToStats,5,40,0,2,2,11,1,3,1,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.statistics.dummy,DummyTemporalGraphStatisticsFactory,19,0,0,0,5,0,5,0,5,0

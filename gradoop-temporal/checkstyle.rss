@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2022 University of Leipzig</copyright>
     <item>
-      <title>File: 108,
+      <title>File: 111,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -621,6 +621,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.homomorphism.HomomorphismFromToData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/homomorphism/HomomorphismFromToData.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.metric.VertexCentricAverageDegreeEvolutionTest.java">org/gradoop/temporal/model/impl/operators/metric/VertexCentricAverageDegreeEvolutionTest.java</a>
                 </td>
                 <td>
                   0
@@ -1334,6 +1348,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.metric.VertexCentricMinDegreeEvolutionTest.java">org/gradoop/temporal/model/impl/operators/metric/VertexCentricMinDegreeEvolutionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.common.query.predicates.comparables.TimeConstantComparableTest.java">org/gradoop/temporal/model/impl/operators/matching/common/query/predicates/comparables/TimeConstantComparableTest.java</a>
                 </td>
                 <td>
@@ -1461,6 +1489,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.matching.single.cypher.testdata.isomorphism.IsomorphismAfterData.java">org/gradoop/temporal/model/impl/operators/matching/single/cypher/testdata/isomorphism/IsomorphismAfterData.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-temporal/checkstyle.html#org.gradoop.temporal.model.impl.operators.metric.VertexCentricMaxDegreeEvolutionTest.java">org/gradoop/temporal/model/impl/operators/metric/VertexCentricMaxDegreeEvolutionTest.java</a>
                 </td>
                 <td>
                   0

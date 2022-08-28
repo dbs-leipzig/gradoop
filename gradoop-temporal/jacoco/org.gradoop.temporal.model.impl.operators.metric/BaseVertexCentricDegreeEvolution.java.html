@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseVertexCentricDegreeEvolution.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric</a> &gt; <span class="el_source">BaseVertexCentricDegreeEvolution.java</span></div><h1>BaseVertexCentricDegreeEvolution.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.aggregation.Aggregations;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
+import org.gradoop.flink.model.impl.functions.epgm.BySourceOrTargetId;
+import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
+import org.gradoop.temporal.model.api.TimeDimension;
+import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
+import org.gradoop.temporal.model.impl.operators.metric.functions.FilterEdgesInInterval;
+import org.gradoop.flink.model.impl.functions.tuple.CastTuple1IntToDouble;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapCalculatePartialAverageDegree;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapCalculateAverageDegree;
+
+import java.util.Objects;
+
+/**
+ * An abstract base class which calculates the minimum, maximum or average degree of a given vertex
+ * referenced via its {@code vertexId} within a given time interval: start {@code queryFrom},
+ * end {@code queryTo}. The result is a single value (Double) in a DataSet. This class has three
+ * subclasses for each aggregation type (min, max and average).
+ * &lt;p&gt;
+ * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
+ */
+public abstract class BaseVertexCentricDegreeEvolution
+  implements UnaryBaseGraphToValueOperator&lt;TemporalGraph, DataSet&lt;Tuple1&lt;Double&gt;&gt;&gt; {
+  /**
+   * The time dimension that will be considered.
+   */
+  private final TimeDimension dimension;
+  /**
+   * The degree type (IN, OUT, BOTH);
+   */
+  private final VertexDegree degreeType;
+  /**
+   * The vertex to be considered.
+   */
+  private final GradoopId vertexId;
+  /**
+   * The start of the interval specified by the user.
+   */
+  private final Long queryFrom;
+  /**
+   * The end of the interval specified by the user.
+   */
+  private final Long queryTo;
+  /**
+   * The type of aggregation to be performed (min or max)
+   */
+  private final AggregationType aggregationType;
+
+  /**
+   * Creates an instance of this temporal vertex degree aggregation operator.
+   *
+   * @param degreeType      the degree type to consider
+   * @param dimension       the time dimension to consider
+   * @param vertexId        the id of the vertex to consider
+   * @param queryFrom       the start of the interval
+   * @param queryTo         the end of the interval
+   * @param aggregationType the type of aggregation (min, max or avg)
+   */
+  public BaseVertexCentricDegreeEvolution(VertexDegree degreeType, TimeDimension dimension,
+<span class="fc" id="L82">    GradoopId vertexId, Long queryFrom, Long queryTo, AggregationType aggregationType) {</span>
+<span class="fc" id="L83">    this.degreeType = Objects.requireNonNull(degreeType);</span>
+<span class="fc" id="L84">    this.dimension = Objects.requireNonNull(dimension);</span>
+<span class="fc" id="L85">    this.vertexId = Objects.requireNonNull(vertexId);</span>
+<span class="fc" id="L86">    this.queryFrom = Objects.requireNonNull(queryFrom);</span>
+<span class="fc" id="L87">    this.queryTo = Objects.requireNonNull(queryTo);</span>
+<span class="fc" id="L88">    this.aggregationType = Objects.requireNonNull(aggregationType);</span>
+<span class="fc" id="L89">  }</span>
+
+  @Override
+  public DataSet&lt;Tuple1&lt;Double&gt;&gt; execute(TemporalGraph graph) {
+    // Find relevant subgraph (vertex and all its edges)
+<span class="fc" id="L94">    TemporalGraph subGraph = graph</span>
+<span class="fc" id="L95">      .edgeInducedSubgraph(new BySourceOrTargetId&lt;&gt;(vertexId));</span>
+
+    // Apply TemporalVertexDegree on subgraph
+<span class="fc" id="L98">    TemporalVertexDegree temporalVertexDegree = new TemporalVertexDegree(degreeType, dimension);</span>
+<span class="fc" id="L99">    temporalVertexDegree.setIncludeVertexTime(true);</span>
+<span class="fc" id="L100">    DataSet&lt;Tuple4&lt;GradoopId, Long, Long, Integer&gt;&gt; filteredEdges = temporalVertexDegree.execute(subGraph)</span>
+      // Find relevant edges which exist within the given time
+<span class="fc" id="L102">      .filter(new FilterEdgesInInterval(queryFrom, queryTo, vertexId));</span>
+
+<span class="pc bpc" id="L104" title="1 of 4 branches missed.">    switch (aggregationType) {</span>
+    case MIN:
+<span class="fc" id="L106">      return filteredEdges</span>
+        // Group dataset and find minimum degree
+<span class="fc" id="L108">        .groupBy(0)</span>
+<span class="fc" id="L109">        .aggregate(Aggregations.MIN, 3)</span>
+        // get field 3 which contains the minimum degree
+<span class="fc" id="L111">        .&lt;Tuple1&lt;Integer&gt;&gt;project(3)</span>
+        // Convert to Double
+<span class="fc" id="L113">        .map(new CastTuple1IntToDouble());</span>
+    case MAX:
+<span class="fc" id="L115">      return filteredEdges</span>
+        // group dataset and find maximum degree
+<span class="fc" id="L117">        .groupBy(0)</span>
+<span class="fc" id="L118">        .aggregate(Aggregations.MAX, 3)</span>
+        // get field 3 which contains the maximum degree
+<span class="fc" id="L120">        .&lt;Tuple1&lt;Integer&gt;&gt;project(3)</span>
+        // Convert to Double
+<span class="fc" id="L122">        .map(new CastTuple1IntToDouble());</span>
+    case AVG:
+<span class="fc" id="L124">      return filteredEdges</span>
+        // Map each tuple to an interim result from which we can calculate the overall average degree
+<span class="fc" id="L126">        .map(new MapCalculatePartialAverageDegree(queryFrom, queryTo))</span>
+        // Group dataset and sum all the interim results from before
+<span class="fc" id="L128">        .groupBy(0)</span>
+<span class="fc" id="L129">        .aggregate(Aggregations.SUM, 1)</span>
+        // Now divide this sum by the length of the time interval
+<span class="fc" id="L131">        .map(new MapCalculateAverageDegree(queryFrom, queryTo));</span>
+    default:
+<span class="nc" id="L133">      throw new IllegalArgumentException(&quot;Aggregate type not specified.&quot;);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

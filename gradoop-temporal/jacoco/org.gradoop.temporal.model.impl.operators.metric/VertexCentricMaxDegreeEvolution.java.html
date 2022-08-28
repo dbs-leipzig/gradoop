@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VertexCentricMaxDegreeEvolution.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric</a> &gt; <span class="el_source">VertexCentricMaxDegreeEvolution.java</span></div><h1>VertexCentricMaxDegreeEvolution.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric;
+
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
+import org.gradoop.temporal.model.api.TimeDimension;
+import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
+
+/**
+ * A TPGM operator calculating the maximum degree of a given vertex referenced via its {@code vertexId}
+ * within a given time interval: start {@code queryFrom}, end {@code queryTo}. The result is a single
+ * value (Double). The logic is implemented in the superclass {@link BaseVertexCentricDegreeEvolution}.
+ * &lt;p&gt;
+ * The type of the degree (IN, OUT, BOTH) can be chosen by the arguments.
+ */
+public class VertexCentricMaxDegreeEvolution extends BaseVertexCentricDegreeEvolution {
+  /**
+   * Creates an instance of this temporal vertex-centric maximum degree aggregation operator.
+   *
+   * @param degreeType the degree type to consider
+   * @param dimension the time dimension to consider
+   * @param vertexId the id of the vertex to consider
+   * @param queryFrom the start of the interval
+   * @param queryTo the end of the interval
+   */
+  public VertexCentricMaxDegreeEvolution(VertexDegree degreeType, TimeDimension dimension,
+                                         GradoopId vertexId, Long queryFrom, Long queryTo) {
+<span class="fc" id="L42">    super(degreeType, dimension, vertexId, queryFrom, queryTo, AggregationType.MAX);</span>
+<span class="fc" id="L43">  }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

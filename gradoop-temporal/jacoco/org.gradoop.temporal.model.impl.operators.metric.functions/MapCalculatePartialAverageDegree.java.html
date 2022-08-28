@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapCalculatePartialAverageDegree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.model.impl.operators.metric.functions</a> &gt; <span class="el_source">MapCalculatePartialAverageDegree.java</span></div><h1>MapCalculatePartialAverageDegree.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.model.impl.operators.metric.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.util.Objects;
+
+/**
+ * A map function which calculates partial average degrees, an interim result for calculating the
+ * overall average degree.
+ */
+public class MapCalculatePartialAverageDegree
+  implements MapFunction&lt;Tuple4&lt;GradoopId, Long, Long, Integer&gt;, Tuple2&lt;GradoopId, Long&gt;&gt; {
+  /**
+   * The start of the interval specified by the user.
+   */
+  private final Long queryFrom;
+  /**
+   * The end of the interval specified by the user.
+   */
+  private final Long queryTo;
+
+  /**
+   * Creates an instance of this map transformation.
+   *
+   * @param queryFrom the start of the interval
+   * @param queryTo   the end of the interval
+   */
+<span class="fc" id="L46">  public MapCalculatePartialAverageDegree(Long queryFrom, Long queryTo) {</span>
+<span class="fc" id="L47">    this.queryFrom = Objects.requireNonNull(queryFrom);</span>
+<span class="fc" id="L48">    this.queryTo = Objects.requireNonNull(queryTo);</span>
+<span class="fc" id="L49">  }</span>
+
+  @Override
+  public Tuple2&lt;GradoopId, Long&gt; map(Tuple4&lt;GradoopId, Long, Long, Integer&gt; temporalEdge) throws Exception {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    if (temporalEdge.f1 &lt; queryFrom) {</span>
+<span class="fc" id="L54">      temporalEdge.f1 = queryFrom;</span>
+    }
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (temporalEdge.f2 &gt; queryTo) {</span>
+<span class="fc" id="L57">      temporalEdge.f2 = queryTo;</span>
+    }
+<span class="fc" id="L59">    Long lengthOfIntervalTimesDegree = (temporalEdge.f2 - temporalEdge.f1) * temporalEdge.f3;</span>
+<span class="fc" id="L60">    return new Tuple2&lt;&gt;(temporalEdge.f0, lengthOfIntervalTimesDegree);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
