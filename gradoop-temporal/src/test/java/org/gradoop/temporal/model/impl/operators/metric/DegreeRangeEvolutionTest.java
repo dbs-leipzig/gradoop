@@ -72,7 +72,7 @@ public class DegreeRangeEvolutionTest extends TemporalGradoopTestBase {
     // DEGREES
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(Long.MIN_VALUE, 0));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(0L, 1));
-    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 3));
+    EXPECTED_BOTH_DEGREES.add(new Tuple2<>(4L, 2));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(5L, 1));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(6L, 2));
     EXPECTED_BOTH_DEGREES.add(new Tuple2<>(7L, 1));

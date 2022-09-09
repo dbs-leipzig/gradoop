@@ -21,8 +21,7 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAggregateDegrees;
-import org.gradoop.temporal.model.impl.operators.metric.functions.AggregateType;
+import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToDegreeRange;
 import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
 import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
 import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
@@ -66,6 +65,6 @@ public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<Tempo
           .reduceGroup(new BuildTemporalDegreeTree())
           // 4) Transform each tree to aggregated evolution
           .map(new TransformDeltaToAbsoluteDegreeTree())
-          .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregateType.RANGE));
+          .reduceGroup(new GroupDegreeTreesToDegreeRange());
   }
 }
