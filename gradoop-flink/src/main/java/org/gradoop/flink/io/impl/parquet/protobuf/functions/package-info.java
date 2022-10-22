@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * Contains all commonly used classes related to Parquet input and output to Flink.
+ * Contains functions to transform EPGM entities into Protobuf objects and vice versa.
  */
-package org.gradoop.flink.io.impl.parquet.common;
+package org.gradoop.flink.io.impl.parquet.protobuf.functions;

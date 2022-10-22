@@ -32,8 +32,13 @@ import java.io.IOException;
 public class HadoopValueInputFormat<T> extends HadoopInputFormatBase<Void, T, T> implements
   ResultTypeQueryable<T> {
 
-  public HadoopValueInputFormat(InputFormat<Void, T> mapreduceInputFormat, Class<T> value,
-    Job job) {
+  /**
+   * Creates a new Flink input format.
+   * @param mapreduceInputFormat  Hadoop (mapreduce) input format
+   * @param value value type class
+   * @param job job instance for configuration
+   */
+  public HadoopValueInputFormat(InputFormat<Void, T> mapreduceInputFormat, Class<T> value, Job job) {
     super(mapreduceInputFormat, Void.class, value, job);
   }
 
@@ -62,6 +67,10 @@ public class HadoopValueInputFormat<T> extends HadoopInputFormatBase<Void, T, T>
 
   @Override
   public String toString() {
-    return String.format("HadoopValueInputFormat[%s]", this.valueClass.getSimpleName());
+    String jobName = this.getConfiguration().get("mapreduce.job.name");
+    if (jobName != null) {
+      return String.format("HadoopValueInputFormat[%s]", jobName);
+    }
+    return super.toString();
   }
 }
