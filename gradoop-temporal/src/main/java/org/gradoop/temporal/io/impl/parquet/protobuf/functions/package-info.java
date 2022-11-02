@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to parquet-protobuf input and output to Flink.
+ * Contains functions to transform TPGM entities into Protobuf objects and vice versa.
  */
-package org.gradoop.flink.io.impl.parquet.protobuf;
+package org.gradoop.temporal.io.impl.parquet.protobuf.functions;

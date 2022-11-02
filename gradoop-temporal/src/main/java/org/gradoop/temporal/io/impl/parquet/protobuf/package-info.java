@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
- * Contains all classes related to parquet-protobuf input and output to Flink.
+ * Contains all classes related to temporal parquet-protobuf input and output to Flink.
  */
-package org.gradoop.flink.io.impl.parquet.protobuf;
+package org.gradoop.temporal.io.impl.parquet.protobuf;
