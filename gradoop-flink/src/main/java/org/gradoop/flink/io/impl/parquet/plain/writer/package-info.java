@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * Contains all commonly used classes related to parquet input and output to Flink.
+ * Contains parquet writers for EPGM entities
  */
-package org.gradoop.flink.io.impl.parquet.common;
+package org.gradoop.flink.io.impl.parquet.plain.writer;

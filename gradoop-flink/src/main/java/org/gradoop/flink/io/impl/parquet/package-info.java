@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to Parquet input and output to Flink.
+ * Contains all classes related to parquet input and output to Flink.
  */
 package org.gradoop.flink.io.impl.parquet;

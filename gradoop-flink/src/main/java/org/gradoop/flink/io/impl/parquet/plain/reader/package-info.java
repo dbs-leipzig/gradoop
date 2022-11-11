@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains Parquet readers for EPGM entities
+ * Contains parquet readers for EPGM entities
  */
-package org.gradoop.flink.io.impl.parquet.reader;
+package org.gradoop.flink.io.impl.parquet.plain.reader;
