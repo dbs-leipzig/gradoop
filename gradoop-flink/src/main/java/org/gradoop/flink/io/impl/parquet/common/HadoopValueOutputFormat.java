@@ -31,6 +31,7 @@ public class HadoopValueOutputFormat<T> extends HadoopOutputFormatBase<Void, T, 
 
   /**
    * Creates a new Flink output format.
+   *
    * @param mapreduceOutputFormat Hadoop (mapreduce) output format
    * @param job job instance for configuration
    */

@@ -30,15 +30,15 @@ import java.io.IOException;
 /**
  * A temporal graph data sink for parquet-protobuf files.
  */
-public class ParquetProtobufTemporalDataSink extends ParquetProtobufDataSink implements TemporalDataSink {
+public class TemporalParquetProtobufDataSink extends ParquetProtobufDataSink implements TemporalDataSink {
 
   /**
-   * Creates a new parquet-protobuf data sink.
+   * Creates a new temporal parquet-protobuf data sink.
    *
    * @param basePath directory to the parquet-protobuf files
    * @param config   Gradoop Flink configuration
    */
-  protected ParquetProtobufTemporalDataSink(String basePath, GradoopFlinkConfig config) {
+  public TemporalParquetProtobufDataSink(String basePath, GradoopFlinkConfig config) {
     super(basePath, config);
   }
 

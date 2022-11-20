@@ -19,7 +19,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates a protobuf {@link EPGMProto.Vertex.Builder} from an {@link EPGMVertex}
+ * Creates a protobuf {@link EPGMProto.Vertex.Builder} from an {@link EPGMVertex}.
  */
 public class VertexToProtobufObject extends ElementToProtobufObject<EPGMVertex, EPGMProto.Vertex.Builder> {
 

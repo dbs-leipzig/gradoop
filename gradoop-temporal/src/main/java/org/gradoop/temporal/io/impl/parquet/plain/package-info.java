@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains parquet readers for EPGM entities
+ * Contains all classes related to temporal parquet input and output to Flink.
  */
-package org.gradoop.flink.io.impl.parquet.plain.reader;
+package org.gradoop.temporal.io.impl.parquet.plain;

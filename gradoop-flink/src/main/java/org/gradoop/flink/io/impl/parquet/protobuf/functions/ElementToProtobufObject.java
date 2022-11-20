@@ -81,7 +81,7 @@ public abstract class ElementToProtobufObject<E extends Element, B extends Messa
   }
 
   /**
-   * Converts a gradoop id into a protobuf byte array ({@link ByteString})
+   * Converts a gradoop id into a protobuf byte array ({@link ByteString}).
    *
    * @param value the gradoop id
    * @return converted protobuf byte array
@@ -92,7 +92,7 @@ public abstract class ElementToProtobufObject<E extends Element, B extends Messa
 
   /**
    * Converts the properties of an element into a map of strings and binary property values
-   * ({@link ByteString})
+   * ({@link ByteString}).
    *
    * @param element the element
    * @return converted map

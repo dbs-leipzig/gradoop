@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.parquet.protobuf;
+package org.gradoop.flink.io.impl.parquet.plain;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.EdgeToProtobufObject;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.GraphHeadToProtobufObject;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.VertexToProtobufObject;
+import org.gradoop.flink.io.impl.parquet.plain.write.EdgeWriteSupport;
+import org.gradoop.flink.io.impl.parquet.plain.write.GraphHeadWriteSupport;
+import org.gradoop.flink.io.impl.parquet.plain.write.VertexWriteSupport;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -27,17 +26,17 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.io.IOException;
 
 /**
- * A graph data sink for parquet-protobuf files.
+ * A graph data sink for parquet files.
  */
-public class ParquetProtobufDataSink extends ParquetProtobufBase implements DataSink {
+public class ParquetDataSink extends ParquetBase implements DataSink {
 
   /**
-   * Creates a new parquet-protobuf data sink.
+   * Creates a new parquet data sink.
    *
    * @param basePath directory to the parquet-protobuf files
    * @param config   Gradoop Flink configuration
    */
-  public ParquetProtobufDataSink(String basePath, GradoopFlinkConfig config) {
+  public ParquetDataSink(String basePath, GradoopFlinkConfig config) {
     super(basePath, config);
   }
 
@@ -58,17 +57,8 @@ public class ParquetProtobufDataSink extends ParquetProtobufBase implements Data
 
   @Override
   public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
-    DataSet<EPGMProto.GraphHead.Builder> graphHeads = graphCollection.getGraphHeads()
-      .map(new GraphHeadToProtobufObject());
-
-    DataSet<EPGMProto.Vertex.Builder> vertices = graphCollection.getVertices()
-      .map(new VertexToProtobufObject());
-
-    DataSet<EPGMProto.Edge.Builder> edges = graphCollection.getEdges()
-      .map(new EdgeToProtobufObject());
-
-    write(graphHeads, EPGMProto.GraphHead.class, getGraphHeadPath(), overwrite);
-    write(vertices, EPGMProto.Vertex.class, getVertexPath(), overwrite);
-    write(edges, EPGMProto.Edge.class, getEdgePath(), overwrite);
+    write(graphCollection.getGraphHeads(), getGraphHeadPath(), GraphHeadWriteSupport.class, overwrite);
+    write(graphCollection.getVertices(), getVertexPath(), VertexWriteSupport.class, overwrite);
+    write(graphCollection.getEdges(), getEdgePath(), EdgeWriteSupport.class, overwrite);
   }
 }

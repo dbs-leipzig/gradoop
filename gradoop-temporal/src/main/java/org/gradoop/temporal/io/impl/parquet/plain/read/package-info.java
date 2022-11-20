@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains parquet writers for EPGM entities
+ * Contains parquet root converters for TPGM entities
  */
-package org.gradoop.flink.io.impl.parquet.plain.writer;
+package org.gradoop.temporal.io.impl.parquet.plain.read;

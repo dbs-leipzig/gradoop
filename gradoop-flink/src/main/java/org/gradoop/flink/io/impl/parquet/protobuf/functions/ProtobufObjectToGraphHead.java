@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates an {@link EPGMGraphHead} from a protobuf {@link EPGMProto.GraphHead.Builder}
+ * Creates an {@link EPGMGraphHead} from a protobuf {@link EPGMProto.GraphHead.Builder}.
  */
 public class ProtobufObjectToGraphHead extends ProtobufObjectToElement<EPGMProto.GraphHead.Builder, EPGMGraphHead> {
 
@@ -32,7 +32,7 @@ public class ProtobufObjectToGraphHead extends ProtobufObjectToElement<EPGMProto
   private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
-   * Creates ProtobufObjectToGraphHead converter
+   * Creates ProtobufObjectToGraphHead converter.
    *
    * @param graphHeadFactory The factory that is used to create the graph heads.
    */

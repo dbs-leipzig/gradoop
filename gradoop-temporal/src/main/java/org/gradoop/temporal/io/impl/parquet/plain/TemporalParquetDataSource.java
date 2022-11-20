@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.temporal.io.impl.parquet.protobuf;
+package org.gradoop.temporal.io.impl.parquet.plain;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.io.impl.parquet.protobuf.ParquetProtobufDataSource;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.flink.io.impl.parquet.plain.ParquetDataSource;
 import org.gradoop.temporal.io.api.TemporalDataSource;
-import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalEdge;
-import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalGraphHead;
-import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalVertex;
+import org.gradoop.temporal.io.impl.parquet.plain.read.TemporalEdgeRootConverter;
+import org.gradoop.temporal.io.impl.parquet.plain.read.TemporalGraphHeadRootConverter;
+import org.gradoop.temporal.io.impl.parquet.plain.read.TemporalVertexRootConverter;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.TemporalGraphCollection;
 import org.gradoop.temporal.model.impl.TemporalGraphCollectionFactory;
@@ -33,26 +32,25 @@ import org.gradoop.temporal.util.TemporalGradoopConfig;
 import java.io.IOException;
 
 /**
- * A temporal graph data source for parquet-protobuf files.
+ * A graph data source for parquet files storing temporal graphs.
  * <p>
  * The datasource expects files separated by vertices and edges, e.g. in the following directory
  * structure:
  * <p>
- * protoParquetRoot
- * |- vertices.proto.parquet # all vertex data
- * |- edges.proto.parquet    # all edge data
- * |- graphs.proto.parquet   # all graph head data
+ * parquetRoot
+ * |- vertices.parquet # all vertex data
+ * |- edges.parquet    # all edge data
+ * |- graphs.parquet   # all graph head data
  */
-public class ParquetProtobufTemporalDataSource extends ParquetProtobufDataSource implements
-  TemporalDataSource {
+public class TemporalParquetDataSource extends ParquetDataSource implements TemporalDataSource {
 
   /**
-   * Creates a new parquet-protobuf data source.
+   * Creates a new temporal parquet data source.
    *
-   * @param basePath directory to the parquet-protobuf files
+   * @param basePath path to the directory containing the CSV files
    * @param config   Gradoop Flink configuration
    */
-  protected ParquetProtobufTemporalDataSource(String basePath, GradoopFlinkConfig config) {
+  public TemporalParquetDataSource(String basePath, TemporalGradoopConfig config) {
     super(basePath, config);
   }
 
@@ -69,17 +67,20 @@ public class ParquetProtobufTemporalDataSource extends ParquetProtobufDataSource
   public TemporalGraphCollection getTemporalGraphCollection() throws IOException {
     TemporalGraphCollectionFactory collectionFactory = getConfig().getTemporalGraphCollectionFactory();
 
-    DataSet<TemporalGraphHead> graphHeads =
-      read(TPGMProto.TemporalGraphHead.Builder.class, getGraphHeadPath())
-        .map(new ProtobufObjectToTemporalGraphHead(collectionFactory.getGraphHeadFactory()));
+    DataSet<TemporalGraphHead> graphHeads = read(
+      TemporalGraphHead.class,
+      getGraphHeadPath(),
+      TemporalGraphHeadRootConverter.class);
 
-    DataSet<TemporalVertex> vertices =
-      read(TPGMProto.TemporalVertex.Builder.class, getVertexPath())
-        .map(new ProtobufObjectToTemporalVertex(collectionFactory.getVertexFactory()));
+    DataSet<TemporalVertex> vertices = read(
+      TemporalVertex.class,
+      getVertexPath(),
+      TemporalVertexRootConverter.class);
 
-    DataSet<TemporalEdge> edges =
-      read(TPGMProto.TemporalEdge.Builder.class, getEdgePath())
-        .map(new ProtobufObjectToTemporalEdge(collectionFactory.getEdgeFactory()));
+    DataSet<TemporalEdge> edges = read(
+      TemporalEdge.class,
+      getEdgePath(),
+      TemporalEdgeRootConverter.class);
 
     return collectionFactory.fromDataSets(graphHeads, vertices, edges);
   }

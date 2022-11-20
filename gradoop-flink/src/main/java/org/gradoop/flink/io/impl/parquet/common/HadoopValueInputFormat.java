@@ -34,6 +34,7 @@ public class HadoopValueInputFormat<T> extends HadoopInputFormatBase<Void, T, T>
 
   /**
    * Creates a new Flink input format.
+   *
    * @param mapreduceInputFormat  Hadoop (mapreduce) input format
    * @param value value type class
    * @param job job instance for configuration

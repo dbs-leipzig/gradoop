@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates an {@link EPGMEdge} from a protobuf {@link EPGMProto.Edge.Builder}
+ * Creates an {@link EPGMEdge} from a protobuf {@link EPGMProto.Edge.Builder}.
  */
 public class ProtobufObjectToEdge extends ProtobufObjectToElement<EPGMProto.Edge.Builder, EPGMEdge> {
 
@@ -33,7 +33,7 @@ public class ProtobufObjectToEdge extends ProtobufObjectToElement<EPGMProto.Edge
   private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
-   * Creates ProtobufObjectToEdge converter
+   * Creates ProtobufObjectToEdge converter.
    *
    * @param edgeFactory The factory that is used to create the edges.
    */

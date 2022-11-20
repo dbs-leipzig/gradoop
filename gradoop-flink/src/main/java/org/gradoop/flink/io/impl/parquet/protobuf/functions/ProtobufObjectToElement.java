@@ -52,7 +52,7 @@ public abstract class ProtobufObjectToElement<B extends Message.Builder, E exten
   }
 
   /**
-   * Converts a protobuf byte array ({@link ByteString}) into a gradoop id
+   * Converts a protobuf byte array ({@link ByteString}) into a gradoop id.
    *
    * @param value binary representation of a gradoop id
    * @return converted gradoop id
@@ -62,7 +62,7 @@ public abstract class ProtobufObjectToElement<B extends Message.Builder, E exten
   }
 
   /**
-   * Converts a map of strings and binary property values ({@link ByteString}) into a property map
+   * Converts a map of strings and binary property values ({@link ByteString}) into a property map.
    *
    * @param propertyValues map of strings and binary property values
    * @return converted properties
@@ -79,7 +79,7 @@ public abstract class ProtobufObjectToElement<B extends Message.Builder, E exten
   }
 
   /**
-   * Converts a list of binary gradoop ids into a gradoop id set
+   * Converts a list of binary gradoop ids into a gradoop id set.
    *
    * @param gradoopIdList list of binary gradoop ids
    * @return converted gradoop id set

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to temporal parquet-protobuf input and output to Flink.
+ * Contains parquet writers for EPGM entities
  */
-package org.gradoop.temporal.io.impl.parquet.protobuf;
+package org.gradoop.flink.io.impl.parquet.plain.write;

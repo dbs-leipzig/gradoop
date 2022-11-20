@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.parquet.protobuf;
+package org.gradoop.flink.io.impl.parquet.plain;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.ProtobufObjectToEdge;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.ProtobufObjectToGraphHead;
-import org.gradoop.flink.io.impl.parquet.protobuf.functions.ProtobufObjectToVertex;
+import org.gradoop.flink.io.impl.parquet.plain.read.EdgeRootConverter;
+import org.gradoop.flink.io.impl.parquet.plain.read.GraphHeadRootConverter;
+import org.gradoop.flink.io.impl.parquet.plain.read.VertexRootConverter;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -31,25 +31,25 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.io.IOException;
 
 /**
- * A graph data source for parquet-protobuf files.
+ * A graph data source for parquet files.
  * <p>
  * The datasource expects files separated by vertices and edges, e.g. in the following directory
  * structure:
  * <p>
- * protoParquetRoot
- * |- vertices.proto.parquet # all vertex data
- * |- edges.proto.parquet    # all edge data
- * |- graphs.proto.parquet   # all graph head data
+ * parquetRoot
+ * |- vertices.parquet # all vertex data
+ * |- edges.parquet    # all edge data
+ * |- graphs.parquet   # all graph head data
  */
-public class ParquetProtobufDataSource extends ParquetProtobufBase implements DataSource {
+public class ParquetDataSource extends ParquetBase implements DataSource {
 
   /**
-   * Creates a new parquet-protobuf data source.
+   * Creates a new parquet data source.
    *
    * @param basePath directory to the parquet-protobuf files
    * @param config   Gradoop Flink configuration
    */
-  public ParquetProtobufDataSource(String basePath, GradoopFlinkConfig config) {
+  public ParquetDataSource(String basePath, GradoopFlinkConfig config) {
     super(basePath, config);
   }
 
@@ -66,17 +66,18 @@ public class ParquetProtobufDataSource extends ParquetProtobufBase implements Da
   public GraphCollection getGraphCollection() throws IOException {
     GraphCollectionFactory collectionFactory = getConfig().getGraphCollectionFactory();
 
-    DataSet<EPGMGraphHead> graphHeads =
-      read(EPGMProto.GraphHead.Builder.class, getGraphHeadPath())
-        .map(new ProtobufObjectToGraphHead(collectionFactory.getGraphHeadFactory()));
-
-    DataSet<EPGMVertex> vertices =
-      read(EPGMProto.Vertex.Builder.class, getVertexPath())
-        .map(new ProtobufObjectToVertex(collectionFactory.getVertexFactory()));
-
-    DataSet<EPGMEdge> edges =
-      read(EPGMProto.Edge.Builder.class, getEdgePath())
-        .map(new ProtobufObjectToEdge(collectionFactory.getEdgeFactory()));
+    DataSet<EPGMGraphHead> graphHeads = read(
+      EPGMGraphHead.class,
+      getGraphHeadPath(),
+      GraphHeadRootConverter.class);
+    DataSet<EPGMVertex> vertices = read(
+      EPGMVertex.class,
+      getVertexPath(),
+      VertexRootConverter.class);
+    DataSet<EPGMEdge> edges = read(
+      EPGMEdge.class,
+      getEdgePath(),
+      EdgeRootConverter.class);
 
     return collectionFactory.fromDataSets(graphHeads, vertices, edges);
   }

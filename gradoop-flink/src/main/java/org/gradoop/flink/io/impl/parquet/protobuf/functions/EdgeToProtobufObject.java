@@ -19,7 +19,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates a protobuf {@link EPGMProto.Edge.Builder} from an {@link EPGMEdge}
+ * Creates a protobuf {@link EPGMProto.Edge.Builder} from an {@link EPGMEdge}.
  */
 public class EdgeToProtobufObject extends ElementToProtobufObject<EPGMEdge, EPGMProto.Edge.Builder> {
 

@@ -37,7 +37,8 @@ public class ParquetOutputFormatWithMode<T> extends ParquetOutputFormat<T> {
   private static final String PARQUET_WRITER_MODE = "parquet.writer.mode";
 
   /**
-   * Sets the file creation mode of a {@link JobContext}
+   * Sets the file creation mode of a {@link JobContext}.
+   *
    * @param context the job's context
    * @param mode the file creation mode
    */
@@ -46,7 +47,8 @@ public class ParquetOutputFormatWithMode<T> extends ParquetOutputFormat<T> {
   }
 
   /**
-   * Gets the file creation mode of a {@link JobContext}
+   * Gets the file creation mode of a {@link JobContext}.
+   *
    * @param context the job's context
    * @return the specified mode or defaults to {@link ParquetFileWriter.Mode#CREATE} if not found
    */

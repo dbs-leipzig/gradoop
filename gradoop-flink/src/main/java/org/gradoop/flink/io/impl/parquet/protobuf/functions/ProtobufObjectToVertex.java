@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates an {@link EPGMVertex} from a protobuf {@link EPGMProto.Vertex.Builder}
+ * Creates an {@link EPGMVertex} from a protobuf {@link EPGMProto.Vertex.Builder}.
  */
 public class ProtobufObjectToVertex extends ProtobufObjectToElement<EPGMProto.Vertex.Builder, EPGMVertex> {
 
@@ -33,7 +33,7 @@ public class ProtobufObjectToVertex extends ProtobufObjectToElement<EPGMProto.Ve
   private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
-   * Creates ProtobufObjectToVertex converter
+   * Creates ProtobufObjectToVertex converter.
    *
    * @param vertexFactory The factory that is used to create the vertices.
    */

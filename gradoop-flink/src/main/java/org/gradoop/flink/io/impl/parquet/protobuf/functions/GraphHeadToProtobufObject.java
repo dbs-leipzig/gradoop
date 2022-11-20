@@ -19,7 +19,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.io.impl.parquet.protobuf.EPGMProto;
 
 /**
- * Creates a protobuf {@link EPGMProto.GraphHead.Builder} from an {@link EPGMGraphHead}
+ * Creates a protobuf {@link EPGMProto.GraphHead.Builder} from an {@link EPGMGraphHead}.
  */
 public class GraphHeadToProtobufObject extends ElementToProtobufObject<EPGMGraphHead, EPGMProto.GraphHead.Builder> {
 
