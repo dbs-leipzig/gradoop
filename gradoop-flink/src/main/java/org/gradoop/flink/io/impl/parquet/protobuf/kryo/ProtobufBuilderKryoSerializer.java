@@ -47,7 +47,7 @@ public class ProtobufBuilderKryoSerializer extends Serializer<Message.Builder> {
     CacheBuilder.newBuilder().maximumSize(MAX_CACHE_SIZE).build(CacheLoader.from(key -> {
       try {
         assert key != null;
-        return key.getMethod("newBuilder");
+        return key.getDeclaringClass().getMethod("newBuilder");
       } catch (NoSuchMethodException e) {
         throw new RuntimeException(String.format(
           "can't find newBuilder method for Protobuf message builder class: %s", key.getName()), e);
