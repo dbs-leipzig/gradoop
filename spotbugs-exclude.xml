@@ -10,8 +10,8 @@
     <!-- auto generated protobuf files -->
     <Match>
         <Or>
-            <Package name="org.gradoop.flink.io.impl.parquet.protobuf"/>
-            <Package name="org.gradoop.temporal.io.impl.parquet.protobuf"/>
+            <Class name="~org\.gradoop\.flink\.io\.impl\.parquet\.protobuf\.EPGMProto.*"/>
+            <Class name="~org\.gradoop\.temporal\.io\.impl\.parquet\.protobuf\.TPGMProto.*"/>
         </Or>
     </Match>
 </FindBugsFilter>

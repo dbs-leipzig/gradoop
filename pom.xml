@@ -183,7 +183,6 @@
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
         <plugin.maven-protoc.version>3.11.4</plugin.maven-protoc.version>
-        <plugin.maven-build-helper.version>3.3.0</plugin.maven-build-helper.version>
         <plugin.maven-compiler.version>3.8.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
         <plugin.maven-spotbugs.version>4.3.0</plugin.maven-spotbugs.version>
