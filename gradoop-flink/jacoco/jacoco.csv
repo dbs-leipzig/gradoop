@@ -340,8 +340,8 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,AverageIncomingD
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,DegreeCentralityBase,0,3,0,0,0,1,0,1,0,1
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,EdgeLabelDistribution,0,12,0,0,0,2,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,IncomingVertexDegrees,0,37,0,0,0,5,0,2,0,2
-Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,ConnectedComponentsDistribution,18,64,0,2,6,10,3,3,3,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,SourceLabelAndEdgeLabelDistribution,0,40,0,0,0,7,0,2,0,2
+Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,ConnectedComponentsDistribution,18,64,0,2,6,10,3,3,3,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,DistinctEdgePropertiesByLabel,0,10,0,0,0,2,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,OutgoingVertexDegrees,0,37,0,0,0,5,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics,DistinctTargetIds,0,12,0,0,0,5,0,2,0,2
@@ -669,9 +669,9 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.split,Split,0,149,0,0,0,37,
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,AlphabeticalLabelComparator,11,0,0,0,2,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,UndirectedDFSBranchComparator,71,0,8,0,13,0,6,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,ProportionalLabelComparator,31,0,4,0,7,0,4,0,2,0
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,41,195,25,33,7,46,19,12,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,34,202,22,36,6,47,17,14,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,3,89,1,11,1,18,1,7,0,2
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,3,28,1,3,1,6,1,3,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,0,31,0,4,0,7,0,4,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,DFSCodeUtils,1,49,2,6,0,11,2,6,0,4
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,Simple16Compressor,3,54,0,4,1,11,1,7,1,5
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,UnsortedSearchGraphUtils,2,3,0,0,1,1,1,1,1,1
