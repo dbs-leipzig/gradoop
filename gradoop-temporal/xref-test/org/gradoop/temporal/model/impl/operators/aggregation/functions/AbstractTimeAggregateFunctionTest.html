@@ -69,7 +69,7 @@
 <a name="59" href="#59">59</a>      <em class="jxr_comment">// Create a mock of the abstract function. (The first constructor parameter, the property key,</em>
 <a name="60" href="#60">60</a>      <em class="jxr_comment">// is irrelevant for this test.</em>
 <a name="61" href="#61">61</a>      TemporalAggregateFunction mock = mock(AbstractTimeAggregateFunction.<strong class="jxr_keyword">class</strong>, withSettings()
-<a name="62" href="#62">62</a>        .useConstructor(<span class="jxr_string">""</span>, interval, field).defaultAnswer(CALLS_REAL_METHODS));
+<a name="62" href="#62">62</a>        .useConstructor(interval, field, <span class="jxr_string">""</span>).defaultAnswer(CALLS_REAL_METHODS));
 <a name="63" href="#63">63</a>      PropertyValue increment = mock.getIncrement(testElement);
 <a name="64" href="#64">64</a>      assertTrue(increment.isLong());
 <a name="65" href="#65">65</a>      assertEquals(expectedValue, increment.getLong());

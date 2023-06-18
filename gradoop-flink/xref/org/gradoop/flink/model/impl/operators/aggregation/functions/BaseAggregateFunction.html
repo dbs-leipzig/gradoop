@@ -34,14 +34,14 @@
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/BaseAggregateFunction.html">BaseAggregateFunction</a> implements <a href="../../../../../../../../org/gradoop/flink/model/api/functions/AggregateFunction.html">AggregateFunction</a> {
 <a name="26" href="#26">26</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">   * Key of the aggregate property.</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">   * The key of the property where the aggregated result is saved.</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="29" href="#29">29</a>    <strong class="jxr_keyword">private</strong> String aggregatePropertyKey;
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Creates a new instance of a base aggregate function.</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * @param aggregatePropertyKey aggregate property key</em>
+<a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * @param aggregatePropertyKey the aggregate property key</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="36" href="#36">36</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/BaseAggregateFunction.html">BaseAggregateFunction</a>(String aggregatePropertyKey) {
 <a name="37" href="#37">37</a>      setAggregatePropertyKey(aggregatePropertyKey);

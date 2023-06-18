@@ -16,7 +16,10 @@
 package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
@@ -28,6 +31,10 @@ import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxEdgeTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxVertexTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinEdgeTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinVertexTime;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
@@ -38,6 +45,9 @@ import org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValid
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
@@ -59,7 +69,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate) {
-<span class="fc" id="L62">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L72">    return snapshot(predicate, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -72,7 +82,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return the snapshot as a temporal graph
    */
   default TemporalGraph snapshot(TemporalPredicate predicate, TimeDimension dimension) {
-<span class="fc" id="L75">    return callForGraph(new Snapshot(predicate, dimension));</span>
+<span class="fc" id="L85">    return callForGraph(new Snapshot(predicate, dimension));</span>
   }
 
   /**
@@ -85,7 +95,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see AsOf
    */
   default TemporalGraph asOf(long timestamp) {
-<span class="fc" id="L88">    return snapshot(new AsOf(timestamp));</span>
+<span class="fc" id="L98">    return snapshot(new AsOf(timestamp));</span>
   }
 
   /**
@@ -99,7 +109,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see FromTo
    */
   default TemporalGraph fromTo(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L102">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L112">    return snapshot(new FromTo(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -113,7 +123,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see Between
    */
   default TemporalGraph between(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L116">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L126">    return snapshot(new Between(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -127,7 +137,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ContainedIn
    */
   default TemporalGraph containedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L130">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L140">    return snapshot(new ContainedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -141,7 +151,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see ValidDuring
    */
   default TemporalGraph validDuring(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L144">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L154">    return snapshot(new ValidDuring(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -155,7 +165,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see CreatedIn
    */
   default TemporalGraph createdIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L158">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L168">    return snapshot(new CreatedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -169,7 +179,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @see DeletedIn
    */
   default TemporalGraph deletedIn(long fromTimestamp, long toTimestamp) {
-<span class="fc" id="L172">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
+<span class="fc" id="L182">    return snapshot(new DeletedIn(fromTimestamp, toTimestamp));</span>
   }
 
   /**
@@ -200,7 +210,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * {@link Diff#PROPERTY_KEY} is set on each graph element with a numerical value (-1, 0, 1) defined above.
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot) {
-<span class="fc" id="L203">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
+<span class="fc" id="L213">    return diff(firstSnapshot, secondSnapshot, TimeDimension.VALID_TIME);</span>
   }
 
   /**
@@ -231,7 +241,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    */
   default TemporalGraph diff(TemporalPredicate firstSnapshot, TemporalPredicate secondSnapshot,
                              TimeDimension dimension) {
-<span class="fc" id="L234">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
+<span class="fc" id="L244">    return callForGraph(new Diff(firstSnapshot, secondSnapshot, dimension));</span>
   }
 
   /**
@@ -247,7 +257,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return graph collection containing matching subgraphs
    */
   default TemporalGraphCollection temporalQuery(String temporalGdlQuery) {
-<span class="nc" id="L250">    return temporalQuery(temporalGdlQuery, new DummyTemporalGraphStatistics());</span>
+<span class="nc" id="L260">    return temporalQuery(temporalGdlQuery, new DummyTemporalGraphStatistics());</span>
   }
 
   /**
@@ -274,7 +284,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return graph collection containing the output of the construct pattern
    */
   default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern) {
-<span class="nc" id="L277">    return temporalQuery(temporalGdlQuery, constructionPattern, new DummyTemporalGraphStatistics());</span>
+<span class="nc" id="L287">    return temporalQuery(temporalGdlQuery, constructionPattern, new DummyTemporalGraphStatistics());</span>
   }
 
   /**
@@ -288,7 +298,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    */
   default TemporalGraphCollection temporalQuery(String temporalGdlQuery,
     TemporalGraphStatistics graphStatistics) {
-<span class="nc" id="L291">    return temporalQuery(temporalGdlQuery, null, graphStatistics);</span>
+<span class="nc" id="L301">    return temporalQuery(temporalGdlQuery, null, graphStatistics);</span>
   }
 
   /**
@@ -313,7 +323,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    */
   default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
     TemporalGraphStatistics graphStatistics) {
-<span class="nc" id="L316">    return temporalQuery(temporalGdlQuery, constructionPattern, true, MatchStrategy.HOMOMORPHISM,</span>
+<span class="nc" id="L326">    return temporalQuery(temporalGdlQuery, constructionPattern, true, MatchStrategy.HOMOMORPHISM,</span>
       MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
@@ -332,10 +342,70 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
   default TemporalGraphCollection temporalQuery(String temporalGdlQuery, String constructionPattern,
     boolean attachData, MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
     TemporalGraphStatistics stats) {
-<span class="nc" id="L335">    return callForCollection(</span>
+<span class="nc" id="L345">    return callForCollection(</span>
       new CypherTemporalPatternMatching(temporalGdlQuery, constructionPattern, attachData, vertexStrategy,
         edgeStrategy, stats, new CNFPostProcessing()));
   }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexGroupingKeys) {
+<span class="nc" id="L360">    return temporalGroupBy(vertexGroupingKeys, null);</span>
+  }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param edgeGroupingKeys   property keys to group edges
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexGroupingKeys,
+    List&lt;KeyFunction&lt;TemporalEdge, ?&gt;&gt; edgeGroupingKeys) {
+<span class="nc" id="L375">    return temporalGroupBy(vertexGroupingKeys, new ArrayList&lt;&gt;(), edgeGroupingKeys, new ArrayList&lt;&gt;());</span>
+  }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys       property keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys         property keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexGroupingKeys,
+    List&lt;AggregateFunction&gt; vertexAggregateFunctions, List&lt;KeyFunction&lt;TemporalEdge, ?&gt;&gt; edgeGroupingKeys,
+    List&lt;AggregateFunction&gt; edgeAggregateFunctions) {
+    // Add min/max valid time aggregations that will result in the new valid times
+<span class="fc" id="L394">    List&lt;AggregateFunction&gt; tempVertexAgg = new ArrayList&lt;&gt;(vertexAggregateFunctions);</span>
+<span class="fc" id="L395">    tempVertexAgg.add(new MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)</span>
+<span class="fc" id="L396">      .setAsValidTime(TimeDimension.Field.FROM));</span>
+<span class="fc" id="L397">    tempVertexAgg.add(new MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)</span>
+<span class="fc" id="L398">      .setAsValidTime(TimeDimension.Field.TO));</span>
+<span class="fc" id="L399">    List&lt;AggregateFunction&gt; tempEdgeAgg = new ArrayList&lt;&gt;(edgeAggregateFunctions);</span>
+<span class="fc" id="L400">    tempEdgeAgg.add(new MinEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)</span>
+<span class="fc" id="L401">      .setAsValidTime(TimeDimension.Field.FROM));</span>
+<span class="fc" id="L402">    tempEdgeAgg.add(new MaxEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)</span>
+<span class="fc" id="L403">      .setAsValidTime(TimeDimension.Field.TO));</span>
+
+<span class="fc" id="L405">    return callForGraph(new KeyedGrouping&lt;&gt;(vertexGroupingKeys, tempVertexAgg, edgeGroupingKeys,</span>
+      tempEdgeAgg));
+  }
+
   //----------------------------------------------------------------------------
   // Utilities
   //----------------------------------------------------------------------------
@@ -358,7 +428,7 @@ public interface TemporalGraphOperators extends BaseGraphOperators&lt;TemporalGr
    * @return This graph with invalid or dangling edges removed.
    */
   default TemporalGraph updateEdgeValidity() {
-<span class="nc" id="L361">    return callForGraph(new VerifyAndUpdateEdgeValidity());</span>
+<span class="nc" id="L431">    return callForGraph(new VerifyAndUpdateEdgeValidity());</span>
   }
 
 }

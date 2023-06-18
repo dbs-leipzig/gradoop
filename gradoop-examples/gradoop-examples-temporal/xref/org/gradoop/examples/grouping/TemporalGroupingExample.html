@@ -99,8 +99,8 @@
 <a name="89" href="#89">89</a>          Arrays.asList(
 <a name="90" href="#90">90</a>            <strong class="jxr_keyword">new</strong> Count(<span class="jxr_string">"count"</span>),
 <a name="91" href="#91">91</a>            <strong class="jxr_keyword">new</strong> AverageDuration(<span class="jxr_string">"avgDur"</span>, dim),
-<a name="92" href="#92">92</a>            <strong class="jxr_keyword">new</strong> MinTime(<span class="jxr_string">"firstStart"</span>, dim, TimeDimension.Field.FROM),
-<a name="93" href="#93">93</a>            <strong class="jxr_keyword">new</strong> MaxTime(<span class="jxr_string">"lastStart"</span>, dim, TimeDimension.Field.FROM)),
+<a name="92" href="#92">92</a>            <strong class="jxr_keyword">new</strong> MinTime(dim, TimeDimension.Field.FROM, <span class="jxr_string">"firstStart"</span>),
+<a name="93" href="#93">93</a>            <strong class="jxr_keyword">new</strong> MaxTime(dim, TimeDimension.Field.FROM, <span class="jxr_string">"lastStart"</span>)),
 <a name="94" href="#94">94</a>          <em class="jxr_comment">// Edge grouping keys (label)</em>
 <a name="95" href="#95">95</a>          Collections.singletonList(GroupingKeys.label()),
 <a name="96" href="#96">96</a>          <em class="jxr_comment">// Edge aggregation functions (count)</em>

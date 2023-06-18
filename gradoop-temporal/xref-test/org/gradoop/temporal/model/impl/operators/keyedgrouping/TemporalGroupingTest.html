@@ -27,10 +27,10 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.KeyFunction;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.RemoveProperties;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.TemporalGraph;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.temporal.model.impl.operators.keyedgrouping.keys.DurationKeyFunction;
@@ -89,150 +89,168 @@
 <a name="79" href="#79">79</a>        <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"max_a"</span>),
 <a name="80" href="#80">80</a>        <strong class="jxr_keyword">new</strong> MinVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"min_a"</span>),
 <a name="81" href="#81">81</a>        <strong class="jxr_keyword">new</strong> VertexCount(<span class="jxr_string">"count"</span>));
-<a name="82" href="#82">82</a>      TemporalGraph result = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexGroupingKeys, vertexAggregateFunctions,
-<a name="83" href="#83">83</a>        Collections.emptyList(), Collections.emptyList()));
+<a name="82" href="#82">82</a>      TemporalGraph result = input.temporalGroupBy(vertexGroupingKeys, vertexAggregateFunctions,
+<a name="83" href="#83">83</a>        Collections.emptyList(), Collections.emptyList());
 <a name="84" href="#84">84</a>      TemporalGraph expected = toTemporalGraphWithDefaultExtractors(
 <a name="85" href="#85">85</a>        loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>))
-<a name="86" href="#86">86</a>        .transformVertices((current, transformed) -&gt; {
-<a name="87" href="#87">87</a>          <em class="jxr_comment">// These properties are not automatically removed when the graph is converted to a temporal graph,</em>
-<a name="88" href="#88">88</a>          <em class="jxr_comment">// but they are during grouping, since no property grouping keys are given.</em>
-<a name="89" href="#89">89</a>          current.removeProperty(<span class="jxr_string">"__valFrom"</span>);
-<a name="90" href="#90">90</a>          current.removeProperty(<span class="jxr_string">"__valTo"</span>);
-<a name="91" href="#91">91</a>          <strong class="jxr_keyword">return</strong> current;
-<a name="92" href="#92">92</a>        });
-<a name="93" href="#93">93</a>      collectAndAssertTrue(expected.toLogicalGraph().equalsByElementData(result.toLogicalGraph()));
-<a name="94" href="#94">94</a>    }
-<a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * Test grouping using the {@link TimeStampKeyFunction} key function.</em>
-<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails</em>
-<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   */</em>
-<a name="101" href="#101">101</a>   @Test
-<a name="102" href="#102">102</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTimeStampKeyFunctionOnGraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="103" href="#103">103</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime1 = asMillis(<span class="jxr_string">"2019.01.01 01:00:00.000"</span>);
-<a name="104" href="#104">104</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime2 = asMillis(<span class="jxr_string">"2019.01.01 01:00:00.001"</span>);
-<a name="105" href="#105">105</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime3 = asMillis(<span class="jxr_string">"2018.01.01 01:00:00.000"</span>);
-<a name="106" href="#106">106</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime4 = asMillis(<span class="jxr_string">"2019.02.01 01:00:00.000"</span>);
-<a name="107" href="#107">107</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input["</span> +
-<a name="108" href="#108">108</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime1 + <span class="jxr_string">"L, __valTo: "</span> + testTime2 + <span class="jxr_string">"L, a: 1L})"</span> +
-<a name="109" href="#109">109</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime1 + <span class="jxr_string">"L, __valTo: "</span> + testTime2 + <span class="jxr_string">"L, a: 2L})"</span> +
-<a name="110" href="#110">110</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime2 + <span class="jxr_string">"L, __valTo: "</span> + testTime2 + <span class="jxr_string">"L, a: 3L})"</span> +
-<a name="111" href="#111">111</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime2 + <span class="jxr_string">"L, __valTo: "</span> + testTime2 + <span class="jxr_string">"L, a: 4L})"</span> +
-<a name="112" href="#112">112</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime3 + <span class="jxr_string">"L, __valTo: "</span> + testTime4 + <span class="jxr_string">"L, a: 5L})"</span> +
-<a name="113" href="#113">113</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime3 + <span class="jxr_string">"L, __valTo: "</span> + testTime4 + <span class="jxr_string">"L, a: 6L})"</span> +
-<a name="114" href="#114">114</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime4 + <span class="jxr_string">"L, __valTo: "</span> + testTime4 + <span class="jxr_string">"L, a: 7L})"</span> +
-<a name="115" href="#115">115</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTime4 + <span class="jxr_string">"L, __valTo: "</span> + testTime4 + <span class="jxr_string">"L, a: 8L})"</span> +
-<a name="116" href="#116">116</a>       <span class="jxr_string">"] expected1 ["</span> +
-<a name="117" href="#117">117</a>       <span class="jxr_string">"({time_VALID_TIME_FROM: "</span> + testTime1 + <span class="jxr_string">"L, min_a: 1L, max_a: 2L, count: 2L})"</span> +
-<a name="118" href="#118">118</a>       <span class="jxr_string">"({time_VALID_TIME_FROM: "</span> + testTime2 + <span class="jxr_string">"L, min_a: 3L, max_a: 4L, count: 2L})"</span> +
-<a name="119" href="#119">119</a>       <span class="jxr_string">"({time_VALID_TIME_FROM: "</span> + testTime3 + <span class="jxr_string">"L, min_a: 5L, max_a: 6L, count: 2L})"</span> +
-<a name="120" href="#120">120</a>       <span class="jxr_string">"({time_VALID_TIME_FROM: "</span> + testTime4 + <span class="jxr_string">"L, min_a: 7L, max_a: 8L, count: 2L})"</span> +
-<a name="121" href="#121">121</a>       <span class="jxr_string">"] expected2 ["</span> +
-<a name="122" href="#122">122</a>       <span class="jxr_string">"({time_VALID_TIME_FROM_MonthOfYear: 1L, time_VALID_TIME_FROM_Year: 2019L,"</span> +
-<a name="123" href="#123">123</a>       <span class="jxr_string">" min_a: 1L, max_a: 4L, count: 4L})"</span> +
-<a name="124" href="#124">124</a>       <span class="jxr_string">"({time_VALID_TIME_FROM_MonthOfYear: 1L, time_VALID_TIME_FROM_Year: 2018L,"</span> +
-<a name="125" href="#125">125</a>       <span class="jxr_string">" min_a: 5L, max_a: 6L, count: 2L})"</span> +
-<a name="126" href="#126">126</a>       <span class="jxr_string">"({time_VALID_TIME_FROM_MonthOfYear: 2L, time_VALID_TIME_FROM_Year: 2019L,"</span> +
-<a name="127" href="#127">127</a>       <span class="jxr_string">" min_a: 7L, max_a: 8L, count: 2L})"</span> +
-<a name="128" href="#128">128</a>       <span class="jxr_string">"] expected3 ["</span> +
-<a name="129" href="#129">129</a>       <span class="jxr_string">"({time_VALID_TIME_TO_MilliOfSecond: 1L, min_a: 1L, max_a: 4L, count: 4L})"</span> +
-<a name="130" href="#130">130</a>       <span class="jxr_string">"({time_VALID_TIME_TO_MilliOfSecond: 0L, min_a: 5L, max_a: 8L, count: 4L})"</span> +
-<a name="131" href="#131">131</a>       <span class="jxr_string">"]"</span>);
-<a name="132" href="#132">132</a>     List&lt;AggregateFunction&gt; vertexAggregateFunctions = Arrays.asList(
-<a name="133" href="#133">133</a>       <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"max_a"</span>),
-<a name="134" href="#134">134</a>       <strong class="jxr_keyword">new</strong> MinVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"min_a"</span>),
-<a name="135" href="#135">135</a>       <strong class="jxr_keyword">new</strong> VertexCount(<span class="jxr_string">"count"</span>));
-<a name="136" href="#136">136</a>     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>));
-<a name="137" href="#137">137</a>     <em class="jxr_comment">// Test with no TemporalField calculated</em>
-<a name="138" href="#138">138</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidFrom = Collections.singletonList(
-<a name="139" href="#139">139</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM));
-<a name="140" href="#140">140</a>     TemporalGraph expected1 = toTemporalGraph(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected1"</span>));
-<a name="141" href="#141">141</a>     TemporalGraph result1 = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysValidFrom, vertexAggregateFunctions,
-<a name="142" href="#142">142</a>       Collections.emptyList(), Collections.emptyList()));
-<a name="143" href="#143">143</a>     collectAndAssertTrue(result1.toLogicalGraph().equalsByElementData(expected1.toLogicalGraph()));
-<a name="144" href="#144">144</a>     <em class="jxr_comment">// Test with two TemporalFields calculated</em>
-<a name="145" href="#145">145</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidFrom2 = Arrays.asList(
-<a name="146" href="#146">146</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.MONTH_OF_YEAR),
-<a name="147" href="#147">147</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.YEAR));
-<a name="148" href="#148">148</a>     TemporalGraph expected2 = toTemporalGraph(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected2"</span>));
-<a name="149" href="#149">149</a>     TemporalGraph result2 = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysValidFrom2,
-<a name="150" href="#150">150</a>       vertexAggregateFunctions, Collections.emptyList(), Collections.emptyList()));
-<a name="151" href="#151">151</a>     collectAndAssertTrue(result2.toLogicalGraph().equalsByElementData(expected2.toLogicalGraph()));
-<a name="152" href="#152">152</a>     <em class="jxr_comment">// Test with validTo time</em>
-<a name="153" href="#153">153</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidTo = Collections.singletonList(
-<a name="154" href="#154">154</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, TO, ChronoField.MILLI_OF_SECOND));
-<a name="155" href="#155">155</a>     TemporalGraph expected3 = toTemporalGraph(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected3"</span>));
-<a name="156" href="#156">156</a>     TemporalGraph result3 = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysValidTo, vertexAggregateFunctions,
-<a name="157" href="#157">157</a>       Collections.emptyList(), Collections.emptyList()));
-<a name="158" href="#158">158</a>     collectAndAssertTrue(result3.toLogicalGraph().equalsByElementData(expected3.toLogicalGraph()));
-<a name="159" href="#159">159</a>   }
-<a name="160" href="#160">160</a> 
-<a name="161" href="#161">161</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="162" href="#162">162</a> <em class="jxr_javadoccomment">   * Test grouping using the {@link DurationKeyFunction} key function.</em>
-<a name="163" href="#163">163</a> <em class="jxr_javadoccomment">   *</em>
-<a name="164" href="#164">164</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails</em>
-<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">   */</em>
-<a name="166" href="#166">166</a>   @Test
-<a name="167" href="#167">167</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDurationKeyFunctionOnGraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="168" href="#168">168</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom1 = asMillis(<span class="jxr_string">"2019.04.20 00:00:00.000"</span>);
-<a name="169" href="#169">169</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo1 = asMillis(<span class="jxr_string">"2019.07.20 00:00:00.000"</span>);
-<a name="170" href="#170">170</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom2 = asMillis(<span class="jxr_string">"2020.08.01 12:00:00.000"</span>);
-<a name="171" href="#171">171</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo2 = asMillis(<span class="jxr_string">"2020.11.02 12:00:00.000"</span>);
-<a name="172" href="#172">172</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom3 = asMillis(<span class="jxr_string">"2019.01.01 12:00:00.000"</span>);
-<a name="173" href="#173">173</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo3 = asMillis(<span class="jxr_string">"2019.01.01 12:30:00.000"</span>);
-<a name="174" href="#174">174</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom4 = asMillis(<span class="jxr_string">"2019.01.01 18:10:10.100"</span>);
-<a name="175" href="#175">175</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo4 = asMillis(<span class="jxr_string">"2019.01.01 18:40:10.110"</span>);
-<a name="176" href="#176">176</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input["</span> +
-<a name="177" href="#177">177</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom1 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo1 + <span class="jxr_string">"L, a: 1L})"</span> +
-<a name="178" href="#178">178</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom2 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo2 + <span class="jxr_string">"L, a: 2L})"</span> +
-<a name="179" href="#179">179</a>       <span class="jxr_string">"] expected1 ["</span> +
-<a name="180" href="#180">180</a>       <span class="jxr_string">"({duration_VALID_TIME_Months: 3L, min_a: 1L, max_a: 2L, count: 2L})"</span> +
-<a name="181" href="#181">181</a>       <span class="jxr_string">"] expected2 ["</span> +
-<a name="182" href="#182">182</a>       <span class="jxr_string">"({duration_VALID_TIME_Days: 91L, min_a: 1L, max_a: 1L, count: 1L})"</span> +
-<a name="183" href="#183">183</a>       <span class="jxr_string">"({duration_VALID_TIME_Days: 93L, min_a: 2L, max_a: 2L, count: 1L})"</span> +
-<a name="184" href="#184">184</a>       <span class="jxr_string">"]"</span> +
-<a name="185" href="#185">185</a>       <span class="jxr_string">"input2 ["</span> +
-<a name="186" href="#186">186</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom3 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo3 + <span class="jxr_string">"L, a: 1L})"</span> +
-<a name="187" href="#187">187</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom4 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo4 + <span class="jxr_string">"L, a: 2L})"</span> +
-<a name="188" href="#188">188</a>       <span class="jxr_string">"] expected3 ["</span> +
-<a name="189" href="#189">189</a>       <span class="jxr_string">"({duration_VALID_TIME_Minutes: 30L, min_a: 1L, max_a: 2L, count: 2L})"</span> +
-<a name="190" href="#190">190</a>       <span class="jxr_string">"] expected4 ["</span> +
-<a name="191" href="#191">191</a>       <span class="jxr_string">"({duration_VALID_TIME_Millis: 1800000L, min_a: 1L, max_a: 1L, count: 1L})"</span> +
-<a name="192" href="#192">192</a>       <span class="jxr_string">"({duration_VALID_TIME_Millis: 1800010L, min_a: 2L, max_a: 2L, count: 1L})"</span> +
-<a name="193" href="#193">193</a>       <span class="jxr_string">"]"</span>);
-<a name="194" href="#194">194</a>     List&lt;AggregateFunction&gt; vertexAggregateFunctions = Arrays.asList(
-<a name="195" href="#195">195</a>       <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"max_a"</span>),
-<a name="196" href="#196">196</a>       <strong class="jxr_keyword">new</strong> MinVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"min_a"</span>),
-<a name="197" href="#197">197</a>       <strong class="jxr_keyword">new</strong> VertexCount(<span class="jxr_string">"count"</span>));
-<a name="198" href="#198">198</a>     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>));
-<a name="199" href="#199">199</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMonths = Collections.singletonList(
-<a name="200" href="#200">200</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MONTHS));
-<a name="201" href="#201">201</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysDays = Collections.singletonList(
-<a name="202" href="#202">202</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.DAYS));
-<a name="203" href="#203">203</a>     TemporalGraph byMonths = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysMonths, vertexAggregateFunctions,
-<a name="204" href="#204">204</a>       Collections.emptyList(), Collections.emptyList()));
-<a name="205" href="#205">205</a>     collectAndAssertTrue(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected1"</span>)
-<a name="206" href="#206">206</a>       .equalsByElementData(byMonths.toLogicalGraph()));
-<a name="207" href="#207">207</a>     TemporalGraph byDays = input.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysDays, vertexAggregateFunctions,
-<a name="208" href="#208">208</a>       Collections.emptyList(), Collections.emptyList()));
-<a name="209" href="#209">209</a>     collectAndAssertTrue(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected2"</span>)
-<a name="210" href="#210">210</a>       .equalsByElementData(byDays.toLogicalGraph()));
-<a name="211" href="#211">211</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMinutes = Collections.singletonList(
-<a name="212" href="#212">212</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MINUTES));
-<a name="213" href="#213">213</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMillis = Collections.singletonList(
-<a name="214" href="#214">214</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MILLIS));
-<a name="215" href="#215">215</a>     TemporalGraph input2 = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input2"</span>));
-<a name="216" href="#216">216</a>     TemporalGraph byMinutes = input2.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysMinutes,
-<a name="217" href="#217">217</a>       vertexAggregateFunctions, Collections.emptyList(), Collections.emptyList()));
-<a name="218" href="#218">218</a>     collectAndAssertTrue(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected3"</span>)
-<a name="219" href="#219">219</a>       .equalsByElementData(byMinutes.toLogicalGraph()));
-<a name="220" href="#220">220</a>     TemporalGraph byMillis = input2.callForGraph(<strong class="jxr_keyword">new</strong> KeyedGrouping&lt;&gt;(vertexKeysMillis, vertexAggregateFunctions,
-<a name="221" href="#221">221</a>       Collections.emptyList(), Collections.emptyList()));
-<a name="222" href="#222">222</a>     collectAndAssertTrue(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected4"</span>)
-<a name="223" href="#223">223</a>       .equalsByElementData(byMillis.toLogicalGraph()));
-<a name="224" href="#224">224</a>   }
-<a name="225" href="#225">225</a> }
+<a name="86" href="#86">86</a>        .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="87" href="#87">87</a>      collectAndAssertTrue(expected.equalsByData(result));
+<a name="88" href="#88">88</a>    }
+<a name="89" href="#89">89</a>  
+<a name="90" href="#90">90</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * Test grouping using the {@link TimeStampKeyFunction} key function.</em>
+<a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails</em>
+<a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="95" href="#95">95</a>    @Test
+<a name="96" href="#96">96</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testTimeStampKeyFunctionOnGraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="97" href="#97">97</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime1 = asMillis(<span class="jxr_string">"2019.01.01 01:00:00.000"</span>);
+<a name="98" href="#98">98</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime2 = asMillis(<span class="jxr_string">"2019.01.01 01:00:00.001"</span>);
+<a name="99" href="#99">99</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime3 = asMillis(<span class="jxr_string">"2018.01.01 01:00:00.000"</span>);
+<a name="100" href="#100">100</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTime4 = asMillis(<span class="jxr_string">"2019.02.01 01:00:00.000"</span>);
+<a name="101" href="#101">101</a>     String loaderString = String.format(<span class="jxr_string">"input["</span> +
+<a name="102" href="#102">102</a>       <span class="jxr_string">"(:t {__valFrom: %1$dL, __valTo: %2$dL, a: 1L})"</span> +
+<a name="103" href="#103">103</a>       <span class="jxr_string">"(:t {__valFrom: %1$dL, __valTo: %2$dL, a: 2L})"</span> +
+<a name="104" href="#104">104</a>       <span class="jxr_string">"(:t {__valFrom: %2$dL, __valTo: %2$dL, a: 3L})"</span> +
+<a name="105" href="#105">105</a>       <span class="jxr_string">"(:t {__valFrom: %2$dL, __valTo: %2$dL, a: 4L})"</span> +
+<a name="106" href="#106">106</a>       <span class="jxr_string">"(:t {__valFrom: %3$dL, __valTo: %4$dL, a: 5L})"</span> +
+<a name="107" href="#107">107</a>       <span class="jxr_string">"(:t {__valFrom: %3$dL, __valTo: %4$dL, a: 6L})"</span> +
+<a name="108" href="#108">108</a>       <span class="jxr_string">"(:t {__valFrom: %4$dL, __valTo: %4$dL, a: 7L})"</span> +
+<a name="109" href="#109">109</a>       <span class="jxr_string">"(:t {__valFrom: %4$dL, __valTo: %4$dL, a: 8L})"</span> +
+<a name="110" href="#110">110</a>       <span class="jxr_string">"] expected1 ["</span> +
+<a name="111" href="#111">111</a>       <span class="jxr_string">"({__valFrom: %1$dL, __valTo: %2$dL, time_VALID_TIME_FROM: %1$dL, min_a: 1L, max_a: 2L, count: 2L})"</span> +
+<a name="112" href="#112">112</a>       <span class="jxr_string">"({__valFrom: %2$dL, __valTo: %2$dL, time_VALID_TIME_FROM: %2$dL, min_a: 3L, max_a: 4L, count: 2L})"</span> +
+<a name="113" href="#113">113</a>       <span class="jxr_string">"({__valFrom: %3$dL, __valTo: %4$dL, time_VALID_TIME_FROM: %3$dL, min_a: 5L, max_a: 6L, count: 2L})"</span> +
+<a name="114" href="#114">114</a>       <span class="jxr_string">"({__valFrom: %4$dL, __valTo: %4$dL, time_VALID_TIME_FROM: %4$dL, min_a: 7L, max_a: 8L, count: 2L})"</span> +
+<a name="115" href="#115">115</a>       <span class="jxr_string">"] expected2 ["</span> +
+<a name="116" href="#116">116</a>       <span class="jxr_string">"({__valFrom: %1$dL, __valTo: %2$dL, time_VALID_TIME_FROM_MonthOfYear: 1L, time_VALID_TIME_FROM_Year: 2019L,"</span> +
+<a name="117" href="#117">117</a>       <span class="jxr_string">" min_a: 1L, max_a: 4L, count: 4L})"</span> +
+<a name="118" href="#118">118</a>       <span class="jxr_string">"({__valFrom: %3$dL, __valTo: %4$dL, time_VALID_TIME_FROM_MonthOfYear: 1L, time_VALID_TIME_FROM_Year: 2018L,"</span> +
+<a name="119" href="#119">119</a>       <span class="jxr_string">" min_a: 5L, max_a: 6L, count: 2L})"</span> +
+<a name="120" href="#120">120</a>       <span class="jxr_string">"({__valFrom: %4$dL, __valTo: %4$dL, time_VALID_TIME_FROM_MonthOfYear: 2L, time_VALID_TIME_FROM_Year: 2019L,"</span> +
+<a name="121" href="#121">121</a>       <span class="jxr_string">" min_a: 7L, max_a: 8L, count: 2L})"</span> +
+<a name="122" href="#122">122</a>       <span class="jxr_string">"] expected3 ["</span> +
+<a name="123" href="#123">123</a>       <span class="jxr_string">"({__valFrom: %1$dL, __valTo: %2$dL, time_VALID_TIME_TO_MilliOfSecond: 1L, min_a: 1L, max_a: 4L, count: 4L})"</span> +
+<a name="124" href="#124">124</a>       <span class="jxr_string">"({__valFrom: %3$dL, __valTo: %4$dL, time_VALID_TIME_TO_MilliOfSecond: 0L, min_a: 5L, max_a: 8L, count: 4L})"</span> +
+<a name="125" href="#125">125</a>       <span class="jxr_string">"]"</span>, testTime1, testTime2, testTime3, testTime4);
+<a name="126" href="#126">126</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(loaderString);
+<a name="127" href="#127">127</a>     List&lt;AggregateFunction&gt; vertexAggregateFunctions = Arrays.asList(
+<a name="128" href="#128">128</a>       <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"max_a"</span>),
+<a name="129" href="#129">129</a>       <strong class="jxr_keyword">new</strong> MinVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"min_a"</span>),
+<a name="130" href="#130">130</a>       <strong class="jxr_keyword">new</strong> VertexCount(<span class="jxr_string">"count"</span>));
+<a name="131" href="#131">131</a>     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>));
+<a name="132" href="#132">132</a>     <em class="jxr_comment">// Test with no TemporalField calculated</em>
+<a name="133" href="#133">133</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidFrom = Collections.singletonList(
+<a name="134" href="#134">134</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM));
+<a name="135" href="#135">135</a>     TemporalGraph expected1 = toTemporalGraphWithDefaultExtractors(
+<a name="136" href="#136">136</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected1"</span>))
+<a name="137" href="#137">137</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="138" href="#138">138</a>     TemporalGraph result1 = input.temporalGroupBy(vertexKeysValidFrom, vertexAggregateFunctions,
+<a name="139" href="#139">139</a>       Collections.emptyList(), Collections.emptyList());
+<a name="140" href="#140">140</a>     collectAndAssertTrue(result1.equalsByData(expected1));
+<a name="141" href="#141">141</a>     <em class="jxr_comment">// Test with two TemporalFields calculated</em>
+<a name="142" href="#142">142</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidFrom2 = Arrays.asList(
+<a name="143" href="#143">143</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.MONTH_OF_YEAR),
+<a name="144" href="#144">144</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, FROM, ChronoField.YEAR));
+<a name="145" href="#145">145</a>     TemporalGraph expected2 = toTemporalGraphWithDefaultExtractors(
+<a name="146" href="#146">146</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected2"</span>))
+<a name="147" href="#147">147</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="148" href="#148">148</a>     TemporalGraph result2 = input.temporalGroupBy(vertexKeysValidFrom2, vertexAggregateFunctions,
+<a name="149" href="#149">149</a>       Collections.emptyList(), Collections.emptyList());
+<a name="150" href="#150">150</a>     collectAndAssertTrue(result2.equalsByData(expected2));
+<a name="151" href="#151">151</a>     <em class="jxr_comment">// Test with validTo time</em>
+<a name="152" href="#152">152</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysValidTo = Collections.singletonList(
+<a name="153" href="#153">153</a>       TemporalGroupingKeys.timeStamp(VALID_TIME, TO, ChronoField.MILLI_OF_SECOND));
+<a name="154" href="#154">154</a>     TemporalGraph expected3 = toTemporalGraphWithDefaultExtractors(
+<a name="155" href="#155">155</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected3"</span>))
+<a name="156" href="#156">156</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="157" href="#157">157</a>     TemporalGraph result3 = input.temporalGroupBy(vertexKeysValidTo, vertexAggregateFunctions,
+<a name="158" href="#158">158</a>       Collections.emptyList(), Collections.emptyList());
+<a name="159" href="#159">159</a>     collectAndAssertTrue(result3.equalsByData(expected3));
+<a name="160" href="#160">160</a>   }
+<a name="161" href="#161">161</a> 
+<a name="162" href="#162">162</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="163" href="#163">163</a> <em class="jxr_javadoccomment">   * Test grouping using the {@link DurationKeyFunction} key function.</em>
+<a name="164" href="#164">164</a> <em class="jxr_javadoccomment">   *</em>
+<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails</em>
+<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">   */</em>
+<a name="167" href="#167">167</a>   @Test
+<a name="168" href="#168">168</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDurationKeyFunctionOnGraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="169" href="#169">169</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom1 = asMillis(<span class="jxr_string">"2019.04.20 00:00:00.000"</span>);
+<a name="170" href="#170">170</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo1 = asMillis(<span class="jxr_string">"2019.07.20 00:00:00.000"</span>);
+<a name="171" href="#171">171</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom2 = asMillis(<span class="jxr_string">"2020.08.01 12:00:00.000"</span>);
+<a name="172" href="#172">172</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo2 = asMillis(<span class="jxr_string">"2020.11.02 12:00:00.000"</span>);
+<a name="173" href="#173">173</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom3 = asMillis(<span class="jxr_string">"2019.01.01 12:00:00.000"</span>);
+<a name="174" href="#174">174</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo3 = asMillis(<span class="jxr_string">"2019.01.01 12:30:00.000"</span>);
+<a name="175" href="#175">175</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeFrom4 = asMillis(<span class="jxr_string">"2019.01.01 18:10:10.100"</span>);
+<a name="176" href="#176">176</a>     <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> testTimeTo4 = asMillis(<span class="jxr_string">"2019.01.01 18:40:10.110"</span>);
+<a name="177" href="#177">177</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input["</span> +
+<a name="178" href="#178">178</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom1 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo1 + <span class="jxr_string">"L, a: 1L})"</span> +
+<a name="179" href="#179">179</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom2 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo2 + <span class="jxr_string">"L, a: 2L})"</span> +
+<a name="180" href="#180">180</a>       <span class="jxr_string">"] expected1 ["</span> +
+<a name="181" href="#181">181</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom1 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo2 + <span class="jxr_string">"L,"</span> +
+<a name="182" href="#182">182</a>       <span class="jxr_string">" duration_VALID_TIME_Months: 3L, min_a: 1L, max_a: 2L, count: 2L})"</span> +
+<a name="183" href="#183">183</a>       <span class="jxr_string">"] expected2 ["</span> +
+<a name="184" href="#184">184</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom1 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo1 + <span class="jxr_string">"L,"</span> +
+<a name="185" href="#185">185</a>       <span class="jxr_string">" duration_VALID_TIME_Days: 91L, min_a: 1L, max_a: 1L, count: 1L})"</span> +
+<a name="186" href="#186">186</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom2 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo2 + <span class="jxr_string">"L,"</span> +
+<a name="187" href="#187">187</a>       <span class="jxr_string">" duration_VALID_TIME_Days: 93L, min_a: 2L, max_a: 2L, count: 1L})"</span> +
+<a name="188" href="#188">188</a>       <span class="jxr_string">"]"</span> +
+<a name="189" href="#189">189</a>       <span class="jxr_string">"input2 ["</span> +
+<a name="190" href="#190">190</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom3 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo3 + <span class="jxr_string">"L, a: 1L})"</span> +
+<a name="191" href="#191">191</a>       <span class="jxr_string">"(:t {__valFrom: "</span> + testTimeFrom4 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo4 + <span class="jxr_string">"L, a: 2L})"</span> +
+<a name="192" href="#192">192</a>       <span class="jxr_string">"] expected3 ["</span> +
+<a name="193" href="#193">193</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom3 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo4 + <span class="jxr_string">"L,"</span> +
+<a name="194" href="#194">194</a>       <span class="jxr_string">" duration_VALID_TIME_Minutes: 30L, min_a: 1L, max_a: 2L, count: 2L})"</span> +
+<a name="195" href="#195">195</a>       <span class="jxr_string">"] expected4 ["</span> +
+<a name="196" href="#196">196</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom3 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo3 + <span class="jxr_string">"L,"</span> +
+<a name="197" href="#197">197</a>       <span class="jxr_string">" duration_VALID_TIME_Millis: 1800000L, min_a: 1L, max_a: 1L, count: 1L})"</span> +
+<a name="198" href="#198">198</a>       <span class="jxr_string">"({__valFrom: "</span> + testTimeFrom4 + <span class="jxr_string">"L, __valTo: "</span> + testTimeTo4 + <span class="jxr_string">"L,"</span> +
+<a name="199" href="#199">199</a>       <span class="jxr_string">" duration_VALID_TIME_Millis: 1800010L, min_a: 2L, max_a: 2L, count: 1L})"</span> +
+<a name="200" href="#200">200</a>       <span class="jxr_string">"]"</span>);
+<a name="201" href="#201">201</a>     List&lt;AggregateFunction&gt; vertexAggregateFunctions = Arrays.asList(
+<a name="202" href="#202">202</a>       <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"max_a"</span>),
+<a name="203" href="#203">203</a>       <strong class="jxr_keyword">new</strong> MinVertexProperty(<span class="jxr_string">"a"</span>, <span class="jxr_string">"min_a"</span>),
+<a name="204" href="#204">204</a>       <strong class="jxr_keyword">new</strong> VertexCount(<span class="jxr_string">"count"</span>));
+<a name="205" href="#205">205</a>     TemporalGraph input = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>));
+<a name="206" href="#206">206</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMonths = Collections.singletonList(
+<a name="207" href="#207">207</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MONTHS));
+<a name="208" href="#208">208</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysDays = Collections.singletonList(
+<a name="209" href="#209">209</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.DAYS));
+<a name="210" href="#210">210</a>     TemporalGraph byMonths = input.temporalGroupBy(vertexKeysMonths, vertexAggregateFunctions,
+<a name="211" href="#211">211</a>       Collections.emptyList(), Collections.emptyList());
+<a name="212" href="#212">212</a>     TemporalGraph expected1 = toTemporalGraphWithDefaultExtractors(
+<a name="213" href="#213">213</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected1"</span>))
+<a name="214" href="#214">214</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="215" href="#215">215</a>     collectAndAssertTrue(expected1.equalsByData(byMonths));
+<a name="216" href="#216">216</a> 
+<a name="217" href="#217">217</a>     TemporalGraph byDays = input.temporalGroupBy(vertexKeysDays, vertexAggregateFunctions,
+<a name="218" href="#218">218</a>       Collections.emptyList(), Collections.emptyList());
+<a name="219" href="#219">219</a>     TemporalGraph expected2 = toTemporalGraphWithDefaultExtractors(
+<a name="220" href="#220">220</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected2"</span>))
+<a name="221" href="#221">221</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="222" href="#222">222</a>     collectAndAssertTrue(expected2.equalsByData(byDays));
+<a name="223" href="#223">223</a> 
+<a name="224" href="#224">224</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMinutes = Collections.singletonList(
+<a name="225" href="#225">225</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MINUTES));
+<a name="226" href="#226">226</a>     List&lt;KeyFunction&lt;TemporalVertex, ?&gt;&gt; vertexKeysMillis = Collections.singletonList(
+<a name="227" href="#227">227</a>       TemporalGroupingKeys.duration(VALID_TIME, ChronoUnit.MILLIS));
+<a name="228" href="#228">228</a>     TemporalGraph input2 = toTemporalGraphWithDefaultExtractors(loader.getLogicalGraphByVariable(<span class="jxr_string">"input2"</span>));
+<a name="229" href="#229">229</a>     TemporalGraph byMinutes = input2.temporalGroupBy(vertexKeysMinutes,
+<a name="230" href="#230">230</a>       vertexAggregateFunctions, Collections.emptyList(), Collections.emptyList());
+<a name="231" href="#231">231</a>     TemporalGraph expected3 = toTemporalGraphWithDefaultExtractors(
+<a name="232" href="#232">232</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected3"</span>))
+<a name="233" href="#233">233</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="234" href="#234">234</a>     collectAndAssertTrue(expected3.equalsByData(byMinutes));
+<a name="235" href="#235">235</a> 
+<a name="236" href="#236">236</a>     TemporalGraph byMillis = input2.temporalGroupBy(vertexKeysMillis, vertexAggregateFunctions,
+<a name="237" href="#237">237</a>       Collections.emptyList(), Collections.emptyList());
+<a name="238" href="#238">238</a>     TemporalGraph expected4 = toTemporalGraphWithDefaultExtractors(
+<a name="239" href="#239">239</a>       loader.getLogicalGraphByVariable(<span class="jxr_string">"expected4"</span>))
+<a name="240" href="#240">240</a>       .transformVertices(<strong class="jxr_keyword">new</strong> RemoveProperties&lt;&gt;(<span class="jxr_string">"__valFrom"</span>, <span class="jxr_string">"__valTo"</span>));
+<a name="241" href="#241">241</a>     collectAndAssertTrue(expected4.equalsByData(byMillis));
+<a name="242" href="#242">242</a>   }
+<a name="243" href="#243">243</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

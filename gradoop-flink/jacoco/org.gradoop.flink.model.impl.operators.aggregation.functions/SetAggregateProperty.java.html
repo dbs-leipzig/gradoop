@@ -51,52 +51,39 @@ public class SetAggregateProperty&lt;G extends GraphHead&gt;
    */
   private Map&lt;String, PropertyValue&gt; aggregateValues;
 
-  /**
-   * map from aggregate property key to its default value
-   * used to replace aggregate value in case of NULL.
-   */
-  private final Map&lt;String, PropertyValue&gt; defaultValues;
-
 
   /**
    * Creates a new instance of a SetAggregateProperty rich map function.
    *
    * @param aggregateFunctions aggregate functions
    */
-<span class="fc" id="L66">  public SetAggregateProperty(Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
-<span class="fc" id="L67">    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);</span>
-
-<span class="fc" id="L69">    defaultValues = new HashMap&lt;&gt;();</span>
-
-<span class="fc bfc" id="L71" title="All 2 branches covered.">    for (AggregateFunction func : aggregateFunctions) {</span>
-<span class="fc" id="L72">      Objects.requireNonNull(func);</span>
-<span class="fc" id="L73">      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));</span>
-<span class="fc" id="L74">    }</span>
-<span class="fc" id="L75">  }</span>
+<span class="fc" id="L60">  public SetAggregateProperty(Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
+<span class="fc" id="L61">    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);</span>
+<span class="fc" id="L62">  }</span>
 
   @SuppressWarnings(&quot;unchecked&quot;)
   @Override
   public void open(Configuration parameters) throws Exception {
-<span class="fc" id="L80">    super.open(parameters);</span>
+<span class="fc" id="L67">    super.open(parameters);</span>
 
-<span class="fc bfc" id="L82" title="All 2 branches covered.">    if (getRuntimeContext().getBroadcastVariable(VALUE).isEmpty()) {</span>
-<span class="fc" id="L83">      aggregateValues = defaultValues;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (getRuntimeContext().getBroadcastVariable(VALUE).isEmpty()) {</span>
+<span class="fc" id="L70">      aggregateValues = new HashMap&lt;&gt;();</span>
     } else {
-<span class="fc" id="L85">      aggregateValues = (Map&lt;String, PropertyValue&gt;) getRuntimeContext()</span>
-<span class="fc" id="L86">        .getBroadcastVariable(VALUE).get(0);</span>
+<span class="fc" id="L72">      aggregateValues = (Map&lt;String, PropertyValue&gt;) getRuntimeContext()</span>
+<span class="fc" id="L73">        .getBroadcastVariable(VALUE).get(0);</span>
       // Compute post-aggregate functions.
-<span class="fc bfc" id="L88" title="All 2 branches covered.">      for (AggregateFunction function : aggregateFunctions) {</span>
-<span class="fc" id="L89">        aggregateValues.computeIfPresent(function.getAggregatePropertyKey(),</span>
-<span class="fc" id="L90">          (k, v) -&gt; function.postAggregate(v));</span>
-<span class="fc" id="L91">      }</span>
-<span class="fc" id="L92">      defaultValues.forEach(aggregateValues::putIfAbsent);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">      for (AggregateFunction function : aggregateFunctions) {</span>
+<span class="fc" id="L76">        aggregateValues.computeIfPresent(function.getAggregatePropertyKey(),</span>
+<span class="fc" id="L77">          (k, v) -&gt; function.postAggregate(v));</span>
+<span class="fc" id="L78">      }</span>
     }
-<span class="fc" id="L94">  }</span>
+<span class="fc" id="L80">  }</span>
 
   @Override
   public G map(G graphHead) throws Exception {
-<span class="fc" id="L98">    aggregateValues.forEach(graphHead::setProperty);</span>
-<span class="fc" id="L99">    return graphHead;</span>
+<span class="fc" id="L84">    aggregateFunctions.forEach(f -&gt; f.applyResult(graphHead,</span>
+<span class="fc" id="L85">      aggregateValues.getOrDefault(f.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(f))));</span>
+<span class="fc" id="L86">    return graphHead;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -5,10 +5,10 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalVertex,0,12,0,0,0,
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHeadFactory,21,50,0,0,4,10,2,8,2,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphElement,1,65,2,4,0,17,2,9,0,8
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdgeFactory,17,110,0,0,2,17,2,12,2,12
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement.new Object() {...},2,17,0,0,0,1,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement.new Object() {...},4,33,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalGraphHead,0,11,0,0,0,4,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalEdge,0,32,0,0,0,12,0,6,0,6
-Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement,14,227,2,15,1,48,2,24,0,17
+Gradoop Temporal,org.gradoop.temporal.model.impl.pojo,TemporalElement,28,243,3,17,2,54,3,26,0,18
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning,BinningTemporalGraphStatistics,119,2291,33,295,20,452,31,166,0,33
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.statistics.binning,BinningTemporalGraphStatisticsFactory,7,84,1,3,1,20,2,6,1,5
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.functions,ElementsFromEmbeddingTPGM,83,375,9,21,16,75,6,16,0,7
@@ -20,10 +20,10 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.stati
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.keyedgrouping,TemporalGroupingKeys,0,23,0,0,0,4,0,4,0,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring.functions,TemporalElementToDataString,0,44,0,4,0,12,0,4,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,ContainedIn,11,40,0,4,4,6,1,5,1,3
-Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Precedes,11,40,1,3,4,6,2,4,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,AsOf,7,30,0,4,3,5,1,5,1,3
-Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,FromTo,11,38,0,4,4,6,1,5,1,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Precedes,11,40,1,3,4,6,2,4,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,CreatedIn,11,40,0,4,4,6,1,5,1,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,FromTo,11,38,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Overlaps,12,39,1,1,4,6,2,3,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,ValidDuring,11,40,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,DeletedIn,11,40,0,4,4,6,1,5,1,3
@@ -38,20 +38,20 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.common.query
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction,15,131,5,12,1,22,5,7,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinDuration,17,73,0,8,2,16,1,8,1,4
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageDuration,39,87,3,7,3,16,4,8,1,6
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinVertexTime,0,6,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxVertexTime,0,6,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxEdgeTime,0,6,0,0,0,2,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinVertexTime,0,11,0,0,0,4,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxVertexTime,0,11,0,0,0,4,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxEdgeTime,0,11,0,0,0,4,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinVertexDuration,0,5,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction,53,96,4,18,4,20,5,12,1,4
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction,43,117,4,19,4,25,5,14,1,6
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinEdgeDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractDurationAggregateFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinEdgeTime,0,6,0,0,0,2,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinEdgeTime,0,11,0,0,0,4,0,2,0,2
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxEdgeDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageVertexDuration,0,5,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxTime,0,12,0,0,0,3,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxTime,0,29,0,0,0,5,0,3,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxDuration,17,73,0,8,2,16,1,8,1,4
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction.new Object() {...},4,33,0,0,0,2,0,1,0,1
-Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinTime,0,12,0,0,0,3,0,2,0,2
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AbstractTimeAggregateFunction.new Object() {...},2,17,0,0,0,1,0,1,0,1
+Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MinTime,0,29,0,0,0,5,0,3,0,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,MaxVertexDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.aggregation.functions,AverageEdgeDuration,0,5,0,0,0,2,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.diff,Diff,6,69,0,0,2,13,1,3,1,3
@@ -110,7 +110,7 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cyphe
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation,FilterTemporalEstimator,0,89,1,5,0,22,1,9,0,7
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation,JoinTemporalEstimator,0,325,1,17,0,61,1,21,0,13
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single.cypher.planning.estimation,TemporalQueryPlanEstimator,0,89,0,10,0,22,0,9,0,4
-Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,53,85,0,0,6,11,6,11,6,11
+Gradoop Temporal,org.gradoop.temporal.model.api,TemporalGraphOperators,69,146,0,0,8,22,8,12,8,12
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension.Field,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.api,TimeDimension,0,24,0,0,0,3,0,1,0,1
 Gradoop Temporal,org.gradoop.temporal.model.impl.operators.matching.single,TemporalPatternMatching,65,78,2,6,17,23,7,8,5,6

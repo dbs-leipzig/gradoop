@@ -125,19 +125,38 @@ public abstract class TemporalElement extends EPGMElement implements Element {
 <span class="fc" id="L125">  }</span>
 
   /**
+   * Set value time by field.
+   *
+   * @param validTime time value
+   * @param field time field
+   */
+  public void setValidTime(long validTime, TimeDimension.Field field) {
+<span class="pc bpc" id="L134" title="1 of 3 branches missed.">    switch (Objects.requireNonNull(field)) {</span>
+    case FROM:
+<span class="fc" id="L136">      setValidFrom(validTime);</span>
+<span class="fc" id="L137">      break;</span>
+    case TO:
+<span class="fc" id="L139">      setValidTo(validTime);</span>
+<span class="fc" id="L140">      break;</span>
+    default:
+<span class="nc" id="L142">      throw new IllegalArgumentException(&quot;Unknown field [&quot; + field + &quot;].&quot;);</span>
+    }
+<span class="fc" id="L144">  }</span>
+
+  /**
    * Get the time tuple (from, to) regarding to the given {@link TimeDimension}.
    *
    * @param dimension the time dimension of the returned values
    * @return a tuple 2 representing the time interval of the given dimension
    */
   public Tuple2&lt;Long, Long&gt; getTimeByDimension(TimeDimension dimension) {
-<span class="pc bpc" id="L134" title="1 of 3 branches missed.">    switch (Objects.requireNonNull(dimension)) {</span>
+<span class="pc bpc" id="L153" title="1 of 3 branches missed.">    switch (Objects.requireNonNull(dimension)) {</span>
     case VALID_TIME:
-<span class="fc" id="L136">      return this.validTime;</span>
+<span class="fc" id="L155">      return this.validTime;</span>
     case TRANSACTION_TIME:
-<span class="fc" id="L138">      return this.transactionTime;</span>
+<span class="fc" id="L157">      return this.transactionTime;</span>
     default:
-<span class="nc" id="L140">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + dimension + &quot;].&quot;);</span>
+<span class="nc" id="L159">      throw new IllegalArgumentException(&quot;Unknown dimension [&quot; + dimension + &quot;].&quot;);</span>
     }
   }
 
@@ -147,7 +166,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @return the beginning of the elements validity as unix timestamp in milliseconds
    */
   public Long getValidFrom() {
-<span class="fc" id="L150">    return this.validTime.f0;</span>
+<span class="fc" id="L169">    return this.validTime.f0;</span>
   }
 
   /**
@@ -156,8 +175,8 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param validFrom the beginning of the elements validity as unix timestamp in milliseconds
    */
   public void setValidFrom(long validFrom) {
-<span class="fc" id="L159">    this.validTime.f0 = validFrom;</span>
-<span class="fc" id="L160">  }</span>
+<span class="fc" id="L178">    this.validTime.f0 = validFrom;</span>
+<span class="fc" id="L179">  }</span>
 
   /**
    * Get the end of the elements validity as unix timestamp in milliseconds.
@@ -165,7 +184,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @return the end of the elements validity as unix timestamp in milliseconds
    */
   public Long getValidTo() {
-<span class="fc" id="L168">    return this.validTime.f1;</span>
+<span class="fc" id="L187">    return this.validTime.f1;</span>
   }
 
   /**
@@ -174,8 +193,8 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param validTo the end of the elements validity as unix timestamp in milliseconds
    */
   public void setValidTo(long validTo) {
-<span class="fc" id="L177">    this.validTime.f1 = validTo;</span>
-<span class="fc" id="L178">  }</span>
+<span class="fc" id="L196">    this.validTime.f1 = validTo;</span>
+<span class="fc" id="L197">  }</span>
 
   /**
    * Get the beginning of the elements transaction interval as unix timestamp in milliseconds.
@@ -183,7 +202,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @return the beginning of the elements transaction interval as unix timestamp in milliseconds
    */
   public Long getTxFrom() {
-<span class="fc" id="L186">    return this.transactionTime.f0;</span>
+<span class="fc" id="L205">    return this.transactionTime.f0;</span>
   }
 
   /**
@@ -192,8 +211,8 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param txFrom the beginning of the elements transaction interval as unit timestamp in milliseconds
    */
   public void setTxFrom(long txFrom) {
-<span class="fc" id="L195">    this.transactionTime.f0 = txFrom;</span>
-<span class="fc" id="L196">  }</span>
+<span class="fc" id="L214">    this.transactionTime.f0 = txFrom;</span>
+<span class="fc" id="L215">  }</span>
 
   /**
    * Get the end of the elements transaction interval as unix timestamp in milliseconds.
@@ -201,7 +220,7 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @return the end of the elements transaction interval as unix timestamp in milliseconds
    */
   public Long getTxTo() {
-<span class="fc" id="L204">    return this.transactionTime.f1;</span>
+<span class="fc" id="L223">    return this.transactionTime.f1;</span>
   }
 
   /**
@@ -210,17 +229,17 @@ public abstract class TemporalElement extends EPGMElement implements Element {
    * @param txTo the end of the elements transaction interval as unix timestamp in milliseconds
    */
   public void setTxTo(long txTo) {
-<span class="fc" id="L213">    this.transactionTime.f1 = txTo;</span>
-<span class="fc" id="L214">  }</span>
+<span class="fc" id="L232">    this.transactionTime.f1 = txTo;</span>
+<span class="fc" id="L233">  }</span>
 
   @Override
   public String toString() {
-<span class="pc bpc" id="L218" title="1 of 2 branches missed.">    return String.format(&quot;%s%s%s[tx%s,val%s]{%s}&quot;,</span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">    return String.format(&quot;%s%s%s[tx%s,val%s]{%s}&quot;,</span>
       id,
-<span class="fc bfc" id="L220" title="All 2 branches covered.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
       label,
-<span class="fc" id="L222">      getTransactionTime(),</span>
-<span class="fc bfc" id="L223" title="All 2 branches covered.">      getValidTime(),</span>
+<span class="fc" id="L241">      getTransactionTime(),</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">      getValidTime(),</span>
       properties == null ? &quot;&quot; : properties);
   }
 }

@@ -31,17 +31,27 @@ public class MaxTime extends AbstractTimeAggregateFunction {
   /**
    * Sets attributes used to initialize this aggregate function.
    *
-   * @param aggregatePropertyKey The aggregate property key.
    * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MaxTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
-<span class="fc" id="L39">    super(aggregatePropertyKey, dimension, field);</span>
-<span class="fc" id="L40">  }</span>
+  public MaxTime(TimeDimension dimension, TimeDimension.Field field) {
+<span class="fc" id="L38">    this(dimension, field, String.format(&quot;max_%s_%s&quot;, dimension, field));</span>
+<span class="fc" id="L39">  }</span>
+
+  /**
+   * Sets attributes used to initialize this aggregate function.
+   *
+   * @param dimension            The time dimension to consider.
+   * @param field                The field of the time-interval to consider.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
+   */
+  public MaxTime(TimeDimension dimension, TimeDimension.Field field, String aggregatePropertyKey) {
+<span class="fc" id="L49">    super(dimension, field, aggregatePropertyKey);</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
   public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
-<span class="fc" id="L44">    return applyAggregateWithDefaults(aggregate, increment, PropertyValueUtils.Numeric::max);</span>
+<span class="fc" id="L54">    return applyAggregateWithDefaults(aggregate, increment, PropertyValueUtils.Numeric::max);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

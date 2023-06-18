@@ -23,7 +23,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -37,11 +36,6 @@ public class SetAggregateProperties&lt;G extends GraphHead&gt;
   implements CoGroupFunction&lt;G, Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;, G&gt; {
 
   /**
-   * default values used to replace aggregate values in case of NULL.
-   */
-  private final Map&lt;String, PropertyValue&gt; defaultValues;
-
-  /**
    * Aggregate functions from the aggregation step.
    */
   private final Set&lt;AggregateFunction&gt; aggregateFunctions;
@@ -51,39 +45,36 @@ public class SetAggregateProperties&lt;G extends GraphHead&gt;
    *
    * @param aggregateFunctions aggregate functions
    */
-<span class="fc" id="L54">  public SetAggregateProperties(final Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
-
-<span class="fc" id="L56">    defaultValues = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L57">    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);</span>
-
-<span class="fc bfc" id="L59" title="All 2 branches covered.">    for (AggregateFunction func : aggregateFunctions) {</span>
-<span class="fc" id="L60">      Objects.requireNonNull(func);</span>
-<span class="fc" id="L61">      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));</span>
-<span class="fc" id="L62">    }</span>
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L48">  public SetAggregateProperties(final Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
+<span class="fc" id="L49">    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
   public void coGroup(Iterable&lt;G&gt; left, Iterable&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; right,
                       Collector&lt;G&gt; out) {
 
-<span class="fc bfc" id="L69" title="All 2 branches covered.">    for (G leftElem : left) {</span>
-<span class="fc" id="L70">      boolean rightEmpty = true;</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">      for (Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt; rightElem : right) {</span>
-<span class="fc" id="L72">        Map&lt;String, PropertyValue&gt; values = rightElem.f1;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    for (G leftElem : left) {</span>
+<span class="fc" id="L57">      boolean rightEmpty = true;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      for (Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt; rightElem : right) {</span>
+<span class="fc" id="L59">        Map&lt;String, PropertyValue&gt; values = rightElem.f1;</span>
         // Apply post-aggregation step.
-<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (AggregateFunction function : aggregateFunctions) {</span>
-<span class="fc" id="L75">          values.computeIfPresent(function.getAggregatePropertyKey(),</span>
-<span class="fc" id="L76">            (k, v) -&gt; function.postAggregate(v));</span>
-<span class="fc" id="L77">        }</span>
-<span class="fc" id="L78">        values.forEach(leftElem::setProperty);</span>
-<span class="fc" id="L79">        out.collect(leftElem);</span>
-<span class="fc" id="L80">        rightEmpty = false;</span>
-<span class="fc" id="L81">      }</span>
-<span class="fc bfc" id="L82" title="All 2 branches covered.">      if (rightEmpty) {</span>
-<span class="fc" id="L83">        defaultValues.forEach(leftElem::setProperty);</span>
-<span class="fc" id="L84">        out.collect(leftElem);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (AggregateFunction function : aggregateFunctions) {</span>
+<span class="fc" id="L62">          values.computeIfPresent(function.getAggregatePropertyKey(),</span>
+<span class="fc" id="L63">            (k, v) -&gt; function.postAggregate(v));</span>
+<span class="fc" id="L64">          function.applyResult(leftElem, values.getOrDefault(function.getAggregatePropertyKey(),</span>
+<span class="fc" id="L65">            AggregateUtil.getDefaultAggregate(function)));</span>
+<span class="fc" id="L66">        }</span>
+<span class="fc" id="L67">        out.collect(leftElem);</span>
+<span class="fc" id="L68">        rightEmpty = false;</span>
+<span class="fc" id="L69">      }</span>
+      // For example if the graph is empty
+<span class="fc bfc" id="L71" title="All 2 branches covered.">      if (rightEmpty) {</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for (AggregateFunction function : aggregateFunctions) {</span>
+<span class="fc" id="L73">          function.applyResult(leftElem, AggregateUtil.getDefaultAggregate(function));</span>
+<span class="fc" id="L74">        }</span>
+<span class="fc" id="L75">        out.collect(leftElem);</span>
       }
-<span class="fc" id="L86">    }</span>
-<span class="fc" id="L87">  }</span>
+<span class="fc" id="L77">    }</span>
+<span class="fc" id="L78">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

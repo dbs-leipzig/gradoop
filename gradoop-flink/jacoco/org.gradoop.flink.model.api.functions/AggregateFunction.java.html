@@ -81,5 +81,18 @@ public interface AggregateFunction extends Serializable {
   default PropertyValue postAggregate(PropertyValue result) {
 <span class="fc" id="L82">    return result;</span>
   }
+
+  /**
+   * Add result to aggregated element.
+   *
+   * @param element aggregated element to add result to
+   * @param aggregate aggregation result
+   * @param &lt;E&gt; element type
+   * @return aggregated element
+   */
+  default &lt;E extends Element&gt; E applyResult(E element, PropertyValue aggregate) {
+<span class="fc" id="L94">    element.setProperty(getAggregatePropertyKey(), aggregate);</span>
+<span class="fc" id="L95">    return element;</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -77,10 +77,10 @@
 <a name="67" href="#67">67</a>      bikeGraph
 <a name="68" href="#68">68</a>        <em class="jxr_comment">// apply four aggregate functions to get the earliest and latest start and end of a duration</em>
 <a name="69" href="#69">69</a>        .aggregate(
-<a name="70" href="#70">70</a>          <strong class="jxr_keyword">new</strong> MinVertexTime(<span class="jxr_string">"earliestStart"</span>, TimeDimension.VALID_TIME, TimeDimension.Field.FROM),
-<a name="71" href="#71">71</a>          <strong class="jxr_keyword">new</strong> MinVertexTime(<span class="jxr_string">"earliestEnd"</span>, TimeDimension.VALID_TIME, TimeDimension.Field.TO),
-<a name="72" href="#72">72</a>          <strong class="jxr_keyword">new</strong> MaxVertexTime(<span class="jxr_string">"lastStart"</span>, TimeDimension.VALID_TIME, TimeDimension.Field.FROM),
-<a name="73" href="#73">73</a>          <strong class="jxr_keyword">new</strong> MaxVertexTime(<span class="jxr_string">"lastEnd"</span>, TimeDimension.VALID_TIME, TimeDimension.Field.TO))
+<a name="70" href="#70">70</a>          <strong class="jxr_keyword">new</strong> MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM, <span class="jxr_string">"earliestStart"</span>),
+<a name="71" href="#71">71</a>          <strong class="jxr_keyword">new</strong> MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO, <span class="jxr_string">"earliestEnd"</span>),
+<a name="72" href="#72">72</a>          <strong class="jxr_keyword">new</strong> MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM, <span class="jxr_string">"lastStart"</span>),
+<a name="73" href="#73">73</a>          <strong class="jxr_keyword">new</strong> MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO, <span class="jxr_string">"lastEnd"</span>))
 <a name="74" href="#74">74</a>        <em class="jxr_comment">// since the aggregated values are 'long' values, we transform them into 'LocalDateTime' values</em>
 <a name="75" href="#75">75</a>        .transformGraphHead(
 <a name="76" href="#76">76</a>          <strong class="jxr_keyword">new</strong> TransformLongPropertiesToDateTime&lt;&gt;(<span class="jxr_string">"earliestStart"</span>, <span class="jxr_string">"earliestEnd"</span>, <span class="jxr_string">"lastStart"</span>, <span class="jxr_string">"lastEnd"</span>))

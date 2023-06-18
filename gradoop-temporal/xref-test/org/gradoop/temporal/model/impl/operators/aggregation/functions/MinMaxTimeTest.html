@@ -63,12 +63,12 @@
 <a name="53" href="#53">53</a>      <strong class="jxr_keyword">final</strong> String keyMax = <span class="jxr_string">"maxTime"</span>;
 <a name="54" href="#54">54</a>      <strong class="jxr_keyword">final</strong> String keyMin = <span class="jxr_string">"minTime"</span>;
 <a name="55" href="#55">55</a>      TemporalGraph result = getTestGraphWithValues().aggregate(
-<a name="56" href="#56">56</a>        <strong class="jxr_keyword">new</strong> MaxEdgeTime(keyMaxEdge, temporalAttribute, field),
-<a name="57" href="#57">57</a>        <strong class="jxr_keyword">new</strong> MinEdgeTime(keyMinEdge, temporalAttribute, field),
-<a name="58" href="#58">58</a>        <strong class="jxr_keyword">new</strong> MaxVertexTime(keyMaxVertex, temporalAttribute, field),
-<a name="59" href="#59">59</a>        <strong class="jxr_keyword">new</strong> MinVertexTime(keyMinVertex, temporalAttribute, field),
-<a name="60" href="#60">60</a>        <strong class="jxr_keyword">new</strong> MinTime(keyMin, temporalAttribute, field),
-<a name="61" href="#61">61</a>        <strong class="jxr_keyword">new</strong> MaxTime(keyMax, temporalAttribute, field));
+<a name="56" href="#56">56</a>        <strong class="jxr_keyword">new</strong> MaxEdgeTime(temporalAttribute, field, keyMaxEdge),
+<a name="57" href="#57">57</a>        <strong class="jxr_keyword">new</strong> MinEdgeTime(temporalAttribute, field, keyMinEdge),
+<a name="58" href="#58">58</a>        <strong class="jxr_keyword">new</strong> MaxVertexTime(temporalAttribute, field, keyMaxVertex),
+<a name="59" href="#59">59</a>        <strong class="jxr_keyword">new</strong> MinVertexTime(temporalAttribute, field, keyMinVertex),
+<a name="60" href="#60">60</a>        <strong class="jxr_keyword">new</strong> MinTime(temporalAttribute, field, keyMin),
+<a name="61" href="#61">61</a>        <strong class="jxr_keyword">new</strong> MaxTime(temporalAttribute, field, keyMax));
 <a name="62" href="#62">62</a>      TemporalGraphHead head = result.getGraphHead().collect().get(0);
 <a name="63" href="#63">63</a>      assertEquals(PropertyValue.create(expectedMaxEdge), head.getPropertyValue(keyMaxEdge));
 <a name="64" href="#64">64</a>      assertEquals(PropertyValue.create(expectedMinEdge), head.getPropertyValue(keyMinEdge));
@@ -119,12 +119,12 @@
 <a name="109" href="#109">109</a>     <strong class="jxr_keyword">final</strong> String keyMax = <span class="jxr_string">"maxTime"</span>;
 <a name="110" href="#110">110</a>     <strong class="jxr_keyword">final</strong> String keyMin = <span class="jxr_string">"minTime"</span>;
 <a name="111" href="#111">111</a>     TemporalGraph result = getTestGraphWithAllDefaults().aggregate(
-<a name="112" href="#112">112</a>       <strong class="jxr_keyword">new</strong> MaxEdgeTime(keyMaxEdge, temporalAttribute, field),
-<a name="113" href="#113">113</a>       <strong class="jxr_keyword">new</strong> MinEdgeTime(keyMinEdge, temporalAttribute, field),
-<a name="114" href="#114">114</a>       <strong class="jxr_keyword">new</strong> MaxVertexTime(keyMaxVertex, temporalAttribute, field),
-<a name="115" href="#115">115</a>       <strong class="jxr_keyword">new</strong> MinVertexTime(keyMinVertex, temporalAttribute, field),
-<a name="116" href="#116">116</a>       <strong class="jxr_keyword">new</strong> MinTime(keyMin, temporalAttribute, field),
-<a name="117" href="#117">117</a>       <strong class="jxr_keyword">new</strong> MaxTime(keyMax, temporalAttribute, field));
+<a name="112" href="#112">112</a>       <strong class="jxr_keyword">new</strong> MaxEdgeTime(temporalAttribute, field, keyMaxEdge),
+<a name="113" href="#113">113</a>       <strong class="jxr_keyword">new</strong> MinEdgeTime(temporalAttribute, field, keyMinEdge),
+<a name="114" href="#114">114</a>       <strong class="jxr_keyword">new</strong> MaxVertexTime(temporalAttribute, field, keyMaxVertex),
+<a name="115" href="#115">115</a>       <strong class="jxr_keyword">new</strong> MinVertexTime(temporalAttribute, field, keyMinVertex),
+<a name="116" href="#116">116</a>       <strong class="jxr_keyword">new</strong> MinTime(temporalAttribute, field, keyMin),
+<a name="117" href="#117">117</a>       <strong class="jxr_keyword">new</strong> MaxTime(temporalAttribute, field, keyMax));
 <a name="118" href="#118">118</a>     TemporalGraphHead head = result.getGraphHead().collect().get(0);
 <a name="119" href="#119">119</a> 
 <a name="120" href="#120">120</a>     <em class="jxr_comment">// The expected values for max and min aggregations. For valid times, they should be null.</em>

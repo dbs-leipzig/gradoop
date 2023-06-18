@@ -89,7 +89,7 @@ abstract class BuildSuperElementFromTuple&lt;T extends Tuple, E extends Element&
 <span class="fc" id="L89">      final PropertyValue postAggregateValue = function.postAggregate(</span>
 <span class="fc" id="L90">        tupleData.getField(tupleDataOffset + keyFunctions.size() + i));</span>
 <span class="fc bfc" id="L91" title="All 2 branches covered.">      if (postAggregateValue != null) {</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue.isNull() ?</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        element = function.applyResult(element, postAggregateValue.isNull() ?</span>
 <span class="fc" id="L93">          AggregateUtil.getDefaultAggregate(function) : postAggregateValue);</span>
       }
     }
