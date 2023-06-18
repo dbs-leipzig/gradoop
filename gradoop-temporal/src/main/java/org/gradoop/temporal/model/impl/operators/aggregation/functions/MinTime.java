@@ -31,12 +31,22 @@ public class MinTime extends AbstractTimeAggregateFunction {
   /**
    * Sets attributes used to initialize this aggregate function.
    *
-   * @param aggregatePropertyKey The aggregate property key.
    * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MinTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
-    super(aggregatePropertyKey, dimension, field);
+  public MinTime(TimeDimension dimension, TimeDimension.Field field) {
+    this(dimension, field, String.format("min_%s_%s", dimension, field));
+  }
+
+  /**
+   * Sets attributes used to initialize this aggregate function.
+   *
+   * @param dimension            The time dimension to consider.
+   * @param field                The field of the time-interval to consider.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
+   */
+  public MinTime(TimeDimension dimension, TimeDimension.Field field, String aggregatePropertyKey) {
+    super(dimension, field, aggregatePropertyKey);
   }
 
   @Override

@@ -16,6 +16,7 @@
 package org.gradoop.temporal.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.temporal.model.api.functions.TemporalAggregateFunction;
@@ -43,6 +44,11 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   private final TimeDimension.Field field;
 
   /**
+   * Selects the field the resulting value is written to. Defaults to property value if null.
+   */
+  private TimeDimension.Field resultValidTimeField = null;
+
+  /**
    * The property value that is considered as the default 'from' value of this aggregate function.
    * It is ignored during aggregation of valid times.
    */
@@ -57,12 +63,12 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
   /**
    * Sets attributes used to initialize this aggregate function.
    *
-   * @param aggregatePropertyKey The aggregate property key.
-   * @param timeDimension        The time dimension type to consider.
-   * @param field                The field of the time-dimension to consider.
+   * @param timeDimension The time dimension type to consider.
+   * @param field The field of the time-dimension to consider.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
    */
-  public AbstractTimeAggregateFunction(String aggregatePropertyKey, TimeDimension timeDimension,
-    TimeDimension.Field field) {
+  public AbstractTimeAggregateFunction(TimeDimension timeDimension, TimeDimension.Field field,
+    String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.timeDimension = Objects.requireNonNull(timeDimension);
     this.field = Objects.requireNonNull(field);
@@ -77,17 +83,7 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
    */
   @Override
   public PropertyValue getIncrement(TemporalElement element) {
-    final Tuple2<Long, Long> timeInterval;
-    switch (timeDimension) {
-    case TRANSACTION_TIME:
-      timeInterval = element.getTransactionTime();
-      break;
-    case VALID_TIME:
-      timeInterval = element.getValidTime();
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown dimension [" + timeDimension + "].");
-    }
+    final Tuple2<Long, Long> timeInterval = element.getTimeByDimension(timeDimension);
     switch (field) {
     case FROM:
       return PropertyValue.create(timeInterval.f0);
@@ -132,8 +128,35 @@ public abstract class AbstractTimeAggregateFunction extends BaseAggregateFunctio
       (value.equals(defaultFromValue) || value.equals(defaultToValue));
   }
 
+  /**
+   * Valid time field to write the aggregation result to.
+   * Passing null defaults to adding a property value instead.
+   *
+   * @param field field
+   * @return this
+   */
+  public AbstractTimeAggregateFunction setAsValidTime(TimeDimension.Field field) {
+    this.resultValidTimeField = field;
+    return this;
+  }
+
   @Override
   public String toString() {
     return String.format("%s(%s.%s)", getClass().getSimpleName(), timeDimension, field);
+  }
+
+  @Override
+  public <E extends Element> E applyResult(E element, PropertyValue aggregate) {
+    if (resultValidTimeField == null) {
+      return super.applyResult(element, aggregate);
+    }
+    if (!(element instanceof TemporalElement)) {
+      throw new IllegalArgumentException("Cannot write time value to non-temporal element.");
+    }
+
+    TemporalElement temporalElement = (TemporalElement) element;
+    temporalElement.setValidTime(aggregate.getLong(), resultValidTimeField);
+
+    return (E) temporalElement;
   }
 }

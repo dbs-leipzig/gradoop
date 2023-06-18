@@ -51,12 +51,6 @@ public class SetAggregateProperty<G extends GraphHead>
    */
   private Map<String, PropertyValue> aggregateValues;
 
-  /**
-   * map from aggregate property key to its default value
-   * used to replace aggregate value in case of NULL.
-   */
-  private final Map<String, PropertyValue> defaultValues;
-
 
   /**
    * Creates a new instance of a SetAggregateProperty rich map function.
@@ -65,13 +59,6 @@ public class SetAggregateProperty<G extends GraphHead>
    */
   public SetAggregateProperty(Set<AggregateFunction> aggregateFunctions) {
     this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
-
-    defaultValues = new HashMap<>();
-
-    for (AggregateFunction func : aggregateFunctions) {
-      Objects.requireNonNull(func);
-      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -80,7 +67,7 @@ public class SetAggregateProperty<G extends GraphHead>
     super.open(parameters);
 
     if (getRuntimeContext().getBroadcastVariable(VALUE).isEmpty()) {
-      aggregateValues = defaultValues;
+      aggregateValues = new HashMap<>();
     } else {
       aggregateValues = (Map<String, PropertyValue>) getRuntimeContext()
         .getBroadcastVariable(VALUE).get(0);
@@ -89,13 +76,13 @@ public class SetAggregateProperty<G extends GraphHead>
         aggregateValues.computeIfPresent(function.getAggregatePropertyKey(),
           (k, v) -> function.postAggregate(v));
       }
-      defaultValues.forEach(aggregateValues::putIfAbsent);
     }
   }
 
   @Override
   public G map(G graphHead) throws Exception {
-    aggregateValues.forEach(graphHead::setProperty);
+    aggregateFunctions.forEach(f -> f.applyResult(graphHead,
+      aggregateValues.getOrDefault(f.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(f))));
     return graphHead;
   }
 }

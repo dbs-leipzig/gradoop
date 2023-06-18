@@ -53,12 +53,12 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
     final String keyMax = "maxTime";
     final String keyMin = "minTime";
     TemporalGraph result = getTestGraphWithValues().aggregate(
-      new MaxEdgeTime(keyMaxEdge, temporalAttribute, field),
-      new MinEdgeTime(keyMinEdge, temporalAttribute, field),
-      new MaxVertexTime(keyMaxVertex, temporalAttribute, field),
-      new MinVertexTime(keyMinVertex, temporalAttribute, field),
-      new MinTime(keyMin, temporalAttribute, field),
-      new MaxTime(keyMax, temporalAttribute, field));
+      new MaxEdgeTime(temporalAttribute, field, keyMaxEdge),
+      new MinEdgeTime(temporalAttribute, field, keyMinEdge),
+      new MaxVertexTime(temporalAttribute, field, keyMaxVertex),
+      new MinVertexTime(temporalAttribute, field, keyMinVertex),
+      new MinTime(temporalAttribute, field, keyMin),
+      new MaxTime(temporalAttribute, field, keyMax));
     TemporalGraphHead head = result.getGraphHead().collect().get(0);
     assertEquals(PropertyValue.create(expectedMaxEdge), head.getPropertyValue(keyMaxEdge));
     assertEquals(PropertyValue.create(expectedMinEdge), head.getPropertyValue(keyMinEdge));
@@ -109,12 +109,12 @@ public class MinMaxTimeTest extends TemporalGradoopTestBase {
     final String keyMax = "maxTime";
     final String keyMin = "minTime";
     TemporalGraph result = getTestGraphWithAllDefaults().aggregate(
-      new MaxEdgeTime(keyMaxEdge, temporalAttribute, field),
-      new MinEdgeTime(keyMinEdge, temporalAttribute, field),
-      new MaxVertexTime(keyMaxVertex, temporalAttribute, field),
-      new MinVertexTime(keyMinVertex, temporalAttribute, field),
-      new MinTime(keyMin, temporalAttribute, field),
-      new MaxTime(keyMax, temporalAttribute, field));
+      new MaxEdgeTime(temporalAttribute, field, keyMaxEdge),
+      new MinEdgeTime(temporalAttribute, field, keyMinEdge),
+      new MaxVertexTime(temporalAttribute, field, keyMaxVertex),
+      new MinVertexTime(temporalAttribute, field, keyMinVertex),
+      new MinTime(temporalAttribute, field, keyMin),
+      new MaxTime(temporalAttribute, field, keyMax));
     TemporalGraphHead head = result.getGraphHead().collect().get(0);
 
     // The expected values for max and min aggregations. For valid times, they should be null.
