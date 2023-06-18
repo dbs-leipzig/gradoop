@@ -31,7 +31,7 @@ public abstract class BaseAggregateFunction implements AggregateFunction {
   /**
    * Creates a new instance of a base aggregate function.
    *
-   * @param aggregatePropertyKey aggregate property key
+   * @param aggregatePropertyKey the aggregate property key
    */
   public BaseAggregateFunction(String aggregatePropertyKey) {
     setAggregatePropertyKey(aggregatePropertyKey);
