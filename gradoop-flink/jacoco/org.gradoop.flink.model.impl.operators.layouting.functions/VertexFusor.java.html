@@ -137,7 +137,7 @@ public class VertexFusor {
 <span class="fc" id="L137">        .with(new FlatJoinFunction&lt;LVertex, LVertex, LVertex&gt;() {</span>
           @Override
           public void join(LVertex lVertex, LVertex lVertex2, Collector&lt;LVertex&gt; collector) {
-<span class="fc bfc" id="L140" title="All 2 branches covered.">            if (lVertex2 == null) {</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">            if (lVertex2 == null) {</span>
 <span class="fc" id="L141">              collector.collect(lVertex);</span>
             }
 <span class="fc" id="L143">          }</span>
@@ -149,7 +149,7 @@ public class VertexFusor {
           @Override
           public void join(LVertex lVertex, Tuple2&lt;LVertex, LVertex&gt; lVertexLVertexDoubleTuple3,
             Collector&lt;LVertex&gt; collector) {
-<span class="fc bfc" id="L152" title="All 2 branches covered.">            if (lVertexLVertexDoubleTuple3 == null) {</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">            if (lVertexLVertexDoubleTuple3 == null) {</span>
 <span class="fc" id="L153">              collector.collect(lVertex);</span>
             }
 <span class="fc" id="L155">          }</span>
@@ -171,8 +171,8 @@ public class VertexFusor {
 <span class="fc" id="L171">      .with(new JoinFunction&lt;LEdge, Tuple2&lt;LVertex, LVertex&gt;, LEdge&gt;() {</span>
         @Override
         public LEdge join(LEdge lEdge, Tuple2&lt;LVertex, LVertex&gt; lVertexLVertexDoubleTuple3) {
-<span class="fc bfc" id="L174" title="All 2 branches covered.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
-<span class="fc" id="L175">            lEdge.setSourceId(lVertexLVertexDoubleTuple3.f1.getId());</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
+<span class="nc" id="L175">            lEdge.setSourceId(lVertexLVertexDoubleTuple3.f1.getId());</span>
           }
 <span class="fc" id="L177">          return lEdge;</span>
         }
@@ -182,8 +182,8 @@ public class VertexFusor {
 <span class="fc" id="L182">      .with(new JoinFunction&lt;LEdge, Tuple2&lt;LVertex, LVertex&gt;, LEdge&gt;() {</span>
         @Override
         public LEdge join(LEdge lEdge, Tuple2&lt;LVertex, LVertex&gt; lVertexLVertexDoubleTuple3) {
-<span class="fc bfc" id="L185" title="All 2 branches covered.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
-<span class="fc" id="L186">            lEdge.setTargetId(lVertexLVertexDoubleTuple3.f1.getId());</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">          if (lVertexLVertexDoubleTuple3 != null) {</span>
+<span class="nc" id="L186">            lEdge.setTargetId(lVertexLVertexDoubleTuple3.f1.getId());</span>
           }
 <span class="fc" id="L188">          return lEdge;</span>
         }
