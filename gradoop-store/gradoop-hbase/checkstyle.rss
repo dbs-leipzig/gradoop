@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2023 University of Leipzig</copyright>
     <item>
-      <title>File: 7,
+      <title>File: 6,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -47,20 +47,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.java">org/gradoop/storage/impl/hbase/GradoopHBaseTestBase.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropRegTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropRegTest.java</a>
                 </td>
                 <td>
                   0

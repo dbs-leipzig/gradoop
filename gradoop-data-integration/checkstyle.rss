@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2023 University of Leipzig</copyright>
     <item>
-      <title>File: 11,
+      <title>File: 10,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -88,34 +88,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdgesTest.java">org/gradoop/dataintegration/transformation/functions/CreateCartesianNeighborhoodEdgesTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.PropertyTransformationTest.java">org/gradoop/dataintegration/transformation/impl/PropertyTransformationTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporterTest.java">org/gradoop/dataintegration/importer/impl/csv/MinimalCSVImporterTest.java</a>
                 </td>
                 <td>
@@ -144,7 +116,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.VertexDeduplicationTest.java">org/gradoop/dataintegration/transformation/VertexDeduplicationTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.ConnectNeighborsTest.java">org/gradoop/dataintegration/transformation/ConnectNeighborsTest.java</a>
                 </td>
                 <td>
                   0
@@ -173,6 +145,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTripleTest.java">org/gradoop/dataintegration/transformation/functions/CreateEdgesFromTripleTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.InvertEdgesTest.java">org/gradoop/dataintegration/transformation/impl/InvertEdgesTest.java</a>
                 </td>
                 <td>
                   0
