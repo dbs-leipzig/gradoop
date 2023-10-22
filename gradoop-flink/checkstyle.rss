@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2023 University of Leipzig</copyright>
     <item>
-      <title>File: 209,
+      <title>File: 214,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -46,7 +46,7 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.id.GradoopIdSerializationTest.java">org/gradoop/flink/model/impl/id/GradoopIdSerializationTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicateTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/booleans/OrPredicateTest.java</a>
                 </td>
                 <td>
                   0
@@ -60,7 +60,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.OrPredicateTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/booleans/OrPredicateTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.id.GradoopIdSerializationTest.java">org/gradoop/flink/model/impl/id/GradoopIdSerializationTest.java</a>
                 </td>
                 <td>
                   0
@@ -103,6 +103,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.layouting.functions.Util.java">org/gradoop/flink/model/impl/operators/layouting/functions/Util.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.fusion.VertexFusionUtils.java">org/gradoop/flink/model/impl/operators/fusion/VertexFusionUtils.java</a>
                 </td>
                 <td>
                   0
@@ -214,7 +228,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.properties.PropertiesSerializationTest.java">org/gradoop/flink/model/impl/properties/PropertiesSerializationTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/expressions/ComparisonExpressionTest.java</a>
                 </td>
                 <td>
                   0
@@ -228,7 +242,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpressionTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/expressions/ComparisonExpressionTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.properties.PropertiesSerializationTest.java">org/gradoop/flink/model/impl/properties/PropertiesSerializationTest.java</a>
                 </td>
                 <td>
                   0
@@ -634,20 +648,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.sampling.statistics.AverageOutgoingDegreeTest.java">org/gradoop/flink/model/impl/operators/sampling/statistics/AverageOutgoingDegreeTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.PatternMatchingWithBindingTest.java">org/gradoop/flink/model/impl/operators/matching/single/PatternMatchingWithBindingTest.java</a>
                 </td>
                 <td>
@@ -858,7 +858,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.pagerank.PageRankTest.java">org/gradoop/flink/algorithms/gelly/pagerank/PageRankTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativeHomomorphismSetPairBulkTest.java">org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativeHomomorphismSetPairBulkTest.java</a>
                 </td>
                 <td>
                   0
@@ -872,7 +872,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativeHomomorphismSetPairBulkTest.java">org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativeHomomorphismSetPairBulkTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.pagerank.PageRankTest.java">org/gradoop/flink/algorithms/gelly/pagerank/PageRankTest.java</a>
                 </td>
                 <td>
                   0
@@ -998,20 +998,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.GraphTransactionTest.java">org/gradoop/flink/model/impl/GraphTransactionTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.grouping.GroupingGroupCombineTest.java">org/gradoop/flink/model/impl/operators/grouping/GroupingGroupCombineTest.java</a>
                 </td>
                 <td>
@@ -1026,7 +1012,35 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.GraphTransactionTest.java">org/gradoop/flink/model/impl/GraphTransactionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/PhysicalOperatorTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.layouts.gve.indexed.IndexedGVECollectionLayoutFactoryTest.java">org/gradoop/flink/model/impl/layouts/gve/indexed/IndexedGVECollectionLayoutFactoryTest.java</a>
                 </td>
                 <td>
                   0
@@ -1068,7 +1082,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.fsm.transactional.basic.BasicPatternsData.java">org/gradoop/flink/algorithms/fsm/transactional/basic/BasicPatternsData.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.intersection.ReduceIntersectionTest.java">org/gradoop/flink/model/impl/operators/intersection/ReduceIntersectionTest.java</a>
                 </td>
                 <td>
                   0
@@ -1082,7 +1096,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.intersection.ReduceIntersectionTest.java">org/gradoop/flink/model/impl/operators/intersection/ReduceIntersectionTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.fsm.transactional.basic.BasicPatternsData.java">org/gradoop/flink/algorithms/fsm/transactional/basic/BasicPatternsData.java</a>
                 </td>
                 <td>
                   0
@@ -1180,7 +1194,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimatorTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimatorTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsBulkTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/ExpandEmbeddingsBulkTest.java</a>
                 </td>
                 <td>
                   0
@@ -1194,7 +1208,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsBulkTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/ExpandEmbeddingsBulkTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimatorTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/QueryPlanEstimatorTest.java</a>
                 </td>
                 <td>
                   0
@@ -1600,7 +1614,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherGraphConstructionTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/CypherGraphConstructionTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulationDeltaTest.java">org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/DualSimulationDeltaTest.java</a>
                 </td>
                 <td>
                   0
@@ -1614,7 +1628,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.DualSimulationDeltaTest.java">org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/DualSimulationDeltaTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherGraphConstructionTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/CypherGraphConstructionTest.java</a>
                 </td>
                 <td>
                   0
@@ -1727,6 +1741,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.booleans.XorPredicateTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/booleans/XorPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.sampling.statistics.AverageIncomingDegreeTest.java">org/gradoop/flink/model/impl/operators/sampling/statistics/AverageIncomingDegreeTest.java</a>
                 </td>
                 <td>
                   0
@@ -1866,6 +1894,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirectedTest.java">org/gradoop/flink/algorithms/gelly/clusteringcoefficient/GellyLocalClusteringCoefficientDirectedTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.FilterEstimatorTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/estimation/FilterEstimatorTest.java</a>
                 </td>
                 <td>
@@ -1908,7 +1950,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectVerticesTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectVerticesTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativeHomomorphismTriplesForLoopTest.java">org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativeHomomorphismTriplesForLoopTest.java</a>
                 </td>
                 <td>
                   0
@@ -1922,7 +1964,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativeHomomorphismTriplesForLoopTest.java">org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/ExplorativeHomomorphismTriplesForLoopTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.ProjectVerticesTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectVerticesTest.java</a>
                 </td>
                 <td>
                   0
@@ -2048,7 +2090,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddingsTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/functions/MergeExpandEmbeddingsTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase.java">org/gradoop/flink/model/impl/operators/base/ReducibleBinaryOperatorsTestBase.java</a>
                 </td>
                 <td>
                   0
@@ -2062,7 +2104,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase.java">org/gradoop/flink/model/impl/operators/base/ReducibleBinaryOperatorsTestBase.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddingsTest.java">org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/expand/functions/MergeExpandEmbeddingsTest.java</a>
                 </td>
                 <td>
                   0
@@ -2119,6 +2161,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.matching.common.query.predicates.compareables.LiteralComparableTest.java">org/gradoop/flink/model/impl/operators/matching/common/query/predicates/compareables/LiteralComparableTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSourceTest.java">org/gradoop/flink/io/impl/csv/indexed/IndexedCSVDataSourceTest.java</a>
                 </td>
                 <td>
                   0
@@ -2356,7 +2412,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.trianglecounting.GellyTriangleCountingTest.java">org/gradoop/flink/algorithms/gelly/trianglecounting/GellyTriangleCountingTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.rollup.RollUpTest.java">org/gradoop/flink/model/impl/operators/rollup/RollUpTest.java</a>
                 </td>
                 <td>
                   0
@@ -2370,7 +2426,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.rollup.RollUpTest.java">org/gradoop/flink/model/impl/operators/rollup/RollUpTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.trianglecounting.GellyTriangleCountingTest.java">org/gradoop/flink/algorithms/gelly/trianglecounting/GellyTriangleCountingTest.java</a>
                 </td>
                 <td>
                   0
@@ -2608,34 +2664,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.shortestpaths.SingleSourceShortestPathsTest.java">org/gradoop/flink/algorithms/gelly/shortestpaths/SingleSourceShortestPathsTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.hits.HITSTest.java">org/gradoop/flink/algorithms/gelly/hits/HITSTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.layouting.FusingFRLayouterTest.java">org/gradoop/flink/model/impl/operators/layouting/FusingFRLayouterTest.java</a>
                 </td>
                 <td>
@@ -2665,6 +2693,34 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFunctionTest.java">org/gradoop/flink/model/impl/operators/layouting/functions/FRRepulsionFunctionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.shortestpaths.SingleSourceShortestPathsTest.java">org/gradoop/flink/algorithms/gelly/shortestpaths/SingleSourceShortestPathsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.algorithms.gelly.hits.HITSTest.java">org/gradoop/flink/algorithms/gelly/hits/HITSTest.java</a>
                 </td>
                 <td>
                   0
@@ -2945,6 +3001,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.functions.filters.AbstractRichCombinedFilterFunctionTest.java">org/gradoop/flink/model/impl/functions/filters/AbstractRichCombinedFilterFunctionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-flink/checkstyle.html#org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactoryTest.java">org/gradoop/flink/model/impl/layouts/gve/GVECollectionLayoutFactoryTest.java</a>
                 </td>
                 <td>
                   0
