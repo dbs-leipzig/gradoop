@@ -22,8 +22,8 @@ Gradoop Temporal,org.gradoop.temporal.model.impl.operators.tostring.functions,Te
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,ContainedIn,11,40,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Precedes,11,40,1,3,4,6,2,4,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,AsOf,7,30,0,4,3,5,1,5,1,3
-Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,FromTo,11,38,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,CreatedIn,11,40,0,4,4,6,1,5,1,3
+Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,FromTo,11,38,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,Overlaps,12,39,1,1,4,6,2,3,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,ValidDuring,11,40,0,4,4,6,1,5,1,3
 Gradoop Temporal,org.gradoop.temporal.model.impl.functions.predicates,DeletedIn,11,40,0,4,4,6,1,5,1,3
