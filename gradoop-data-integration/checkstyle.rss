@@ -88,6 +88,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairsTest.java">org/gradoop/dataintegration/transformation/functions/BuildIdPropertyValuePairsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporterTest.java">org/gradoop/dataintegration/importer/impl/csv/MinimalCSVImporterTest.java</a>
                 </td>
                 <td>
@@ -116,21 +130,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.ExtractPropertyFromVertexTest.java">org/gradoop/dataintegration/transformation/impl/ExtractPropertyFromVertexTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.ConnectNeighborsTest.java">org/gradoop/dataintegration/transformation/ConnectNeighborsTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.VertexToEdgeTest.java">org/gradoop/dataintegration/transformation/VertexToEdgeTest.java</a>
                 </td>
                 <td>
                   0
@@ -172,7 +172,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.GetPropertiesAsListTest.java">org/gradoop/dataintegration/transformation/functions/GetPropertiesAsListTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.InvertEdgesTest.java">org/gradoop/dataintegration/transformation/impl/InvertEdgesTest.java</a>
                 </td>
                 <td>
                   0
