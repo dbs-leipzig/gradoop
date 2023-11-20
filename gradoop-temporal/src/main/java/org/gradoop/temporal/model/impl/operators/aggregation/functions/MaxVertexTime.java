@@ -28,11 +28,21 @@ public class MaxVertexTime extends MaxTime implements VertexAggregateFunction {
   /**
    * Creates an instance of the {@link MaxVertexTime} aggregate function.
    *
-   * @param aggregatePropertyKey The aggregate property key.
    * @param dimension            The time dimension to consider.
    * @param field                The field of the time-interval to consider.
    */
-  public MaxVertexTime(String aggregatePropertyKey, TimeDimension dimension, TimeDimension.Field field) {
-    super(aggregatePropertyKey, dimension, field);
+  public MaxVertexTime(TimeDimension dimension, TimeDimension.Field field) {
+    super(dimension, field);
+  }
+
+  /**
+   * Creates an instance of the {@link MaxVertexTime} aggregate function.
+   *
+   * @param dimension            The time dimension to consider.
+   * @param field                The field of the time-interval to consider.
+   * @param aggregatePropertyKey The key of the property where the aggregated result is saved.
+   */
+  public MaxVertexTime(TimeDimension dimension, TimeDimension.Field field, String aggregatePropertyKey) {
+    super(dimension, field, aggregatePropertyKey);
   }
 }

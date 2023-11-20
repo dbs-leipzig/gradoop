@@ -89,8 +89,8 @@ public class TemporalGroupingExample {
         Arrays.asList(
           new Count("count"),
           new AverageDuration("avgDur", dim),
-          new MinTime("firstStart", dim, TimeDimension.Field.FROM),
-          new MaxTime("lastStart", dim, TimeDimension.Field.FROM)),
+          new MinTime(dim, TimeDimension.Field.FROM, "firstStart"),
+          new MaxTime(dim, TimeDimension.Field.FROM, "lastStart")),
         // Edge grouping keys (label)
         Collections.singletonList(GroupingKeys.label()),
         // Edge aggregation functions (count)

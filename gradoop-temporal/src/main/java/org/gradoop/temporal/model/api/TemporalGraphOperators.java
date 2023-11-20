@@ -16,7 +16,10 @@
 package org.gradoop.temporal.model.api;
 
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 import org.gradoop.temporal.model.impl.TemporalGraph;
@@ -28,6 +31,10 @@ import org.gradoop.temporal.model.impl.functions.predicates.CreatedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.DeletedIn;
 import org.gradoop.temporal.model.impl.functions.predicates.FromTo;
 import org.gradoop.temporal.model.impl.functions.predicates.ValidDuring;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxEdgeTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxVertexTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinEdgeTime;
+import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinVertexTime;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
@@ -38,6 +45,9 @@ import org.gradoop.temporal.model.impl.operators.verify.VerifyAndUpdateEdgeValid
 import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
 import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
 import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
@@ -336,6 +346,66 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
       new CypherTemporalPatternMatching(temporalGdlQuery, constructionPattern, attachData, vertexStrategy,
         edgeStrategy, stats, new CNFPostProcessing()));
   }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List<KeyFunction<TemporalVertex, ?>> vertexGroupingKeys) {
+    return temporalGroupBy(vertexGroupingKeys, null);
+  }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param edgeGroupingKeys   property keys to group edges
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List<KeyFunction<TemporalVertex, ?>> vertexGroupingKeys,
+    List<KeyFunction<TemporalEdge, ?>> edgeGroupingKeys) {
+    return temporalGroupBy(vertexGroupingKeys, new ArrayList<>(), edgeGroupingKeys, new ArrayList<>());
+  }
+
+  /**
+   * Grouping operator that aggregates valid times per group and sets it as new valid time.
+   * The grouped validFrom value will be computed by min over all validFrom values.
+   * The grouped validTo value will be computed by max over all validTo values.
+   *
+   * @param vertexGroupingKeys       property keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys         property keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
+   * @return summary graph
+   * @see KeyedGrouping
+   */
+  default TemporalGraph temporalGroupBy(List<KeyFunction<TemporalVertex, ?>> vertexGroupingKeys,
+    List<AggregateFunction> vertexAggregateFunctions, List<KeyFunction<TemporalEdge, ?>> edgeGroupingKeys,
+    List<AggregateFunction> edgeAggregateFunctions) {
+    // Add min/max valid time aggregations that will result in the new valid times
+    List<AggregateFunction> tempVertexAgg = new ArrayList<>(vertexAggregateFunctions);
+    tempVertexAgg.add(new MinVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
+      .setAsValidTime(TimeDimension.Field.FROM));
+    tempVertexAgg.add(new MaxVertexTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)
+      .setAsValidTime(TimeDimension.Field.TO));
+    List<AggregateFunction> tempEdgeAgg = new ArrayList<>(edgeAggregateFunctions);
+    tempEdgeAgg.add(new MinEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.FROM)
+      .setAsValidTime(TimeDimension.Field.FROM));
+    tempEdgeAgg.add(new MaxEdgeTime(TimeDimension.VALID_TIME, TimeDimension.Field.TO)
+      .setAsValidTime(TimeDimension.Field.TO));
+
+    return callForGraph(new KeyedGrouping<>(vertexGroupingKeys, tempVertexAgg, edgeGroupingKeys,
+      tempEdgeAgg));
+  }
+
   //----------------------------------------------------------------------------
   // Utilities
   //----------------------------------------------------------------------------
