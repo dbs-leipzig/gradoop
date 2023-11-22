@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+option java_package = "org.gradoop.flink.io.impl.parquet.protobuf";
+option java_outer_classname = "EPGMProto";
+
+message GraphHead {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+}
+
+message Vertex {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+  repeated bytes graphIds = 4;
+}
+
+message Edge {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+  repeated bytes graphIds = 4;
+  required bytes sourceId = 5;
+  required bytes targetId = 6;
+}
