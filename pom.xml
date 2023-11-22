@@ -110,6 +110,11 @@
             <name>Lucas Schons</name>
             <organization>University of Leipzig</organization>
         </developer>
+        <developer>
+            <id>ingrim4</id>
+            <name>Maurice Eisenblätter</name>
+            <organization>University of Leipzig</organization>
+        </developer>
     </developers>
 
     <scm>
@@ -168,6 +173,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
+        <dep.parquet.version>1.12.0</dep.parquet.version>
         <dep.log4j.version>2.17.1</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
         <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
@@ -176,6 +182,7 @@
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
+        <plugin.maven-protoc.version>3.11.4</plugin.maven-protoc.version>
         <plugin.maven-compiler.version>3.8.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
         <plugin.maven-spotbugs.version>4.3.0</plugin.maven-spotbugs.version>
@@ -282,6 +289,25 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>com.github.os72</groupId>
+                    <artifactId>protoc-jar-maven-plugin</artifactId>
+                    <version>${plugin.maven-protoc.version}</version>
+                    <configuration>
+                        <protocVersion>3.0.0</protocVersion>
+                        <inputDirectories>
+                            <include>src/main/proto</include>
+                        </inputDirectories>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -632,6 +658,13 @@
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo</artifactId>
                 <version>${dep.kryo.version}</version>
+            </dependency>
+
+            <!-- Parquet -->
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-protobuf</artifactId>
+                <version>${dep.parquet.version}</version>
             </dependency>
 
             <!-- Others -->

@@ -7,4 +7,11 @@
         <Class name="org.gradoop.common.model.impl.properties.bytes.Bytes$ByteArrayComparator"/>
         <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
     </Match>
+    <!-- auto generated protobuf files -->
+    <Match>
+        <Or>
+            <Class name="~org\.gradoop\.flink\.io\.impl\.parquet\.protobuf\.EPGMProto.*"/>
+            <Class name="~org\.gradoop\.temporal\.io\.impl\.parquet\.protobuf\.TPGMProto.*"/>
+        </Or>
+    </Match>
 </FindBugsFilter>

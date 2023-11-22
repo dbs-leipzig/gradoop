@@ -89,7 +89,7 @@ abstract class BuildSuperElementFromTuple<T extends Tuple, E extends Element>
       final PropertyValue postAggregateValue = function.postAggregate(
         tupleData.getField(tupleDataOffset + keyFunctions.size() + i));
       if (postAggregateValue != null) {
-        element.setProperty(function.getAggregatePropertyKey(), postAggregateValue.isNull() ?
+        element = function.applyResult(element, postAggregateValue.isNull() ?
           AggregateUtil.getDefaultAggregate(function) : postAggregateValue);
       }
     }

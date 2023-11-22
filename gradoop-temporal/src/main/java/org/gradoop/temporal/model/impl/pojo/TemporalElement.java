@@ -125,6 +125,25 @@ public abstract class TemporalElement extends EPGMElement implements Element {
   }
 
   /**
+   * Set value time by field.
+   *
+   * @param validTime time value
+   * @param field time field
+   */
+  public void setValidTime(long validTime, TimeDimension.Field field) {
+    switch (Objects.requireNonNull(field)) {
+    case FROM:
+      setValidFrom(validTime);
+      break;
+    case TO:
+      setValidTo(validTime);
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown field [" + field + "].");
+    }
+  }
+
+  /**
    * Get the time tuple (from, to) regarding to the given {@link TimeDimension}.
    *
    * @param dimension the time dimension of the returned values

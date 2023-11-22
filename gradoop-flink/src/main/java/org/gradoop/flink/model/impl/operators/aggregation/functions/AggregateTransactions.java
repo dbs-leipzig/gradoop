@@ -44,10 +44,6 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    * Set of aggregate edge functions.
    */
   private final Set<AggregateFunction> edgeAggregateFunctions;
-  /**
-   * Set of aggregate default values.
-   */
-  private final Map<String, PropertyValue> aggregateDefaultValues;
 
   /**
    * Creates a new instance of a AggregateTransactions map function.
@@ -65,12 +61,6 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     edgeAggregateFunctions = aggregateFunctions.stream()
       .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet());
-
-    aggregateDefaultValues = new HashMap<>();
-    for (AggregateFunction func : aggregateFunctions) {
-      aggregateDefaultValues.put(func.getAggregatePropertyKey(),
-        AggregateUtil.getDefaultAggregate(func));
-    }
   }
 
   @Override
@@ -82,10 +72,9 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     for (AggregateFunction function : aggregateFunctions) {
       aggregate.computeIfPresent(function.getAggregatePropertyKey(),
         (k, v) -> function.postAggregate(v));
+      function.applyResult(graphTransaction.getGraphHead(), aggregate
+        .getOrDefault(function.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(function)));
     }
-    aggregateDefaultValues.forEach(aggregate::putIfAbsent);
-
-    aggregate.forEach(graphTransaction.getGraphHead()::setProperty);
     return graphTransaction;
   }
 
