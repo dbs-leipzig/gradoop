@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+option java_package = "org.gradoop.temporal.io.impl.parquet.protobuf";
+option java_outer_classname = "TPGMProto";
+
+message TemporalGraphHead {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+  required int64 txFrom = 4;
+  required int64 txTo = 5;
+  required int64 valFrom = 6;
+  required int64 valTo = 7;
+}
+
+message TemporalVertex {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+  repeated bytes graphIds = 4;
+  required int64 txFrom = 5;
+  required int64 txTo = 6;
+  required int64 valFrom = 7;
+  required int64 valTo = 8;
+}
+
+message TemporalEdge {
+  required bytes id = 1;
+  required string label = 2;
+  map<string, bytes> properties = 3;
+  repeated bytes graphIds = 4;
+  required bytes sourceId = 5;
+  required bytes targetId = 6;
+  required int64 txFrom = 7;
+  required int64 txTo = 8;
+  required int64 valFrom = 9;
+  required int64 valTo = 10;
+}
