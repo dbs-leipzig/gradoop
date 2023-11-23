@@ -169,7 +169,7 @@
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.13.1</dep.junit.version>
-        <dep.jettison.version>1.5.1</dep.jettison.version>
+        <dep.jettison.version>1.5.4</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
