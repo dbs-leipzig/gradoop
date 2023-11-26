@@ -31,6 +31,7 @@ org.gradoop.flink.io.impl.gdl
 org.gradoop.flink.io.impl.graph
 org.gradoop.flink.io.impl.image
 org.gradoop.flink.io.impl.mtx
+org.gradoop.flink.io.impl.parquet
 org.gradoop.flink.io.impl.statistics
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.model
@@ -120,6 +121,7 @@ org.gradoop.storage.impl.hbase.io
 org.gradoop.storage.impl.hbase.predicate.filter.impl
 org.gradoop.temporal.io.impl.csv
 org.gradoop.temporal.io.impl.csv.indexed
+org.gradoop.temporal.io.impl.parquet
 org.gradoop.temporal.model.api.functions
 org.gradoop.temporal.model.impl
 org.gradoop.temporal.model.impl.functions

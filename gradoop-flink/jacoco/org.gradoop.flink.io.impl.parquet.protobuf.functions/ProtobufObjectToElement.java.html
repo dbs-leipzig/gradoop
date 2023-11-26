@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProtobufObjectToElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.protobuf.functions</a> &gt; <span class="el_source">ProtobufObjectToElement.java</span></div><h1>ProtobufObjectToElement.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.protobuf.functions;
+
+import com.google.protobuf.ByteString;
+import com.google.protobuf.Message;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Base class for converting an {@link Element} into a protobuf object.
+ *
+ * @param &lt;B&gt; protobuf object type
+ * @param &lt;E&gt; element type
+ */
+public abstract class ProtobufObjectToElement&lt;B extends Message.Builder, E extends EPGMElement&gt; implements
+  MapFunction&lt;B, E&gt; {
+
+  /**
+   * Stores the properties for the {@link Element} to be converted.
+   */
+  private final Properties properties;
+
+  /**
+   * Constructor
+   */
+<span class="fc" id="L50">  public ProtobufObjectToElement() {</span>
+<span class="fc" id="L51">    this.properties = Properties.create();</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Converts a protobuf byte array ({@link ByteString}) into a gradoop id.
+   *
+   * @param value binary representation of a gradoop id
+   * @return converted gradoop id
+   */
+  protected GradoopId parseGradoopId(ByteString value) {
+<span class="fc" id="L61">    return GradoopId.fromByteArray(value.toByteArray());</span>
+  }
+
+  /**
+   * Converts a map of strings and binary property values ({@link ByteString}) into a property map.
+   *
+   * @param propertyValues map of strings and binary property values
+   * @return converted properties
+   */
+  protected Properties parseProperties(Map&lt;String, ByteString&gt; propertyValues) {
+<span class="fc" id="L71">    properties.clear();</span>
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    for (Map.Entry&lt;String, ByteString&gt; entry : propertyValues.entrySet()) {</span>
+<span class="fc" id="L74">      PropertyValue value = PropertyValue.fromRawBytes(entry.getValue().toByteArray());</span>
+<span class="fc" id="L75">      properties.set(entry.getKey(), value);</span>
+<span class="fc" id="L76">    }</span>
+
+<span class="fc" id="L78">    return properties;</span>
+  }
+
+  /**
+   * Converts a list of binary gradoop ids into a gradoop id set.
+   *
+   * @param gradoopIdList list of binary gradoop ids
+   * @return converted gradoop id set
+   */
+  protected GradoopIdSet parseGradoopIds(List&lt;ByteString&gt; gradoopIdList) {
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    List&lt;GradoopId&gt; gradoopIds = gradoopIdList.isEmpty() ? Collections.emptyList() :</span>
+<span class="fc" id="L89">      gradoopIdList.stream().map(this::parseGradoopId).collect(Collectors.toList());</span>
+<span class="fc" id="L90">    return GradoopIdSet.fromExisting(gradoopIds);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

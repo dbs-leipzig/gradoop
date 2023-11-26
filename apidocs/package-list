@@ -101,6 +101,15 @@ org.gradoop.flink.io.impl.image
 org.gradoop.flink.io.impl.image.functions
 org.gradoop.flink.io.impl.mtx
 org.gradoop.flink.io.impl.mtx.functions
+org.gradoop.flink.io.impl.parquet
+org.gradoop.flink.io.impl.parquet.common
+org.gradoop.flink.io.impl.parquet.plain
+org.gradoop.flink.io.impl.parquet.plain.common
+org.gradoop.flink.io.impl.parquet.plain.read
+org.gradoop.flink.io.impl.parquet.plain.write
+org.gradoop.flink.io.impl.parquet.protobuf
+org.gradoop.flink.io.impl.parquet.protobuf.functions
+org.gradoop.flink.io.impl.parquet.protobuf.kryo
 org.gradoop.flink.io.impl.statistics
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.io.impl.tlf.constants
@@ -294,6 +303,11 @@ org.gradoop.temporal.io.impl.csv
 org.gradoop.temporal.io.impl.csv.functions
 org.gradoop.temporal.io.impl.csv.indexed
 org.gradoop.temporal.io.impl.csv.tuples
+org.gradoop.temporal.io.impl.parquet.plain
+org.gradoop.temporal.io.impl.parquet.plain.read
+org.gradoop.temporal.io.impl.parquet.plain.write
+org.gradoop.temporal.io.impl.parquet.protobuf
+org.gradoop.temporal.io.impl.parquet.protobuf.functions
 org.gradoop.temporal.model.api
 org.gradoop.temporal.model.api.functions
 org.gradoop.temporal.model.impl

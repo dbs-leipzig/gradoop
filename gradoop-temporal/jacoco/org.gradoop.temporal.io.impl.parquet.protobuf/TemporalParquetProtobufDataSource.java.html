@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporalParquetProtobufDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Temporal</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.temporal.io.impl.parquet.protobuf</a> &gt; <span class="el_source">TemporalParquetProtobufDataSource.java</span></div><h1>TemporalParquetProtobufDataSource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.temporal.io.impl.parquet.protobuf;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.io.impl.parquet.protobuf.ParquetProtobufDataSource;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.temporal.io.api.TemporalDataSource;
+import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalEdge;
+import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalGraphHead;
+import org.gradoop.temporal.io.impl.parquet.protobuf.functions.ProtobufObjectToTemporalVertex;
+import org.gradoop.temporal.model.impl.TemporalGraph;
+import org.gradoop.temporal.model.impl.TemporalGraphCollection;
+import org.gradoop.temporal.model.impl.TemporalGraphCollectionFactory;
+import org.gradoop.temporal.model.impl.pojo.TemporalEdge;
+import org.gradoop.temporal.model.impl.pojo.TemporalGraphHead;
+import org.gradoop.temporal.model.impl.pojo.TemporalVertex;
+import org.gradoop.temporal.util.TemporalGradoopConfig;
+
+import java.io.IOException;
+
+/**
+ * A temporal graph data source for parquet-protobuf files.
+ * &lt;p&gt;
+ * The datasource expects files separated by vertices and edges, e.g. in the following directory
+ * structure:
+ * &lt;p&gt;
+ * protoParquetRoot
+ * |- vertices.proto.parquet # all vertex data
+ * |- edges.proto.parquet    # all edge data
+ * |- graphs.proto.parquet   # all graph head data
+ */
+public class TemporalParquetProtobufDataSource extends ParquetProtobufDataSource implements
+  TemporalDataSource {
+
+  /**
+   * Creates a new temporal parquet-protobuf data source.
+   *
+   * @param basePath directory to the parquet-protobuf files
+   * @param config   Gradoop Flink configuration
+   */
+  public TemporalParquetProtobufDataSource(String basePath, GradoopFlinkConfig config) {
+<span class="fc" id="L56">    super(basePath, config);</span>
+<span class="fc" id="L57">  }</span>
+
+  @Override
+  public TemporalGraph getTemporalGraph() throws IOException {
+<span class="fc" id="L61">    TemporalGraphCollection collection = getTemporalGraphCollection();</span>
+<span class="fc" id="L62">    return getConfig().getTemporalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L63">      collection.getGraphHeads().first(1),</span>
+<span class="fc" id="L64">      collection.getVertices(),</span>
+<span class="fc" id="L65">      collection.getEdges());</span>
+  }
+
+  @Override
+  public TemporalGraphCollection getTemporalGraphCollection() throws IOException {
+<span class="fc" id="L70">    TemporalGraphCollectionFactory collectionFactory = getConfig().getTemporalGraphCollectionFactory();</span>
+
+<span class="fc" id="L72">    DataSet&lt;TemporalGraphHead&gt; graphHeads =</span>
+<span class="fc" id="L73">      read(TPGMProto.TemporalGraphHead.Builder.class, getGraphHeadPath())</span>
+<span class="fc" id="L74">        .map(new ProtobufObjectToTemporalGraphHead(collectionFactory.getGraphHeadFactory()));</span>
+
+<span class="fc" id="L76">    DataSet&lt;TemporalVertex&gt; vertices =</span>
+<span class="fc" id="L77">      read(TPGMProto.TemporalVertex.Builder.class, getVertexPath())</span>
+<span class="fc" id="L78">        .map(new ProtobufObjectToTemporalVertex(collectionFactory.getVertexFactory()));</span>
+
+<span class="fc" id="L80">    DataSet&lt;TemporalEdge&gt; edges =</span>
+<span class="fc" id="L81">      read(TPGMProto.TemporalEdge.Builder.class, getEdgePath())</span>
+<span class="fc" id="L82">        .map(new ProtobufObjectToTemporalEdge(collectionFactory.getEdgeFactory()));</span>
+
+<span class="fc" id="L84">    return collectionFactory.fromDataSets(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  protected TemporalGradoopConfig getConfig() {
+<span class="fc" id="L89">    return (TemporalGradoopConfig) super.getConfig();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

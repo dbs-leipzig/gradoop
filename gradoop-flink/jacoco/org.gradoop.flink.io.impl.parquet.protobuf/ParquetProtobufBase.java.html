@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ParquetProtobufBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.protobuf</a> &gt; <span class="el_source">ParquetProtobufBase.java</span></div><h1>ParquetProtobufBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.protobuf;
+
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageOrBuilder;
+import org.apache.flink.api.java.DataSet;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.parquet.hadoop.ParquetFileWriter;
+import org.apache.parquet.hadoop.ParquetOutputFormat;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.apache.parquet.hadoop.util.ContextUtil;
+import org.apache.parquet.proto.ProtoParquetInputFormat;
+import org.apache.parquet.proto.ProtoReadSupport;
+import org.apache.parquet.proto.ProtoWriteSupport;
+import org.gradoop.flink.io.impl.parquet.common.HadoopValueInputFormat;
+import org.gradoop.flink.io.impl.parquet.common.HadoopValueOutputFormat;
+import org.gradoop.flink.io.impl.parquet.common.ParquetOutputFormatWithMode;
+import org.gradoop.flink.io.impl.parquet.protobuf.kryo.ProtobufBuilderKryoSerializer;
+import org.gradoop.flink.io.impl.parquet.protobuf.kryo.ProtobufMessageKryoSerializer;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+/**
+ * Base class for parquet-protobuf data source and data sink.
+ */
+abstract class ParquetProtobufBase {
+
+  /**
+   * File ending for parquet-protobuf files.
+   */
+  private static final String PROTOBUF_PARQUET_FILE_SUFFIX = &quot;.proto.parquet&quot;;
+  /**
+   * parquet-protobuf file for vertices.
+   */
+  private static final String VERTEX_FILE = &quot;vertices&quot; + PROTOBUF_PARQUET_FILE_SUFFIX;
+  /**
+   * parquet-protobuf file for graph heads.
+   */
+  private static final String GRAPH_HEAD_FILE = &quot;graphs&quot; + PROTOBUF_PARQUET_FILE_SUFFIX;
+  /**
+   * parquet-protobuf file for edges.
+   */
+  private static final String EDGE_FILE = &quot;edges&quot; + PROTOBUF_PARQUET_FILE_SUFFIX;
+
+  /**
+   * Root directory containing the CSV and metadata files.
+   */
+  private final String basePath;
+  /**
+   * Gradoop Flink configuration
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Constructor.
+   *
+   * @param basePath directory to the parquet-protobuf files
+   * @param config   Gradoop Flink configuration
+   */
+<span class="fc" id="L80">  protected ParquetProtobufBase(String basePath, GradoopFlinkConfig config) {</span>
+<span class="fc" id="L81">    Objects.requireNonNull(basePath);</span>
+<span class="fc" id="L82">    Objects.requireNonNull(config);</span>
+
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    this.basePath = basePath.endsWith(File.separator) ? basePath : basePath + File.separator;</span>
+<span class="fc" id="L85">    this.config = config;</span>
+
+    // see: https://github.com/apache/flink/pull/7865
+<span class="fc" id="L88">    config.getExecutionEnvironment()</span>
+<span class="fc" id="L89">      .addDefaultKryoSerializer(Message.Builder.class, ProtobufBuilderKryoSerializer.class);</span>
+<span class="fc" id="L90">    config.getExecutionEnvironment()</span>
+<span class="fc" id="L91">      .addDefaultKryoSerializer(Message.class, ProtobufMessageKryoSerializer.class);</span>
+<span class="fc" id="L92">  }</span>
+
+  /**
+   * Returns the path to the graph head file.
+   *
+   * @return graph head file path
+   */
+  protected String getGraphHeadPath() {
+<span class="fc" id="L100">    return basePath + GRAPH_HEAD_FILE;</span>
+  }
+
+  /**
+   * Returns the path to the vertex file.
+   *
+   * @return vertex file path
+   */
+  protected String getVertexPath() {
+<span class="fc" id="L109">    return basePath + VERTEX_FILE;</span>
+  }
+
+  /**
+   * Returns the path to the edge file.
+   *
+   * @return edge file path
+   */
+  protected String getEdgePath() {
+<span class="fc" id="L118">    return basePath + EDGE_FILE;</span>
+  }
+
+  /**
+   * Get the gradoop configuration.
+   *
+   * @return the gradoop configuration instance
+   */
+  protected GradoopFlinkConfig getConfig() {
+<span class="fc" id="L127">    return config;</span>
+  }
+
+  /**
+   * Writes a protobuf {@link DataSet} as parquet-protobuf file(s) to the specified location.
+   *
+   * @param data the protobuf {@link DataSet}
+   * @param type the protobuf object class
+   * @param outputPath the path of the file
+   * @param overwrite the behavior regarding existing files
+   * @param &lt;T&gt; protobuf object type
+   * @throws IOException if an I/O error occurs
+   */
+  public &lt;T extends MessageOrBuilder&gt; void write(DataSet&lt;T&gt; data, Class&lt;? extends Message&gt; type,
+    String outputPath, boolean overwrite) throws IOException {
+<span class="fc" id="L142">    Job job = Job.getInstance();</span>
+
+<span class="fc" id="L144">    FileOutputFormat.setOutputPath(job, new Path(outputPath));</span>
+<span class="fc" id="L145">    ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);</span>
+<span class="fc" id="L146">    ParquetOutputFormat.setEnableDictionary(job, false);</span>
+<span class="fc" id="L147">    ParquetOutputFormat.setWriteSupportClass(job, ProtoWriteSupport.class);</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">    ParquetOutputFormatWithMode.setFileCreationMode(job,</span>
+      overwrite ? ParquetFileWriter.Mode.OVERWRITE : ParquetFileWriter.Mode.CREATE);
+<span class="fc" id="L150">    ProtoWriteSupport.setSchema(ContextUtil.getConfiguration(job), type);</span>
+<span class="fc" id="L151">    ProtoWriteSupport.setWriteSpecsCompliant(ContextUtil.getConfiguration(job), true);</span>
+
+<span class="fc" id="L153">    data.output(new HadoopValueOutputFormat&lt;T&gt;(new ParquetOutputFormatWithMode&lt;&gt;(), job));</span>
+<span class="fc" id="L154">  }</span>
+
+  /**
+   * Creates a {@link DataSet} that represents the protobuf objects produced by reading the given
+   * parquet-protobuf file.
+   *
+   * @param type the protobuf object class
+   * @param inputPath the path of the file
+   * @return A {@link DataSet} that represents the data read from the given file.
+   * @param &lt;T&gt; protobuf object type
+   * @throws IOException if an I/O error occurs
+   */
+  public &lt;T extends Message.Builder&gt; DataSet&lt;T&gt; read(Class&lt;T&gt; type, String inputPath) throws
+    IOException {
+<span class="fc" id="L168">    Job job = Job.getInstance();</span>
+
+<span class="fc" id="L170">    FileInputFormat.addInputPath(job, new Path(inputPath));</span>
+<span class="fc" id="L171">    ProtoReadSupport.setProtobufClass(ContextUtil.getConfiguration(job),</span>
+<span class="fc" id="L172">      type.getDeclaringClass().asSubclass(Message.class).getName());</span>
+
+<span class="fc" id="L174">    return config.getExecutionEnvironment()</span>
+<span class="fc" id="L175">      .createInput(new HadoopValueInputFormat&lt;T&gt;(new ProtoParquetInputFormat&lt;&gt;(), type, job));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

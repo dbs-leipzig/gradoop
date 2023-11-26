@@ -82,6 +82,9 @@ Gradoop Flink,org.gradoop.flink.io.impl.csv.functions,CSVLineToVertex,0,38,0,0,0
 Gradoop Flink,org.gradoop.flink.io.impl.gdl.functions,GraphTransactionsToGDL,0,55,0,2,0,13,0,3,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle,TransactionalFSMBase,0,125,0,0,0,38,0,3,0,3
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle,ThinkLikeAnEmbeddingFSMBase,0,52,0,0,0,12,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.read,GraphHeadRootConverter,0,51,0,0,0,10,0,6,0,6
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.read,EdgeRootConverter,0,93,0,0,0,16,0,9,0,9
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.read,VertexRootConverter,0,65,0,0,0,12,0,7,0,7
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.config,DIMSpanConfig,144,57,4,0,28,20,12,9,10,9
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.config,DataflowStep,0,44,0,0,0,5,0,1,0,1
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.config,DIMSpanConstants,3,0,0,0,1,0,1,0,1,0
@@ -444,6 +447,9 @@ Gradoop Flink,org.gradoop.flink.algorithms.gelly.clusteringcoefficient,Clusterin
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.clusteringcoefficient,GellyLocalClusteringCoefficientDirected,0,44,0,0,0,10,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.clusteringcoefficient,GellyLocalClusteringCoefficientUndirected,0,44,0,0,0,10,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.clusteringcoefficient,GellyGlobalClusteringCoefficientDirected,0,43,0,0,0,11,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.common,ParquetOutputFormatWithMode,0,22,0,0,0,5,0,4,0,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.common,HadoopValueOutputFormat,16,22,1,1,3,8,1,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.common,HadoopValueInputFormat,20,37,3,3,5,12,3,4,0,4
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand,ExpandEmbeddings,0,202,0,4,0,40,0,8,0,6
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand,ExpandEmbeddingsBulk,13,102,0,0,2,16,1,3,1,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand,ExpandEmbeddingsForLoop,13,125,0,4,2,18,1,5,1,3
@@ -557,6 +563,9 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.statistics.writer,DistinctS
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.transactional.tuples,GraphWithCandidates,7,36,0,0,2,13,2,6,2,6
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.pagerank.functions,PageRankToAttribute,0,17,0,0,0,5,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.pagerank.functions,PageRankResultKey,0,7,0,0,0,2,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain,ParquetDataSource,16,36,0,0,5,10,1,2,1,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain,ParquetBase,4,120,2,2,0,23,2,7,0,7
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain,ParquetDataSink,19,30,0,0,6,6,3,2,3,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions,ProjectEdge,0,16,0,0,0,5,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions,ProjectEmbeddingElements,0,45,0,2,0,10,0,3,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions,ProjectEmbedding,0,11,0,0,0,4,0,2,0,2
@@ -656,6 +665,20 @@ Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle.pojos,Embedding
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle.pojos,TFSMGraph,0,11,0,0,0,4,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle.pojos,CCSGraph,12,0,0,0,4,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.tle.pojos,FSMEdge,75,21,10,0,15,8,8,4,3,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.TimeIntervalConverter,66,0,4,0,14,0,8,0,6,0
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.LongValueConverter,11,0,0,0,5,0,2,0,2,0
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.GradoopIdSetConverter,5,39,1,1,1,11,1,5,0,5
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.PropertyValueConverter,0,15,0,0,0,6,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter,12,62,1,3,1,17,1,7,0,6
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRecordMaterializer,0,13,0,0,0,5,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.StringConverter,0,14,0,0,0,6,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.KeyValueConverter,5,28,1,3,1,12,1,5,0,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopParquetTypeBuilder,40,72,0,0,11,26,1,6,1,6
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.ListElementConverter,5,13,1,1,1,7,1,4,0,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.PropertiesConverter,5,56,1,1,1,11,1,7,0,7
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopReadSupport,14,54,0,0,4,12,0,5,0,5
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopWriteSupport,51,182,1,7,11,46,2,11,1,8
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.common,GradoopRootConverter.GradoopIdConverter,0,15,0,0,0,6,0,2,0,2
 Gradoop Flink,org.gradoop.flink.io.impl.edgelist.functions,CreateImportEdge,0,41,0,0,0,9,0,2,0,2
 Gradoop Flink,org.gradoop.flink.io.impl.edgelist.functions,CreateLabeledImportVertex,0,37,0,0,0,9,0,2,0,2
 Gradoop Flink,org.gradoop.flink.io.impl.edgelist.functions,CreateImportVertex,0,20,0,0,0,6,0,2,0,2
@@ -669,9 +692,9 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.split,Split,0,149,0,0,0,37,
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,AlphabeticalLabelComparator,11,0,0,0,2,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,UndirectedDFSBranchComparator,71,0,8,0,13,0,6,0,2,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,ProportionalLabelComparator,31,0,4,0,7,0,4,0,2,0
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,41,195,25,33,7,46,19,12,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DFSCodeComparator,34,202,22,36,6,47,17,14,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,DirectedDFSBranchComparator,0,92,0,12,0,19,0,8,0,2
-Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,3,28,1,3,1,6,1,3,0,2
+Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.comparison,InverseProportionalLabelComparator,0,31,0,4,0,7,0,4,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,DFSCodeUtils,1,49,2,6,0,11,2,6,0,4
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,Simple16Compressor,3,54,0,4,1,11,1,7,1,5
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.dimspan.model,UnsortedSearchGraphUtils,2,3,0,0,1,1,1,1,1,1
@@ -731,6 +754,8 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.oper
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation,GradoopLabelPropagation,0,17,0,0,0,5,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation,LabelPropagation,0,58,0,0,0,11,0,3,0,3
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation,GellyLabelPropagation,13,0,0,0,4,0,2,0,2,0
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.kryo,ProtobufMessageKryoSerializer,81,16,5,1,15,3,6,2,3,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.kryo,ProtobufBuilderKryoSerializer,28,65,3,3,5,13,3,5,0,5
 Gradoop Flink,org.gradoop.flink.model.impl.operators.transformation,Transformation,0,100,0,12,0,22,0,9,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.transformation,ApplyTransformation,4,59,1,1,1,19,1,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.difference.functions,RemoveCut,0,43,0,8,0,13,0,6,0,2
@@ -776,8 +801,8 @@ Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,ByDifferentId,0,16,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,GraphElementSet,41,0,4,0,12,0,4,0,2,0
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,LabelCombiner,0,23,0,2,0,4,0,3,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,EdgeFromIds,0,38,0,0,0,9,0,3,0,3
-Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,IdInBroadcast,0,20,0,0,0,5,0,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,PropertyGetter,4,38,1,3,1,10,1,3,0,2
+Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,IdInBroadcast,0,20,0,0,0,5,0,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,ToPropertyValue,6,0,0,0,2,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,ExpandGradoopIds,0,27,0,2,0,6,0,3,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.functions.epgm,TransactionEdges,0,13,0,0,0,3,0,2,0,2
@@ -833,6 +858,9 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.oper
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project,ProjectVertices,15,27,0,0,6,9,2,3,2,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project,ProjectEmbeddingsElements,3,49,0,0,1,12,1,3,1,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project,ProjectEmbeddings,0,36,0,0,0,11,0,4,0,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.write,EdgeWriteSupport,0,58,0,0,0,16,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.write,VertexWriteSupport,0,42,0,0,0,12,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.plain.write,GraphHeadWriteSupport,0,34,0,0,0,10,0,3,0,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions,ComparisonExpression,38,196,6,32,6,43,7,27,2,13
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.common,TFSMConstants,3,0,0,0,1,0,1,0,1,0
 Gradoop Flink,org.gradoop.flink.algorithms.fsm.transactional.common,FSMConfig,39,30,0,0,15,11,3,5,3,5
@@ -913,6 +941,31 @@ Gradoop Flink,org.gradoop.flink.model.impl.operators.matching.common.matching,El
 Gradoop Flink,org.gradoop.flink.model.impl.operators.count.functions,Tuple2FromTupleWithObjectAnd1L,0,21,0,0,0,6,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.count.functions,Tuple1With1L,2,12,0,0,1,3,1,3,1,3
 Gradoop Flink,org.gradoop.flink.model.impl.operators.count.functions,Tuple2WithObjectAnd1L,0,20,0,0,0,6,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,ElementToProtobufObject,0,86,0,8,0,20,0,9,0,5
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,ProtobufObjectToElement,2,56,1,3,0,13,1,5,0,4
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,EdgeToProtobufObject,0,36,0,0,0,9,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,ProtobufObjectToVertex,0,33,0,0,0,8,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,ProtobufObjectToGraphHead,0,27,0,0,0,7,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,GraphHeadToProtobufObject,0,21,0,0,0,6,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,VertexToProtobufObject,0,26,0,0,0,7,0,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf.functions,ProtobufObjectToEdge,0,45,0,0,0,10,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Edge.Builder,390,537,60,36,100,148,71,40,27,36
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,ParquetProtobufBase,4,139,2,2,0,30,2,7,0,7
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Vertex.new AbstractParser() {...},0,10,0,0,0,2,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Vertex.PropertiesDefaultEntryHolder,0,8,0,0,0,3,0,1,0,1
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.GraphHead.new AbstractParser() {...},0,10,0,0,0,2,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Edge.PropertiesDefaultEntryHolder,0,8,0,0,0,3,0,1,0,1
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.GraphHead.Builder,280,313,42,22,71,92,50,29,21,26
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.new Descriptors.FileDescriptor.InternalDescriptorAssigner() {...},0,8,0,0,0,3,0,2,0,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,ParquetProtobufDataSource,16,51,0,0,5,13,1,2,1,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.GraphHead,429,308,72,27,103,87,71,24,28,16
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Vertex.Builder,336,415,48,28,86,118,59,34,25,30
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Edge,566,499,112,44,128,127,98,34,30,21
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Vertex,468,393,79,35,110,103,77,29,30,17
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,ParquetProtobufDataSink,19,48,0,0,6,12,3,2,3,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto,4,177,0,0,3,21,2,2,2,2
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.GraphHead.PropertiesDefaultEntryHolder,0,8,0,0,0,3,0,1,0,1
+Gradoop Flink,org.gradoop.flink.io.impl.parquet.protobuf,EPGMProto.Edge.new AbstractParser() {...},0,10,0,0,0,2,0,2,0,2
 Gradoop Flink,org.gradoop.flink.model.impl.operators.tostring.tuples,GraphHeadString,0,24,0,0,0,10,0,5,0,5
 Gradoop Flink,org.gradoop.flink.model.impl.operators.tostring.tuples,VertexString,0,27,0,0,0,11,0,5,0,5
 Gradoop Flink,org.gradoop.flink.model.impl.operators.tostring.tuples,EdgeString,0,68,0,0,0,26,0,13,0,13
@@ -928,7 +981,7 @@ Gradoop Flink,org.gradoop.flink.model.api.operators,ApplicableUnaryBaseGraphToBa
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,ToCoordsTuple,0,41,0,0,0,10,0,2,0,2
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexScaleMap,45,0,0,0,11,0,2,0,2,0
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,TargetCoordinateJoin,0,17,0,0,0,7,0,2,0,2
-Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexZoomMap,7,133,1,1,0,26,1,3,0,3
+Gradoop Flink,org.gradoop.flink.io.impl.image.functions,VertexZoomMap,6,134,1,1,0,26,1,3,0,3
 Gradoop Flink,org.gradoop.flink.io.impl.image.functions,SourceCoordinateJoin,0,17,0,0,0,7,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation.functions,LPMessageFunction,0,8,0,0,0,3,0,2,0,2
 Gradoop Flink,org.gradoop.flink.algorithms.gelly.labelpropagation.functions,LPVertexJoin,0,15,0,0,0,5,0,2,0,2

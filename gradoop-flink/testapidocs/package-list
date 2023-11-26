@@ -19,6 +19,7 @@ org.gradoop.flink.io.impl.gdl
 org.gradoop.flink.io.impl.graph
 org.gradoop.flink.io.impl.image
 org.gradoop.flink.io.impl.mtx
+org.gradoop.flink.io.impl.parquet
 org.gradoop.flink.io.impl.statistics
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.model

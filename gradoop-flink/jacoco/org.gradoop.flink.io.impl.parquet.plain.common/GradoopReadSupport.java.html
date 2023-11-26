@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopReadSupport.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.plain.common</a> &gt; <span class="el_source">GradoopReadSupport.java</span></div><h1>GradoopReadSupport.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.plain.common;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.parquet.hadoop.api.InitContext;
+import org.apache.parquet.hadoop.api.ReadSupport;
+import org.apache.parquet.hadoop.util.ContextUtil;
+import org.apache.parquet.io.api.RecordMaterializer;
+import org.apache.parquet.schema.MessageType;
+
+import java.lang.reflect.Constructor;
+import java.util.Map;
+
+/**
+ * Simple parquet read support for a {@link GradoopRootConverter&lt;R&gt;}
+ *
+ * @param &lt;R&gt; the record type
+ */
+<span class="fc" id="L35">public class GradoopReadSupport&lt;R&gt; extends ReadSupport&lt;R&gt; {</span>
+
+  /**
+   * The configuration key for the {@link GradoopRootConverter}
+   */
+  public static final String GRADOOP_ROOT_CONVERTER_CLASS = &quot;gradoop.parquet.rootConverterClass&quot;;
+
+  /**
+   * The constructor of the root converter
+   */
+  private Constructor&lt;? extends GradoopRootConverter&gt; rootConverterConstructor;
+
+  /**
+   * Sets the root converter class of a {@link JobContext}.
+   *
+   * @param job the job's context
+   * @param rootConverter the root converter class
+   */
+  public static void setRootConverter(Job job, Class&lt;? extends GradoopRootConverter&lt;?&gt;&gt; rootConverter) {
+<span class="fc" id="L54">    ContextUtil.getConfiguration(job)</span>
+<span class="fc" id="L55">      .setClass(GRADOOP_ROOT_CONVERTER_CLASS, rootConverter, GradoopRootConverter.class);</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Gets the root converter class of a job's {@link Configuration}.
+   *
+   * @param configuration the job's configuration
+   * @return the specified root converter class or defaults to null
+   */
+  public static Class&lt;? extends GradoopRootConverter&gt; getRootConverter(Configuration configuration) {
+<span class="fc" id="L65">    return configuration.getClass(GRADOOP_ROOT_CONVERTER_CLASS, null, GradoopRootConverter.class);</span>
+  }
+
+  @Override
+  public ReadContext init(InitContext context) {
+    try {
+<span class="fc" id="L71">      Class&lt;? extends GradoopRootConverter&gt; rootConverter = getRootConverter(context.getConfiguration());</span>
+<span class="fc" id="L72">      this.rootConverterConstructor = rootConverter.getConstructor(MessageType.class);</span>
+<span class="nc" id="L73">    } catch (ReflectiveOperationException | SecurityException e) {</span>
+<span class="nc" id="L74">      throw new RuntimeException(&quot;can't initialize ReadSupport&quot;, e);</span>
+<span class="fc" id="L75">    }</span>
+
+<span class="fc" id="L77">    return new ReadContext(context.getFileSchema());</span>
+  }
+
+  @Override
+  public RecordMaterializer&lt;R&gt; prepareForRead(Configuration configuration,
+    Map&lt;String, String&gt; keyValueMetaData,
+    MessageType fileSchema, ReadContext readContext) {
+    try {
+<span class="fc" id="L85">      GradoopRootConverter rootConverter = this.rootConverterConstructor</span>
+<span class="fc" id="L86">        .newInstance(readContext.getRequestedSchema());</span>
+<span class="fc" id="L87">      return new GradoopRecordMaterializer&lt;&gt;(rootConverter);</span>
+<span class="nc" id="L88">    } catch (ReflectiveOperationException e) {</span>
+<span class="nc" id="L89">      throw new RuntimeException(&quot;can't initialize GradoopRecordMaterializer&quot;, e);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

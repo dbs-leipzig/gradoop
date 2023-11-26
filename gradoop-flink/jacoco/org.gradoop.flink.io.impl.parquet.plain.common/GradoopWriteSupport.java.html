@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopWriteSupport.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.plain.common</a> &gt; <span class="el_source">GradoopWriteSupport.java</span></div><h1>GradoopWriteSupport.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.plain.common;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.parquet.hadoop.api.WriteSupport;
+import org.apache.parquet.io.api.Binary;
+import org.apache.parquet.io.api.RecordConsumer;
+import org.apache.parquet.schema.MessageType;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
+
+/**
+ * Base class for all EPGM/TPGM parquet write supports
+ *
+ * @param &lt;R&gt; the record type
+ */
+<span class="fc" id="L37">public abstract class GradoopWriteSupport&lt;R&gt; extends WriteSupport&lt;R&gt; {</span>
+
+  /**
+   * the current record consumer
+   */
+  private RecordConsumer recordConsumer;
+
+  @Override
+  public final WriteContext init(Configuration configuration) {
+<span class="fc" id="L46">    return new WriteContext(this.getMessageType(), Collections.emptyMap());</span>
+  }
+
+  @Override
+  public final void prepareForWrite(RecordConsumer recordConsumer) {
+<span class="fc" id="L51">    this.recordConsumer = recordConsumer;</span>
+<span class="fc" id="L52">  }</span>
+
+  @Override
+  public final void write(R record) {
+<span class="fc" id="L56">    this.recordConsumer.startMessage();</span>
+<span class="fc" id="L57">    this.writeRecord(record);</span>
+<span class="fc" id="L58">    this.recordConsumer.endMessage();</span>
+<span class="fc" id="L59">  }</span>
+
+  /**
+   * Retrurns the record's message type
+   *
+   * @return the record's message type
+   */
+  public abstract MessageType getMessageType();
+
+  /**
+   * Gets called once per record.
+   *
+   * @param record the record to be written
+   */
+  public abstract void writeRecord(R record);
+
+  /**
+   * Appends a gradoop id field to the record consumer
+   *
+   * @param label record field label
+   * @param index record field index
+   * @param value the gradoop id
+   */
+  protected void writeGradoopId(String label, int index, GradoopId value) {
+<span class="fc" id="L83">    this.recordConsumer.startField(label, index);</span>
+<span class="fc" id="L84">    this.recordConsumer.addBinary(Binary.fromConstantByteArray(value.toByteArray()));</span>
+<span class="fc" id="L85">    this.recordConsumer.endField(label, index);</span>
+<span class="fc" id="L86">  }</span>
+
+  /**
+   * Appends a string field to the record consumer
+   *
+   * @param label record field label
+   * @param index record field index
+   * @param value the string
+   */
+  protected void writeString(String label, int index, String value) {
+<span class="fc" id="L96">    this.recordConsumer.startField(label, index);</span>
+<span class="fc" id="L97">    this.recordConsumer.addBinary(Binary.fromString(value));</span>
+<span class="fc" id="L98">    this.recordConsumer.endField(label, index);</span>
+<span class="fc" id="L99">  }</span>
+
+  /**
+   * Appends a properties field to the record consumer.
+   *
+   * @param label record field label
+   * @param index record field index
+   * @param value the properties
+   */
+  protected void writeProperties(String label, int index, @Nullable Properties value) {
+    // skip empty properties since property fields are optional
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">    if (value == null || value.isEmpty()) {</span>
+<span class="fc" id="L111">      return;</span>
+    }
+
+<span class="fc" id="L114">    this.recordConsumer.startField(label, index);</span>
+<span class="fc" id="L115">    this.recordConsumer.startGroup();</span>
+
+<span class="fc" id="L117">    this.recordConsumer.startField(&quot;key_value&quot;, 0);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">    for (String propertyKey : value.getKeys()) {</span>
+<span class="fc" id="L119">      this.recordConsumer.startGroup();</span>
+
+<span class="fc" id="L121">      writeString(&quot;key&quot;, 0, propertyKey);</span>
+
+<span class="fc" id="L123">      this.recordConsumer.startField(&quot;value&quot;, 1);</span>
+<span class="fc" id="L124">      PropertyValue propertyValue = value.get(propertyKey);</span>
+<span class="fc" id="L125">      this.recordConsumer.addBinary(Binary.fromConstantByteArray(propertyValue.getRawBytes()));</span>
+<span class="fc" id="L126">      this.recordConsumer.endField(&quot;value&quot;, 1);</span>
+
+<span class="fc" id="L128">      this.recordConsumer.endGroup();</span>
+<span class="fc" id="L129">    }</span>
+<span class="fc" id="L130">    this.recordConsumer.endField(&quot;key_value&quot;, 0);</span>
+
+<span class="fc" id="L132">    this.recordConsumer.endGroup();</span>
+<span class="fc" id="L133">    this.recordConsumer.endField(label, index);</span>
+<span class="fc" id="L134">  }</span>
+
+  /**
+   * Appends a gradoop id set field to the record consumer.
+   *
+   * @param label record field label
+   * @param index record field index
+   * @param value the gradoop id set
+   */
+  protected void writeGradoopIdSet(String label, int index, GradoopIdSet value) {
+<span class="fc" id="L144">    this.recordConsumer.startField(label, index);</span>
+<span class="fc" id="L145">    this.recordConsumer.startGroup();</span>
+
+<span class="fc" id="L147">    this.recordConsumer.startField(&quot;list&quot;, 0);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">    for (GradoopId element : value) {</span>
+<span class="fc" id="L149">      this.recordConsumer.startGroup();</span>
+
+<span class="fc" id="L151">      writeGradoopId(&quot;element&quot;, 0, element);</span>
+
+<span class="fc" id="L153">      this.recordConsumer.endGroup();</span>
+<span class="fc" id="L154">    }</span>
+<span class="fc" id="L155">    this.recordConsumer.endField(&quot;list&quot;, 0);</span>
+
+<span class="fc" id="L157">    this.recordConsumer.endGroup();</span>
+<span class="fc" id="L158">    this.recordConsumer.endField(label, index);</span>
+<span class="fc" id="L159">  }</span>
+
+  /**
+   * Appends a time interval field to the record consumer.
+   *
+   * @param label record field label
+   * @param index record field index
+   * @param value the timer interval
+   */
+  protected void writeTimeIntervalField(String label, int index, Tuple2&lt;Long, Long&gt; value) {
+<span class="nc" id="L169">    this.recordConsumer.startField(label, index);</span>
+<span class="nc" id="L170">    this.recordConsumer.startGroup();</span>
+
+<span class="nc" id="L172">    this.recordConsumer.startField(&quot;from&quot;, 0);</span>
+<span class="nc" id="L173">    this.recordConsumer.addLong(value.f0);</span>
+<span class="nc" id="L174">    this.recordConsumer.endField(&quot;from&quot;, 0);</span>
+
+<span class="nc" id="L176">    this.recordConsumer.startField(&quot;to&quot;, 1);</span>
+<span class="nc" id="L177">    this.recordConsumer.addLong(value.f1);</span>
+<span class="nc" id="L178">    this.recordConsumer.endField(&quot;to&quot;, 1);</span>
+
+<span class="nc" id="L180">    this.recordConsumer.endGroup();</span>
+<span class="nc" id="L181">    this.recordConsumer.endField(label, index);</span>
+<span class="nc" id="L182">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ParquetProtobufDataSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.protobuf</a> &gt; <span class="el_source">ParquetProtobufDataSink.java</span></div><h1>ParquetProtobufDataSink.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.protobuf;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.parquet.protobuf.functions.EdgeToProtobufObject;
+import org.gradoop.flink.io.impl.parquet.protobuf.functions.GraphHeadToProtobufObject;
+import org.gradoop.flink.io.impl.parquet.protobuf.functions.VertexToProtobufObject;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+
+/**
+ * A graph data sink for parquet-protobuf files.
+ */
+public class ParquetProtobufDataSink extends ParquetProtobufBase implements DataSink {
+
+  /**
+   * Creates a new parquet-protobuf data sink.
+   *
+   * @param basePath directory to the parquet-protobuf files
+   * @param config   Gradoop Flink configuration
+   */
+  public ParquetProtobufDataSink(String basePath, GradoopFlinkConfig config) {
+<span class="fc" id="L41">    super(basePath, config);</span>
+<span class="fc" id="L42">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph) throws IOException {
+<span class="nc" id="L46">    write(logicalGraph, false);</span>
+<span class="nc" id="L47">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection) throws IOException {
+<span class="nc" id="L51">    write(graphCollection, false);</span>
+<span class="nc" id="L52">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+<span class="nc" id="L56">    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);</span>
+<span class="nc" id="L57">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
+<span class="fc" id="L61">    DataSet&lt;EPGMProto.GraphHead.Builder&gt; graphHeads = graphCollection.getGraphHeads()</span>
+<span class="fc" id="L62">      .map(new GraphHeadToProtobufObject());</span>
+
+<span class="fc" id="L64">    DataSet&lt;EPGMProto.Vertex.Builder&gt; vertices = graphCollection.getVertices()</span>
+<span class="fc" id="L65">      .map(new VertexToProtobufObject());</span>
+
+<span class="fc" id="L67">    DataSet&lt;EPGMProto.Edge.Builder&gt; edges = graphCollection.getEdges()</span>
+<span class="fc" id="L68">      .map(new EdgeToProtobufObject());</span>
+
+<span class="fc" id="L70">    write(graphHeads, EPGMProto.GraphHead.class, getGraphHeadPath(), overwrite);</span>
+<span class="fc" id="L71">    write(vertices, EPGMProto.Vertex.class, getVertexPath(), overwrite);</span>
+<span class="fc" id="L72">    write(edges, EPGMProto.Edge.class, getEdgePath(), overwrite);</span>
+<span class="fc" id="L73">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

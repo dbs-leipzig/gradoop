@@ -273,7 +273,7 @@
 <a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * @param element the temporal graph element to check</em>
 <a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   */</em>
 <a name="265" href="#265">265</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkDefaultTxTimes(TemporalElement element) {
-<a name="266" href="#266">266</a>     assertTrue(element.getTxFrom() &lt; System.currentTimeMillis());
+<a name="266" href="#266">266</a>     assertTrue(element.getTxFrom() &lt;= System.currentTimeMillis());
 <a name="267" href="#267">267</a>     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getTxTo());
 <a name="268" href="#268">268</a>   }
 <a name="269" href="#269">269</a> 

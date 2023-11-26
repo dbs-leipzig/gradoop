@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopParquetTypeBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.parquet.plain.common</a> &gt; <span class="el_source">GradoopParquetTypeBuilder.java</span></div><h1>GradoopParquetTypeBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2021 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.parquet.plain.common;
+
+import org.apache.parquet.schema.LogicalTypeAnnotation;
+import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.PrimitiveType;
+import org.apache.parquet.schema.Types;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+/**
+ * Simple builder for parquet types with support for common EPGM/TPGM field types.
+ */
+<span class="fc" id="L27">public class GradoopParquetTypeBuilder {</span>
+
+  /**
+   * the internal parquet type builder
+   */
+<span class="fc" id="L32">  private final Types.GroupBuilder&lt;MessageType&gt; messageTypeBuilder = Types.buildMessage();</span>
+
+  /**
+   * Adds a parquet type for a gradoop id field.
+   *
+   * @param label record field label
+   * @return the builder instance
+   */
+  public GradoopParquetTypeBuilder addGradoopIdField(String label) {
+<span class="fc" id="L41">    this.messageTypeBuilder.addField(</span>
+<span class="fc" id="L42">      Types.required(PrimitiveType.PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY)</span>
+<span class="fc" id="L43">        .length(GradoopId.ID_SIZE)</span>
+<span class="fc" id="L44">        .named(label)</span>
+    );
+<span class="fc" id="L46">    return this;</span>
+  }
+
+  /**
+   * Adds a parquet type for a string field.
+   *
+   * @param label record field label
+   * @return the builder instance
+   */
+  public GradoopParquetTypeBuilder addStringField(String label) {
+<span class="fc" id="L56">    this.messageTypeBuilder.addField(</span>
+<span class="fc" id="L57">      Types.required(PrimitiveType.PrimitiveTypeName.BINARY)</span>
+<span class="fc" id="L58">        .as(LogicalTypeAnnotation.stringType())</span>
+<span class="fc" id="L59">        .named(label)</span>
+    );
+<span class="fc" id="L61">    return this;</span>
+  }
+
+  /**
+   * Adds a parquet type for a properties field.
+   *
+   * @param label record field label
+   * @return the builder instance
+   */
+  public GradoopParquetTypeBuilder addPropertiesField(String label) {
+<span class="fc" id="L71">    this.messageTypeBuilder.addField(</span>
+<span class="fc" id="L72">      Types.optionalMap()</span>
+<span class="fc" id="L73">        .key(PrimitiveType.PrimitiveTypeName.BINARY)</span>
+<span class="fc" id="L74">          .as(LogicalTypeAnnotation.stringType())</span>
+<span class="fc" id="L75">        .requiredValue(PrimitiveType.PrimitiveTypeName.BINARY)</span>
+<span class="fc" id="L76">        .named(label)</span>
+    );
+<span class="fc" id="L78">    return this;</span>
+  }
+
+  /**
+   * Adds a parquet type for a gradoop id set field.
+   *
+   * @param label record field label
+   * @return the builder instance
+   */
+  public GradoopParquetTypeBuilder addGradoopIdSetField(String label) {
+<span class="fc" id="L88">    this.messageTypeBuilder.addField(</span>
+<span class="fc" id="L89">      Types.requiredList()</span>
+<span class="fc" id="L90">        .requiredElement(PrimitiveType.PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY)</span>
+<span class="fc" id="L91">        .length(GradoopId.ID_SIZE)</span>
+<span class="fc" id="L92">        .named(label)</span>
+    );
+<span class="fc" id="L94">    return this;</span>
+  }
+
+  /**
+   * Adds a parquet type for a time interval (&lt;code&gt;Tuple2&amp;lt;Long, Long&amp;gt;&lt;/code&gt;) field.
+   *
+   * @param label record field label
+   * @return the builder instance
+   */
+  public GradoopParquetTypeBuilder addTimeInterval(String label) {
+<span class="nc" id="L104">    this.messageTypeBuilder.addField(</span>
+<span class="nc" id="L105">      Types.requiredGroup()</span>
+<span class="nc" id="L106">        .addFields(</span>
+<span class="nc" id="L107">          Types.required(PrimitiveType.PrimitiveTypeName.INT64)</span>
+<span class="nc" id="L108">            .as(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))</span>
+<span class="nc" id="L109">            .named(&quot;from&quot;),</span>
+<span class="nc" id="L110">          Types.required(PrimitiveType.PrimitiveTypeName.INT64)</span>
+<span class="nc" id="L111">            .as(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))</span>
+<span class="nc" id="L112">            .named(&quot;to&quot;)</span>
+        )
+<span class="nc" id="L114">        .named(label)</span>
+    );
+<span class="nc" id="L116">    return this;</span>
+  }
+
+  /**
+   * Creates the configured message type.
+   *
+   * @param name message type's name
+   * @return configured message type
+   */
+  public MessageType build(String name) {
+<span class="fc" id="L126">    return this.messageTypeBuilder.named(name);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
