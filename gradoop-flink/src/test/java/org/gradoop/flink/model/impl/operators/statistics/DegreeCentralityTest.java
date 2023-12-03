@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.DegreeCentrality;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
