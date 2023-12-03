@@ -15,22 +15,28 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * A filter function used to select super vertices from the set of vertex-tuples.
- * Super-vertices are identified by them having the same ID and super ID.
+ * Create a mapping (in the form of a {@link Tuple2}) from the ID of an element to itself.
  *
- * @param <T> The type of the vertex-tuples.
+ * @param <E> The element type.
  */
-public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
+public class CreateElementMappingToSelf<E extends Identifiable>
+  implements MapFunction<E, Tuple2<GradoopId, GradoopId>> {
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple2<GradoopId, GradoopId> reuse = new Tuple2<>();
 
   @Override
-  public boolean filter(T t) throws Exception {
-    final GradoopId id = t.getField(GroupingConstants.VERTEX_TUPLE_ID);
-    final GradoopId superId = t.getField(GroupingConstants.VERTEX_TUPLE_SUPERID);
-    return id.equals(superId);
+  public Tuple2<GradoopId, GradoopId> map(E element) {
+    reuse.f0 = element.getId();
+    reuse.f1 = element.getId();
+    return reuse;
   }
 }
