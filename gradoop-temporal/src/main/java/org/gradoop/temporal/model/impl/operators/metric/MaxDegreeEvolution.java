@@ -22,6 +22,7 @@ import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
 import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAggregateDegrees;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapDegreesToInterval;
 
 /**
  * Operator that calculates the evolution of the graph's maximum degree for the whole lifetime of the graph.
@@ -34,9 +35,9 @@ public class MaxDegreeEvolution extends BaseAggregateDegreeEvolution {
      * Creates an instance of this maximum degree evolution operator using {@link TimeDimension#VALID_TIME}
      * as default time dimension and {@link VertexDegree#BOTH} as default degree type.
      */
-    public MaxDegreeEvolution() {
+  public MaxDegreeEvolution() {
         super();
-    }
+  }
 
     /**
      * Creates an instance of this maximum degree evolution operator using the given time dimension and
@@ -45,12 +46,14 @@ public class MaxDegreeEvolution extends BaseAggregateDegreeEvolution {
      * @param degreeType the degree type (IN, OUT or BOTH)
      * @param dimension the time dimension to consider (VALID_TIME or TRANSACTION_TIME)
      */
-    public MaxDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
+  public MaxDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
         super(degreeType, dimension);
-    }
+  }
 
-    @Override
-    public DataSet<Tuple3<Long, Long, Float>> execute(TemporalGraph graph) {
-        return preProcess(graph).reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregationType.MAX));
-    }
+  @Override
+  public DataSet<Tuple3<Long, Long, Float>> execute(TemporalGraph graph) {
+    return preProcess(graph)
+                .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregationType.MAX))
+                .mapPartition(new MapDegreesToInterval());
+  }
 }

@@ -22,6 +22,7 @@ import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
 import org.gradoop.temporal.model.impl.operators.metric.functions.AggregationType;
 import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToAggregateDegrees;
+import org.gradoop.temporal.model.impl.operators.metric.functions.MapDegreesToInterval;
 
 /**
  * Operator that calculates the evolution of the graph's minimum degree for the whole lifetime of the graph.
@@ -35,9 +36,9 @@ public class MinDegreeEvolution extends BaseAggregateDegreeEvolution {
      * Creates an instance of this minimum degree evolution operator using {@link TimeDimension#VALID_TIME}
      * as default time dimension and {@link VertexDegree#BOTH} as default degree type.
      */
-    public MinDegreeEvolution() {
+  public MinDegreeEvolution() {
         super();
-    }
+  }
 
     /**
      * Creates an instance of this minimum degree evolution operator using the given time dimension and
@@ -46,12 +47,14 @@ public class MinDegreeEvolution extends BaseAggregateDegreeEvolution {
      * @param degreeType the degree type (IN, OUT or BOTH)
      * @param dimension the time dimension to consider (VALID_TIME or TRANSACTION_TIME)
      */
-    public MinDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
+  public MinDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
         super(degreeType, dimension);
-    }
+  }
 
-    @Override
+  @Override
     public DataSet<Tuple3<Long, Long, Float>> execute(TemporalGraph graph) {
-        return preProcess(graph).reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregationType.MIN));
-    }
+    return preProcess(graph)
+                .reduceGroup(new GroupDegreeTreesToAggregateDegrees(AggregationType.MIN))
+                .mapPartition(new MapDegreesToInterval());
+  }
 }

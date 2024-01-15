@@ -39,19 +39,19 @@ abstract class BaseAggregateDegreeEvolution
     /**
      * The time dimension that will be considered.
      */
-    private TimeDimension dimension = TimeDimension.VALID_TIME;
+  private TimeDimension dimension = TimeDimension.VALID_TIME;
 
     /**
      * The degree type (IN, OUT, BOTH);
      */
-    private VertexDegree degreeType = VertexDegree.BOTH;
+  private VertexDegree degreeType = VertexDegree.BOTH;
 
     /**
      * Default constructor using {@link TimeDimension#VALID_TIME} as default time dimension and
      * {@link VertexDegree#BOTH} as default degree type.
      */
-    protected BaseAggregateDegreeEvolution() {
-    }
+  protected BaseAggregateDegreeEvolution() {
+  }
 
     /**
      * Abstract constructor for the aggregated degree evolution of a graph.
@@ -59,10 +59,10 @@ abstract class BaseAggregateDegreeEvolution
      * @param degreeType the degree type (IN, OUT or BOTH)
      * @param dimension the time dimension to consider (VALID_TIME or TRANSACTION_TIME)
      */
-    protected BaseAggregateDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
-        this.degreeType = Objects.requireNonNull(degreeType);
-        this.dimension = Objects.requireNonNull(dimension);
-    }
+  protected BaseAggregateDegreeEvolution(VertexDegree degreeType, TimeDimension dimension) {
+    this.degreeType = Objects.requireNonNull(degreeType);
+    this.dimension = Objects.requireNonNull(dimension);
+  }
 
     /**
      * A pre-process function to prevent duplicate code for min, max and avg aggregation. The result is an
@@ -71,8 +71,8 @@ abstract class BaseAggregateDegreeEvolution
      * @param graph the temporal graph as input
      * @return a dataset containing an absolute degree tree for each vertex identifier
      */
-    public DataSet<Tuple2<GradoopId, TreeMap<Long, Integer>>> preProcess(TemporalGraph graph) {
-        return graph.getEdges()
+  public DataSet<Tuple2<GradoopId, TreeMap<Long, Integer>>> preProcess(TemporalGraph graph) {
+    return graph.getEdges()
                 // 1) Extract vertex id(s) and corresponding time intervals
                 .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
                 // 2) Group them by the vertex id
@@ -81,5 +81,5 @@ abstract class BaseAggregateDegreeEvolution
                 .reduceGroup(new BuildTemporalDegreeTree())
                 // 4) Transform each tree to aggregated evolution
                 .map(new TransformDeltaToAbsoluteDegreeTree());
-    }
+  }
 }
