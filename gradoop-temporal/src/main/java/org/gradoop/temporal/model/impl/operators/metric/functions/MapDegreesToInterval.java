@@ -27,41 +27,41 @@ import org.apache.flink.util.Collector;
  */
 
 public class MapDegreesToInterval implements MapPartitionFunction<Tuple2<Long, Float>, Tuple3<Long, Long, Float>> {
-    @Override
-    public void mapPartition(Iterable<Tuple2<Long, Float>> values, Collector<Tuple3<Long, Long, Float>> out) {
+  @Override
+  public void mapPartition(Iterable<Tuple2<Long, Float>> values, Collector<Tuple3<Long, Long, Float>> out) {
 
-        //set starting values to null
-        Long startTimestamp = null;
-        Long endTimestamp = null;
-        Float value = null;
-        Boolean collected = false;
+    //set starting values to null
+    Long startTimestamp = null;
+    Long endTimestamp = null;
+    Float value = null;
+    Boolean collected = false;
 
-        //loop through each tuple
-        for (Tuple2<Long, Float> tuple : values) {
-            if (startTimestamp == null) {
-                // First element in the group
-                startTimestamp = tuple.f0;
-                endTimestamp = tuple.f0;
-                value = tuple.f1;
-            } else {
-                if (!tuple.f1.equals(value)) {
-                    // Value changed, emit the current interval and start a new one
-                    out.collect(new Tuple3<>(startTimestamp, tuple.f0, value));
-                    startTimestamp = tuple.f0;
-                    endTimestamp = tuple.f0;
-                    value = tuple.f1;
-                    collected = true;
-                } else {
-                    // Extend the current interval
-                    endTimestamp = tuple.f0;
-                    collected = false;
-                }
-            }
+    //loop through each tuple
+    for (Tuple2<Long, Float> tuple : values) {
+      if (startTimestamp == null) {
+        // First element in the group
+        startTimestamp = tuple.f0;
+        endTimestamp = tuple.f0;
+        value = tuple.f1;
+      } else {
+        if (!tuple.f1.equals(value)) {
+          // Value changed, emit the current interval and start a new one
+          out.collect(new Tuple3<>(startTimestamp, tuple.f0, value));
+          startTimestamp = tuple.f0;
+          endTimestamp = tuple.f0;
+          value = tuple.f1;
+          collected = true;
+        } else {
+          // Extend the current interval
+          endTimestamp = tuple.f0;
+          collected = false;
         }
-        //check if the latest interval was collected, if not, collect it
-        //this happens when the last interval has the value 0
-        if (!collected) {
-            out.collect(new Tuple3<>(startTimestamp, endTimestamp, value));
-        }
+      }
     }
+    //check if the latest interval was collected, if not, collect it
+    //this happens when the last interval has the value 0
+    if (!collected) {
+      out.collect(new Tuple3<>(startTimestamp, endTimestamp, value));
+    }
+  }
 }
