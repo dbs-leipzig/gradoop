@@ -33,59 +33,59 @@ import java.util.Map;
 public class GroupDegreeTreesToDegreeRange
         implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Float>> {
 
-    /**
-     * Creates an instance of this group reduce function.
-     *
-     */
-    public GroupDegreeTreesToDegreeRange() {
+   /**
+   * Creates an instance of this group reduce function.
+   *
+   */
+  public GroupDegreeTreesToDegreeRange() {
 
-    }
+  }
 
-    @Override
-    public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+  @Override
+  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
                        Collector<Tuple2<Long, Float>> collector) throws Exception {
 
-        // init necessary maps and set
-        HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
-        HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
-        SortedSet<Long> timePoints = new TreeSet<>();
+    // init necessary maps and set
+    HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
+    HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
+    SortedSet<Long> timePoints = new TreeSet<>();
 
-        // convert the iterables to a hashmap and remember all possible timestamps
-        for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
-            degreeTrees.put(tuple.f0, tuple.f1);
-            timePoints.addAll(tuple.f1.keySet());
-        }
-
-        // Add default times
-        timePoints.add(Long.MIN_VALUE);
-
-        for (Long timePoint : timePoints) {
-            // skip last default time
-            /*if (Long.MAX_VALUE == timePoint) {
-                continue;
-            }*/
-            // Iterate over all vertices
-            for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
-                // Make sure the vertex is registered in the current vertexDegrees capture
-                if (!vertexDegrees.containsKey(entry.getKey())) {
-                    vertexDegrees.put(entry.getKey(), 0);
-                }
-
-                // Check if timestamp is in tree, if not, take the lower key
-                if (entry.getValue().containsKey(timePoint)) {
-                    vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
-                } else {
-                    Long lowerKey = entry.getValue().lowerKey(timePoint);
-                    if (lowerKey != null) {
-                        vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
-                    }
-                }
-            }
-
-            // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
-            float maxDegree = vertexDegrees.values().stream().reduce(Math::max).orElse(0).floatValue();
-            float minDegree = vertexDegrees.values().stream().reduce(Math::min).orElse(0).floatValue();
-            collector.collect(new Tuple2<>(timePoint, maxDegree - minDegree));
-        }
+    // convert the iterables to a hashmap and remember all possible timestamps
+    for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
+      degreeTrees.put(tuple.f0, tuple.f1);
+      timePoints.addAll(tuple.f1.keySet());
     }
+
+    // Add default times
+    timePoints.add(Long.MIN_VALUE);
+
+    for (Long timePoint : timePoints) {
+        // skip last default time
+        /*if (Long.MAX_VALUE == timePoint) {
+            continue;
+        }*/
+        // Iterate over all vertices
+      for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
+        // Make sure the vertex is registered in the current vertexDegrees capture
+        if (!vertexDegrees.containsKey(entry.getKey())) {
+          vertexDegrees.put(entry.getKey(), 0);
+        }
+
+        // Check if timestamp is in tree, if not, take the lower key
+        if (entry.getValue().containsKey(timePoint)) {
+          vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
+        } else {
+          Long lowerKey = entry.getValue().lowerKey(timePoint);
+          if (lowerKey != null) {
+            vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
+          }
+        }
+      }
+
+      // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
+      float maxDegree = vertexDegrees.values().stream().reduce(Math::max).orElse(0).floatValue();
+      float minDegree = vertexDegrees.values().stream().reduce(Math::min).orElse(0).floatValue();
+      collector.collect(new Tuple2<>(timePoint, maxDegree - minDegree));
+    }
+  }
 }
