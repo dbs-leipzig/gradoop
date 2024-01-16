@@ -17,14 +17,12 @@ package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
-import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToVariance;
+import org.gradoop.temporal.model.impl.operators.metric.functions.*;
 
 import java.util.Objects;
 
@@ -32,7 +30,7 @@ import java.util.Objects;
  * Operator that calculates the degree variance evolution of a temporal graph for the
  * whole lifetime of the graph.
  */
-public class DegreeVarianceEvolution implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple2<Long, Double>>> {
+public class DegreeVarianceEvolution implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple3<Long, Long, Double>>> {
     /**
      * The time dimension that will be considered.
      */
@@ -55,7 +53,7 @@ public class DegreeVarianceEvolution implements UnaryBaseGraphToValueOperator<Te
     }
 
     @Override
-    public DataSet<Tuple2<Long, Double>> execute(TemporalGraph graph) {
+    public DataSet<Tuple3<Long, Long, Double>> execute(TemporalGraph graph) {
         return graph.getEdges()
                 // 1) Extract vertex id(s) and corresponding time intervals
                 .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
@@ -66,6 +64,7 @@ public class DegreeVarianceEvolution implements UnaryBaseGraphToValueOperator<Te
                 // 4) Transform each tree to aggregated evolution
                 .map(new TransformDeltaToAbsoluteDegreeTree())
                 // 6) Merge trees together and calculate aggregation
-                .reduceGroup(new GroupDegreeTreesToVariance());
+                .reduceGroup(new GroupDegreeTreesToVariance())
+                .mapPartition(new MapDegreesToInterval());
     }
 }

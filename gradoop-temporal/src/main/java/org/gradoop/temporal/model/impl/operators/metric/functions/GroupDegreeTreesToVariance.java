@@ -64,9 +64,9 @@ public class GroupDegreeTreesToVariance
 
         for (Long timePoint : timePoints) {
             // skip last default time
-            if (Long.MAX_VALUE == timePoint) {
+           /* if (Long.MAX_VALUE == timePoint) {
                 continue;
-            }
+            }*/
             // Iterate over all vertices
             for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
                 // Make sure the vertex is registered in the current vertexDegrees capture
@@ -85,12 +85,15 @@ public class GroupDegreeTreesToVariance
                 }
             }
 
+            //sum of the degrees of all vertices
             Optional<Integer> opt = vertexDegrees.values().stream().reduce(Math::addExact);
             Optional<Double> opt2 = Optional.empty();
 
             double mean;
 
+            //if we have a sum at the current timestamp
             if (opt.isPresent()) {
+                //calculate the avg degree of the graph at the current timestamp
                 mean = (double) opt.get() / (double) numberOfVertices;
                 opt2 = Optional.of(vertexDegrees.values().stream()
                         .mapToDouble(val -> (val - mean) * (val - mean)).sum());
