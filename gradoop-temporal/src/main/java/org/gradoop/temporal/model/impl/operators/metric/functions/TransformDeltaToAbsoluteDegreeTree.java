@@ -32,24 +32,23 @@ public class TransformDeltaToAbsoluteDegreeTree
         implements MapFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>,
         Tuple2<GradoopId, TreeMap<Long, Integer>>> {
 
-    /**
-     * To reduce object instantiations.
-     */
-    private TreeMap<Long, Integer> absoluteDegreeTree;
+  /**
+   * To reduce object instantiations.
+   */
+  private TreeMap<Long, Integer> absoluteDegreeTree;
+  @Override
+  public Tuple2<GradoopId, TreeMap<Long, Integer>> map(
+         Tuple2<GradoopId, TreeMap<Long, Integer>> vIdTreeMapTuple) throws Exception {
+    // init the degree and the temporal tree
+    int degree = 0;
+    absoluteDegreeTree = new TreeMap<>();
 
-    @Override
-    public Tuple2<GradoopId, TreeMap<Long, Integer>> map(
-            Tuple2<GradoopId, TreeMap<Long, Integer>> vIdTreeMapTuple) throws Exception {
-        // init the degree and the temporal tree
-        int degree = 0;
-        absoluteDegreeTree = new TreeMap<>();
-
-        // aggregate the degrees
-        for (Map.Entry<Long, Integer> entry : vIdTreeMapTuple.f1.entrySet()) {
-            degree += entry.getValue();
-            absoluteDegreeTree.put(entry.getKey(), degree);
-        }
-        vIdTreeMapTuple.f1 = absoluteDegreeTree;
-        return vIdTreeMapTuple;
+    // aggregate the degrees
+    for (Map.Entry<Long, Integer> entry : vIdTreeMapTuple.f1.entrySet()) {
+      degree += entry.getValue();
+      absoluteDegreeTree.put(entry.getKey(), degree);
     }
+    vIdTreeMapTuple.f1 = absoluteDegreeTree;
+    return vIdTreeMapTuple;
+  }
 }

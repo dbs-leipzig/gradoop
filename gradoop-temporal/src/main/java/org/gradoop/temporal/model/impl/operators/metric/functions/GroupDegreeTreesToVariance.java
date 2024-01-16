@@ -32,75 +32,73 @@ import java.util.Optional;
  * that represents the aggregated degree value for the whole graph at the given time.
  */
 public class GroupDegreeTreesToVariance
-        implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Double>> {
+        implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Float>> {
 
-    /**
-     * Creates an instance of this group reduce function.
-     *
-     */
-    public GroupDegreeTreesToVariance() {
+  /**
+   * Creates an instance of this group reduce function.
+   *
+   */
+  public GroupDegreeTreesToVariance() {
+  }
 
+  @Override
+  public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+                     Collector<Tuple2<Long, Float>> collector) throws Exception {
+
+    // init necessary maps and set
+    HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
+    HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
+    SortedSet<Long> timePoints = new TreeSet<>();
+
+    // convert the iterables to a hashmap and remember all possible timestamps
+    for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
+      degreeTrees.put(tuple.f0, tuple.f1);
+      timePoints.addAll(tuple.f1.keySet());
     }
 
-    @Override
-    public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
-                       Collector<Tuple2<Long, Double>> collector) throws Exception {
+    int numberOfVertices = degreeTrees.size();
 
-        // init necessary maps and set
-        HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
-        HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
-        SortedSet<Long> timePoints = new TreeSet<>();
+    // Add default times
+    timePoints.add(Long.MIN_VALUE);
 
-        // convert the iterables to a hashmap and remember all possible timestamps
-        for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
-            degreeTrees.put(tuple.f0, tuple.f1);
-            timePoints.addAll(tuple.f1.keySet());
+    for (Long timePoint : timePoints) {
+      // skip last default time
+      /* if (Long.MAX_VALUE == timePoint) {
+          continue;
+      }*/
+      // Iterate over all vertices
+      for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
+        // Make sure the vertex is registered in the current vertexDegrees capture
+        if (!vertexDegrees.containsKey(entry.getKey())) {
+          vertexDegrees.put(entry.getKey(), 0);
         }
-
-        int numberOfVertices = degreeTrees.size();
-
-        // Add default times
-        timePoints.add(Long.MIN_VALUE);
-
-        for (Long timePoint : timePoints) {
-            // skip last default time
-           /* if (Long.MAX_VALUE == timePoint) {
-                continue;
-            }*/
-            // Iterate over all vertices
-            for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
-                // Make sure the vertex is registered in the current vertexDegrees capture
-                if (!vertexDegrees.containsKey(entry.getKey())) {
-                    vertexDegrees.put(entry.getKey(), 0);
-                }
-
-                // Check if timestamp is in tree, if not, take the lower key
-                if (entry.getValue().containsKey(timePoint)) {
-                    vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
-                } else {
-                    Long lowerKey = entry.getValue().lowerKey(timePoint);
-                    if (lowerKey != null) {
-                        vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
-                    }
-                }
-            }
-
-            //sum of the degrees of all vertices
-            Optional<Integer> opt = vertexDegrees.values().stream().reduce(Math::addExact);
-            Optional<Double> opt2 = Optional.empty();
-
-            double mean;
-
-            //if we have a sum at the current timestamp
-            if (opt.isPresent()) {
-                //calculate the avg degree of the graph at the current timestamp
-                mean = (double) opt.get() / (double) numberOfVertices;
-                opt2 = Optional.of(vertexDegrees.values().stream()
-                        .mapToDouble(val -> (val - mean) * (val - mean)).sum());
-            }
-
-            opt2.ifPresent(val -> collector.collect(
-                    new Tuple2<>(timePoint, val / (double) numberOfVertices)));
+        // Check if timestamp is in tree, if not, take the lower key
+        if (entry.getValue().containsKey(timePoint)) {
+          vertexDegrees.put(entry.getKey(), entry.getValue().get(timePoint));
+        } else {
+          Long lowerKey = entry.getValue().lowerKey(timePoint);
+          if (lowerKey != null) {
+            vertexDegrees.put(entry.getKey(), entry.getValue().get(lowerKey));
+          }
         }
+      }
+
+      //sum of the degrees of all vertices
+      Optional<Integer> opt = vertexDegrees.values().stream().reduce(Math::addExact);
+      Optional<Double> opt2 = Optional.empty();
+
+      double mean;
+
+      //if we have a sum at the current timestamp
+      if (opt.isPresent()) {
+        //calculate the avg degree of the graph at the current timestamp
+        mean = (double) opt.get() / (double) numberOfVertices;
+        opt2 = Optional.of(vertexDegrees.values().stream()
+              .mapToDouble(val -> (val - mean) * (val - mean)).sum());
+      }
+
+      opt2.ifPresent(val -> collector.collect(
+                    new Tuple2<>(timePoint, (float) (val / numberOfVertices))));
     }
+  }
 }
