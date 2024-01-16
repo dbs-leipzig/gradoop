@@ -16,15 +16,12 @@
 package org.gradoop.temporal.model.impl.operators.metric;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.gradoop.temporal.model.api.TimeDimension;
 import org.gradoop.temporal.model.impl.TemporalGraph;
-import org.gradoop.temporal.model.impl.operators.metric.functions.GroupDegreeTreesToDegreeRange;
-import org.gradoop.temporal.model.impl.operators.metric.functions.TransformDeltaToAbsoluteDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.BuildTemporalDegreeTree;
-import org.gradoop.temporal.model.impl.operators.metric.functions.FlatMapVertexIdEdgeInterval;
+import org.gradoop.temporal.model.impl.operators.metric.functions.*;
 
 import java.util.Objects;
 
@@ -32,7 +29,7 @@ import java.util.Objects;
  * Operator that calculates the degree range evolution of a temporal graph for the
  * whole lifetime of the graph.
  */
-public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple2<Long, Integer>>> {
+public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<TemporalGraph, DataSet<Tuple3<Long, Long, Float>>> {
     /**
      * The time dimension that will be considered.
      */
@@ -55,7 +52,7 @@ public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<Tempo
     }
 
     @Override
-    public DataSet<Tuple2<Long, Integer>> execute(TemporalGraph graph) {
+    public DataSet<Tuple3<Long, Long, Float>> execute(TemporalGraph graph) {
         return graph.getEdges()
                 // 1) Extract vertex id(s) and corresponding time intervals
                 .flatMap(new FlatMapVertexIdEdgeInterval(dimension, degreeType))
@@ -65,6 +62,7 @@ public class DegreeRangeEvolution implements UnaryBaseGraphToValueOperator<Tempo
                 .reduceGroup(new BuildTemporalDegreeTree())
                 // 4) Transform each tree to aggregated evolution
                 .map(new TransformDeltaToAbsoluteDegreeTree())
-                .reduceGroup(new GroupDegreeTreesToDegreeRange());
+                .reduceGroup(new GroupDegreeTreesToDegreeRange())
+                .mapPartition(new MapDegreesToInterval());
     }
 }
