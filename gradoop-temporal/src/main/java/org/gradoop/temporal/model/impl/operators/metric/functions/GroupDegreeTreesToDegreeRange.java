@@ -31,7 +31,7 @@ import java.util.Map;
  * that represents the aggregated degree value for the whole graph at the given time.
  */
 public class GroupDegreeTreesToDegreeRange
-        implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Integer>> {
+        implements GroupReduceFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>, Tuple2<Long, Float>> {
 
     /**
      * Creates an instance of this group reduce function.
@@ -43,7 +43,7 @@ public class GroupDegreeTreesToDegreeRange
 
     @Override
     public void reduce(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
-                       Collector<Tuple2<Long, Integer>> collector) throws Exception {
+                       Collector<Tuple2<Long, Float>> collector) throws Exception {
 
         // init necessary maps and set
         HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
@@ -61,9 +61,9 @@ public class GroupDegreeTreesToDegreeRange
 
         for (Long timePoint : timePoints) {
             // skip last default time
-            if (Long.MAX_VALUE == timePoint) {
+            /*if (Long.MAX_VALUE == timePoint) {
                 continue;
-            }
+            }*/
             // Iterate over all vertices
             for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
                 // Make sure the vertex is registered in the current vertexDegrees capture
@@ -83,8 +83,8 @@ public class GroupDegreeTreesToDegreeRange
             }
 
             // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
-            int maxDegree = vertexDegrees.values().stream().reduce(Math::max).orElse(0);
-            int minDegree = vertexDegrees.values().stream().reduce(Math::min).orElse(0);
+            float maxDegree = vertexDegrees.values().stream().reduce(Math::max).orElse(0).floatValue();
+            float minDegree = vertexDegrees.values().stream().reduce(Math::min).orElse(0).floatValue();
             collector.collect(new Tuple2<>(timePoint, maxDegree - minDegree));
         }
     }
