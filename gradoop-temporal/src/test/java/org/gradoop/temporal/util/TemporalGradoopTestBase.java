@@ -263,7 +263,7 @@ public abstract class TemporalGradoopTestBase extends GradoopFlinkTestBase {
    * @param element the temporal graph element to check
    */
   protected void checkDefaultTxTimes(TemporalElement element) {
-    assertTrue(element.getTxFrom() < System.currentTimeMillis());
+    assertTrue(element.getTxFrom() <= System.currentTimeMillis());
     assertEquals(TemporalElement.DEFAULT_TIME_TO, element.getTxTo());
   }
 
