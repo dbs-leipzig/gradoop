@@ -15,7 +15,7 @@
  */
 package org.gradoop.temporal.model.impl.operators.metric.functions;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.MapPartitionFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
@@ -28,51 +28,62 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A group reduce function that merges all Tuples (vId, degreeTree, Integer)
- * to a dataset of tuples (time, aggDegree) that represents the aggregated
- * degree value for the whole graph at the given time.
+ * A map partition function that merges/aggregates all Tuples (vId, degreeTree) on a partition into a
+ * new Tuple (GradoopId, degreeTree, Integer) that represents a new "super" vertex which is the aggregated
+ * combination of all vertices on that partition. The Integer represents the count of
+ * degreeTrees that were used to create this new one.
  */
-public class GroupDegreeTreesToAggregateDegrees
-        implements GroupReduceFunction<Tuple3<GradoopId, TreeMap<Long, Integer>, Integer>,
-                                       Tuple2<Long, Float>> {
+public class MapPartitionCombineDegreeTrees
+        implements MapPartitionFunction<Tuple2<GradoopId, TreeMap<Long, Integer>>,
+                                        Tuple3<GradoopId, TreeMap<Long, Integer>, Integer>> {
 
-    /**
-     * The aggregate type to use (min,max,avg).
-     */
+  /**
+   * The aggregate type to use (min,max,avg).
+   */
   private final AggregationType aggregateType;
 
-    /**
-     * Creates an instance of this group reduce function.
-     *
-     * @param aggregateType the aggregate type to use (min,max,avg).
-     */
-  public GroupDegreeTreesToAggregateDegrees(AggregationType aggregateType) {
+   /**
+   * Creates an instance of this map partition function.
+   *
+   * @param aggregateType the aggregate type to use (min,max,avg).
+   */
+  public MapPartitionCombineDegreeTrees(AggregationType aggregateType) {
     this.aggregateType = aggregateType;
   }
+
   @Override
-  public void reduce(Iterable<Tuple3<GradoopId, TreeMap<Long, Integer>, Integer>> iterable,
-                     Collector<Tuple2<Long, Float>> collector) throws Exception {
+  public void mapPartition(Iterable<Tuple2<GradoopId, TreeMap<Long, Integer>>> iterable,
+                           Collector<Tuple3<GradoopId, TreeMap<Long, Integer>, Integer>> collector)
+          throws Exception {
 
     // init necessary maps and set
     HashMap<GradoopId, TreeMap<Long, Integer>> degreeTrees = new HashMap<>();
     HashMap<GradoopId, Integer> vertexDegrees = new HashMap<>();
+    TreeMap<Long, Integer> values = new TreeMap<>();
     SortedSet<Long> timePoints = new TreeSet<>();
-    int numberOfVertices = 0;
 
     // convert the iterables to a hashmap and remember all possible timestamps
-    for (Tuple3<GradoopId, TreeMap<Long, Integer>, Integer> tuple : iterable) {
+    for (Tuple2<GradoopId, TreeMap<Long, Integer>> tuple : iterable) {
       degreeTrees.put(tuple.f0, tuple.f1);
       timePoints.addAll(tuple.f1.keySet());
-      numberOfVertices = numberOfVertices + tuple.f2;
     }
 
-    float degreeValue = 0f;
+    int numberOfVertices = degreeTrees.size();
+
+    //check if partition is empty, if yes, collect nothing and return
+    if (numberOfVertices == 0) {
+      return;
+    }
+
+    int degreeValue = 0;
 
     // Add default times
     timePoints.add(Long.MIN_VALUE);
 
-    for (Long timePoint : timePoints) {
+    //create new GradoopId for the new "super-vertex"
+    GradoopId key = GradoopId.get();
 
+    for (Long timePoint : timePoints) {
       // Iterate over all vertices
       for (Map.Entry<GradoopId, TreeMap<Long, Integer>> entry : degreeTrees.entrySet()) {
         // Make sure the vertex is registered in the current vertexDegrees capture
@@ -91,24 +102,22 @@ public class GroupDegreeTreesToAggregateDegrees
         }
       }
 
-
-      // Here, every tree with this time point is iterated. Now we need to aggregate for the current time.
       switch (aggregateType) {
       case MIN:
-        degreeValue = vertexDegrees.values().stream().reduce(Math::min).orElse(0).floatValue();
+        degreeValue = vertexDegrees.values().stream().reduce(Math::min).orElse(0);
         break;
       case MAX:
-        degreeValue = vertexDegrees.values().stream().reduce(Math::max).orElse(0).floatValue();
+        degreeValue = vertexDegrees.values().stream().reduce(Math::max).orElse(0);
         break;
       case AVG:
-        int sum = vertexDegrees.values().stream().reduce(Math::addExact).orElse(0);
-        degreeValue = (float) sum /  (float) numberOfVertices;
+        degreeValue = vertexDegrees.values().stream().reduce(Math::addExact).orElse(0);
         break;
       default:
         throw new IllegalArgumentException("Aggregate type not specified.");
       }
-      //collect the results
-      collector.collect(new Tuple2<>(timePoint, degreeValue));
+      values.put(timePoint, degreeValue);
     }
+    //collect the results
+    collector.collect(new Tuple3<>(key, values, numberOfVertices));
   }
 }
