@@ -52,4 +52,8 @@
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
   <suppress checks="StaticVariableName"
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+
+  <!-- no checkstyle for auto generated code -->
+  <suppress checks=".*"
+            files="[/\\]target[/\\]generated-sources[/\\]"/>
 </suppressions>
