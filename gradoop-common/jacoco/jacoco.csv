@@ -39,15 +39,15 @@ Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.Lexicographi
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder.PureJavaComparer,69,0,12,0,12,0,8,0,2,0
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,UnsafeAvailChecker.new PrivilegedAction() {...},8,21,1,1,3,5,1,2,0,2
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.ByteArrayComparator,16,0,0,0,5,0,3,0,3,0
-Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder,6,24,0,0,3,7,1,2,1,2
 Gradoop Common,org.gradoop.common.model.impl.properties.bytes,UnsafeAvailChecker,8,49,3,3,3,13,3,2,0,2
+Gradoop Common,org.gradoop.common.model.impl.properties.bytes,Bytes.LexicographicalComparerHolder,6,24,0,0,3,7,1,2,1,2
 Gradoop Common,org.gradoop.common.model.impl.id,GradoopId,77,633,10,46,21,109,17,42,7,24
 Gradoop Common,org.gradoop.common.model.impl.id,GradoopIdSet,26,366,5,41,8,95,8,41,3,23
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMGraphElement,18,46,2,4,3,14,4,7,2,6
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMElement,35,161,6,20,14,31,11,22,5,15
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMVertex,13,7,0,0,3,2,2,1,2,1
-Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMVertexFactory,44,33,0,0,8,6,8,4,8,4
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMGraphHead,3,16,0,0,2,3,1,2,1,2
+Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMVertexFactory,44,33,0,0,8,6,8,4,8,4
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMEdgeFactory,49,54,0,0,8,9,7,5,7,5
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMEdge,31,19,0,0,8,6,4,3,4,3
 Gradoop Common,org.gradoop.common.model.impl.pojo,EPGMGraphHeadFactory,17,30,0,0,4,6,4,4,4,4
