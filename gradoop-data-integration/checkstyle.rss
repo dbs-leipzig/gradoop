@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2021 - 2024 University of Leipzig</copyright>
     <item>
-      <title>File: 9,
+      <title>File: 10,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -103,6 +103,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.functions.MinimalJsonToVertexTest.java">org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertexTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.ConnectNeighborsTest.java">org/gradoop/dataintegration/transformation/ConnectNeighborsTest.java</a>
                 </td>
                 <td>
                   0
