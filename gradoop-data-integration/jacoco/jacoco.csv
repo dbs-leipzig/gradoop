@@ -5,12 +5,12 @@ Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.json.function
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateVertexFromEdges,0,68,0,0,0,11,0,3,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateEdgesFromTriple,0,83,0,0,0,18,0,3,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateMappingFromMarkedDuplicates,0,29,0,2,0,7,0,3,0,2
-Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,GetPropertiesAsList,0,43,0,4,0,10,0,5,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,AccumulatePropagatedValues,1,61,1,7,1,16,1,6,0,3
+Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,GetPropertiesAsList,0,43,0,4,0,10,0,5,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateNeighborList.new Object() {...},2,17,0,0,0,1,0,1,0,1
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateNeighborList,0,87,0,9,0,19,0,8,0,3
-Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateCartesianNeighborhoodEdges,0,71,0,6,0,17,0,6,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,EdgesFromLocalTransitiveClosure,1,119,3,7,1,26,3,5,0,3
+Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,CreateCartesianNeighborhoodEdges,0,71,0,6,0,17,0,6,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,BuildTargetVertexIdPropertyValuePairs,0,9,0,0,0,3,0,2,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,MarkDuplicatesInGroup,0,38,0,4,0,13,0,4,0,2
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.functions,BuildIdPropertyValuePairs,0,47,0,4,0,11,0,4,0,2
@@ -31,6 +31,6 @@ Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,InvertE
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,BasePropertyTransformationFunction,2,114,1,11,1,26,1,8,0,3
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,Neighborhood.EdgeDirection,0,34,0,0,0,4,0,1,0,1
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,PropertyTransformation,5,100,1,11,1,14,1,8,0,3
-Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,Neighborhood,3,81,0,12,1,22,1,7,1,1
 Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,NeighborhoodVertex,0,17,0,0,0,6,0,3,0,3
+Gradoop Data Integration,org.gradoop.dataintegration.transformation.impl,Neighborhood,3,81,0,12,1,22,1,7,1,1
 Gradoop Data Integration,org.gradoop.dataintegration.importer.impl.json,MinimalJSONImporter,0,45,0,0,0,11,0,3,0,3
