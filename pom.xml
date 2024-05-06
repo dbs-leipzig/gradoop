@@ -142,7 +142,7 @@
         </site>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/org/gradoop</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>release_artifacts_gradoop</id>
