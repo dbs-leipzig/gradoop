@@ -1,9 +1,9 @@
 name: release-snapshot
 
-on: workflow_dispatch
+on:
   # Run weekly on sunday at 22:00 UTC (arbitrary)
-#  schedule:
-#    - cron: '00 22 * * SUN'
+  schedule:
+    - cron: '00 22 * * SUN'
 
 jobs:
   release:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: '#1598_github_actions_upgrade'
+          ref: develop
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v4.2.1

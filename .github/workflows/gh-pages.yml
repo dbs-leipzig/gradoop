@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-java@v4.2.1
         with:
           java-version: 8
+          distribution: zulu
 
       - name: Build Project
         run: mvn clean install

@@ -27,6 +27,7 @@ jobs:
       uses: actions/setup-java@v4.2.1
       with:
         java-version: 8
+        distribution: zulu
     - name: Build with Maven
       run: |
         mvn clean install -DskipTests --no-transfer-progress -DtrimStackTrace=false
