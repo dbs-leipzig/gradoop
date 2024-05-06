@@ -6,7 +6,7 @@ on:
     - cron: '00 23 * * SUN'
 
 jobs:
-  deploy:
+  deploy-gh-pages:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
