@@ -1,9 +1,9 @@
 name: release-snapshot
 
-on:
+on: workflow-dispatch
   # Run weekly on sunday at 22:00 UTC (arbitrary)
-  schedule:
-    - cron: '00 22 * * SUN'
+#  schedule:
+#    - cron: '00 22 * * SUN'
 
 jobs:
   release:
