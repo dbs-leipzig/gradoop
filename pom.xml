@@ -173,6 +173,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
+        <dep.protoc.version>3.0.0</dep.protoc.version>
         <dep.parquet.version>1.12.0</dep.parquet.version>
         <dep.log4j.version>2.17.1</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
@@ -294,7 +295,7 @@
                     <artifactId>protoc-jar-maven-plugin</artifactId>
                     <version>${plugin.maven-protoc.version}</version>
                     <configuration>
-                        <protocVersion>3.0.0</protocVersion>
+                        <protocVersion>${dep.protoc.version}</protocVersion>
                         <inputDirectories>
                             <include>src/main/proto</include>
                         </inputDirectories>
