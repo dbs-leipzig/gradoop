@@ -88,20 +88,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOElementIdRangeTest.java">org/gradoop/storage/impl/accumulo/io/source/IOElementIdRangeTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOVertexPredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOVertexPredicateTest.java</a>
                 </td>
                 <td>
@@ -116,7 +102,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOGraphPredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOGraphPredicateTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOElementIdRangeTest.java">org/gradoop/storage/impl/accumulo/io/source/IOElementIdRangeTest.java</a>
                 </td>
                 <td>
                   0
@@ -131,6 +117,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreBasicPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOGraphPredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOGraphPredicateTest.java</a>
                 </td>
                 <td>
                   0
