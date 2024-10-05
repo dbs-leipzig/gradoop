@@ -20,17 +20,14 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * A filter function used to select super vertices from the set of vertex-tuples.
- * Super-vertices are identified by them having the same ID and super ID.
+ * A filter function accepting all edges that were not marked for retention.
  *
- * @param <T> The type of the vertex-tuples.
+ * @param <T> The edge tuple type.
  */
-public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
+public class FilterEdgesToGroup<T extends Tuple> implements FilterFunction<T> {
 
   @Override
-  public boolean filter(T t) throws Exception {
-    final GradoopId id = t.getField(GroupingConstants.VERTEX_TUPLE_ID);
-    final GradoopId superId = t.getField(GroupingConstants.VERTEX_TUPLE_SUPERID);
-    return id.equals(superId);
+  public boolean filter(T tuple) {
+    return tuple.getField(GroupingConstants.EDGE_TUPLE_ID).equals(GradoopId.NULL_VALUE);
   }
 }

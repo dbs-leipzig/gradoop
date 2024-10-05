@@ -117,6 +117,39 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
   }
 
   /**
+   * Tests correct retention of a vertex with a null property.
+   *
+   * @throws Exception if collecting result values fails
+   */
+  @Test
+  public void testRetentionNullProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: NULL})" + // group
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {a: NULL, count: 1L})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(getStrategy())
+      .retainVerticesWithoutGroup()
+      .useVertexLabel(true)
+      .addVertexGroupingKey("a")
+      .addVertexAggregateFunction(new Count())
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct retention of a vertex with multiple properties.
    *
@@ -898,6 +931,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
    * - a vertex with a matching label, no properties: retain
    * - a vertex with a matching label, one matching property: retain
    * - two vertices with matching labels, two matching properties: group
+   * - two vertices with matching labels, two matching null properties: group
    *
    * @throws Exception if collecting result values fails
    */
@@ -913,6 +947,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       "(v6:A {})" +
       "(v7:A {a : 1})" +
       "(v8:A {a : 1, b : 2})" +
+      "(v9:A {a : NULL, b : NULL})" +
       "]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
@@ -928,6 +963,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
         "(v06:A {})" +
         "(v07:A {a : 1})" +
         "(v08:A {a : 1, b : 2, count: 1L})" +
+        "(v09:A {a : NULL, b : NULL, count: 1L})" +
         "]");
 
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -1048,5 +1084,31 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
+   * Test if edges are properly updated when the source or target vertex was retained.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testEdgeUpdateWithRetainedSourceOrTarget() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(retained:Retained {otherprop: 1L})-[e:edge]->(notretained:NotRetained {prop: 1L, otherprop: 1L})" +
+      "-[:otherEdge {otherprop: 1L}]->(:NotRetained2 {prop:1L, otherprop: 2L})-[e2:edge2]->" +
+      "(retained2:RetainedTarget {otherprop: 2L})" +
+      "] expected [" +
+      "(retained)-->(resv {prop: 1L})-->(resv)-->(retained2)" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(getStrategy())
+      .retainVerticesWithoutGroup()
+      .useVertexLabel(false)
+      .addVertexGroupingKey("prop")
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
+      .execute(input);
+
+    collectAndAssertTrue(output.equalsByData(loader.getLogicalGraphByVariable("expected")));
   }
 }
