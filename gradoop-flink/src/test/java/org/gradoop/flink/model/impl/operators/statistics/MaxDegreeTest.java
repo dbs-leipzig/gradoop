@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.AverageIncomingDegree;
-import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test-class for average incoming degree computation.
+ * Integration test class of {@link MaxDegree}.
  */
-public class AverageIncomingDegreeTest extends GradoopFlinkTestBase {
+public class MaxDegreeTest extends GradoopFlinkTestBase {
 
   /**
-   * Tests the computation of the average incoming degree for a logical graph
+   * Tests the computation of the maximum degree of a logical graph.
    *
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testAverageIncomingDegree() throws Exception {
+  public void testMaxDegree() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    long averageIncomingDegree = graph.callForGraph(new AverageIncomingDegree())
+    long maxDegree = graph.callForGraph(new MaxDegree())
       .getGraphHead()
       .collect()
       .get(0)
-      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_INCOMING_DEGREE).getLong();
+      .getPropertyValue(MaxDegree.PROPERTY_MAX_DEGREE).getLong();
 
-    // average incoming degree for social network graph should be (24 / 11) = 2.1818... -> 3
-    assertEquals("Computed average incoming degree is incorrect", 3L, averageIncomingDegree);
+    assertEquals(6L, maxDegree);
   }
 }

@@ -13,37 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.AverageOutgoingDegree;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test-class for average outgoing degree computation.
+ * Test-class for average incoming degree computation.
  */
-public class AverageOutgoingDegreeTest extends GradoopFlinkTestBase {
+public class AverageIncomingDegreeTest extends GradoopFlinkTestBase {
 
   /**
-   * Tests the computation of the average outgoing degree for a logical graph
+   * Tests the computation of the average incoming degree for a logical graph
    *
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testAverageOutgoingDegree() throws Exception {
+  public void testAverageIncomingDegree() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    long averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
+    long averageIncomingDegree = graph.callForGraph(new AverageIncomingDegree())
       .getGraphHead()
       .collect()
       .get(0)
-      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE).getLong();
+      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_INCOMING_DEGREE).getLong();
 
-    // average outgoing degree for social network graph should be (24 / 11) = 2.1818... -> 3
-    assertEquals("Computed average outgoing degree is incorrect", 3L, averageOutgoingDegree);
+    // average incoming degree for social network graph should be (24 / 11) = 2.1818... -> 3
+    assertEquals("Computed average incoming degree is incorrect", 3L, averageIncomingDegree);
   }
 }

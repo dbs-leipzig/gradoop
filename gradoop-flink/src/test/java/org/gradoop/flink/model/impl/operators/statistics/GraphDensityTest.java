@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.GraphDensity;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -46,6 +46,6 @@ public class GraphDensityTest extends GradoopFlinkTestBase {
     // density should not be 0
     assertTrue("Graph density is 0", density > 0.);
     // density for social network graph should be (24 / 11 * 10) = 0.21818...
-    assertTrue("Computed graph density is incorrect", density == (24d / 110d));
+    assertEquals("Computed graph density is incorrect", 24d / 110d, density, 0.0);
   }
 }
