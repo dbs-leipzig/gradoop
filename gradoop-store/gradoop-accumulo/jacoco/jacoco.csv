@@ -10,8 +10,8 @@ Gradoop Accumulo,org.gradoop.storage.accumulo.impl.iterator.tserver,GradoopEdgeI
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl.constants,AccumuloTables,3,0,0,0,1,0,1,0,1,0
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl.constants,AccumuloTables.KEY,3,0,0,0,1,0,1,0,1,0
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl.constants,AccumuloDefault,3,3,0,0,1,1,1,1,1,1
-Gradoop Accumulo,org.gradoop.storage.accumulo.utils,AccumuloFilters,3,29,0,0,1,5,1,5,1,5
 Gradoop Accumulo,org.gradoop.storage.accumulo.utils,KryoUtils,3,92,0,0,1,20,1,4,1,4
+Gradoop Accumulo,org.gradoop.storage.accumulo.utils,AccumuloFilters,3,29,0,0,1,5,1,5,1,5
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl.iterator.client,ClientClosableIterator,3,81,1,7,2,23,1,7,0,4
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl,AccumuloEPGMStore,76,596,9,49,22,140,9,45,0,25
 Gradoop Accumulo,org.gradoop.storage.accumulo.impl.io,AccumuloDataSink,17,43,1,1,5,12,3,3,2,3
