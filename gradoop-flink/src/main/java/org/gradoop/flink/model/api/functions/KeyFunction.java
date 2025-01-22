@@ -54,4 +54,16 @@ public interface KeyFunction<E, K> extends Serializable {
    * @return The key type.
    */
   TypeInformation<K> getType();
+
+  /**
+   * The element will not be grouped, if this returns true for all key functions and
+   * {@link org.gradoop.flink.model.impl.operators.keyedgrouping.KeyedGrouping#setRetainUngroupedVertices(boolean)}
+   * is set to true.
+   *
+   * @param element element to test
+   * @return true, if element should not be grouped
+   */
+  default boolean retainElement(E element) {
+    return false;
+  }
 }

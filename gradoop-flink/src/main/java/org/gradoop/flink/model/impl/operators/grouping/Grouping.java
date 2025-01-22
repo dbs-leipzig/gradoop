@@ -779,13 +779,10 @@ public abstract class Grouping<
           retainVerticesWithoutGroup);
         break;
       case GROUP_WITH_KEYFUNCTIONS:
-        if (retainVerticesWithoutGroup) {
-          throw new UnsupportedOperationException("Retaining vertices without group is not yet supported" +
-            " with this strategy.");
-        }
-        groupingOperator = KeyedGroupingUtils.createInstance(
+        groupingOperator = KeyedGroupingUtils.<G, V, E, LG, GC>createInstance(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
-          globalVertexAggregateFunctions, globalEdgeAggregateFunctions);
+          globalVertexAggregateFunctions, globalEdgeAggregateFunctions)
+          .setRetainUngroupedVertices(retainVerticesWithoutGroup);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

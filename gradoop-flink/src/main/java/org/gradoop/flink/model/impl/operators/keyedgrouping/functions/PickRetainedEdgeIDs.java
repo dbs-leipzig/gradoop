@@ -15,22 +15,23 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * A filter function used to select super vertices from the set of vertex-tuples.
- * Super-vertices are identified by them having the same ID and super ID.
+ * Picks the ID from a tuple if that ID is not {@link GradoopId#NULL_VALUE}.
  *
- * @param <T> The type of the vertex-tuples.
+ * @param <T> The input tuple type.
  */
-public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
+public class PickRetainedEdgeIDs<T extends Tuple> implements FlatMapFunction<T, GradoopId> {
 
   @Override
-  public boolean filter(T t) throws Exception {
-    final GradoopId id = t.getField(GroupingConstants.VERTEX_TUPLE_ID);
-    final GradoopId superId = t.getField(GroupingConstants.VERTEX_TUPLE_SUPERID);
-    return id.equals(superId);
+  public void flatMap(T tuple, Collector<GradoopId> collector) {
+    final GradoopId id = tuple.getField(GroupingConstants.EDGE_TUPLE_ID);
+    if (!id.equals(GradoopId.NULL_VALUE)) {
+      collector.collect(id);
+    }
   }
 }

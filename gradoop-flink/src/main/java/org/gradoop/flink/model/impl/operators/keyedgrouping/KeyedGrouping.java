@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.keyedgrouping;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,16 +28,24 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.KeyFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.filters.Not;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperEdgeFromTuple;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildSuperVertexFromTuple;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromEdges;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromEdgesWithId;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.BuildTuplesFromVertices;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.CreateElementMappingToSelf;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.FilterEdgesToGroup;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.GroupingConstants;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.PickRetainedEdgeIDs;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceEdgeTuples;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.ReduceVertexTuples;
 import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdField;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.functions.UpdateIdFieldAndMarkTuple;
+import org.gradoop.flink.model.impl.operators.keyedgrouping.labelspecific.WithAllKeysRetained;
 
 import java.util.Collections;
 import java.util.List;
@@ -94,6 +103,11 @@ public class KeyedGrouping<
   private boolean useGroupCombine = true;
 
   /**
+   * Should vertices without groups be retained in the result as is.
+   */
+  private boolean retainUngroupedVertices = false;
+
+  /**
    * Instantiate this grouping function.
    *
    * @param vertexGroupingKeys       The vertex grouping keys.
@@ -123,33 +137,63 @@ public class KeyedGrouping<
   @Override
   public LG execute(LG graph) {
     /* First we create tuple representations of each vertex.
+       If retention of ungrouped vertices is enabled, we filter out retained vertices prior to this step.
        Those tuples will then be grouped by the respective key fields (the fields containing the values
        extracted by the key functions) and reduced to assign a super vertex and to calculate aggregates. */
-    DataSet<Tuple> verticesWithSuperVertex = graph.getVertices()
+    DataSet<V> vertices = graph.getVertices();
+    DataSet<V> ungrouped = vertices;
+    if (retainUngroupedVertices) {
+      final FilterFunction<V> retentionSelector = new WithAllKeysRetained<>(vertexGroupingKeys);
+      ungrouped = ungrouped.filter(retentionSelector);
+      vertices = vertices.filter(new Not<>(retentionSelector));
+    }
+
+    /* Group vertices and create super-vertices. Do not yet remove the input vertices. */
+    DataSet<Tuple> verticesWithSuperVertex = vertices
       .map(new BuildTuplesFromVertices<>(vertexGroupingKeys, vertexAggregateFunctions))
       .groupBy(getInternalVertexGroupingKeys())
       .reduceGroup(new ReduceVertexTuples<>(
         GroupingConstants.VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size(), vertexAggregateFunctions));
+
     /* Extract a mapping from vertex-ID to super-vertex-ID from the result of the vertex-reduce step. */
     DataSet<Tuple2<GradoopId, GradoopId>> idToSuperId = verticesWithSuperVertex
       .filter(new Not<>(new FilterSuperVertices<>()))
       .project(GroupingConstants.VERTEX_TUPLE_ID, GroupingConstants.VERTEX_TUPLE_SUPERID);
+    if (retainUngroupedVertices) {
+      /* Retained vertices will be mapped to themselves, instead of a super-vertex. */
+      idToSuperId = idToSuperId.union(ungrouped.map(new CreateElementMappingToSelf<>()));
+    }
 
+    final int edgeOffset = retainUngroupedVertices ?
+      GroupingConstants.EDGE_RETENTION_OFFSET : GroupingConstants.EDGE_DEFAULT_OFFSET;
     /* Create tuple representations of each edge and update the source- and target-ids of those tuples with
-       with the mapping extracted in the previous step. Edges will then point from and to super-vertices. */
+       with the mapping extracted in the previous step. Edges will then point from and to super-vertices.
+       When retention of ungrouped vertices is enabled, we keep track of edge IDs to pick those that point
+       to and from retained vertices later. The ID is stored at the beginning of the tuple, we therefore
+       add some additional offset for these operations. */
     DataSet<Tuple> edgesWithUpdatedIds = graph.getEdges()
-      .map(new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
+      .map(retainUngroupedVertices ?
+        new BuildTuplesFromEdgesWithId<>(edgeGroupingKeys, edgeAggregateFunctions) :
+        new BuildTuplesFromEdges<>(edgeGroupingKeys, edgeAggregateFunctions))
       .join(idToSuperId)
-      .where(GroupingConstants.EDGE_TUPLE_SOURCEID)
+      .where(GroupingConstants.EDGE_TUPLE_SOURCEID + edgeOffset)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_SOURCEID))
+      .with(retainUngroupedVertices ?
+        new UpdateIdFieldAndMarkTuple<>(GroupingConstants.EDGE_TUPLE_SOURCEID) :
+        new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_SOURCEID))
       .join(idToSuperId)
-      .where(GroupingConstants.EDGE_TUPLE_TARGETID)
+      .where(GroupingConstants.EDGE_TUPLE_TARGETID + edgeOffset)
       .equalTo(GroupingConstants.VERTEX_TUPLE_ID)
-      .with(new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_TARGETID));
+      .with(retainUngroupedVertices ?
+        new UpdateIdFieldAndMarkTuple<>(GroupingConstants.EDGE_TUPLE_TARGETID) :
+        new UpdateIdField<>(GroupingConstants.EDGE_TUPLE_TARGETID));
 
-    /* Group the edge-tuples by the key fields and vertex IDs and reduce them to single elements. */
-    DataSet<Tuple> superEdgeTuples = edgesWithUpdatedIds
+    /* Group the edge-tuples by the key fields and vertex IDs and reduce them to single elements.
+       When retention of ungrouped vertices is enabled, we have to filter out edges marked for retention
+       before the grouping step and then project to remove the additional ID field. */
+    DataSet<Tuple> superEdgeTuples = (retainUngroupedVertices ? edgesWithUpdatedIds
+      .filter(new FilterEdgesToGroup<>())
+      .project(getInternalEdgeProjectionIndices()) : edgesWithUpdatedIds)
       .groupBy(getInternalEdgeGroupingKeys())
       .reduceGroup(new ReduceEdgeTuples<>(
         GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size(), edgeAggregateFunctions))
@@ -166,6 +210,18 @@ public class KeyedGrouping<
     DataSet<E> superEdges = superEdgeTuples
       .map(new BuildSuperEdgeFromTuple<>(edgeGroupingKeys, edgeAggregateFunctions,
         graph.getFactory().getEdgeFactory()));
+
+    if (retainUngroupedVertices) {
+      /* We have to add the previously filtered vertices back. */
+      superVertices = superVertices.union(ungrouped);
+      /* We have to select the retained edges and add them back. */
+      DataSet<GradoopId> retainedEdgeIds = edgesWithUpdatedIds.flatMap(new PickRetainedEdgeIDs<>());
+      DataSet<E> retainedEdges = graph.getEdges().join(retainedEdgeIds)
+        .where(new Id<>())
+        .equalTo("*")
+        .with(new LeftSide<>());
+      superEdges = superEdges.union(retainedEdges);
+    }
 
     return graph.getFactory().fromDataSets(superVertices, superEdges);
   }
@@ -191,6 +247,20 @@ public class KeyedGrouping<
   }
 
   /**
+   * Get the indices to which edge tuples should be projected to remove the additional and at this stage
+   * no longer required {@link GroupingConstants#EDGE_TUPLE_ID} field. This will effectively return all
+   * the indices of all fields, except for that ID field.<p>
+   * This is only needed when {@link #retainUngroupedVertices} is enabled.
+   *
+   * @return The edge tuple indices.
+   */
+  private int[] getInternalEdgeProjectionIndices() {
+    return IntStream.range(GroupingConstants.EDGE_RETENTION_OFFSET, GroupingConstants.EDGE_RETENTION_OFFSET +
+      GroupingConstants.EDGE_TUPLE_RESERVED + edgeGroupingKeys.size() + edgeAggregateFunctions.size())
+      .toArray();
+  }
+
+  /**
    * Enable or disable an optional combine step before the reduce step.
    * Note that this currently only affects the edge reduce step.
    * <p>
@@ -201,6 +271,27 @@ public class KeyedGrouping<
    */
   public KeyedGrouping<G, V, E, LG, GC> setUseGroupCombine(boolean useGroupCombine) {
     this.useGroupCombine = useGroupCombine;
+    return this;
+  }
+
+  /**
+   * Enable or disable vertex retention.
+   * Vertices will be retained, if all key functions return true for
+   * {@link KeyFunction#retainElement(Object)}.
+   * For example {@code KeyFunctionWithDefaultValue} returns true,
+   * if the extracted key equals the default key.
+   * <p>
+   * Retained vertices will not be grouped and returned without modifications.
+   * Edges between retained vertices will not be grouped and returned without modifications.
+   * Edges between retained vertices and grouped vertices will be grouped.
+   * <p>
+   * This is disabled per default.
+   *
+   * @param retainVertices Should vertices be retained?
+   * @return This operator.
+   */
+  public KeyedGrouping<G, V, E, LG, GC> setRetainUngroupedVertices(boolean retainVertices) {
+    this.retainUngroupedVertices = retainVertices;
     return this;
   }
 }
