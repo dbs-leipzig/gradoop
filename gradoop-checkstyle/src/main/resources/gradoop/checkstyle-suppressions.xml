@@ -17,6 +17,9 @@
   <suppress checks="IllegalCatch"
             files="PrintTableSink"
             lines="90-100"/>
+  <suppress checks="IllegalCatch"
+            files="TemporalGellyAlgorithm.java"
+            lines="85-90"/>
   <suppress checks="IllegalImport"
             files="Bytes.java"
             lines="20"/>

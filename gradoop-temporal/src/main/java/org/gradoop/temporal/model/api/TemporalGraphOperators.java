@@ -15,6 +15,7 @@
  */
 package org.gradoop.temporal.model.api;
 
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.KeyFunction;
@@ -36,6 +37,7 @@ import org.gradoop.temporal.model.impl.operators.aggregation.functions.MaxVertex
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinEdgeTime;
 import org.gradoop.temporal.model.impl.operators.aggregation.functions.MinVertexTime;
 import org.gradoop.temporal.model.impl.operators.diff.Diff;
+import org.gradoop.temporal.model.impl.operators.gelly.earliestArrival.SingleSourceEarliestArrival;
 import org.gradoop.temporal.model.impl.operators.matching.common.query.postprocessing.CNFPostProcessing;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.TemporalGraphStatistics;
 import org.gradoop.temporal.model.impl.operators.matching.common.statistics.dummy.DummyTemporalGraphStatistics;
@@ -404,6 +406,24 @@ public interface TemporalGraphOperators extends BaseGraphOperators<TemporalGraph
 
     return callForGraph(new KeyedGrouping<>(vertexGroupingKeys, tempVertexAgg, edgeGroupingKeys,
       tempEdgeAgg));
+  }
+
+  /**
+   * determines the single source earliest arrival time to all nodes starting from a start node
+   *
+   * @param srcID           Gradoop ID of the source vertex
+   * @param maxIterations   maximum number of iterations
+   * @param vertexProperty  vertex property to store SSEA time
+   * @param interval        edge valid time is interval (true) or timestamp (false)
+   * @param starttime       start time on source vertex
+   * @param overlap         valid time can overlap (true) or not (false)
+   * @return Graph with the earliest arrival times
+   */
+  default TemporalGraph singleSourceEarliestArrival(
+          GradoopId srcID, int maxIterations, String vertexProperty, boolean interval, Long starttime,
+          boolean overlap) {
+    return callForGraph(new SingleSourceEarliestArrival<>(
+            srcID, maxIterations, vertexProperty, interval, starttime, overlap));
   }
 
   //----------------------------------------------------------------------------
