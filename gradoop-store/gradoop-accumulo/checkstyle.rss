@@ -158,7 +158,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StorePropPredicateTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreIdsPredicateTest.java</a>
                 </td>
                 <td>
                   0
@@ -172,7 +172,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreIdsPredicateTest.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StorePropPredicateTest.java</a>
                 </td>
                 <td>
                   0
