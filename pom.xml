@@ -162,7 +162,7 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.10.1</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.commons-lang.version>3.11</dep.commons-lang.version>
+        <dep.commons-lang.version>3.18.0</dep.commons-lang.version>
         <dep.flink.version>1.9.3</dep.flink.version>
         <dep.gradoop.gdl.version>0.5.2</dep.gradoop.gdl.version>
         <dep.guava.version>14.0</dep.guava.version>
