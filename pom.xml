@@ -175,7 +175,7 @@
         <dep.flink-shaded.version>2.6.5-9.0</dep.flink-shaded.version>
         <dep.protoc.version>3.0.0</dep.protoc.version>
         <dep.parquet.version>1.12.0</dep.parquet.version>
-        <dep.log4j.version>2.17.1</dep.log4j.version>
+        <dep.log4j.version>2.25.3</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
         <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
         <dep.testng.version>7.5.1</dep.testng.version>
